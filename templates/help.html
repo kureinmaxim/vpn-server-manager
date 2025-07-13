@@ -350,6 +350,149 @@
             </div>
 
             <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_icons">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_icons" aria-expanded="false" aria-controls="collapse_icons">
+                        <i class="bi bi-image me-2"></i> Создание и настройка иконок приложения
+                    </button>
+                </h2>
+                <div id="collapse_icons" class="accordion-collapse collapse" aria-labelledby="heading_icons" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>Приложение поддерживает кастомные иконки для каждой операционной системы. Это позволяет создать единый визуальный стиль на всех платформах.</p>
+                        
+                        <h5>Требования к исходной иконке</h5>
+                        <div class="alert alert-info">
+                            <strong>Рекомендуется:</strong> Используйте PNG файл размером <strong>1024x1024 пикселей</strong> с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, включая Retina-дисплеи.
+                        </div>
+                        <ul>
+                            <li><strong>Формат:</strong> PNG с альфа-каналом (прозрачность)</li>
+                            <li><strong>Размер:</strong> 1024x1024 пикселей (квадрат)</li>
+                            <li><strong>Цветовая модель:</strong> RGB</li>
+                            <li><strong>Расположение:</strong> <code>static/images/icon.png</code></li>
+                        </ul>
+
+                        <h5>Автоматическое создание иконок</h5>
+                        <p>При использовании скриптов сборки (<code>build_macos.py</code> или <code>build_windows.py</code>) иконки создаются автоматически из исходного PNG файла:</p>
+                        <ul>
+                            <li><strong>macOS:</strong> Создается файл <code>static/images/icon.icns</code> со всеми необходимыми размерами</li>
+                            <li><strong>Windows:</strong> Создается файл <code>static/favicon.ico</code> с множественными размерами</li>
+                        </ul>
+
+                        <h5>Ручное создание иконок</h5>
+                        <p>Если вы хотите создать иконки вручную или скрипты сборки не работают:</p>
+                        
+                        <h6>Для macOS (.icns)</h6>
+                        <p>Создайте временную папку и нарежьте иконку на нужные размеры:</p>
+                        <pre><code class="language-bash"># Создайте временную папку
+mkdir -p static/images/tmp.iconset
+
+# Создайте иконки разных размеров
+sips -z 16 16 static/images/icon.png --out static/images/tmp.iconset/icon_16x16.png
+sips -z 32 32 static/images/icon.png --out static/images/tmp.iconset/icon_16x16@2x.png
+sips -z 32 32 static/images/icon.png --out static/images/tmp.iconset/icon_32x32.png
+sips -z 64 64 static/images/icon.png --out static/images/tmp.iconset/icon_32x32@2x.png
+sips -z 128 128 static/images/icon.png --out static/images/tmp.iconset/icon_128x128.png
+sips -z 256 256 static/images/icon.png --out static/images/tmp.iconset/icon_128x128@2x.png
+sips -z 256 256 static/images/icon.png --out static/images/tmp.iconset/icon_256x256.png
+sips -z 512 512 static/images/icon.png --out static/images/tmp.iconset/icon_256x256@2x.png
+sips -z 512 512 static/images/icon.png --out static/images/tmp.iconset/icon_512x512.png
+cp static/images/icon.png static/images/tmp.iconset/icon_512x512@2x.png
+
+# Создайте .icns файл
+iconutil -c icns static/images/tmp.iconset
+
+# Переместите результат и очистите временные файлы
+mv static/images/tmp.icns static/images/icon.icns
+rm -rf static/images/tmp.iconset</code></pre>
+
+                        <h6>Для Windows (.ico)</h6>
+                        <p>Используйте Python с библиотекой Pillow для создания .ico файла:</p>
+                        <pre><code class="language-bash"># Установите Pillow, если не установлена
+pip install Pillow
+
+# Создайте .ico файл
+python3 -c "
+from PIL import Image
+import os
+
+if os.path.exists('static/images/icon.png'):
+    img = Image.open('static/images/icon.png')
+    img.save('static/favicon.ico', format='ICO', sizes=[(16,16), (32,32), (48,48), (64,64), (128,128), (256,256)])
+    print('Создан .ico файл: static/favicon.ico')
+else:
+    print('PNG файл не найден: static/images/icon.png')
+"</code></pre>
+
+                        <h5>Замена иконки в уже собранном приложении</h5>
+                        <p>Если вы хотите заменить иконку в уже готовом приложении без пересборки:</p>
+                        
+                        <h6>macOS</h6>
+                        <ol>
+                            <li>Найдите приложение в папке Applications</li>
+                            <li>Кликните правой кнопкой мыши → "Get Info" (Свойства)</li>
+                            <li>Перетащите новую иконку на маленькую иконку в левом верхнем углу окна</li>
+                            <li>Или замените файл <code>YourApp.app/Contents/Resources/icon.icns</code> напрямую</li>
+                        </ol>
+
+                        <h6>Windows</h6>
+                        <ol>
+                            <li>Найдите .exe файл приложения</li>
+                            <li>Кликните правой кнопкой мыши → "Properties" → "Change Icon"</li>
+                            <li>Или используйте специальные утилиты для замены иконок в .exe файлах (например, Resource Hacker)</li>
+                        </ol>
+
+                        <h5>Советы по оптимизации</h5>
+                        <ul>
+                            <li><strong>Простота:</strong> Иконки должны быть читаемы в малых размерах (16x16). Избегайте мелких деталей.</li>
+                            <li><strong>Контраст:</strong> Используйте высокий контраст между элементами иконки и фоном.</li>
+                            <li><strong>Тестирование:</strong> Проверьте как иконка выглядит на разных фонах (светлом/темном).</li>
+                            <li><strong>Формат:</strong> Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую совместимость.</li>
+                        </ul>
+
+                        <div class="alert alert-warning">
+                            <strong>Важно:</strong> После замены иконки может потребоваться перезагрузка системы или очистка кэша иконок, чтобы изменения стали видны в файловом менеджере.
+                        </div>
+
+                        <h5>Устранение проблем с иконками</h5>
+                        <p>Если иконки не отображаются или приложение собирается с дефектными иконками:</p>
+                        
+                        <h6>Проблема: Иконка не отображается в собранном приложении</h6>
+                        <ul>
+                            <li><strong>Проверьте размер файла:</strong> Убедитесь, что <code>static/images/icon.icns</code> имеет размер больше 1KB. Если файл всего несколько байт, он поврежден.</li>
+                            <li><strong>Пересоздайте иконки:</strong> Удалите <code>static/images/icon.icns</code> и <code>static/favicon.ico</code>, затем запустите сборку снова.</li>
+                            <li><strong>Проверьте путь в build_macos.py:</strong> Убедитесь, что путь <code>ICON_FILE</code> правильно указывает на <code>static/images/icon.icns</code></li>
+                        </ul>
+
+                        <h6>Проблема: Ошибка при автоматическом создании иконок</h6>
+                        <ul>
+                            <li><strong>macOS:</strong> Убедитесь, что утилиты <code>sips</code> и <code>iconutil</code> доступны в системе</li>
+                            <li><strong>Windows:</strong> Установите библиотеку Pillow: <code>pip install Pillow</code></li>
+                            <li><strong>Права доступа:</strong> Убедитесь, что у приложения есть права на запись в папку <code>static/images/</code></li>
+                        </ul>
+
+                        <h6>Проблема: Иконка размыта или низкого качества</h6>
+                        <ul>
+                            <li><strong>Увеличьте разрешение исходника:</strong> Используйте PNG размером не менее 1024x1024 пикселей</li>
+                            <li><strong>Проверьте качество PNG:</strong> Убедитесь, что исходный файл не сжат с потерями</li>
+                            <li><strong>Пересоздайте иконки:</strong> Удалите старые иконки и пересоздайте их из нового PNG</li>
+                        </ul>
+
+                        <h6>Диагностика проблем</h6>
+                        <p>Для диагностики проблем с иконками выполните следующие команды:</p>
+                        <pre><code class="language-bash"># Проверьте размер и тип файлов иконок
+ls -la static/images/icon.icns static/favicon.ico
+file static/images/icon.icns static/favicon.ico
+
+# Проверьте исходный PNG
+file static/images/icon.png</code></pre>
+
+                        <div class="alert alert-info">
+                            <strong>Совет:</strong> Если проблемы с иконками повторяются, создайте резервную копию рабочей иконки после успешной сборки. Это поможет быстро восстановить функциональность в случае проблем.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_structure">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_structure" aria-expanded="false" aria-controls="collapse_structure">
                         <i class="bi bi-diagram-3 me-2"></i> Структура проекта и алгоритм работы
