@@ -74,7 +74,8 @@ def update_config_and_get_version():
 def check_and_create_icns():
     if not ICON_FILE.exists():
         print("Иконка .icns не найдена. Попытка создать из PNG...")
-        png_icon = PROJECT_ROOT / 'static' / 'icon.png'
+        # Исправляем путь к PNG иконке - убираем символ "@"
+        png_icon = PROJECT_ROOT / 'static' / 'images' / 'icon.png'
         
         if not png_icon.exists():
             print("PNG иконка тоже не найдена. Будет использована стандартная иконка.")
@@ -82,26 +83,34 @@ def check_and_create_icns():
         
         try:
             # Создаем временную директорию для iconset
-            iconset_dir = PROJECT_ROOT / 'static' / 'tmp.iconset'
+            iconset_dir = PROJECT_ROOT / 'static' / 'images' / 'tmp.iconset'
             iconset_dir.mkdir(exist_ok=True)
             
             # Создаем иконки разных размеров
-            sizes = [16, 32, 64, 128, 256, 512, 1024]
+            sizes = [16, 32, 128, 256, 512]
             for size in sizes:
                 size2x = size * 2
-                # Генерируем обычную и @2x версии
+                # Генерируем обычную версию
                 subprocess.call(['sips', '-z', str(size), str(size), 
                                str(png_icon), '--out', 
                                str(iconset_dir / f"icon_{size}x{size}.png")])
                                 
-                if size < 512:  # Только для размеров до 512
+                # Генерируем @2x версии (кроме 512x512)
+                if size < 512:
                     subprocess.call(['sips', '-z', str(size2x), str(size2x), 
                                    str(png_icon), '--out', 
                                    str(iconset_dir / f"icon_{size}x{size}@2x.png")])
             
-            # Конвертируем iconset в .icns
-            subprocess.call(['iconutil', '-c', 'icns', str(iconset_dir), 
-                           '-o', str(ICON_FILE)])
+            # Для 512x512@2x используем оригинальную иконку 1024x1024
+            shutil.copy(png_icon, iconset_dir / "icon_512x512@2x.png")
+            
+            # Конвертируем iconset в .icns - исправляем команду
+            subprocess.call(['iconutil', '-c', 'icns', str(iconset_dir)])
+            
+            # Перемещаем созданный .icns файл в нужное место
+            created_icns = iconset_dir.parent / f"{iconset_dir.name}.icns"
+            if created_icns.exists():
+                shutil.move(created_icns, ICON_FILE)
             
             # Удаляем временную директорию
             shutil.rmtree(iconset_dir)
@@ -111,6 +120,12 @@ def check_and_create_icns():
         except Exception as e:
             print(f"Ошибка создания .icns: {e}")
             return False
+    
+    # Проверяем размер существующей иконки
+    if ICON_FILE.stat().st_size < 1000:  # Если меньше 1KB, вероятно поврежден
+        print("Существующая .icns иконка слишком мала, пересоздаем...")
+        ICON_FILE.unlink()  # Удаляем поврежденный файл
+        return check_and_create_icns()  # Рекурсивно вызываем функцию
     
     return True
 
