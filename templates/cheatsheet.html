@@ -1,0 +1,345 @@
+{% extends "layout.html" %}
+
+{% block title %}Шпаргалка по командам{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)</h1>
+    <p class="lead">Этот раздел объединяет наиболее полезные команды для быстрой оценки состояния сервера.</p>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Быстрая сводка</h5>
+        </div>
+        <div class="card-body">
+            <div class="position-relative">
+                <pre><code class="language-bash">echo "=== Система ===" && cat /etc/os-release | head -2 && \
+echo "=== Процессор ===" && cat /proc/cpuinfo | grep "model name" | head -1 && \
+echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
+                <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                    <i class="bi bi-clipboard"></i> Копировать
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Установленное ПО</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Показать все установленные пакеты:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">dpkg -l | grep ii | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Найти конкретный пакет</strong> (замените `nginx`):</p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">dpkg -l | grep nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Показать файлы, установленные пакетом</strong> (замените `nginx`):</p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">dpkg -L nginx | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Ключевые утилиты</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Информация о ядре и системе</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">uname -a</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Информация о процессоре</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">lscpu | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Использование оперативной памяти</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">free -h</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Использование дискового пространства</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">df -h</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр сетевых интерфейсов</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">ip a</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр активных сетевых портов</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">ss -tulnp | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Кто сейчас в системе</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">w</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Системный журнал в реальном времени</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">tail -f /var/log/syslog</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Подробнее о `df` (использование дискового пространства)</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Показать тип файловой системы</strong> (например, ext4, xfs)</p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">df -hT</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+             <li class="list-group-item">
+                <p class="mb-1"><strong>Показать итоговую строку с суммой по всем разделам</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">df -h --total</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+                        <i class="bi bi-clipboard"></i> Копировать
+                    </button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Основы безопасности</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Управление файрволом (ufw)</strong></p>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Проверить статус и правила:</small>
+                    <pre><code class="language-bash">sudo ufw status verbose</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Разрешить стандартный порт SSH (22):</small>
+                    <pre><code class="language-bash">sudo ufw allow ssh</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Пример: разрешить нестандартный порт SSH (например, 2222):</small>
+                    <pre><code class="language-bash">sudo ufw allow 2222/tcp</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                 <div class="position-relative my-2">
+                    <small class="text-muted">Пример: разрешить порт для веб-сервера (HTTPS):</small>
+                    <pre><code class="language-bash">sudo ufw allow 443/tcp</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                 <div class="position-relative my-2">
+                    <small class="text-muted">Пример: удалить правило:</small>
+                    <pre><code class="language-bash">sudo ufw delete allow 443/tcp</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверка Fail2Ban</strong></p>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Статус службы Fail2Ban:</small>
+                    <pre><code class="language-bash">sudo systemctl status fail2ban</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Статус защиты SSH и список забаненных IP:</small>
+                    <pre><code class="language-bash">sudo fail2ban-client status sshd</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Разбанить IP-адрес (замените 1.2.3.4):</small>
+                    <pre><code class="language-bash">sudo fail2ban-client set sshd unbanip 1.2.3.4</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Аудит и мониторинг</strong></p>
+                 <div class="position-relative my-2">
+                    <small class="text-muted">Показать последних вошедших пользователей:</small>
+                    <pre><code class="language-bash">last | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+                <div class="position-relative my-2">
+                    <small class="text-muted">Показать неудачные попытки входа (требует root):</small>
+                    <pre><code class="language-bash">sudo lastb | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Управление процессами</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Показать все запущенные процессы</strong></p>
+                <div class="position-relative my-2">
+                    <pre><code class="language-bash">ps aux | cat</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Интерактивный монитор процессов</strong> (htop более удобен, если установлен)</p>
+                <div class="position-relative my-2">
+                    <pre><code class="language-bash">top</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Найти процесс по имени</strong> (замените `nginx`)</p>
+                <div class="position-relative my-2">
+                    <pre><code class="language-bash">ps aux | grep nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Управление службами (systemd)</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                 <p class="mb-1"><strong>Проверить статус службы</strong> (замените `nginx`)</p>
+                 <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Перезапустить службу:</strong></p>
+                 <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Включить автозапуск службы:</strong></p>
+                 <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Выключить автозапуск службы:</strong></p>
+                 <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+        </ul>
+    </div>
+
+     <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Управление пакетами (apt)</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                 <p class="mb-1"><strong>Обновить список пакетов:</strong></p>
+                 <pre><code class="language-bash">sudo apt update</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Обновить установленные пакеты:</strong></p>
+                 <pre><code class="language-bash">sudo apt upgrade</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Установить пакет</strong> (замените `htop`):</p>
+                 <pre><code class="language-bash">sudo apt install htop</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+             <li class="list-group-item">
+                 <p class="mb-1"><strong>Удалить пакет:</strong></p>
+                 <pre><code class="language-bash">sudo apt remove htop</code></pre>
+                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+            </li>
+        </ul>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const copyButtons = document.querySelectorAll('.copy-btn');
+    copyButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const pre = e.currentTarget.closest('.position-relative').querySelector('pre');
+            const code = pre.querySelector('code');
+            const command = code.innerText;
+
+            navigator.clipboard.writeText(command).then(() => {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check-lg"></i> Скопировано!';
+                button.classList.remove('btn-outline-secondary');
+                button.classList.add('btn-success');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHtml;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-secondary');
+                }, 2000);
+            }).catch(err => {
+                console.error('Не удалось скопировать текст: ', err);
+                alert('Ошибка при копировании');
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

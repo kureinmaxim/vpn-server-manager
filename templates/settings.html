@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Управление данными{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Управление данными</h2>
+
+    <!-- Блок для вывода flash-сообщений -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Статус файла данных</h5>
+        </div>
+        <div class="card-body">
+            {% if active_data_file %}
+                <p>
+                    <i class="bi bi-check-circle-fill text-success"></i> 
+                    <strong>Активный файл:</strong> <code>{{ active_data_file }}</code>
+                </p>
+                <p class="text-muted">Все ваши данные о серверах загружаются из этого зашифрованного файла.</p>
+                <a href="{{ url_for('export_data') }}" class="btn btn-primary me-2">
+                    <i class="bi bi-download"></i> Экспортировать данные
+                </a>
+                <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.');">
+                    <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-unlock"></i> Открепить файл
+                    </button>
+                </form>
+            {% else %}
+                <p>
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                    <strong>Файл данных не прикреплен.</strong>
+                </p>
+                <p class="text-muted">Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Импорт файла данных</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.</p>
+            <form action="{{ url_for('import_data') }}" method="post" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="file" class="form-control" name="data_file" id="dataFile" accept=".enc" required>
+                    <button class="btn btn-success" type="submit">
+                        <i class="bi bi-upload"></i> Импортировать и прикрепить
+                    </button>
+                </div>
+                <div class="form-text">
+                    Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 
