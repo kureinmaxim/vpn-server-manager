@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "group": "Ключевые утилиты",
+    "command": "uname -a"
+  },
+  {
+    "id": 2,
+    "group": "Ключевые утилиты",
+    "command": "lscpu | cat"
+  },
+  {
+    "id": 3,
+    "group": "Ключевые утилиты",
+    "command": "free -h"
+  },
+  {
+    "id": 4,
+    "group": "Ключевые утилиты",
+    "command": "df -h"
+  },
+  {
+    "id": 5,
+    "group": "Управление службами",
+    "command": "systemctl status nginx"
+  },
+  {
+    "id": 6,
+    "group": "Управление службами",
+    "command": "systemctl restart nginx"
+  },
+  {
+    "id": 7,
+    "group": "Управление пакетами",
+    "command": "apt update"
+  },
+  {
+    "id": 8,
+    "group": "Управление пакетами",
+    "command": "apt upgrade"
+  },
+  {
+    "id": 9,
+    "group": "Безопасность",
+    "command": "ufw status verbose"
+  },
+  {
+    "id": 10,
+    "group": "Безопасность",
+    "command": "fail2ban-client status sshd"
+  }
+] 

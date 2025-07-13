@@ -1,0 +1,424 @@
+{% extends "layout.html" %}
+
+{% block title %}Справка - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h1 class="mb-4">Справка по использованию</h1>
+        <div class="accordion" id="helpAccordion">
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                        Добавление нового сервера
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        Нажмите кнопку "Добавить сервер" на главной странице. Заполните все необходимые поля. Пароли будут автоматически зашифрованы перед сохранением. Вы также можете прикрепить файл (например, чек об оплате).
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                        Управление паролями и SSH
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p class="alert alert-info">Пароли намеренно не отображаются в открытом виде для безопасности. Чтобы увидеть сохраненный пароль, используйте иконку глаза.</p>
+                        <ul>
+                            <li><strong>Отображение пароля:</strong> На главной странице, рядом со скрытым паролем, нажмите на иконку глаза <i class="bi bi-eye"></i>, чтобы временно его показать.</li>
+                            <li><strong>Копирование данных:</strong> Нажмите на иконку <i class="bi bi-clipboard"></i>, чтобы безопасно скопировать логин, пароль или URL в буфер обмена.</li>
+                            <li><strong>SSH-команда:</strong> Нажмите кнопку <i class="bi bi-terminal"></i> "Копировать SSH", чтобы получить готовую команду для вставки в терминал.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                        Редактирование и удаление
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        Используйте кнопки "Редактировать" и "Удалить" на карточке каждого сервера. При удалении потребуется подтверждение. При редактировании вы можете оставить поле пароля пустым, чтобы не изменять его.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour">
+                        Безопасность и хранение паролей
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Безопасность данных является ключевым аспектом этого приложения. Вот как реализована защита ваших данных:</p>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-success">
+                                <h6><i class="bi bi-shield-check"></i> SSH, Панель, Хостер (Пароли) - Высокий уровень</h6>
+                                <p class="mb-0">Все пароли (для SSH, панели управления и кабинета хостера) хранятся в файле <code>data/servers.json</code> в <strong>зашифрованном виде</strong> с использованием надежного алгоритма. Для шифрования используется секретный ключ из файла <code>.env</code>, который должен храниться в строгой тайне.</p>
+                            </li>
+                             <li class="list-group-item list-group-item-warning">
+                                <h6><i class="bi bi-eye-slash"></i> URL Панелей - Низкий уровень</h6>
+                                <p class="mb-0">URL-адреса панелей управления и кабинетов хостера хранятся в <strong>открытом виде</strong>. Они не шифруются, но на главной странице их пути маскируются для защиты от случайных взглядов.</p>
+                            </li>
+                            <li class="list-group-item list-group-item-info">
+                                <h6><i class="bi bi-unlock"></i> Расшифровка</h6>
+                                <p class="mb-0">Все зашифрованные данные расшифровываются "на лету" только в момент их отображения на странице или при копировании в буфер обмена. В файле они всегда остаются зашифрованными.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive">
+                        Диагностика и проверка IP
+                    </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Приложение включает в себя инструменты для быстрой диагностики сети и серверов.</p>
+                        <ul>
+                            <li><strong>Тест IP и DNS:</strong> Вверху главной страницы находятся кнопки "Тест IP" и "Тест DNS", которые ведут на внешние сервисы `browserleaks.com` и `dnsleaktest.com` для проверки вашего текущего сетевого подключения.</li>
+                            <li><strong>Автоматическая геолокация:</strong> При добавлении или редактировании сервера приложение автоматически определяет его геолокацию (страну и город) по IP-адресу и отображает её в шапке карточки.</li>
+                            <li><strong>Проверка IP сервера:</strong> На каждой карточке есть кнопка <i class="bi bi-search"></i> "Проверить IP". При нажатии на неё открывается всплывающее окно с подробной информацией об IP-адресе сервера от сервиса `ipinfo.io`, включая данные об организации и хостинге.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix">
+                        Индекс пригодности для стриминга
+                    </button>
+                </h2>
+                <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>На карточке каждого сервера есть строка с тремя индикаторами, которые помогают быстро оценить, подходит ли IP-адрес для использования со стриминговыми сервисами, имеющими геолокационные ограничения (например, 9Now, Hulu, BBC iPlayer).</p>
+                        <dl>
+                            <dt><span class="badge bg-success">ISP/Residential</span> / <span class="badge bg-danger">Хостинг</span></dt>
+                            <dd>Это результат <strong>автоматической</strong> проверки. Приложение анализирует, кому принадлежит IP-адрес.
+                                <ul>
+                                    <li><span class="badge bg-success">ISP/Residential</span>: Отлично. IP-адрес "домашний", такие адреса редко блокируются.</li>
+                                    <li><span class="badge bg-danger">Хостинг</span>: Внимание. IP-адрес выдан дата-центром или VPN-провайдером. Вероятность блокировки на стриминговых платформах очень высока.</li>
+                                </ul>
+                            </dd>
+
+                            <dt><span class="badge bg-warning text-dark">DNS ?</span> / <span class="badge bg-success">DNS OK</span></dt>
+                            <dd>Это результат <strong>ручной</strong> проверки, которую вы должны провести самостоятельно. Многие стриминговые сервисы определяют ваше реальное местоположение через DNS-запросы. Если они "утекают" (идут мимо вашего VPN-сервера), сервис поймет, что вы используете VPN.
+                                <ul>
+                                    <li><span class="badge bg-warning text-dark">DNS ?</span>: Статус неизвестен. Проверьте сервер на <a href="https://dnsleaktest.com/" target="_blank">утечки DNS</a>.</li>
+                                    <li><span class="badge bg-success">DNS OK</span>: Вы подтвердили, что утечек нет, установив галочку "DNS-тест пройден" в форме редактирования сервера.</li>
+                                </ul>
+                            </dd>
+
+                            <dt><span class="badge bg-warning text-dark">Стриминг ?</span> / <span class="badge bg-success">Стриминг OK</span></dt>
+                            <dd>Это также <strong>ручная</strong> отметка. Она нужна для подтверждения, что конкретный стриминговый сервис работает через этот сервер.
+                                 <ul>
+                                    <li><span class="badge bg-warning text-dark">Стриминг ?</span>: Статус неизвестен. Вы еще не проверяли работу нужной платформы.</li>
+                                    <li><span class="badge bg-success">Стриминг OK</span>: Вы подтвердили, что сервис работает, установив галочку "Стриминг-тест пройден".</li>
+                                </ul>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven">
+                        Управление данными и шифрование
+                    </button>
+                </h2>
+                <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Вся информация о ваших серверах хранится в одном зашифрованном файле, что обеспечивает как безопасность, так и портативность данных.</p>
+                        
+                        <h5>Как это работает?</h5>
+                        <p>
+                            Все данные о серверах, которые вы вводите, собираются вместе и преобразуются в единый текстовый блок (в формате JSON). Затем этот блок полностью шифруется и сохраняется в файл с расширением <code>.enc</code>.
+                        </p>
+                        <p>
+                            Можно представить это как подробный чертеж (ваши данные), который разрезали на тысячи мельчайших кусочков и сложили в коробку (файл <code>.enc</code>). Без точной инструкции по сборке (ключа шифрования <code>SECRET_KEY</code>) никто не сможет восстановить исходный чертеж.
+                        </p>
+
+                        <h5>Импорт и Экспорт</h5>
+                        <p>На странице <strong>"Настройки"</strong> вы можете:</p>
+                        <ul>
+                            <li><strong>Экспортировать данные:</strong> Скачать текущий зашифрованный файл (<code>.enc</code>). Это полезно для создания резервных копий или переноса данных на другое устройство.</li>
+                            <li><strong>Импортировать и прикрепить:</strong> Загрузить ранее экспортированный файл. Приложение начнет работать с ним, и все ваши серверы появятся в списке.</li>
+                            <li><strong>Открепить файл:</strong> Прекратить работу с текущим файлом. Список серверов станет пустым, как при первой установке. Сам файл при этом не удаляется.</li>
+                        </ul>
+
+                        <h5>Алгоритм шифрования Fernet</h5>
+                        <p>
+                            Для защиты ваших данных используется <strong>Fernet</strong> — это высокоуровневая система симметричного (с секретным ключом) шифрования из библиотеки <code>cryptography</code>.
+                        </p>
+                        <p>Ключевые особенности Fernet:</p>
+                        <ul>
+                            <li><strong>Гарантия подлинности:</strong> Fernet гарантирует, что зашифрованные данные не были изменены или подделаны. Если кто-то попытается изменить хоть один символ в <code>.enc</code> файле, он не сможет быть расшифрован.</li>
+                            <li><strong>Надежные алгоритмы:</strong> "Под капотом" Fernet использует стандартные и проверенные временем криптографические алгоритмы: <strong>AES-128</strong> в режиме CBC для шифрования и <strong>HMAC</strong> с SHA256 для аутентификации (проверки подлинности).</li>
+                        </ul>
+                        <div class="alert alert-info">
+                            <strong>Важно:</strong> Вся безопасность системы зависит от секретности вашего ключа <code>SECRET_KEY</code> в файле <code>.env</code>. Никогда и никому его не передавайте.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_secret_key">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_secret_key" aria-expanded="false" aria-controls="collapse_secret_key">
+                        <i class="bi bi-key-fill me-2"></i> Что такое SECRET_KEY и где его взять?
+                    </button>
+                </h2>
+                <div id="collapse_secret_key" class="accordion-collapse collapse" aria-labelledby="heading_secret_key" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p><code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных в приложении. Он абсолютно необходим для работы.</p>
+                        <ul>
+                            <li><strong>Где находится:</strong> Ключ хранится в файле <code>.env</code> в корневой папке приложения.</li>
+                            <li><strong>Как сгенерировать:</strong> Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого можно использовать Python:
+                                <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
+                            </li>
+                            <li>Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:
+                                <pre><code class="language-bash">SECRET_KEY=ваш_сгенерированный_ключ</code></pre>
+                            </li>
+                            <li><strong>ВАЖНО:</strong> Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_transfer">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_transfer" aria-expanded="false" aria-controls="collapse_transfer">
+                        <i class="bi bi-folder-symlink me-2"></i> Структура и перенос приложения на другой компьютер?
+                    </button>
+                </h2>
+                <div id="collapse_transfer" class="accordion-collapse collapse" aria-labelledby="heading_transfer" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>Перенос приложения со всеми серверами, чеками и настройками требует копирования нескольких ключевых файлов и папок.</p>
+                        
+                        <div class="alert alert-info">
+                            <strong>Важно:</strong> Эта инструкция предназначена для текущей "портативной" версии приложения. В будущем, для версий, установленных через инсталлятор (Windows, macOS), будет предусмотрен специальный механизм экспорта и импорта.
+                        </div>
+
+                        <h5>Шаг 1: Что нужно скопировать</h5>
+                        <p>Для полного переноса вам нужно скопировать <strong>3 ключевых элемента</strong> из папки проекта:</p>
+                        <ol>
+                            <li><strong>Файл <code>.env</code></strong> — самый важный файл! В нем содержится ваш уникальный <code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все данные будут утеряны.</strong></li>
+                            <li><strong>Папка <code>/data/</code></strong> — здесь хранится основной файл <code>servers.json.enc</code> со всей информацией о ваших серверах.</li>
+                            <li><strong>Папка <code>/uploads/</code></strong> — здесь лежат все загруженные вами файлы: иконки серверов и чеки об оплате.</li>
+                        </ol>
+
+                        <h5>Шаг 2: Процесс переноса</h5>
+                         <ol>
+                            <li>На старом компьютере создайте архив всей папки с приложением (например, <code>VPNserverManage.zip</code>). Это самый надежный способ ничего не забыть.</li>
+                            <li>Перенесите этот архив на новый компьютер и распакуйте его.</li>
+                            <li>На новом компьютере выполните стандартную настройку:
+                                <ul>
+                                    <li>Создайте и активируйте виртуальное окружение.</li>
+                                    <li>Установите зависимости командой <code>pip install -r requirements.txt</code>.</li>
+                                </ul>
+                            </li>
+                            <li>Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на месте.</li>
+                        </ol>
+                        
+                        <h5 class="mt-4">Структура файлов проекта (для разработчиков)</h5>
+                        <p>Для понимания, где что лежит:</p>
+                        <ul>
+                            <li><code>app.py</code>: Основной файл приложения.</li>
+                            <li><code>decrypt_tool.py</code>: Утилита для полной расшифровки данных.</li>
+                            <li><code>build_macos.py</code>, <code>build_windows.py</code>: Скрипты для сборки приложения.</li>
+                            <li><code>requirements.txt</code>: Список зависимостей Python.</li>
+                            <li><code>.env</code>: <strong>Ваш секретный ключ!</strong></li>
+                            <li><code>/data/</code>: Здесь хранятся зашифрованные данные серверов (<code>servers.json.enc</code>).</li>
+                            <li><code>/uploads/</code>: Загруженные файлы (чеки, иконки).</li>
+                            <li><code>/templates/</code>: HTML-шаблоны страниц.</li>
+                            <li><code>/static/</code>: Статические файлы (CSS, изображения, иконки <code>.png</code> и <code>.icns</code>).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_decrypt_tool">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_decrypt_tool" aria-expanded="false" aria-controls="collapse_decrypt_tool">
+                        <i class="bi bi-unlock-fill me-2"></i> Как посмотреть все пароли сразу (расшифровка)?
+                    </button>
+                </h2>
+                <div id="collapse_decrypt_tool" class="accordion-collapse collapse" aria-labelledby="heading_decrypt_tool" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>
+                            Хотя приложение позволяет просматривать пароли по одному через интерфейс, может возникнуть ситуация, когда вам нужно получить доступ ко всем данным сразу в читаемом виде. Например, для резервного копирования в текстовый файл или для переноса в другую систему.
+                        </p>
+                        <p>
+                            Для этой цели в корневой папке проекта существует специальный инструмент — <code>decrypt_tool.py</code>.
+                        </p>
+                        
+                        <h5>Что он делает?</h5>
+                        <p>
+                            Этот скрипт использует ваш ключ <code>SECRET_KEY</code> из файла <code>.env</code> для полной расшифровки файла с данными <code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную структуру и расшифровывает все учетные данные: <strong>SSH, панель управления и кабинет хостера</strong>, после чего выводит все в терминал в структурированном виде.
+                        </p>
+
+                        <h5>Как использовать?</h5>
+                        <p>
+                            Вам нужно выполнить одну команду в терминале, находясь в корневой папке проекта:
+                        </p>
+                        <pre><code class="language-bash">source venv/bin/activate && python3 decrypt_tool.py</code></pre>
+                        <p>Эта команда сначала активирует необходимое виртуальное окружение, а затем запускает скрипт для расшифровки.</p>
+                        
+                        <div class="alert alert-warning">
+                            <strong>Внимание:</strong> Выводимые данные (включая все пароли) будут видны в вашем терминале. Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет увидеть ваш экран.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_macos">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_macos" aria-expanded="false" aria-controls="collapse_macos">
+                        <i class="bi bi-apple me-2"></i> Особенности работы на macOS
+                    </button>
+                </h2>
+                <div id="collapse_macos" class="accordion-collapse collapse" aria-labelledby="heading_macos" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>В установленной версии приложения для macOS данные хранятся в пользовательской директории для соответствия стандартам безопасности Apple.</p>
+                        
+                        <h5>Расположение данных</h5>
+                        <p>Все данные приложения (файл <code>servers.json.enc</code>, конфигурация, загруженные чеки и иконки) находятся по пути:</p>
+                        <p><code>~/Library/Application Support/VPNServerManager/</code></p>
+                        <small class="text-muted">Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт «Library». В открывшейся папке далее перейдите в «Application Support», а затем в «VPNServerManager».</small>
+                    
+                        <h5 class="mt-4">Версия для разработки</h5>
+                        <p>Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_windows">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_windows" aria-expanded="false" aria-controls="collapse_windows">
+                        <i class="bi bi-windows me-2"></i> Особенности работы на Windows
+                    </button>
+                </h2>
+                <div id="collapse_windows" class="accordion-collapse collapse" aria-labelledby="heading_windows" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>В установленной версии приложения для Windows (<code>.exe</code>) данные хранятся в системной папке <code>AppData</code>, как и у большинства стандартных приложений.</p>
+                        
+                        <h5>Расположение данных</h5>
+                        <p>Все данные приложения (файл <code>servers.json.enc</code>, конфигурация, загруженные чеки и иконки) находятся по пути:</p>
+                        <p><code>%APPDATA%\VPNServerManager\</code></p>
+                        <small class="text-muted">Обычно этот путь раскрывается в <code>C:\Users\ВАШЕ_ИМЯ\AppData\Roaming\VPNServerManager</code>. Проще всего вставить <code>%APPDATA%\VPNServerManager</code> в адресную строку Проводника и нажать Enter.</small>
+                    
+                        <h5 class="mt-4">Версия для разработки</h5>
+                        <p>Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.</p>
+                    </div>
+                </div>
+                        </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_linux">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_linux" aria-expanded="false" aria-controls="collapse_linux">
+                        <i class="bi bi-ubuntu me-2"></i> Особенности работы на Linux
+                    </button>
+                </h2>
+                <div id="collapse_linux" class="accordion-collapse collapse" aria-labelledby="heading_linux" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>В установленной версии приложения для Linux данные хранятся в директории <code>.local/share</code> в вашей домашней папке, согласно стандартам XDG Base Directory Specification.</p>
+                        
+                        <h5>Расположение данных</h5>
+                        <p>Все данные приложения (файл <code>servers.json.enc</code>, конфигурация, загруженные чеки и иконки) находятся по пути:</p>
+                        <p><code>~/.local/share/VPNServerManager/</code></p>
+                        <small class="text-muted">Папка <code>.local</code> является скрытой. Чтобы увидеть её в файловом менеджере, включите отображение скрытых файлов (обычно по нажатию <code>Ctrl+H</code>).</small>
+                    
+                        <h5 class="mt-4">Версия для разработки</h5>
+                        <p>Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_structure">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_structure" aria-expanded="false" aria-controls="collapse_structure">
+                        <i class="bi bi-diagram-3 me-2"></i> Структура проекта и алгоритм работы
+                    </button>
+                </h2>
+                <div id="collapse_structure" class="accordion-collapse collapse" aria-labelledby="heading_structure" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <h5>Дерево Проекта</h5>
+<pre><code class="language-bash">
+VPNserverManage/
+│
+├── app.py
+├── build_macos.py
+├── requirements.txt
+├── config.json
+│
+├── data/
+│   ├── servers.json.enc
+│   └── hints.json
+│
+├── static/
+│   └── ...
+│
+├── templates/
+│   └── ...
+│
+└── venv/
+</code></pre>
+                        <h5>Описание Файлов и Директорий</h5>
+                        <ul>
+                            <li><strong><code>app.py</code></strong>: Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию с PyWebView для создания окна.</li>
+                            <li><strong><code>build_macos.py</code></strong>: Скрипт для сборки приложения в <code>.app</code> для macOS с помощью PyInstaller.</li>
+                            <li><strong><code>requirements.txt</code></strong>: Список всех библиотек Python, необходимых для работы.</li>
+                            <li><strong><code>config.json</code></strong>: Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов.</li>
+                            <li><strong><code>data/servers.json.enc</code></strong>: Самый важный файл. Это <strong>зашифрованный</strong> JSON-файл, содержащий всю информацию о серверах.</li>
+                            <li><strong><code>static/</code></strong> и <strong><code>templates/</code></strong>: Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-интерфейса.</li>
+                        </ul>
+
+                        <h5>Алгоритм Работы Программы</h5>
+                        <ol>
+                            <li><strong>Запуск</strong>: `app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно с помощью PyWebView.</li>
+                            <li><strong>Отображение</strong>: В окне загружается веб-страница. Flask расшифровывает данные из <code>servers.json.enc</code> и показывает их.</li>
+                            <li><strong>Взаимодействие</strong>: Все действия пользователя обрабатываются Flask, который изменяет данные и снова шифрует их.</li>
+                            <li><strong>Завершение</strong>: При закрытии окна PyWebView отправляет команду на выключение сервера Flask, который корректно завершает работу и освобождает порт.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_dev">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_dev" aria-expanded="false" aria-controls="collapse_dev">
+                        <i class="bi bi-code-slash me-2"></i> Для разработчиков
+                    </button>
+                </h2>
+                <div id="collapse_dev" class="accordion-collapse collapse" aria-labelledby="heading_dev" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <h5>Ошибка `ModuleNotFoundError`</h5>
+                        <p>Если при запуске приложения из исходного кода (<code>python3 app.py</code>) вы видите ошибку <code>ModuleNotFoundError: No module named 'имя_модуля'</code>, это означает, что в вашем окружении отсутствует необходимая библиотека.</p>
+                        <p>Это происходит, когда в проект добавляется новая функциональность (например, как недавно был добавлен `pywebview`).</p>
+                        <h6>Решение</h6>
+                        <p>Чтобы установить или обновить все зависимости, выполните в терминале следующую команду, находясь в папке проекта:</p>
+                        <pre><code class="language-bash">python3 -m pip install -r requirements.txt</code></pre>
+                        <p>Эта команда прочитает файл <code>requirements.txt</code> и установит точные версии всех библиотек, необходимых для корректной работы.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %} 

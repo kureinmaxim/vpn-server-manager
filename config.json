@@ -1,0 +1,15 @@
+{
+  "SECRET_KEY_FILE": ".env",
+  "app_info": {
+    "version": "3.1.0",
+    "release_date": "13.07.2025",
+    "developer": "Куреин М.Н.",
+    "last_updated": "2025-07-13"
+  },
+  "service_urls": {
+    "ip_check_api": "https://ipinfo.io/{ip}/json",
+    "general_ip_test": "https://browserleaks.com/ip",
+    "general_dns_test": "https://dnsleaktest.com/"
+  },
+  "active_data_file": "/Users/olgazaharova/Project/ProjectPython/VPNserverManage/data/servers.json.enc"
+}
