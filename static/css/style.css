@@ -1,0 +1,47 @@
+/* Light Theme */
+[data-bs-theme="light"] {
+    --bs-body-bg: #f0f7f6;
+    --bs-body-color: #000;
+    --bs-tertiary-bg: #ffffff;
+    --bs-border-color: #dee2e6;
+    --bs-primary: #008060;
+    --bs-primary-rgb: 0, 128, 96;
+    --bs-link-color: #008060;
+    --bs-link-hover-color: #005942;
+}
+
+/* Dark Theme */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #0d1a26;
+    --bs-body-color: #e6e6e6;
+    --bs-tertiary-bg: #1a2938;
+    --bs-border-color: #2a3f52;
+    --bs-primary: #00bfa5;
+    --bs-primary-rgb: 0, 191, 165;
+    --bs-link-color: #00bfa5;
+    --bs-link-hover-color: #33cdc0;
+}
+
+.card {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.form-control, .form-select {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--bs-primary);
+    --bs-btn-border-color: var(--bs-primary);
+    --bs-btn-hover-bg: var(--bs-link-hover-color);
+    --bs-btn-hover-border-color: var(--bs-link-hover-color);
+}
+
+[data-bs-theme="dark"] .badge.bg-success {
+    color: #1a2938 !important; /* Темный текст на зеленом фоне */
+}
+
+/* Принудительно задает темный цвет текста для шапки карточки в обеих темах */
+.force-dark-text, .force-dark-text h5, .force-dark-text small {
+    color: #212529 !important;
+}

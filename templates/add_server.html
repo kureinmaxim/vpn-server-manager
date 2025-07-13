@@ -1,0 +1,334 @@
+{% extends "layout.html" %}
+
+{% block title %}Добавить сервер{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Добавить новый сервер</h1>
+    <hr>
+    <div class="row">
+        <div class="col-md-8">
+            <form action="{{ url_for('add_server') }}" method="post" enctype="multipart/form-data">
+                <h5 class="mt-4">Основная информация</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Название сервера</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="provider" class="form-label">Хостинг-провайдер</label>
+                        <input type="text" class="form-control" id="provider" name="provider">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="ip_address" class="form-label">IP-адрес</label>
+                    <input type="text" class="form-control" id="ip_address" name="ip_address" required>
+                </div>
+                <div class="mb-3">
+                    <label for="os" class="form-label">Операционная система</label>
+                    <input type="text" class="form-control" id="os" name="os" placeholder="Например, Ubuntu 22.04">
+                </div>
+
+                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label">Статус</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="Active" selected>Активен</option>
+                            <option value="Inactive">Неактивен</option>
+                            <option value="Suspended">Заблокирован</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="panel_url" class="form-label">URL панели управления</label>
+                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="http://1.2.3.4:2053/panel">
+                </div>
+
+                <h5 class="mt-4">Оформление карточки</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="card_color" class="form-label">Цвет карточки</label>
+                        <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="#ffc107">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="server_icon" class="form-label">Иконка сервера</label>
+                        <input class="form-control" type="file" id="server_icon" name="server_icon">
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Характеристики сервера</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="cpu" class="form-label">CPU</label>
+                        <input type="text" class="form-control" id="cpu" name="cpu">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="ram" class="form-label">RAM</label>
+                        <input type="text" class="form-control" id="ram" name="ram">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="disk" class="form-label">Диск</label>
+                        <input type="text" class="form-control" id="disk" name="disk" placeholder="100GB SSD">
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Платёжная информация</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="amount" class="form-label">Сумма</label>
+                        <input type="number" step="0.01" class="form-control" id="amount" name="amount">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="currency" class="form-label">Валюта</label>
+                        <input type="text" class="form-control" id="currency" name="currency" value="RUB">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="next_due_date" class="form-label">Следующая оплата</label>
+                        <input type="date" class="form-control" id="next_due_date" name="next_due_date">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="payment_period" class="form-label">Период оплаты</label>
+                        <select class="form-select" id="payment_period" name="payment_period">
+                            <option value="Monthly" selected>Месяц</option>
+                            <option value="3 Months">3 месяца</option>
+                            <option value="Yearly">Год</option>
+                            <option value="Perpetual">Бессрочно</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">SSH-доступ</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_user" class="form-label">Пользователь SSH</label>
+                        <input type="text" class="form-control" id="ssh_user" name="ssh_user">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_password" class="form-label">Пароль SSH</label>
+                        <input type="password" class="form-control" id="ssh_password" name="ssh_password">
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="ssh_port" class="form-label">Порт SSH</label>
+                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22">
+                    </div>
+                </div>
+                 <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_root_password" class="form-label">Пароль root</label>
+                        <input type="password" class="form-control" id="ssh_root_password" name="ssh_root_password">
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" checked>
+                            <label class="form-check-label" for="root_login_allowed">
+                                Вход для root по SSH разрешен
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Панель управления (3x-ui и др.)</h5>
+                <div class="mb-3">
+                    <label for="panel_url" class="form-label">URL панели</label>
+                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="http://1.2.3.4:2053/panel">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="panel_user" class="form-label">Логин панели</label>
+                        <input type="text" class="form-control" id="panel_user" name="panel_user">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="panel_password" class="form-label">Пароль панели</label>
+                        <input type="password" class="form-control" id="panel_password" name="panel_password">
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Кабинет хостера</h5>
+                <div class="mb-3">
+                    <label for="hoster_url" class="form-label">URL кабинета</label>
+                    <input type="text" class="form-control" id="hoster_url" name="hoster_url" placeholder="https://my.hoster.com">
+                </div>
+                <div class="row">
+                     <div class="col-md-6 mb-3">
+                        <label for="hoster_login_method" class="form-label">Способ входа</label>
+                        <select class="form-select" id="hoster_login_method" name="hoster_login_method">
+                            <option value="password" selected>По логину/паролю</option>
+                            <option value="google">Через Google</option>
+                            <option value="apple">Через Apple</option>
+                            <option value="other">Другой</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="hoster_user" class="form-label" id="hoster_user_label">Логин хостера</label>
+                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" placeholder="user@example.com">
+                    </div>
+                    <div class="col-md-6 mb-3" id="hoster_password_field">
+                        <label for="hoster_password" class="form-label">Пароль хостера</label>
+                        <input type="password" class="form-control" id="hoster_password" name="hoster_password">
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Результаты проверок</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok">
+                            <label class="form-check-label" for="check_dns_ok">
+                                DNS-тест пройден (нет утечек)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="check_streaming_ok" name="check_streaming_ok">
+                            <label class="form-check-label" for="check_streaming_ok">
+                                Стриминг-тест пройден (например, 9Now)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Загрузка файлов</h5>
+                <div class="mb-3">
+                    <label for="receipt" class="form-label">Загрузить чек об оплате</label>
+                    <input class="form-control" type="file" id="receipt" name="receipt">
+                </div>
+
+
+                <h5 class="mt-4">Дополнительная информация</h5>
+                 <div class="mb-3">
+                    <label for="notes" class="form-label">Заметки</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="docker_info" class="form-label">Информация о Docker</label>
+                    <textarea class="form-control" id="docker_info" name="docker_info" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="software_info" class="form-label">Установленное ПО</label>
+                    <textarea class="form-control" id="software_info" name="software_info" rows="3"></textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Отмена</a>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Подсказки по командам (Debian/Ubuntu)</h5>
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
+                    
+                    <h6 class="mt-2">Установленное ПО</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">dpkg -l | grep ii</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+
+                    <h6 class="mt-3">Ключевые утилиты</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">uname -a</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">lscpu | cat</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">free -h</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">df -h</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+
+                    <h6 class="mt-3">Управление службами</h6>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">systemctl status nginx</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">systemctl restart nginx</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+
+                    <h6 class="mt-3">Управление пакетами</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">apt update</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">apt upgrade</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+
+                    <h6 class="mt-3">Безопасность</h6>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">ufw status verbose</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">ufw allow ssh</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">fail2ban-client status sshd</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                     <div class="d-flex justify-content-between align-items-center mb-2">
+                        <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">last | head</code></pre>
+                        <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loginMethodSelect = document.getElementById('hoster_login_method');
+    const passwordField = document.getElementById('hoster_password_field');
+    const userLabel = document.getElementById('hoster_user_label');
+
+    function toggleFields() {
+        if (loginMethodSelect.value === 'password') {
+            passwordField.style.display = '';
+            userLabel.textContent = 'Логин хостера';
+        } else {
+            passwordField.style.display = 'none';
+            if (loginMethodSelect.value === 'google' || loginMethodSelect.value === 'apple') {
+                userLabel.textContent = 'Email для входа';
+            } else {
+                userLabel.textContent = 'Логин / Email';
+            }
+        }
+    }
+
+    toggleFields();
+    loginMethodSelect.addEventListener('change', toggleFields);
+});
+
+function copyHint(button) {
+    const pre = button.closest('.d-flex').querySelector('pre');
+    const command = pre.innerText;
+    navigator.clipboard.writeText(command).then(() => {
+        const icon = button.querySelector('i');
+        const originalClass = icon.className;
+        icon.className = 'bi bi-check-lg text-success';
+        setTimeout(() => {
+            icon.className = originalClass;
+        }, 1500);
+    }).catch(err => {
+        console.error('Ошибка копирования: ', err);
+    });
+}
+</script>
+{% endblock %} 

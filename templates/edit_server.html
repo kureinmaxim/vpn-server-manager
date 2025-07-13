@@ -1,0 +1,466 @@
+{% extends "layout.html" %}
+
+{% block title %}Редактировать сервер{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Редактировать: {{ server.name }}</h1>
+    <hr>
+    <div class="row">
+        <div class="col-md-8">
+            <form action="{{ url_for('edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
+                <h5 class="mt-4">Основная информация</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Название сервера</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ server.name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="provider" class="form-label">Хостинг-провайдер</label>
+                        <input type="text" class="form-control" id="provider" name="provider" value="{{ server.provider }}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="ip_address" class="form-label">IP-адрес</label>
+                    <input type="text" class="form-control" id="ip_address" name="ip_address" value="{{ server.ip_address }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="os" class="form-label">Операционная система</label>
+                    <input type="text" class="form-control" id="os" name="os" value="{{ server.os }}" placeholder="Например, Ubuntu 22.04">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="status" class="form-label">Статус</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="Active" {% if server.status == 'Active' %}selected{% endif %}>Активен</option>
+                            <option value="Inactive" {% if server.status == 'Inactive' %}selected{% endif %}>Неактивен</option>
+                            <option value="Suspended" {% if server.status == 'Suspended' %}selected{% endif %}>Приостановлен</option>
+                            <option value="Удален" {% if server.status == 'Удален' %}selected{% endif %}>Удален</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Результаты проверок</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok" {% if server.checks.get('dns_ok') %}checked{% endif %}>
+                            <label class="form-check-label" for="check_dns_ok">
+                                DNS-тест пройден (нет утечек)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="check_streaming_ok" name="check_streaming_ok" {% if server.checks.get('streaming_ok') %}checked{% endif %}>
+                            <label class="form-check-label" for="check_streaming_ok">
+                                Стриминг-тест пройден
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Оформление карточки</h5>
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3">
+                        <label for="card_color" class="form-label">Цвет карточки</label>
+                        <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="{{ server.get('card_color', '#ffc107') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="server_icon" class="form-label">Иконка сервера (заменит текущую)</label>
+                        <input class="form-control" type="file" id="server_icon" name="server_icon">
+                        {% if server.icon_filename %}
+                        <div class="mt-2">
+                            <small>Текущая:</small>
+                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: contain; margin-left: 10px;">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Характеристики сервера</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="cpu" class="form-label">CPU</label>
+                        <input type="text" class="form-control" id="cpu" name="cpu" value="{{ server.specs.cpu }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="ram" class="form-label">RAM</label>
+                        <input type="text" class="form-control" id="ram" name="ram" value="{{ server.specs.ram }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="disk" class="form-label">Диск</label>
+                        <input type="text" class="form-control" id="disk" name="disk" value="{{ server.specs.disk }}">
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Платёжная информация</h5>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="amount" class="form-label">Сумма платежа</label>
+                        <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ server.payment_info.amount }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="currency" class="form-label">Валюта</label>
+                        <input type="text" class="form-control" id="currency" name="currency" value="{{ server.payment_info.currency }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="next_due_date" class="form-label">Дата след. платежа</label>
+                        <input type="date" class="form-control" id="next_due_date" name="next_due_date" value="{{ server.payment_info.next_due_date }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="payment_period" class="form-label">Период оплаты</label>
+                        <select class="form-select" id="payment_period" name="payment_period">
+                            <option value="" {% if not server.payment_info.get('payment_period') %}selected{% endif %}>Не указан</option>
+                            <option value="Monthly" {% if server.payment_info.get('payment_period') == 'Monthly' %}selected{% endif %}>Месяц</option>
+                            <option value="3 Months" {% if server.payment_info.get('payment_period') == '3 Months' %}selected{% endif %}>3 месяца</option>
+                            <option value="Yearly" {% if server.payment_info.get('payment_period') == 'Yearly' %}selected{% endif %}>Год</option>
+                            <option value="Perpetual" {% if server.payment_info.get('payment_period') == 'Perpetual' %}selected{% endif %}>Бессрочно</option>
+                        </select>
+                    </div>
+                     <div class="col-12 mt-2">
+                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#receiptsModal">
+                            <i class="bi bi-receipt"></i> Управление чеками ({{ server.payment_info.get('receipts', [])|length }})
+                        </button>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">SSH-доступ</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_user" class="form-label">Пользователь SSH</label>
+                        <input type="text" class="form-control" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_password" class="form-label">Новый пароль SSH</label>
+                        <input type="password" class="form-control" id="ssh_password" name="ssh_password" aria-describedby="sshPasswordHelp">
+                        <div id="sshPasswordHelp" class="form-text">Оставьте пустым, чтобы не менять.</div>
+                    </div>
+                     <div class="col-md-6 mb-3">
+                        <label for="ssh_port" class="form-label">Порт SSH</label>
+                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="{{ server.ssh_credentials.get('port', 22) }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="ssh_root_password" class="form-label">Новый пароль root</label>
+                        <input type="password" class="form-control" id="ssh_root_password" name="ssh_root_password" aria-describedby="rootPasswordHelp">
+                        <div id="rootPasswordHelp" class="form-text">Оставьте пустым, чтобы не менять.</div>
+                    </div>
+                    <div class="col-md-6 mb-3 d-flex align-items-end">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" {% if server.ssh_credentials.get('root_login_allowed') %}checked{% endif %}>
+                            <label class="form-check-label" for="root_login_allowed">
+                                Вход для root по SSH разрешен
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Панель управления (3x-ui и др.)</h5>
+                <div class="mb-3">
+                    <label for="panel_url" class="form-label">URL панели</label>
+                    <input type="text" class="form-control" id="panel_url" name="panel_url" value="{{ server.get('panel_url', '') }}">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="panel_user" class="form-label">Логин панели</label>
+                        <input type="text" class="form-control" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="panel_password" class="form-label">Новый пароль панели</label>
+                        <input type="password" class="form-control" id="panel_password" name="panel_password" aria-describedby="panelPasswordHelp">
+                        <div id="panelPasswordHelp" class="form-text">Оставьте пустым, чтобы не менять.</div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Кабинет хостера</h5>
+                 <div class="mb-3">
+                    <label for="hoster_url" class="form-label">URL кабинета</label>
+                    <input type="text" class="form-control" id="hoster_url" name="hoster_url" value="{{ server.get('hoster_url', '') }}">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="hoster_login_method" class="form-label">Способ входа</label>
+                        <select class="form-select" id="hoster_login_method" name="hoster_login_method">
+                            <option value="password" {% if server.hoster_credentials.login_method == 'password' %}selected{% endif %}>По логину/паролю</option>
+                            <option value="google" {% if server.hoster_credentials.login_method == 'google' %}selected{% endif %}>Через Google</option>
+                            <option value="apple" {% if server.hoster_credentials.login_method == 'apple' %}selected{% endif %}>Через Apple</option>
+                            <option value="other" {% if server.hoster_credentials.login_method == 'other' %}selected{% endif %}>Другой</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="hoster_user" class="form-label" id="hoster_user_label">Логин хостера</label>
+                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com">
+                    </div>
+                    <div class="col-md-6 mb-3" id="hoster_password_field">
+                        <label for="hoster_password" class="form-label">Новый пароль хостера</label>
+                        <input type="password" class="form-control" id="hoster_password" name="hoster_password" aria-describedby="hosterPasswordHelp">
+                        <div id="hosterPasswordHelp" class="form-text">Оставьте пустым, чтобы не менять.</div>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Быстрая загрузка чека</h5>
+                 <div class="mb-3">
+                   <label for="receipt" class="form-label">Файл нового чека</label>
+                    <input class="form-control" type="file" id="receipt" name="receipt">
+                   <div class="form-text">Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку "Управление чеками".</div>
+               </div>
+               <div class="mb-3">
+                   <label for="receipt_description" class="form-label">Описание чека</label>
+                   <input type="text" class="form-control" id="receipt_description" name="receipt_description" placeholder="Например, Оплата за январь 2024">
+                </div>
+
+                <h5 class="mt-4">Дополнительная информация</h5>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Заметки</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ server.notes }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="docker_info" class="form-label">Информация о Docker</label>
+                    <textarea class="form-control" id="docker_info" name="docker_info" rows="3">{{ server.get('docker_info', '') }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="software_info" class="form-label">Установленное ПО</label>
+                    <textarea class="form-control" id="software_info" name="software_info" rows="3">{{ server.get('software_info', '') }}</textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Отмена</a>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Подсказки по командам</h5>
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
+                    {% if hints %}
+                        {% for group, commands in hints.items() %}
+                            <h6 class="mt-3">{{ group }}</h6>
+                            {% for hint in commands %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">{{ hint.command }}</code></pre>
+                                <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                            </div>
+                            {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Подсказок нет. Вы можете <a href="{{ url_for('manage_hints_page') }}">добавить их</a>.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Receipts -->
+<div class="modal fade" id="receiptsModal" tabindex="-1" aria-labelledby="receiptsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="receiptsModalLabel">Чеки по оплате: {{ server.name }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Form to add new receipt -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="card-title">Добавить новый чек</h6>
+                <form id="add-receipt-form" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="new_receipt_description" class="form-label">Описание</label>
+                        <input type="text" class="form-control" id="new_receipt_description" name="description" required placeholder="Напр., Оплата за февраль 2024">
+                    </div>
+                    <div class="mb-3">
+                        <label for="receipt_file" class="form-label">Файл чека</label>
+                        <input type="file" class="form-control" id="receipt_file" name="receipt_file" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Добавить
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- List of existing receipts -->
+        <h6>Загруженные чеки</h6>
+        <ul class="list-group" id="receipts-list">
+            {% if server.payment_info and server.payment_info.receipts %}
+                {% for receipt in server.payment_info.receipts %}
+                <li class="list-group-item d-flex justify-content-between align-items-center" id="receipt-{{ receipt.filename | replace('.', '_') | replace(' ', '_') }}">
+                    <div>
+                        <strong>{{ receipt.description or 'Чек' }}</strong><br>
+                        <small class="text-muted">Загружен: {{ receipt.upload_date | format_datetime }}</small><br>
+                        <a href="{{ url_for('uploaded_file', filename=receipt.filename) }}" target="_blank">{{ receipt.original_name }}</a>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="{{ receipt.filename }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </li>
+                {% endfor %}
+            {% else %}
+                <li id="no-receipts-placeholder" class="list-group-item text-center text-muted">Чеки еще не загружены.</li>
+            {% endif %}
+        </ul>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Helper to toggle hoster password field visibility
+    const loginMethodSelect = document.getElementById('hoster_login_method');
+    if (loginMethodSelect) {
+    const passwordField = document.getElementById('hoster_password_field');
+    const userLabel = document.getElementById('hoster_user_label');
+
+        function togglePasswordField() {
+        if (loginMethodSelect.value === 'password') {
+                passwordField.style.display = 'block';
+            userLabel.textContent = 'Логин хостера';
+        } else {
+            passwordField.style.display = 'none';
+                userLabel.textContent = 'Email для входа';
+            }
+        }
+        loginMethodSelect.addEventListener('change', togglePasswordField);
+        togglePasswordField(); // Initial check
+    }
+
+    // --- Receipt Management ---
+    const addReceiptForm = document.getElementById('add-receipt-form');
+    const receiptsList = document.getElementById('receipts-list');
+    const serverId = {{ server.id }};
+
+    if (addReceiptForm) {
+        // ADD RECEIPT
+        addReceiptForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const spinner = this.querySelector('.spinner-border');
+            const submitButton = this.querySelector('button[type="submit"]');
+            spinner.classList.remove('d-none');
+            submitButton.disabled = true;
+
+            const formData = new FormData(this);
+
+            fetch(`/server/${serverId}/receipts/add`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || 'Ошибка сети') });
+                }
+                return response.json();
+            })
+            .then(newReceipt => {
+                const placeholder = document.getElementById('no-receipts-placeholder');
+                if (placeholder) {
+                    placeholder.remove();
+                }
+
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                const safeFilenameId = newReceipt.filename.replace(/\./g, '_').replace(/ /g, '_');
+                listItem.id = `receipt-${safeFilenameId}`;
+                listItem.innerHTML = `
+                    <div>
+                        <strong>${newReceipt.description || 'Чек'}</strong><br>
+                        <small class="text-muted">Загружен: ${newReceipt.formatted_date}</small><br>
+                        <a href="/uploads/${newReceipt.filename}" target="_blank">${newReceipt.original_name}</a>
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="${newReceipt.filename}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                `;
+                receiptsList.prepend(listItem);
+                addReceiptForm.reset();
+                
+                const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
+                const count = receiptsList.getElementsByTagName('li').length;
+                receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> Управление чеками (${count})`;
+            })
+            .catch(error => {
+                console.error('Ошибка при добавлении чека:', error);
+                alert(`Не удалось добавить чек: ${error.message}`);
+            })
+            .finally(() => {
+                spinner.classList.add('d-none');
+                submitButton.disabled = false;
+            });
+        });
+    }
+
+    if (receiptsList) {
+        // DELETE RECEIPT (using event delegation)
+        receiptsList.addEventListener('click', function(e) {
+            const deleteButton = e.target.closest('.delete-receipt-btn');
+            if (!deleteButton) return;
+
+            if (!confirm('Вы уверены, что хотите удалить этот чек? Это действие необратимо.')) {
+                return;
+            }
+
+            const filename = deleteButton.dataset.filename;
+            const safeFilenameId = filename.replace(/\./g, '_').replace(/ /g, '_');
+            const listItem = document.getElementById(`receipt-${safeFilenameId}`);
+            
+            fetch(`/server/${serverId}/receipts/delete/${filename}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || 'Ошибка сети') });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    listItem.remove();
+                    
+                    const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
+                    const count = receiptsList.getElementsByTagName('li').length;
+                    receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> Управление чеками (${count})`;
+
+                    if (count === 0) {
+                        receiptsList.innerHTML = '<li id="no-receipts-placeholder" class="list-group-item text-center text-muted">Чеки еще не загружены.</li>';
+                    }
+                } else {
+                    throw new Error(data.message || 'Не удалось удалить чек.');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при удалении чека:', error);
+                alert(`Не удалось удалить чек: ${error.message}`);
+            });
+        });
+    }
+});
+
+function copyHint(element) {
+    const code = element.previousElementSibling.querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+        const originalIcon = element.innerHTML;
+        element.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
+        setTimeout(() => {
+            element.innerHTML = originalIcon;
+        }, 1500);
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
+{% endblock %} 
