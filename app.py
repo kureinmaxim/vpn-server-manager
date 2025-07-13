@@ -137,6 +137,7 @@ else:
 # Загрузка основной конфигурации в Flask
 app.config.update(final_config)
 
+
 # Если `app_info` все еще отсутствует (например, при самом первом запуске в dev), добавляем заглушку
 if 'app_info' not in app.config:
     app.config['app_info'] = {
