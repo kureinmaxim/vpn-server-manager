@@ -49,6 +49,17 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-search"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li class="dropdown-header">Масштаб интерфейса</li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('80')"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('90')"><i class="bi bi-search me-2"></i>90%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('100')"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-circle-half"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -73,9 +84,40 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Применить сохранённый масштаб при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedZoom = getCookie('ui_zoom') || '100';
+            document.body.style.zoom = savedZoom + '%';
+        });
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
         function setTheme(theme) {
             document.documentElement.setAttribute('data-bs-theme', theme);
             document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
+        }
+
+        function setZoom(zoom) {
+            document.body.style.zoom = zoom + '%';
+            document.cookie = `ui_zoom=${zoom};path=/;max-age=31536000;SameSite=Lax`;
+            // Показать уведомление о применении масштаба
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="bi bi-info-circle"></i> Масштаб изменён на ${zoom}%
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
         }
     </script>
     {% block scripts %}{% endblock %}

@@ -101,4 +101,82 @@ dmypy.json
 *.DS_Store
 
 # VSCode
-.vscode/ 
+.vscode/
+
+# Временные и тестовые файлы
+*.tmp
+*.temp
+temp/
+tmp/
+*.bak
+*.backup
+*.orig
+*~
+
+# Тестовые файлы и директории
+test/
+tests/
+*_test.py
+*_tests.py
+test_*.py
+tests_*.py
+
+# Логи и отчеты
+*.log
+logs/
+*.audit
+audit/
+
+# Конфигурационные файлы разработки
+.env.local
+.env.development
+.env.test
+config.local.json
+config.dev.json
+
+# Файлы редакторов
+*.swp
+*.swo
+*~
+.#*
+\#*#
+
+# Временные файлы IDE
+.idea/
+*.iml
+.project
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Системные файлы
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Файлы загрузок и кеша
+uploads/*.tmp
+uploads/*.temp
+cache/
+*.cache
+
+# Экспортированные данные (кроме примеров)
+*.enc.backup
+data/*.backup
+data/temp_*
+
+# Файлы сборки и дистрибуции
+*.dmg
+*.pkg
+*.msi
+*.exe
+*.deb
+*.rpm
+*.app/
+*.AppImage
+
+# Временные файлы Python
+*.pyc
+*.pyo
+*.pyd 

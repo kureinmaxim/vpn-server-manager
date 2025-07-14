@@ -178,6 +178,79 @@
             </div>
 
             <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportExternal">
+                        <i class="bi bi-arrow-down-up me-2"></i> Импорт из другой установки
+                    </button>
+                </h2>
+                <div id="collapseImportExternal" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>Эта функция позволяет перенести данные о серверах из другой установки VPN Server Manager, даже если у неё другой ключ шифрования.</p>
+                        
+                        <h5>Когда это нужно?</h5>
+                        <ul>
+                            <li>Вы настроили приложение на другом компьютере и хотите перенести данные на новый</li>
+                            <li>У коллеги есть список серверов, и вы хотите добавить его к своему</li>
+                            <li>Вы потеряли свой <code>.env</code> файл, но у вас есть резервная копия ключа</li>
+                            <li>Вы переустанавливали приложение и создался новый ключ шифрования</li>
+                        </ul>
+
+                        <h5>Как это работает?</h5>
+                        <ol>
+                            <li><strong>Подготовка данных:</strong> На исходном компьютере найдите два файла:
+                                <ul>
+                                    <li>Файл данных с расширением <code>.enc</code> (обычно в папке <code>data/</code>)</li>
+                                    <li>Ключ шифрования из файла <code>.env</code> (строка типа <code>SECRET_KEY=gAAAAABhZ...</code>)</li>
+                                </ul>
+                            </li>
+                            <li><strong>Перенос:</strong> Скопируйте оба элемента на новый компьютер любым удобным способом (флешка, облако, email)</li>
+                            <li><strong>Импорт:</strong> На новом компьютере:
+                                <ul>
+                                    <li>Откройте раздел "Настройки" → "Импорт из другой установки"</li>
+                                    <li>Выберите файл <code>.enc</code></li>
+                                    <li>Вставьте ключ шифрования в текстовое поле</li>
+                                    <li>Нажмите "Импортировать с внешним ключом"</li>
+                                </ul>
+                            </li>
+                        </ol>
+
+                        <h5>Где найти ключ шифрования?</h5>
+                        <p>Ключ находится в файле <code>.env</code> в корневой папке приложения:</p>
+                        <ul>
+                            <li><strong>На macOS:</strong> откройте файл <code>.env</code> в текстовом редакторе</li>
+                            <li><strong>В терминале:</strong> выполните <code>cat .env</code> в папке приложения</li>
+                            <li><strong>Формат ключа:</strong> строка вида <code>SECRET_KEY=gAAAAABhZ4x2...</code></li>
+                        </ul>
+                        <p><strong>Скопируйте только значение после знака равенства</strong> (без <code>SECRET_KEY=</code>)</p>
+
+                        <h5>Что происходит при импорте?</h5>
+                        <ol>
+                            <li>Приложение расшифровывает внешний файл с помощью предоставленного ключа</li>
+                            <li>Проверяет корректность данных</li>
+                            <li>Зашифровывает данные заново с помощью вашего текущего ключа</li>
+                            <li>Сохраняет в вашу систему и делает активными</li>
+                        </ol>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Важные замечания:</strong>
+                            <ul class="mb-0">
+                                <li>Импорт <strong>заменит</strong> ваши текущие данные</li>
+                                <li>Создайте резервную копию перед импортом</li>
+                                <li>Внешний ключ не сохраняется в системе - он используется только для одноразового импорта</li>
+                                <li>После импорта все данные будут зашифрованы вашим текущим ключом</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-success">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <strong>Совет:</strong> Для регулярного обмена данными между установками рекомендуется использовать одинаковый <code>SECRET_KEY</code> на всех устройствах. Тогда можно будет просто копировать <code>.enc</code> файлы без дополнительных действий.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_secret_key">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_secret_key" aria-expanded="false" aria-controls="collapse_secret_key">
                         <i class="bi bi-key-fill me-2"></i> Что такое SECRET_KEY и где его взять?
