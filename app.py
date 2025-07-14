@@ -982,39 +982,120 @@ def export_data():
 
 @app.route('/data/import', methods=['POST'])
 def import_data():
-    """Обрабатывает загрузку и прикрепление нового файла данных."""
-    if 'data_file' not in request.files:
-        flash('Файл не был предоставлен.', 'danger')
-        return redirect(url_for('settings_page'))
-
-    file = request.files['data_file']
-    if file.filename == '':
-        flash('Файл не выбран.', 'warning')
-        return redirect(url_for('settings_page'))
-
-    if file and file.filename.endswith('.enc'):
-        # Проверяем, можно ли расшифровать файл
-        try:
-            file_content = file.read()
-            fernet.decrypt(file_content)
-            # Возвращаем указатель в начало файла для сохранения
-            file.seek(0)
-        except (InvalidToken, Exception):
-            flash('Неверный формат файла или ключ шифрования (SECRET_KEY) не подходит.', 'danger')
+    global app_config
+    try:
+        uploaded_file = request.files['data_file']
+        if uploaded_file and allowed_file(uploaded_file.filename) and uploaded_file.filename.endswith('.enc'):
+            # Создаем уникальное имя файла с временной меткой
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"imported_{timestamp}_{secure_filename(uploaded_file.filename)}"
+            
+            # Получаем директорию для хранения данных
+            app_data_dir = get_app_data_dir()
+            data_dir = os.path.join(app_data_dir, "data")
+            
+            # Убедимся, что директория существует
+            os.makedirs(data_dir, exist_ok=True)
+            
+            file_path = os.path.join(data_dir, filename)
+            uploaded_file.save(file_path)
+            
+            # Проверяем, что файл действительно зашифрован и может быть прочитан с нашим ключом
+            try:
+                servers = decrypt_data(open(file_path, 'rb').read())
+                json.loads(servers)  # Проверяем, что это корректный JSON
+                flash('Файл данных успешно импортирован и прикреплен!', 'success')
+            except (InvalidToken, json.JSONDecodeError, Exception) as e:
+                # Удаляем файл, если он не может быть расшифрован
+                os.remove(file_path)
+                flash('Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан с другим ключом.', 'danger')
+                return redirect(url_for('settings_page'))
+            
+            # Обновляем конфигурацию для использования нового файла
+            app.config['active_data_file'] = file_path
+            save_app_config()
             return redirect(url_for('settings_page'))
+        else:
+            flash('Неверный тип файла. Пожалуйста, выберите файл .enc', 'danger')
+    except Exception as e:
+        flash(f'Ошибка при импорте файла: {str(e)}', 'danger')
+    return redirect(url_for('settings_page'))
 
-        # Сохраняем новый файл и обновляем конфиг
-        imported_path = os.path.join(APP_DATA_DIR, 'data', 'servers.json.enc')
-        file.save(imported_path)
+@app.route('/data/import_external', methods=['POST'])
+def import_external_data():
+    global app_config
+    try:
+        uploaded_file = request.files['external_file']
+        external_key = request.form.get('external_key', '').strip()
         
-        app.config['active_data_file'] = imported_path
-        save_app_config()
+        if not uploaded_file or not external_key:
+            flash('Необходимо выбрать файл и указать внешний ключ шифрования.', 'danger')
+            return redirect(url_for('settings_page'))
+            
+        if not uploaded_file.filename.endswith('.enc'):
+            flash('Неверный тип файла. Пожалуйста, выберите файл .enc', 'danger')
+            return redirect(url_for('settings_page'))
         
-        flash('Файл данных успешно импортирован и прикреплен.', 'success')
-        return redirect(url_for('index'))
-    else:
-        flash('Разрешены только зашифрованные файлы с расширением .enc.', 'danger')
-        return redirect(url_for('settings_page'))
+        # Проверяем формат ключа (должен быть в формате Fernet)
+        if not external_key.startswith(('gAAAAA', 'ferne-')):
+            flash('Неверный формат ключа шифрования. Ключ должен начинаться с "gAAAAA".', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        # Создаем временный файл для проверки
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            uploaded_file.save(temp_file.name)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Пытаемся расшифровать файл с внешним ключом
+            fernet_external = Fernet(external_key.encode())
+            with open(temp_file_path, 'rb') as f:
+                encrypted_data = f.read()
+            
+            decrypted_data = fernet_external.decrypt(encrypted_data)
+            servers_data = json.loads(decrypted_data.decode('utf-8'))
+            
+            # Проверяем структуру данных
+            if not isinstance(servers_data, list):
+                raise ValueError("Неверная структура данных")
+            
+            # Данные корректны, теперь зашифровываем их нашим ключом и сохраняем
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"external_import_{timestamp}.enc"
+            
+            app_data_dir = get_app_data_dir()
+            data_dir = os.path.join(app_data_dir, "data")
+            os.makedirs(data_dir, exist_ok=True)
+            
+            file_path = os.path.join(data_dir, filename)
+            
+            # Шифруем данные нашим ключом
+            encrypted_with_our_key = encrypt_data(json.dumps(servers_data))
+            with open(file_path, 'wb') as f:
+                f.write(encrypted_with_our_key)
+            
+            # Обновляем конфигурацию
+            app.config['active_data_file'] = file_path
+            save_app_config()
+            
+            flash(f'Данные из внешней установки успешно импортированы! Загружено серверов: {len(servers_data)}', 'success')
+            
+        except InvalidToken:
+            flash('Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа.', 'danger')
+        except json.JSONDecodeError:
+            flash('Ошибка: файл содержит некорректные данные.', 'danger')
+        except Exception as e:
+            flash(f'Ошибка при импорте: {str(e)}', 'danger')
+        finally:
+            # Удаляем временный файл
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+                
+    except Exception as e:
+        flash(f'Ошибка при обработке файла: {str(e)}', 'danger')
+    
+    return redirect(url_for('settings_page'))
 
 @app.route('/data/detach', methods=['POST'])
 def detach_data():
