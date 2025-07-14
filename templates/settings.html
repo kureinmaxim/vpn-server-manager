@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Импорт файла данных</h5>
         </div>
@@ -62,6 +62,37 @@
                 </div>
                 <div class="form-text">
                     Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Импорт из другой установки</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Импортируйте данные из другой установки VPN Server Manager, используя внешний ключ шифрования. Эта функция позволяет переносить данные между разными установками приложения.</p>
+            <form action="{{ url_for('import_external_data') }}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="externalFile" class="form-label">Файл данных (.enc)</label>
+                    <input type="file" class="form-control" name="external_file" id="externalFile" accept=".enc" required>
+                    <div class="form-text">Выберите зашифрованный файл данных из другой установки</div>
+                </div>
+                <div class="mb-3">
+                    <label for="externalKey" class="form-label">Внешний ключ шифрования</label>
+                    <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="Вставьте сюда ключ шифрования из файла .env другой установки (например: gAAAAABhZ...)" required></textarea>
+                    <div class="form-text">
+                        <strong>Где найти ключ:</strong><br>
+                        • В файле <code>.env</code> в папке с другой установкой<br>
+                        • Ищите строку <code>SECRET_KEY=</code><br>
+                        • Скопируйте значение после знака равенства
+                    </div>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-warning" type="submit">
+                        <i class="bi bi-key"></i> Импортировать с внешним ключом
+                    </button>
                 </div>
             </form>
         </div>
