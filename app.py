@@ -230,12 +230,62 @@ def encrypt_data(data):
     return fernet.encrypt(data.encode()).decode()
 
 def decrypt_data(encrypted_data):
-    if not encrypted_data:
+    """
+    Расшифровывает данные, зашифрованные с помощью Fernet.
+    Автоматически определяет формат данных и обрабатывает их соответственно.
+    """
+    # Проверяем на пустые данные в начале
+    if not encrypted_data or encrypted_data == "" or encrypted_data is None:
         return ""
+    
+    # Конвертируем в строку если нужно
+    if not isinstance(encrypted_data, str):
+        encrypted_data = str(encrypted_data)
+    
+    # Дополнительная проверка на пустую строку после конвертации
+    if encrypted_data.strip() == "":
+        return ""
+    
+    # Если данные начинаются с gAAAAA, это точно Fernet данные
+    if encrypted_data.startswith('gAAAAA'):
     try:
         return fernet.decrypt(encrypted_data.encode()).decode()
-    except (InvalidToken, Exception):
-        return "Ошибка дешифровки!"
+        except Exception:
+            # Если расшифровка не удалась, возвращаем пустую строку
+            return ""
+    
+    # Если данные выглядят как обычный текст (не содержат специальных символов), возвращаем как есть
+    # Зашифрованные Fernet данные всегда содержат специальные символы и начинаются с определенных префиксов
+    try:
+        import base64
+        # Пытаемся декодировать как base64 для проверки формата
+        decoded = base64.b64decode(encrypted_data)
+        
+        # Проверяем, начинаются ли декодированные данные с байтов, характерных для Fernet
+        # Fernet использует специальную структуру: версия (0x80) + timestamp (8 bytes) + IV (16 bytes) + data + HMAC (32 bytes)
+        if len(decoded) >= 57 and decoded[0] == 0x80:  # Минимальная длина Fernet token и версия
+            # Это похоже на зашифрованные данные Fernet, пытаемся расшифровать
+            try:
+                return fernet.decrypt(encrypted_data.encode()).decode()
+            except Exception:
+                # Если расшифровка не удалась, возвращаем пустую строку
+                return ""
+        else:
+            # Это не Fernet данные, возможно просто base64 строка или обычный текст
+            return encrypted_data
+    except Exception:
+        # Если декодирование base64 не удалось или это не Fernet формат
+        # Проверяем, может это простой текст
+        if all(ord(c) < 128 and c.isprintable() for c in encrypted_data):
+            # Это обычный ASCII текст
+            return encrypted_data
+        else:
+            # Последняя попытка расшифровки
+            try:
+                return fernet.decrypt(encrypted_data.encode()).decode()
+            except Exception:
+                # Если ничего не помогло, возвращаем пустую строку вместо зашифрованных данных
+                return ""
 
 def save_app_config():
     """Сохраняет текущую JSON-совместимую конфигурацию в файл."""
@@ -974,11 +1024,120 @@ def export_data():
         flash('Нет активного файла данных для экспорта.', 'warning')
         return redirect(url_for('settings_page'))
     
+    # Для PyWebView создаем копию файла в текущей директории для удобного доступа
+    try:
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        export_filename = f"servers_export_{timestamp}.enc"
+        export_path = os.path.join(os.getcwd(), export_filename)
+        
+        # Копируем файл в текущую директорию
+        import shutil
+        shutil.copy2(active_file, export_path)
+        
+        flash(f'✅ Файл данных экспортирован как: {export_filename}', 'success')
+    
     return send_from_directory(
-        os.path.dirname(active_file), 
-        os.path.basename(active_file), 
+            os.getcwd(), 
+            export_filename, 
         as_attachment=True
     )
+    except Exception as e:
+        flash(f'Ошибка при экспорте: {str(e)}', 'danger')
+        return redirect(url_for('settings_page'))
+
+@app.route('/data/export_key')
+def export_key():
+    """Экспортирует SECRET_KEY в виде .env файла для скачивания."""
+    try:
+        # Создаем .env файл в текущей директории
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        key_filename = f"SECRET_KEY_{timestamp}.env"
+        key_path = os.path.join(os.getcwd(), key_filename)
+        
+        with open(key_path, 'w', encoding='utf-8') as f:
+            f.write(f"SECRET_KEY={SECRET_KEY}\n")
+            f.write(f"FLASK_SECRET_KEY=portable_app_key\n")
+        
+        flash(f'✅ Ключ шифрования экспортирован как: {key_filename}', 'success')
+        
+        return send_from_directory(
+            os.getcwd(),
+            key_filename,
+            as_attachment=True
+        )
+    except Exception as e:
+        flash(f'Ошибка при экспорте ключа: {str(e)}', 'danger')
+        return redirect(url_for('settings_page'))
+
+@app.route('/data/export_package')
+def export_package():
+    """Создает ZIP архив с данными, ключом и загруженными файлами."""
+    try:
+        import zipfile
+        from datetime import datetime
+        
+        # Проверяем наличие активного файла данных
+        active_file = get_active_data_path()
+        if not active_file or not os.path.exists(active_file):
+            flash('Нет активного файла данных для экспорта.', 'warning')
+            return redirect(url_for('settings_page'))
+        
+        # Создаем ZIP файл в текущей директории
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        zip_filename = f'vpn_servers_backup_{timestamp}.zip'
+        zip_path = os.path.join(os.getcwd(), zip_filename)
+        
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Добавляем файл данных сервера
+            zipf.write(active_file, f"servers_{timestamp}.enc")
+            
+            # Создаем и добавляем файл с ключом
+            env_content = f"SECRET_KEY={SECRET_KEY}\nFLASK_SECRET_KEY=portable_app_key\n"
+            zipf.writestr("SECRET_KEY.env", env_content)
+            
+            # Добавляем загруженные файлы (если они есть)
+            uploads_dir = os.path.join(get_app_data_dir(), "uploads")
+            if os.path.exists(uploads_dir):
+                for filename in os.listdir(uploads_dir):
+                    file_path = os.path.join(uploads_dir, filename)
+                    if os.path.isfile(file_path):
+                        zipf.write(file_path, f"uploads/{filename}")
+            
+            # Добавляем README с инструкциями
+            readme_content = f"""VPN Server Manager - Экспорт данных
+===========================================
+
+Дата экспорта: {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
+
+Содержимое архива:
+- servers_{timestamp}.enc - Зашифрованные данные серверов
+- SECRET_KEY.env - Ключ шифрования (поместите в папку с приложением)
+- uploads/ - Загруженные файлы (счета, скриншоты и т.д.)
+
+Инструкция по импорту:
+1. Скопируйте SECRET_KEY.env в папку с новой установкой VPN Server Manager
+2. Переименуйте SECRET_KEY.env в .env
+3. Перезапустите приложение
+4. В разделе "Настройки" -> "Управление данными" импортируйте файл servers_{timestamp}.enc
+5. Скопируйте содержимое папки uploads/ в папку uploads/ новой установки
+
+ВАЖНО: Храните этот архив в безопасном месте. Любой, кто имеет доступ к нему,
+может расшифровать ваши данные о серверах!
+"""
+            zipf.writestr("README.txt", readme_content)
+        
+        flash(f'✅ Полный архив создан как: {zip_filename}', 'success')
+        
+        # Отправляем ZIP файл
+        return send_from_directory(
+            os.getcwd(),
+            zip_filename,
+            as_attachment=True
+        )
+        
+    except Exception as e:
+        flash(f'Ошибка при создании архива: {str(e)}', 'danger')
+        return redirect(url_for('settings_page'))
 
 @app.route('/data/import', methods=['POST'])
 def import_data():
@@ -1037,8 +1196,12 @@ def import_external_data():
             return redirect(url_for('settings_page'))
         
         # Проверяем формат ключа (должен быть в формате Fernet)
-        if not external_key.startswith(('gAAAAA', 'ferne-')):
-            flash('Неверный формат ключа шифрования. Ключ должен начинаться с "gAAAAA".', 'danger')
+        try:
+            # Попытаемся создать экземпляр Fernet с предоставленным ключом
+            # Это лучше, чем проверка префикса, так как ключи могут иметь разные префиксы
+            test_fernet = Fernet(external_key.encode())
+        except Exception:
+            flash('Неверный формат ключа шифрования. Ключ должен быть действительным ключом Fernet.', 'danger')
             return redirect(url_for('settings_page'))
         
         # Создаем временный файл для проверки
@@ -1060,9 +1223,60 @@ def import_external_data():
             if not isinstance(servers_data, list):
                 raise ValueError("Неверная структура данных")
             
-            # Данные корректны, теперь зашифровываем их нашим ключом и сохраняем
+            # Данные корректны, теперь объединяем их с текущими данными
+            current_servers = []
+            current_file = get_active_data_path()
+            
+            # Загружаем текущие данные, если файл существует
+            if current_file and os.path.exists(current_file):
+                try:
+                    with open(current_file, 'rb') as f:
+                        current_encrypted = f.read()
+                    # decrypt_data ожидает строку, поэтому декодируем bytes в строку
+                    current_decrypted = fernet.decrypt(current_encrypted).decode('utf-8')
+                    current_servers = json.loads(current_decrypted)
+                except Exception:
+                    current_servers = []
+            
+            # Получаем списки существующих IP адресов и имен для предотвращения дублей
+            existing_ips = {server.get('ip', '') for server in current_servers if server.get('ip')}
+            existing_names = {server.get('name', '') for server in current_servers if server.get('name')}
+            
+            # Находим максимальный ID среди существующих серверов
+            max_id = 0
+            for server in current_servers:
+                if 'id' in server and isinstance(server['id'], int):
+                    max_id = max(max_id, server['id'])
+            
+            # Фильтруем импортируемые сервера и присваиваем новые ID
+            new_servers = []
+            skipped_count = 0
+            for server in servers_data:
+                server_ip = server.get('ip', '')
+                server_name = server.get('name', '')
+                
+                # Проверяем на дублирование по IP или имени
+                if server_ip in existing_ips or server_name in existing_names:
+                    skipped_count += 1
+                    continue
+                
+                # Присваиваем новый уникальный ID
+                max_id += 1
+                server['id'] = max_id
+                new_servers.append(server)
+                
+                # Добавляем в списки для отслеживания дублей
+                if server_ip:
+                    existing_ips.add(server_ip)
+                if server_name:
+                    existing_names.add(server_name)
+            
+            # Объединяем данные
+            combined_servers = current_servers + new_servers
+            
+            # Создаем новый файл с объединенными данными
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"external_import_{timestamp}.enc"
+            filename = f"merged_{timestamp}.enc"
             
             app_data_dir = get_app_data_dir()
             data_dir = os.path.join(app_data_dir, "data")
@@ -1070,8 +1284,9 @@ def import_external_data():
             
             file_path = os.path.join(data_dir, filename)
             
-            # Шифруем данные нашим ключом
-            encrypted_with_our_key = encrypt_data(json.dumps(servers_data))
+            # Шифруем объединенные данные нашим ключом
+            json_string = json.dumps(combined_servers, ensure_ascii=False, indent=2)
+            encrypted_with_our_key = fernet.encrypt(json_string.encode('utf-8'))
             with open(file_path, 'wb') as f:
                 f.write(encrypted_with_our_key)
             
@@ -1079,7 +1294,14 @@ def import_external_data():
             app.config['active_data_file'] = file_path
             save_app_config()
             
-            flash(f'Данные из внешней установки успешно импортированы! Загружено серверов: {len(servers_data)}', 'success')
+            # Информируем пользователя о результате
+            if new_servers:
+                message = f'Успешно импортировано {len(new_servers)} новых серверов!'
+                if skipped_count > 0:
+                    message += f' Пропущено {skipped_count} дублирующихся серверов.'
+                flash(message, 'success')
+            else:
+                flash('Все сервера из импортируемого файла уже существуют в вашем списке.', 'info')
             
         except InvalidToken:
             flash('Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа.', 'danger')
