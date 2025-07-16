@@ -18,70 +18,118 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Статус файла данных -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Статус файла данных</h5>
+            <h5 class="mb-0"><i class="bi bi-database"></i> Статус файла данных</h5>
         </div>
         <div class="card-body">
             {% if active_data_file %}
-                <p>
-                    <i class="bi bi-check-circle-fill text-success"></i> 
+                <div class="alert alert-success" role="alert">
+                    <i class="bi bi-check-circle-fill"></i> 
                     <strong>Активный файл:</strong> <code>{{ active_data_file }}</code>
-                </p>
+                </div>
                 <p class="text-muted">Все ваши данные о серверах загружаются из этого зашифрованного файла.</p>
-                <a href="{{ url_for('export_data') }}" class="btn btn-primary me-2">
+                
+                <!-- Кнопки экспорта -->
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <a href="{{ url_for('export_data') }}" class="btn btn-primary w-100" onclick="showExportMessage('данные сервера (.enc файл)')">
                     <i class="bi bi-download"></i> Экспортировать данные
                 </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="{{ url_for('export_key') }}" class="btn btn-warning w-100" onclick="showExportMessage('ключ шифрования (.env файл)')">
+                            <i class="bi bi-key"></i> Экспортировать ключ
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <a href="{{ url_for('export_package') }}" class="btn btn-success w-100" onclick="showExportMessage('полный архив (.zip файл с данными, ключом и файлами)')">
+                            <i class="bi bi-archive"></i> Полный экспорт
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Уведомление об экспорте -->
+                <div id="exportNotification" class="alert alert-info mt-3" style="display: none;">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Экспорт запущен!</strong> 
+                    <span id="exportMessage"></span>
+                    <br><small>📁 Файл сохранится в папку с приложением VPN Server Manager.</small>
+                </div>
+                
+                <div class="mt-3">
                 <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.');">
                     <button type="submit" class="btn btn-outline-danger">
                         <i class="bi bi-unlock"></i> Открепить файл
                     </button>
                 </form>
+                </div>
             {% else %}
-                <p>
-                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                     <strong>Файл данных не прикреплен.</strong>
-                </p>
+                </div>
                 <p class="text-muted">Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.</p>
             {% endif %}
         </div>
     </div>
 
+    <!-- Импорт файла данных -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Импорт файла данных</h5>
+            <h5 class="mb-0"><i class="bi bi-upload"></i> Импорт файла данных</h5>
         </div>
         <div class="card-body">
             <p class="text-muted">Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.</p>
             <form action="{{ url_for('import_data') }}" method="post" enctype="multipart/form-data">
-                <div class="input-group">
+                <div class="mb-3">
+                    <label for="dataFile" class="form-label">Выбор файла данных</label>
                     <input type="file" class="form-control" name="data_file" id="dataFile" accept=".enc" required>
+                    <div class="form-text">Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.</div>
+                </div>
+                <div class="d-grid">
                     <button class="btn btn-success" type="submit">
                         <i class="bi bi-upload"></i> Импортировать и прикрепить
                     </button>
-                </div>
-                <div class="form-text">
-                    Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Импорт из другой установки -->
     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">Импорт из другой установки</h5>
+        <div class="card-header d-flex align-items-center">
+            <i class="bi bi-plus-circle me-2"></i>
+            <h5 class="mb-0">Импорт серверов из другой установки</h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Импортируйте данные из другой установки VPN Server Manager, используя внешний ключ шифрования. Эта функция позволяет переносить данные между разными установками приложения.</p>
+            <div class="alert alert-info" role="alert">
+                <strong>Новая функция!</strong> Импортируйте серверы из другого компьютера или установки приложения, даже если они зашифрованы другим SECRET_KEY. Сервера будут добавлены к вашим текущим данным.
+            </div>
+            
+            <div class="alert alert-light border" role="alert">
+                <i class="bi bi-info-circle"></i> <strong>Что нужно:</strong> файл <code>.env</code> и <code>servers.json.enc</code> из другой установки приложения.
+            </div>
+
             <form action="{{ url_for('import_external_data') }}" method="post" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Левая колонка: servers.json.enc файл -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary">servers.json.enc файл</h6>
                 <div class="mb-3">
-                    <label for="externalFile" class="form-label">Файл данных (.enc)</label>
-                    <input type="file" class="form-control" name="external_file" id="externalFile" accept=".enc" required>
+                            <label for="envFile" class="form-label">Файл данных (.enc)</label>
+                            <input type="file" class="form-control" name="external_file" id="envFile" accept=".enc" required>
                     <div class="form-text">Выберите зашифрованный файл данных из другой установки</div>
                 </div>
+                    </div>
+
+                    <!-- Правая колонка: .env файл с SECRET_KEY -->
+                    <div class="col-md-6">
+                        <h6 class="text-primary">.env файл с SECRET_KEY</h6>
                 <div class="mb-3">
                     <label for="externalKey" class="form-label">Внешний ключ шифрования</label>
-                    <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="Вставьте сюда ключ шифрования из файла .env другой установки (например: gAAAAABhZ...)" required></textarea>
+                            <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="Вставьте сюда ключ шифрования из файла .env другой установки (например: k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)" required></textarea>
                     <div class="form-text">
                         <strong>Где найти ключ:</strong><br>
                         • В файле <code>.env</code> в папке с другой установкой<br>
@@ -89,13 +137,35 @@
                         • Скопируйте значение после знака равенства
                     </div>
                 </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" role="alert">
+                    <strong>Примечание:</strong> Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку.
+                </div>
+
                 <div class="d-grid">
                     <button class="btn btn-warning" type="submit">
-                        <i class="bi bi-key"></i> Импортировать с внешним ключом
+                        <i class="bi bi-arrow-down-circle"></i> Импортировать и объединить сервера
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function showExportMessage(fileType) {
+    const notification = document.getElementById('exportNotification');
+    const message = document.getElementById('exportMessage');
+    
+    message.textContent = `Экспортируются ${fileType}`;
+    notification.style.display = 'block';
+    
+    // Автоматически скрыть уведомление через 5 секунд
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 5000);
+}
+</script>
 {% endblock %} 

@@ -173,72 +173,133 @@ def create_readme():
     
     return readme_path
 
-# Сборка основного приложения с PyInstaller
+# Команда для создания .app файла с помощью PyInstaller
 def build_app():
-    app_name = "VPNServerManager"
+    """
+    Создает .app файл из app.py с помощью PyInstaller.
+    Включает все необходимые файлы: templates, static, config.json и другие.
+    """
+    print("Запуск PyInstaller для создания .app бандла...")
     
-    # Проверяем/создаем иконку
-    has_icon = check_and_create_icns()
+    icon_arg = f"--icon={ICON_FILE}" if ICON_FILE.exists() else ""
     
-    # Определяем путь к плагинам PyQt6
-    try:
-        qt_plugins_path = Path(sysconfig.get_paths()["purelib"]) / "PyQt6" / "Qt6" / "plugins"
-        if not qt_plugins_path.exists():
-            print(f"ОШИБКА: Не удалось найти директорию с плагинами PyQt6: {qt_plugins_path}")
-            sys.exit(1)
-    except Exception as e:
-        print(f"Критическая ошибка при поиске плагинов PyQt6: {e}")
-        sys.exit(1)
-    
-    pyinstaller_cmd = [
-        "python3", "-m", "PyInstaller",
-        "--name={}".format(app_name),
-        
-        # --- Основные данные приложения ---
-        "--add-data=static:static",
-        "--add-data=templates:templates",
-        "--add-data=requirements.txt:.",
-        "--add-data=config.json:.",
-        
-        # --- Явно указываем Qt, где искать плагины ---
-        "--add-data=qt.conf:.",
-        f"--add-data={qt_plugins_path}:PlugIns",
-
-        # --- Скрытые импорты (оставляем только то, что не определяется автоматически) ---
-        "--hidden-import=dotenv",
-        "--hidden-import=cryptography.hazmat.primitives.kdf.scrypt",
-
-
-        "--onedir",
-        "--windowed",  # Без консоли
-        "--debug=all", # Включаем полную отладку
-        "app.py"
+    # Определяем все файлы, которые нужно включить в сборку
+    datas = [
+        "templates:templates",          # HTML шаблоны
+        "static:static",                # CSS, изображения, иконки
+        "config.json:.",                # Файл конфигурации
+        "data:data",                    # Директория с данными (если есть)
+        "qt.conf:.",                    # Qt конфигурация для поиска плагинов
     ]
     
-    # Добавляем иконку, если она есть
-    if has_icon:
-        pyinstaller_cmd.insert(-1, f"--icon={ICON_FILE}")
+    # Если существует файл hints.json, добавляем его
+    hints_file = Path("data/hints.json")
+    if hints_file.exists():
+        datas.append("data/hints.json:data")
     
-    # Выполняем команду сборки
-    print("Запуск PyInstaller для создания .app бандла...")
-    subprocess.call(pyinstaller_cmd)
+    # Формируем аргументы для PyInstaller
+    datas_args = [f"--add-data={data}" for data in datas]
     
-    # Пути к созданному .app
-    app_path = DIST_DIR / f"{app_name}.app"
+    # Добавляем скрытые импорты для стабильной работы Qt
+    hidden_imports = [
+        "--hidden-import=PyQt6.QtCore",
+        "--hidden-import=PyQt6.QtWidgets",
+        "--hidden-import=PyQt6.QtGui",
+        "--hidden-import=PyQt6.sip",
+        "--collect-all=PyQt6"
+    ]
     
-    # Копируем .env файл если он существует
-    env_file = PROJECT_ROOT / '.env'
-    if env_file.exists():
-        target_resources = app_path / 'Contents' / 'Resources'
-        # Убедимся, что директория существует, прежде чем копировать
-        os.makedirs(target_resources, exist_ok=True)
-        shutil.copy(env_file, target_resources)
-        print(f"Файл .env скопирован в {target_resources}")
-    else:
-        print("КРИТИЧЕСКАЯ ОШИБКА: Файл .env не найден. Приложение не будет работать.")
-        sys.exit(1) # Прерываем сборку, если нет ключа
+    pyinstaller_cmd = [
+        "pyinstaller",
+        "--onefile",                    # Создать единый исполняемый файл
+        "--windowed",                   # GUI приложение (не консольное)
+        "--name=VPNServerManager",      # Имя приложения
+        icon_arg,                       # Иконка (если есть)
+        "--clean",                      # Очистить кэш PyInstaller
+        "--noconfirm",                  # Не запрашивать подтверждение
+        "--distpath=dist",              # Явно указываем директорию вывода
+        "--workpath=build",             # Явно указываем рабочую директорию
+        "--noupx",                      # Отключаем UPX для стабильности
+        "--strip",                      # Удаляем отладочную информацию
+        *datas_args,                    # Добавляемые файлы и директории
+        "app.py"                        # Основной файл приложения
+    ]
+    
+    # Убираем пустые аргументы (например, если иконки нет)
+    pyinstaller_cmd = [arg for arg in pyinstaller_cmd if arg]
+    
+    # Запуск PyInstaller
+    result = subprocess.run(pyinstaller_cmd, capture_output=False, text=True)
+    
+    if result.returncode != 0:
+        print(f"ОШИБКА: PyInstaller завершился с кодом {result.returncode}")
+        return False
+    
+    app_path = DIST_DIR / "VPNServerManager.app"
+    if not app_path.exists():
+        print("ОШИБКА: .app файл не был создан.")
+        return False
+    
+    print(f"✅ .app бандл создан: {app_path}")
+    
+    # Копируем .env файл в Resources приложения
+    env_source = PROJECT_ROOT / ".env"
+    if env_source.exists():
+        env_dest = app_path / "Contents" / "Resources" / ".env"
+        env_dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(env_source, env_dest)
+        print(f"Файл .env скопирован в {env_dest}")
+    
+    # Обновляем Info.plist с правильной версией
+    update_info_plist(app_path)
     
     return app_path
+
+def update_info_plist(app_path):
+    """
+    Обновляет Info.plist с правильной версией из config.json
+    """
+    info_plist_path = app_path / "Contents" / "Info.plist"
+    if not info_plist_path.exists():
+        print("ПРЕДУПРЕЖДЕНИЕ: Info.plist не найден")
+        return
+    
+    try:
+        # Читаем версию из config.json
+        with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        
+        version = config_data.get('app_info', {}).get('version', '3.2.0')
+        
+        # Читаем Info.plist
+        with open(info_plist_path, 'r', encoding='utf-8') as f:
+            plist_content = f.read()
+        
+        # Обновляем версии в Info.plist
+        import re
+        
+        # Обновляем CFBundleShortVersionString
+        plist_content = re.sub(
+            r'(<key>CFBundleShortVersionString</key>\s*<string>)[^<]*(</string>)',
+            f'\\1{version}\\2',
+            plist_content
+        )
+        
+        # Обновляем CFBundleVersion
+        plist_content = re.sub(
+            r'(<key>CFBundleVersion</key>\s*<string>)[^<]*(</string>)',
+            f'\\1{version}\\2',
+            plist_content
+        )
+        
+        # Записываем обновленный Info.plist
+        with open(info_plist_path, 'w', encoding='utf-8') as f:
+            f.write(plist_content)
+        
+        print(f"✅ Info.plist обновлен с версией {version}")
+        
+    except Exception as e:
+        print(f"ОШИБКА при обновлении Info.plist: {e}")
 
 # Создание DMG образа
 def create_dmg(app_path):
