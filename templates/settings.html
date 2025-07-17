@@ -24,7 +24,6 @@
             <h5 class="mb-0"><i class="bi bi-key"></i> Управление ключом шифрования</h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Управляйте главным ключом шифрования для защиты ваших данных.</p>
             
             <!-- Смена ключа -->
             <div class="row mb-4">
@@ -55,7 +54,7 @@
                 <!-- Проверка соответствия ключ-данные -->
                 <div class="col-lg-6">
                     <h6 class="text-primary"><i class="bi bi-search"></i> Проверка соответствия ключ-данные</h6>
-                    <p class="small text-muted">Быстро проверьте, подходит ли ключ к файлу данных, без импорта в приложение.</p>
+                    <p class="small text-muted">Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение.</p>
                     
                     <form action="{{ url_for('verify_key_data') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
@@ -86,7 +85,7 @@
                     <i class="bi bi-check-circle-fill"></i> 
                     <strong>Активный файл:</strong> <code>{{ active_data_file }}</code>
                 </div>
-                <p class="text-muted">Все ваши данные о серверах загружаются из этого зашифрованного файла.</p>
+                <p class="text-muted">Все данные о серверах загружаются из этого зашифрованного файла.</p>
                 
                 <!-- Кнопки экспорта -->
                 <div class="row">
@@ -161,10 +160,6 @@
             <h5 class="mb-0">Импорт серверов из другой установки</h5>
         </div>
         <div class="card-body">
-            <div class="alert alert-info" role="alert">
-                <strong>Новая функция!</strong> Импортируйте серверы из другого компьютера или установки приложения, даже если они зашифрованы другим SECRET_KEY. Сервера будут добавлены к вашим текущим данным.
-            </div>
-            
             <div class="alert alert-light border" role="alert">
                 <i class="bi bi-info-circle"></i> <strong>Что нужно:</strong> файл <code>.env</code> и <code>servers.json.enc</code> из другой установки приложения.
             </div>
@@ -177,7 +172,7 @@
                 <div class="mb-3">
                             <label for="envFile" class="form-label">Файл данных (.enc)</label>
                             <input type="file" class="form-control" name="external_file" id="envFile" accept=".enc" required>
-                    <div class="form-text">Выберите зашифрованный файл данных из другой установки</div>
+                    <div class="form-text">Выберать зашифрованный файл данных из другой установки</div>
                 </div>
                     </div>
 

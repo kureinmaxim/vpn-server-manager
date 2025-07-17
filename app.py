@@ -185,7 +185,7 @@ def inject_service_urls():
     # Инжектируем URL-адреса сервисов и путь к активному файлу данных
     return {
         'service_urls': app.config.get('service_urls', {}),
-        'active_data_file': app.config.get('active_data_file')
+        'active_data_file': get_active_data_path()  # Используем полный абсолютный путь
     }
 
 def allowed_file(filename):
@@ -323,6 +323,16 @@ def get_active_data_path():
             return os.path.join(APP_DATA_DIR, path)
         return path
     return None
+
+def get_export_dir():
+    """Возвращает безопасную директорию для экспорта файлов."""
+    # Используем папку Downloads пользователя - стандартное место для загрузок
+    downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+    if os.path.exists(downloads_dir) and os.access(downloads_dir, os.W_OK):
+        return downloads_dir
+    
+    # Если Downloads недоступна, используем APP_DATA_DIR
+    return APP_DATA_DIR
 
 
 def get_day_with_suffix(d):
@@ -1024,20 +1034,21 @@ def export_data():
         flash('Нет активного файла данных для экспорта.', 'warning')
         return redirect(url_for('settings_page'))
     
-    # Для PyWebView создаем копию файла в текущей директории для удобного доступа
+    # Для PyWebView создаем копию файла в папке Downloads для удобного доступа
     try:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         export_filename = f"servers_export_{timestamp}.enc"
-        export_path = os.path.join(os.getcwd(), export_filename)
+        export_dir = get_export_dir()
+        export_path = os.path.join(export_dir, export_filename)
         
-        # Копируем файл в текущую директорию
+        # Копируем файл в папку Downloads
         import shutil
         shutil.copy2(active_file, export_path)
         
-        flash(f'✅ Файл данных экспортирован как: {export_filename}', 'success')
+        flash(f'✅ Файл данных экспортирован как: {export_filename} в папку Downloads', 'success')
         
         return send_from_directory(
-                os.getcwd(), 
+                export_dir, 
             export_filename, 
         as_attachment=True
     )
@@ -1049,19 +1060,20 @@ def export_data():
 def export_key():
     """Экспортирует SECRET_KEY в виде .env файла для скачивания."""
     try:
-        # Создаем .env файл в текущей директории
+        # Создаем .env файл в папке Downloads
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
         key_filename = f"SECRET_KEY_{timestamp}.env"
-        key_path = os.path.join(os.getcwd(), key_filename)
+        export_dir = get_export_dir()
+        key_path = os.path.join(export_dir, key_filename)
         
         with open(key_path, 'w', encoding='utf-8') as f:
             f.write(f"SECRET_KEY={SECRET_KEY}\n")
             f.write(f"FLASK_SECRET_KEY=portable_app_key\n")
         
-        flash(f'✅ Ключ шифрования экспортирован как: {key_filename}', 'success')
+        flash(f'✅ Ключ шифрования экспортирован как: {key_filename} в папку Downloads', 'success')
         
         return send_from_directory(
-            os.getcwd(),
+            export_dir,
             key_filename,
             as_attachment=True
         )
@@ -1082,10 +1094,11 @@ def export_package():
             flash('Нет активного файла данных для экспорта.', 'warning')
             return redirect(url_for('settings_page'))
         
-        # Создаем ZIP файл в текущей директории
+        # Создаем ZIP файл в папке Downloads
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         zip_filename = f'vpn_servers_backup_{timestamp}.zip'
-        zip_path = os.path.join(os.getcwd(), zip_filename)
+        export_dir = get_export_dir()
+        zip_path = os.path.join(export_dir, zip_filename)
         
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             # Добавляем файл данных сервера
@@ -1126,11 +1139,11 @@ def export_package():
 """
             zipf.writestr("README.txt", readme_content)
         
-        flash(f'✅ Полный архив создан как: {zip_filename}', 'success')
+        flash(f'✅ Полный архив создан как: {zip_filename} в папке Downloads', 'success')
         
         # Отправляем ZIP файл
         return send_from_directory(
-            os.getcwd(),
+            export_dir,
             zip_filename,
             as_attachment=True
         )
