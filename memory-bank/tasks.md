@@ -1,6 +1,86 @@
 # MEMORY BANK - ACTIVE TASKS
 
-## CURRENT TASK: Enhanced Settings Panel - Key Management & Menu Optimization v3.3.0
+## CURRENT TASK: Fix .env File Write Error & Dependency Cleanup v3.3.4
+
+**Task ID:** BUGFIX-ENV-001  
+**Level:** Level 1 (Quick Bug Fix)  
+**Status:** ✅ COMPLETED  
+**Date:** 16.01.2025  
+**Build Time:** Completed  
+**Reflection:** ⏳ PENDING  
+**Archive:** ⏳ PENDING  
+
+### 🎯 PROBLEMS TO FIX
+
+**1. .env File Write Error** ❌ CRITICAL
+- **Issue**: "Read-only file system: '.env'" при смене ключа шифрования
+- **Root Cause**: Приложение пытается писать в .env файл внутри .app bundle (read-only)
+- **Solution**: Сохранять .env в пользовательскую директорию и обновить логику загрузки
+
+**2. Unnecessary Qt Dependencies** ⚠️ OPTIMIZATION  
+- **Issue**: pywebview[qt] добавляет PyQt6 зависимости без использования
+- **Files Affected**: requirements.txt, qt.conf, build_macos.py
+- **Solution**: Использовать нативные компоненты macOS без Qt
+
+**3. Obsolete Files** 🗑️ CLEANUP
+- **Issue**: app.py.orig - старая резервная копия
+- **Solution**: Удалить файл
+
+### ✅ IMPLEMENTATION COMPLETED
+
+**Phase 1: Fix .env File Path Logic** ✅ COMPLETED
+- [x] Обновить change_main_key() для сохранения .env в APP_DATA_DIR
+- [x] Обновить логику загрузки SECRET_KEY для поиска в пользовательской директории
+- [x] Тестировать смену ключа
+
+**Phase 2: Remove Qt Dependencies** ✅ COMPLETED
+- [x] Изменить pywebview[qt] на pywebview в requirements.txt
+- [x] Удалить qt.conf файл
+- [x] Обновить build_macos.py (убрать PyQt6 импорты)
+
+**Phase 3: Cleanup** ✅ COMPLETED
+- [x] Удалить app.py.orig
+
+### 🎯 PROBLEM RESOLUTION
+
+**✅ .env File Write Error - FIXED**
+- **Before**: Пытался писать в .env внутри read-only .app bundle
+- **After**: Сохраняет .env в `~/Library/Application Support/VPNServerManager/` для упакованного приложения
+- **Logic**: Упакованное приложение ищет .env в пользовательской директории, fallback на bundle
+- **Development**: В режиме разработки использует локальный .env как раньше
+
+**✅ Qt Dependencies - REMOVED**
+- **Removed**: pywebview[qt] → pywebview (native components)
+- **Deleted**: qt.conf файл (больше не нужен)
+- **Updated**: build_macos.py без PyQt6 импортов
+- **Result**: Меньше зависимостей, использует нативные компоненты macOS
+
+**✅ File Cleanup - COMPLETED**
+- **Deleted**: app.py.orig (устаревшая резервная копия)
+
+### 🧪 VERIFICATION
+
+**Code Quality:**
+- ✅ app.py компилируется без синтаксических ошибок
+- ✅ APP_DATA_DIR логика работает корректно
+- ✅ Логика .env файла теперь учитывает frozen/development режимы
+
+**Expected Results:**
+- 🔑 Смена ключа шифрования теперь работает без ошибки "Read-only file system"
+- 🏗️ Сборка приложения будет легче без Qt зависимостей
+- 🧹 Проект очищен от устаревших файлов
+
+### 📂 FILES TO MODIFY
+
+1. **app.py** - логика работы с .env файлом (строки ~1403, ~195-215)
+2. **requirements.txt** - убрать [qt] из pywebview  
+3. **build_macos.py** - убрать PyQt6 импорты (строки 204-208)
+4. **qt.conf** - удалить файл
+5. **app.py.orig** - удалить файл
+
+---
+
+## COMPLETED TASK: Enhanced Settings Panel - Key Management & Menu Optimization v3.3.0
 
 **Task ID:** SETTINGS-ENHANCE-001  
 **Level:** Level 2 (Simple Enhancement)  

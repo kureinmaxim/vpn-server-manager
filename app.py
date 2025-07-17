@@ -197,13 +197,21 @@ SECRET_KEY = None
 is_frozen = getattr(sys, 'frozen', False)
 
 if is_frozen:
-    # Если приложение собрано, строим абсолютный путь к .env внутри .app
+    # Для упакованного приложения ищем .env в пользовательской директории И в bundle
     try:
-        base_path = Path(sys.executable).parent.parent / 'Resources'
-        dotenv_path = base_path / '.env'
-        if dotenv_path.exists():
-            load_dotenv(dotenv_path=dotenv_path)
+        # Сначала пробуем пользовательскую директорию
+        user_dotenv_path = Path(APP_DATA_DIR) / '.env'
+        if user_dotenv_path.exists():
+            load_dotenv(dotenv_path=user_dotenv_path)
             SECRET_KEY = os.getenv("SECRET_KEY")
+        
+        # Если не найден в пользовательской директории, пробуем bundle (для совместимости)
+        if not SECRET_KEY:
+            base_path = Path(sys.executable).parent.parent / 'Resources'
+            bundle_dotenv_path = base_path / '.env'
+            if bundle_dotenv_path.exists():
+                load_dotenv(dotenv_path=bundle_dotenv_path)
+                SECRET_KEY = os.getenv("SECRET_KEY")
     except Exception:
         SECRET_KEY = None
 else:
@@ -1400,8 +1408,15 @@ def change_main_key():
         # Устанавливаем новый ключ
         os.environ['SECRET_KEY'] = new_key
         
-        # Обновляем файл .env
-        env_file = '.env'
+        # Определяем правильный путь к .env файлу
+        is_frozen = getattr(sys, 'frozen', False)
+        if is_frozen:
+            # Для упакованного приложения сохраняем .env в пользовательскую директорию
+            env_file = os.path.join(APP_DATA_DIR, '.env')
+        else:
+            # Для разработки используем локальный .env
+            env_file = '.env'
+        
         env_lines = []
         
         if os.path.exists(env_file):
@@ -1418,6 +1433,9 @@ def change_main_key():
         
         if not key_updated:
             env_lines.append(f'SECRET_KEY={new_key}\n')
+        
+        # Создаем директорию если нужно
+        os.makedirs(os.path.dirname(env_file), exist_ok=True)
         
         with open(env_file, 'w') as f:
             f.writelines(env_lines)
