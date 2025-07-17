@@ -1366,6 +1366,7 @@ def check_ip(ip_address):
 @app.route('/settings/change-key', methods=['POST'])
 def change_main_key():
     """Смена главного ключа с перешифровкой всех данных."""
+    global SECRET_KEY, fernet
     try:
         new_key = request.form.get('new_key', '').strip()
         confirm_key = request.form.get('confirm_key', '').strip()
@@ -1453,11 +1454,19 @@ def change_main_key():
             app.config['active_data_file'] = new_file_path
             save_app_config()
             
+            # КРИТИЧНО: Обновляем глобальные переменные для корректной работы экспорта
+            SECRET_KEY = new_key
+            fernet = Fernet(SECRET_KEY.encode())
+            
             flash(f'✅ Ключ успешно изменен! Создан новый файл данных: {new_filename}. Резервная копия сохранена как: {backup_filename}', 'success')
             
         except Exception as e:
             # Откатываем изменения в случае ошибки
             os.environ['SECRET_KEY'] = old_key
+            
+            # КРИТИЧНО: Откатываем глобальные переменные
+            SECRET_KEY = old_key
+            fernet = Fernet(SECRET_KEY.encode())
             
             # Восстанавливаем старый .env файл
             old_env_lines = []
