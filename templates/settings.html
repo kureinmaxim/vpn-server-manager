@@ -18,6 +18,63 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Управление ключом шифрования -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-key"></i> Управление ключом шифрования</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Управляйте главным ключом шифрования для защиты ваших данных.</p>
+            
+            <!-- Смена ключа -->
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <h6 class="text-primary"><i class="bi bi-arrow-repeat"></i> Смена главного ключа</h6>
+                    <p class="small text-muted">При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.</p>
+                    
+                    <form action="{{ url_for('change_main_key') }}" method="post" onsubmit="return confirmKeyChange()">
+                        <div class="mb-3">
+                            <label for="newKey" class="form-label">Новый ключ</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="new_key" id="newKey" required placeholder="Введите новый ключ Fernet">
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateRandomKey()">
+                                    <i class="bi bi-dice-3"></i> Сгенерировать
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmKey" class="form-label">Подтверждение ключа</label>
+                            <input type="text" class="form-control" name="confirm_key" id="confirmKey" required placeholder="Повторите новый ключ">
+                        </div>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-arrow-repeat"></i> Сменить ключ
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Проверка соответствия ключ-данные -->
+                <div class="col-lg-6">
+                    <h6 class="text-primary"><i class="bi bi-search"></i> Проверка соответствия ключ-данные</h6>
+                    <p class="small text-muted">Быстро проверьте, подходит ли ключ к файлу данных, без импорта в приложение.</p>
+                    
+                    <form action="{{ url_for('verify_key_data') }}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="verifyFile" class="form-label">Файл данных (.enc)</label>
+                            <input type="file" class="form-control" name="verify_file" id="verifyFile" accept=".enc" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="verifyKey" class="form-label">Ключ для проверки</label>
+                            <textarea class="form-control" name="verify_key" id="verifyKey" rows="3" required placeholder="Вставьте ключ шифрования для проверки"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-info">
+                            <i class="bi bi-search"></i> Проверить соответствие
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Статус файла данных -->
     <div class="card mb-4">
         <div class="card-header">
@@ -166,6 +223,40 @@ function showExportMessage(fileType) {
     setTimeout(() => {
         notification.style.display = 'none';
     }, 5000);
+}
+
+function confirmKeyChange() {
+    const newKey = document.getElementById('newKey').value;
+    const confirmKey = document.getElementById('confirmKey').value;
+    
+    if (newKey !== confirmKey) {
+        alert('Ключи не совпадают!');
+        return false;
+    }
+    
+    return confirm('Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл данных и сохранит резервную копию старого.');
+}
+
+async function generateRandomKey() {
+    try {
+        const response = await fetch('/settings/generate-key', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('newKey').value = data.key;
+            document.getElementById('confirmKey').value = data.key;
+        } else {
+            alert('Ошибка при генерации ключа: ' + data.error);
+        }
+    } catch (error) {
+        alert('Ошибка при генерации ключа: ' + error.message);
+    }
 }
 </script>
 {% endblock %} 
