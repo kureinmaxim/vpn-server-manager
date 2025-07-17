@@ -248,8 +248,8 @@ def decrypt_data(encrypted_data):
     
     # Если данные начинаются с gAAAAA, это точно Fernet данные
     if encrypted_data.startswith('gAAAAA'):
-    try:
-        return fernet.decrypt(encrypted_data.encode()).decode()
+        try:
+            return fernet.decrypt(encrypted_data.encode()).decode()
         except Exception:
             # Если расшифровка не удалась, возвращаем пустую строку
             return ""
@@ -1035,9 +1035,9 @@ def export_data():
         shutil.copy2(active_file, export_path)
         
         flash(f'✅ Файл данных экспортирован как: {export_filename}', 'success')
-    
-    return send_from_directory(
-            os.getcwd(), 
+        
+        return send_from_directory(
+                os.getcwd(), 
             export_filename, 
         as_attachment=True
     )
@@ -1341,6 +1341,185 @@ def check_ip(ip_address):
             return jsonify({"error": f"Ошибка запроса: статус {response.status_code}"}), 500
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Не удалось подключиться к сервису: {e}"}), 500
+
+@app.route('/settings/change-key', methods=['POST'])
+def change_main_key():
+    """Смена главного ключа с перешифровкой всех данных."""
+    try:
+        new_key = request.form.get('new_key', '').strip()
+        confirm_key = request.form.get('confirm_key', '').strip()
+        
+        # Проверяем, что ключи совпадают
+        if new_key != confirm_key:
+            flash('Ошибка: ключи не совпадают.', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        # Проверяем формат нового ключа
+        if not new_key:
+            flash('Ошибка: новый ключ не может быть пустым.', 'danger')
+            return redirect(url_for('settings_page'))
+            
+        try:
+            # Проверяем, что новый ключ корректный для Fernet
+            test_fernet = Fernet(new_key.encode())
+        except Exception:
+            flash('Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet.', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        # Загружаем текущие данные с существующим ключом
+        current_servers = load_servers()
+        
+        # Создаем резервную копию с временной меткой
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_filename = f"backup_before_key_change_{timestamp}.enc"
+        
+        app_data_dir = get_app_data_dir()
+        data_dir = os.path.join(app_data_dir, "data")
+        backup_path = os.path.join(data_dir, backup_filename)
+        
+        # Создаем резервную копию
+        if app.config.get('active_data_file') and os.path.exists(app.config['active_data_file']):
+            shutil.copy2(app.config['active_data_file'], backup_path)
+        
+        # Сохраняем старый ключ для отката в случае ошибки
+        old_key = os.environ.get('SECRET_KEY')
+        
+        # Устанавливаем новый ключ
+        os.environ['SECRET_KEY'] = new_key
+        
+        # Обновляем файл .env
+        env_file = '.env'
+        env_lines = []
+        
+        if os.path.exists(env_file):
+            with open(env_file, 'r') as f:
+                env_lines = f.readlines()
+        
+        # Обновляем или добавляем SECRET_KEY
+        key_updated = False
+        for i, line in enumerate(env_lines):
+            if line.startswith('SECRET_KEY='):
+                env_lines[i] = f'SECRET_KEY={new_key}\n'
+                key_updated = True
+                break
+        
+        if not key_updated:
+            env_lines.append(f'SECRET_KEY={new_key}\n')
+        
+        with open(env_file, 'w') as f:
+            f.writelines(env_lines)
+        
+        # Создаем новый зашифрованный файл с новым ключом
+        new_filename = f"servers_reencrypted_{timestamp}.enc"
+        new_file_path = os.path.join(data_dir, new_filename)
+        
+        try:
+            # Перешифровываем данные с новым ключом
+            with open(new_file_path, 'wb') as f:
+                f.write(encrypt_data(json.dumps(current_servers)).encode())
+            
+            # Обновляем конфигурацию приложения
+            app.config['active_data_file'] = new_file_path
+            save_app_config()
+            
+            flash(f'✅ Ключ успешно изменен! Создан новый файл данных: {new_filename}. Резервная копия сохранена как: {backup_filename}', 'success')
+            
+        except Exception as e:
+            # Откатываем изменения в случае ошибки
+            os.environ['SECRET_KEY'] = old_key
+            
+            # Восстанавливаем старый .env файл
+            old_env_lines = []
+            for line in env_lines:
+                if line.startswith('SECRET_KEY='):
+                    old_env_lines.append(f'SECRET_KEY={old_key}\n')
+                else:
+                    old_env_lines.append(line)
+            
+            with open(env_file, 'w') as f:
+                f.writelines(old_env_lines)
+            
+            flash(f'Ошибка при перешифровке данных: {str(e)}. Изменения отменены.', 'danger')
+            
+    except Exception as e:
+        flash(f'Ошибка при смене ключа: {str(e)}', 'danger')
+    
+    return redirect(url_for('settings_page'))
+
+@app.route('/settings/verify-key-data', methods=['POST'])
+def verify_key_data():
+    """Проверка соответствия ключа и данных без импорта."""
+    try:
+        uploaded_file = request.files.get('verify_file')
+        test_key = request.form.get('verify_key', '').strip()
+        
+        if not uploaded_file or not test_key:
+            flash('Необходимо выбрать файл и указать ключ для проверки.', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        if not uploaded_file.filename.endswith('.enc'):
+            flash('Неверный тип файла. Выберите файл .enc', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        # Проверяем формат ключа
+        try:
+            test_fernet = Fernet(test_key.encode())
+        except Exception:
+            flash('❌ Некорректный формат ключа Fernet.', 'danger')
+            return redirect(url_for('settings_page'))
+        
+        # Читаем файл
+        file_content = uploaded_file.read()
+        
+        try:
+            # Пытаемся расшифровать
+            decrypted_data = test_fernet.decrypt(file_content).decode()
+            data = json.loads(decrypted_data)
+            
+            # Анализируем содержимое
+            if isinstance(data, list):
+                server_count = len(data)
+                
+                # Собираем информацию о серверах
+                providers = set()
+                server_names = []
+                
+                for server in data:
+                    if isinstance(server, dict):
+                        if 'provider' in server:
+                            providers.add(server['provider'])
+                        if 'name' in server:
+                            server_names.append(server['name'])
+                
+                provider_list = ', '.join(sorted(providers)) if providers else 'Не указано'
+                name_preview = ', '.join(server_names[:3])
+                if len(server_names) > 3:
+                    name_preview += f' и еще {len(server_names) - 3}'
+                
+                flash(f'✅ Ключ подходит! Найдено серверов: {server_count}. Провайдеры: {provider_list}. Серверы: {name_preview}', 'success')
+            else:
+                flash('✅ Ключ подходит, но структура данных неожиданная.', 'warning')
+                
+        except InvalidToken:
+            flash('❌ Ключ не подходит к этому файлу данных.', 'danger')
+        except json.JSONDecodeError:
+            flash('❌ Файл расшифрован, но содержит некорректные JSON данные.', 'danger')
+        except Exception as e:
+            flash(f'❌ Ошибка при проверке: {str(e)}', 'danger')
+            
+    except Exception as e:
+        flash(f'Ошибка при обработке файла: {str(e)}', 'danger')
+    
+    return redirect(url_for('settings_page'))
+
+@app.route('/settings/generate-key', methods=['POST'])
+def generate_new_key():
+    """Генерация нового случайного ключа Fernet."""
+    try:
+        new_key = Fernet.generate_key().decode()
+        return jsonify({'success': True, 'key': new_key})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/shutdown')
 def shutdown():
