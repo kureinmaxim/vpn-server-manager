@@ -22,6 +22,12 @@
 
 **Result**: Key management functionality now works correctly in packaged .app without read-only filesystem errors.
 
+#### Additional Fix: Export Key Bug ✅
+- Fixed issue where key export showed old key after key change
+- Root cause: Global variables `SECRET_KEY` and `fernet` weren't updated after key change  
+- Solution: Added global variable updates in `change_main_key()` function
+- Result: Key export now shows the current active key correctly
+
 ---
 
 ## Previous Task: Educational Content Creation - COMPLETED
