@@ -1,6 +1,30 @@
-# Progress Tracking: VPN Server Manager Educational Guide
+# Progress Tracking: VPN Server Manager
 
-## Current Task: Educational Content Creation - COMPLETED
+## Current Task: .env File Write Error & Dependency Cleanup v3.3.4 - COMPLETED
+
+### Bug Fix Implementation Status: ✅ COMPLETE
+
+#### Critical Fix: .env File Write Error ✅ 
+- Fixed "Read-only file system" error when changing encryption key
+- Updated .env save location for packaged app: `~/Library/Application Support/VPNServerManager/`
+- Maintained backward compatibility with bundle .env files
+- Development mode continues using local .env as before
+
+#### Optimization: Qt Dependencies Removal ✅
+- Removed unnecessary PyQt6 dependencies from requirements.txt
+- Deleted qt.conf file (no longer needed)
+- Updated build_macos.py to use native macOS components
+- Reduced application size and complexity
+
+#### Cleanup: Obsolete Files ✅
+- Removed app.py.orig backup file
+- Project cleanup completed
+
+**Result**: Key management functionality now works correctly in packaged .app without read-only filesystem errors.
+
+---
+
+## Previous Task: Educational Content Creation - COMPLETED
 
 ### Implementation Status: ✅ COMPLETE
 
