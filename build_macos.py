@@ -189,7 +189,6 @@ def build_app():
         "static:static",                # CSS, изображения, иконки
         "config.json:.",                # Файл конфигурации
         "data:data",                    # Директория с данными (если есть)
-        "qt.conf:.",                    # Qt конфигурация для поиска плагинов
     ]
     
     # Если существует файл hints.json, добавляем его
@@ -200,13 +199,10 @@ def build_app():
     # Формируем аргументы для PyInstaller
     datas_args = [f"--add-data={data}" for data in datas]
     
-    # Добавляем скрытые импорты для стабильной работы Qt
+    # Скрытые импорты для pywebview и других зависимостей
     hidden_imports = [
-        "--hidden-import=PyQt6.QtCore",
-        "--hidden-import=PyQt6.QtWidgets",
-        "--hidden-import=PyQt6.QtGui",
-        "--hidden-import=PyQt6.sip",
-        "--collect-all=PyQt6"
+        "--hidden-import=webview",
+        "--hidden-import=cryptography"
     ]
     
     pyinstaller_cmd = [
