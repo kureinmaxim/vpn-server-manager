@@ -1,10 +1,10 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.3.5",
-    "release_date": "18.07.2025",
+    "version": "3.4.0",
+    "release_date": "02.08.2025",
     "developer": "Куреин М.Н.",
-    "last_updated": "2025-07-18"
+    "last_updated": "2025-08-02"
   },
   "service_urls": {
     "ip_check_api": "https://ipinfo.io/{ip}/json",

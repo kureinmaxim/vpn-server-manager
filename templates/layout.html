@@ -119,6 +119,132 @@
                 }
             }, 3000);
         }
+
+        // Улучшенная функция проверки IP с обработкой ошибок
+        function checkIpInfo(ipAddress) {
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            
+            // Показываем индикатор загрузки
+            button.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Проверка...';
+            button.disabled = true;
+            
+            fetch(`/check_ip/${ipAddress}`)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(data => {
+                            throw new Error(data.message || data.error || 'Ошибка проверки IP');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Создаем модальное окно с результатами
+                    const modal = document.createElement('div');
+                    modal.className = 'modal fade';
+                    modal.innerHTML = `
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-search"></i> Информация об IP: ${ipAddress}
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Основная информация</h6>
+                                            <ul class="list-unstyled">
+                                                <li><strong>IP:</strong> ${data.ip || ipAddress}</li>
+                                                <li><strong>Город:</strong> ${data.city || 'Неизвестно'}</li>
+                                                <li><strong>Регион:</strong> ${data.region || 'Неизвестно'}</li>
+                                                <li><strong>Страна:</strong> ${data.country || 'Неизвестно'}</li>
+                                                <li><strong>Провайдер:</strong> ${data.org || 'Неизвестно'}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Геолокация</h6>
+                                            <ul class="list-unstyled">
+                                                <li><strong>Координаты:</strong> ${data.loc || 'Неизвестно'}</li>
+                                                <li><strong>Часовой пояс:</strong> ${data.timezone || 'Неизвестно'}</li>
+                                                <li><strong>Почтовый индекс:</strong> ${data.postal || 'Неизвестно'}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                    new bootstrap.Modal(modal).show();
+                    
+                    // Удаляем модальное окно после закрытия
+                    modal.addEventListener('hidden.bs.modal', () => {
+                        modal.remove();
+                    });
+                })
+                .catch(error => {
+                    // Показываем ошибку пользователю
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Ошибка проверки IP:</strong><br>
+                        ${error.message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    document.body.appendChild(alertDiv);
+                    setTimeout(() => {
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, 5000);
+                })
+                .finally(() => {
+                    // Восстанавливаем кнопку
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                });
+        }
+
+        // Функция копирования в буфер обмена
+        function copyToClipboard(button, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i>';
+                button.classList.add('btn-success');
+                button.classList.remove('btn-outline-secondary');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-outline-secondary');
+                }, 1000);
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
+                alert('Не удалось скопировать в буфер обмена');
+            });
+        }
+
+        // Функция переключения видимости пароля
+        function togglePassword(button) {
+            const passwordField = button.previousElementSibling;
+            const isVisible = passwordField.type === 'text';
+            
+            if (isVisible) {
+                passwordField.type = 'password';
+                passwordField.textContent = '********';
+                button.innerHTML = '<i class="bi bi-eye"></i>';
+            } else {
+                passwordField.type = 'text';
+                passwordField.textContent = passwordField.dataset.password;
+                button.innerHTML = '<i class="bi bi-eye-slash"></i>';
+            }
+        }
     </script>
     {% block scripts %}{% endblock %}
 </body>
