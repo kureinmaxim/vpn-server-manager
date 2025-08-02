@@ -16,6 +16,7 @@ import subprocess
 import shutil
 import webview
 import signal
+import socket
 
 load_dotenv()
 
@@ -380,7 +381,12 @@ def analyze_hosting(ip_info):
 def load_servers():
     """Загружает и расшифровывает серверы из активного зашифрованного файла."""
     active_file = get_active_data_path()
-    if not active_file or not os.path.exists(active_file):
+    if not active_file:
+        print("Активный файл данных не найден")
+        return []
+    
+    if not os.path.exists(active_file):
+        print(f"Файл данных не существует: {active_file}")
         return []
 
     try:
@@ -388,6 +394,7 @@ def load_servers():
             encrypted_data = f.read()
 
         if not encrypted_data:
+            print("Файл данных пуст")
             return []
 
         decrypted_data = fernet.decrypt(encrypted_data)
@@ -469,11 +476,18 @@ def load_servers():
                 # Сортировка чеков по дате загрузки (от новых к старым)
                 server['payment_info']['receipts'].sort(key=lambda r: r.get('upload_date', ''), reverse=True)
 
+        print(f"Успешно загружено {len(servers)} серверов")
         return servers
-    except (FileNotFoundError, json.JSONDecodeError):
+    except FileNotFoundError:
+        print(f"Файл данных не найден: {active_file}")
         return []
-    except (InvalidToken, Exception):
+    except json.JSONDecodeError as e:
+        print(f"Ошибка декодирования JSON: {e}")
+        flash('Ошибка чтения файла данных. Файл может быть поврежден.', 'danger')
+        return []
+    except (InvalidToken, Exception) as e:
         # Если ключ неверный или файл поврежден
+        print(f"Ошибка расшифровки данных: {e}")
         flash('Не удалось расшифровать файл данных. Проверьте ваш SECRET_KEY или целостность файла.', 'danger')
         return []
 
@@ -621,7 +635,12 @@ def add_security_headers(response):
 
 @app.route('/')
 def index():
-    servers = load_servers()
+    try:
+        servers = load_servers()
+    except Exception as e:
+        print(f"Ошибка загрузки серверов: {e}")
+        servers = []
+        flash('Не удалось загрузить данные серверов. Проверьте подключение к интернету и целостность файла данных.', 'warning')
     
     def get_os_icon(os_name):
         os_lower = os_name.lower()
@@ -654,11 +673,21 @@ def index():
         except Exception:
             return url_string 
 
+    # Проверяем доступность интернета
+    internet_available = True
+    try:
+        # Быстрая проверка интернета
+        import socket
+        socket.create_connection(("8.8.8.8", 53), timeout=3)
+    except OSError:
+        internet_available = False
+        flash('Нет подключения к интернету. Некоторые функции могут быть недоступны.', 'info')
+
     for server in servers:
         server['os_icon'] = get_os_icon(server.get('os', ''))
         server['masked_panel_url'] = mask_url_path(server.get('panel_url', ''))
         
-    return render_template('index.html', servers=servers)
+    return render_template('index.html', servers=servers, internet_available=internet_available)
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -1354,14 +1383,39 @@ def detach_data():
 @app.route('/check_ip/<ip_address>')
 def check_ip(ip_address):
     try:
+        # Проверяем доступность интернета
+        socket.create_connection(("8.8.8.8", 53), timeout=3)
+    except OSError:
+        return jsonify({
+            "error": "Нет подключения к интернету",
+            "message": "Проверка IP недоступна в офлайн режиме"
+        }), 503
+    
+    try:
         ip_check_url = app.config.get('service_urls', {}).get('ip_check_api', 'https://ipinfo.io/{ip}/json').format(ip=ip_address)
-        response = requests.get(ip_check_url, timeout=5)
+        response = requests.get(ip_check_url, timeout=10)
         if response.status_code == 200:
             return jsonify(response.json())
         else:
-            return jsonify({"error": f"Ошибка запроса: статус {response.status_code}"}), 500
+            return jsonify({
+                "error": f"Ошибка запроса: статус {response.status_code}",
+                "message": "Сервис проверки IP временно недоступен"
+            }), 500
+    except requests.exceptions.Timeout:
+        return jsonify({
+            "error": "Превышено время ожидания",
+            "message": "Сервис проверки IP не отвечает"
+        }), 504
+    except requests.exceptions.ConnectionError:
+        return jsonify({
+            "error": "Ошибка подключения",
+            "message": "Не удалось подключиться к сервису проверки IP"
+        }), 503
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Не удалось подключиться к сервису: {e}"}), 500
+        return jsonify({
+            "error": f"Ошибка запроса: {str(e)}",
+            "message": "Проблема с подключением к сервису"
+        }), 500
 
 @app.route('/settings/change-key', methods=['POST'])
 def change_main_key():
@@ -1406,8 +1460,12 @@ def change_main_key():
         # Сохраняем старый ключ для отката в случае ошибки
         old_key = os.environ.get('SECRET_KEY')
         
-        # Устанавливаем новый ключ
+        # Устанавливаем новый ключ в переменной окружения
         os.environ['SECRET_KEY'] = new_key
+        
+        # КРИТИЧНО: Обновляем глобальные переменные ПЕРЕД перешифровкой
+        SECRET_KEY = new_key
+        fernet = Fernet(SECRET_KEY.encode())
         
         # Определяем правильный путь к .env файлу
         is_frozen = getattr(sys, 'frozen', False)
@@ -1453,10 +1511,6 @@ def change_main_key():
             # Обновляем конфигурацию приложения
             app.config['active_data_file'] = new_file_path
             save_app_config()
-            
-            # КРИТИЧНО: Обновляем глобальные переменные для корректной работы экспорта
-            SECRET_KEY = new_key
-            fernet = Fernet(SECRET_KEY.encode())
             
             flash(f'✅ Ключ успешно изменен! Создан новый файл данных: {new_filename}. Резервная копия сохранена как: {backup_filename}', 'success')
             

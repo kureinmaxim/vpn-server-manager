@@ -45,3 +45,72 @@
 .force-dark-text, .force-dark-text h5, .force-dark-text small {
     color: #212529 !important;
 }
+
+/* Анимация загрузки */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Стили для офлайн режима */
+.offline-indicator {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Улучшенные стили для кнопок в офлайн режиме */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Стили для модальных окон */
+.modal-content {
+    background-color: var(--bs-tertiary-bg);
+    color: var(--bs-body-color);
+}
+
+.modal-header {
+    border-bottom-color: var(--bs-border-color);
+}
+
+.modal-footer {
+    border-top-color: var(--bs-border-color);
+}
+
+/* Стили для алертов */
+.alert {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Анимация появления алертов */
+.alert.fade.show {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
