@@ -173,8 +173,8 @@
                                         <small>Пароль:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.hoster_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -197,7 +197,7 @@
                             <div id="collapse-ssh-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     <div class="text-center mb-2">
-                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))">
+                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать SSH команду подключения">
                                             <i class="bi bi-terminal"></i> Копировать команду
                                         </button>
                                     </div>
@@ -207,7 +207,7 @@
                                         <small>Login:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.ssh_credentials.user }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -216,8 +216,8 @@
                                         <small>Пароль:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -237,8 +237,8 @@
                                         <small>Пароль:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.root_password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -259,7 +259,7 @@
                                         <small>Логин:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.panel_credentials.user_decrypted }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -268,8 +268,8 @@
                                         <small>Пароль:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.panel_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -321,6 +321,14 @@
 
 {% block scripts %}
 <script>
+    // Инициализация tooltips при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
     function checkIpInfo(ipAddress) {
         const modal = new bootstrap.Modal(document.getElementById('ipInfoModal'));
         const content = document.getElementById('ipInfoContent');
