@@ -1,12 +1,16 @@
 # Active Context: VPN Server Manager Project
 
-## Current Task Status: Decryption Fix v3.2.6 - COMPLETED & ARCHIVED
+## Current Task Status: No Active Tasks - Ready for New Development
 
 ## Project Overview
 VPN Server Manager - десктопное приложение для управления VPN-серверами с гибридной архитектурой (Flask + PyWebView).
 
-## Recent Achievement
-Успешно исправлена критическая проблема расшифровки данных серверов. Все 4 сервера теперь корректно отображают учетные данные вместо зашифрованных строк. Созданы новые дистрибутивы v3.2.6 для продакшн использования.
+## Recent Achievement (v3.3.4)
+Успешно исправлена критическая проблема с управлением ключами шифрования:
+- ✅ Исправлена ошибка "Read-only file system" при смене ключей в упакованном .app
+- ✅ Оптимизированы зависимости (удален ненужный Qt) 
+- ✅ Очищена структура проекта
+- ✅ Полностью восстановлена функциональность управления ключами
 
 ## Key Technologies
 - **Frontend**: HTML/CSS/JavaScript + Jinja2 templates
@@ -34,12 +38,12 @@ PyWebView (Native Window) -> Flask (Local Server) -> HTML Interface
 - Configuration: `config.json`
 
 ## Next Recommended Actions
-1. Monitor user feedback on the new v3.2.6 distribution
-2. Consider implementing automated tests for decryption functionality
-3. Review potential security enhancements for encryption key management
+1. Build and test new v3.3.4 distribution with key management fixes
+2. Consider implementing automated tests for key management functionality  
+3. Monitor user feedback on improved key management experience
 4. Plan next feature development cycle
 
 ## Memory Bank Status
 - **Current Tasks**: None (ready for new task)
-- **Last Archive**: VPN Server Data Decryption Fix v3.2.6 (15.07.2025)
+- **Last Archive**: .env File Write Error & Dependency Cleanup v3.3.4 (16.01.2025)
 - **Ready for**: VAN Mode to initialize next task
