@@ -1321,6 +1321,65 @@ def import_external_data():
                 if server_name:
                     existing_names.add(server_name)
             
+            # Перешифровываем пароли в новых серверах с нашим ключом
+            for server in new_servers:
+                # Перешифровываем SSH пароли
+                if 'ssh_credentials' in server:
+                    if 'password' in server['ssh_credentials'] and server['ssh_credentials']['password']:
+                        # Расшифровываем старым ключом
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_password = fernet_external.decrypt(server['ssh_credentials']['password'].encode()).decode()
+                            # Шифруем нашим ключом
+                            server['ssh_credentials']['password'] = fernet.encrypt(decrypted_password.encode()).decode()
+                        except Exception:
+                            # Если не удалось расшифровать, оставляем как есть
+                            pass
+                    
+                    if 'root_password' in server['ssh_credentials'] and server['ssh_credentials']['root_password']:
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_root_password = fernet_external.decrypt(server['ssh_credentials']['root_password'].encode()).decode()
+                            server['ssh_credentials']['root_password'] = fernet.encrypt(decrypted_root_password.encode()).decode()
+                        except Exception:
+                            pass
+                
+                # Перешифровываем пароли панели управления
+                if 'panel_credentials' in server:
+                    if 'password' in server['panel_credentials'] and server['panel_credentials']['password']:
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_panel_password = fernet_external.decrypt(server['panel_credentials']['password'].encode()).decode()
+                            server['panel_credentials']['password'] = fernet.encrypt(decrypted_panel_password.encode()).decode()
+                        except Exception:
+                            pass
+                    
+                    if 'user' in server['panel_credentials'] and server['panel_credentials']['user']:
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_panel_user = fernet_external.decrypt(server['panel_credentials']['user'].encode()).decode()
+                            server['panel_credentials']['user'] = fernet.encrypt(decrypted_panel_user.encode()).decode()
+                        except Exception:
+                            pass
+                
+                # Перешифровываем пароли кабинета хостера
+                if 'hoster_credentials' in server:
+                    if 'password' in server['hoster_credentials'] and server['hoster_credentials']['password']:
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_hoster_password = fernet_external.decrypt(server['hoster_credentials']['password'].encode()).decode()
+                            server['hoster_credentials']['password'] = fernet.encrypt(decrypted_hoster_password.encode()).decode()
+                        except Exception:
+                            pass
+                    
+                    if 'user' in server['hoster_credentials'] and server['hoster_credentials']['user']:
+                        try:
+                            fernet_external = Fernet(external_key.encode())
+                            decrypted_hoster_user = fernet_external.decrypt(server['hoster_credentials']['user'].encode()).decode()
+                            server['hoster_credentials']['user'] = fernet.encrypt(decrypted_hoster_user.encode()).decode()
+                        except Exception:
+                            pass
+            
             # Объединяем данные
             combined_servers = current_servers + new_servers
             
