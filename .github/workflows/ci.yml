@@ -65,7 +65,7 @@ jobs:
         pip install -r requirements.txt
         pip install pyinstaller
     
-    - name: Test build
+    - name: Run basic tests
       run: |
         python generate_key.py
-        python -c "import app; print('✅ App imports successfully')" 
+        python test_basic.py 
