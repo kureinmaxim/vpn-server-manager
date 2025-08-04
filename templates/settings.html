@@ -103,6 +103,9 @@
                         <button class="btn btn-success w-100" onclick="showExportInfo('package')">
                             <i class="bi bi-archive"></i> Полный экспорт
                         </button>
+                        <small class="text-muted d-block mt-1">
+                            <i class="bi bi-key"></i> Включает PIN-код
+                        </small>
                     </div>
                 </div>
                 
@@ -280,6 +283,14 @@ function showExportInfo(exportType) {
     exportTypeElement.textContent = typeText;
     exportLocationElement.textContent = locationText;
     
+    // Показываем дополнительную информацию для полного экспорта
+    const packageInfo = document.getElementById('packageInfo');
+    if (exportType === 'package') {
+        packageInfo.style.display = 'block';
+    } else {
+        packageInfo.style.display = 'none';
+    }
+    
     // Показываем модальное окно
     modal.style.display = 'block';
 }
@@ -329,6 +340,16 @@ window.onclick = function(event) {
         <div class="modal-body">
             <div class="alert alert-info" style="background-color: #1f2937; border: 1px solid #3498db; color: #3498db; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
                 <strong>Экспортируется:</strong> <span id="exportTypeText"></span>
+                <div id="packageInfo" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #3498db;">
+                    <i class="bi bi-key"></i> <strong>Содержимое архива:</strong>
+                    <ul style="margin: 5px 0 0 20px; color: #bdc3c7;">
+                        <li>Зашифрованные данные серверов</li>
+                        <li>Ключ шифрования (.env)</li>
+                        <li>PIN-код для входа (PIN.txt)</li>
+                        <li>Загруженные файлы (uploads/)</li>
+                        <li>Инструкции по импорту (README.txt)</li>
+                    </ul>
+                </div>
             </div>
             
             <div style="margin-bottom: 20px;">

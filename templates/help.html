@@ -616,6 +616,77 @@ VPNserverManage/
             </div>
 
             <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_pin">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_pin" aria-expanded="false" aria-controls="collapse_pin">
+                        <i class="bi bi-shield-lock me-2"></i> PIN-система защиты
+                    </button>
+                </h2>
+                <div id="collapse_pin" class="accordion-collapse collapse" aria-labelledby="heading_pin" data-bs-parent="#helpAccordion">
+                    <div class="card-body">
+                        <p>Приложение защищено PIN-кодом для дополнительной безопасности. Это обеспечивает защиту от несанкционированного доступа к вашим данным.</p>
+                        
+                        <h5>Первый запуск</h5>
+                        <p>При первом запуске приложения вы увидите экран "Доступ ограничен". У вас есть два варианта:</p>
+                        <ul>
+                            <li><strong>Создать новый PIN:</strong> Нажмите "Первый запуск" → "Создать новый PIN-код". Это создаст новый PIN и сбросит все данные.</li>
+                            <li><strong>Импортировать архив:</strong> Нажмите "Первый запуск" → "Импортировать архив". Это позволит восстановить данные из ранее созданного архива.</li>
+                        </ul>
+
+                        <h5>Вход в приложение</h5>
+                        <p>После настройки PIN-кода для входа в приложение используйте один из способов:</p>
+                        <ul>
+                            <li><strong>Двойной клик по имени разработчика:</strong> Внизу страницы найдите имя разработчика в футере и дважды кликните по нему.</li>
+                            <li><strong>Через настройки:</strong> Если вы уже вошли в систему, можете изменить PIN в разделе "Настройки".</li>
+                        </ul>
+
+                        <h5>Безопасность PIN-кода</h5>
+                        <ul>
+                            <li><strong>Минимальная длина:</strong> PIN должен содержать минимум 4 символа</li>
+                            <li><strong>Защита от перебора:</strong> После 2 неудачных попыток вход блокируется на 30 секунд</li>
+                            <li><strong>Автоматический счетчик:</strong> При блокировке на экране отображается обратный отсчет времени</li>
+                            <li><strong>Хранение:</strong> PIN хранится в зашифрованном виде в файле конфигурации</li>
+                        </ul>
+
+                        <h5>Экспорт и импорт с PIN</h5>
+                        <p>При использовании функции "Полный экспорт" PIN-код автоматически включается в архив:</p>
+                        <ul>
+                            <li><strong>Экспорт:</strong> В созданный ZIP-архив добавляется файл <code>PIN.txt</code> с вашим PIN-кодом</li>
+                            <li><strong>Импорт:</strong> При импорте архива PIN автоматически извлекается и устанавливается</li>
+                            <li><strong>Показ PIN:</strong> При импорте PIN отображается в отдельном окне для записи</li>
+                        </ul>
+
+                        <h5>Смена PIN-кода</h5>
+                        <p>Для смены PIN-кода:</p>
+                        <ol>
+                            <li>Войдите в приложение</li>
+                            <li>Перейдите в "Настройки"</li>
+                            <li>Найдите раздел "PIN-код"</li>
+                            <li>Введите старый PIN и новый PIN дважды</li>
+                            <li>Нажмите "Сменить PIN"</li>
+                        </ol>
+
+                        <h5>Выход из системы</h5>
+                        <p>Для выхода из системы нажмите кнопку "Выход" в верхней панели навигации. После выхода потребуется повторный ввод PIN-кода для доступа к данным.</p>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Важно:</strong>
+                            <ul class="mb-0">
+                                <li>Запишите PIN-код в надежном месте - без него вы не сможете получить доступ к данным</li>
+                                <li>При создании нового PIN все существующие данные будут удалены</li>
+                                <li>PIN-код не восстанавливается - если вы его забудете, потребуется создавать новый</li>
+                            </ul>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <strong>Совет:</strong> Для максимальной безопасности используйте PIN-код длиной 6-8 символов, содержащий цифры и буквы.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_dev">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_dev" aria-expanded="false" aria-controls="collapse_dev">
                         <i class="bi bi-code-slash me-2"></i> Для разработчиков

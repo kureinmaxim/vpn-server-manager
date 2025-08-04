@@ -280,7 +280,7 @@ def build_app():
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
         "--windowed",                   # GUI приложение
-        "--name=VPNServerManager",
+        "--name=VPNServer",
         icon_arg,                       # Иконка (если есть)
         "--clean",
         "--noconfirm",
@@ -288,7 +288,7 @@ def build_app():
         "--workpath=build",
         "--noupx",
         "--strip",
-        "--osx-bundle-identifier=com.vpnservermanager.app",
+        "--osx-bundle-identifier=com.vpnserver.app",
         "--debug=all",
         *datas_args,
         *hidden_imports,
@@ -312,7 +312,7 @@ def build_app():
 
 def create_app_bundle():
     """Создание .app бандла для macOS"""
-    app_name = "VPNServerManager"
+    app_name = "VPNServer"
     
     # Проверяем, создалась ли папка с приложением
     app_dir = DIST_DIR / app_name
@@ -346,6 +346,9 @@ def create_app_bundle():
         # Копируем все файлы из папки приложения
         shutil.copytree(app_dir, app_macos / app_name, dirs_exist_ok=True)
         
+        # Получаем версию из config.json
+        version = get_version_from_config()
+        
         # Создаем Info.plist
         info_plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -354,15 +357,15 @@ def create_app_bundle():
     <key>CFBundleExecutable</key>
     <string>{app_name}</string>
     <key>CFBundleIdentifier</key>
-    <string>com.vpnservermanager.app</string>
+    <string>com.vpnserver.app</string>
     <key>CFBundleName</key>
     <string>{app_name}</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>3.3.4</string>
+    <string>{version}</string>
     <key>CFBundleVersion</key>
-    <string>3.3.4</string>
+    <string>{version}</string>
     <key>LSMinimumSystemVersion</key>
     <string>10.14</string>
     <key>NSHighResolutionCapable</key>
@@ -406,7 +409,7 @@ def create_readme():
 ## Хранение данных
 
 Приложение автоматически сохраняет все данные в вашей пользовательской директории:
-~/Library/Application Support/VPNServerManager/
+~/Library/Application Support/VPNServer/
 
 В этой директории хранятся:
 - Файлы конфигурации
@@ -416,7 +419,7 @@ def create_readme():
 ## Резервное копирование
 
 Для создания резервной копии данных, сохраните директорию:
-~/Library/Application Support/VPNServerManager/
+~/Library/Application Support/VPNServer/
 
 ## Проблемы с запуском
 
@@ -490,18 +493,35 @@ def diagnose_app(app_path):
     
     # Проверяем права доступа
     try:
-        executable_path = app_path / "Contents" / "MacOS" / "VPNServerManager" / "VPNServerManager"
-        if executable_path.exists():
+        # Ищем исполняемый файл в разных возможных местах
+        possible_executables = [
+            app_path / "Contents" / "MacOS" / "VPNServer" / "VPNServer",
+            app_path / "Contents" / "MacOS" / "VPNServer",
+            app_path / "Contents" / "MacOS" / "app",
+            app_path / "Contents" / "MacOS" / "VPNServer.app" / "VPNServer"
+        ]
+        
+        executable_path = None
+        for exec_path in possible_executables:
+            if exec_path.exists():
+                executable_path = exec_path
+                break
+        
+        if executable_path:
             os.chmod(executable_path, 0o755)
-            print("✅ Права доступа установлены")
+            print(f"✅ Права доступа установлены для: {executable_path.name}")
         else:
-            print("⚠️ Исполняемый файл не найден")
+            print("⚠️ Исполняемый файл не найден в стандартных местах")
+            # Показываем содержимое MacOS директории
+            macos_dir = app_path / "Contents" / "MacOS"
+            if macos_dir.exists():
+                print(f"📁 Содержимое MacOS: {[f.name for f in macos_dir.iterdir()]}")
     except Exception as e:
         print(f"⚠️ Ошибка установки прав: {e}")
     
     # Проверяем зависимости
     try:
-        if executable_path.exists():
+        if executable_path and executable_path.exists():
             result = subprocess.run([
                 "otool", "-L", str(executable_path)
             ], capture_output=True, text=True)
@@ -526,24 +546,87 @@ def diagnose_app(app_path):
         print("⚠️ Иконка отсутствует")
     
     # Проверяем структуру приложения
-    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager"
+    app_dir = app_path / "Contents" / "MacOS" / "VPNServer"
+    if not app_dir.exists():
+        # Проверяем альтернативные пути
+        alt_paths = [
+            app_path / "Contents" / "MacOS",
+            app_path / "Contents" / "MacOS" / "app",
+            app_path / "Contents" / "MacOS" / "VPNServer.app"
+        ]
+        for alt_path in alt_paths:
+            if alt_path.exists():
+                app_dir = alt_path
+                break
+    
     if app_dir.exists():
         print("✅ Структура приложения корректна")
         # Показываем размер
         try:
-            size = sum(f.stat().st_size for f in app_dir.rglob('*') if f.is_file())
-            print(f"📊 Размер приложения: {size / 1024 / 1024:.1f} MB")
-        except:
-            pass
+            if app_dir.is_file():
+                # Если это файл (исполняемый), считаем размер всего приложения
+                size = sum(f.stat().st_size for f in app_path.rglob('*') if f.is_file())
+                print(f"📊 Размер приложения: {size / 1024 / 1024:.1f} MB")
+                
+                # Показываем количество файлов
+                file_count = len([f for f in app_path.rglob('*') if f.is_file()])
+                print(f"📁 Количество файлов: {file_count}")
+            else:
+                # Если это директория, считаем размер как раньше
+                size = sum(f.stat().st_size for f in app_dir.rglob('*') if f.is_file())
+                print(f"📊 Размер приложения: {size / 1024 / 1024:.1f} MB")
+                
+                # Показываем количество файлов
+                file_count = len([f for f in app_dir.rglob('*') if f.is_file()])
+                print(f"📁 Количество файлов: {file_count}")
+                
+                # Показываем основные файлы
+                main_files = [f.name for f in app_dir.iterdir() if f.is_file()]
+                if main_files:
+                    print(f"📄 Основные файлы: {main_files[:5]}")  # Показываем первые 5
+        except Exception as e:
+            print(f"⚠️ Не удалось подсчитать размер: {e}")
     else:
         print("❌ Структура приложения некорректна")
+        # Показываем что есть в Contents
+        contents_dir = app_path / "Contents"
+        if contents_dir.exists():
+            print(f"📁 Содержимое Contents: {[f.name for f in contents_dir.iterdir()]}")
+            
+            # Проверяем MacOS директорию
+            macos_dir = contents_dir / "MacOS"
+            if macos_dir.exists():
+                print(f"📁 Содержимое MacOS: {[f.name for f in macos_dir.iterdir()]}")
+                
+                # Проверяем каждый элемент в MacOS
+                for item in macos_dir.iterdir():
+                    if item.is_dir():
+                        print(f"📂 Папка {item.name}: {[f.name for f in item.iterdir()][:3]}...")  # Показываем первые 3 файла
+                    else:
+                        print(f"📄 Файл {item.name}")
     
     print("🔍 Диагностика завершена")
     return True
 
+def get_version_from_config():
+    """Получение версии из config.json"""
+    try:
+        config_path = PROJECT_ROOT / "config.json"
+        if config_path.exists():
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                return config.get('app_info', {}).get('version', '3.5.2')
+        else:
+            print("⚠️ config.json не найден, используем версию по умолчанию")
+            return '3.5.2'
+    except Exception as e:
+        print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
+        return '3.5.2'
+
 def main():
     """Основная функция сборки"""
-    print("🚀 Сборка VPN Server Manager v3.3.4")
+    version = get_version_from_config()
+    print(f"🚀 Сборка VPN Server v{version}")
     print("=====================================")
     print(f"📁 Проект: {PROJECT_ROOT}")
     print(f"📦 Результат: {DIST_DIR}")
