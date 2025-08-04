@@ -16,30 +16,30 @@ def test_config():
         assert 'app_info' in config
         assert 'service_urls' in config
         assert 'secret_pin' in config
-        print("✅ Configuration loads correctly")
+        print("OK: Configuration loads correctly")
         return True
     except Exception as e:
-        print(f"❌ Configuration error: {e}")
+        print(f"ERROR: Configuration error: {e}")
         return False
 
 def test_imports():
     """Test module imports"""
     try:
         import app
-        print("✅ app.py imports successfully")
+        print("OK: app.py imports successfully")
         
         import pin_auth
-        print("✅ pin_auth.py imports successfully")
+        print("OK: pin_auth.py imports successfully")
         
         import decrypt_tool
-        print("✅ decrypt_tool.py imports successfully")
+        print("OK: decrypt_tool.py imports successfully")
         
         import build_macos
-        print("✅ build_macos.py imports successfully")
+        print("OK: build_macos.py imports successfully")
         
         return True
     except Exception as e:
-        print(f"❌ Import error: {e}")
+        print(f"ERROR: Import error: {e}")
         return False
 
 def test_files():
@@ -63,10 +63,10 @@ def test_files():
             missing_files.append(file_path)
     
     if missing_files:
-        print(f"❌ Missing files: {missing_files}")
+        print(f"ERROR: Missing files: {missing_files}")
         return False
     else:
-        print("✅ All required files present")
+        print("OK: All required files present")
         return True
 
 def test_env():
@@ -77,18 +77,18 @@ def test_env():
         
         secret_key = os.environ.get('SECRET_KEY')
         if secret_key:
-            print("✅ SECRET_KEY found")
+            print("OK: SECRET_KEY found")
             return True
         else:
-            print("⚠️ SECRET_KEY not found (but this is normal for CI)")
+            print("WARNING: SECRET_KEY not found (but this is normal for CI)")
             return True
     except Exception as e:
-        print(f"❌ Environment error: {e}")
+        print(f"ERROR: Environment error: {e}")
         return False
 
 def main():
     """Main testing function"""
-    print("🧪 Running basic tests for VPN Server Manager...")
+    print("Running basic tests for VPN Server Manager...")
     print("=" * 50)
     
     tests = [
@@ -107,13 +107,13 @@ def main():
         print()
     
     print("=" * 50)
-    print(f"📊 Results: {passed}/{total} tests passed")
+    print(f"Results: {passed}/{total} tests passed")
     
     if passed == total:
-        print("🎉 All tests passed successfully!")
+        print("SUCCESS: All tests passed successfully!")
         return 0
     else:
-        print("❌ Some tests failed")
+        print("FAILED: Some tests failed")
         return 1
 
 if __name__ == "__main__":
