@@ -5,10 +5,18 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  # Позволяет запускать вручную
+  workflow_dispatch:
+
+# Ограничиваем количество одновременных runs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # Таймаут для предотвращения зависания
     strategy:
       matrix:
         python-version: [3.9, 3.10, 3.11, 3.12]
@@ -46,6 +54,7 @@ jobs:
 
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15  # Таймаут для сборки
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -68,4 +77,6 @@ jobs:
     - name: Run basic tests
       run: |
         python generate_key.py
-        python test_basic.py 
+        python test_basic.py
+      env:
+        PYTHONIOENCODING: utf-8  # Предотвращает проблемы с кодировкой 
