@@ -120,6 +120,7 @@ tests/
 *_tests.py
 test_*.py
 tests_*.py
+!test_basic.py
 
 # Логи и отчеты
 *.log
