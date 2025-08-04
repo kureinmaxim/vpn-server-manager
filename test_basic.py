@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Базовые тесты для VPN Server Manager без GUI
+Basic tests for VPN Server Manager without GUI
 """
 
 import os
@@ -9,41 +9,41 @@ import json
 from pathlib import Path
 
 def test_config():
-    """Тест конфигурации"""
+    """Test configuration"""
     try:
         with open('config.json', 'r', encoding='utf-8') as f:
             config = json.load(f)
         assert 'app_info' in config
         assert 'service_urls' in config
         assert 'secret_pin' in config
-        print("✅ Конфигурация загружается корректно")
+        print("✅ Configuration loads correctly")
         return True
     except Exception as e:
-        print(f"❌ Ошибка конфигурации: {e}")
+        print(f"❌ Configuration error: {e}")
         return False
 
 def test_imports():
-    """Тест импорта модулей"""
+    """Test module imports"""
     try:
         import app
-        print("✅ app.py импортируется успешно")
+        print("✅ app.py imports successfully")
         
         import pin_auth
-        print("✅ pin_auth.py импортируется успешно")
+        print("✅ pin_auth.py imports successfully")
         
         import decrypt_tool
-        print("✅ decrypt_tool.py импортируется успешно")
+        print("✅ decrypt_tool.py imports successfully")
         
         import build_macos
-        print("✅ build_macos.py импортируется успешно")
+        print("✅ build_macos.py imports successfully")
         
         return True
     except Exception as e:
-        print(f"❌ Ошибка импорта: {e}")
+        print(f"❌ Import error: {e}")
         return False
 
 def test_files():
-    """Тест наличия необходимых файлов"""
+    """Test required files presence"""
     required_files = [
         'app.py',
         'config.json',
@@ -63,32 +63,32 @@ def test_files():
             missing_files.append(file_path)
     
     if missing_files:
-        print(f"❌ Отсутствуют файлы: {missing_files}")
+        print(f"❌ Missing files: {missing_files}")
         return False
     else:
-        print("✅ Все необходимые файлы присутствуют")
+        print("✅ All required files present")
         return True
 
 def test_env():
-    """Тест переменных окружения"""
+    """Test environment variables"""
     try:
         from dotenv import load_dotenv
         load_dotenv()
         
         secret_key = os.environ.get('SECRET_KEY')
         if secret_key:
-            print("✅ SECRET_KEY найден")
+            print("✅ SECRET_KEY found")
             return True
         else:
-            print("⚠️ SECRET_KEY не найден (но это нормально для CI)")
+            print("⚠️ SECRET_KEY not found (but this is normal for CI)")
             return True
     except Exception as e:
-        print(f"❌ Ошибка переменных окружения: {e}")
+        print(f"❌ Environment error: {e}")
         return False
 
 def main():
-    """Основная функция тестирования"""
-    print("🧪 Запуск базовых тестов VPN Server Manager...")
+    """Main testing function"""
+    print("🧪 Running basic tests for VPN Server Manager...")
     print("=" * 50)
     
     tests = [
@@ -107,13 +107,13 @@ def main():
         print()
     
     print("=" * 50)
-    print(f"📊 Результаты: {passed}/{total} тестов пройдено")
+    print(f"📊 Results: {passed}/{total} tests passed")
     
     if passed == total:
-        print("🎉 Все тесты пройдены успешно!")
+        print("🎉 All tests passed successfully!")
         return 0
     else:
-        print("❌ Некоторые тесты не пройдены")
+        print("❌ Some tests failed")
         return 1
 
 if __name__ == "__main__":
