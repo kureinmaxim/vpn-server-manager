@@ -29,6 +29,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
+                    {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('settings_page') }}">Настройки</a>
                     </li>
@@ -44,9 +45,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('cheatsheet_page') }}">Шпаргалка</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('about_page') }}">О программе</a>
                     </li>
+                    {% if session.get('pin_authenticated') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()" title="Выйти из системы">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-search"></i>
@@ -245,6 +254,395 @@
                 button.innerHTML = '<i class="bi bi-eye-slash"></i>';
             }
         }
+        
+        // Функция выхода из системы
+        function logout() {
+            if (confirm('Вы уверены, что хотите выйти из системы?')) {
+                fetch('/pin/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка выхода:', error);
+                    // В случае ошибки все равно перезагружаем страницу
+                    window.location.reload();
+                });
+            }
+        }
+        
+        // Обработка двойного клика по имени разработчика
+        document.addEventListener('DOMContentLoaded', function() {
+            const developerName = document.querySelector('footer p');
+            if (developerName) {
+                let clickCount = 0;
+                let clickTimer = null;
+                
+                developerName.addEventListener('click', function() {
+                    clickCount++;
+                    
+                    if (clickCount === 1) {
+                        clickTimer = setTimeout(() => {
+                            clickCount = 0;
+                        }, 300);
+                    } else if (clickCount === 2) {
+                        clearTimeout(clickTimer);
+                        clickCount = 0;
+                        showPinLoginModal();
+                    }
+                });
+            }
+        });
+        
+        // Функция показа модального окна входа по PIN
+        function showPinLoginModal() {
+            // Создаем модальный диалог
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.id = 'pinLoginModal';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-key"></i> Вход по PIN
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Навигационные вкладки -->
+                            <ul class="nav nav-tabs" id="pinLoginTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#login-pane" type="button" role="tab" 
+                                            aria-controls="login-pane" aria-selected="true">Вход</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="change-pin-tab" data-bs-toggle="tab" 
+                                            data-bs-target="#change-pin-pane" type="button" role="tab" 
+                                            aria-controls="change-pin-pane" aria-selected="false">Сменить PIN</button>
+                                </li>
+                            </ul>
+                            
+                            <!-- Содержимое вкладок -->
+                            <div class="tab-content" id="pinLoginTabContent">
+                                <!-- Вкладка входа -->
+                                <div class="tab-pane fade show active" id="login-pane" role="tabpanel" 
+                                     aria-labelledby="login-tab">
+                                    <p class="text-muted mb-3 mt-3">Введите PIN-код для входа в систему</p>
+                                    <div class="mb-3">
+                                        <label for="pinInput" class="form-label">PIN-код</label>
+                                        <input type="password" class="form-control" id="pinInput" 
+                                               placeholder="Введите PIN" maxlength="4" autocomplete="off">
+                                    </div>
+                                    <div id="pinLoginMessage" class="alert" style="display: none;"></div>
+                                </div>
+                                
+                                <!-- Вкладка смены PIN -->
+                                <div class="tab-pane fade" id="change-pin-pane" role="tabpanel" 
+                                     aria-labelledby="change-pin-tab">
+                                    <p class="text-muted mb-3 mt-3">Смените PIN-код для входа</p>
+                                    <form id="changePinForm">
+                                        <div class="mb-3">
+                                            <label for="oldPin" class="form-label">Старый PIN</label>
+                                            <input type="password" class="form-control" id="oldPin" name="old_pin" 
+                                                   placeholder="Введите старый PIN" maxlength="4" autocomplete="off" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="newPin1" class="form-label">Новый PIN</label>
+                                            <input type="password" class="form-control" id="newPin1" name="new_pin1" 
+                                                   placeholder="Введите новый PIN" maxlength="4" autocomplete="off" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="newPin2" class="form-label">Подтвердите новый PIN</label>
+                                            <input type="password" class="form-control" id="newPin2" name="new_pin2" 
+                                                   placeholder="Повторите новый PIN" maxlength="4" autocomplete="off" required>
+                                        </div>
+                                        <div id="changePinMessage" class="alert" style="display: none;"></div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-primary" id="modalSubmitBtn" 
+                                    onclick="submitPinLogin()">Войти</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Показываем модальный диалог
+            const bootstrapModal = new bootstrap.Modal(modal);
+            bootstrapModal.show();
+            
+            // Фокус на поле ввода
+            setTimeout(() => {
+                document.getElementById('pinInput').focus();
+            }, 500);
+            
+            // Обработка нажатия Enter
+            document.getElementById('pinInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitPinLogin();
+                }
+            });
+            
+            // Удаляем модальный диалог после закрытия
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(modal);
+                
+                // Проверяем, аутентифицирован ли пользователь
+                // Если нет, перезагружаем страницу для возврата к заблокированному экрану
+                fetch('/pin/check_auth', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.authenticated) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка проверки аутентификации:', error);
+                    // В случае ошибки перезагружаем страницу для безопасности
+                    window.location.reload();
+                });
+            });
+            
+            // Добавляем обработчик для автоматической разблокировки через 30 секунд
+            let blockTimer = null;
+            modal.addEventListener('show.bs.modal', function() {
+                // Проверяем, заблокирован ли вход
+                fetch('/pin/check_block', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.blocked && data.remaining_seconds > 0) {
+                        // Если заблокирован, запускаем таймер для автоматической разблокировки
+                        blockTimer = setTimeout(() => {
+                            // Перезагружаем страницу для сброса блокировки
+                            window.location.reload();
+                        }, (data.remaining_seconds + 1) * 1000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка проверки блокировки:', error);
+                });
+            });
+            
+            // Очищаем таймер при закрытии модального окна
+            modal.addEventListener('hidden.bs.modal', function() {
+                if (blockTimer) {
+                    clearTimeout(blockTimer);
+                    blockTimer = null;
+                }
+            });
+        }
+        
+        // Функция отправки PIN для входа
+        function submitPinLogin() {
+            const pin = document.getElementById('pinInput').value;
+            const messageDiv = document.getElementById('pinLoginMessage');
+            const submitButton = document.querySelector('#pinLoginModal .btn-primary');
+            
+            if (!pin) {
+                showPinLoginMessage('Введите PIN-код', 'danger');
+                return;
+            }
+            
+            // Отключаем кнопку во время запроса
+            submitButton.disabled = true;
+            submitButton.textContent = 'Проверка...';
+            
+            // Отправляем запрос на сервер
+            fetch('/pin/login_ajax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `pin=${encodeURIComponent(pin)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showPinLoginMessage(data.message, 'success');
+                    setTimeout(() => {
+                        // Закрываем модальный диалог и перезагружаем страницу
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('pinLoginModal'));
+                        modal.hide();
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    if (data.blocked) {
+                        // Показываем блокировку с таймером
+                        showPinLoginBlocked(data.remaining_seconds);
+                    } else {
+                        showPinLoginMessage(data.message, 'danger');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка входа по PIN:', error);
+                showPinLoginMessage('Ошибка соединения с сервером', 'danger');
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                submitButton.disabled = false;
+                submitButton.textContent = 'Войти';
+            });
+        }
+        
+        // Функция показа блокировки с таймером
+        function showPinLoginBlocked(remainingSeconds) {
+            const messageDiv = document.getElementById('pinLoginMessage');
+            const pinInput = document.getElementById('pinInput');
+            const submitButton = document.querySelector('#pinLoginModal .btn-primary');
+            
+            // Блокируем поле ввода и кнопку
+            pinInput.disabled = true;
+            submitButton.disabled = true;
+            
+            // Показываем сообщение о блокировке
+            messageDiv.className = 'alert alert-warning';
+            messageDiv.style.display = 'block';
+            
+            // Запускаем таймер обратного отсчета
+            let secondsLeft = remainingSeconds;
+            updateBlockedMessage(secondsLeft);
+            
+            const timer = setInterval(() => {
+                secondsLeft--;
+                updateBlockedMessage(secondsLeft);
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(timer);
+                    // Разблокируем поле ввода и кнопку
+                    pinInput.disabled = false;
+                    submitButton.disabled = false;
+                    messageDiv.style.display = 'none';
+                    pinInput.value = '';
+                    pinInput.focus();
+                }
+            }, 1000);
+            
+            function updateBlockedMessage(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                const timeStr = `${minutes}:${secs.toString().padStart(2, '0')}`;
+                messageDiv.innerHTML = `🔒 Вход заблокирован на <strong>${timeStr}</strong> секунд`;
+            }
+        }
+        
+        // Функция показа сообщения
+        function showPinLoginMessage(message, type) {
+            const messageDiv = document.getElementById('pinLoginMessage');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+        }
+        
+        // Функция отправки смены PIN
+        function submitChangePin() {
+            const form = document.getElementById('changePinForm');
+            const formData = new FormData(form);
+            const messageDiv = document.getElementById('changePinMessage');
+            const submitButton = document.getElementById('modalSubmitBtn');
+            
+            // Проверяем, что все поля заполнены
+            const oldPin = formData.get('old_pin');
+            const newPin1 = formData.get('new_pin1');
+            const newPin2 = formData.get('new_pin2');
+            
+            if (!oldPin || !newPin1 || !newPin2) {
+                showChangePinMessage('Заполните все поля', 'danger');
+                return;
+            }
+            
+            // Проверяем, что новые PIN совпадают
+            if (newPin1 !== newPin2) {
+                showChangePinMessage('Новые PIN-коды не совпадают', 'danger');
+                return;
+            }
+            
+            // Проверяем минимальную длину
+            if (newPin1.length < 4) {
+                showChangePinMessage('PIN должен содержать минимум 4 символа', 'danger');
+                return;
+            }
+            
+            // Отключаем кнопку во время запроса
+            submitButton.disabled = true;
+            submitButton.textContent = 'Проверка...';
+            
+            // Отправляем запрос
+            fetch('/pin/change_ajax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showChangePinMessage('PIN успешно изменён!', 'success');
+                    // Очищаем форму
+                    form.reset();
+                    // Переключаемся на вкладку входа
+                    setTimeout(() => {
+                        document.getElementById('login-tab').click();
+                    }, 1500);
+                } else {
+                    showChangePinMessage('Ошибка: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                showChangePinMessage('Произошла ошибка при смене PIN', 'danger');
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку
+                submitButton.disabled = false;
+                submitButton.textContent = 'Сменить PIN';
+            });
+        }
+        
+        // Функция показа сообщения для смены PIN
+        function showChangePinMessage(message, type) {
+            const messageDiv = document.getElementById('changePinMessage');
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.textContent = message;
+            messageDiv.style.display = 'block';
+        }
+        
+        // Обработка смены вкладок
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                const submitButton = document.getElementById('modalSubmitBtn');
+                if (e.target.id === 'change-pin-tab') {
+                    submitButton.textContent = 'Сменить PIN';
+                    submitButton.onclick = submitChangePin;
+                    submitButton.className = 'btn btn-warning';
+                } else if (e.target.id === 'login-tab') {
+                    submitButton.textContent = 'Войти';
+                    submitButton.onclick = submitPinLogin;
+                    submitButton.className = 'btn btn-primary';
+                }
+            });
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>
