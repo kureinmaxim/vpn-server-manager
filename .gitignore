@@ -67,6 +67,9 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+# Local documentation (not for GitHub)
+docs/
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
