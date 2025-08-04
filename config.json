@@ -1,0 +1,20 @@
+{
+  "SECRET_KEY_FILE": ".env",
+  "app_info": {
+    "version": "3.5.2",
+    "release_date": "04.08.2025",
+    "developer": "Разработчик",
+    "last_updated": "2025-08-04"
+  },
+  "service_urls": {
+    "ip_check_api": "https://ipinfo.io/{ip}/json",
+    "general_ip_test": "https://browserleaks.com/ip",
+    "general_dns_test": "https://dnsleaktest.com/"
+  },
+  "active_data_file": "data/servers.json.enc",
+  "secret_pin": {
+    "default_pin": "1234",
+    "current_pin": "1234",
+    "last_changed": "2025-08-04"
+  }
+}

@@ -1,0 +1,182 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Virtualenv
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# macOS
+.DS_Store
+*.DS_Store
+
+# VSCode
+.vscode/
+
+# Временные и тестовые файлы
+*.tmp
+*.temp
+temp/
+tmp/
+*.bak
+*.backup
+*.orig
+*~
+
+# Тестовые файлы и директории
+test/
+tests/
+*_test.py
+*_tests.py
+test_*.py
+tests_*.py
+
+# Логи и отчеты
+*.log
+logs/
+*.audit
+audit/
+
+# Конфигурационные файлы разработки
+.env.local
+.env.development
+.env.test
+config.local.json
+config.dev.json
+
+# Файлы редакторов
+*.swp
+*.swo
+*~
+.#*
+\#*#
+
+# Временные файлы IDE
+.idea/
+*.iml
+.project
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# Системные файлы
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Файлы загрузок и кеша
+uploads/*.tmp
+uploads/*.temp
+cache/
+*.cache
+
+# Экспортированные данные (кроме примеров)
+*.enc.backup
+data/*.backup
+data/temp_*
+
+# Файлы сборки и дистрибуции
+*.dmg
+*.pkg
+*.msi
+*.exe
+*.deb
+*.rpm
+*.app/
+*.AppImage
+
+# Временные файлы Python
+*.pyc
+*.pyo
+*.pyd 

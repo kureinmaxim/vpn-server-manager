@@ -1,0 +1,7 @@
+Flask>=3.0.0
+requests
+python-dotenv
+cryptography
+Werkzeug
+Jinja2
+pywebview 
