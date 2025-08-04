@@ -16,7 +16,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10  # Таймаут для предотвращения зависания
+    timeout-minutes: 10  # Таймаут для предотвращения зависания (обновлено)
     strategy:
       matrix:
         python-version: [3.9, 3.10, 3.11, 3.12]
