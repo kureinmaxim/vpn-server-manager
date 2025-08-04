@@ -1,12 +1,20 @@
+#!/usr/bin/env python3
+"""
+Generate SECRET_KEY for VPN Server Manager
+"""
+
 from cryptography.fernet import Fernet
+import os
 
 def generate_key():
-    """Генерирует ключ и сохраняет его в файл .env."""
+    """Generate and save SECRET_KEY to .env file"""
     key = Fernet.generate_key()
-    with open(".env", "wb") as key_file:
-        key_file.write(b"SECRET_KEY=" + key)
-    print("Ключ успешно сгенерирован и сохранен в .env файле.")
-    print("ВАЖНО: Если вы перезаписали существующий ключ, перезапустите сервер и пересоздайте записи с паролями.")
+    
+    with open('.env', 'w') as f:
+        f.write(f'SECRET_KEY={key.decode()}')
+    
+    print("Key successfully generated and saved in .env file.")
+    print("IMPORTANT: If you overwrote an existing key, restart the server and recreate password records.")
 
 if __name__ == "__main__":
     generate_key() 
