@@ -4,7 +4,7 @@ import datetime
 import sys
 from pathlib import Path
 from datetime import date
-from flask import Flask, render_template, request, redirect, url_for, make_response, send_from_directory, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, make_response, send_from_directory, jsonify, flash, session
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet, InvalidToken
 from werkzeug.utils import secure_filename
@@ -138,6 +138,10 @@ else:
 # Загрузка основной конфигурации в Flask
 app.config.update(final_config)
 
+# Убедимся, что PIN-настройки загружены в app.config
+if 'secret_pin' in final_config:
+    app.config['secret_pin'] = final_config['secret_pin']
+
 
 # Если `app_info` все еще отсутствует (например, при самом первом запуске в dev), добавляем заглушку
 if 'app_info' not in app.config:
@@ -167,6 +171,9 @@ def inject_app_info():
 
 # Ключ для flash-сообщений
 app.config['SECRET_KEY'] = os.getenv("FLASK_SECRET_KEY", "a-default-secret-key-for-flash")
+
+# Импортируем PIN-аутентификацию после настройки приложения
+from pin_auth import pin_auth
 
 # Устанавливаем пути относительно директории данных приложения
 app.config['UPLOAD_FOLDER'] = os.path.join(APP_DATA_DIR, 'uploads')
@@ -312,6 +319,10 @@ def save_app_config():
     for key in ['version', 'developer', 'service_urls', 'app_info']:
         if key in app.config:
             config_to_save[key] = app.config[key]
+    
+    # Сохраняем PIN-настройки, если они есть
+    if 'secret_pin' in app.config:
+        config_to_save['secret_pin'] = app.config['secret_pin']
             
     # Особо обрабатываем active_data_file
     if app.config.get('active_data_file'):
@@ -633,8 +644,337 @@ def add_security_headers(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
+
+
+@app.route('/pin/login_ajax', methods=['POST'])
+def pin_login_ajax():
+    """AJAX обработчик входа по PIN."""
+    try:
+        if pin_auth.is_pin_login_blocked():
+            remaining = pin_auth.get_pin_block_remaining()
+            return jsonify({
+                'success': False, 
+                'message': f'Вход заблокирован на {remaining} секунд',
+                'blocked': True,
+                'remaining_seconds': remaining
+            }), 429
+        
+        pin = request.form.get('pin', '').strip()
+        
+        if not pin:
+            return jsonify({'success': False, 'message': 'Введите PIN-код'}), 400
+        
+        success, message = pin_auth.authenticate_pin(pin)
+        
+        if success:
+            return jsonify({'success': True, 'message': 'Аутентификация успешна'})
+        else:
+            if pin_auth.is_pin_login_blocked():
+                remaining = pin_auth.get_pin_block_remaining()
+                return jsonify({
+                    'success': False, 
+                    'message': message,
+                    'blocked': True,
+                    'remaining_seconds': remaining
+                }), 429
+            else:
+                return jsonify({'success': False, 'message': message}), 400
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка аутентификации: {e}'}), 500
+
+@app.route('/pin/check_archive', methods=['POST'])
+def check_archive_for_pin():
+    """Проверяет архив на наличие PIN-кода."""
+    try:
+        uploaded_file = request.files.get('archive_file')
+        if not uploaded_file or not uploaded_file.filename.endswith('.zip'):
+            return jsonify({'success': False, 'message': 'Выберите ZIP архив'})
+        
+        # Создаем временный файл
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_file:
+            uploaded_file.save(temp_file.name)
+            temp_file_path = temp_file.name
+        
+        try:
+            import zipfile
+            with zipfile.ZipFile(temp_file_path, 'r') as zipf:
+                # Ищем файл PIN.txt в архиве
+                pin_file = None
+                for file_info in zipf.filelist:
+                    if file_info.filename == 'PIN.txt':
+                        pin_file = file_info
+                        break
+                
+                if pin_file:
+                    # Читаем PIN из архива
+                    pin_content = zipf.read('PIN.txt').decode('utf-8')
+                    pin_line = pin_content.strip()
+                    if pin_line.startswith('PIN='):
+                        pin = pin_line[4:]  # Убираем "PIN="
+                        return jsonify({
+                            'success': True, 
+                            'pin': pin,
+                            'message': f'Найден PIN-код: {pin}'
+                        })
+                    else:
+                        return jsonify({'success': False, 'message': 'Неверный формат PIN в архиве'})
+                else:
+                    return jsonify({'success': False, 'message': 'PIN-код не найден в архиве'})
+                    
+        except zipfile.BadZipFile:
+            return jsonify({'success': False, 'message': 'Неверный формат ZIP архива'})
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Ошибка чтения архива: {str(e)}'})
+        finally:
+            # Удаляем временный файл
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+                
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка обработки файла: {str(e)}'})
+
+@app.route('/pin/import_archive', methods=['POST'])
+def import_archive_with_pin():
+    """Импортирует данные из архива и устанавливает PIN."""
+    try:
+        uploaded_file = request.files.get('archive_file')
+        if not uploaded_file or not uploaded_file.filename.endswith('.zip'):
+            return jsonify({'success': False, 'message': 'Выберите ZIP архив'})
+        
+        # Создаем временный файл
+        import tempfile
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_file:
+            uploaded_file.save(temp_file.name)
+            temp_file_path = temp_file.name
+        
+        try:
+            import zipfile
+            with zipfile.ZipFile(temp_file_path, 'r') as zipf:
+                # Проверяем наличие необходимых файлов
+                required_files = ['PIN.txt', 'SECRET_KEY.env']
+                missing_files = []
+                
+                for required_file in required_files:
+                    if required_file not in [f.filename for f in zipf.filelist]:
+                        missing_files.append(required_file)
+                
+                if missing_files:
+                    return jsonify({
+                        'success': False, 
+                        'message': f'В архиве отсутствуют файлы: {", ".join(missing_files)}'
+                    })
+                
+                # Проверяем наличие данных серверов (может быть в разных форматах)
+                servers_data_file = None
+                possible_server_files = ['servers.json.enc', 'servers.json', 'data.json.enc', 'data.json']
+                
+                # Сначала ищем точные совпадения
+                for file_info in zipf.filelist:
+                    if file_info.filename in possible_server_files:
+                        servers_data_file = file_info.filename
+                        break
+                
+                # Если точных совпадений нет, ищем файлы с .enc расширением и содержащие "servers"
+                if not servers_data_file:
+                    for file_info in zipf.filelist:
+                        if file_info.filename.endswith('.enc') and 'servers' in file_info.filename.lower():
+                            servers_data_file = file_info.filename
+                            break
+                
+                # Если и это не найдено, ищем любые .enc файлы
+                if not servers_data_file:
+                    for file_info in zipf.filelist:
+                        if file_info.filename.endswith('.enc'):
+                            servers_data_file = file_info.filename
+                            break
+                
+                if not servers_data_file:
+                    return jsonify({
+                        'success': False, 
+                        'message': 'В архиве не найдены данные серверов'
+                    })
+                
+                # Читаем PIN
+                pin_content = zipf.read('PIN.txt').decode('utf-8')
+                pin_line = pin_content.strip()
+                if not pin_line.startswith('PIN='):
+                    return jsonify({'success': False, 'message': 'Неверный формат PIN в архиве'})
+                pin = pin_line[4:]  # Убираем "PIN="
+                
+                # Читаем SECRET_KEY
+                secret_key_content = zipf.read('SECRET_KEY.env').decode('utf-8')
+                secret_key_line = None
+                for line in secret_key_content.split('\n'):
+                    if line.startswith('SECRET_KEY='):
+                        secret_key_line = line
+                        break
+                
+                if not secret_key_line:
+                    return jsonify({'success': False, 'message': 'SECRET_KEY не найден в архиве'})
+                
+                secret_key = secret_key_line[11:]  # Убираем "SECRET_KEY="
+                
+                # Читаем данные серверов
+                servers_data = zipf.read(servers_data_file)
+                
+                # Определяем, зашифрованы ли данные
+                is_encrypted = servers_data_file.endswith('.enc')
+                
+                # Устанавливаем новый SECRET_KEY
+                app.config['SECRET_KEY'] = secret_key
+                global fernet
+                fernet = Fernet(secret_key.encode())
+                
+                # Устанавливаем новый PIN
+                success, message = pin_auth.change_pin_without_old(pin)
+                if not success:
+                    return jsonify({'success': False, 'message': f'Ошибка установки PIN: {message}'})
+                
+                # Сохраняем данные серверов
+                active_file = get_active_data_path()
+                if active_file:
+                    if is_encrypted:
+                        # Если данные зашифрованы, сохраняем как есть
+                        with open(active_file, 'wb') as f:
+                            f.write(servers_data)
+                    else:
+                        # Если данные не зашифрованы, шифруем их перед сохранением
+                        try:
+                            # Пытаемся расшифровать как JSON
+                            json_data = servers_data.decode('utf-8')
+                            # Шифруем данные
+                            encrypted_data = fernet.encrypt(json_data.encode('utf-8'))
+                            with open(active_file, 'wb') as f:
+                                f.write(encrypted_data)
+                        except Exception as e:
+                            return jsonify({
+                                'success': False, 
+                                'message': f'Ошибка обработки данных серверов: {str(e)}'
+                            })
+                
+                # Сохраняем обновленную конфигурацию
+                save_app_config()
+                
+                # Аутентифицируем пользователя
+                session['pin_authenticated'] = True
+                session['pin_login_used'] = True
+                
+                return jsonify({
+                    'success': True, 
+                    'message': 'Данные успешно импортированы из архива'
+                })
+                    
+        except zipfile.BadZipFile:
+            return jsonify({'success': False, 'message': 'Неверный формат ZIP архива'})
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Ошибка импорта: {str(e)}'})
+        finally:
+            # Удаляем временный файл
+            if os.path.exists(temp_file_path):
+                os.remove(temp_file_path)
+                
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка обработки файла: {str(e)}'})
+
+@app.route('/pin/first_time_setup', methods=['POST'])
+def first_time_setup():
+    """Настройка для первого запуска - создание нового PIN и сброс данных."""
+    try:
+        new_pin = request.form.get('new_pin', '').strip()
+        
+        if not new_pin or len(new_pin) < 4:
+            return jsonify({'success': False, 'message': 'PIN должен содержать минимум 4 символа'})
+        
+        # Создаем новый PIN без проверки старого
+        success, message = pin_auth.change_pin_without_old(new_pin)
+        
+        if success:
+            # Сохраняем обновленную конфигурацию
+            save_app_config()
+            # Сбрасываем данные - создаем пустой файл данных
+            active_file = get_active_data_path()
+            if active_file:
+                # Создаем пустой зашифрованный файл
+                empty_data = json.dumps([], ensure_ascii=False, indent=2)
+                encrypted_data = fernet.encrypt(empty_data.encode('utf-8'))
+                
+                with open(active_file, 'wb') as f:
+                    f.write(encrypted_data)
+            
+            # Аутентифицируем пользователя
+            session['pin_authenticated'] = True
+            session['pin_login_used'] = True
+            
+            return jsonify({'success': True, 'message': 'Настройка завершена успешно'})
+        else:
+            return jsonify({'success': False, 'message': message})
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка настройки: {e}'}), 500
+
+@app.route('/pin/logout', methods=['POST'])
+def pin_logout():
+    """Выход из системы по PIN."""
+    session.pop('pin_authenticated', None)
+    session.pop('pin_login_used', None)
+    return jsonify({'success': True, 'message': 'Выход выполнен успешно'})
+
+@app.route('/pin/change_ajax', methods=['POST'])
+def change_pin_ajax():
+    """AJAX обработчик смены PIN."""
+    try:
+        old_pin = request.form.get('old_pin', '').strip()
+        new_pin1 = request.form.get('new_pin1', '').strip()
+        new_pin2 = request.form.get('new_pin2', '').strip()
+        
+        # Проверяем, что новый PIN введен дважды одинаково
+        if new_pin1 != new_pin2:
+            return jsonify({'success': False, 'message': 'Новые PIN-коды не совпадают'})
+        
+        # Проверяем, что новый PIN не пустой
+        if not new_pin1:
+            return jsonify({'success': False, 'message': 'Новый PIN не может быть пустым'})
+        
+        # Проверяем минимальную длину
+        if len(new_pin1) < 4:
+            return jsonify({'success': False, 'message': 'PIN должен содержать минимум 4 символа'})
+        
+        # Пытаемся сменить PIN
+        success, message = pin_auth.change_pin(old_pin, new_pin1)
+        
+        if success:
+            # Сохраняем обновленную конфигурацию
+            save_app_config()
+        
+        return jsonify({'success': success, 'message': message})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка: {e}'}), 500
+
+@app.route('/pin/check_auth', methods=['GET'])
+def check_auth():
+    """Проверка статуса аутентификации."""
+    return jsonify({'authenticated': pin_auth.is_authenticated()})
+
+@app.route('/pin/check_block', methods=['GET'])
+def check_block():
+    """Проверка статуса блокировки PIN."""
+    blocked = pin_auth.is_pin_login_blocked()
+    remaining_seconds = pin_auth.get_pin_block_remaining() if blocked else 0
+    print(f"🔍 Проверка блокировки: заблокирован={blocked}, осталось_секунд={remaining_seconds}")
+    return jsonify({
+        'blocked': blocked,
+        'remaining_seconds': remaining_seconds
+    })
+
 @app.route('/')
 def index():
+    # Проверяем аутентификацию по PIN
+    if not pin_auth.is_authenticated():
+        return render_template('index_locked.html')
+    
     try:
         servers = load_servers()
     except Exception as e:
@@ -694,6 +1034,7 @@ def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/add', methods=['GET', 'POST'])
+@pin_auth.require_auth
 def add_server():
     # Если файл данных не прикреплен, создаем его по умолчанию "на лету"
     if not get_active_data_path():
@@ -815,6 +1156,7 @@ def add_server():
     return render_template('add_server.html')
 
 @app.route('/delete/<int:server_id>', methods=['POST'])
+@pin_auth.require_auth
 def delete_server(server_id):
     servers = load_servers()
     servers = [s for s in servers if s['id'] != server_id]
@@ -822,6 +1164,7 @@ def delete_server(server_id):
     return redirect(url_for('index'))
 
 @app.route('/edit/<int:server_id>', methods=['GET', 'POST'])
+@pin_auth.require_auth
 def edit_server(server_id):
     servers = load_servers()
     server = next((s for s in servers if s['id'] == server_id), None)
@@ -1059,6 +1402,7 @@ def cheatsheet_page():
     return render_template('cheatsheet.html')
 
 @app.route('/settings')
+@pin_auth.require_auth
 def settings_page():
     """Отображает страницу управления данными."""
     return render_template('settings.html')
@@ -1145,6 +1489,11 @@ def export_package():
             env_content = f"SECRET_KEY={SECRET_KEY}\nFLASK_SECRET_KEY=portable_app_key\n"
             zipf.writestr("SECRET_KEY.env", env_content)
             
+            # Добавляем файл с PIN-кодом
+            current_pin = pin_auth.get_secret_pin()
+            pin_content = f"PIN={current_pin}\n"
+            zipf.writestr("PIN.txt", pin_content)
+            
             # Добавляем загруженные файлы (если они есть)
             uploads_dir = os.path.join(get_app_data_dir(), "uploads")
             if os.path.exists(uploads_dir):
@@ -1162,6 +1511,7 @@ def export_package():
 Содержимое архива:
 - servers_{timestamp}.enc - Зашифрованные данные серверов
 - SECRET_KEY.env - Ключ шифрования (поместите в папку с приложением)
+- PIN.txt - PIN-код для входа в приложение
 - uploads/ - Загруженные файлы (счета, скриншоты и т.д.)
 
 Инструкция по импорту:
@@ -1170,6 +1520,7 @@ def export_package():
 3. Перезапустите приложение
 4. В разделе "Настройки" -> "Управление данными" импортируйте файл servers_{timestamp}.enc
 5. Скопируйте содержимое папки uploads/ в папку uploads/ новой установки
+6. Запомните PIN-код из файла PIN.txt для входа в приложение
 
 ВАЖНО: Храните этот архив в безопасном месте. Любой, кто имеет доступ к нему,
 может расшифровать ваши данные о серверах!
