@@ -118,7 +118,7 @@
                 </div>
                 
                 <div class="mt-3">
-                    <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" onsubmit="return confirm('{{ _("Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.") }}');">
+                    <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" data-confirm-message="{{ _('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
                         <button type="submit" class="btn btn-outline-danger">
                             <i class="bi bi-unlock"></i> {{ _('Открепить файл') }}
                         </button>
@@ -173,7 +173,7 @@
                     <div class="col-md-6">
                         <h6 class="text-primary">{{ _('servers.json.enc файл') }}</h6>
                 <div class="mb-3">
-                            <label for="envFile" class="form-label">Файл данных (.enc)</label>
+                            <label for="envFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
                             <input type="file" class="form-control" name="external_file" id="envFile" accept=".enc" required>
                     <div class="form-text">{{ _('Выберать зашифрованный файл данных из другой установки') }}</div>
                 </div>
@@ -183,25 +183,25 @@
                     <div class="col-md-6">
                         <h6 class="text-primary">.env файл с SECRET_KEY</h6>
                 <div class="mb-3">
-                    <label for="externalKey" class="form-label">Внешний ключ шифрования</label>
-                            <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="Вставьте сюда ключ шифрования из файла .env другой установки (например: REDACTED_ROTATE_KEY)" required></textarea>
+                    <label for="externalKey" class="form-label">{{ _('Внешний ключ шифрования') }}</label>
+                            <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="{{ _('Вставьте сюда ключ шифрования из файла .env другой установки (например: REDACTED_ROTATE_KEY)') }}" required></textarea>
                     <div class="form-text">
-                        <strong>Где найти ключ:</strong><br>
-                        • В файле <code>.env</code> в папке с другой установкой<br>
-                        • Ищите строку <code>SECRET_KEY=</code><br>
-                        • Скопируйте значение после знака равенства
+                        <strong>{{ _('Где найти ключ:') }}</strong><br>
+                        • {{ _('В файле') }} <code>.env</code> {{ _('в папке с другой установкой') }}<br>
+                        • {{ _('Ищите строку') }} <code>SECRET_KEY=</code><br>
+                        • {{ _('Скопируйте значение после знака равенства') }}
                     </div>
                 </div>
                     </div>
                 </div>
 
                 <div class="alert alert-warning" role="alert">
-                    <strong>Примечание:</strong> Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку.
+                    <strong>{{ _('Примечание:') }}</strong> {{ _('Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку.') }}
                 </div>
 
                 <div class="d-grid">
                     <button class="btn btn-warning" type="submit">
-                        <i class="bi bi-arrow-down-circle"></i> Импортировать и объединить сервера
+                        <i class="bi bi-arrow-down-circle"></i> {{ _('Импортировать и объединить сервера') }}
                     </button>
                 </div>
             </form>
@@ -215,7 +215,7 @@ function showExportMessage(fileType) {
     const notification = document.getElementById('exportNotification');
     const message = document.getElementById('exportMessage');
     
-    message.textContent = `Экспортируются ${fileType}`;
+    message.textContent = `{{ _('Экспортируются') }} ${fileType}`;
     notification.style.display = 'block';
     
     // Автоматически скрыть уведомление через 5 секунд
@@ -229,11 +229,11 @@ function confirmKeyChange() {
     const confirmKey = document.getElementById('confirmKey').value;
     
     if (newKey !== confirmKey) {
-        alert('Ключи не совпадают!');
+        alert('{{ _("Ключи не совпадают!") }}');
         return false;
     }
     
-    return confirm('Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл данных и сохранит резервную копию старого.');
+    return confirm('{{ _("Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл данных и сохранит резервную копию старого.") }}');
 }
 
 async function generateRandomKey() {
@@ -251,10 +251,10 @@ async function generateRandomKey() {
             document.getElementById('newKey').value = data.key;
             document.getElementById('confirmKey').value = data.key;
         } else {
-            alert('Ошибка при генерации ключа: ' + data.error);
+            alert('{{ _("Ошибка при генерации ключа:") }} ' + data.error);
         }
     } catch (error) {
-        alert('Ошибка при генерации ключа: ' + error.message);
+        alert('{{ _("Ошибка при генерации ключа:") }} ' + error.message);
     }
 }
 
@@ -268,15 +268,15 @@ function showExportInfo(exportType) {
     let typeText, locationText;
     switch(exportType) {
         case 'data':
-            typeText = 'Файл данных серверов (.enc)';
+            typeText = '{{ _("Файл данных серверов (.enc)") }}';
             locationText = 'servers_export_[дата_время].enc';
             break;
         case 'key':
-            typeText = 'Ключ шифрования (.env)';
+            typeText = '{{ _("Ключ шифрования (.env)") }}';
             locationText = 'SECRET_KEY_[дата_время].env';
             break;
         case 'package':
-            typeText = 'Полный архив (.zip)';
+            typeText = '{{ _("Полный архив (.zip)") }}';
             locationText = 'vpn_servers_backup_[дата_время].zip';
             break;
     }
@@ -334,28 +334,28 @@ window.onclick = function(event) {
     <div class="modal-content" style="background-color: #2c3e50; margin: 15% auto; padding: 20px; border: none; border-radius: 10px; width: 80%; max-width: 500px; color: white;">
         <div class="modal-header" style="border-bottom: 1px solid #34495e; padding-bottom: 10px; margin-bottom: 20px;">
             <h4 style="margin: 0; color: #3498db;">
-                <i class="bi bi-info-circle"></i> Информация об экспорте
+                <i class="bi bi-info-circle"></i> {{ _('Информация об экспорте') }}
             </h4>
             <span class="close" onclick="closeExportModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
         </div>
         <div class="modal-body">
             <div class="alert alert-info" style="background-color: #1f2937; border: 1px solid #3498db; color: #3498db; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>Экспортируется:</strong> <span id="exportTypeText"></span>
+                <strong>{{ _('Экспортируется:') }}</strong> <span id="exportTypeText"></span>
                 <div id="packageInfo" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #3498db;">
-                    <i class="bi bi-key"></i> <strong>Содержимое архива:</strong>
+                    <i class="bi bi-key"></i> <strong>{{ _('Содержимое архива:') }}</strong>
                     <ul style="margin: 5px 0 0 20px; color: #bdc3c7;">
-                        <li>Зашифрованные данные серверов</li>
-                        <li>Ключ шифрования (.env)</li>
-                        <li>PIN-код для входа (PIN.txt)</li>
-                        <li>Загруженные файлы (uploads/)</li>
-                        <li>Инструкции по импорту (README.txt)</li>
+                        <li>{{ _('Зашифрованные данные серверов') }}</li>
+                        <li>{{ _('Ключ шифрования (.env)') }}</li>
+                        <li>{{ _('PIN-код для входа (PIN.txt)') }}</li>
+                        <li>{{ _('Загруженные файлы (uploads/)') }}</li>
+                        <li>{{ _('Инструкции по импорту (README.txt)') }}</li>
                     </ul>
                 </div>
             </div>
             
             <div style="margin-bottom: 20px;">
                 <h6 style="color: #2ecc71; margin-bottom: 10px;">
-                    <i class="bi bi-folder"></i> Место сохранения:
+                    <i class="bi bi-folder"></i> {{ _('Место сохранения:') }}
                 </h6>
                 <div style="background-color: #1f2937; padding: 10px; border-radius: 5px; font-family: monospace; word-break: break-all;">
                     <strong>📁 ~/Downloads/</strong><br>
@@ -365,21 +365,21 @@ window.onclick = function(event) {
             
             <div style="margin-bottom: 20px;">
                 <h6 style="color: #e74c3c; margin-bottom: 10px;">
-                    <i class="bi bi-exclamation-triangle"></i> Важно:
+                    <i class="bi bi-exclamation-triangle"></i> {{ _('Важно:') }}
                 </h6>
                 <ul style="margin: 0; padding-left: 20px; color: #bdc3c7;">
-                    <li>Файл будет автоматически загружен в браузере</li>
-                    <li>Также сохранится в папку <strong>Downloads</strong></li>
-                    <li>Проверьте папку Downloads после завершения</li>
+                    <li>{{ _('Файл будет автоматически загружен в браузере') }}</li>
+                    <li>{{ _('Также сохранится в папку') }} <strong>Downloads</strong></li>
+                    <li>{{ _('Проверьте папку Downloads после завершения') }}</li>
                 </ul>
             </div>
         </div>
         <div class="modal-footer" style="border-top: 1px solid #34495e; padding-top: 15px; text-align: right;">
             <button type="button" class="btn btn-secondary" onclick="closeExportModal()" style="margin-right: 10px;">
-                Отмена
+                {{ _('Отмена') }}
             </button>
             <button type="button" class="btn btn-success" onclick="confirmExport(currentExportType)" id="confirmExportBtn">
-                <i class="bi bi-download"></i> Продолжить экспорт
+                <i class="bi bi-download"></i> {{ _('Продолжить экспорт') }}
             </button>
         </div>
     </div>
@@ -400,15 +400,15 @@ function showExportInfo(exportType) {
     let typeText, locationText;
     switch(exportType) {
         case 'data':
-            typeText = 'Файл данных серверов (.enc)';
+            typeText = '{{ _("Файл данных серверов (.enc)") }}';
             locationText = 'servers_export_[дата_время].enc';
             break;
         case 'key':
-            typeText = 'Ключ шифрования (.env)';
+            typeText = '{{ _("Ключ шифрования (.env)") }}';
             locationText = 'SECRET_KEY_[дата_время].env';
             break;
         case 'package':
-            typeText = 'Полный архив (.zip)';
+            typeText = '{{ _("Полный архив (.zip)") }}';
             locationText = 'vpn_servers_backup_[дата_время].zip';
             break;
     }
