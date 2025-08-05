@@ -172,8 +172,16 @@
                 <form id="archiveUploadForm">
                     <div class="mb-3">
                         <label for="archiveFile" class="form-label">{{ _('Выберите ZIP архив') }}</label>
-                        <input type="file" class="form-control" id="archiveFile" name="archive_file" 
-                               accept=".zip" required>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="archiveFile" name="archive_file" 
+                                   accept=".zip" required style="display: none;">
+                            <input type="text" class="form-control" id="archiveFileDisplay" 
+                                   placeholder="{{ _('Нажмите кнопку для выбора файла') }}" readonly>
+                            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('archiveFile').click()">
+                                {{ _('Выбрать файл') }}
+                            </button>
+                        </div>
+                        <div class="form-text">{{ _('Файл не выбран') }}</div>
                     </div>
                     <div id="archiveMessage" class="alert" style="display: none;"></div>
                 </form>
@@ -924,6 +932,27 @@
                     clearTimeout(clickTimer);
                     clickCount = 0;
                     showPinLoginModal();
+                }
+            });
+        }
+    });
+    
+    // Обработка выбора файла для кастомного input
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('archiveFile');
+        const fileDisplay = document.getElementById('archiveFileDisplay');
+        const fileText = document.querySelector('#archiveUploadForm .form-text');
+        
+        if (fileInput && fileDisplay) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileDisplay.value = this.files[0].name;
+                    fileText.textContent = '{{ _("Файл выбран") }}';
+                    fileText.className = 'form-text text-success';
+                } else {
+                    fileDisplay.value = '';
+                    fileText.textContent = '{{ _("Файл не выбран") }}';
+                    fileText.className = 'form-text text-muted';
                 }
             });
         }

@@ -280,7 +280,7 @@ def build_app():
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
         "--windowed",                   # GUI приложение
-        "--name=VPNServer",
+        "--name=VPNServerManager",
         icon_arg,                       # Иконка (если есть)
         "--clean",
         "--noconfirm",
@@ -288,7 +288,7 @@ def build_app():
         "--workpath=build",
         "--noupx",
         "--strip",
-        "--osx-bundle-identifier=com.vpnserver.app",
+        "--osx-bundle-identifier=com.vpnservermanager.app",
         "--debug=all",
         *datas_args,
         *hidden_imports,
@@ -312,7 +312,7 @@ def build_app():
 
 def create_app_bundle():
     """Создание .app бандла для macOS"""
-    app_name = "VPNServer"
+    app_name = "VPNServerManager"
     
     # Проверяем, создалась ли папка с приложением
     app_dir = DIST_DIR / app_name
@@ -357,7 +357,7 @@ def create_app_bundle():
     <key>CFBundleExecutable</key>
     <string>{app_name}</string>
     <key>CFBundleIdentifier</key>
-    <string>com.vpnserver.app</string>
+    <string>com.vpnservermanager.app</string>
     <key>CFBundleName</key>
     <string>{app_name}</string>
     <key>CFBundlePackageType</key>
@@ -409,7 +409,7 @@ def create_readme():
 ## Хранение данных
 
 Приложение автоматически сохраняет все данные в вашей пользовательской директории:
-~/Library/Application Support/VPNServer/
+~/Library/Application Support/VPNServerManager/
 
 В этой директории хранятся:
 - Файлы конфигурации
@@ -419,7 +419,7 @@ def create_readme():
 ## Резервное копирование
 
 Для создания резервной копии данных, сохраните директорию:
-~/Library/Application Support/VPNServer/
+~/Library/Application Support/VPNServerManager/
 
 ## Проблемы с запуском
 
@@ -495,10 +495,10 @@ def diagnose_app(app_path):
     try:
         # Ищем исполняемый файл в разных возможных местах
         possible_executables = [
-            app_path / "Contents" / "MacOS" / "VPNServer" / "VPNServer",
-            app_path / "Contents" / "MacOS" / "VPNServer",
+            app_path / "Contents" / "MacOS" / "VPNServerManager" / "VPNServerManager",
+            app_path / "Contents" / "MacOS" / "VPNServerManager",
             app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServer.app" / "VPNServer"
+            app_path / "Contents" / "MacOS" / "VPNServerManager.app" / "VPNServerManager"
         ]
         
         executable_path = None
@@ -546,7 +546,7 @@ def diagnose_app(app_path):
         print("⚠️ Иконка отсутствует")
     
     # Проверяем структуру приложения
-    app_dir = app_path / "Contents" / "MacOS" / "VPNServer"
+    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager"
     if not app_dir.exists():
         # Проверяем альтернативные пути
         alt_paths = [
@@ -626,7 +626,7 @@ def get_version_from_config():
 def main():
     """Основная функция сборки"""
     version = get_version_from_config()
-    print(f"🚀 Сборка VPN Server v{version}")
+    print(f"🚀 Сборка VPN Server Manager v{version}")
     print("=====================================")
     print(f"📁 Проект: {PROJECT_ROOT}")
     print(f"📦 Результат: {DIST_DIR}")
