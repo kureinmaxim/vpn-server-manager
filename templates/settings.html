@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 
-{% block title %}Управление данными{% endblock %}
+{% block title %}{{ _('Управление данными') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Управление данными</h2>
+    <h2 class="mb-4">{{ _('Управление данными') }}</h2>
 
     <!-- Блок для вывода flash-сообщений -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,52 +21,52 @@
     <!-- Управление ключом шифрования -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-key"></i> Управление ключом шифрования</h5>
+            <h5 class="mb-0"><i class="bi bi-key"></i> {{ _('Управление ключом шифрования') }}</h5>
         </div>
         <div class="card-body">
             
             <!-- Смена ключа -->
             <div class="row mb-4">
                 <div class="col-lg-6">
-                    <h6 class="text-primary"><i class="bi bi-arrow-repeat"></i> Смена главного ключа</h6>
-                    <p class="small text-muted">При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.</p>
+                    <h6 class="text-primary"><i class="bi bi-arrow-repeat"></i> {{ _('Смена главного ключа') }}</h6>
+                    <p class="small text-muted">{{ _('При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.') }}</p>
                     
                     <form action="{{ url_for('change_main_key') }}" method="post" onsubmit="return confirmKeyChange()">
                         <div class="mb-3">
-                            <label for="newKey" class="form-label">Новый ключ</label>
+                            <label for="newKey" class="form-label">{{ _('Новый ключ') }}</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" name="new_key" id="newKey" required placeholder="Введите новый ключ Fernet">
+                                <input type="text" class="form-control" name="new_key" id="newKey" required placeholder="{{ _('Введите новый ключ Fernet') }}">
                                 <button type="button" class="btn btn-outline-secondary" onclick="generateRandomKey()">
-                                    <i class="bi bi-dice-3"></i> Сгенерировать
+                                    <i class="bi bi-dice-3"></i> {{ _('Сгенерировать') }}
                                 </button>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="confirmKey" class="form-label">Подтверждение ключа</label>
-                            <input type="text" class="form-control" name="confirm_key" id="confirmKey" required placeholder="Повторите новый ключ">
+                            <label for="confirmKey" class="form-label">{{ _('Подтверждение ключа') }}</label>
+                            <input type="text" class="form-control" name="confirm_key" id="confirmKey" required placeholder="{{ _('Повторите новый ключ') }}">
                         </div>
                         <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-arrow-repeat"></i> Сменить ключ
+                            <i class="bi bi-arrow-repeat"></i> {{ _('Сменить ключ') }}
                         </button>
                     </form>
                 </div>
                 
                 <!-- Проверка соответствия ключ-данные -->
                 <div class="col-lg-6">
-                    <h6 class="text-primary"><i class="bi bi-search"></i> Проверка соответствия ключ-данные</h6>
-                    <p class="small text-muted">Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение.</p>
+                    <h6 class="text-primary"><i class="bi bi-search"></i> {{ _('Проверка соответствия ключ-данные') }}</h6>
+                    <p class="small text-muted">{{ _('Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение.') }}</p>
                     
                     <form action="{{ url_for('verify_key_data') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="verifyFile" class="form-label">Файл данных (.enc)</label>
+                            <label for="verifyFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
                             <input type="file" class="form-control" name="verify_file" id="verifyFile" accept=".enc" required>
                         </div>
                         <div class="mb-3">
-                            <label for="verifyKey" class="form-label">Ключ для проверки</label>
-                            <textarea class="form-control" name="verify_key" id="verifyKey" rows="3" required placeholder="Вставьте ключ шифрования для проверки"></textarea>
+                            <label for="verifyKey" class="form-label">{{ _('Ключ для проверки') }}</label>
+                            <textarea class="form-control" name="verify_key" id="verifyKey" rows="3" required placeholder="{{ _('Вставьте ключ шифрования для проверки') }}"></textarea>
                         </div>
                         <button type="submit" class="btn btn-info">
-                            <i class="bi bi-search"></i> Проверить соответствие
+                            <i class="bi bi-search"></i> {{ _('Проверить соответствие') }}
                         </button>
                     </form>
                 </div>
@@ -77,26 +77,26 @@
     <!-- Статус файла данных -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-database"></i> Статус файла данных</h5>
+            <h5 class="mb-0"><i class="bi bi-database"></i> {{ _('Статус файла данных') }}</h5>
         </div>
         <div class="card-body">
             {% if active_data_file %}
                 <div class="alert alert-success" role="alert">
                     <i class="bi bi-check-circle-fill"></i> 
-                    <strong>Активный файл:</strong> <code>{{ active_data_file }}</code>
+                    <strong>{{ _('Активный файл:') }}</strong> <code>{{ active_data_file }}</code>
                 </div>
-                <p class="text-muted">Все данные о серверах загружаются из этого зашифрованного файла.</p>
+                <p class="text-muted">{{ _('Все данные о серверах загружаются из этого зашифрованного файла.') }}</p>
                 
                 <!-- Кнопки экспорта -->
                 <div class="row">
                     <div class="col-md-4 mb-2">
                         <button class="btn btn-primary w-100" onclick="showExportInfo('data')">
-                            <i class="bi bi-download"></i> Экспортировать данные
+                            <i class="bi bi-download"></i> {{ _('Экспортировать данные') }}
                         </button>
                     </div>
                     <div class="col-md-4 mb-2">
                         <button class="btn btn-warning w-100" onclick="showExportInfo('key')">
-                            <i class="bi bi-key"></i> Экспортировать ключ
+                            <i class="bi bi-key"></i> {{ _('Экспортировать ключ') }}
                         </button>
                     </div>
                     <div class="col-md-4 mb-2">
@@ -118,18 +118,18 @@
                 </div>
                 
                 <div class="mt-3">
-                <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" onsubmit="return confirm('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.');">
-                    <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-unlock"></i> Открепить файл
-                    </button>
-                </form>
+                    <form action="{{ url_for('detach_data') }}" method="post" class="d-inline" onsubmit="return confirm('{{ _("Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.") }}');">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-unlock"></i> {{ _('Открепить файл') }}
+                        </button>
+                    </form>
                 </div>
             {% else %}
                 <div class="alert alert-warning" role="alert">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    <strong>Файл данных не прикреплен.</strong>
+                    <strong>{{ _('Файл данных не прикреплен.') }}</strong>
                 </div>
-                <p class="text-muted">Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.</p>
+                <p class="text-muted">{{ _('Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.') }}</p>
             {% endif %}
         </div>
     </div>
@@ -137,19 +137,19 @@
     <!-- Импорт файла данных -->
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-upload"></i> Импорт файла данных</h5>
+            <h5 class="mb-0"><i class="bi bi-upload"></i> {{ _('Импорт файла данных') }}</h5>
         </div>
         <div class="card-body">
-            <p class="text-muted">Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.</p>
+            <p class="text-muted">{{ _('Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.') }}</p>
             <form action="{{ url_for('import_data') }}" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
-                    <label for="dataFile" class="form-label">Выбор файла данных</label>
+                    <label for="dataFile" class="form-label">{{ _('Выбор файла данных') }}</label>
                     <input type="file" class="form-control" name="data_file" id="dataFile" accept=".enc" required>
-                    <div class="form-text">Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.</div>
+                    <div class="form-text">{{ _('Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.') }}</div>
                 </div>
                 <div class="d-grid">
                     <button class="btn btn-success" type="submit">
-                        <i class="bi bi-upload"></i> Импортировать и прикрепить
+                        <i class="bi bi-upload"></i> {{ _('Импортировать и прикрепить') }}
                     </button>
                 </div>
             </form>
@@ -160,22 +160,22 @@
     <div class="card">
         <div class="card-header d-flex align-items-center">
             <i class="bi bi-plus-circle me-2"></i>
-            <h5 class="mb-0">Импорт серверов из другой установки</h5>
+            <h5 class="mb-0">{{ _('Импорт серверов из другой установки') }}</h5>
         </div>
         <div class="card-body">
             <div class="alert alert-light border" role="alert">
-                <i class="bi bi-info-circle"></i> <strong>Что нужно:</strong> файл <code>.env</code> и <code>servers.json.enc</code> из другой установки приложения.
+                <i class="bi bi-info-circle"></i> <strong>{{ _('Что нужно:') }}</strong> {{ _('файл <code>.env</code> и <code>servers.json.enc</code> из другой установки приложения.') }}
             </div>
 
             <form action="{{ url_for('import_external_data') }}" method="post" enctype="multipart/form-data">
                 <div class="row">
                     <!-- Левая колонка: servers.json.enc файл -->
                     <div class="col-md-6">
-                        <h6 class="text-primary">servers.json.enc файл</h6>
+                        <h6 class="text-primary">{{ _('servers.json.enc файл') }}</h6>
                 <div class="mb-3">
                             <label for="envFile" class="form-label">Файл данных (.enc)</label>
                             <input type="file" class="form-control" name="external_file" id="envFile" accept=".enc" required>
-                    <div class="form-text">Выберать зашифрованный файл данных из другой установки</div>
+                    <div class="form-text">{{ _('Выберать зашифрованный файл данных из другой установки') }}</div>
                 </div>
                     </div>
 
@@ -210,6 +210,7 @@
 </div>
 
 <script>
+// @ts-nocheck - Jinja2 template syntax
 function showExportMessage(fileType) {
     const notification = document.getElementById('exportNotification');
     const message = document.getElementById('exportMessage');
