@@ -1,183 +1,183 @@
 {% extends "layout.html" %}
 
-{% block title %}Добавить сервер{% endblock %}
+{% block title %}{{ _('Добавить сервер') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Добавить новый сервер</h1>
+    <h1>{{ _('Добавить новый сервер') }}</h1>
     <hr>
     <div class="row">
         <div class="col-md-8">
             <form action="{{ url_for('add_server') }}" method="post" enctype="multipart/form-data">
-                <h5 class="mt-4">Основная информация</h5>
+                <h5 class="mt-4">{{ _('Основная информация') }}</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="name" class="form-label">Название сервера</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+                        <label for="name" class="form-label">{{ _('Название сервера') }}</label>
+                        <input type="text" class="form-control" id="name" name="name" required placeholder="{{ _('Например, VPS-1') }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="provider" class="form-label">Хостинг-провайдер</label>
-                        <input type="text" class="form-control" id="provider" name="provider">
+                        <label for="provider" class="form-label">{{ _('Хостинг-провайдер') }}</label>
+                        <input type="text" class="form-control" id="provider" name="provider" placeholder="{{ _('Например, Hetzner') }}">
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="ip_address" class="form-label">IP-адрес</label>
-                    <input type="text" class="form-control" id="ip_address" name="ip_address" required>
+                    <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
+                    <input type="text" class="form-control" id="ip_address" name="ip_address" required placeholder="{{ _('Например, 1.2.3.4') }}">
                 </div>
                 <div class="mb-3">
-                    <label for="os" class="form-label">Операционная система</label>
-                    <input type="text" class="form-control" id="os" name="os" placeholder="Например, Ubuntu 22.04">
+                    <label for="os" class="form-label">{{ _('Операционная система') }}</label>
+                    <input type="text" class="form-control" id="os" name="os" placeholder="{{ _('Например, Ubuntu 22.04') }}">
                 </div>
 
                  <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="status" class="form-label">Статус</label>
+                        <label for="status" class="form-label">{{ _('Статус') }}</label>
                         <select class="form-select" id="status" name="status">
-                            <option value="Active" selected>Активен</option>
-                            <option value="Inactive">Неактивен</option>
-                            <option value="Suspended">Заблокирован</option>
+                            <option value="Active" selected>{{ _('Активен') }}</option>
+                            <option value="Inactive">{{ _('Неактивен') }}</option>
+                            <option value="Suspended">{{ _('Заблокирован') }}</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label for="panel_url" class="form-label">URL панели управления</label>
-                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="http://1.2.3.4:2053/panel">
+                    <label for="panel_url" class="form-label">{{ _('URL панели управления') }}</label>
+                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="{{ _('Например, http://1.2.3.4:2053/panel') }}">
                 </div>
 
-                <h5 class="mt-4">Оформление карточки</h5>
+                <h5 class="mt-4">{{ _('Оформление карточки') }}</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="card_color" class="form-label">Цвет карточки</label>
+                        <label for="card_color" class="form-label">{{ _('Цвет карточки') }}</label>
                         <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="#ffc107">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="server_icon" class="form-label">Иконка сервера</label>
+                        <label for="server_icon" class="form-label">{{ _('Иконка сервера') }}</label>
                         <input class="form-control" type="file" id="server_icon" name="server_icon">
                     </div>
                 </div>
 
-                <h5 class="mt-4">Характеристики сервера</h5>
+                <h5 class="mt-4">{{ _('Характеристики сервера') }}</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="cpu" class="form-label">CPU</label>
-                        <input type="text" class="form-control" id="cpu" name="cpu">
+                        <label for="cpu" class="form-label">{{ _('CPU') }}</label>
+                        <input type="text" class="form-control" id="cpu" name="cpu" placeholder="{{ _('Например, 4 vCPU') }}">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="ram" class="form-label">RAM</label>
-                        <input type="text" class="form-control" id="ram" name="ram">
+                        <label for="ram" class="form-label">{{ _('RAM') }}</label>
+                        <input type="text" class="form-control" id="ram" name="ram" placeholder="{{ _('Например, 8GB') }}">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="disk" class="form-label">Диск</label>
-                        <input type="text" class="form-control" id="disk" name="disk" placeholder="100GB SSD">
+                        <label for="disk" class="form-label">{{ _('Диск') }}</label>
+                        <input type="text" class="form-control" id="disk" name="disk" placeholder="{{ _('Например, 100GB SSD') }}">
                     </div>
                 </div>
 
-                <h5 class="mt-4">Платёжная информация</h5>
+                <h5 class="mt-4">{{ _('Платёжная информация') }}</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label for="amount" class="form-label">Сумма</label>
+                        <label for="amount" class="form-label">{{ _('Сумма') }}</label>
                         <input type="number" step="0.01" class="form-control" id="amount" name="amount">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="currency" class="form-label">Валюта</label>
-                        <input type="text" class="form-control" id="currency" name="currency" value="RUB">
+                        <label for="currency" class="form-label">{{ _('Валюта') }}</label>
+                        <input type="text" class="form-control" id="currency" name="currency" value="RUB" placeholder="{{ _('Например, USD') }}">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="next_due_date" class="form-label">Следующая оплата</label>
+                        <label for="next_due_date" class="form-label">{{ _('Следующая оплата') }}</label>
                         <input type="date" class="form-control" id="next_due_date" name="next_due_date">
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label for="payment_period" class="form-label">Период оплаты</label>
+                        <label for="payment_period" class="form-label">{{ _('Период оплаты') }}</label>
                         <select class="form-select" id="payment_period" name="payment_period">
-                            <option value="Monthly" selected>Месяц</option>
-                            <option value="3 Months">3 месяца</option>
-                            <option value="Yearly">Год</option>
-                            <option value="Perpetual">Бессрочно</option>
+                            <option value="Monthly" selected>{{ _('Месяц') }}</option>
+                            <option value="3 Months">{{ _('3 месяца') }}</option>
+                            <option value="Yearly">{{ _('Год') }}</option>
+                            <option value="Perpetual">{{ _('Бессрочно') }}</option>
                         </select>
                     </div>
                 </div>
 
-                <h5 class="mt-4">SSH-доступ</h5>
+                <h5 class="mt-4">{{ _('SSH-доступ') }}</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="ssh_user" class="form-label">Пользователь SSH</label>
-                        <input type="text" class="form-control" id="ssh_user" name="ssh_user">
+                        <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>
+                        <input type="text" class="form-control" id="ssh_user" name="ssh_user" placeholder="{{ _('Например, root') }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="ssh_password" class="form-label">Пароль SSH</label>
-                        <input type="password" class="form-control" id="ssh_password" name="ssh_password">
+                        <label for="ssh_password" class="form-label">{{ _('Пароль SSH') }}</label>
+                        <input type="password" class="form-control" id="ssh_password" name="ssh_password" placeholder="{{ _('Введите пароль') }}">
                     </div>
                      <div class="col-md-6 mb-3">
-                        <label for="ssh_port" class="form-label">Порт SSH</label>
-                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22">
+                        <label for="ssh_port" class="form-label">{{ _('Порт SSH') }}</label>
+                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22" placeholder="{{ _('По умолчанию 22') }}">
                     </div>
                 </div>
                  <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="ssh_root_password" class="form-label">Пароль root</label>
-                        <input type="password" class="form-control" id="ssh_root_password" name="ssh_root_password">
+                        <label for="ssh_root_password" class="form-label">{{ _('Пароль root') }}</label>
+                        <input type="password" class="form-control" id="ssh_root_password" name="ssh_root_password" placeholder="{{ _('Введите пароль root') }}">
                     </div>
                     <div class="col-md-6 mb-3 d-flex align-items-end">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" checked>
                             <label class="form-check-label" for="root_login_allowed">
-                                Вход для root по SSH разрешен
+                                {{ _('Вход для root по SSH разрешен') }}
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <h5 class="mt-4">Панель управления (3x-ui и др.)</h5>
+                <h5 class="mt-4">{{ _('Панель управления (3x-ui и др.)') }}</h5>
                 <div class="mb-3">
-                    <label for="panel_url" class="form-label">URL панели</label>
-                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="http://1.2.3.4:2053/panel">
+                    <label for="panel_url" class="form-label">{{ _('URL панели') }}</label>
+                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="{{ _('Например, http://1.2.3.4:2053/panel') }}">
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="panel_user" class="form-label">Логин панели</label>
-                        <input type="text" class="form-control" id="panel_user" name="panel_user">
+                        <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
+                        <input type="text" class="form-control" id="panel_user" name="panel_user" placeholder="{{ _('Например, admin') }}">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="panel_password" class="form-label">Пароль панели</label>
-                        <input type="password" class="form-control" id="panel_password" name="panel_password">
+                        <label for="panel_password" class="form-label">{{ _('Пароль панели') }}</label>
+                        <input type="password" class="form-control" id="panel_password" name="panel_password" placeholder="{{ _('Введите пароль панели') }}">
                     </div>
                 </div>
 
-                <h5 class="mt-4">Кабинет хостера</h5>
+                <h5 class="mt-4">{{ _('Кабинет хостера') }}</h5>
                 <div class="mb-3">
-                    <label for="hoster_url" class="form-label">URL кабинета</label>
-                    <input type="text" class="form-control" id="hoster_url" name="hoster_url" placeholder="https://my.hoster.com">
+                    <label for="hoster_url" class="form-label">{{ _('URL кабинета') }}</label>
+                    <input type="text" class="form-control" id="hoster_url" name="hoster_url" placeholder="{{ _('Например, https://my.hoster.com') }}">
                 </div>
                 <div class="row">
                      <div class="col-md-6 mb-3">
-                        <label for="hoster_login_method" class="form-label">Способ входа</label>
+                        <label for="hoster_login_method" class="form-label">{{ _('Способ входа') }}</label>
                         <select class="form-select" id="hoster_login_method" name="hoster_login_method">
-                            <option value="password" selected>По логину/паролю</option>
-                            <option value="google">Через Google</option>
-                            <option value="apple">Через Apple</option>
-                            <option value="other">Другой</option>
+                            <option value="password" selected>{{ _('По логину/паролю') }}</option>
+                            <option value="google">{{ _('Через Google') }}</option>
+                            <option value="apple">{{ _('Через Apple') }}</option>
+                            <option value="other">{{ _('Другой') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="hoster_user" class="form-label" id="hoster_user_label">Логин хостера</label>
-                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" placeholder="user@example.com">
+                        <label for="hoster_user" class="form-label" id="hoster_user_label">{{ _('Логин хостера') }}</label>
+                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" placeholder="{{ _('Например, user@example.com') }}">
                     </div>
                     <div class="col-md-6 mb-3" id="hoster_password_field">
-                        <label for="hoster_password" class="form-label">Пароль хостера</label>
-                        <input type="password" class="form-control" id="hoster_password" name="hoster_password">
+                        <label for="hoster_password" class="form-label">{{ _('Пароль хостера') }}</label>
+                        <input type="password" class="form-control" id="hoster_password" name="hoster_password" placeholder="{{ _('Введите пароль хостера') }}">
                     </div>
                 </div>
 
-                <h5 class="mt-4">Результаты проверок</h5>
+                <h5 class="mt-4">{{ _('Результаты проверок') }}</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok">
                             <label class="form-check-label" for="check_dns_ok">
-                                DNS-тест пройден (нет утечек)
+                                {{ _('DNS-тест пройден (нет утечек)') }}
                             </label>
                         </div>
                     </div>
@@ -185,51 +185,51 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="check_streaming_ok" name="check_streaming_ok">
                             <label class="form-check-label" for="check_streaming_ok">
-                                Стриминг-тест пройден (например, 9Now)
+                                {{ _('Стриминг-тест пройден (например, 9Now)') }}
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <h5 class="mt-4">Загрузка файлов</h5>
+                <h5 class="mt-4">{{ _('Загрузка файлов') }}</h5>
                 <div class="mb-3">
-                    <label for="receipt" class="form-label">Загрузить чек об оплате</label>
+                    <label for="receipt" class="form-label">{{ _('Загрузить чек об оплате') }}</label>
                     <input class="form-control" type="file" id="receipt" name="receipt">
                 </div>
 
 
-                <h5 class="mt-4">Дополнительная информация</h5>
+                <h5 class="mt-4">{{ _('Дополнительная информация') }}</h5>
                  <div class="mb-3">
-                    <label for="notes" class="form-label">Заметки</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <label for="notes" class="form-label">{{ _('Заметки') }}</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="{{ _('Введите заметки') }}"></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="docker_info" class="form-label">Информация о Docker</label>
-                    <textarea class="form-control" id="docker_info" name="docker_info" rows="3"></textarea>
+                    <label for="docker_info" class="form-label">{{ _('Информация о Docker') }}</label>
+                    <textarea class="form-control" id="docker_info" name="docker_info" rows="3" placeholder="{{ _('Информация о Docker-контейнерах') }}"></textarea>
                 </div>
                 <div class="mb-3">
-                    <label for="software_info" class="form-label">Установленное ПО</label>
-                    <textarea class="form-control" id="software_info" name="software_info" rows="3"></textarea>
+                    <label for="software_info" class="form-label">{{ _('Установленное ПО') }}</label>
+                    <textarea class="form-control" id="software_info" name="software_info" rows="3" placeholder="{{ _('Установленное ПО, например: nginx, docker, fail2ban') }}"></textarea>
                 </div>
                 
-                <button type="submit" class="btn btn-primary mt-3">Сохранить</button>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">Отмена</a>
+                <button type="submit" class="btn btn-primary mt-3">{{ _('Сохранить') }}</button>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">{{ _('Отмена') }}</a>
             </form>
         </div>
         <div class="col-md-4">
             <div class="card mt-4">
                 <div class="card-header">
-                    <h5 class="mb-0">Подсказки по командам (Debian/Ubuntu)</h5>
+                    <h5 class="mb-0">{{ _('Подсказки по командам (Debian/Ubuntu)') }}</h5>
                 </div>
                 <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
                     
-                    <h6 class="mt-2">Установленное ПО</h6>
+                    <h6 class="mt-2">{{ _('Установленное ПО') }}</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">dpkg -l | grep ii</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">Ключевые утилиты</h6>
+                    <h6 class="mt-3">{{ _('Ключевые утилиты') }}</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">uname -a</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -247,7 +247,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">Управление службами</h6>
+                    <h6 class="mt-3">{{ _('Управление службами') }}</h6>
                      <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">systemctl status nginx</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -257,7 +257,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">Управление пакетами</h6>
+                    <h6 class="mt-3">{{ _('Управление пакетами') }}</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">apt update</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -267,7 +267,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">Безопасность</h6>
+                    <h6 class="mt-3">{{ _('Безопасность') }}</h6>
                      <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">ufw status verbose</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -297,17 +297,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginMethodSelect = document.getElementById('hoster_login_method');
     const passwordField = document.getElementById('hoster_password_field');
     const userLabel = document.getElementById('hoster_user_label');
+    // Переводы для JS
+    const labelLoginHoster = document.body.getAttribute('data-label-login-hoster');
+    const labelEmailLogin = document.body.getAttribute('data-label-email-login');
+    const labelLoginEmail = document.body.getAttribute('data-label-login-email');
 
     function toggleFields() {
         if (loginMethodSelect.value === 'password') {
             passwordField.style.display = '';
-            userLabel.textContent = 'Логин хостера';
+            userLabel.textContent = labelLoginHoster;
         } else {
             passwordField.style.display = 'none';
             if (loginMethodSelect.value === 'google' || loginMethodSelect.value === 'apple') {
-                userLabel.textContent = 'Email для входа';
+                userLabel.textContent = labelEmailLogin;
             } else {
-                userLabel.textContent = 'Логин / Email';
+                userLabel.textContent = labelLoginEmail;
             }
         }
     }
@@ -327,8 +331,11 @@ function copyHint(button) {
             icon.className = originalClass;
         }, 1500);
     }).catch(err => {
-        console.error('Ошибка копирования: ', err);
+        const copyError = document.body.getAttribute('data-copy-error');
+        console.error(copyError, err);
     });
 }
 </script>
-{% endblock %} 
+{% endblock %}
+
+{% block body_attrs %}data-label-login-hoster="{{ _('Логин хостера') }}" data-label-email-login="{{ _('Email для входа') }}" data-label-login-email="{{ _('Логин / Email') }}" data-copy-error="{{ _('Ошибка копирования: ') }}"{% endblock %} 
