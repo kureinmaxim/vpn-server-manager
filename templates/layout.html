@@ -267,7 +267,7 @@
         
         // Функция выхода из системы
         function logout() {
-            if (confirm('Вы уверены, что хотите выйти из системы?')) {
+            if (confirm('{{ _('Вы уверены, что хотите выйти из системы?') }}')) {
                 fetch('/pin/logout', {
                     method: 'POST',
                     headers: {
@@ -280,7 +280,7 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Ошибка выхода:', error);
+                    console.error('{{ _('Ошибка выхода:') }}', error);
                     // В случае ошибки все равно перезагружаем страницу
                     window.location.reload();
                 });
@@ -321,7 +321,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="bi bi-key"></i> Вход по PIN
+                                <i class="bi bi-key"></i> {{ _('Вход по PIN') }}
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -331,12 +331,12 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
                                             data-bs-target="#login-pane" type="button" role="tab" 
-                                            aria-controls="login-pane" aria-selected="true">Вход</button>
+                                            aria-controls="login-pane" aria-selected="true">{{ _('Вход') }}</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="change-pin-tab" data-bs-toggle="tab" 
                                             data-bs-target="#change-pin-pane" type="button" role="tab" 
-                                            aria-controls="change-pin-pane" aria-selected="false">Сменить PIN</button>
+                                            aria-controls="change-pin-pane" aria-selected="false">{{ _('Сменить PIN') }}</button>
                                 </li>
                             </ul>
                             
@@ -345,11 +345,11 @@
                                 <!-- Вкладка входа -->
                                 <div class="tab-pane fade show active" id="login-pane" role="tabpanel" 
                                      aria-labelledby="login-tab">
-                                    <p class="text-muted mb-3 mt-3">Введите PIN-код для входа в систему</p>
+                                    <p class="text-muted mb-3 mt-3">{{ _('Введите PIN-код для входа в систему') }}</p>
                                     <div class="mb-3">
-                                        <label for="pinInput" class="form-label">PIN-код</label>
+                                        <label for="pinInput" class="form-label">{{ _('PIN-код') }}</label>
                                         <input type="password" class="form-control" id="pinInput" 
-                                               placeholder="Введите PIN" maxlength="4" autocomplete="off">
+                                               placeholder="{{ _('Введите PIN') }}" maxlength="4" autocomplete="off">
                                     </div>
                                     <div id="pinLoginMessage" class="alert" style="display: none;"></div>
                                 </div>
@@ -357,22 +357,22 @@
                                 <!-- Вкладка смены PIN -->
                                 <div class="tab-pane fade" id="change-pin-pane" role="tabpanel" 
                                      aria-labelledby="change-pin-tab">
-                                    <p class="text-muted mb-3 mt-3">Смените PIN-код для входа</p>
+                                    <p class="text-muted mb-3 mt-3">{{ _('Смените PIN-код для входа') }}</p>
                                     <form id="changePinForm">
                                         <div class="mb-3">
-                                            <label for="oldPin" class="form-label">Старый PIN</label>
+                                            <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                             <input type="password" class="form-control" id="oldPin" name="old_pin" 
-                                                   placeholder="Введите старый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Введите старый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="newPin1" class="form-label">Новый PIN</label>
+                                            <label for="newPin1" class="form-label">{{ _('Новый PIN') }}</label>
                                             <input type="password" class="form-control" id="newPin1" name="new_pin1" 
-                                                   placeholder="Введите новый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Введите новый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="newPin2" class="form-label">Подтвердите новый PIN</label>
+                                            <label for="newPin2" class="form-label">{{ _('Подтвердите новый PIN') }}</label>
                                             <input type="password" class="form-control" id="newPin2" name="new_pin2" 
-                                                   placeholder="Повторите новый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div id="changePinMessage" class="alert" style="display: none;"></div>
                                     </form>
@@ -380,9 +380,9 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
                             <button type="button" class="btn btn-primary" id="modalSubmitBtn" 
-                                    onclick="submitPinLogin()">Войти</button>
+                                    onclick="submitPinLogin()">{{ _('Войти') }}</button>
                         </div>
                     </div>
                 </div>
