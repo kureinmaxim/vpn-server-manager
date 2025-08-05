@@ -1,0 +1,1600 @@
+# Chinese translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-08-05 14:59+0300\n"
+"PO-Revision-Date: 2025-08-05 11:08+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: app.py:520
+msgid "Ошибка чтения файла данных. Файл может быть поврежден."
+msgstr "读取数据文件时出错。文件可能已损坏。"
+
+#: app.py:525
+msgid ""
+"Не удалось расшифровать файл данных. Проверьте ваш SECRET_KEY или "
+"целостность файла."
+msgstr "无法解密数据文件。请检查您的SECRET_KEY或文件完整性。"
+
+#: app.py:532
+msgid "Ошибка: не указан активный файл данных. Сохранение невозможно."
+msgstr "错误：未指定活动数据文件。无法保存。"
+
+#: app.py:1006
+msgid ""
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
+" целостность файла данных."
+msgstr "无法加载服务器数据。请检查互联网连接和数据文件完整性。"
+
+#: app.py:1047
+msgid "Нет подключения к интернету. Некоторые функции могут быть недоступны."
+msgstr "没有互联网连接。某些功能可能不可用。"
+
+#: app.py:1084
+msgid "Создан новый файл для хранения серверов. Теперь можно добавить первый."
+msgstr "已创建新文件用于存储服务器。现在可以添加第一个。"
+
+#: app.py:1438 app.py:1498
+msgid "Нет активного файла данных для экспорта."
+msgstr "没有可导出的活动数据文件。"
+
+#: app.py:1590
+msgid "Файл данных успешно импортирован и прикреплен!"
+msgstr "数据文件已成功导入并附加！"
+
+#: app.py:1594
+msgid ""
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
+" с другим ключом."
+msgstr "错误：文件无法解密或已损坏。可能是用不同的密钥创建的。"
+
+#: app.py:1602 app.py:1619
+msgid "Неверный тип файла. Пожалуйста, выберите файл .enc"
+msgstr "文件类型无效。请选择.enc文件"
+
+#: app.py:1615
+msgid "Необходимо выбрать файл и указать внешний ключ шифрования."
+msgstr "必须选择文件并指定外部加密密钥。"
+
+#: app.py:1628
+msgid ""
+"Неверный формат ключа шифрования. Ключ должен быть действительным ключом "
+"Fernet."
+msgstr "加密密钥格式无效。密钥必须是有效的Fernet密钥。"
+
+#: app.py:1787
+msgid "Все сервера из импортируемого файла уже существуют в вашем списке."
+msgstr "导入文件中的所有服务器已存在于您的列表中。"
+
+#: app.py:1790
+msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+msgstr "错误：加密密钥无效。请检查输入的密钥是否正确。"
+
+#: app.py:1792
+msgid "Ошибка: файл содержит некорректные данные."
+msgstr "错误：文件包含不正确的数据。"
+
+#: app.py:1811
+msgid "Файл данных успешно откреплен."
+msgstr "数据文件已成功分离。"
+
+#: app.py:1863
+msgid "Ошибка: ключи не совпадают."
+msgstr "错误：密钥不匹配。"
+
+#: app.py:1868
+msgid "Ошибка: новый ключ не может быть пустым."
+msgstr "错误：新密钥不能为空。"
+
+#: app.py:1875
+msgid "Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet."
+msgstr "错误：密钥格式不正确。密钥必须是Fernet格式。"
+
+#: app.py:1948
+#, python-format
+msgid ""
+"✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
+"Резервная копия сохранена как: %(backup_filename)s"
+msgstr "✅ 密钥已成功更改！已创建新数据文件：%(new_filename)s。 备份保存为：%(backup_filename)s"
+
+#: app.py:1984
+msgid "Необходимо выбрать файл и указать ключ для проверки."
+msgstr "必须选择文件并指定密钥进行验证。"
+
+#: app.py:1988
+msgid "Неверный тип файла. Выберите файл .enc"
+msgstr "文件类型无效。选择.enc文件"
+
+#: app.py:1995
+msgid "❌ Некорректный формат ключа Fernet."
+msgstr "❌ Fernet密钥格式不正确。"
+
+#: app.py:2026
+#, python-format
+msgid ""
+"✅ Ключ подходит! Найдено серверов: %(server_count)s. Провайдеры: "
+"%(provider_list)s. Серверы: %(name_preview)s"
+msgstr "✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
+
+#: app.py:2028
+msgid "✅ Ключ подходит, но структура данных неожиданная."
+msgstr "✅ 密钥有效，但数据结构意外。"
+
+#: app.py:2031
+msgid "❌ Ключ не подходит к этому файлу данных."
+msgstr "❌ 密钥与此数据文件不匹配。"
+
+#: app.py:2033
+msgid "❌ Файл расшифрован, но содержит некорректные JSON данные."
+msgstr "❌ 文件已解密，但包含无效的JSON数据。"
+
+#: app.py:2056
+#, python-format
+msgid "Язык изменен на %(lang)s"
+msgstr "语言已更改为 %(lang)s"
+
+#: templates/about.html:3 templates/layout.html:50
+msgid "О программе"
+msgstr "关于"
+
+#: templates/about.html:10 templates/layout.html:6
+msgid "Панель управления VPS"
+msgstr "VPS控制面板"
+
+#: templates/about.html:11
+msgid "Версия:"
+msgstr "版本："
+
+#: templates/about.html:12
+msgid "Дата выпуска:"
+msgstr "发布日期："
+
+#: templates/about.html:13
+#, fuzzy
+msgid "Разработчик:"
+msgstr "开发者："
+
+#: templates/about.html:16
+msgid ""
+"Программа для удобного и безопасного хранения информации о VPS/VDS "
+"серверах от различных провайдеров."
+msgstr "用于方便安全地存储来自各种提供商的VPS/VDS服务器信息的程序。"
+
+#: templates/cheatsheet.html:3
+#, fuzzy
+msgid "Шпаргалка по командам"
+msgstr "命令速查表"
+
+#: templates/cheatsheet.html:7
+msgid "Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)"
+msgstr "服务器诊断速查表 (Debian/Ubuntu)"
+
+#: templates/cheatsheet.html:8
+msgid ""
+"Этот раздел объединяет наиболее полезные команды для быстрой оценки "
+"состояния сервера."
+msgstr "本节汇集了用于快速评估服务器状态的最有用命令。"
+
+#: templates/cheatsheet.html:12
+msgid "Быстрая сводка"
+msgstr "快速摘要"
+
+#: templates/cheatsheet.html:20 templates/cheatsheet.html:65
+#: templates/cheatsheet.html:74 templates/cheatsheet.html:83
+#: templates/cheatsheet.html:92 templates/cheatsheet.html:101
+#: templates/cheatsheet.html:110 templates/cheatsheet.html:119
+#: templates/cheatsheet.html:128 templates/cheatsheet.html:145
+#: templates/cheatsheet.html:154
+#, fuzzy
+msgid "Копировать"
+msgstr "复制"
+
+#: templates/cheatsheet.html:28
+msgid "Установленное ПО"
+msgstr "已安装软件"
+
+#: templates/cheatsheet.html:32
+msgid "Показать все установленные пакеты:"
+msgstr "显示所有已安装的包："
+
+#: templates/cheatsheet.html:39
+msgid "Найти конкретный пакет"
+msgstr "查找特定包"
+
+#: templates/cheatsheet.html:39 templates/cheatsheet.html:46
+#: templates/cheatsheet.html:248 templates/cheatsheet.html:263
+#: templates/cheatsheet.html:301
+msgid "замените"
+msgstr "替换"
+
+#: templates/cheatsheet.html:46
+msgid "Показать файлы, установленные пакетом"
+msgstr "显示包安装的文件"
+
+#: templates/cheatsheet.html:57
+msgid "Ключевые утилиты"
+msgstr "关键工具"
+
+#: templates/cheatsheet.html:61
+msgid "Информация о ядре и системе"
+msgstr "内核和系统信息"
+
+#: templates/cheatsheet.html:70
+msgid "Информация о процессоре"
+msgstr "处理器信息"
+
+#: templates/cheatsheet.html:79
+msgid "Использование оперативной памяти"
+msgstr "内存使用情况"
+
+#: templates/cheatsheet.html:88
+msgid "Использование дискового пространства"
+msgstr "磁盘空间使用情况"
+
+#: templates/cheatsheet.html:97
+msgid "Просмотр сетевых интерфейсов"
+msgstr "查看网络接口"
+
+#: templates/cheatsheet.html:106
+msgid "Просмотр активных сетевых портов"
+msgstr "查看活动网络端口"
+
+#: templates/cheatsheet.html:115
+msgid "Кто сейчас в системе"
+msgstr "当前系统用户"
+
+#: templates/cheatsheet.html:124
+msgid "Системный журнал в реальном времени"
+msgstr "实时系统日志"
+
+#: templates/cheatsheet.html:137
+msgid "Подробнее о `df` (использование дискового пространства)"
+msgstr "关于 `df` 的更多信息（磁盘空间使用）"
+
+#: templates/cheatsheet.html:141
+msgid "Показать тип файловой системы"
+msgstr "显示文件系统类型"
+
+#: templates/cheatsheet.html:141
+msgid "например"
+msgstr "例如"
+
+#: templates/cheatsheet.html:150
+msgid "Показать итоговую строку с суммой по всем разделам"
+msgstr "显示所有分区的汇总行"
+
+#: templates/cheatsheet.html:163
+msgid "Основы безопасности"
+msgstr "安全基础"
+
+#: templates/cheatsheet.html:167
+#, fuzzy
+msgid "Управление файрволом (ufw)"
+msgstr "防火墙管理 (ufw)"
+
+#: templates/cheatsheet.html:169
+#, fuzzy
+msgid "Проверить статус и правила:"
+msgstr "检查状态和规则："
+
+#: templates/cheatsheet.html:174
+msgid "Разрешить стандартный порт SSH (22):"
+msgstr "允许标准SSH端口 (22)："
+
+#: templates/cheatsheet.html:179
+msgid "Пример: разрешить нестандартный порт SSH (например, 2222):"
+msgstr "示例：允许非标准SSH端口（例如，2222）："
+
+#: templates/cheatsheet.html:184
+msgid "Пример: разрешить порт для веб-сервера (HTTPS):"
+msgstr "示例：允许Web服务器端口 (HTTPS)："
+
+#: templates/cheatsheet.html:189
+msgid "Пример: удалить правило:"
+msgstr "示例：删除规则："
+
+#: templates/cheatsheet.html:195
+msgid "Проверка Fail2Ban"
+msgstr "Fail2Ban检查"
+
+#: templates/cheatsheet.html:197
+msgid "Статус службы Fail2Ban:"
+msgstr "Fail2Ban服务状态："
+
+#: templates/cheatsheet.html:202
+msgid "Статус защиты SSH и список забаненных IP:"
+msgstr "SSH保护状态和被封禁IP列表："
+
+#: templates/cheatsheet.html:207
+msgid "Разбанить IP-адрес (замените 1.2.3.4):"
+msgstr "解封IP地址（替换1.2.3.4）："
+
+#: templates/cheatsheet.html:213
+msgid "Аудит и мониторинг"
+msgstr "审计和监控"
+
+#: templates/cheatsheet.html:215
+msgid "Показать последних вошедших пользователей:"
+msgstr "显示最近登录的用户："
+
+#: templates/cheatsheet.html:220
+msgid "Показать неудачные попытки входа (требует root):"
+msgstr "显示失败的登录尝试（需要root）："
+
+#: templates/cheatsheet.html:230
+#, fuzzy
+msgid "Управление процессами"
+msgstr "进程管理"
+
+#: templates/cheatsheet.html:234
+msgid "Показать все запущенные процессы"
+msgstr "显示所有运行中的进程"
+
+#: templates/cheatsheet.html:241
+msgid "Интерактивный монитор процессов"
+msgstr "交互式进程监视器"
+
+#: templates/cheatsheet.html:241
+msgid "более удобен, если установлен"
+msgstr "如果已安装则更方便"
+
+#: templates/cheatsheet.html:248
+msgid "Найти процесс по имени"
+msgstr "按名称查找进程"
+
+#: templates/cheatsheet.html:259
+#, fuzzy
+msgid "Управление службами (systemd)"
+msgstr "服务管理 (systemd)"
+
+#: templates/cheatsheet.html:263
+#, fuzzy
+msgid "Проверить статус службы"
+msgstr "检查服务状态"
+
+#: templates/cheatsheet.html:268
+msgid "Перезапустить службу:"
+msgstr "重启服务："
+
+#: templates/cheatsheet.html:273
+msgid "Включить автозапуск службы:"
+msgstr "启用服务自动启动："
+
+#: templates/cheatsheet.html:278
+msgid "Выключить автозапуск службы:"
+msgstr "禁用服务自动启动："
+
+#: templates/cheatsheet.html:287
+#, fuzzy
+msgid "Управление пакетами (apt)"
+msgstr "包管理 (apt)"
+
+#: templates/cheatsheet.html:291
+msgid "Обновить список пакетов:"
+msgstr "更新包列表："
+
+#: templates/cheatsheet.html:296
+msgid "Обновить установленные пакеты:"
+msgstr "更新已安装的包："
+
+#: templates/cheatsheet.html:301
+msgid "Установить пакет"
+msgstr "安装包"
+
+#: templates/cheatsheet.html:306
+msgid "Удалить пакет:"
+msgstr "删除包："
+
+#: templates/cheatsheet.html:328
+msgid "Скопировано!"
+msgstr "已复制！"
+
+#: templates/cheatsheet.html:338
+msgid "Не удалось скопировать текст: "
+msgstr "复制文本失败："
+
+#: templates/cheatsheet.html:339
+msgid "Ошибка при копировании"
+msgstr "复制时出错"
+
+#: templates/help.html:8 templates/layout.html:41
+msgid "Справка по использованию"
+msgstr "使用帮助"
+
+#: templates/help.html:14
+msgid "Добавление нового сервера"
+msgstr "添加新服务器"
+
+#: templates/help.html:19
+msgid ""
+"Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
+"необходимые поля. Пароли будут автоматически зашифрованы перед "
+"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
+msgstr "点击主页上的\"添加服务器\"按钮。填写所有必填字段。密码将在保存前自动加密。您还可以附加文件（例如付款收据）。"
+
+#: templates/help.html:27
+msgid "Управление паролями и SSH"
+msgstr "密码和SSH管理"
+
+#: templates/help.html:32
+msgid ""
+"Пароли намеренно не отображаются в открытом виде для безопасности. Чтобы "
+"увидеть сохраненный пароль, используйте иконку глаза."
+msgstr "出于安全考虑，密码不会以明文显示。要查看保存的密码，请使用眼睛图标。"
+
+#: templates/help.html:34
+msgid "Отображение пароля:"
+msgstr "显示密码："
+
+#: templates/help.html:34
+msgid "На главной странице, рядом со скрытым паролем, нажмите на иконку глаза"
+msgstr "在主页上，点击隐藏密码旁边的眼睛图标"
+
+#: templates/help.html:34
+msgid "чтобы временно его показать."
+msgstr "以临时显示它。"
+
+#: templates/help.html:35
+msgid "Копирование данных:"
+msgstr "复制数据："
+
+#: templates/help.html:35
+msgid "Нажмите на иконку"
+msgstr "点击图标"
+
+#: templates/help.html:35
+msgid "чтобы безопасно скопировать логин, пароль или URL в буфер обмена."
+msgstr "以安全地将登录名、密码或URL复制到剪贴板。"
+
+#: templates/help.html:36
+msgid "SSH-команда:"
+msgstr "SSH命令："
+
+#: templates/help.html:36
+msgid "Нажмите кнопку"
+msgstr "点击按钮"
+
+#: templates/help.html:36
+msgid "\"Копировать SSH\", чтобы получить готовую команду для вставки в терминал."
+msgstr "\"复制SSH\"以获取可在终端中粘贴的现成命令。"
+
+#: templates/help.html:45
+msgid "Редактирование и удаление"
+msgstr "编辑和删除"
+
+#: templates/help.html:50
+msgid ""
+"Используйте кнопки \"Редактировать\" и \"Удалить\" на карточке каждого "
+"сервера. При удалении потребуется подтверждение. При редактировании вы "
+"можете оставить поле пароля пустым, чтобы не изменять его."
+msgstr "使用每个服务器卡片上的\"编辑\"和\"删除\"按钮。删除需要确认。编辑时，您可以将密码字段留空以避免更改它。"
+
+#: templates/help.html:58
+msgid "Безопасность и хранение паролей"
+msgstr "安全和密码存储"
+
+#: templates/help.html:63
+msgid ""
+"Безопасность данных является ключевым аспектом этого приложения. Вот как "
+"реализована защита ваших данных:"
+msgstr "数据安全是此应用程序的关键方面。以下是您的数据保护实现方式："
+
+#: templates/help.html:66
+msgid "SSH, Панель, Хостер (Пароли) - Высокий уровень"
+msgstr "SSH、面板、主机（密码）- 高级别"
+
+#: templates/help.html:67
+msgid ""
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
+"файле"
+msgstr "所有密码（SSH、控制面板和主机账户）都存储在文件中"
+
+#: templates/help.html:67
+msgid "в"
+msgstr "以"
+
+#: templates/help.html:67
+msgid "зашифрованном виде"
+msgstr "加密形式"
+
+#: templates/help.html:67
+msgid ""
+"с использованием надежного алгоритма. Для шифрования используется "
+"секретный ключ из файла"
+msgstr "使用可靠的算法。加密使用文件中的密钥"
+
+#: templates/help.html:67
+msgid "который должен храниться в строгой тайне."
+msgstr "必须严格保密。"
+
+#: templates/help.html:70
+msgid "URL Панелей - Низкий уровень"
+msgstr "面板URL - 低级别"
+
+#: templates/help.html:71
+msgid "URL-адреса панелей управления и кабинетов хостера хранятся в"
+msgstr "控制面板和主机账户的URL地址以"
+
+#: templates/help.html:71
+msgid "открытом виде"
+msgstr "明文形式"
+
+#: templates/help.html:71
+msgid ""
+"Они не шифруются, но на главной странице их пути маскируются для защиты "
+"от случайных взглядов."
+msgstr "它们不加密，但在主页上路径被屏蔽以保护免受随意查看。"
+
+#: templates/help.html:74
+msgid "Расшифровка"
+msgstr "解密"
+
+#: templates/help.html:75
+msgid ""
+"Все зашифрованные данные расшифровываются \"на лету\" только в момент их "
+"отображения на странице или при копировании в буфер обмена. В файле они "
+"всегда остаются зашифрованными."
+msgstr "所有加密数据仅在页面显示或复制到剪贴板时\"即时\"解密。在文件中，它们始终保持加密状态。"
+
+#: templates/help.html:85
+msgid "Диагностика и проверка IP"
+msgstr "诊断和IP检查"
+
+#: templates/help.html:90
+msgid ""
+"Приложение включает в себя инструменты для быстрой диагностики сети и "
+"серверов."
+msgstr "应用程序包含用于快速网络和服务器诊断的工具。"
+
+#: templates/help.html:92
+msgid "Тест IP и DNS:"
+msgstr "IP和DNS测试："
+
+#: templates/help.html:92
+msgid ""
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
+"которые ведут на внешние сервисы"
+msgstr "主页顶部有\"IP测试\"和\"DNS测试\"按钮，它们指向外部服务"
+
+#: templates/help.html:92
+msgid "и"
+msgstr "和"
+
+#: templates/help.html:92
+msgid "для проверки вашего текущего сетевого подключения."
+msgstr "以检查您当前的网络连接。"
+
+#: templates/help.html:93
+msgid "Автоматическая геолокация:"
+msgstr "自动地理定位："
+
+#: templates/help.html:93
+msgid ""
+"При добавлении или редактировании сервера приложение автоматически "
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
+" шапке карточки."
+msgstr "添加或编辑服务器时，应用程序会根据IP地址自动确定其地理定位（国家和城市）并在卡片标题中显示。"
+
+#: templates/help.html:94
+msgid "Проверка IP сервера:"
+msgstr "服务器IP检查："
+
+#: templates/help.html:94
+msgid "На каждой карточке есть кнопка"
+msgstr "每张卡片上都有一个按钮"
+
+#: templates/help.html:94
+msgid ""
+"\"Проверить IP\". При нажатии на неё открывается всплывающее окно с "
+"подробной информацией об IP-адресе сервера от сервиса"
+msgstr "\"检查IP\"。点击时会打开一个弹出窗口，显示来自服务的服务器IP地址的详细信息"
+
+#: templates/help.html:94
+msgid "включая данные об организации и хостинге."
+msgstr "包括组织和托管数据。"
+
+#: templates/index.html:22
+msgid "Интернет доступен"
+msgstr "网络可用"
+
+#: templates/index.html:26
+msgid "Нет интернета"
+msgstr "无网络"
+
+#: templates/index.html:34
+msgid "Список серверов"
+msgstr "服务器列表"
+
+#: templates/index.html:36
+msgid "Тест IP"
+msgstr "IP测试"
+
+#: templates/index.html:37
+msgid "Тест DNS"
+msgstr "DNS测试"
+
+#: templates/index.html:40
+msgid "Добавить сервер"
+msgstr "添加服务器"
+
+#: templates/index.html:49
+msgid "Добро пожаловать в VPN Server Manager"
+msgstr "欢迎使用VPN服务器管理器"
+
+#: templates/index.html:52
+msgid "Режим офлайн:"
+msgstr "离线模式："
+
+#: templates/index.html:52
+msgid "Интернет недоступен, но вы можете работать с локальными данными."
+msgstr "网络不可用，但您可以处理本地数据。"
+
+#: templates/index.html:54
+msgid ""
+"Вы можете начать с добавления вашего первого сервера или импортировать "
+"существующие данные."
+msgstr "您可以从添加第一个服务器或导入现有数据开始。"
+
+#: templates/index.html:59
+msgid "Добавить первый сервер"
+msgstr "添加第一个服务器"
+
+#: templates/index.html:62 templates/index_locked.html:184
+#: templates/index_locked.html:841
+msgid "Импортировать данные"
+msgstr "导入数据"
+
+#: templates/index.html:68
+msgid "Работа в офлайн режиме"
+msgstr "离线模式工作"
+
+#: templates/index.html:70
+msgid "Все данные будут сохранены в зашифрованный файл."
+msgstr "所有数据将保存到加密文件中。"
+
+#: templates/index.html:98
+msgid "Стоимость"
+msgstr "费用"
+
+#: templates/index.html:100
+msgid "N/A"
+msgstr "N/A"
+
+#: templates/index.html:103
+msgid "След. платёж"
+msgstr "下次付款"
+
+#: templates/index.html:107
+msgid "Статус"
+msgstr "状态"
+
+#: templates/index.html:127
+msgid "DNS OK"
+msgstr "DNS 正常"
+
+#: templates/index.html:129
+msgid "DNS ?"
+msgstr "DNS ?"
+
+#: templates/index.html:134
+msgid "Стриминг OK"
+msgstr "流媒体正常"
+
+#: templates/index.html:136
+msgid "Стриминг ?"
+msgstr "流媒体 ?"
+
+#: templates/index.html:142
+#, fuzzy
+msgid "Требуется интернет"
+msgstr "需要网络"
+
+#: templates/index.html:143
+msgid "Проверить IP"
+msgstr "检查IP"
+
+#: templates/index.html:152
+msgid "Кабинет хостера"
+msgstr "主机商面板"
+
+#: templates/index.html:158
+msgid "Вход через"
+msgstr "通过"
+
+#: templates/index.html:163
+msgid "Email"
+msgstr "邮箱"
+
+#: templates/index.html:163 templates/index.html:259
+msgid "Логин"
+msgstr "登录"
+
+#: templates/index.html:173 templates/index.html:216 templates/index.html:237
+#: templates/index.html:268
+msgid "Пароль"
+msgstr "密码"
+
+#: templates/index.html:176 templates/index.html:219 templates/index.html:240
+#: templates/index.html:271
+msgid "Показать/скрыть пароль"
+msgstr "显示/隐藏密码"
+
+#: templates/index.html:177 templates/index.html:220 templates/index.html:241
+#: templates/index.html:272
+#, fuzzy
+msgid "Копировать пароль"
+msgstr "复制密码"
+
+#: templates/index.html:184
+msgid "Перейти в кабинет"
+msgstr "进入面板"
+
+#: templates/index.html:195
+msgid "SSH-доступ"
+msgstr "SSH访问"
+
+#: templates/index.html:200
+msgid "Копировать SSH команду подключения"
+msgstr "复制SSH连接命令"
+
+#: templates/index.html:201
+#, fuzzy
+msgid "Копировать команду"
+msgstr "复制命令"
+
+#: templates/index.html:204
+msgid "Пользователь"
+msgstr "用户"
+
+#: templates/index.html:207
+msgid "Login"
+msgstr ""
+
+#: templates/index.html:210 templates/index.html:262
+#, fuzzy
+msgid "Копировать логин"
+msgstr "复制登录"
+
+#: templates/index.html:226
+msgid "Root"
+msgstr "Root"
+
+#: templates/index.html:228
+msgid "Вход по SSH"
+msgstr "SSH登录"
+
+#: templates/index.html:230
+msgid "Разрешен"
+msgstr "允许"
+
+#: templates/index.html:232
+msgid "Запрещен"
+msgstr "禁止"
+
+#: templates/index.html:253
+msgid "Панель (3x-ui)"
+msgstr "面板 (3x-ui)"
+
+#: templates/index.html:278
+msgid "Перейти в панель"
+msgstr "进入面板"
+
+#: templates/index.html:289
+#, fuzzy
+msgid "Редактировать"
+msgstr "编辑"
+
+#: templates/index.html:291
+#, fuzzy
+msgid "Вы уверены, что хотите удалить этот сервер?"
+msgstr "您确定要删除这个服务器吗？"
+
+#: templates/index.html:292
+#, fuzzy
+msgid "Удалить"
+msgstr "删除"
+
+#: templates/index.html:301
+msgid "Серверов пока нет."
+msgstr "暂无服务器。"
+
+#: templates/index.html:301
+msgid "Добавьте первый"
+msgstr "添加第一个"
+
+#: templates/index.html:301
+msgid "или"
+msgstr "或"
+
+#: templates/index.html:301
+msgid "импортируйте данные"
+msgstr "导入数据"
+
+#: templates/index.html:311
+msgid "Информация об IP"
+msgstr "IP信息"
+
+#: templates/index.html:335
+msgid "Загрузка..."
+msgstr "加载中..."
+
+#: templates/index.html:344
+msgid "Ошибка при загрузке данных:"
+msgstr "加载数据时出错："
+
+#: templates/index.html:356
+msgid "Ошибка копирования:"
+msgstr "复制错误："
+
+#: templates/index_locked.html:10
+msgid "Доступ ограничен"
+msgstr "访问受限"
+
+#: templates/index_locked.html:17
+msgid "Требуется PIN-код"
+msgstr "需要PIN码"
+
+#: templates/index_locked.html:19
+msgid "Для доступа к данным серверов необходимо ввести PIN-код."
+msgstr "要访问服务器数据，需要输入PIN码。"
+
+#: templates/index_locked.html:24
+msgid "Совет:"
+msgstr "提示："
+
+#: templates/index_locked.html:24
+msgid ""
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
+"для создания PIN-кода."
+msgstr "如果您是第一次使用应用程序，请点击\"首次运行\"按钮创建PIN码。"
+
+#: templates/index_locked.html:31 templates/index_locked.html:474
+msgid "Вход заблокирован на"
+msgstr "登录被阻止"
+
+#: templates/index_locked.html:31 templates/index_locked.html:474
+msgid "секунд"
+msgstr "秒"
+
+#: templates/index_locked.html:37 templates/index_locked.html:131
+msgid "Первый запуск"
+msgstr "首次运行"
+
+#: templates/index_locked.html:44
+msgid ""
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
+"защиту."
+msgstr "所有数据都通过加密保护。PIN码提供额外的保护。"
+
+#: templates/index_locked.html:58
+msgid "Вход по PIN-коду"
+msgstr "使用PIN码登录"
+
+#: templates/index_locked.html:68
+msgid "Вход"
+msgstr "登录"
+
+#: templates/index_locked.html:73 templates/index_locked.html:545
+#: templates/index_locked.html:898
+msgid "Сменить PIN"
+msgstr "更换PIN"
+
+#: templates/index_locked.html:82
+msgid "Введите PIN-код для входа в систему"
+msgstr "输入PIN码以访问系统"
+
+#: templates/index_locked.html:84
+msgid "PIN-код"
+msgstr "PIN码"
+
+#: templates/index_locked.html:86
+msgid "Введите PIN"
+msgstr "输入PIN"
+
+#: templates/index_locked.html:94
+msgid "Смените PIN-код для входа"
+msgstr "更改登录PIN码"
+
+#: templates/index_locked.html:97
+msgid "Старый PIN"
+msgstr "旧PIN"
+
+#: templates/index_locked.html:99
+msgid "Введите старый PIN"
+msgstr "输入旧PIN"
+
+#: templates/index_locked.html:102
+msgid "Новый PIN"
+msgstr "新PIN"
+
+#: templates/index_locked.html:104
+msgid "Введите новый PIN"
+msgstr "输入新PIN"
+
+#: templates/index_locked.html:107
+msgid "Подтвердите новый PIN"
+msgstr "确认新PIN"
+
+#: templates/index_locked.html:109 templates/index_locked.html:215
+#, fuzzy
+msgid "Повторите новый PIN"
+msgstr "重复新密钥"
+
+#: templates/index_locked.html:117 templates/index_locked.html:151
+#: templates/index_locked.html:182 templates/index_locked.html:221
+#: templates/index_locked.html:253
+#, fuzzy
+msgid "Отмена"
+msgstr "深色"
+
+#: templates/index_locked.html:119 templates/index_locked.html:428
+#: templates/index_locked.html:902
+msgid "Войти"
+msgstr ""
+
+#: templates/index_locked.html:138 templates/index_locked.html:170
+#: templates/index_locked.html:203
+#, fuzzy
+msgid "Информация:"
+msgstr "IP信息"
+
+#: templates/index_locked.html:138
+#, fuzzy
+msgid "Вы можете создать новый PIN-код или импортировать существующие данные."
+msgstr "您可以从添加第一个服务器或导入现有数据开始。"
+
+#: templates/index_locked.html:140
+#, fuzzy
+msgid "Выберите действие:"
+msgstr "检查匹配"
+
+#: templates/index_locked.html:143
+msgid "Создать новый PIN-код"
+msgstr ""
+
+#: templates/index_locked.html:146
+#, fuzzy
+msgid "Импортировать из архива"
+msgstr "导入数据"
+
+#: templates/index_locked.html:163
+msgid "Импорт из архива"
+msgstr ""
+
+#: templates/index_locked.html:170
+msgid "Загрузите ZIP архив, созданный функцией \"Полный экспорт\"."
+msgstr ""
+
+#: templates/index_locked.html:174
+msgid "Выберите ZIP архив"
+msgstr ""
+
+#: templates/index_locked.html:183 templates/index_locked.html:764
+#, fuzzy
+msgid "Проверить PIN"
+msgstr "检查IP"
+
+#: templates/index_locked.html:196
+msgid "Создание нового PIN-кода"
+msgstr ""
+
+#: templates/index_locked.html:203
+msgid "Создайте новый PIN-код для защиты приложения."
+msgstr ""
+
+#: templates/index_locked.html:207
+#, fuzzy
+msgid "Новый PIN-код"
+msgstr "新密钥"
+
+#: templates/index_locked.html:209
+msgid "Введите новый PIN (минимум 4 символа)"
+msgstr ""
+
+#: templates/index_locked.html:210 templates/index_locked.html:511
+#: templates/index_locked.html:650
+msgid "PIN должен содержать минимум 4 символа"
+msgstr ""
+
+#: templates/index_locked.html:213
+#, fuzzy
+msgid "Подтвердите PIN-код"
+msgstr "密钥确认"
+
+#: templates/index_locked.html:222 templates/index_locked.html:690
+msgid "Создать PIN"
+msgstr ""
+
+#: templates/index_locked.html:234
+msgid "PIN-код из архива"
+msgstr ""
+
+#: templates/index_locked.html:241
+msgid "PIN-код найден!"
+msgstr ""
+
+#: templates/index_locked.html:241
+msgid "Запомните или запишите этот код."
+msgstr ""
+
+#: templates/index_locked.html:245
+msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
+msgstr ""
+
+#: templates/index_locked.html:249
+msgid "Важно:"
+msgstr ""
+
+#: templates/index_locked.html:249
+msgid "PIN-код будет показан только один раз. Запишите его!"
+msgstr ""
+
+#: templates/index_locked.html:254
+msgid "Продолжить импорт"
+msgstr ""
+
+#: templates/index_locked.html:255
+#, fuzzy
+msgid "Импортировать сейчас"
+msgstr "导入数据"
+
+#: templates/index_locked.html:386
+msgid "Введите PIN-код"
+msgstr ""
+
+#: templates/index_locked.html:392 templates/index_locked.html:517
+#: templates/index_locked.html:734
+msgid "Проверка..."
+msgstr ""
+
+#: templates/index_locked.html:423 templates/index_locked.html:759
+#: templates/index_locked.html:836 templates/index_locked.html:887
+msgid "Ошибка соединения с сервером"
+msgstr ""
+
+#: templates/index_locked.html:499
+msgid "Заполните все поля"
+msgstr ""
+
+#: templates/index_locked.html:505
+msgid "Новые PIN-коды не совпадают"
+msgstr ""
+
+#: templates/index_locked.html:527
+msgid "PIN успешно изменён!"
+msgstr ""
+
+#: templates/index_locked.html:535 templates/index_locked.html:680
+#: templates/index_locked.html:831 templates/index_locked.html:881
+msgid "Ошибка:"
+msgstr ""
+
+#: templates/index_locked.html:540
+msgid "Произошла ошибка при смене PIN"
+msgstr ""
+
+#: templates/index_locked.html:589 templates/index_locked.html:726
+#: templates/index_locked.html:800
+msgid "Выберите файл"
+msgstr ""
+
+#: templates/index_locked.html:614
+msgid "Произошла ошибка при проверке архива"
+msgstr ""
+
+#: templates/index_locked.html:656
+msgid "PIN-коды не совпадают"
+msgstr ""
+
+#: templates/index_locked.html:662
+msgid "Создание..."
+msgstr ""
+
+#: templates/index_locked.html:675
+msgid "PIN успешно создан!"
+msgstr ""
+
+#: templates/index_locked.html:675
+msgid "Приложение будет перезагружено."
+msgstr ""
+
+#: templates/index_locked.html:685
+msgid "Произошла ошибка при создании PIN"
+msgstr ""
+
+#: templates/index_locked.html:808
+msgid "Импорт..."
+msgstr ""
+
+#: templates/index_locked.html:826 templates/index_locked.html:875
+#, fuzzy
+msgid "Данные успешно импортированы!"
+msgstr "数据文件已成功导入并附加！"
+
+#: templates/index_locked.html:826 templates/index_locked.html:875
+msgid "Перенаправление..."
+msgstr ""
+
+#: templates/index_locked.html:850
+msgid "Файл не выбран"
+msgstr ""
+
+#: templates/index_locked.html:861
+#, fuzzy
+msgid "Импорт данных..."
+msgstr "导入数据"
+
+#: templates/layout.html:25 templates/layout.html:100
+msgid "VPS Manager"
+msgstr "VPS管理器"
+
+#: templates/layout.html:34
+msgid "Настройки"
+msgstr "设置"
+
+#: templates/layout.html:38
+msgid "Справка"
+msgstr "帮助"
+
+#: templates/layout.html:42
+msgid "Управление подсказками"
+msgstr "提示管理"
+
+#: templates/layout.html:46
+msgid "Шпаргалка"
+msgstr "备忘单"
+
+#: templates/layout.html:54
+msgid "Выйти из системы"
+msgstr "退出系统"
+
+#: templates/layout.html:64
+msgid "Масштаб интерфейса"
+msgstr "界面缩放"
+
+#: templates/layout.html:85
+msgid "Светлая"
+msgstr "浅色"
+
+#: templates/layout.html:86
+msgid "Темная"
+msgstr "深色"
+
+#: templates/layout.html:100
+msgid "Разработчик"
+msgstr "开发者"
+
+#: templates/settings.html:3 templates/settings.html:7
+#, fuzzy
+msgid "Управление данными"
+msgstr "数据管理"
+
+#: templates/settings.html:24
+msgid "Управление ключом шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:31
+msgid "Смена главного ключа"
+msgstr "更换主密钥"
+
+#: templates/settings.html:32
+msgid ""
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
+" сохранится как резервная копия."
+msgstr "更换密钥时，将创建新的加密数据文件。旧文件将作为备份保存。"
+
+#: templates/settings.html:36
+msgid "Новый ключ"
+msgstr "新密钥"
+
+#: templates/settings.html:38
+msgid "Введите новый ключ Fernet"
+msgstr "输入新的Fernet密钥"
+
+#: templates/settings.html:40
+msgid "Сгенерировать"
+msgstr "生成"
+
+#: templates/settings.html:45
+msgid "Подтверждение ключа"
+msgstr "密钥确认"
+
+#: templates/settings.html:46
+msgid "Повторите новый ключ"
+msgstr "重复新密钥"
+
+#: templates/settings.html:49
+msgid "Сменить ключ"
+msgstr "更换密钥"
+
+#: templates/settings.html:56
+msgid "Проверка соответствия ключ-данные"
+msgstr "密钥-数据匹配检查"
+
+#: templates/settings.html:57
+msgid ""
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
+"приложение."
+msgstr "快速检查密钥是否与数据文件匹配，无需导入应用。"
+
+#: templates/settings.html:61
+msgid "Файл данных (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:65
+msgid "Ключ для проверки"
+msgstr "用于验证的密钥"
+
+#: templates/settings.html:66
+msgid "Вставьте ключ шифрования для проверки"
+msgstr "粘贴用于验证的加密密钥"
+
+#: templates/settings.html:69
+msgid "Проверить соответствие"
+msgstr "检查匹配"
+
+#: templates/settings.html:80
+msgid "Статус файла данных"
+msgstr "数据文件状态"
+
+#: templates/settings.html:86
+msgid "Активный файл:"
+msgstr "当前文件："
+
+#: templates/settings.html:88
+#, fuzzy
+msgid "Все данные о серверах загружаются из этого зашифрованного файла."
+msgstr "所有数据将保存到加密文件中。"
+
+#: templates/settings.html:94
+#, fuzzy
+msgid "Экспортировать данные"
+msgstr "导入数据"
+
+#: templates/settings.html:99
+#, fuzzy
+msgid "Экспортировать ключ"
+msgstr "导入数据"
+
+#: templates/settings.html:121
+msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgstr "您确定要解除数据文件的绑定吗？服务器列表将为空。"
+
+#: templates/settings.html:123
+msgid "Открепить файл"
+msgstr "解除文件绑定"
+
+#: templates/settings.html:130
+#, fuzzy
+msgid "Файл данных не прикреплен."
+msgstr "数据文件已成功分离。"
+
+#: templates/settings.html:132
+msgid ""
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
+"можете импортировать существующий файл, чтобы восстановить свои записи."
+msgstr "应用当前未使用任何数据文件。您可以导入现有文件以恢复记录。"
+
+#: templates/settings.html:140
+#, fuzzy
+msgid "Импорт файла данных"
+msgstr "导入数据"
+
+#: templates/settings.html:143
+msgid ""
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
+" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"заменен."
+msgstr "上传加密数据文件（<code>.enc</code>）以绑定并使用。如有已绑定文件将被替换。"
+
+#: templates/settings.html:146
+msgid "Выбор файла данных"
+msgstr "选择数据文件"
+
+#: templates/settings.html:148
+msgid ""
+"Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее "
+"экспортированный из этого приложения."
+msgstr "请选择此前从本应用导出的<code>.enc</code>文件。"
+
+#: templates/settings.html:152
+#, fuzzy
+msgid "Импортировать и прикрепить"
+msgstr "导入数据"
+
+#: templates/settings.html:163
+msgid "Импорт серверов из другой установки"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:167
+msgid "Что нужно:"
+msgstr "所需内容："
+
+#: templates/settings.html:167
+msgid ""
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
+"установки приложения."
+msgstr "来自其他安装的<code>.env</code>文件和<code>servers.json.enc</code>文件。"
+
+#: templates/settings.html:174
+msgid "servers.json.enc файл"
+msgstr "servers.json.enc文件"
+
+#: templates/settings.html:178
+msgid "Выберать зашифрованный файл данных из другой установки"
+msgstr "选择来自其他安装的加密数据文件"
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
