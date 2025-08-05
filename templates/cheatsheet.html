@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 
-{% block title %}Шпаргалка по командам{% endblock %}
+{% block title %}{{ _('Шпаргалка по командам') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)</h1>
-    <p class="lead">Этот раздел объединяет наиболее полезные команды для быстрой оценки состояния сервера.</p>
+    <h1 class="mb-4">{{ _('Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)') }}</h1>
+    <p class="lead">{{ _('Этот раздел объединяет наиболее полезные команды для быстрой оценки состояния сервера.') }}</p>
     
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Быстрая сводка</h5>
+            <h5 class="mb-0">{{ _('Быстрая сводка') }}</h5>
         </div>
         <div class="card-body">
             <div class="position-relative">
@@ -17,7 +17,7 @@
 echo "=== Процессор ===" && cat /proc/cpuinfo | grep "model name" | head -1 && \
 echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                    <i class="bi bi-clipboard"></i> Копировать
+                    <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                 </button>
             </div>
         </div>
@@ -25,25 +25,25 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Установленное ПО</h5>
+            <h5 class="mb-0">{{ _('Установленное ПО') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <p class="mb-1"><strong>Показать все установленные пакеты:</strong></p>
+                <p class="mb-1"><strong>{{ _('Показать все установленные пакеты:') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">dpkg -l | grep ii | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Найти конкретный пакет</strong> (замените `nginx`):</p>
+                <p class="mb-1"><strong>{{ _('Найти конкретный пакет') }}</strong> ({{ _('замените') }} `nginx`):</p>
                 <div class="position-relative">
                     <pre><code class="language-bash">dpkg -l | grep nginx</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Показать файлы, установленные пакетом</strong> (замените `nginx`):</p>
+                <p class="mb-1"><strong>{{ _('Показать файлы, установленные пакетом') }}</strong> ({{ _('замените') }} `nginx`):</p>
                 <div class="position-relative">
                     <pre><code class="language-bash">dpkg -L nginx | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
@@ -54,78 +54,78 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Ключевые утилиты</h5>
+            <h5 class="mb-0">{{ _('Ключевые утилиты') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <p class="mb-1"><strong>Информация о ядре и системе</strong></p>
+                <p class="mb-1"><strong>{{ _('Информация о ядре и системе') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">uname -a</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Информация о процессоре</strong></p>
+                <p class="mb-1"><strong>{{ _('Информация о процессоре') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">lscpu | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Использование оперативной памяти</strong></p>
+                <p class="mb-1"><strong>{{ _('Использование оперативной памяти') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">free -h</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Использование дискового пространства</strong></p>
+                <p class="mb-1"><strong>{{ _('Использование дискового пространства') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Просмотр сетевых интерфейсов</strong></p>
+                <p class="mb-1"><strong>{{ _('Просмотр сетевых интерфейсов') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">ip a</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Просмотр активных сетевых портов</strong></p>
+                <p class="mb-1"><strong>{{ _('Просмотр активных сетевых портов') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">ss -tulnp | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Кто сейчас в системе</strong></p>
+                <p class="mb-1"><strong>{{ _('Кто сейчас в системе') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">w</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Системный журнал в реальном времени</strong></p>
+                <p class="mb-1"><strong>{{ _('Системный журнал в реальном времени') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">tail -f /var/log/syslog</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
@@ -134,24 +134,24 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Подробнее о `df` (использование дискового пространства)</h5>
+            <h5 class="mb-0">{{ _('Подробнее о `df` (использование дискового пространства)') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <p class="mb-1"><strong>Показать тип файловой системы</strong> (например, ext4, xfs)</p>
+                <p class="mb-1"><strong>{{ _('Показать тип файловой системы') }}</strong> ({{ _('например') }}, ext4, xfs)</p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -hT</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
              <li class="list-group-item">
-                <p class="mb-1"><strong>Показать итоговую строку с суммой по всем разделам</strong></p>
+                <p class="mb-1"><strong>{{ _('Показать итоговую строку с суммой по всем разделам') }}</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h --total</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
             </li>
@@ -160,64 +160,64 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Основы безопасности</h5>
+            <h5 class="mb-0">{{ _('Основы безопасности') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <p class="mb-1"><strong>Управление файрволом (ufw)</strong></p>
+                <p class="mb-1"><strong>{{ _('Управление файрволом (ufw)') }}</strong></p>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Проверить статус и правила:</small>
+                    <small class="text-muted">{{ _('Проверить статус и правила:') }}</small>
                     <pre><code class="language-bash">sudo ufw status verbose</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Разрешить стандартный порт SSH (22):</small>
+                    <small class="text-muted">{{ _('Разрешить стандартный порт SSH (22):') }}</small>
                     <pre><code class="language-bash">sudo ufw allow ssh</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Пример: разрешить нестандартный порт SSH (например, 2222):</small>
+                    <small class="text-muted">{{ _('Пример: разрешить нестандартный порт SSH (например, 2222):') }}</small>
                     <pre><code class="language-bash">sudo ufw allow 2222/tcp</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                  <div class="position-relative my-2">
-                    <small class="text-muted">Пример: разрешить порт для веб-сервера (HTTPS):</small>
+                    <small class="text-muted">{{ _('Пример: разрешить порт для веб-сервера (HTTPS):') }}</small>
                     <pre><code class="language-bash">sudo ufw allow 443/tcp</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                  <div class="position-relative my-2">
-                    <small class="text-muted">Пример: удалить правило:</small>
+                    <small class="text-muted">{{ _('Пример: удалить правило:') }}</small>
                     <pre><code class="language-bash">sudo ufw delete allow 443/tcp</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Проверка Fail2Ban</strong></p>
+                <p class="mb-1"><strong>{{ _('Проверка Fail2Ban') }}</strong></p>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Статус службы Fail2Ban:</small>
+                    <small class="text-muted">{{ _('Статус службы Fail2Ban:') }}</small>
                     <pre><code class="language-bash">sudo systemctl status fail2ban</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Статус защиты SSH и список забаненных IP:</small>
+                    <small class="text-muted">{{ _('Статус защиты SSH и список забаненных IP:') }}</small>
                     <pre><code class="language-bash">sudo fail2ban-client status sshd</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Разбанить IP-адрес (замените 1.2.3.4):</small>
+                    <small class="text-muted">{{ _('Разбанить IP-адрес (замените 1.2.3.4):') }}</small>
                     <pre><code class="language-bash">sudo fail2ban-client set sshd unbanip 1.2.3.4</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Аудит и мониторинг</strong></p>
+                <p class="mb-1"><strong>{{ _('Аудит и мониторинг') }}</strong></p>
                  <div class="position-relative my-2">
-                    <small class="text-muted">Показать последних вошедших пользователей:</small>
+                    <small class="text-muted">{{ _('Показать последних вошедших пользователей:') }}</small>
                     <pre><code class="language-bash">last | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
                 <div class="position-relative my-2">
-                    <small class="text-muted">Показать неудачные попытки входа (требует root):</small>
+                    <small class="text-muted">{{ _('Показать неудачные попытки входа (требует root):') }}</small>
                     <pre><code class="language-bash">sudo lastb | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
@@ -227,25 +227,25 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Управление процессами</h5>
+            <h5 class="mb-0">{{ _('Управление процессами') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <p class="mb-1"><strong>Показать все запущенные процессы</strong></p>
+                <p class="mb-1"><strong>{{ _('Показать все запущенные процессы') }}</strong></p>
                 <div class="position-relative my-2">
                     <pre><code class="language-bash">ps aux | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Интерактивный монитор процессов</strong> (htop более удобен, если установлен)</p>
+                <p class="mb-1"><strong>{{ _('Интерактивный монитор процессов') }}</strong> (htop {{ _('более удобен, если установлен') }})</p>
                 <div class="position-relative my-2">
                     <pre><code class="language-bash">top</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>Найти процесс по имени</strong> (замените `nginx`)</p>
+                <p class="mb-1"><strong>{{ _('Найти процесс по имени') }}</strong> ({{ _('замените') }} `nginx`)</p>
                 <div class="position-relative my-2">
                     <pre><code class="language-bash">ps aux | grep nginx</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
@@ -254,28 +254,28 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         </ul>
     </div>
 
-    <div class="card mb-4">
+     <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Управление службами (systemd)</h5>
+            <h5 class="mb-0">{{ _('Управление службами (systemd)') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                 <p class="mb-1"><strong>Проверить статус службы</strong> (замените `nginx`)</p>
+                 <p class="mb-1"><strong>{{ _('Проверить статус службы') }}</strong> ({{ _('замените') }} `nginx`)</p>
                  <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Перезапустить службу:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Перезапустить службу:') }}</strong></p>
                  <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Включить автозапуск службы:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Включить автозапуск службы:') }}</strong></p>
                  <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Выключить автозапуск службы:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Выключить автозапуск службы:') }}</strong></p>
                  <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
@@ -284,26 +284,26 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
 
      <div class="card mb-4">
         <div class="card-header">
-            <h5 class="mb-0">Управление пакетами (apt)</h5>
+            <h5 class="mb-0">{{ _('Управление пакетами (apt)') }}</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                 <p class="mb-1"><strong>Обновить список пакетов:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Обновить список пакетов:') }}</strong></p>
                  <pre><code class="language-bash">sudo apt update</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Обновить установленные пакеты:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Обновить установленные пакеты:') }}</strong></p>
                  <pre><code class="language-bash">sudo apt upgrade</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Установить пакет</strong> (замените `htop`):</p>
+                 <p class="mb-1"><strong>{{ _('Установить пакет') }}</strong> ({{ _('замените') }} `htop`):</p>
                  <pre><code class="language-bash">sudo apt install htop</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
              <li class="list-group-item">
-                 <p class="mb-1"><strong>Удалить пакет:</strong></p>
+                 <p class="mb-1"><strong>{{ _('Удалить пакет:') }}</strong></p>
                  <pre><code class="language-bash">sudo apt remove htop</code></pre>
                  <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </li>
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             navigator.clipboard.writeText(command).then(() => {
                 const originalHtml = button.innerHTML;
-                button.innerHTML = '<i class="bi bi-check-lg"></i> Скопировано!';
+                button.innerHTML = '<i class="bi bi-check-lg"></i> {{ _("Скопировано!") }}';
                 button.classList.remove('btn-outline-secondary');
                 button.classList.add('btn-success');
                 
@@ -335,8 +335,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.classList.add('btn-outline-secondary');
                 }, 2000);
             }).catch(err => {
-                console.error('Не удалось скопировать текст: ', err);
-                alert('Ошибка при копировании');
+                console.error('{{ _("Не удалось скопировать текст: ") }}', err);
+                alert('{{ _("Ошибка при копировании") }}');
             });
         });
     });

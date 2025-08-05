@@ -1,0 +1,1652 @@
+# English translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-08-05 14:59+0300\n"
+"PO-Revision-Date: 2025-08-05 11:08+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: app.py:520
+msgid "Ошибка чтения файла данных. Файл может быть поврежден."
+msgstr "Error reading data file. The file may be corrupted."
+
+#: app.py:525
+msgid ""
+"Не удалось расшифровать файл данных. Проверьте ваш SECRET_KEY или "
+"целостность файла."
+msgstr "Failed to decrypt data file. Check your SECRET_KEY or file integrity."
+
+#: app.py:532
+msgid "Ошибка: не указан активный файл данных. Сохранение невозможно."
+msgstr "Error: No active data file specified. Saving is not possible."
+
+#: app.py:1006
+msgid ""
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
+" целостность файла данных."
+msgstr ""
+"Failed to load server data. Check your internet connection and data file "
+"integrity."
+
+#: app.py:1047
+msgid "Нет подключения к интернету. Некоторые функции могут быть недоступны."
+msgstr "No internet connection. Some features may be unavailable."
+
+#: app.py:1084
+msgid "Создан новый файл для хранения серверов. Теперь можно добавить первый."
+msgstr "New file created for storing servers. You can now add the first one."
+
+#: app.py:1438 app.py:1498
+msgid "Нет активного файла данных для экспорта."
+msgstr "No active data file for export."
+
+#: app.py:1590
+msgid "Файл данных успешно импортирован и прикреплен!"
+msgstr "Data file successfully imported and attached!"
+
+#: app.py:1594
+msgid ""
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
+" с другим ключом."
+msgstr ""
+"Error: File cannot be decrypted or is corrupted. It may have been created"
+" with a different key."
+
+#: app.py:1602 app.py:1619
+msgid "Неверный тип файла. Пожалуйста, выберите файл .enc"
+msgstr "Invalid file type. Please select a .enc file"
+
+#: app.py:1615
+msgid "Необходимо выбрать файл и указать внешний ключ шифрования."
+msgstr "You must select a file and specify an external encryption key."
+
+#: app.py:1628
+msgid ""
+"Неверный формат ключа шифрования. Ключ должен быть действительным ключом "
+"Fernet."
+msgstr "Invalid encryption key format. The key must be a valid Fernet key."
+
+#: app.py:1787
+msgid "Все сервера из импортируемого файла уже существуют в вашем списке."
+msgstr "All servers from the imported file already exist in your list."
+
+#: app.py:1790
+msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+msgstr "Error: Invalid encryption key. Check the correctness of the entered key."
+
+#: app.py:1792
+msgid "Ошибка: файл содержит некорректные данные."
+msgstr "Error: File contains incorrect data."
+
+#: app.py:1811
+msgid "Файл данных успешно откреплен."
+msgstr "Data file successfully detached."
+
+#: app.py:1863
+msgid "Ошибка: ключи не совпадают."
+msgstr "Error: Keys do not match."
+
+#: app.py:1868
+msgid "Ошибка: новый ключ не может быть пустым."
+msgstr "Error: New key cannot be empty."
+
+#: app.py:1875
+msgid "Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet."
+msgstr "Error: Incorrect key format. The key must be in Fernet format."
+
+#: app.py:1948
+#, python-format
+msgid ""
+"✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
+"Резервная копия сохранена как: %(backup_filename)s"
+msgstr ""
+"✅ Key successfully changed! New data file created: %(new_filename)s. "
+"Backup saved as: %(backup_filename)s"
+
+#: app.py:1984
+msgid "Необходимо выбрать файл и указать ключ для проверки."
+msgstr "You must select a file and specify a key for verification."
+
+#: app.py:1988
+msgid "Неверный тип файла. Выберите файл .enc"
+msgstr "Invalid file type. Select a .enc file"
+
+#: app.py:1995
+msgid "❌ Некорректный формат ключа Fernet."
+msgstr "❌ Invalid Fernet key format."
+
+#: app.py:2026
+#, python-format
+msgid ""
+"✅ Ключ подходит! Найдено серверов: %(server_count)s. Провайдеры: "
+"%(provider_list)s. Серверы: %(name_preview)s"
+msgstr ""
+"✅ Key is valid! Found servers: %(server_count)s. Providers: "
+"%(provider_list)s. Servers: %(name_preview)s"
+
+#: app.py:2028
+msgid "✅ Ключ подходит, но структура данных неожиданная."
+msgstr "✅ Key is valid, but data structure is unexpected."
+
+#: app.py:2031
+msgid "❌ Ключ не подходит к этому файлу данных."
+msgstr "❌ Key does not match this data file."
+
+#: app.py:2033
+msgid "❌ Файл расшифрован, но содержит некорректные JSON данные."
+msgstr "❌ File decrypted, but contains invalid JSON data."
+
+#: app.py:2056
+#, python-format
+msgid "Язык изменен на %(lang)s"
+msgstr "Language changed to %(lang)s"
+
+#: templates/about.html:3 templates/layout.html:50
+msgid "О программе"
+msgstr "About"
+
+#: templates/about.html:10 templates/layout.html:6
+msgid "Панель управления VPS"
+msgstr "VPS Control Panel"
+
+#: templates/about.html:11
+msgid "Версия:"
+msgstr "Version:"
+
+#: templates/about.html:12
+msgid "Дата выпуска:"
+msgstr "Release Date:"
+
+#: templates/about.html:13
+#, fuzzy
+msgid "Разработчик:"
+msgstr "Developer:"
+
+#: templates/about.html:16
+msgid ""
+"Программа для удобного и безопасного хранения информации о VPS/VDS "
+"серверах от различных провайдеров."
+msgstr ""
+"Program for convenient and secure storage of information about VPS/VDS "
+"servers from various providers."
+
+#: templates/cheatsheet.html:3
+#, fuzzy
+msgid "Шпаргалка по командам"
+msgstr "Command Cheatsheet"
+
+#: templates/cheatsheet.html:7
+msgid "Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)"
+msgstr "Quick Server Diagnostics Cheatsheet (Debian/Ubuntu)"
+
+#: templates/cheatsheet.html:8
+msgid ""
+"Этот раздел объединяет наиболее полезные команды для быстрой оценки "
+"состояния сервера."
+msgstr ""
+"This section combines the most useful commands for quick server status "
+"assessment."
+
+#: templates/cheatsheet.html:12
+msgid "Быстрая сводка"
+msgstr "Quick Summary"
+
+#: templates/cheatsheet.html:20 templates/cheatsheet.html:65
+#: templates/cheatsheet.html:74 templates/cheatsheet.html:83
+#: templates/cheatsheet.html:92 templates/cheatsheet.html:101
+#: templates/cheatsheet.html:110 templates/cheatsheet.html:119
+#: templates/cheatsheet.html:128 templates/cheatsheet.html:145
+#: templates/cheatsheet.html:154
+#, fuzzy
+msgid "Копировать"
+msgstr "Copy"
+
+#: templates/cheatsheet.html:28
+msgid "Установленное ПО"
+msgstr "Installed Software"
+
+#: templates/cheatsheet.html:32
+msgid "Показать все установленные пакеты:"
+msgstr "Show all installed packages:"
+
+#: templates/cheatsheet.html:39
+msgid "Найти конкретный пакет"
+msgstr "Find specific package"
+
+#: templates/cheatsheet.html:39 templates/cheatsheet.html:46
+#: templates/cheatsheet.html:248 templates/cheatsheet.html:263
+#: templates/cheatsheet.html:301
+msgid "замените"
+msgstr "replace"
+
+#: templates/cheatsheet.html:46
+msgid "Показать файлы, установленные пакетом"
+msgstr "Show files installed by package"
+
+#: templates/cheatsheet.html:57
+msgid "Ключевые утилиты"
+msgstr "Key Utilities"
+
+#: templates/cheatsheet.html:61
+msgid "Информация о ядре и системе"
+msgstr "Kernel and System Information"
+
+#: templates/cheatsheet.html:70
+msgid "Информация о процессоре"
+msgstr "Processor Information"
+
+#: templates/cheatsheet.html:79
+msgid "Использование оперативной памяти"
+msgstr "RAM Usage"
+
+#: templates/cheatsheet.html:88
+msgid "Использование дискового пространства"
+msgstr "Disk Space Usage"
+
+#: templates/cheatsheet.html:97
+msgid "Просмотр сетевых интерфейсов"
+msgstr "View Network Interfaces"
+
+#: templates/cheatsheet.html:106
+msgid "Просмотр активных сетевых портов"
+msgstr "View Active Network Ports"
+
+#: templates/cheatsheet.html:115
+msgid "Кто сейчас в системе"
+msgstr "Who is currently in the system"
+
+#: templates/cheatsheet.html:124
+msgid "Системный журнал в реальном времени"
+msgstr "Real-time System Log"
+
+#: templates/cheatsheet.html:137
+msgid "Подробнее о `df` (использование дискового пространства)"
+msgstr "More about `df` (disk space usage)"
+
+#: templates/cheatsheet.html:141
+msgid "Показать тип файловой системы"
+msgstr "Show filesystem type"
+
+#: templates/cheatsheet.html:141
+msgid "например"
+msgstr "for example"
+
+#: templates/cheatsheet.html:150
+msgid "Показать итоговую строку с суммой по всем разделам"
+msgstr "Show summary line with total for all partitions"
+
+#: templates/cheatsheet.html:163
+msgid "Основы безопасности"
+msgstr "Security Basics"
+
+#: templates/cheatsheet.html:167
+#, fuzzy
+msgid "Управление файрволом (ufw)"
+msgstr "Firewall Management (ufw)"
+
+#: templates/cheatsheet.html:169
+#, fuzzy
+msgid "Проверить статус и правила:"
+msgstr "Check status and rules:"
+
+#: templates/cheatsheet.html:174
+msgid "Разрешить стандартный порт SSH (22):"
+msgstr "Allow standard SSH port (22):"
+
+#: templates/cheatsheet.html:179
+msgid "Пример: разрешить нестандартный порт SSH (например, 2222):"
+msgstr "Example: allow non-standard SSH port (e.g., 2222):"
+
+#: templates/cheatsheet.html:184
+msgid "Пример: разрешить порт для веб-сервера (HTTPS):"
+msgstr "Example: allow port for web server (HTTPS):"
+
+#: templates/cheatsheet.html:189
+msgid "Пример: удалить правило:"
+msgstr "Example: remove rule:"
+
+#: templates/cheatsheet.html:195
+msgid "Проверка Fail2Ban"
+msgstr "Fail2Ban Check"
+
+#: templates/cheatsheet.html:197
+msgid "Статус службы Fail2Ban:"
+msgstr "Fail2Ban service status:"
+
+#: templates/cheatsheet.html:202
+msgid "Статус защиты SSH и список забаненных IP:"
+msgstr "SSH protection status and banned IP list:"
+
+#: templates/cheatsheet.html:207
+msgid "Разбанить IP-адрес (замените 1.2.3.4):"
+msgstr "Unban IP address (replace 1.2.3.4):"
+
+#: templates/cheatsheet.html:213
+msgid "Аудит и мониторинг"
+msgstr "Audit and Monitoring"
+
+#: templates/cheatsheet.html:215
+msgid "Показать последних вошедших пользователей:"
+msgstr "Show recent logged in users:"
+
+#: templates/cheatsheet.html:220
+msgid "Показать неудачные попытки входа (требует root):"
+msgstr "Show failed login attempts (requires root):"
+
+#: templates/cheatsheet.html:230
+#, fuzzy
+msgid "Управление процессами"
+msgstr "Process Management"
+
+#: templates/cheatsheet.html:234
+msgid "Показать все запущенные процессы"
+msgstr "Show all running processes"
+
+#: templates/cheatsheet.html:241
+msgid "Интерактивный монитор процессов"
+msgstr "Interactive Process Monitor"
+
+#: templates/cheatsheet.html:241
+msgid "более удобен, если установлен"
+msgstr "more convenient if installed"
+
+#: templates/cheatsheet.html:248
+msgid "Найти процесс по имени"
+msgstr "Find process by name"
+
+#: templates/cheatsheet.html:259
+#, fuzzy
+msgid "Управление службами (systemd)"
+msgstr "Service Management (systemd)"
+
+#: templates/cheatsheet.html:263
+#, fuzzy
+msgid "Проверить статус службы"
+msgstr "Check service status"
+
+#: templates/cheatsheet.html:268
+msgid "Перезапустить службу:"
+msgstr "Restart service:"
+
+#: templates/cheatsheet.html:273
+msgid "Включить автозапуск службы:"
+msgstr "Enable service autostart:"
+
+#: templates/cheatsheet.html:278
+msgid "Выключить автозапуск службы:"
+msgstr "Disable service autostart:"
+
+#: templates/cheatsheet.html:287
+#, fuzzy
+msgid "Управление пакетами (apt)"
+msgstr "Package Management (apt)"
+
+#: templates/cheatsheet.html:291
+msgid "Обновить список пакетов:"
+msgstr "Update package list:"
+
+#: templates/cheatsheet.html:296
+msgid "Обновить установленные пакеты:"
+msgstr "Update installed packages:"
+
+#: templates/cheatsheet.html:301
+msgid "Установить пакет"
+msgstr "Install package"
+
+#: templates/cheatsheet.html:306
+msgid "Удалить пакет:"
+msgstr "Remove package:"
+
+#: templates/cheatsheet.html:328
+msgid "Скопировано!"
+msgstr "Copied!"
+
+#: templates/cheatsheet.html:338
+msgid "Не удалось скопировать текст: "
+msgstr "Failed to copy text: "
+
+#: templates/cheatsheet.html:339
+msgid "Ошибка при копировании"
+msgstr "Error copying"
+
+#: templates/help.html:8 templates/layout.html:41
+msgid "Справка по использованию"
+msgstr "Usage Help"
+
+#: templates/help.html:14
+msgid "Добавление нового сервера"
+msgstr "Adding a New Server"
+
+#: templates/help.html:19
+msgid ""
+"Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
+"необходимые поля. Пароли будут автоматически зашифрованы перед "
+"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
+msgstr ""
+"Click the \"Add Server\" button on the main page. Fill in all required "
+"fields. Passwords will be automatically encrypted before saving. You can "
+"also attach a file (e.g., payment receipt)."
+
+#: templates/help.html:27
+msgid "Управление паролями и SSH"
+msgstr "Password and SSH Management"
+
+#: templates/help.html:32
+msgid ""
+"Пароли намеренно не отображаются в открытом виде для безопасности. Чтобы "
+"увидеть сохраненный пароль, используйте иконку глаза."
+msgstr ""
+"Passwords are intentionally not displayed in plain text for security. To "
+"see the saved password, use the eye icon."
+
+#: templates/help.html:34
+msgid "Отображение пароля:"
+msgstr "Display Password:"
+
+#: templates/help.html:34
+msgid "На главной странице, рядом со скрытым паролем, нажмите на иконку глаза"
+msgstr "On the main page, next to the hidden password, click the eye icon"
+
+#: templates/help.html:34
+msgid "чтобы временно его показать."
+msgstr "to temporarily show it."
+
+#: templates/help.html:35
+msgid "Копирование данных:"
+msgstr "Copy Data:"
+
+#: templates/help.html:35
+msgid "Нажмите на иконку"
+msgstr "Click the icon"
+
+#: templates/help.html:35
+msgid "чтобы безопасно скопировать логин, пароль или URL в буфер обмена."
+msgstr "to safely copy login, password or URL to clipboard."
+
+#: templates/help.html:36
+msgid "SSH-команда:"
+msgstr "SSH Command:"
+
+#: templates/help.html:36
+msgid "Нажмите кнопку"
+msgstr "Click the button"
+
+#: templates/help.html:36
+msgid "\"Копировать SSH\", чтобы получить готовую команду для вставки в терминал."
+msgstr "\"Copy SSH\" to get a ready command for pasting into terminal."
+
+#: templates/help.html:45
+msgid "Редактирование и удаление"
+msgstr "Editing and Deleting"
+
+#: templates/help.html:50
+msgid ""
+"Используйте кнопки \"Редактировать\" и \"Удалить\" на карточке каждого "
+"сервера. При удалении потребуется подтверждение. При редактировании вы "
+"можете оставить поле пароля пустым, чтобы не изменять его."
+msgstr ""
+"Use the \"Edit\" and \"Delete\" buttons on each server card. Deletion "
+"requires confirmation. When editing, you can leave the password field "
+"empty to avoid changing it."
+
+#: templates/help.html:58
+msgid "Безопасность и хранение паролей"
+msgstr "Security and Password Storage"
+
+#: templates/help.html:63
+msgid ""
+"Безопасность данных является ключевым аспектом этого приложения. Вот как "
+"реализована защита ваших данных:"
+msgstr ""
+"Data security is a key aspect of this application. Here's how your data "
+"protection is implemented:"
+
+#: templates/help.html:66
+msgid "SSH, Панель, Хостер (Пароли) - Высокий уровень"
+msgstr "SSH, Panel, Host (Passwords) - High Level"
+
+#: templates/help.html:67
+msgid ""
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
+"файле"
+msgstr "All passwords (for SSH, control panel and host cabinet) are stored in file"
+
+#: templates/help.html:67
+msgid "в"
+msgstr "in"
+
+#: templates/help.html:67
+msgid "зашифрованном виде"
+msgstr "encrypted form"
+
+#: templates/help.html:67
+msgid ""
+"с использованием надежного алгоритма. Для шифрования используется "
+"секретный ключ из файла"
+msgstr "using a reliable algorithm. For encryption, a secret key from file"
+
+#: templates/help.html:67
+msgid "который должен храниться в строгой тайне."
+msgstr "which must be kept in strict secrecy."
+
+#: templates/help.html:70
+msgid "URL Панелей - Низкий уровень"
+msgstr "Panel URLs - Low Level"
+
+#: templates/help.html:71
+msgid "URL-адреса панелей управления и кабинетов хостера хранятся в"
+msgstr "Control panel and host cabinet URLs are stored in"
+
+#: templates/help.html:71
+msgid "открытом виде"
+msgstr "plain text"
+
+#: templates/help.html:71
+msgid ""
+"Они не шифруются, но на главной странице их пути маскируются для защиты "
+"от случайных взглядов."
+msgstr ""
+"They are not encrypted, but on the main page their paths are masked to "
+"protect from casual glances."
+
+#: templates/help.html:74
+msgid "Расшифровка"
+msgstr "Decryption"
+
+#: templates/help.html:75
+msgid ""
+"Все зашифрованные данные расшифровываются \"на лету\" только в момент их "
+"отображения на странице или при копировании в буфер обмена. В файле они "
+"всегда остаются зашифрованными."
+msgstr ""
+"All encrypted data is decrypted \"on the fly\" only when displayed on the"
+" page or copied to clipboard. In the file, they always remain encrypted."
+
+#: templates/help.html:85
+msgid "Диагностика и проверка IP"
+msgstr "Diagnostics and IP Checking"
+
+#: templates/help.html:90
+msgid ""
+"Приложение включает в себя инструменты для быстрой диагностики сети и "
+"серверов."
+msgstr "The application includes tools for quick network and server diagnostics."
+
+#: templates/help.html:92
+msgid "Тест IP и DNS:"
+msgstr "IP and DNS Test:"
+
+#: templates/help.html:92
+msgid ""
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
+"которые ведут на внешние сервисы"
+msgstr ""
+"At the top of the main page are \"IP Test\" and \"DNS Test\" buttons that"
+" lead to external services"
+
+#: templates/help.html:92
+msgid "и"
+msgstr "and"
+
+#: templates/help.html:92
+msgid "для проверки вашего текущего сетевого подключения."
+msgstr "to check your current network connection."
+
+#: templates/help.html:93
+msgid "Автоматическая геолокация:"
+msgstr "Automatic Geolocation:"
+
+#: templates/help.html:93
+msgid ""
+"При добавлении или редактировании сервера приложение автоматически "
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
+" шапке карточки."
+msgstr ""
+"When adding or editing a server, the application automatically determines"
+" its geolocation (country and city) by IP address and displays it in the "
+"card header."
+
+#: templates/help.html:94
+msgid "Проверка IP сервера:"
+msgstr "Server IP Check:"
+
+#: templates/help.html:94
+msgid "На каждой карточке есть кнопка"
+msgstr "On each card there is a button"
+
+#: templates/help.html:94
+msgid ""
+"\"Проверить IP\". При нажатии на неё открывается всплывающее окно с "
+"подробной информацией об IP-адресе сервера от сервиса"
+msgstr ""
+"\"Check IP\". When clicked, a popup window opens with detailed "
+"information about the server's IP address from service"
+
+#: templates/help.html:94
+msgid "включая данные об организации и хостинге."
+msgstr "including organization and hosting data."
+
+#: templates/index.html:22
+msgid "Интернет доступен"
+msgstr "Internet available"
+
+#: templates/index.html:26
+msgid "Нет интернета"
+msgstr "No internet"
+
+#: templates/index.html:34
+msgid "Список серверов"
+msgstr "Server List"
+
+#: templates/index.html:36
+msgid "Тест IP"
+msgstr "IP Test"
+
+#: templates/index.html:37
+msgid "Тест DNS"
+msgstr "DNS Test"
+
+#: templates/index.html:40
+msgid "Добавить сервер"
+msgstr "Add Server"
+
+#: templates/index.html:49
+msgid "Добро пожаловать в VPN Server Manager"
+msgstr "Welcome to VPN Server Manager"
+
+#: templates/index.html:52
+msgid "Режим офлайн:"
+msgstr "Offline mode:"
+
+#: templates/index.html:52
+msgid "Интернет недоступен, но вы можете работать с локальными данными."
+msgstr "Internet is unavailable, but you can work with local data."
+
+#: templates/index.html:54
+msgid ""
+"Вы можете начать с добавления вашего первого сервера или импортировать "
+"существующие данные."
+msgstr "You can start by adding your first server or importing existing data."
+
+#: templates/index.html:59
+msgid "Добавить первый сервер"
+msgstr "Add First Server"
+
+#: templates/index.html:62 templates/index_locked.html:184
+#: templates/index_locked.html:841
+msgid "Импортировать данные"
+msgstr "Import Data"
+
+#: templates/index.html:68
+msgid "Работа в офлайн режиме"
+msgstr "Working in offline mode"
+
+#: templates/index.html:70
+msgid "Все данные будут сохранены в зашифрованный файл."
+msgstr "All data will be saved to an encrypted file."
+
+#: templates/index.html:98
+msgid "Стоимость"
+msgstr "Cost"
+
+#: templates/index.html:100
+msgid "N/A"
+msgstr "N/A"
+
+#: templates/index.html:103
+msgid "След. платёж"
+msgstr "Next Payment"
+
+#: templates/index.html:107
+msgid "Статус"
+msgstr "Status"
+
+#: templates/index.html:127
+msgid "DNS OK"
+msgstr "DNS OK"
+
+#: templates/index.html:129
+msgid "DNS ?"
+msgstr "DNS ?"
+
+#: templates/index.html:134
+msgid "Стриминг OK"
+msgstr "Streaming OK"
+
+#: templates/index.html:136
+msgid "Стриминг ?"
+msgstr "Streaming ?"
+
+#: templates/index.html:142
+#, fuzzy
+msgid "Требуется интернет"
+msgstr "No internet"
+
+#: templates/index.html:143
+msgid "Проверить IP"
+msgstr "Check IP"
+
+#: templates/index.html:152
+msgid "Кабинет хостера"
+msgstr "Host Cabinet"
+
+#: templates/index.html:158
+msgid "Вход через"
+msgstr "Login via"
+
+#: templates/index.html:163
+msgid "Email"
+msgstr "Email"
+
+#: templates/index.html:163 templates/index.html:259
+msgid "Логин"
+msgstr "Login"
+
+#: templates/index.html:173 templates/index.html:216 templates/index.html:237
+#: templates/index.html:268
+msgid "Пароль"
+msgstr "Password"
+
+#: templates/index.html:176 templates/index.html:219 templates/index.html:240
+#: templates/index.html:271
+msgid "Показать/скрыть пароль"
+msgstr "Show/hide password"
+
+#: templates/index.html:177 templates/index.html:220 templates/index.html:241
+#: templates/index.html:272
+#, fuzzy
+msgid "Копировать пароль"
+msgstr "Copy password"
+
+#: templates/index.html:184
+msgid "Перейти в кабинет"
+msgstr "Go to cabinet"
+
+#: templates/index.html:195
+msgid "SSH-доступ"
+msgstr "SSH Access"
+
+#: templates/index.html:200
+msgid "Копировать SSH команду подключения"
+msgstr "Copy SSH connection command"
+
+#: templates/index.html:201
+#, fuzzy
+msgid "Копировать команду"
+msgstr "Copy command"
+
+#: templates/index.html:204
+msgid "Пользователь"
+msgstr "User"
+
+#: templates/index.html:207
+msgid "Login"
+msgstr ""
+
+#: templates/index.html:210 templates/index.html:262
+#, fuzzy
+msgid "Копировать логин"
+msgstr "Copy login"
+
+#: templates/index.html:226
+msgid "Root"
+msgstr "Root"
+
+#: templates/index.html:228
+msgid "Вход по SSH"
+msgstr "SSH Login"
+
+#: templates/index.html:230
+msgid "Разрешен"
+msgstr "Allowed"
+
+#: templates/index.html:232
+msgid "Запрещен"
+msgstr "Forbidden"
+
+#: templates/index.html:253
+msgid "Панель (3x-ui)"
+msgstr "Panel (3x-ui)"
+
+#: templates/index.html:278
+msgid "Перейти в панель"
+msgstr "Go to panel"
+
+#: templates/index.html:289
+#, fuzzy
+msgid "Редактировать"
+msgstr "Edit"
+
+#: templates/index.html:291
+#, fuzzy
+msgid "Вы уверены, что хотите удалить этот сервер?"
+msgstr "Are you sure you want to delete this server?"
+
+#: templates/index.html:292
+#, fuzzy
+msgid "Удалить"
+msgstr "Delete"
+
+#: templates/index.html:301
+msgid "Серверов пока нет."
+msgstr "No servers yet."
+
+#: templates/index.html:301
+msgid "Добавьте первый"
+msgstr "Add the first one"
+
+#: templates/index.html:301
+msgid "или"
+msgstr "or"
+
+#: templates/index.html:301
+msgid "импортируйте данные"
+msgstr "import data"
+
+#: templates/index.html:311
+msgid "Информация об IP"
+msgstr "IP Information"
+
+#: templates/index.html:335
+msgid "Загрузка..."
+msgstr "Loading..."
+
+#: templates/index.html:344
+msgid "Ошибка при загрузке данных:"
+msgstr "Error loading data:"
+
+#: templates/index.html:356
+msgid "Ошибка копирования:"
+msgstr "Copy error:"
+
+#: templates/index_locked.html:10
+msgid "Доступ ограничен"
+msgstr "Access Restricted"
+
+#: templates/index_locked.html:17
+msgid "Требуется PIN-код"
+msgstr "PIN Code Required"
+
+#: templates/index_locked.html:19
+msgid "Для доступа к данным серверов необходимо ввести PIN-код."
+msgstr "To access server data, you need to enter a PIN code."
+
+#: templates/index_locked.html:24
+msgid "Совет:"
+msgstr "Tip:"
+
+#: templates/index_locked.html:24
+msgid ""
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
+"для создания PIN-кода."
+msgstr ""
+"If you are using the application for the first time, click the \"First "
+"Run\" button to create a PIN code."
+
+#: templates/index_locked.html:31 templates/index_locked.html:474
+msgid "Вход заблокирован на"
+msgstr "Login blocked for"
+
+#: templates/index_locked.html:31 templates/index_locked.html:474
+msgid "секунд"
+msgstr "seconds"
+
+#: templates/index_locked.html:37 templates/index_locked.html:131
+msgid "Первый запуск"
+msgstr "First Run"
+
+#: templates/index_locked.html:44
+msgid ""
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
+"защиту."
+msgstr ""
+"All data is protected by encryption. PIN code provides additional "
+"protection."
+
+#: templates/index_locked.html:58
+msgid "Вход по PIN-коду"
+msgstr "Login with PIN Code"
+
+#: templates/index_locked.html:68
+msgid "Вход"
+msgstr "Login"
+
+#: templates/index_locked.html:73 templates/index_locked.html:545
+#: templates/index_locked.html:898
+msgid "Сменить PIN"
+msgstr "Change PIN"
+
+#: templates/index_locked.html:82
+msgid "Введите PIN-код для входа в систему"
+msgstr "Enter PIN code to access the system"
+
+#: templates/index_locked.html:84
+msgid "PIN-код"
+msgstr "PIN Code"
+
+#: templates/index_locked.html:86
+msgid "Введите PIN"
+msgstr "Enter PIN"
+
+#: templates/index_locked.html:94
+msgid "Смените PIN-код для входа"
+msgstr "Change PIN code for login"
+
+#: templates/index_locked.html:97
+msgid "Старый PIN"
+msgstr "Old PIN"
+
+#: templates/index_locked.html:99
+msgid "Введите старый PIN"
+msgstr "Enter old PIN"
+
+#: templates/index_locked.html:102
+msgid "Новый PIN"
+msgstr "New PIN"
+
+#: templates/index_locked.html:104
+msgid "Введите новый PIN"
+msgstr "Enter new PIN"
+
+#: templates/index_locked.html:107
+msgid "Подтвердите новый PIN"
+msgstr "Confirm new PIN"
+
+#: templates/index_locked.html:109 templates/index_locked.html:215
+#, fuzzy
+msgid "Повторите новый PIN"
+msgstr "Repeat new key"
+
+#: templates/index_locked.html:117 templates/index_locked.html:151
+#: templates/index_locked.html:182 templates/index_locked.html:221
+#: templates/index_locked.html:253
+#, fuzzy
+msgid "Отмена"
+msgstr "Dark"
+
+#: templates/index_locked.html:119 templates/index_locked.html:428
+#: templates/index_locked.html:902
+msgid "Войти"
+msgstr ""
+
+#: templates/index_locked.html:138 templates/index_locked.html:170
+#: templates/index_locked.html:203
+#, fuzzy
+msgid "Информация:"
+msgstr "Processor Information"
+
+#: templates/index_locked.html:138
+#, fuzzy
+msgid "Вы можете создать новый PIN-код или импортировать существующие данные."
+msgstr "You can start by adding your first server or importing existing data."
+
+#: templates/index_locked.html:140
+#, fuzzy
+msgid "Выберите действие:"
+msgstr "Check Match"
+
+#: templates/index_locked.html:143
+msgid "Создать новый PIN-код"
+msgstr ""
+
+#: templates/index_locked.html:146
+#, fuzzy
+msgid "Импортировать из архива"
+msgstr "Import and Attach"
+
+#: templates/index_locked.html:163
+msgid "Импорт из архива"
+msgstr ""
+
+#: templates/index_locked.html:170
+msgid "Загрузите ZIP архив, созданный функцией \"Полный экспорт\"."
+msgstr ""
+
+#: templates/index_locked.html:174
+msgid "Выберите ZIP архив"
+msgstr ""
+
+#: templates/index_locked.html:183 templates/index_locked.html:764
+#, fuzzy
+msgid "Проверить PIN"
+msgstr "Check IP"
+
+#: templates/index_locked.html:196
+msgid "Создание нового PIN-кода"
+msgstr ""
+
+#: templates/index_locked.html:203
+msgid "Создайте новый PIN-код для защиты приложения."
+msgstr ""
+
+#: templates/index_locked.html:207
+#, fuzzy
+msgid "Новый PIN-код"
+msgstr "New Key"
+
+#: templates/index_locked.html:209
+msgid "Введите новый PIN (минимум 4 символа)"
+msgstr ""
+
+#: templates/index_locked.html:210 templates/index_locked.html:511
+#: templates/index_locked.html:650
+msgid "PIN должен содержать минимум 4 символа"
+msgstr ""
+
+#: templates/index_locked.html:213
+#, fuzzy
+msgid "Подтвердите PIN-код"
+msgstr "Key Confirmation"
+
+#: templates/index_locked.html:222 templates/index_locked.html:690
+msgid "Создать PIN"
+msgstr ""
+
+#: templates/index_locked.html:234
+msgid "PIN-код из архива"
+msgstr ""
+
+#: templates/index_locked.html:241
+msgid "PIN-код найден!"
+msgstr ""
+
+#: templates/index_locked.html:241
+msgid "Запомните или запишите этот код."
+msgstr ""
+
+#: templates/index_locked.html:245
+msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
+msgstr ""
+
+#: templates/index_locked.html:249
+msgid "Важно:"
+msgstr ""
+
+#: templates/index_locked.html:249
+msgid "PIN-код будет показан только один раз. Запишите его!"
+msgstr ""
+
+#: templates/index_locked.html:254
+msgid "Продолжить импорт"
+msgstr ""
+
+#: templates/index_locked.html:255
+#, fuzzy
+msgid "Импортировать сейчас"
+msgstr "Import Data"
+
+#: templates/index_locked.html:386
+msgid "Введите PIN-код"
+msgstr ""
+
+#: templates/index_locked.html:392 templates/index_locked.html:517
+#: templates/index_locked.html:734
+msgid "Проверка..."
+msgstr ""
+
+#: templates/index_locked.html:423 templates/index_locked.html:759
+#: templates/index_locked.html:836 templates/index_locked.html:887
+msgid "Ошибка соединения с сервером"
+msgstr ""
+
+#: templates/index_locked.html:499
+msgid "Заполните все поля"
+msgstr ""
+
+#: templates/index_locked.html:505
+msgid "Новые PIN-коды не совпадают"
+msgstr ""
+
+#: templates/index_locked.html:527
+msgid "PIN успешно изменён!"
+msgstr ""
+
+#: templates/index_locked.html:535 templates/index_locked.html:680
+#: templates/index_locked.html:831 templates/index_locked.html:881
+msgid "Ошибка:"
+msgstr ""
+
+#: templates/index_locked.html:540
+msgid "Произошла ошибка при смене PIN"
+msgstr ""
+
+#: templates/index_locked.html:589 templates/index_locked.html:726
+#: templates/index_locked.html:800
+msgid "Выберите файл"
+msgstr ""
+
+#: templates/index_locked.html:614
+msgid "Произошла ошибка при проверке архива"
+msgstr ""
+
+#: templates/index_locked.html:656
+msgid "PIN-коды не совпадают"
+msgstr ""
+
+#: templates/index_locked.html:662
+msgid "Создание..."
+msgstr ""
+
+#: templates/index_locked.html:675
+msgid "PIN успешно создан!"
+msgstr ""
+
+#: templates/index_locked.html:675
+msgid "Приложение будет перезагружено."
+msgstr ""
+
+#: templates/index_locked.html:685
+msgid "Произошла ошибка при создании PIN"
+msgstr ""
+
+#: templates/index_locked.html:808
+msgid "Импорт..."
+msgstr ""
+
+#: templates/index_locked.html:826 templates/index_locked.html:875
+#, fuzzy
+msgid "Данные успешно импортированы!"
+msgstr "Data file successfully imported and attached!"
+
+#: templates/index_locked.html:826 templates/index_locked.html:875
+msgid "Перенаправление..."
+msgstr ""
+
+#: templates/index_locked.html:850
+msgid "Файл не выбран"
+msgstr ""
+
+#: templates/index_locked.html:861
+#, fuzzy
+msgid "Импорт данных..."
+msgstr "Import Data File"
+
+#: templates/layout.html:25 templates/layout.html:100
+msgid "VPS Manager"
+msgstr "VPS Manager"
+
+#: templates/layout.html:34
+msgid "Настройки"
+msgstr "Settings"
+
+#: templates/layout.html:38
+msgid "Справка"
+msgstr "Help"
+
+#: templates/layout.html:42
+msgid "Управление подсказками"
+msgstr "Hint Management"
+
+#: templates/layout.html:46
+msgid "Шпаргалка"
+msgstr "Cheatsheet"
+
+#: templates/layout.html:54
+msgid "Выйти из системы"
+msgstr "Logout"
+
+#: templates/layout.html:64
+msgid "Масштаб интерфейса"
+msgstr "Interface Scale"
+
+#: templates/layout.html:85
+msgid "Светлая"
+msgstr "Light"
+
+#: templates/layout.html:86
+msgid "Темная"
+msgstr "Dark"
+
+#: templates/layout.html:100
+msgid "Разработчик"
+msgstr "Developer"
+
+#: templates/settings.html:3 templates/settings.html:7
+#, fuzzy
+msgid "Управление данными"
+msgstr "Hint Management"
+
+#: templates/settings.html:24
+msgid "Управление ключом шифрования"
+msgstr "Encryption Key Management"
+
+#: templates/settings.html:31
+msgid "Смена главного ключа"
+msgstr "Change Main Key"
+
+#: templates/settings.html:32
+msgid ""
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
+" сохранится как резервная копия."
+msgstr ""
+"When changing the key, a new encrypted data file will be created. The old"
+" file will be saved as a backup."
+
+#: templates/settings.html:36
+msgid "Новый ключ"
+msgstr "New Key"
+
+#: templates/settings.html:38
+msgid "Введите новый ключ Fernet"
+msgstr "Enter new Fernet key"
+
+#: templates/settings.html:40
+msgid "Сгенерировать"
+msgstr "Generate"
+
+#: templates/settings.html:45
+msgid "Подтверждение ключа"
+msgstr "Key Confirmation"
+
+#: templates/settings.html:46
+msgid "Повторите новый ключ"
+msgstr "Repeat new key"
+
+#: templates/settings.html:49
+msgid "Сменить ключ"
+msgstr "Change Key"
+
+#: templates/settings.html:56
+msgid "Проверка соответствия ключ-данные"
+msgstr "Key-Data Match Check"
+
+#: templates/settings.html:57
+msgid ""
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
+"приложение."
+msgstr ""
+"Quickly check if the key matches the data file without importing into the"
+" app."
+
+#: templates/settings.html:61
+msgid "Файл данных (.enc)"
+msgstr "Data file (.enc)"
+
+#: templates/settings.html:65
+msgid "Ключ для проверки"
+msgstr "Key for verification"
+
+#: templates/settings.html:66
+msgid "Вставьте ключ шифрования для проверки"
+msgstr "Paste the encryption key for verification"
+
+#: templates/settings.html:69
+msgid "Проверить соответствие"
+msgstr "Check Match"
+
+#: templates/settings.html:80
+msgid "Статус файла данных"
+msgstr "Data File Status"
+
+#: templates/settings.html:86
+msgid "Активный файл:"
+msgstr "Active file:"
+
+#: templates/settings.html:88
+msgid "Все данные о серверах загружаются из этого зашифрованного файла."
+msgstr "All server data is loaded from this encrypted file."
+
+#: templates/settings.html:94
+msgid "Экспортировать данные"
+msgstr "Export Data"
+
+#: templates/settings.html:99
+msgid "Экспортировать ключ"
+msgstr "Export Key"
+
+#: templates/settings.html:121
+msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgstr ""
+"Are you sure you want to detach the data file? The server list will be "
+"empty."
+
+#: templates/settings.html:123
+msgid "Открепить файл"
+msgstr "Detach File"
+
+#: templates/settings.html:130
+msgid "Файл данных не прикреплен."
+msgstr "No data file attached."
+
+#: templates/settings.html:132
+msgid ""
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
+"можете импортировать существующий файл, чтобы восстановить свои записи."
+msgstr ""
+"The application is not currently working with any data file. You can "
+"import an existing file to restore your records."
+
+#: templates/settings.html:140
+msgid "Импорт файла данных"
+msgstr "Import Data File"
+
+#: templates/settings.html:143
+msgid ""
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
+" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"заменен."
+msgstr ""
+"Upload an encrypted data file (<code>.enc</code>) to attach and work with"
+" it. The current attached file (if any) will be replaced."
+
+#: templates/settings.html:146
+msgid "Выбор файла данных"
+msgstr "Select Data File"
+
+#: templates/settings.html:148
+msgid ""
+"Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее "
+"экспортированный из этого приложения."
+msgstr ""
+"Please select a file with the <code>.enc</code> extension previously "
+"exported from this app."
+
+#: templates/settings.html:152
+msgid "Импортировать и прикрепить"
+msgstr "Import and Attach"
+
+#: templates/settings.html:163
+msgid "Импорт серверов из другой установки"
+msgstr "Import servers from another installation"
+
+#: templates/settings.html:167
+msgid "Что нужно:"
+msgstr "Requirements:"
+
+#: templates/settings.html:167
+msgid ""
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
+"установки приложения."
+msgstr ""
+"<code>.env</code> file and <code>servers.json.enc</code> from another "
+"installation of the app."
+
+#: templates/settings.html:174
+msgid "servers.json.enc файл"
+msgstr "servers.json.enc file"
+
+#: templates/settings.html:178
+msgid "Выберать зашифрованный файл данных из другой установки"
+msgstr "Select encrypted data file from another installation"
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+

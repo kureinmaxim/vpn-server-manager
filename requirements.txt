@@ -4,4 +4,6 @@ python-dotenv
 cryptography
 Werkzeug
 Jinja2
-pywebview 
+pywebview
+Flask-Babel==4.0.0
+Babel==2.14.0 

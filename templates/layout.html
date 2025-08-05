@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Панель управления VPS{% endblock %}</title>
+    <title>{% block title %}{{ _('Панель управления VPS') }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
@@ -22,7 +22,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="bi bi-hdd-stack"></i> VPS Manager
+                <i class="bi bi-hdd-stack"></i> {{ _('VPS Manager') }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -31,27 +31,27 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('settings_page') }}">Настройки</a>
+                        <a class="nav-link" href="{{ url_for('settings_page') }}">{{ _('Настройки') }}</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Справка
+                            {{ _('Справка') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('help_page') }}">Справка по использованию</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manage_hints_page') }}">Управление подсказками</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('help_page') }}">{{ _('Справка по использованию') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('manage_hints_page') }}">{{ _('Управление подсказками') }}</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cheatsheet_page') }}">Шпаргалка</a>
+                        <a class="nav-link" href="{{ url_for('cheatsheet_page') }}">{{ _('Шпаргалка') }}</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about_page') }}">О программе</a>
+                        <a class="nav-link" href="{{ url_for('about_page') }}">{{ _('О программе') }}</a>
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout()" title="Выйти из системы">
+                        <a class="nav-link" href="#" onclick="logout()" title="{{ _('Выйти из системы') }}">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </li>
@@ -61,7 +61,7 @@
                             <i class="bi bi-search"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li class="dropdown-header">Масштаб интерфейса</li>
+                            <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
                             <li><a class="dropdown-item" href="#" onclick="setZoom('80')"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
                             <li><a class="dropdown-item" href="#" onclick="setZoom('90')"><i class="bi bi-search me-2"></i>90%</a></li>
                             <li><a class="dropdown-item" href="#" onclick="setZoom('100')"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
@@ -69,11 +69,21 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='ru') }}">🇷🇺 Русский</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='en') }}">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='zh') }}">🇨🇳 中文</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-circle-half"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun-fill me-2"></i>Светлая</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars-fill me-2"></i>Темная</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -87,7 +97,7 @@
     
     <footer class="text-center text-muted small py-3 bg-dark">
         <div class="container">
-            <p class="mb-0">VPS Manager v{{ app_info.version }} | Разработчик: {{ app_info.developer }}</p>
+                            <p class="mb-0">{{ _('VPS Manager') }} v{{ app_info.version }} | {{ _('Разработчик') }}: {{ app_info.developer }}</p>
         </div>
     </footer>
 
