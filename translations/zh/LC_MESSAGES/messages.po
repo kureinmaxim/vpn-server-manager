@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-05 14:59+0300\n"
+"POT-Creation-Date: 2025-08-05 15:53+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -934,7 +934,7 @@ msgstr "重复新密钥"
 
 #: templates/index_locked.html:117 templates/index_locked.html:151
 #: templates/index_locked.html:182 templates/index_locked.html:221
-#: templates/index_locked.html:253
+#: templates/index_locked.html:253 templates/settings.html:379
 #, fuzzy
 msgid "Отмена"
 msgstr "深色"
@@ -1033,7 +1033,7 @@ msgstr ""
 msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
 msgstr ""
 
-#: templates/index_locked.html:249
+#: templates/index_locked.html:249 templates/settings.html:368
 msgid "Важно:"
 msgstr ""
 
@@ -1229,7 +1229,7 @@ msgid ""
 "приложение."
 msgstr "快速检查密钥是否与数据文件匹配，无需导入应用。"
 
-#: templates/settings.html:61
+#: templates/settings.html:61 templates/settings.html:176
 msgid "Файл данных (.enc)"
 msgstr "数据文件（.enc）"
 
@@ -1335,6 +1335,139 @@ msgstr "servers.json.enc文件"
 #: templates/settings.html:178
 msgid "Выберать зашифрованный файл данных из другой установки"
 msgstr "选择来自其他安装的加密数据文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
 msgid "{editor}: Editing failed"
