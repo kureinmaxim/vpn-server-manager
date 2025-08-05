@@ -19,11 +19,11 @@
         <div class="d-flex justify-content-end mb-3">
             {% if internet_available %}
                 <span class="badge bg-success">
-                    <i class="bi bi-wifi"></i> Интернет доступен
+                    <i class="bi bi-wifi"></i> {{ _('Интернет доступен') }}
                 </span>
             {% else %}
                 <span class="badge bg-warning text-dark">
-                    <i class="bi bi-wifi-off"></i> Нет интернета
+                    <i class="bi bi-wifi-off"></i> {{ _('Нет интернета') }}
                 </span>
             {% endif %}
         </div>
@@ -31,13 +31,13 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1>Список серверов</h1>
+            <h1>{{ _('Список серверов') }}</h1>
             <div class="btn-group" role="group">
-                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info">Тест IP</a>
-                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">Тест DNS</a>
+                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест IP') }}</a>
+                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест DNS') }}</a>
             </div>
         </div>
-        <a href="{{ url_for('add_server') }}" class="btn btn-primary">Добавить сервер</a>
+        <a href="{{ url_for('add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
     </div>
 
     {% if not active_data_file and not servers %}
@@ -46,28 +46,28 @@
             <div class="mb-3">
                 <i class="bi bi-server display-1 text-muted"></i>
             </div>
-            <h5 class="card-title">Добро пожаловать в VPN Server Manager</h5>
+            <h5 class="card-title">{{ _('Добро пожаловать в VPN Server Manager') }}</h5>
             <p class="card-text">
                 {% if internet_available is defined and not internet_available %}
-                    <strong>Режим офлайн:</strong> Интернет недоступен, но вы можете работать с локальными данными.
+                    <strong>{{ _('Режим офлайн:') }}</strong> {{ _('Интернет недоступен, но вы можете работать с локальными данными.') }}
                 {% else %}
-                    Вы можете начать с добавления вашего первого сервера или импортировать существующие данные.
+                    {{ _('Вы можете начать с добавления вашего первого сервера или импортировать существующие данные.') }}
                 {% endif %}
             </p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                  <a href="{{ url_for('add_server') }}" class="btn btn-primary btn-lg px-4 gap-3">
-                    <i class="bi bi-plus-circle"></i> Добавить первый сервер
+                    <i class="bi bi-plus-circle"></i> {{ _('Добавить первый сервер') }}
                 </a>
                 <a href="{{ url_for('settings_page') }}" class="btn btn-outline-secondary btn-lg px-4">
-                    <i class="bi bi-upload"></i> Импортировать данные
+                    <i class="bi bi-upload"></i> {{ _('Импортировать данные') }}
                 </a>
             </div>
         </div>
         <div class="card-footer text-muted">
             {% if internet_available is defined and not internet_available %}
-                <i class="bi bi-info-circle"></i> Работа в офлайн режиме
+                <i class="bi bi-info-circle"></i> {{ _('Работа в офлайн режиме') }}
             {% else %}
-                Все данные будут сохранены в зашифрованный файл.
+                {{ _('Все данные будут сохранены в зашифрованный файл.') }}
             {% endif %}
         </div>
     </div>
@@ -95,16 +95,16 @@
                 <div class="card-body p-3">
                     <div class="row text-center border-bottom pb-3 mb-2">
                         <div class="col">
-                            <small class="text-muted">Стоимость</small>
+                            <small class="text-muted">{{ _('Стоимость') }}</small>
                             <div><strong>{{ "%.2f"|format(server.payment_info.amount) }} {{ server.payment_info.currency }}</strong></div>
-                            <small>{{ server.payment_info.get('payment_period', 'N/A') }}</small>
+                            <small>{{ server.payment_info.get('payment_period', _('N/A')) }}</small>
                         </div>
                         <div class="col">
-                            <small class="text-muted">След. платёж</small>
+                            <small class="text-muted">{{ _('След. платёж') }}</small>
                             <div><strong>{{ server.payment_info.formatted_date }}</strong></div>
                         </div>
                         <div class="col">
-                            <small class="text-muted">Статус</small>
+                            <small class="text-muted">{{ _('Статус') }}</small>
                             <div>
                                 {% set status_color = {
                                     'Active': 'success', 
@@ -124,23 +124,23 @@
                         </div>
                         <div class="col">
                              {% if server.checks.get('dns_ok') %}
-                                <span class="badge bg-success">DNS OK</span>
+                                <span class="badge bg-success">{{ _('DNS OK') }}</span>
                             {% else %}
-                                <span class="badge bg-warning text-dark">DNS ?</span>
+                                <span class="badge bg-warning text-dark">{{ _('DNS ?') }}</span>
                             {% endif %}
                         </div>
                         <div class="col">
                              {% if server.checks.get('streaming_ok') %}
-                                <span class="badge bg-success">Стриминг OK</span>
+                                <span class="badge bg-success">{{ _('Стриминг OK') }}</span>
                             {% else %}
-                                <span class="badge bg-warning text-dark">Стриминг ?</span>
+                                <span class="badge bg-warning text-dark">{{ _('Стриминг ?') }}</span>
                             {% endif %}
                         </div>
                     </div>
 
                     <div class="d-grid mb-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="Требуется интернет"{% endif %}>
-                            <i class="bi bi-search"></i> Проверить IP
+                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="{{ _('Требуется интернет') }}"{% endif %}>
+                            <i class="bi bi-search"></i> {{ _('Проверить IP') }}
                         </button>
                     </div>
 
@@ -149,18 +149,18 @@
                         {% if server.hoster_url or server.hoster_credentials.user_decrypted %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-hoster-{{ server.id }}">Кабинет хостера</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-hoster-{{ server.id }}">{{ _('Кабинет хостера') }}</button>
                             </h2>
                             <div id="collapse-hoster-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     
                                     {% if server.hoster_credentials.login_method != 'password' %}
-                                        <p class="text-center my-1 small">Вход через <strong>{{ server.hoster_credentials.login_method|capitalize }}</strong></p>
+                                        <p class="text-center my-1 small">{{ _('Вход через') }} <strong>{{ server.hoster_credentials.login_method|capitalize }}</strong></p>
                                     {% endif %}
 
                                     {% if server.hoster_credentials.user_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>{{ 'Email' if server.hoster_credentials.login_method != 'password' else 'Логин' }}:</small>
+                                        <small>{{ _('Email') if server.hoster_credentials.login_method != 'password' else _('Логин') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.hoster_credentials.user_decrypted }}</span>
                                             <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.user_decrypted }}')"><i class="bi bi-clipboard"></i></button>
@@ -170,18 +170,18 @@
 
                                     {% if server.hoster_credentials.login_method == 'password' and server.hoster_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.hoster_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
 
                                     {% if server.hoster_url %}
                                     <div class="d-grid mt-2">
-                                        <a href="{{ server.hoster_url }}" target="_blank" class="btn btn-sm btn-outline-primary">Перейти в кабинет</a>
+                                        <a href="{{ server.hoster_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в кабинет') }}</a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -192,53 +192,53 @@
                         <!-- Блок SSH -->
                         <div class="accordion-item">
                              <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ssh-{{ server.id }}">SSH-доступ</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ssh-{{ server.id }}">{{ _('SSH-доступ') }}</button>
                             </h2>
                             <div id="collapse-ssh-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     <div class="text-center mb-2">
-                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать SSH команду подключения">
-                                            <i class="bi bi-terminal"></i> Копировать команду
+                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать SSH команду подключения') }}">
+                                            <i class="bi bi-terminal"></i> {{ _('Копировать команду') }}
                                         </button>
                                     </div>
-                                    <h6 class="text-muted small">Пользователь</h6>
+                                    <h6 class="text-muted small">{{ _('Пользователь') }}</h6>
                                     {% if server.ssh_credentials.user %}
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Login:</small>
+                                        <small>{{ _('Login') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.ssh_credentials.user }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать логин') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.ssh_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     
                                     <hr class="my-2">
-                                    <h6 class="text-muted small">Root</h6>
+                                    <h6 class="text-muted small">{{ _('Root') }}</h6>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Вход по SSH:</small>
+                                        <small>{{ _('Вход по SSH') }}:</small>
                                         {% if server.ssh_credentials.get('root_login_allowed') %}
-                                            <span class="badge bg-success">Разрешен</span>
+                                            <span class="badge bg-success">{{ _('Разрешен') }}</span>
                                         {% else %}
-                                            <span class="badge bg-danger">Запрещен</span>
+                                            <span class="badge bg-danger">{{ _('Запрещен') }}</span>
                                         {% endif %}
                                     </div>
                                      {% if server.ssh_credentials.root_password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.root_password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -250,32 +250,32 @@
                          {% if server.panel_url or server.panel_credentials.user_decrypted %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-panel-{{ server.id }}">Панель (3x-ui)</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-panel-{{ server.id }}">{{ _('Панель (3x-ui)') }}</button>
                             </h2>
                             <div id="collapse-panel-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     {% if server.panel_credentials.user_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Логин:</small>
+                                        <small>{{ _('Логин') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.panel_credentials.user_decrypted }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать логин') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.panel_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.panel_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.panel_url %}
                                      <div class="d-grid mt-2">
-                                        <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">Перейти в панель</a>
+                                        <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в панель') }}</a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -286,10 +286,10 @@
                 </div>
                 <div class="card-footer d-flex justify-content-between">
                     <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
-                        <i class="bi bi-pencil-square"></i> Редактировать
+                        <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
                     </a>
-                    <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить этот сервер?');">
-                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                    <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('{{ _('Вы уверены, что хотите удалить этот сервер?') }}');">
+                        <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
                     </form>
                 </div>
             </div>
@@ -298,7 +298,7 @@
     </div>
     {% else %}
     <div class="alert alert-secondary text-center" role="alert">
-        Серверов пока нет. <a href="{{ url_for('add_server') }}" class="alert-link">Добавьте первый</a> или <a href="{{ url_for('settings_page') }}" class="alert-link">импортируйте данные</a>.
+        {{ _('Серверов пока нет.') }} <a href="{{ url_for('add_server') }}" class="alert-link">{{ _('Добавьте первый') }}</a> {{ _('или') }} <a href="{{ url_for('settings_page') }}" class="alert-link">{{ _('импортируйте данные') }}</a>.
     </div>
     {% endif %}
 </div>
@@ -308,7 +308,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="ipInfoModalLabel">Информация об IP</h5>
+        <h5 class="modal-title" id="ipInfoModalLabel">{{ _('Информация об IP') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -332,7 +332,7 @@
     function checkIpInfo(ipAddress) {
         const modal = new bootstrap.Modal(document.getElementById('ipInfoModal'));
         const content = document.getElementById('ipInfoContent');
-        content.textContent = 'Загрузка...';
+        content.textContent = '{{ _("Загрузка...") }}';
         modal.show();
 
         fetch(`/check_ip/${ipAddress}`)
@@ -341,7 +341,7 @@
                 content.textContent = JSON.stringify(data, null, 2);
             })
             .catch(error => {
-                content.textContent = 'Ошибка при загрузке данных: ' + error;
+                content.textContent = '{{ _("Ошибка при загрузке данных:") }} ' + error;
             });
     }
 
@@ -353,7 +353,7 @@
                 button.innerHTML = originalIcon;
             }, 1500);
         }).catch(err => {
-            console.error('Ошибка копирования: ', err);
+            console.error('{{ _("Ошибка копирования:") }} ', err);
         });
     }
 
