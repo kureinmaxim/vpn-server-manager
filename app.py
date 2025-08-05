@@ -40,8 +40,19 @@ def get_locale():
     if session.get('language'):
         return session.get('language')
     
-    # Автоопределение языка браузера
-    return request.accept_languages.best_match(['ru', 'en', 'zh'])
+    # Если язык не установлен в сессии, устанавливаем по умолчанию только один раз
+    if 'language_initialized' not in session:
+        # Автоопределение языка браузера
+        detected_lang = request.accept_languages.best_match(['ru', 'en', 'zh'])
+        if detected_lang:
+            session['language'] = detected_lang
+        else:
+            session['language'] = 'ru'  # По умолчанию русский
+        session['language_initialized'] = True
+        return session['language']
+    
+    # Если язык уже инициализирован, возвращаем русский по умолчанию
+    return 'ru'
 
 babel.init_app(app, locale_selector=get_locale)
 
@@ -690,7 +701,7 @@ def pin_login_ajax():
         success, message = pin_auth.authenticate_pin(pin)
         
         if success:
-            return jsonify({'success': True, 'message': 'Аутентификация успешна'})
+            return jsonify({'success': True, 'message': gettext('Аутентификация успешна')})
         else:
             if pin_auth.is_pin_login_blocked():
                 remaining = pin_auth.get_pin_block_remaining()
@@ -2052,8 +2063,14 @@ def generate_new_key():
 def change_language(lang):
     """Изменяет язык приложения."""
     if lang in ['ru', 'en', 'zh']:
+        # Проверяем, был ли язык уже установлен
+        previous_lang = session.get('language')
         session['language'] = lang
-        flash(gettext('Язык изменен на %(lang)s') % {'lang': lang}, 'success')
+        
+        # Показываем уведомление только если язык действительно изменился
+        if previous_lang != lang:
+            flash(gettext('Язык изменен на %(lang)s') % {'lang': lang}, 'success')
+    
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/shutdown')

@@ -2,6 +2,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from flask import session, redirect, url_for
+from flask_babel import gettext
 
 class PinAuth:
     def __init__(self, config_file=None):
@@ -115,7 +116,7 @@ class PinAuth:
                 session['pin_authenticated'] = True
                 session['pin_login_used'] = True
                 print("🔐 Аутентификация по PIN успешна")
-                return True, "Аутентификация успешна"
+                return True, gettext("Аутентификация успешна")
             else:
                 # Неудачная попытка - увеличиваем счетчик
                 self.pin_attempts += 1

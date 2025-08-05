@@ -100,12 +100,12 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix">
-                        Индекс пригодности для стриминга
+                        {{ _('Индекс пригодности для стриминга') }}
                     </button>
                 </h2>
                 <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
                     <div class="accordion-body">
-                        <p>На карточке каждого сервера есть строка с тремя индикаторами, которые помогают быстро оценить, подходит ли IP-адрес для использования со стриминговыми сервисами, имеющими геолокационные ограничения (например, 9Now, Hulu, BBC iPlayer).</p>
+                        <p>{{ _('На карточке каждого сервера есть строка с тремя индикаторами, которые помогают быстро оценить, подходит ли IP-адрес для использования со стриминговыми сервисами, имеющими геолокационные ограничения (например, 9Now, Hulu, BBC iPlayer).') }}</p>
                         <dl>
                             <dt><span class="badge bg-success">ISP/Residential</span> / <span class="badge bg-danger">Хостинг</span></dt>
                             <dd>Это результат <strong>автоматической</strong> проверки. Приложение анализирует, кому принадлежит IP-адрес.
@@ -138,7 +138,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven">
-                        Управление данными и шифрование
+                        {{ _('Управление данными и шифрование') }}
                     </button>
                 </h2>
                 <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
@@ -180,7 +180,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseImportExternal">
-                        <i class="bi bi-arrow-down-up me-2"></i> Импорт из другой установки
+                        <i class="bi bi-arrow-down-up me-2"></i> {{ _('Импорт из другой установки') }}
                     </button>
                 </h2>
                 <div id="collapseImportExternal" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
@@ -253,7 +253,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_secret_key">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_secret_key" aria-expanded="false" aria-controls="collapse_secret_key">
-                        <i class="bi bi-key-fill me-2"></i> Что такое SECRET_KEY и где его взять?
+                        <i class="bi bi-key-fill me-2"></i> {{ _('Что такое SECRET_KEY и где его взять?') }}
                     </button>
                 </h2>
                 <div id="collapse_secret_key" class="accordion-collapse collapse" aria-labelledby="heading_secret_key" data-bs-parent="#helpAccordion">
@@ -276,7 +276,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_transfer">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_transfer" aria-expanded="false" aria-controls="collapse_transfer">
-                        <i class="bi bi-folder-symlink me-2"></i> Структура и перенос приложения на другой компьютер?
+                        <i class="bi bi-folder-symlink me-2"></i> {{ _('Структура и перенос приложения на другой компьютер?') }}
                     </button>
                 </h2>
                 <div id="collapse_transfer" class="accordion-collapse collapse" aria-labelledby="heading_transfer" data-bs-parent="#helpAccordion">
@@ -328,7 +328,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_decrypt_tool">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_decrypt_tool" aria-expanded="false" aria-controls="collapse_decrypt_tool">
-                        <i class="bi bi-unlock-fill me-2"></i> Как посмотреть все пароли сразу (расшифровка)?
+                        <i class="bi bi-unlock-fill me-2"></i> {{ _('Как посмотреть все пароли сразу (расшифровка)?') }}
                     </button>
                 </h2>
                 <div id="collapse_decrypt_tool" class="accordion-collapse collapse" aria-labelledby="heading_decrypt_tool" data-bs-parent="#helpAccordion">
@@ -362,7 +362,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_macos">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_macos" aria-expanded="false" aria-controls="collapse_macos">
-                        <i class="bi bi-apple me-2"></i> Особенности работы на macOS
+                        <i class="bi bi-apple me-2"></i> {{ _('Особенности работы на macOS') }}
                     </button>
                 </h2>
                 <div id="collapse_macos" class="accordion-collapse collapse" aria-labelledby="heading_macos" data-bs-parent="#helpAccordion">
@@ -383,7 +383,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_windows">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_windows" aria-expanded="false" aria-controls="collapse_windows">
-                        <i class="bi bi-windows me-2"></i> Особенности работы на Windows
+                        <i class="bi bi-windows me-2"></i> {{ _('Особенности работы на Windows') }}
                     </button>
                 </h2>
                 <div id="collapse_windows" class="accordion-collapse collapse" aria-labelledby="heading_windows" data-bs-parent="#helpAccordion">
@@ -404,7 +404,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_linux">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_linux" aria-expanded="false" aria-controls="collapse_linux">
-                        <i class="bi bi-ubuntu me-2"></i> Особенности работы на Linux
+                        <i class="bi bi-ubuntu me-2"></i> {{ _('Особенности работы на Linux') }}
                     </button>
                 </h2>
                 <div id="collapse_linux" class="accordion-collapse collapse" aria-labelledby="heading_linux" data-bs-parent="#helpAccordion">
@@ -425,7 +425,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_icons">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_icons" aria-expanded="false" aria-controls="collapse_icons">
-                        <i class="bi bi-image me-2"></i> Создание и настройка иконок приложения
+                        <i class="bi bi-image me-2"></i> {{ _('Создание и настройка иконок приложения') }}
                     </button>
                 </h2>
                 <div id="collapse_icons" class="accordion-collapse collapse" aria-labelledby="heading_icons" data-bs-parent="#helpAccordion">
@@ -568,7 +568,7 @@ file static/images/icon.png</code></pre>
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_structure">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_structure" aria-expanded="false" aria-controls="collapse_structure">
-                        <i class="bi bi-diagram-3 me-2"></i> Структура проекта и алгоритм работы
+                        <i class="bi bi-diagram-3 me-2"></i> {{ _('Структура проекта и алгоритм работы') }}
                     </button>
                 </h2>
                 <div id="collapse_structure" class="accordion-collapse collapse" aria-labelledby="heading_structure" data-bs-parent="#helpAccordion">
@@ -618,7 +618,7 @@ VPNserverManage/
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_pin">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_pin" aria-expanded="false" aria-controls="collapse_pin">
-                        <i class="bi bi-shield-lock me-2"></i> PIN-система защиты
+                        <i class="bi bi-shield-lock me-2"></i> {{ _('PIN-система защиты') }}
                     </button>
                 </h2>
                 <div id="collapse_pin" class="accordion-collapse collapse" aria-labelledby="heading_pin" data-bs-parent="#helpAccordion">
@@ -689,7 +689,7 @@ VPNserverManage/
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_dev">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_dev" aria-expanded="false" aria-controls="collapse_dev">
-                        <i class="bi bi-code-slash me-2"></i> Для разработчиков
+                        <i class="bi bi-code-slash me-2"></i> {{ _('Для разработчиков') }}
                     </button>
                 </h2>
                 <div id="collapse_dev" class="accordion-collapse collapse" aria-labelledby="heading_dev" data-bs-parent="#helpAccordion">
