@@ -17,7 +17,7 @@
 echo "=== Процессор ===" && cat /proc/cpuinfo | grep "model name" | head -1 && \
 echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                    <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                    <i class="bi bi-clipboard"></i>
                 </button>
             </div>
         </div>
@@ -62,7 +62,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">uname -a</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -71,7 +71,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">lscpu | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -80,7 +80,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">free -h</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -89,7 +89,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -98,7 +98,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">ip a</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -107,7 +107,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">ss -tulnp | cat</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -116,7 +116,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">w</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -125,7 +125,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">tail -f /var/log/syslog</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -142,7 +142,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -hT</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -151,7 +151,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h --total</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
             </li>
@@ -238,7 +238,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 </div>
             </li>
             <li class="list-group-item">
-                <p class="mb-1"><strong>{{ _('Интерактивный монитор процессов') }}</strong> (htop {{ _('более удобен, если установлен') }})</p>
+                <p class="mb-1"><strong>{{ _('Интерактивный монитор процессов') }}</strong> ({{ _('htop более удобен, если установлен') }})</p>
                 <div class="position-relative my-2">
                     <pre><code class="language-bash">top</code></pre>
                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>

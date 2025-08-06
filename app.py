@@ -1399,6 +1399,41 @@ def delete_receipt(server_id, filename):
 @app.route('/manage_hints', methods=['GET'])
 def manage_hints_page():
     hints = load_hints()
+    
+    # Словарь переводов для названий групп
+    group_translations = {
+        'Ключевые утилиты': {
+            'ru': 'Ключевые утилиты',
+            'en': 'Key utilities',
+            'zh': '关键工具'
+        },
+        'Управление службами': {
+            'ru': 'Управление службами',
+            'en': 'Service management',
+            'zh': '服务管理'
+        },
+        'Управление пакетами': {
+            'ru': 'Управление пакетами',
+            'en': 'Package management',
+            'zh': '包管理'
+        },
+        'Безопасность': {
+            'ru': 'Безопасность',
+            'en': 'Security',
+            'zh': '安全'
+        }
+    }
+    
+    # Получаем текущий язык
+    current_lang = get_locale()
+    
+    # Переводим названия групп
+    for hint in hints:
+        if hint['group'] in group_translations:
+            hint['group_display'] = group_translations[hint['group']].get(current_lang, hint['group'])
+        else:
+            hint['group_display'] = hint['group']
+    
     return render_template('manage_hints.html', hints=hints)
 
 @app.route('/hints/add', methods=['POST'])
