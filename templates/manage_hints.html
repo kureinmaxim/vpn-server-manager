@@ -41,7 +41,7 @@
         <tbody>
             {% for hint in hints %}
             <tr>
-                <td>{{ hint.group }}</td>
+                <td>{{ hint.group_display }}</td>
                 <td><pre class="mb-0"><code>{{ hint.command }}</code></pre></td>
                 <td>
                     <form action="{{ url_for('delete_hint', hint_id=hint.id) }}" method="post" onsubmit="return confirm('{{ _('Вы уверены, что хотите удалить эту подсказку?') }}');">
