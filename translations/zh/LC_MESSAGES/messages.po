@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-05 17:42+0300\n"
+"POT-Creation-Date: 2025-08-06 17:48+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -50,101 +50,101 @@ msgstr "没有互联网连接。某些功能可能不可用。"
 msgid "Создан новый файл для хранения серверов. Теперь можно добавить первый."
 msgstr "已创建新文件用于存储服务器。现在可以添加第一个。"
 
-#: app.py:1449 app.py:1509
+#: app.py:1484 app.py:1544
 msgid "Нет активного файла данных для экспорта."
 msgstr "没有可导出的活动数据文件。"
 
-#: app.py:1601
+#: app.py:1636
 msgid "Файл данных успешно импортирован и прикреплен!"
 msgstr "数据文件已成功导入并附加！"
 
-#: app.py:1605
+#: app.py:1640
 msgid ""
 "Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
 " с другим ключом."
 msgstr "错误：文件无法解密或已损坏。可能是用不同的密钥创建的。"
 
-#: app.py:1613 app.py:1630
+#: app.py:1648 app.py:1665
 msgid "Неверный тип файла. Пожалуйста, выберите файл .enc"
 msgstr "文件类型无效。请选择.enc文件"
 
-#: app.py:1626
+#: app.py:1661
 msgid "Необходимо выбрать файл и указать внешний ключ шифрования."
 msgstr "必须选择文件并指定外部加密密钥。"
 
-#: app.py:1639
+#: app.py:1674
 msgid ""
 "Неверный формат ключа шифрования. Ключ должен быть действительным ключом "
 "Fernet."
 msgstr "加密密钥格式无效。密钥必须是有效的Fernet密钥。"
 
-#: app.py:1798
+#: app.py:1833
 msgid "Все сервера из импортируемого файла уже существуют в вашем списке."
 msgstr "导入文件中的所有服务器已存在于您的列表中。"
 
-#: app.py:1801
+#: app.py:1836
 msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
 msgstr "错误：加密密钥无效。请检查输入的密钥是否正确。"
 
-#: app.py:1803
+#: app.py:1838
 msgid "Ошибка: файл содержит некорректные данные."
 msgstr "错误：文件包含不正确的数据。"
 
-#: app.py:1822
+#: app.py:1857
 msgid "Файл данных успешно откреплен."
 msgstr "数据文件已成功分离。"
 
-#: app.py:1874
+#: app.py:1909
 msgid "Ошибка: ключи не совпадают."
 msgstr "错误：密钥不匹配。"
 
-#: app.py:1879
+#: app.py:1914
 msgid "Ошибка: новый ключ не может быть пустым."
 msgstr "错误：新密钥不能为空。"
 
-#: app.py:1886
+#: app.py:1921
 msgid "Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet."
 msgstr "错误：密钥格式不正确。密钥必须是Fernet格式。"
 
-#: app.py:1959
+#: app.py:1994
 #, python-format
 msgid ""
 "✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
 "Резервная копия сохранена как: %(backup_filename)s"
 msgstr "✅ 密钥已成功更改！已创建新数据文件：%(new_filename)s。 备份保存为：%(backup_filename)s"
 
-#: app.py:1995
+#: app.py:2030
 msgid "Необходимо выбрать файл и указать ключ для проверки."
 msgstr "必须选择文件并指定密钥进行验证。"
 
-#: app.py:1999
+#: app.py:2034
 msgid "Неверный тип файла. Выберите файл .enc"
 msgstr "文件类型无效。选择.enc文件"
 
-#: app.py:2006
+#: app.py:2041
 msgid "❌ Некорректный формат ключа Fernet."
 msgstr "❌ Fernet密钥格式不正确。"
 
-#: app.py:2037
+#: app.py:2072
 #, python-format
 msgid ""
 "✅ Ключ подходит! Найдено серверов: %(server_count)s. Провайдеры: "
 "%(provider_list)s. Серверы: %(name_preview)s"
 msgstr "✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
 
-#: app.py:2039
+#: app.py:2074
 msgid "✅ Ключ подходит, но структура данных неожиданная."
 msgstr "✅ 密钥有效，但数据结构意外。"
 
-#: app.py:2042
+#: app.py:2077
 msgid "❌ Ключ не подходит к этому файлу данных."
 msgstr "❌ 密钥与此数据文件不匹配。"
 
-#: app.py:2044
+#: app.py:2079
 msgid "❌ Файл расшифрован, но содержит некорректные JSON данные."
 msgstr "❌ 文件已解密，但包含无效的JSON数据。"
 
-#: app.py:2072
+#: app.py:2107
 #, python-format
 msgid "Язык изменен на %(lang)s"
 msgstr "语言已更改为 %(lang)s"
@@ -166,7 +166,6 @@ msgid "Дата выпуска:"
 msgstr "发布日期："
 
 #: templates/about.html:13
-#, fuzzy
 msgid "Разработчик:"
 msgstr "开发者："
 
@@ -181,50 +180,44 @@ msgid "Добавить сервер"
 msgstr "添加服务器"
 
 #: templates/add_server.html:7
-#, fuzzy
 msgid "Добавить новый сервер"
-msgstr "添加第一个服务器"
+msgstr "添加新服务器"
 
 #: templates/add_server.html:12 templates/edit_server.html:12
-#, fuzzy
 msgid "Основная информация"
-msgstr "IP信息"
+msgstr "基本信息"
 
 #: templates/add_server.html:15 templates/edit_server.html:15
-#, fuzzy
 msgid "Название сервера"
-msgstr "添加服务器"
+msgstr "服务器名称"
 
 #: templates/add_server.html:16
-#, fuzzy
 msgid "Например, VPS-1"
-msgstr "例如"
+msgstr "例如，VPS-1"
 
 #: templates/add_server.html:19 templates/edit_server.html:19
 msgid "Хостинг-провайдер"
-msgstr ""
+msgstr "托管提供商"
 
 #: templates/add_server.html:20
-#, fuzzy
 msgid "Например, Hetzner"
-msgstr "例如"
+msgstr "例如，Hetzner"
 
 #: templates/add_server.html:24 templates/edit_server.html:24
 msgid "IP-адрес"
-msgstr ""
+msgstr "IP地址"
 
 #: templates/add_server.html:25
-#, fuzzy
 msgid "Например, 1.2.3.4"
-msgstr "例如"
+msgstr "例如，1.2.3.4"
 
 #: templates/add_server.html:28 templates/edit_server.html:28
 msgid "Операционная система"
-msgstr ""
+msgstr "操作系统"
 
 #: templates/add_server.html:29 templates/edit_server.html:29
 msgid "Например, Ubuntu 22.04"
-msgstr ""
+msgstr "例如，Ubuntu 22.04"
 
 #: templates/add_server.html:34 templates/edit_server.html:34
 #: templates/index.html:107
@@ -233,111 +226,103 @@ msgstr "状态"
 
 #: templates/add_server.html:36 templates/edit_server.html:36
 msgid "Активен"
-msgstr ""
+msgstr "活跃"
 
 #: templates/add_server.html:37 templates/edit_server.html:37
 msgid "Неактивен"
-msgstr ""
+msgstr "非活跃"
 
 #: templates/add_server.html:38
-#, fuzzy
 msgid "Заблокирован"
-msgstr "登录被阻止"
+msgstr "已阻止"
 
 #: templates/add_server.html:44
-#, fuzzy
 msgid "URL панели управления"
-msgstr "VPS控制面板"
+msgstr "控制面板URL"
 
 #: templates/add_server.html:45 templates/add_server.html:134
 msgid "Например, http://1.2.3.4:2053/panel"
-msgstr ""
+msgstr "例如，http://1.2.3.4:2053/panel"
 
 #: templates/add_server.html:48 templates/edit_server.html:64
 msgid "Оформление карточки"
-msgstr ""
+msgstr "卡片设计"
 
 #: templates/add_server.html:51 templates/edit_server.html:67
 msgid "Цвет карточки"
-msgstr ""
+msgstr "卡片颜色"
 
 #: templates/add_server.html:55
-#, fuzzy
 msgid "Иконка сервера"
-msgstr "服务器列表"
+msgstr "服务器图标"
 
 #: templates/add_server.html:60 templates/edit_server.html:82
 msgid "Характеристики сервера"
-msgstr ""
+msgstr "服务器规格"
 
 #: templates/add_server.html:63
 msgid "CPU"
-msgstr ""
+msgstr "CPU"
 
 #: templates/add_server.html:64
-#, fuzzy
 msgid "Например, 4 vCPU"
-msgstr "例如"
+msgstr "例如，4 vCPU"
 
 #: templates/add_server.html:67
 msgid "RAM"
-msgstr ""
+msgstr "内存"
 
 #: templates/add_server.html:68
-#, fuzzy
 msgid "Например, 8GB"
-msgstr "例如"
+msgstr "例如，8GB"
 
 #: templates/add_server.html:71 templates/edit_server.html:93
 msgid "Диск"
-msgstr ""
+msgstr "磁盘"
 
 #: templates/add_server.html:72
 msgid "Например, 100GB SSD"
-msgstr ""
+msgstr "例如，100GB SSD"
 
 #: templates/add_server.html:76 templates/edit_server.html:98
-#, fuzzy
 msgid "Платёжная информация"
-msgstr "IP信息"
+msgstr "付款信息"
 
 #: templates/add_server.html:79
 msgid "Сумма"
-msgstr ""
+msgstr "金额"
 
 #: templates/add_server.html:83 templates/edit_server.html:105
 msgid "Валюта"
-msgstr ""
+msgstr "货币"
 
 #: templates/add_server.html:84
-#, fuzzy
 msgid "Например, USD"
-msgstr "例如"
+msgstr "例如，USD"
 
 #: templates/add_server.html:87
-#, fuzzy
 msgid "Следующая оплата"
 msgstr "下次付款"
 
 #: templates/add_server.html:91 templates/edit_server.html:113
 msgid "Период оплаты"
-msgstr ""
+msgstr "付款周期"
 
 #: templates/add_server.html:93 templates/edit_server.html:116
 msgid "Месяц"
-msgstr ""
+msgstr "月"
 
 #: templates/add_server.html:94 templates/edit_server.html:117
 msgid "3 месяца"
-msgstr ""
+msgstr "3个月"
 
 #: templates/add_server.html:95 templates/edit_server.html:118
 msgid "Год"
-msgstr ""
+msgstr "年"
 
 #: templates/add_server.html:96 templates/edit_server.html:119
 msgid "Бессрочно"
-msgstr ""
+msgstr "永久"
 
 #: templates/add_server.html:101 templates/edit_server.html:129
 #: templates/index.html:195
@@ -345,33 +330,28 @@ msgid "SSH-доступ"
 msgstr "SSH访问"
 
 #: templates/add_server.html:104 templates/edit_server.html:132
-#, fuzzy
 msgid "Пользователь SSH"
-msgstr "用户"
+msgstr "SSH用户"
 
 #: templates/add_server.html:105
-#, fuzzy
 msgid "Например, root"
-msgstr "例如"
+msgstr "例如，root"
 
 #: templates/add_server.html:108
-#, fuzzy
 msgid "Пароль SSH"
-msgstr "密码"
+msgstr "SSH密码"
 
 #: templates/add_server.html:109
-#, fuzzy
 msgid "Введите пароль"
-msgstr "输入PIN"
+msgstr "输入密码"
 
 #: templates/add_server.html:112 templates/edit_server.html:141
-#, fuzzy
 msgid "Порт SSH"
-msgstr "SSH登录"
+msgstr "SSH端口"
 
 #: templates/add_server.html:113
 msgid "По умолчанию 22"
-msgstr ""
+msgstr "默认22"
 
 #: templates/add_server.html:118
 #, fuzzy
@@ -390,30 +370,30 @@ msgstr ""
 #: templates/add_server.html:131 templates/edit_server.html:161
 #, fuzzy
 msgid "Панель управления (3x-ui и др.)"
-msgstr "VPS控制面板"
+msgstr "控制面板 (3x-ui等)"
 
 #: templates/add_server.html:133 templates/edit_server.html:163
 msgid "URL панели"
-msgstr ""
+msgstr "面板URL"
 
 #: templates/add_server.html:138 templates/edit_server.html:168
 msgid "Логин панели"
-msgstr ""
+msgstr "面板登录名"
 
 #: templates/add_server.html:139
 #, fuzzy
 msgid "Например, admin"
-msgstr "例如"
+msgstr "例如，admin"
 
 #: templates/add_server.html:142
 #, fuzzy
 msgid "Пароль панели"
-msgstr "密码"
+msgstr "面板密码"
 
 #: templates/add_server.html:143
 #, fuzzy
 msgid "Введите пароль панели"
-msgstr "密码"
+msgstr "输入面板密码"
 
 #: templates/add_server.html:147 templates/edit_server.html:178
 #: templates/index.html:152
@@ -422,96 +402,88 @@ msgstr "主机商面板"
 
 #: templates/add_server.html:149 templates/edit_server.html:180
 msgid "URL кабинета"
-msgstr ""
+msgstr "账户URL"
 
 #: templates/add_server.html:150
 msgid "Например, https://my.hoster.com"
-msgstr ""
+msgstr "例如，https://my.hoster.com"
 
 #: templates/add_server.html:154 templates/edit_server.html:185
 msgid "Способ входа"
-msgstr ""
+msgstr "登录方式"
 
 #: templates/add_server.html:156 templates/edit_server.html:187
 msgid "По логину/паролю"
-msgstr ""
+msgstr "用户名/密码"
 
 #: templates/add_server.html:157 templates/edit_server.html:188
 msgid "Через Google"
-msgstr ""
+msgstr "通过Google"
 
 #: templates/add_server.html:158 templates/edit_server.html:189
 msgid "Через Apple"
-msgstr ""
+msgstr "通过Apple"
 
 #: templates/add_server.html:159 templates/edit_server.html:190
 msgid "Другой"
-msgstr ""
+msgstr "其他"
 
 #: templates/add_server.html:165 templates/add_server.html:341
 #: templates/edit_server.html:196 templates/edit_server.html:333
-#, fuzzy
 msgid "Логин хостера"
-msgstr "主机商面板"
+msgstr "主机商登录名"
 
 #: templates/add_server.html:166
 msgid "Например, user@example.com"
-msgstr ""
+msgstr "例如，user@example.com"
 
 #: templates/add_server.html:169
-#, fuzzy
 msgid "Пароль хостера"
-msgstr "主机商面板"
+msgstr "主机商密码"
 
 #: templates/add_server.html:170
-#, fuzzy
 msgid "Введите пароль хостера"
-msgstr "主机商面板"
+msgstr "输入主机商密码"
 
 #: templates/add_server.html:174 templates/edit_server.html:44
 msgid "Результаты проверок"
-msgstr ""
+msgstr "检查结果"
 
 #: templates/add_server.html:180 templates/edit_server.html:50
 msgid "DNS-тест пройден (нет утечек)"
-msgstr ""
+msgstr "DNS测试通过（无泄漏）"
 
 #: templates/add_server.html:188
 msgid "Стриминг-тест пройден (например, 9Now)"
-msgstr ""
+msgstr "流媒体测试通过（例如9Now）"
 
 #: templates/add_server.html:194
-#, fuzzy
 msgid "Загрузка файлов"
-msgstr "加载中..."
+msgstr "文件上传"
 
 #: templates/add_server.html:196
 msgid "Загрузить чек об оплате"
-msgstr ""
+msgstr "上传付款收据"
 
 #: templates/add_server.html:201 templates/edit_server.html:217
 msgid "Дополнительная информация"
-msgstr ""
+msgstr "附加信息"
 
 #: templates/add_server.html:203 templates/edit_server.html:219
-#, fuzzy
 msgid "Заметки"
-msgstr "替换"
+msgstr "备注"
 
 #: templates/add_server.html:204
-#, fuzzy
 msgid "Введите заметки"
-msgstr "替换"
+msgstr "输入备注"
 
 #: templates/add_server.html:207 templates/edit_server.html:223
-#, fuzzy
 msgid "Информация о Docker"
-msgstr "IP信息"
+msgstr "Docker信息"
 
 #: templates/add_server.html:208
-#, fuzzy
 msgid "Информация о Docker-контейнерах"
-msgstr "IP信息"
+msgstr "Docker容器信息"
 
 #: templates/add_server.html:211 templates/add_server.html:226
 #: templates/cheatsheet.html:28 templates/edit_server.html:227
@@ -520,11 +492,11 @@ msgstr "已安装软件"
 
 #: templates/add_server.html:212
 msgid "Установленное ПО, например: nginx, docker, fail2ban"
-msgstr ""
+msgstr "已安装的软件，例如：nginx, docker, fail2ban"
 
 #: templates/add_server.html:215
 msgid "Сохранить"
-msgstr ""
+msgstr "保存"
 
 #: templates/add_server.html:216 templates/edit_server.html:232
 #: templates/index_locked.html:117 templates/index_locked.html:151
@@ -536,37 +508,33 @@ msgstr "取消"
 
 #: templates/add_server.html:222
 msgid "Подсказки по командам (Debian/Ubuntu)"
-msgstr ""
+msgstr "命令提示 (Debian/Ubuntu)"
 
 #: templates/add_server.html:232 templates/cheatsheet.html:57
 msgid "Ключевые утилиты"
 msgstr "关键工具"
 
 #: templates/add_server.html:250
-#, fuzzy
 msgid "Управление службами"
-msgstr "服务管理 (systemd)"
+msgstr "服务管理"
 
 #: templates/add_server.html:260
-#, fuzzy
 msgid "Управление пакетами"
-msgstr "包管理 (apt)"
+msgstr "软件包管理"
 
 #: templates/add_server.html:270
-#, fuzzy
 msgid "Безопасность"
-msgstr "安全基础"
+msgstr "安全"
 
 #: templates/add_server.html:341 templates/edit_server.html:336
 msgid "Email для входа"
-msgstr ""
+msgstr "登录电子邮件"
 
 #: templates/add_server.html:341
 msgid "Логин / Email"
-msgstr ""
+msgstr "登录名 / 电子邮件"
 
 #: templates/add_server.html:341
-#, fuzzy
 msgid "Ошибка копирования: "
 msgstr "复制错误："
 
@@ -588,16 +556,6 @@ msgstr "本节汇集了用于快速评估服务器状态的最有用命令。"
 #: templates/cheatsheet.html:12
 msgid "Быстрая сводка"
 msgstr "快速摘要"
-
-#: templates/cheatsheet.html:20 templates/cheatsheet.html:65
-#: templates/cheatsheet.html:74 templates/cheatsheet.html:83
-#: templates/cheatsheet.html:92 templates/cheatsheet.html:101
-#: templates/cheatsheet.html:110 templates/cheatsheet.html:119
-#: templates/cheatsheet.html:128 templates/cheatsheet.html:145
-#: templates/cheatsheet.html:154
-#, fuzzy
-msgid "Копировать"
-msgstr "复制"
 
 #: templates/cheatsheet.html:32
 msgid "Показать все установленные пакеты:"
@@ -730,15 +688,16 @@ msgstr "进程管理"
 
 #: templates/cheatsheet.html:234
 msgid "Показать все запущенные процессы"
-msgstr "显示所有运行中的进程"
+msgstr "显示所有正在运行的进程"
 
 #: templates/cheatsheet.html:241
 msgid "Интерактивный монитор процессов"
 msgstr "交互式进程监视器"
 
 #: templates/cheatsheet.html:241
-msgid "более удобен, если установлен"
-msgstr "如果已安装则更方便"
+#, fuzzy
+msgid "htop более удобен, если установлен"
+msgstr "如果已安装 htop，更加方便"
 
 #: templates/cheatsheet.html:248
 msgid "Найти процесс по имени"
@@ -769,7 +728,7 @@ msgstr "禁用服务自动启动："
 #: templates/cheatsheet.html:287
 #, fuzzy
 msgid "Управление пакетами (apt)"
-msgstr "包管理 (apt)"
+msgstr "软件包管理 (apt)"
 
 #: templates/cheatsheet.html:291
 msgid "Обновить список пакетов:"
@@ -935,7 +894,7 @@ msgstr ""
 #: templates/edit_server.html:285 templates/manage_hints.html:25
 #, fuzzy
 msgid "Добавить"
-msgstr "添加服务器"
+msgstr "添加"
 
 #: templates/edit_server.html:292
 msgid "Загруженные чеки"
@@ -1154,7 +1113,8 @@ msgid ""
 "которые ведут на внешние сервисы"
 msgstr "主页顶部有\"IP测试\"和\"DNS测试\"按钮，它们指向外部服务"
 
-#: templates/help.html:92
+#: templates/help.html:92 templates/help.html:534 templates/help.html:540
+#: templates/help.html:604
 msgid "и"
 msgstr "和"
 
@@ -1203,13 +1163,420 @@ msgid ""
 "9Now, Hulu, BBC iPlayer)."
 msgstr "每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
 
+#: templates/help.html:110 templates/help.html:114
+msgid "Хостинг"
+msgstr ""
+
+#: templates/help.html:111
+msgid ""
+"Это результат автоматической проверки. Приложение анализирует, кому "
+"принадлежит IP-адрес."
+msgstr ""
+
+#: templates/help.html:113
+msgid "Отлично. IP-адрес \"домашний\", такие адреса редко блокируются."
+msgstr ""
+
+#: templates/help.html:114
+msgid ""
+"Внимание. IP-адрес выдан дата-центром или VPN-провайдером. Вероятность "
+"блокировки на стриминговых платформах очень высока."
+msgstr ""
+
+#: templates/help.html:119
+msgid ""
+"Это результат ручной проверки, которую вы должны провести самостоятельно."
+" Многие стриминговые сервисы определяют ваше реальное местоположение "
+"через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
+"сервис поймет, что вы используете VPN."
+msgstr ""
+
+#: templates/help.html:121
+msgid "Статус неизвестен. Проверьте сервер на утечки DNS."
+msgstr ""
+
+#: templates/help.html:122
+msgid ""
+"Вы подтвердили, что утечек нет, установив галочку \"DNS-тест пройден\" в "
+"форме редактирования сервера."
+msgstr ""
+
+#: templates/help.html:126 templates/help.html:129 templates/index.html:136
+msgid "Стриминг ?"
+msgstr "流媒体 ?"
+
+#: templates/help.html:126 templates/help.html:130 templates/index.html:134
+msgid "Стриминг OK"
+msgstr "流媒体正常"
+
+#: templates/help.html:127
+msgid ""
+"Это также ручная отметка. Она нужна для подтверждения, что конкретный "
+"стриминговый сервис работает через этот сервер."
+msgstr ""
+
+#: templates/help.html:129
+msgid "Статус неизвестен. Вы еще не проверяли работу нужной платформы."
+msgstr ""
+
+#: templates/help.html:130
+msgid ""
+"Вы подтвердили, что сервис работает, установив галочку \"Стриминг-тест "
+"пройден\"."
+msgstr ""
+
 #: templates/help.html:141
 msgid "Управление данными и шифрование"
 msgstr "数据管理和加密"
 
+#: templates/help.html:146
+msgid ""
+"Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
+" обеспечивает как безопасность, так и портативность данных."
+msgstr ""
+
+#: templates/help.html:148 templates/help.html:198
+msgid "Как это работает?"
+msgstr ""
+
+#: templates/help.html:150
+msgid ""
+"Все данные о серверах, которые вы вводите, собираются вместе и "
+"преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
+"полностью шифруется и сохраняется в файл с расширением .enc."
+msgstr ""
+
+#: templates/help.html:153
+msgid ""
+"Можно представить это как подробный чертеж (ваши данные), который "
+"разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
+"Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
+"сможет восстановить исходный чертеж."
+msgstr ""
+
+#: templates/help.html:156
+#, fuzzy
+msgid "Импорт и Экспорт"
+msgstr "处理器信息"
+
+#: templates/help.html:157
+msgid "На странице \"Настройки\" вы можете:"
+msgstr ""
+
+#: templates/help.html:159
+#, fuzzy
+msgid "Экспортировать данные:"
+msgstr "导入数据"
+
+#: templates/help.html:159
+msgid ""
+"Скачать текущий зашифрованный файл (.enc). Это полезно для создания "
+"резервных копий или переноса данных на другое устройство."
+msgstr ""
+
+#: templates/help.html:160
+#, fuzzy
+msgid "Импортировать и прикрепить:"
+msgstr "导入数据"
+
+#: templates/help.html:160
+msgid ""
+"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
+"и все ваши серверы появятся в списке."
+msgstr ""
+
+#: templates/help.html:161
+#, fuzzy
+msgid "Открепить файл:"
+msgstr "解除文件绑定"
+
+#: templates/help.html:161
+msgid ""
+"Прекратить работу с текущим файлом. Список серверов станет пустым, как "
+"при первой установке. Сам файл при этом не удаляется."
+msgstr ""
+
+#: templates/help.html:164
+#, fuzzy
+msgid "Алгоритм шифрования Fernet"
+msgstr "加密密钥管理"
+
+#: templates/help.html:166
+msgid ""
+"Для защиты ваших данных используется Fernet — это высокоуровневая система"
+" симметричного (с секретным ключом) шифрования из библиотеки "
+"cryptography."
+msgstr ""
+
+#: templates/help.html:168
+msgid "Ключевые особенности Fernet:"
+msgstr ""
+
+#: templates/help.html:170
+msgid "Гарантия подлинности:"
+msgstr ""
+
+#: templates/help.html:170
+msgid ""
+"Fernet гарантирует, что зашифрованные данные не были изменены или "
+"подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
+" он не сможет быть расшифрован."
+msgstr ""
+
+#: templates/help.html:171
+msgid "Надежные алгоритмы:"
+msgstr ""
+
+#: templates/help.html:171
+msgid ""
+"\"Под капотом\" Fernet использует стандартные и проверенные временем "
+"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
+" SHA256 для аутентификации (проверки подлинности)."
+msgstr ""
+
+#: templates/help.html:174 templates/help.html:525 templates/help.html:673
+#: templates/index_locked.html:257 templates/settings.html:368
+msgid "Важно:"
+msgstr ""
+
+#: templates/help.html:174
+msgid ""
+"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
+" файле .env. Никогда и никому его не передавайте."
+msgstr ""
+
 #: templates/help.html:183
 msgid "Импорт из другой установки"
 msgstr "从其他安装导入"
+
+#: templates/help.html:188
+msgid ""
+"Эта функция позволяет перенести данные о серверах из другой установки VPN"
+" Server Manager, даже если у неё другой ключ шифрования."
+msgstr ""
+
+#: templates/help.html:190
+#, fuzzy
+msgid "Когда это нужно?"
+msgstr "所需内容："
+
+#: templates/help.html:192
+msgid ""
+"Вы настроили приложение на другом компьютере и хотите перенести данные на"
+" новый"
+msgstr ""
+
+#: templates/help.html:193
+msgid "У коллеги есть список серверов, и вы хотите добавить его к своему"
+msgstr ""
+
+#: templates/help.html:194
+msgid "Вы потеряли свой"
+msgstr ""
+
+#: templates/help.html:194
+msgid "файл, но у вас есть резервная копия ключа"
+msgstr ""
+
+#: templates/help.html:195
+msgid "Вы переустанавливали приложение и создался новый ключ шифрования"
+msgstr ""
+
+#: templates/help.html:200
+#, fuzzy
+msgid "Подготовка данных:"
+msgstr "导入数据"
+
+#: templates/help.html:200
+msgid "На исходном компьютере найдите два файла:"
+msgstr ""
+
+#: templates/help.html:202
+#, fuzzy
+msgid "Файл данных с расширением"
+msgstr "数据文件已成功分离。"
+
+#: templates/help.html:202
+msgid "(обычно в папке"
+msgstr ""
+
+#: templates/help.html:202 templates/help.html:203
+msgid ")"
+msgstr ""
+
+#: templates/help.html:203
+#, fuzzy
+msgid "Ключ шифрования из файла"
+msgstr "加密密钥管理"
+
+#: templates/help.html:203
+msgid "(строка типа"
+msgstr ""
+
+#: templates/help.html:206
+msgid "Перенос:"
+msgstr ""
+
+#: templates/help.html:206
+msgid ""
+"Скопируйте оба элемента на новый компьютер любым удобным способом "
+"(флешка, облако, email)"
+msgstr ""
+
+#: templates/help.html:207 templates/help.html:654
+msgid "Импорт:"
+msgstr "导入："
+
+#: templates/help.html:207
+msgid "На новом компьютере:"
+msgstr ""
+
+#: templates/help.html:209
+#, fuzzy
+msgid "Откройте раздел \"Настройки\" → \"Импорт из другой установки\""
+msgstr "从其他安装导入"
+
+#: templates/help.html:210 templates/index_locked.html:597
+#: templates/index_locked.html:734 templates/index_locked.html:808
+msgid "Выберите файл"
+msgstr ""
+
+#: templates/help.html:211
+#, fuzzy
+msgid "Вставьте ключ шифрования в текстовое поле"
+msgstr "粘贴用于验证的加密密钥"
+
+#: templates/help.html:212
+msgid "Нажмите \"Импортировать с внешним ключом\""
+msgstr ""
+
+#: templates/help.html:217
+#, fuzzy
+msgid "Где найти ключ шифрования?"
+msgstr "加密密钥管理"
+
+#: templates/help.html:218
+msgid "Ключ находится в файле"
+msgstr ""
+
+#: templates/help.html:218
+msgid "в корневой папке приложения:"
+msgstr ""
+
+#: templates/help.html:220
+msgid "На macOS:"
+msgstr ""
+
+#: templates/help.html:220
+#, fuzzy
+msgid "откройте файл"
+msgstr "解除文件绑定"
+
+#: templates/help.html:220
+msgid "в текстовом редакторе"
+msgstr ""
+
+#: templates/help.html:221
+msgid "В терминале:"
+msgstr ""
+
+#: templates/help.html:221
+msgid "выполните"
+msgstr ""
+
+#: templates/help.html:221
+#, fuzzy
+msgid "в папке приложения"
+msgstr "登录应用程序"
+
+#: templates/help.html:222
+#, fuzzy
+msgid "Формат ключа:"
+msgstr "信息："
+
+#: templates/help.html:222
+#, fuzzy
+msgid "строка вида"
+msgstr "设置"
+
+#: templates/help.html:224
+msgid "Скопируйте только значение после знака равенства"
+msgstr ""
+
+#: templates/help.html:224
+msgid "без"
+msgstr ""
+
+#: templates/help.html:226
+msgid "Что происходит при импорте?"
+msgstr ""
+
+#: templates/help.html:228
+msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
+msgstr ""
+
+#: templates/help.html:229
+msgid "Проверяет корректность данных"
+msgstr ""
+
+#: templates/help.html:230
+msgid "Зашифровывает данные заново с помощью вашего текущего ключа"
+msgstr ""
+
+#: templates/help.html:231
+msgid "Сохраняет в вашу систему и делает активными"
+msgstr ""
+
+#: templates/help.html:236
+msgid "Важные замечания:"
+msgstr ""
+
+#: templates/help.html:238
+#, fuzzy
+msgid "Импорт"
+msgstr "导入："
+
+#: templates/help.html:238
+#, fuzzy
+msgid "заменит"
+msgstr "替换"
+
+#: templates/help.html:238
+msgid "ваши текущие данные"
+msgstr ""
+
+#: templates/help.html:239
+msgid "Создайте резервную копию перед импортом"
+msgstr ""
+
+#: templates/help.html:240
+msgid ""
+"Внешний ключ не сохраняется в системе - он используется только для "
+"одноразового импорта"
+msgstr ""
+
+#: templates/help.html:241
+msgid "После импорта все данные будут зашифрованы вашим текущим ключом"
+msgstr ""
+
+#: templates/help.html:247 templates/help.html:562 templates/help.html:683
+#: templates/index_locked.html:24
+msgid "Совет:"
+msgstr "提示："
+
+#: templates/help.html:247
+msgid ""
+"Для регулярного обмена данными между установками рекомендуется "
+"использовать одинаковый"
+msgstr ""
+
+#: templates/help.html:247
+msgid "на всех устройствах. Тогда можно будет просто копировать"
+msgstr ""
+
+#: templates/help.html:247
+msgid "файлы без дополнительных действий."
+msgstr ""
 
 #: templates/help.html:256
 msgid "Что такое SECRET_KEY и где его взять?"
@@ -1231,25 +1598,812 @@ msgstr "在macOS上工作的特点"
 msgid "Особенности работы на Windows"
 msgstr "在Windows上工作的特点"
 
+#: templates/help.html:391
+msgid "В установленной версии приложения для Windows ("
+msgstr ""
+
+#: templates/help.html:391
+msgid ") данные хранятся в системной папке"
+msgstr ""
+
+#: templates/help.html:391
+msgid ", как и у большинства стандартных приложений."
+msgstr ""
+
+#: templates/help.html:393 templates/help.html:414
+#, fuzzy
+msgid "Расположение данных"
+msgstr "数据管理"
+
+#: templates/help.html:394 templates/help.html:415
+msgid "Все данные приложения (файл"
+msgstr ""
+
+#: templates/help.html:394 templates/help.html:415
+msgid ", конфигурация, загруженные чеки и иконки) находятся по пути:"
+msgstr ""
+
+#: templates/help.html:396
+msgid "Обычно этот путь раскрывается в"
+msgstr ""
+
+#: templates/help.html:396
+msgid ". Проще всего вставить"
+msgstr ""
+
+#: templates/help.html:396
+msgid "в адресную строку Проводника и нажать Enter."
+msgstr ""
+
+#: templates/help.html:398 templates/help.html:419
+#, fuzzy
+msgid "Версия для разработки"
+msgstr "开发者"
+
+#: templates/help.html:399 templates/help.html:420
+msgid ""
+"Если вы запускаете приложение из исходного кода, все данные хранятся "
+"прямо в папке проекта для удобства отладки."
+msgstr ""
+
 #: templates/help.html:407
 msgid "Особенности работы на Linux"
 msgstr "在Linux上工作的特点"
+
+#: templates/help.html:412
+msgid "В установленной версии приложения для Linux данные хранятся в директории"
+msgstr ""
+
+#: templates/help.html:412
+msgid ""
+"в вашей домашней папке, согласно стандартам XDG Base Directory "
+"Specification."
+msgstr ""
+
+#: templates/help.html:417
+#, fuzzy
+msgid "Папка"
+msgstr "帮助"
+
+#: templates/help.html:417
+msgid ""
+"является скрытой. Чтобы увидеть её в файловом менеджере, включите "
+"отображение скрытых файлов (обычно по нажатию"
+msgstr ""
+
+#: templates/help.html:417
+msgid ")."
+msgstr ""
 
 #: templates/help.html:428
 msgid "Создание и настройка иконок приложения"
 msgstr "创建和配置应用程序图标"
 
+#: templates/help.html:433
+msgid ""
+"Приложение поддерживает кастомные иконки для каждой операционной системы."
+" Это позволяет создать единый визуальный стиль на всех платформах."
+msgstr ""
+
+#: templates/help.html:435
+msgid "Требования к исходной иконке"
+msgstr ""
+
+#: templates/help.html:437
+msgid "Рекомендуется:"
+msgstr ""
+
+#: templates/help.html:437
+msgid "Используйте PNG файл размером"
+msgstr ""
+
+#: templates/help.html:437
+msgid "пикселей"
+msgstr ""
+
+#: templates/help.html:437
+msgid ""
+"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
+" включая Retina-дисплеи."
+msgstr ""
+
+#: templates/help.html:440 templates/help.html:521
+#, fuzzy
+msgid "Формат:"
+msgstr "信息："
+
+#: templates/help.html:440
+msgid "PNG с альфа-каналом (прозрачность)"
+msgstr ""
+
+#: templates/help.html:441
+msgid "Размер:"
+msgstr ""
+
+#: templates/help.html:441
+msgid "пикселей (квадрат)"
+msgstr ""
+
+#: templates/help.html:442
+msgid "Цветовая модель:"
+msgstr ""
+
+#: templates/help.html:442
+msgid "RGB"
+msgstr ""
+
+#: templates/help.html:443
+msgid "Расположение:"
+msgstr ""
+
+#: templates/help.html:446
+#, fuzzy
+msgid "Автоматическое создание иконок"
+msgstr "自动地理定位："
+
+#: templates/help.html:447
+msgid "При использовании скриптов сборки ("
+msgstr ""
+
+#: templates/help.html:447 templates/index.html:301
+msgid "или"
+msgstr "或"
+
+#: templates/help.html:447
+msgid ") иконки создаются автоматически из исходного PNG файла:"
+msgstr ""
+
+#: templates/help.html:449 templates/help.html:450
+msgid "Создается файл"
+msgstr ""
+
+#: templates/help.html:449
+msgid "со всеми необходимыми размерами"
+msgstr ""
+
+#: templates/help.html:450
+msgid "с множественными размерами"
+msgstr ""
+
+#: templates/help.html:453
+msgid "Ручное создание иконок"
+msgstr ""
+
+#: templates/help.html:454
+msgid "Если вы хотите создать иконки вручную или скрипты сборки не работают:"
+msgstr ""
+
+#: templates/help.html:456
+msgid "Для macOS (.icns)"
+msgstr ""
+
+#: templates/help.html:457
+msgid "Создайте временную папку и нарежьте иконку на нужные размеры:"
+msgstr ""
+
+#: templates/help.html:458
+msgid "Создайте временную папку"
+msgstr ""
+
+#: templates/help.html:461
+msgid "Создайте иконки разных размеров"
+msgstr ""
+
+#: templates/help.html:473
+#, fuzzy
+msgid "Создайте .icns файл"
+msgstr "创建PIN"
+
+#: templates/help.html:476
+msgid "Переместите результат и очистите временные файлы"
+msgstr ""
+
+#: templates/help.html:480
+msgid "Для Windows (.ico)"
+msgstr ""
+
+#: templates/help.html:481
+msgid "Используйте Python с библиотекой Pillow для создания .ico файла:"
+msgstr ""
+
+#: templates/help.html:482
+msgid "Установите Pillow, если не установлена"
+msgstr ""
+
+#: templates/help.html:485
+msgid "Создайте .ico файл"
+msgstr ""
+
+#: templates/help.html:498
+msgid "Замена иконки в уже собранном приложении"
+msgstr ""
+
+#: templates/help.html:499
+msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
+msgstr ""
+
+#: templates/help.html:501
+msgid "macOS"
+msgstr ""
+
+#: templates/help.html:503
+msgid "Найдите приложение в папке Applications"
+msgstr ""
+
+#: templates/help.html:504
+msgid "Кликните правой кнопкой мыши → \"Get Info\" (Свойства)"
+msgstr ""
+
+#: templates/help.html:505
+msgid "Перетащите новую иконку на маленькую иконку в левом верхнем углу окна"
+msgstr ""
+
+#: templates/help.html:506
+#, fuzzy
+msgid "Или замените файл"
+msgstr "替换"
+
+#: templates/help.html:506
+#, fuzzy
+msgid "напрямую"
+msgstr "例如"
+
+#: templates/help.html:509
+msgid "Windows"
+msgstr ""
+
+#: templates/help.html:511
+msgid "Найдите .exe файл приложения"
+msgstr ""
+
+#: templates/help.html:512
+msgid "Кликните правой кнопкой мыши → \"Properties\" → \"Change Icon\""
+msgstr ""
+
+#: templates/help.html:513
+msgid ""
+"Или используйте специальные утилиты для замены иконок в .exe файлах "
+"(например, Resource Hacker)"
+msgstr ""
+
+#: templates/help.html:516
+msgid "Советы по оптимизации"
+msgstr ""
+
+#: templates/help.html:518
+msgid "Простота:"
+msgstr ""
+
+#: templates/help.html:518
+msgid ""
+"Иконки должны быть читаемы в малых размерах (16x16). Избегайте мелких "
+"деталей."
+msgstr ""
+
+#: templates/help.html:519
+msgid "Контраст:"
+msgstr ""
+
+#: templates/help.html:519
+msgid "Используйте высокий контраст между элементами иконки и фоном."
+msgstr ""
+
+#: templates/help.html:520
+msgid "Тестирование:"
+msgstr ""
+
+#: templates/help.html:520
+msgid "Проверьте как иконка выглядит на разных фонах (светлом/темном)."
+msgstr ""
+
+#: templates/help.html:521
+msgid ""
+"Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
+"лучшую совместимость."
+msgstr ""
+
+#: templates/help.html:525
+msgid ""
+"После замены иконки может потребоваться перезагрузка системы или очистка "
+"кэша иконок, чтобы изменения стали видны в файловом менеджере."
+msgstr ""
+
+#: templates/help.html:528
+#, fuzzy
+msgid "Устранение проблем с иконками"
+msgstr "进程管理"
+
+#: templates/help.html:529
+msgid ""
+"Если иконки не отображаются или приложение собирается с дефектными "
+"иконками:"
+msgstr ""
+
+#: templates/help.html:531
+msgid "Проблема: Иконка не отображается в собранном приложении"
+msgstr ""
+
+#: templates/help.html:533
+msgid "Проверьте размер файла:"
+msgstr ""
+
+#: templates/help.html:533
+msgid "Убедитесь, что"
+msgstr ""
+
+#: templates/help.html:533
+msgid "имеет размер больше 1KB. Если файл всего несколько байт, он поврежден."
+msgstr ""
+
+#: templates/help.html:534 templates/help.html:549
+msgid "Пересоздайте иконки:"
+msgstr ""
+
+#: templates/help.html:534
+#, fuzzy
+msgid "Удалите"
+msgstr "删除"
+
+#: templates/help.html:534
+msgid "затем запустите сборку снова."
+msgstr ""
+
+#: templates/help.html:535
+msgid "Проверьте путь в build_macos.py:"
+msgstr ""
+
+#: templates/help.html:535
+msgid "Убедитесь, что путь"
+msgstr ""
+
+#: templates/help.html:535
+msgid "правильно указывает на"
+msgstr ""
+
+#: templates/help.html:538
+msgid "Проблема: Ошибка при автоматическом создании иконок"
+msgstr ""
+
+#: templates/help.html:540
+msgid "macOS:"
+msgstr ""
+
+#: templates/help.html:540
+msgid "Убедитесь, что утилиты"
+msgstr ""
+
+#: templates/help.html:540
+msgid "доступны в системе"
+msgstr ""
+
+#: templates/help.html:541
+msgid "Windows:"
+msgstr ""
+
+#: templates/help.html:541
+msgid "Установите библиотеку Pillow:"
+msgstr ""
+
+#: templates/help.html:542
+msgid "Права доступа:"
+msgstr ""
+
+#: templates/help.html:542
+msgid "Убедитесь, что у приложения есть права на запись в папку"
+msgstr ""
+
+#: templates/help.html:545
+msgid "Проблема: Иконка размыта или низкого качества"
+msgstr ""
+
+#: templates/help.html:547
+msgid "Увеличьте разрешение исходника:"
+msgstr ""
+
+#: templates/help.html:547
+msgid "Используйте PNG размером не менее 1024x1024 пикселей"
+msgstr ""
+
+#: templates/help.html:548
+msgid "Проверьте качество PNG:"
+msgstr ""
+
+#: templates/help.html:548
+msgid "Убедитесь, что исходный файл не сжат с потерями"
+msgstr ""
+
+#: templates/help.html:549
+msgid "Удалите старые иконки и пересоздайте их из нового PNG"
+msgstr ""
+
+#: templates/help.html:552
+#, fuzzy
+msgid "Диагностика проблем"
+msgstr "诊断和IP检查"
+
+#: templates/help.html:553
+msgid "Для диагностики проблем с иконками выполните следующие команды:"
+msgstr ""
+
+#: templates/help.html:554
+msgid "Проверьте размер и тип файлов иконок"
+msgstr ""
+
+#: templates/help.html:558
+#, fuzzy
+msgid "Проверьте исходный PNG"
+msgstr "确认新PIN"
+
+#: templates/help.html:562
+msgid ""
+"Если проблемы с иконками повторяются, создайте резервную копию рабочей "
+"иконки после успешной сборки. Это поможет быстро восстановить "
+"функциональность в случае проблем."
+msgstr ""
+
 #: templates/help.html:571
 msgid "Структура проекта и алгоритм работы"
 msgstr "项目结构和操作算法"
 
+#: templates/help.html:576
+msgid "Дерево Проекта"
+msgstr ""
+
+#: templates/help.html:597
+msgid "Описание Файлов и Директорий"
+msgstr ""
+
+#: templates/help.html:599
+msgid ""
+"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
+"интеграцию с PyWebView для создания окна."
+msgstr ""
+
+#: templates/help.html:600
+msgid "Скрипт для сборки приложения в"
+msgstr ""
+
+#: templates/help.html:600
+msgid "для macOS с помощью PyInstaller."
+msgstr ""
+
+#: templates/help.html:601
+msgid "Список всех библиотек Python, необходимых для работы."
+msgstr ""
+
+#: templates/help.html:602
+msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
+msgstr ""
+
+#: templates/help.html:603
+msgid "Самый важный файл. Это"
+msgstr ""
+
+#: templates/help.html:603
+#, fuzzy
+msgid "зашифрованный"
+msgstr "加密形式"
+
+#: templates/help.html:603
+msgid "JSON-файл, содержащий всю информацию о серверах."
+msgstr ""
+
+#: templates/help.html:604
+msgid ""
+"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
+"веб-интерфейса."
+msgstr ""
+
+#: templates/help.html:607
+msgid "Алгоритм Работы Программы"
+msgstr ""
+
+#: templates/help.html:609
+#, fuzzy
+msgid "Запуск"
+msgstr "首次运行"
+
+#: templates/help.html:609
+msgid ""
+"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
+"окно с помощью PyWebView."
+msgstr ""
+
+#: templates/help.html:610
+#, fuzzy
+msgid "Отображение"
+msgstr "显示密码："
+
+#: templates/help.html:610
+msgid "В окне загружается веб-страница. Flask расшифровывает данные из"
+msgstr ""
+
+#: templates/help.html:610
+msgid "и показывает их."
+msgstr ""
+
+#: templates/help.html:611
+#, fuzzy
+msgid "Взаимодействие"
+msgstr "选择操作："
+
+#: templates/help.html:611
+msgid ""
+"Все действия пользователя обрабатываются Flask, который изменяет данные и"
+" снова шифрует их."
+msgstr ""
+
+#: templates/help.html:612
+#, fuzzy
+msgid "Завершение"
+msgstr "替换"
+
+#: templates/help.html:612
+msgid ""
+"При закрытии окна PyWebView отправляет команду на выключение сервера "
+"Flask, который корректно завершает работу и освобождает порт."
+msgstr ""
+
 #: templates/help.html:621
 msgid "PIN-система защиты"
-msgstr "PIN保护系统"
+msgstr "PIN码保护系统"
+
+#: templates/help.html:626
+msgid ""
+"Приложение защищено PIN-кодом для дополнительной безопасности. Это "
+"обеспечивает защиту от несанкционированного доступа к вашим данным."
+msgstr "应用程序受PIN码保护，提供额外的安全性。这可以防止未经授权访问您的数据。"
+
+#: templates/help.html:628 templates/index_locked.html:37
+#: templates/index_locked.html:131
+msgid "Первый запуск"
+msgstr "首次启动"
+
+#: templates/help.html:629
+msgid ""
+"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У "
+"вас есть два варианта:"
+msgstr "首次启动应用程序时，您将看到\"访问受限\"屏幕。您有两个选择："
+
+#: templates/help.html:631
+#, fuzzy
+msgid "Создать новый PIN:"
+msgstr "创建新PIN码"
+
+#: templates/help.html:631
+msgid ""
+"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый "
+"PIN и сбросит все данные."
+msgstr "点击\"首次启动\"→\"创建新PIN码\"。这将创建新的PIN码并重置所有数据。"
+
+#: templates/help.html:632
+#, fuzzy
+msgid "Импортировать архив:"
+msgstr "从存档导入"
+
+#: templates/help.html:632
+msgid ""
+"Нажмите \"Первый запуск\" → \"Импортировать архив\". Это позволит "
+"восстановить данные из ранее созданного архива."
+msgstr "点击\"首次启动\"→\"导入存档\"。这将允许您从之前创建的存档中恢复数据。"
+
+#: templates/help.html:635
+msgid "Вход в приложение"
+msgstr "登录应用程序"
+
+#: templates/help.html:636
+msgid ""
+"После настройки PIN-кода для входа в приложение используйте один из "
+"способов:"
+msgstr "设置PIN码后，使用以下方法之一登录应用程序："
+
+#: templates/help.html:638
+msgid "Двойной клик по имени разработчика:"
+msgstr "双击开发者姓名："
+
+#: templates/help.html:638
+msgid ""
+"Внизу страницы найдите имя разработчика в футере и дважды кликните по "
+"нему."
+msgstr "在页面底部找到页脚中的开发者姓名，然后双击它。"
+
+#: templates/help.html:639
+#, fuzzy
+msgid "Через настройки:"
+msgstr "通过设置："
+
+#: templates/help.html:639
+msgid "Если вы уже вошли в систему, можете изменить PIN в разделе \"Настройки\"."
+msgstr "如果您已经登录，可以在\"设置\"部分更改PIN码。"
+
+#: templates/help.html:642
+#, fuzzy
+msgid "Безопасность PIN-кода"
+msgstr "PIN码安全性"
+
+#: templates/help.html:644
+msgid "Минимальная длина:"
+msgstr "最小长度："
+
+#: templates/help.html:644 templates/index_locked.html:218
+#: templates/index_locked.html:519 templates/index_locked.html:658
+msgid "PIN должен содержать минимум 4 символа"
+msgstr "PIN码必须至少包含4个字符"
+
+#: templates/help.html:645
+msgid "Защита от перебора:"
+msgstr "防暴力破解："
+
+#: templates/help.html:645
+msgid "После 2 неудачных попыток вход блокируется на 30 секунд"
+msgstr "2次失败尝试后，登录将被锁定30秒"
+
+#: templates/help.html:646
+#, fuzzy
+msgid "Автоматический счетчик:"
+msgstr "自动计数器："
+
+#: templates/help.html:646
+msgid "При блокировке на экране отображается обратный отсчет времени"
+msgstr "锁定时，屏幕上显示倒计时"
+
+#: templates/help.html:647
+msgid "Хранение:"
+msgstr "存储："
+
+#: templates/help.html:647
+msgid "PIN хранится в зашифрованном виде в файле конфигурации"
+msgstr "PIN码以加密形式存储在配置文件中"
+
+#: templates/help.html:650
+#, fuzzy
+msgid "Экспорт и импорт с PIN"
+msgstr "使用PIN码导出和导入"
+
+#: templates/help.html:651
+msgid ""
+"При использовании функции \"Полный экспорт\" PIN-код автоматически "
+"включается в архив:"
+msgstr "使用\"完整导出\"功能时，PIN码会自动包含在存档中："
+
+#: templates/help.html:653
+#, fuzzy
+msgid "Экспорт:"
+msgstr "导出："
+
+#: templates/help.html:653
+msgid "В созданный ZIP-архив добавляется файл"
+msgstr "创建的ZIP存档中添加了文件"
+
+#: templates/help.html:653
+#, fuzzy
+msgid "с вашим PIN-кодом"
+msgstr "包含您的PIN码"
+
+#: templates/help.html:654
+msgid "При импорте архива PIN автоматически извлекается и устанавливается"
+msgstr "导入存档时，PIN码会自动提取并设置"
+
+#: templates/help.html:655
+msgid "Показ PIN:"
+msgstr "显示PIN码："
+
+#: templates/help.html:655
+msgid "При импорте PIN отображается в отдельном окне для записи"
+msgstr "导入时，PIN码会在单独的窗口中显示以便记录"
+
+#: templates/help.html:658
+#, fuzzy
+msgid "Смена PIN-кода"
+msgstr "更改PIN码"
+
+#: templates/help.html:659
+#, fuzzy
+msgid "Для смены PIN-кода:"
+msgstr "要更改PIN码："
+
+#: templates/help.html:661
+msgid "Войдите в приложение"
+msgstr "登录应用程序"
+
+#: templates/help.html:662
+msgid "Перейдите в \"Настройки\""
+msgstr "转到\"设置\""
+
+#: templates/help.html:663
+msgid "Найдите раздел \"PIN-код\""
+msgstr "找到\"PIN码\"部分"
+
+#: templates/help.html:664
+#, fuzzy
+msgid "Введите старый PIN и новый PIN дважды"
+msgstr "输入旧PIN码和新PIN码两次"
+
+#: templates/help.html:665
+#, fuzzy
+msgid "Нажмите \"Сменить PIN\""
+msgstr "点击\"更改PIN码\""
+
+#: templates/help.html:668
+#, fuzzy
+msgid "Выход из системы"
+msgstr "退出登录"
+
+#: templates/help.html:669
+msgid ""
+"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели "
+"навигации. После выхода потребуется повторный ввод PIN-кода для доступа к"
+" данным."
+msgstr "要退出登录，请点击顶部导航栏中的\"退出\"按钮。退出后，需要重新输入PIN码才能访问数据。"
+
+#: templates/help.html:675
+msgid ""
+"Запишите PIN-код в надежном месте - без него вы не сможете получить "
+"доступ к данным"
+msgstr "将PIN码记在安全的地方 - 没有它，您将无法访问数据"
+
+#: templates/help.html:676
+msgid "При создании нового PIN все существующие данные будут удалены"
+msgstr "创建新PIN码时，所有现有数据将被删除"
+
+#: templates/help.html:677
+msgid ""
+"PIN-код не восстанавливается - если вы его забудете, потребуется "
+"создавать новый"
+msgstr "PIN码无法恢复 - 如果您忘记了它，需要创建新的PIN码"
+
+#: templates/help.html:683
+msgid ""
+"Для максимальной безопасности используйте PIN-код длиной 6-8 символов, "
+"содержащий цифры и буквы."
+msgstr "为了最大安全性，请使用6-8个字符长的PIN码，包含数字和字母。"
 
 #: templates/help.html:692
 msgid "Для разработчиков"
 msgstr "开发者"
+
+#: templates/help.html:697
+msgid "Ошибка `ModuleNotFoundError`"
+msgstr ""
+
+#: templates/help.html:698
+msgid "Если при запуске приложения из исходного кода ("
+msgstr ""
+
+#: templates/help.html:698
+msgid ") вы видите ошибку "
+msgstr ""
+
+#: templates/help.html:698
+msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
+msgstr ""
+
+#: templates/help.html:699
+msgid ""
+"Это происходит, когда в проект добавляется новая функциональность "
+"(например, как недавно был добавлен `pywebview`)."
+msgstr ""
+
+#: templates/help.html:700
+#, fuzzy
+msgid "Решение"
+msgstr "允许"
+
+#: templates/help.html:701
+msgid ""
+"Чтобы установить или обновить все зависимости, выполните в терминале "
+"следующую команду, находясь в папке проекта:"
+msgstr ""
+
+#: templates/help.html:703
+msgid "Эта команда прочитает файл"
+msgstr ""
+
+#: templates/help.html:703
+msgid ""
+"и установит точные версии всех библиотек, необходимых для корректной "
+"работы."
+msgstr ""
 
 #: templates/index.html:22
 msgid "Интернет доступен"
@@ -1325,14 +2479,6 @@ msgstr "DNS 正常"
 #: templates/index.html:129
 msgid "DNS ?"
 msgstr "DNS ?"
-
-#: templates/index.html:134
-msgid "Стриминг OK"
-msgstr "流媒体正常"
-
-#: templates/index.html:136
-msgid "Стриминг ?"
-msgstr "流媒体 ?"
 
 #: templates/index.html:142
 #, fuzzy
@@ -1445,10 +2591,6 @@ msgid "Добавьте первый"
 msgstr "添加第一个"
 
 #: templates/index.html:301
-msgid "или"
-msgstr "或"
-
-#: templates/index.html:301
 msgid "импортируйте данные"
 msgstr "导入数据"
 
@@ -1481,10 +2623,6 @@ msgid "Для доступа к данным серверов необходим
 msgstr "要访问服务器数据，需要输入PIN码。"
 
 #: templates/index_locked.html:24
-msgid "Совет:"
-msgstr "提示："
-
-#: templates/index_locked.html:24
 msgid ""
 "Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
 "для создания PIN-кода."
@@ -1497,10 +2635,6 @@ msgstr "登录被阻止"
 #: templates/index_locked.html:31 templates/index_locked.html:482
 msgid "секунд"
 msgstr "秒"
-
-#: templates/index_locked.html:37 templates/index_locked.html:131
-msgid "Первый запуск"
-msgstr "首次运行"
 
 #: templates/index_locked.html:44
 msgid ""
@@ -1633,11 +2767,6 @@ msgstr "新PIN码"
 msgid "Введите новый PIN (минимум 4 символа)"
 msgstr "输入新PIN（最少4个字符）"
 
-#: templates/index_locked.html:218 templates/index_locked.html:519
-#: templates/index_locked.html:658
-msgid "PIN должен содержать минимум 4 символа"
-msgstr "PIN必须包含至少4个字符"
-
 #: templates/index_locked.html:221
 msgid "Подтвердите PIN-код"
 msgstr "确认PIN码"
@@ -1660,10 +2789,6 @@ msgstr ""
 
 #: templates/index_locked.html:253
 msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
-msgstr ""
-
-#: templates/index_locked.html:257 templates/settings.html:368
-msgid "Важно:"
 msgstr ""
 
 #: templates/index_locked.html:257
@@ -1712,11 +2837,6 @@ msgstr ""
 
 #: templates/index_locked.html:548
 msgid "Произошла ошибка при смене PIN"
-msgstr ""
-
-#: templates/index_locked.html:597 templates/index_locked.html:734
-#: templates/index_locked.html:808
-msgid "Выберите файл"
 msgstr ""
 
 #: templates/index_locked.html:622
@@ -2407,4 +3527,7 @@ msgstr ""
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
+
+#~ msgid "Копировать"
+#~ msgstr "复制"
 
