@@ -101,10 +101,10 @@
                     </div>
                     <div class="col-md-4 mb-2">
                         <button class="btn btn-success w-100" onclick="showExportInfo('package')">
-                            <i class="bi bi-archive"></i> Полный экспорт
+                            <i class="bi bi-archive"></i> {{ _('Полный экспорт') }}
                         </button>
                         <small class="text-muted d-block mt-1">
-                            <i class="bi bi-key"></i> Включает PIN-код
+                            <i class="bi bi-key"></i> {{ _('Включает PIN-код') }}
                         </small>
                     </div>
                 </div>
@@ -112,9 +112,9 @@
                 <!-- Уведомление об экспорте -->
                 <div id="exportNotification" class="alert alert-info mt-3" style="display: none;">
                     <i class="bi bi-info-circle"></i> 
-                    <strong>Экспорт запущен!</strong> 
+                    <strong>{{ _('Экспорт запущен!') }}</strong> 
                     <span id="exportMessage"></span>
-                    <br><small>📁 Файл сохранится в папку с приложением VPN Server Manager.</small>
+                    <br><small>📁 {{ _('Файл сохранится в папку с приложением VPN Server Manager.') }}</small>
                 </div>
                 
                 <div class="mt-3">
@@ -181,7 +181,7 @@
 
                     <!-- Правая колонка: .env файл с SECRET_KEY -->
                     <div class="col-md-6">
-                        <h6 class="text-primary">.env файл с SECRET_KEY</h6>
+                        <h6 class="text-primary">{{ _('.env файл с SECRET_KEY') }}</h6>
                 <div class="mb-3">
                     <label for="externalKey" class="form-label">{{ _('Внешний ключ шифрования') }}</label>
                             <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="{{ _('Вставьте сюда ключ шифрования из файла .env другой установки (например: k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)') }}" required></textarea>

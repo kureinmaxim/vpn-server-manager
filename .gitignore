@@ -184,3 +184,7 @@ data/temp_*
 *.pyc
 *.pyo
 *.pyd 
+
+# Tutorial Folders
+github_basics_tutorials/
+github_cli_tutorials/ 

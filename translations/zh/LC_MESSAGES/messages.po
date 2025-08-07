@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-07 17:52+0300\n"
+"POT-Creation-Date: 2025-08-07 18:36+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -567,7 +567,7 @@ msgstr "查找特定包"
 
 #: templates/cheatsheet.html:39 templates/cheatsheet.html:46
 #: templates/cheatsheet.html:248 templates/cheatsheet.html:263
-#: templates/cheatsheet.html:301
+#: templates/cheatsheet.html:313
 msgid "замените"
 msgstr "替换"
 
@@ -711,47 +711,47 @@ msgstr "服务管理 (systemd)"
 msgid "Проверить статус службы"
 msgstr "检查服务状态"
 
-#: templates/cheatsheet.html:268
+#: templates/cheatsheet.html:270
 msgid "Перезапустить службу:"
 msgstr "重启服务："
 
-#: templates/cheatsheet.html:273
+#: templates/cheatsheet.html:277
 msgid "Включить автозапуск службы:"
 msgstr "启用服务自动启动："
 
-#: templates/cheatsheet.html:278
+#: templates/cheatsheet.html:284
 msgid "Выключить автозапуск службы:"
 msgstr "禁用服务自动启动："
 
-#: templates/cheatsheet.html:287
+#: templates/cheatsheet.html:295
 msgid "Управление пакетами (apt)"
 msgstr "软件包管理 (apt)"
 
-#: templates/cheatsheet.html:291
+#: templates/cheatsheet.html:299
 msgid "Обновить список пакетов:"
 msgstr "更新包列表："
 
-#: templates/cheatsheet.html:296
+#: templates/cheatsheet.html:306
 msgid "Обновить установленные пакеты:"
 msgstr "更新已安装的包："
 
-#: templates/cheatsheet.html:301
+#: templates/cheatsheet.html:313
 msgid "Установить пакет"
 msgstr "安装包"
 
-#: templates/cheatsheet.html:306
+#: templates/cheatsheet.html:320
 msgid "Удалить пакет:"
 msgstr "删除包："
 
-#: templates/cheatsheet.html:328
+#: templates/cheatsheet.html:344
 msgid "Скопировано!"
 msgstr "已复制！"
 
-#: templates/cheatsheet.html:338
+#: templates/cheatsheet.html:354
 msgid "Не удалось скопировать текст: "
 msgstr "复制文本失败："
 
-#: templates/cheatsheet.html:339
+#: templates/cheatsheet.html:355
 msgid "Ошибка при копировании"
 msgstr "复制时出错"
 
@@ -950,6 +950,10 @@ msgstr "复制文本失败："
 #: templates/edit_server.html:462
 msgid "Could not copy text:"
 msgstr ""
+
+#: templates/help.html:3 templates/layout.html:38
+msgid "Справка"
+msgstr "帮助"
 
 #: templates/help.html:8 templates/layout.html:41
 msgid "Справка по использованию"
@@ -1160,25 +1164,37 @@ msgid ""
 "9Now, Hulu, BBC iPlayer)."
 msgstr "每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
 
+#: templates/help.html:110 templates/help.html:113
+msgid "ISP/Residential"
+msgstr "ISP/住宅"
+
 #: templates/help.html:110 templates/help.html:114
 msgid "Хостинг"
-msgstr ""
+msgstr "主机"
 
 #: templates/help.html:111
 msgid ""
 "Это результат автоматической проверки. Приложение анализирует, кому "
 "принадлежит IP-адрес."
-msgstr ""
+msgstr "这是自动检查的结果。应用程序会分析IP地址的所有者。"
 
 #: templates/help.html:113
 msgid "Отлично. IP-адрес \"домашний\", такие адреса редко блокируются."
-msgstr ""
+msgstr "优秀。IP地址是\"住宅\"，这类地址很少被屏蔽。"
 
 #: templates/help.html:114
 msgid ""
 "Внимание. IP-адрес выдан дата-центром или VPN-провайдером. Вероятность "
 "блокировки на стриминговых платформах очень высока."
-msgstr ""
+msgstr "注意。IP地址由数据中心或VPN提供商颁发。在流媒体平台上被屏蔽的概率非常高。"
+
+#: templates/help.html:118 templates/help.html:121 templates/index.html:129
+msgid "DNS ?"
+msgstr "DNS ?"
+
+#: templates/help.html:118 templates/help.html:122 templates/index.html:127
+msgid "DNS OK"
+msgstr "DNS 正常"
 
 #: templates/help.html:119
 msgid ""
@@ -1186,17 +1202,17 @@ msgid ""
 " Многие стриминговые сервисы определяют ваше реальное местоположение "
 "через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
 "сервис поймет, что вы используете VPN."
-msgstr ""
+msgstr "这是您必须自己执行的手动检查的结果。许多流媒体服务通过DNS请求确定您的真实位置。如果它们\"泄漏\"（绕过您的VPN服务器），服务将知道您正在使用VPN。"
 
 #: templates/help.html:121
 msgid "Статус неизвестен. Проверьте сервер на утечки DNS."
-msgstr ""
+msgstr "状态未知。检查服务器是否存在DNS泄漏。"
 
 #: templates/help.html:122
 msgid ""
 "Вы подтвердили, что утечек нет, установив галочку \"DNS-тест пройден\" в "
 "форме редактирования сервера."
-msgstr ""
+msgstr "您已在服务器编辑表中勾选\"DNS测试通过\"框，确认没有泄漏。"
 
 #: templates/help.html:126 templates/help.html:129 templates/index.html:136
 msgid "Стриминг ?"
@@ -1210,17 +1226,17 @@ msgstr "流媒体正常"
 msgid ""
 "Это также ручная отметка. Она нужна для подтверждения, что конкретный "
 "стриминговый сервис работает через этот сервер."
-msgstr ""
+msgstr "这也是一个手动标记。需要它来确认特定的流媒体服务通过此服务器工作。"
 
 #: templates/help.html:129
 msgid "Статус неизвестен. Вы еще не проверяли работу нужной платформы."
-msgstr ""
+msgstr "状态未知。您尚未检查所需平台的运行情况。"
 
 #: templates/help.html:130
 msgid ""
 "Вы подтвердили, что сервис работает, установив галочку \"Стриминг-тест "
 "пройден\"."
-msgstr ""
+msgstr "您已通过勾选\"流媒体测试通过\"框确认该服务正在运行。"
 
 #: templates/help.html:141
 msgid "Управление данными и шифрование"
@@ -1230,18 +1246,18 @@ msgstr "数据管理和加密"
 msgid ""
 "Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
 " обеспечивает как безопасность, так и портативность данных."
-msgstr ""
+msgstr "有关您服务器的所有信息都存储在一个加密文件中，这既保证了安全性，又保证了数据的可移植性。"
 
 #: templates/help.html:148 templates/help.html:198
 msgid "Как это работает?"
-msgstr ""
+msgstr "它是如何工作的？"
 
 #: templates/help.html:150
 msgid ""
 "Все данные о серверах, которые вы вводите, собираются вместе и "
 "преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
 "полностью шифруется и сохраняется в файл с расширением .enc."
-msgstr ""
+msgstr "您输入的所有服务器数据都被收集并转换为单个文本块（JSON格式）。然后，该块被完全加密并保存到扩展名为.enc的文件中。"
 
 #: templates/help.html:153
 msgid ""
@@ -1249,98 +1265,99 @@ msgid ""
 "разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
 "Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
 "сможет восстановить исходный чертеж."
-msgstr ""
+msgstr "您可以把它想象成一张详细的蓝图（您的数据），被切成成千上万个小块，然后放进一个盒子里（.enc文件）。没有精确的组装说明（SECRET_KEY加密密钥），任何人都无法恢复原始蓝图。"
 
 #: templates/help.html:156
 #, fuzzy
 msgid "Импорт и Экспорт"
-msgstr "处理器信息"
+msgstr "导入和导出"
 
 #: templates/help.html:157
 msgid "На странице \"Настройки\" вы можете:"
-msgstr ""
+msgstr "在\"设置\"页面上，您可以："
 
 #: templates/help.html:159
 #, fuzzy
 msgid "Экспортировать данные:"
-msgstr "导入数据"
+msgstr "导出数据："
 
 #: templates/help.html:159
 msgid ""
 "Скачать текущий зашифрованный файл (.enc). Это полезно для создания "
 "резервных копий или переноса данных на другое устройство."
-msgstr ""
+msgstr "下载当前的加密文件（.enc）。这对于创建备份或将数据传输到另一台设备非常有用。"
 
 #: templates/help.html:160
 #, fuzzy
 msgid "Импортировать и прикрепить:"
-msgstr "导入数据"
+msgstr "导入并附加："
 
 #: templates/help.html:160
 msgid ""
 "Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
 "и все ваши серверы появятся в списке."
-msgstr ""
+msgstr "上传先前导出的文件。应用程序将开始使用它，您的所有服务器将出现在列表中。"
 
 #: templates/help.html:161
 #, fuzzy
 msgid "Открепить файл:"
-msgstr "解除文件绑定"
+msgstr "分离文件："
 
 #: templates/help.html:161
 msgid ""
 "Прекратить работу с текущим файлом. Список серверов станет пустым, как "
 "при первой установке. Сам файл при этом не удаляется."
-msgstr ""
+msgstr "停止使用当前文件。服务器列表将变为空，就像第一次安装时一样。文件本身不会被删除。"
 
 #: templates/help.html:164
 #, fuzzy
 msgid "Алгоритм шифрования Fernet"
-msgstr "加密密钥管理"
+msgstr "Fernet加密算法"
 
 #: templates/help.html:166
 msgid ""
 "Для защиты ваших данных используется Fernet — это высокоуровневая система"
 " симметричного (с секретным ключом) шифрования из библиотеки "
 "cryptography."
-msgstr ""
+msgstr "为了保护您的数据，我们使用了Fernet——这是一个来自密码学库的高级对称（带密钥）加密系统。"
 
 #: templates/help.html:168
 msgid "Ключевые особенности Fernet:"
-msgstr ""
+msgstr "Fernet的主要特点："
 
 #: templates/help.html:170
 msgid "Гарантия подлинности:"
-msgstr ""
+msgstr "真实性保证："
 
 #: templates/help.html:170
 msgid ""
 "Fernet гарантирует, что зашифрованные данные не были изменены или "
 "подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
 " он не сможет быть расшифрован."
-msgstr ""
+msgstr "Fernet保证加密数据没有被更改或篡改。如果有人试图更改.enc文件中的任何一个字符，它将无法解密。"
 
 #: templates/help.html:171
 msgid "Надежные алгоритмы:"
-msgstr ""
+msgstr "可靠的算法："
 
 #: templates/help.html:171
 msgid ""
 "\"Под капотом\" Fernet использует стандартные и проверенные временем "
 "криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
 " SHA256 для аутентификации (проверки подлинности)."
-msgstr ""
+msgstr "“在底层”，Fernet使用标准且经过时间考验的加密算法：用于加密的CBC模式下的AES-128和用于身份验证（真实性检查）的带SHA256的HMAC。"
 
-#: templates/help.html:174 templates/help.html:525 templates/help.html:673
-#: templates/index_locked.html:257 templates/settings.html:368
+#: templates/help.html:174 templates/help.html:287 templates/help.html:525
+#: templates/help.html:673 templates/index_locked.html:257
+#: templates/settings.html:368
 msgid "Важно:"
-msgstr ""
+msgstr "重要："
 
 #: templates/help.html:174
 msgid ""
 "Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
 " файле .env. Никогда и никому его не передавайте."
-msgstr ""
+msgstr "整个系统的安全性取决于您在.env文件中的SECRET_KEY的保密性。切勿与任何人分享。"
 
 #: templates/help.html:183
 msgid "Импорт из другой установки"
@@ -1350,75 +1367,75 @@ msgstr "从其他安装导入"
 msgid ""
 "Эта функция позволяет перенести данные о серверах из другой установки VPN"
 " Server Manager, даже если у неё другой ключ шифрования."
-msgstr ""
+msgstr "此功能允许您从另一个VPN服务器管理器安装中传输服务器数据，即使它具有不同的加密密钥。"
 
 #: templates/help.html:190
 #, fuzzy
 msgid "Когда это нужно?"
-msgstr "所需内容："
+msgstr "何时需要？"
 
 #: templates/help.html:192
 msgid ""
 "Вы настроили приложение на другом компьютере и хотите перенести данные на"
 " новый"
-msgstr ""
+msgstr "您已在另一台计算机上设置了该应用程序，并希望将数据传输到新计算机"
 
 #: templates/help.html:193
 msgid "У коллеги есть список серверов, и вы хотите добавить его к своему"
-msgstr ""
+msgstr "同事有一个服务器列表，您想将其添加到您的列表中"
 
 #: templates/help.html:194
 msgid "Вы потеряли свой"
-msgstr ""
+msgstr "您丢失了您的"
 
 #: templates/help.html:194
 msgid "файл, но у вас есть резервная копия ключа"
-msgstr ""
+msgstr "文件，但您有密钥的备份"
 
 #: templates/help.html:195
 msgid "Вы переустанавливали приложение и создался новый ключ шифрования"
-msgstr ""
+msgstr "您重新安装了应用程序并创建了新的加密密钥"
 
 #: templates/help.html:200
 #, fuzzy
 msgid "Подготовка данных:"
-msgstr "导入数据"
+msgstr "数据准备："
 
 #: templates/help.html:200
 msgid "На исходном компьютере найдите два файла:"
-msgstr ""
+msgstr "在源计算机上，找到两个文件："
 
 #: templates/help.html:202
 #, fuzzy
 msgid "Файл данных с расширением"
-msgstr "数据文件已成功分离。"
+msgstr "带扩展名的数据文件"
 
 #: templates/help.html:202
 msgid "(обычно в папке"
-msgstr ""
+msgstr "（通常在文件夹中"
 
 #: templates/help.html:202 templates/help.html:203
 msgid ")"
-msgstr ""
+msgstr "）"
 
 #: templates/help.html:203
 #, fuzzy
 msgid "Ключ шифрования из файла"
-msgstr "加密密钥管理"
+msgstr "文件中的加密密钥"
 
 #: templates/help.html:203
 msgid "(строка типа"
-msgstr ""
+msgstr "（类型行"
 
 #: templates/help.html:206
 msgid "Перенос:"
-msgstr ""
+msgstr "转移："
 
 #: templates/help.html:206
 msgid ""
 "Скопируйте оба элемента на новый компьютер любым удобным способом "
 "(флешка, облако, email)"
-msgstr ""
+msgstr "以任何方便的方式将两个项目复制到新计算机（U盘、云、电子邮件）"
 
 #: templates/help.html:207 templates/help.html:654
 msgid "Импорт:"
@@ -1426,135 +1443,135 @@ msgstr "导入："
 
 #: templates/help.html:207
 msgid "На новом компьютере:"
-msgstr ""
+msgstr "在新计算机上："
 
 #: templates/help.html:209
 #, fuzzy
 msgid "Откройте раздел \"Настройки\" → \"Импорт из другой установки\""
-msgstr "从其他安装导入"
+msgstr "打开\"设置\"→\"从其他安装导入\""
 
 #: templates/help.html:210 templates/index_locked.html:597
 #: templates/index_locked.html:734 templates/index_locked.html:808
 msgid "Выберите файл"
-msgstr ""
+msgstr "选择文件"
 
 #: templates/help.html:211
 #, fuzzy
 msgid "Вставьте ключ шифрования в текстовое поле"
-msgstr "粘贴用于验证的加密密钥"
+msgstr "将加密密钥粘贴到文本框中"
 
 #: templates/help.html:212
 msgid "Нажмите \"Импортировать с внешним ключом\""
-msgstr ""
+msgstr "点击\"使用外部密钥导入\""
 
 #: templates/help.html:217
 #, fuzzy
 msgid "Где найти ключ шифрования?"
-msgstr "加密密钥管理"
+msgstr "在哪里可以找到加密密钥？"
 
 #: templates/help.html:218
 msgid "Ключ находится в файле"
-msgstr ""
+msgstr "密钥在文件中"
 
 #: templates/help.html:218
 msgid "в корневой папке приложения:"
-msgstr ""
+msgstr "在应用程序的根文件夹中："
 
 #: templates/help.html:220
 msgid "На macOS:"
-msgstr ""
+msgstr "在macOS上："
 
 #: templates/help.html:220
 #, fuzzy
 msgid "откройте файл"
-msgstr "解除文件绑定"
+msgstr "打开文件"
 
 #: templates/help.html:220
 msgid "в текстовом редакторе"
-msgstr ""
+msgstr "在文本编辑器中"
 
 #: templates/help.html:221
 msgid "В терминале:"
-msgstr ""
+msgstr "在终端中："
 
 #: templates/help.html:221
 msgid "выполните"
-msgstr ""
+msgstr "执行"
 
 #: templates/help.html:221
 #, fuzzy
 msgid "в папке приложения"
-msgstr "登录应用程序"
+msgstr "在应用程序文件夹中"
 
 #: templates/help.html:222
 #, fuzzy
 msgid "Формат ключа:"
-msgstr "信息："
+msgstr "密钥格式："
 
 #: templates/help.html:222
 #, fuzzy
 msgid "строка вида"
-msgstr "设置"
+msgstr "类似行"
 
 #: templates/help.html:224
 msgid "Скопируйте только значение после знака равенства"
-msgstr ""
+msgstr "只复制等号后面的值"
 
 #: templates/help.html:224
 msgid "без"
-msgstr ""
+msgstr "不带"
 
 #: templates/help.html:226
 msgid "Что происходит при импорте?"
-msgstr ""
+msgstr "导入时会发生什么？"
 
 #: templates/help.html:228
 msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
-msgstr ""
+msgstr "应用程序使用提供的密钥解密外部文件"
 
 #: templates/help.html:229
 msgid "Проверяет корректность данных"
-msgstr ""
+msgstr "检查数据的正确性"
 
 #: templates/help.html:230
 msgid "Зашифровывает данные заново с помощью вашего текущего ключа"
-msgstr ""
+msgstr "使用您当前的密钥重新加密数据"
 
 #: templates/help.html:231
 msgid "Сохраняет в вашу систему и делает активными"
-msgstr ""
+msgstr "保存到您的系统并激活"
 
 #: templates/help.html:236
 msgid "Важные замечания:"
-msgstr ""
+msgstr "重要说明："
 
 #: templates/help.html:238
 #, fuzzy
 msgid "Импорт"
-msgstr "导入："
+msgstr "导入"
 
 #: templates/help.html:238
 #, fuzzy
 msgid "заменит"
-msgstr "替换"
+msgstr "将替换"
 
 #: templates/help.html:238
 msgid "ваши текущие данные"
-msgstr ""
+msgstr "您当前的数据"
 
 #: templates/help.html:239
 msgid "Создайте резервную копию перед импортом"
-msgstr ""
+msgstr "导入前创建备份"
 
 #: templates/help.html:240
 msgid ""
 "Внешний ключ не сохраняется в системе - он используется только для "
 "одноразового импорта"
-msgstr ""
+msgstr "外部密钥不会保存在系统中 - 它仅用于一次性导入"
 
 #: templates/help.html:241
 msgid "После импорта все данные будут зашифрованы вашим текущим ключом"
-msgstr ""
+msgstr "导入后，所有数据将使用您当前的密钥加密"
 
 #: templates/help.html:247 templates/help.html:562 templates/help.html:683
 #: templates/index_locked.html:24
@@ -1565,31 +1582,317 @@ msgstr "提示："
 msgid ""
 "Для регулярного обмена данными между установками рекомендуется "
 "использовать одинаковый"
-msgstr ""
+msgstr "为定期在安装之间交换数据，建议使用相同的"
 
 #: templates/help.html:247
 msgid "на всех устройствах. Тогда можно будет просто копировать"
-msgstr ""
+msgstr "在所有设备上。然后您就可以只复制"
 
 #: templates/help.html:247
 msgid "файлы без дополнительных действий."
-msgstr ""
+msgstr "文件而无需其他操作。"
 
 #: templates/help.html:256
 msgid "Что такое SECRET_KEY и где его взять?"
 msgstr "什么是SECRET_KEY以及如何获取？"
 
+#: templates/help.html:261
+msgid ""
+"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех "
+"данных в приложении. Он абсолютно необходим для работы."
+msgstr "<code>SECRET_KEY</code> 是您加密应用程序中所有数据的主密码。它对于操作至关重要。"
+
+#: templates/help.html:263
+msgid "Где находится:"
+msgstr "它在哪里："
+
+#: templates/help.html:263
+msgid "Ключ хранится в файле <code>.env</code> в корневой папке приложения."
+msgstr "密钥存储在应用程序根文件夹的 <code>.env</code> 文件中。"
+
+#: templates/help.html:264
+#, fuzzy
+msgid "Как сгенерировать:"
+msgstr "如何生成："
+
+#: templates/help.html:264
+msgid ""
+"Если вы запускаете приложение в первый раз, вам нужно создать его. Для "
+"этого можно использовать Python:"
+msgstr "如果您是第一次运行该应用程序，您需要创建它。为此，您可以使用 Python："
+
+#: templates/help.html:267
+msgid ""
+"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code>"
+" в таком виде:"
+msgstr "复制生成的长代码并将其以此形式粘贴到 <code>.env</code> 文件中："
+
+#: templates/help.html:268
+msgid "ваш_сгенерированный_ключ"
+msgstr "你的_生成_的_密钥"
+
+#: templates/help.html:270
+msgid "ВАЖНО:"
+msgstr "重要："
+
+#: templates/help.html:270
+msgid ""
+"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете "
+"доступ ко всем данным. Если вы переносите приложение, обязательно "
+"скопируйте файл <code>.env</code> вместе с остальными данными."
+msgstr ""
+"切勿与任何人分享此密钥！如果丢失，您将无法访问所有数据。如果您正在传输应用程序，请务必将 <code>.env</code> "
+"文件与其余数据一起复制。"
+
 #: templates/help.html:279
 msgid "Структура и перенос приложения на другой компьютер?"
-msgstr "应用程序结构和传输到另一台计算机？"
+msgstr "应用程序的结构以及如何将其传输到另一台计算机？"
+
+#: templates/help.html:284
+msgid ""
+"Перенос приложения со всеми серверами, чеками и настройками требует "
+"копирования нескольких ключевых файлов и папок."
+msgstr "传输包含所有服务器、收据和设置的应用程序需要复制几个关键文件和文件夹。"
+
+#: templates/help.html:287
+msgid ""
+"Эта инструкция предназначена для текущей \"портативной\" версии "
+"приложения. В будущем, для версий, установленных через инсталлятор "
+"(Windows, macOS), будет предусмотрен специальный механизм экспорта и "
+"импорта."
+msgstr "本说明适用于应用程序的当前\"便携式\"版本。将来，对于通过安装程序（Windows、macOS）安装的版本，将提供特殊的导出和导入机制。"
+
+#: templates/help.html:290
+msgid "Шаг 1: Что нужно скопировать"
+msgstr "步骤1：需要复制什么"
+
+#: templates/help.html:291
+msgid ""
+"Для полного переноса вам нужно скопировать <strong>3 ключевых "
+"элемента</strong> из папки проекта:"
+msgstr "要完全转移，您需要从项目文件夹中复制<strong>3个关键元素</strong>："
+
+#: templates/help.html:293
+msgid "Файл <code>.env</code>"
+msgstr "文件 <code>.env</code>"
+
+#: templates/help.html:293
+msgid ""
+"— самый важный файл! В нем содержится ваш уникальный "
+"<code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все "
+"данные будут утеряны.</strong>"
+msgstr ""
+"— "
+"最重要的文件！它包含您用于解密数据的唯一<code>SECRET_KEY</code>。<strong>没有它，所有数据都将丢失。</strong>"
+
+#: templates/help.html:294
+msgid "Папка <code>/data/</code>"
+msgstr "文件夹 <code>/data/</code>"
+
+#: templates/help.html:294
+msgid ""
+"— здесь хранится основной файл <code>servers.json.enc</code> со всей "
+"информацией о ваших серверах."
+msgstr "— 这里存储着包含您所有服务器信息的主文件<code>servers.json.enc</code>。"
+
+#: templates/help.html:295
+msgid "Папка <code>/uploads/</code>"
+msgstr "文件夹 <code>/uploads/</code>"
+
+#: templates/help.html:295
+msgid ""
+"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об "
+"оплате."
+msgstr "— 这里存放着您上传的所有文件：服务器图标和付款收据。"
+
+#: templates/help.html:298
+msgid "Шаг 2: Процесс переноса"
+msgstr "步骤2：转移过程"
+
+#: templates/help.html:300
+msgid ""
+"На старом компьютере создайте архив всей папки с приложением (например, "
+"<code>VPNserverManage.zip</code>). Это самый надежный способ ничего не "
+"забыть."
+msgstr "在旧电脑上，创建整个应用程序文件夹的存档（例如，<code>VPNserverManage.zip</code>）。这是确保不会忘记任何东西的最可靠方法。"
+
+#: templates/help.html:301
+msgid "Перенесите этот архив на новый компьютер и распакуйте его."
+msgstr "将此存档传输到新计算机并解压缩。"
+
+#: templates/help.html:302
+msgid "На новом компьютере выполните стандартную настройку:"
+msgstr "在新计算机上，执行标准设置："
+
+#: templates/help.html:304
+msgid "Создайте и активируйте виртуальное окружение."
+msgstr "创建并激活虚拟环境。"
+
+#: templates/help.html:305
+msgid ""
+"Установите зависимости командой <code>pip install -r "
+"requirements.txt</code>."
+msgstr "使用命令<code>pip install -r requirements.txt</code>安装依赖项。"
+
+#: templates/help.html:308
+msgid ""
+"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть"
+" на месте."
+msgstr "启动应用程序。您的所有数据，包括收据和图标，都应该在原位。"
+
+#: templates/help.html:311
+#, fuzzy
+msgid "Структура файлов проекта (для разработчиков)"
+msgstr "项目文件结构（供开发人员使用）"
+
+#: templates/help.html:312
+msgid "Для понимания, где что лежит:"
+msgstr "为了解各部分的位置："
+
+#: templates/help.html:314
+#, fuzzy
+msgid "Основной файл приложения."
+msgstr "主应用程序文件。"
+
+#: templates/help.html:315
+msgid "Утилита для полной расшифровки данных."
+msgstr "用于完全解密数据的实用程序。"
+
+#: templates/help.html:316
+msgid "Скрипты для сборки приложения."
+msgstr "用于构建应用程序的脚本。"
+
+#: templates/help.html:317
+msgid "Список зависимостей Python."
+msgstr "Python依赖项列表。"
+
+#: templates/help.html:318
+msgid "Ваш секретный ключ!"
+msgstr "您的密钥！"
+
+#: templates/help.html:319
+msgid ""
+"Здесь хранятся зашифрованные данные серверов "
+"(<code>servers.json.enc</code>)."
+msgstr "加密的服务器数据存储在此处（<code>servers.json.enc</code>）。"
+
+#: templates/help.html:320
+msgid "Загруженные файлы (чеки, иконки)."
+msgstr "上传的文件（收据、图标）。"
+
+#: templates/help.html:321
+msgid "HTML-шаблоны страниц."
+msgstr "HTML页面模板。"
+
+#: templates/help.html:322
+msgid ""
+"Статические файлы (CSS, изображения, иконки <code>.png</code> и "
+"<code>.icns</code>)."
+msgstr "静态文件（CSS、图像、图标<code>.png</code>和<code>.icns</code>）。"
 
 #: templates/help.html:331
 msgid "Как посмотреть все пароли сразу (расшифровка)?"
 msgstr "如何一次性查看所有密码（解密）？"
 
+#: templates/help.html:337
+msgid ""
+"Хотя приложение позволяет просматривать пароли по одному через интерфейс,"
+" может возникнуть ситуация, когда вам нужно получить доступ ко всем "
+"данным сразу в читаемом виде. Например, для резервного копирования в "
+"текстовый файл или для переноса в другую систему."
+msgstr "虽然应用程序允许您通过界面逐个查看密码，但有时您可能需要以可读格式一次性访问所有数据。例如，备份到文本文件或传输到另一个系统。"
+
+#: templates/help.html:340
+msgid ""
+"Для этой цели в корневой папке проекта существует специальный инструмент "
+"— <code>decrypt_tool.py</code>."
+msgstr "为此，项目根文件夹中有一个专用工具——<code>decrypt_tool.py</code>。"
+
+#: templates/help.html:343
+msgid "Что он делает?"
+msgstr "它有什么作用？"
+
+#: templates/help.html:345
+msgid ""
+"Этот скрипт использует ваш ключ <code>SECRET_KEY</code> из файла "
+"<code>.env</code> для полной расшифровки файла с данными "
+"<code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную "
+"структуру и расшифровывает все учетные данные: <strong>SSH, панель "
+"управления и кабинет хостера</strong>, после чего выводит все в терминал "
+"в структурированном виде."
+msgstr "此脚本使用您<code>.env</code>文件中的<code>SECRET_KEY</code>来完全解密数据文件<code>data/servers.json.enc</code>。它能正确处理嵌套结构并解密所有凭据：<strong>SSH、控制面板和主机帐户</strong>，然后以结构化形式将所有内容输出到终端。"
+
+#: templates/help.html:348
+#, fuzzy
+msgid "Как использовать?"
+msgstr "如何使用？"
+
+#: templates/help.html:350
+msgid ""
+"Вам нужно выполнить одну команду в терминале, находясь в корневой папке "
+"проекта:"
+msgstr "您需要在项目的根文件夹中，在终端中执行一个命令："
+
+#: templates/help.html:353
+msgid ""
+"Эта команда сначала активирует необходимое виртуальное окружение, а затем"
+" запускает скрипт для расшифровки."
+msgstr "此命令首先激活必要的虚拟环境，然后运行解密脚本。"
+
+#: templates/help.html:356
+msgid "Внимание:"
+msgstr "注意："
+
+#: templates/help.html:356
+msgid ""
+"Выводимые данные (включая все пароли) будут видны в вашем терминале. "
+"Убедитесь, что вы делаете это в безопасной обстановке, где никто не "
+"сможет увидеть ваш экран."
+msgstr "输出数据（包括所有密码）将在您的终端中可见。请确保您在安全的环境中执行此操作，以免他人看到您的屏幕。"
+
 #: templates/help.html:365
 msgid "Особенности работы на macOS"
 msgstr "在macOS上工作的特点"
+
+#: templates/help.html:370
+msgid ""
+"В установленной версии приложения для macOS данные хранятся в "
+"пользовательской директории для соответствия стандартам безопасности "
+"Apple."
+msgstr "在macOS应用程序的安装版本中，数据存储在用户目录中，以符合Apple的安全标准。"
+
+#: templates/help.html:372 templates/help.html:393 templates/help.html:414
+#, fuzzy
+msgid "Расположение данных"
+msgstr "数据位置"
+
+#: templates/help.html:373
+msgid ""
+"Все данные приложения (файл <code>servers.json.enc</code>, конфигурация, "
+"загруженные чеки и иконки) находятся по пути:"
+msgstr "所有应用程序数据（文件<code>servers.json.enc</code>、配置、上传的收据和图标）都位于以下路径："
+
+#: templates/help.html:375
+msgid ""
+"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню "
+"«Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите "
+"появившийся пункт «Library». В открывшейся папке далее перейдите в "
+"«Application Support», а затем в «VPNServerManager»."
+msgstr ""
+"要快速进入此文件夹：打开Finder，点击\"前往\"菜单，按住<code>Option "
+"(⌥)</code>键，然后选择出现的\"资源库\"项。在打开的文件夹中，接着进入\"Application "
+"Support\"，然后进入\"VPNServerManager\"。"
+
+#: templates/help.html:377 templates/help.html:398 templates/help.html:419
+#, fuzzy
+msgid "Версия для разработки"
+msgstr "开发版本"
+
+#: templates/help.html:378 templates/help.html:399 templates/help.html:420
+msgid ""
+"Если вы запускаете приложение из исходного кода, все данные хранятся "
+"прямо в папке проекта для удобства отладки."
+msgstr "如果您从源代码运行应用程序，所有数据都直接存储在项目文件夹中，以方便调试。"
 
 #: templates/help.html:386
 msgid "Особенности работы на Windows"
@@ -1597,51 +1900,35 @@ msgstr "在Windows上工作的特点"
 
 #: templates/help.html:391
 msgid "В установленной версии приложения для Windows ("
-msgstr ""
+msgstr "在Windows应用程序的安装版本中（"
 
 #: templates/help.html:391
 msgid ") данные хранятся в системной папке"
-msgstr ""
+msgstr "），数据存储在系统文件夹中"
 
 #: templates/help.html:391
 msgid ", как и у большинства стандартных приложений."
-msgstr ""
-
-#: templates/help.html:393 templates/help.html:414
-#, fuzzy
-msgid "Расположение данных"
-msgstr "数据管理"
+msgstr "，与大多数标准应用程序一样。"
 
 #: templates/help.html:394 templates/help.html:415
 msgid "Все данные приложения (файл"
-msgstr ""
+msgstr "所有应用程序数据（文件"
 
 #: templates/help.html:394 templates/help.html:415
 msgid ", конфигурация, загруженные чеки и иконки) находятся по пути:"
-msgstr ""
+msgstr "、配置、上传的收据和图标）都位于以下路径："
 
 #: templates/help.html:396
 msgid "Обычно этот путь раскрывается в"
-msgstr ""
+msgstr "通常，此路径会解析为"
 
 #: templates/help.html:396
 msgid ". Проще всего вставить"
-msgstr ""
+msgstr "。最简单的方法是插入"
 
 #: templates/help.html:396
 msgid "в адресную строку Проводника и нажать Enter."
-msgstr ""
-
-#: templates/help.html:398 templates/help.html:419
-#, fuzzy
-msgid "Версия для разработки"
-msgstr "开发者"
-
-#: templates/help.html:399 templates/help.html:420
-msgid ""
-"Если вы запускаете приложение из исходного кода, все данные хранятся "
-"прямо в папке проекта для удобства отладки."
-msgstr ""
+msgstr "到资源管理器的地址栏中，然后按Enter。"
 
 #: templates/help.html:407
 msgid "Особенности работы на Linux"
@@ -1649,28 +1936,28 @@ msgstr "在Linux上工作的特点"
 
 #: templates/help.html:412
 msgid "В установленной версии приложения для Linux данные хранятся в директории"
-msgstr ""
+msgstr "在Linux应用程序的安装版本中，数据存储在目录中"
 
 #: templates/help.html:412
 msgid ""
 "в вашей домашней папке, согласно стандартам XDG Base Directory "
 "Specification."
-msgstr ""
+msgstr "在您的主文件夹中，符合XDG基本目录规范。"
 
 #: templates/help.html:417
 #, fuzzy
 msgid "Папка"
-msgstr "帮助"
+msgstr "文件夹"
 
 #: templates/help.html:417
 msgid ""
 "является скрытой. Чтобы увидеть её в файловом менеджере, включите "
 "отображение скрытых файлов (обычно по нажатию"
-msgstr ""
+msgstr "是隐藏的。要在文件管理器中看到它，请启用显示隐藏文件（通常按"
 
 #: templates/help.html:417
 msgid ")."
-msgstr ""
+msgstr "）。"
 
 #: templates/help.html:428
 msgid "Создание и настройка иконок приложения"
@@ -1680,67 +1967,67 @@ msgstr "创建和配置应用程序图标"
 msgid ""
 "Приложение поддерживает кастомные иконки для каждой операционной системы."
 " Это позволяет создать единый визуальный стиль на всех платформах."
-msgstr ""
+msgstr "该应用程序支持每个操作系统的自定义图标。这使您可以在所有平台上创建统一的视觉风格。"
 
 #: templates/help.html:435
 msgid "Требования к исходной иконке"
-msgstr ""
+msgstr "对源图标的要求"
 
 #: templates/help.html:437
 msgid "Рекомендуется:"
-msgstr ""
+msgstr "推荐："
 
 #: templates/help.html:437
 msgid "Используйте PNG файл размером"
-msgstr ""
+msgstr "使用大小为"
 
 #: templates/help.html:437
 msgid "пикселей"
-msgstr ""
+msgstr "像素的PNG文件"
 
 #: templates/help.html:437
 msgid ""
 "с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
 " включая Retina-дисплеи."
-msgstr ""
+msgstr "带透明背景。这将确保在所有设备上（包括Retina显示屏）获得最佳质量。"
 
 #: templates/help.html:440 templates/help.html:521
 #, fuzzy
 msgid "Формат:"
-msgstr "信息："
+msgstr "格式："
 
 #: templates/help.html:440
 msgid "PNG с альфа-каналом (прозрачность)"
-msgstr ""
+msgstr "带alpha通道的PNG（透明度）"
 
 #: templates/help.html:441
 msgid "Размер:"
-msgstr ""
+msgstr "大小："
 
 #: templates/help.html:441
 msgid "пикселей (квадрат)"
-msgstr ""
+msgstr "像素（方形）"
 
 #: templates/help.html:442
 msgid "Цветовая модель:"
-msgstr ""
+msgstr "颜色模型："
 
 #: templates/help.html:442
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: templates/help.html:443
 msgid "Расположение:"
-msgstr ""
+msgstr "位置："
 
 #: templates/help.html:446
 #, fuzzy
 msgid "Автоматическое создание иконок"
-msgstr "自动地理定位："
+msgstr "自动创建图标"
 
 #: templates/help.html:447
 msgid "При использовании скриптов сборки ("
-msgstr ""
+msgstr "使用构建脚本时（"
 
 #: templates/help.html:447 templates/index.html:301
 msgid "или"
@@ -1748,193 +2035,203 @@ msgstr "或"
 
 #: templates/help.html:447
 msgid ") иконки создаются автоматически из исходного PNG файла:"
-msgstr ""
+msgstr "），图标会从源PNG文件自动创建："
 
 #: templates/help.html:449 templates/help.html:450
 msgid "Создается файл"
-msgstr ""
+msgstr "创建文件"
 
 #: templates/help.html:449
 msgid "со всеми необходимыми размерами"
-msgstr ""
+msgstr "包含所有必要尺寸"
 
 #: templates/help.html:450
 msgid "с множественными размерами"
-msgstr ""
+msgstr "包含多种尺寸"
 
 #: templates/help.html:453
 msgid "Ручное создание иконок"
-msgstr ""
+msgstr "手动创建图标"
 
 #: templates/help.html:454
 msgid "Если вы хотите создать иконки вручную или скрипты сборки не работают:"
-msgstr ""
+msgstr "如果您想手动创建图标或构建脚本不起作用："
 
 #: templates/help.html:456
 msgid "Для macOS (.icns)"
-msgstr ""
+msgstr "对于macOS (.icns)"
 
 #: templates/help.html:457
 msgid "Создайте временную папку и нарежьте иконку на нужные размеры:"
-msgstr ""
+msgstr "创建一个临时文件夹，并将图标切割成所需尺寸："
 
 #: templates/help.html:458
 msgid "Создайте временную папку"
-msgstr ""
+msgstr "创建临时文件夹"
 
 #: templates/help.html:461
 msgid "Создайте иконки разных размеров"
-msgstr ""
+msgstr "创建不同尺寸的图标"
 
 #: templates/help.html:473
 #, fuzzy
 msgid "Создайте .icns файл"
-msgstr "创建PIN"
+msgstr "创建.icns文件"
 
 #: templates/help.html:476
 msgid "Переместите результат и очистите временные файлы"
-msgstr ""
+msgstr "移动结果并清除临时文件"
 
 #: templates/help.html:480
 msgid "Для Windows (.ico)"
-msgstr ""
+msgstr "对于Windows (.ico)"
 
 #: templates/help.html:481
 msgid "Используйте Python с библиотекой Pillow для создания .ico файла:"
-msgstr ""
+msgstr "使用Python和Pillow库创建.ico文件："
 
 #: templates/help.html:482
 msgid "Установите Pillow, если не установлена"
-msgstr ""
+msgstr "如果未安装Pillow，请安装它"
 
 #: templates/help.html:485
 msgid "Создайте .ico файл"
-msgstr ""
+msgstr "创建.ico文件"
+
+#: templates/help.html:493
+#, fuzzy
+msgid "Создан .ico файл:"
+msgstr "已创建.ico文件："
+
+#: templates/help.html:495
+#, fuzzy
+msgid "PNG файл не найден:"
+msgstr "未找到PNG文件："
 
 #: templates/help.html:498
 msgid "Замена иконки в уже собранном приложении"
-msgstr ""
+msgstr "在已构建的应用程序中替换图标"
 
 #: templates/help.html:499
 msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
-msgstr ""
+msgstr "如果您想在不重新构建的情况下替换已完成应用程序中的图标："
 
 #: templates/help.html:501
 msgid "macOS"
-msgstr ""
+msgstr "macOS"
 
 #: templates/help.html:503
 msgid "Найдите приложение в папке Applications"
-msgstr ""
+msgstr "在\"应用程序\"文件夹中找到该应用程序"
 
 #: templates/help.html:504
 msgid "Кликните правой кнопкой мыши → \"Get Info\" (Свойства)"
-msgstr ""
+msgstr "右键单击→\"获取信息\"（属性）"
 
 #: templates/help.html:505
 msgid "Перетащите новую иконку на маленькую иконку в левом верхнем углу окна"
-msgstr ""
+msgstr "将新图标拖到窗口左上角的小图标上"
 
 #: templates/help.html:506
 #, fuzzy
 msgid "Или замените файл"
-msgstr "替换"
+msgstr "或替换文件"
 
 #: templates/help.html:506
 #, fuzzy
 msgid "напрямую"
-msgstr "例如"
+msgstr "直接"
 
 #: templates/help.html:509
 msgid "Windows"
-msgstr ""
+msgstr "Windows"
 
 #: templates/help.html:511
 msgid "Найдите .exe файл приложения"
-msgstr ""
+msgstr "找到应用程序的.exe文件"
 
 #: templates/help.html:512
 msgid "Кликните правой кнопкой мыши → \"Properties\" → \"Change Icon\""
-msgstr ""
+msgstr "右键单击→\"属性\"→\"更改图标\""
 
 #: templates/help.html:513
 msgid ""
 "Или используйте специальные утилиты для замены иконок в .exe файлах "
 "(например, Resource Hacker)"
-msgstr ""
+msgstr "或使用专用工具替换.exe文件中的图标（例如Resource Hacker）"
 
 #: templates/help.html:516
 msgid "Советы по оптимизации"
-msgstr ""
+msgstr "优化技巧"
 
 #: templates/help.html:518
 msgid "Простота:"
-msgstr ""
+msgstr "简洁性："
 
 #: templates/help.html:518
 msgid ""
 "Иконки должны быть читаемы в малых размерах (16x16). Избегайте мелких "
 "деталей."
-msgstr ""
+msgstr "图标应在小尺寸（16x16）下清晰可读。避免微小细节。"
 
 #: templates/help.html:519
 msgid "Контраст:"
-msgstr ""
+msgstr "对比度："
 
 #: templates/help.html:519
 msgid "Используйте высокий контраст между элементами иконки и фоном."
-msgstr ""
+msgstr "在图标元素和背景之间使用高对比度。"
 
 #: templates/help.html:520
 msgid "Тестирование:"
-msgstr ""
+msgstr "测试："
 
 #: templates/help.html:520
 msgid "Проверьте как иконка выглядит на разных фонах (светлом/темном)."
-msgstr ""
+msgstr "检查图标在不同背景（浅色/深色）下的显示效果。"
 
 #: templates/help.html:521
 msgid ""
 "Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
 "лучшую совместимость."
-msgstr ""
+msgstr "始终使用带透明度的PNG作为源文件——这将确保最佳兼容性。"
 
 #: templates/help.html:525
 msgid ""
 "После замены иконки может потребоваться перезагрузка системы или очистка "
 "кэша иконок, чтобы изменения стали видны в файловом менеджере."
-msgstr ""
+msgstr "更换图标后，可能需要重新启动系统或清除图标缓存，才能在文件管理器中看到更改。"
 
 #: templates/help.html:528
 #, fuzzy
 msgid "Устранение проблем с иконками"
-msgstr "进程管理"
+msgstr "图标问题排查"
 
 #: templates/help.html:529
 msgid ""
 "Если иконки не отображаются или приложение собирается с дефектными "
 "иконками:"
-msgstr ""
+msgstr "如果图标不显示或应用程序构建时图标有缺陷："
 
 #: templates/help.html:531
 msgid "Проблема: Иконка не отображается в собранном приложении"
-msgstr ""
+msgstr "问题：构建的应用程序中不显示图标"
 
 #: templates/help.html:533
 msgid "Проверьте размер файла:"
-msgstr ""
+msgstr "检查文件大小："
 
 #: templates/help.html:533
 msgid "Убедитесь, что"
-msgstr ""
+msgstr "确保"
 
 #: templates/help.html:533
 msgid "имеет размер больше 1KB. Если файл всего несколько байт, он поврежден."
-msgstr ""
+msgstr "的大小大于1KB。如果文件只有几个字节，则说明它已损坏。"
 
 #: templates/help.html:534 templates/help.html:549
 msgid "Пересоздайте иконки:"
-msgstr ""
+msgstr "重新创建图标："
 
 #: templates/help.html:534
 #, fuzzy
@@ -1943,203 +2240,203 @@ msgstr "删除"
 
 #: templates/help.html:534
 msgid "затем запустите сборку снова."
-msgstr ""
+msgstr "然后再次运行构建。"
 
 #: templates/help.html:535
 msgid "Проверьте путь в build_macos.py:"
-msgstr ""
+msgstr "检查build_macos.py中的路径："
 
 #: templates/help.html:535
 msgid "Убедитесь, что путь"
-msgstr ""
+msgstr "确保路径"
 
 #: templates/help.html:535
 msgid "правильно указывает на"
-msgstr ""
+msgstr "正确指向"
 
 #: templates/help.html:538
 msgid "Проблема: Ошибка при автоматическом создании иконок"
-msgstr ""
+msgstr "问题：自动创建图标时出错"
 
 #: templates/help.html:540
 msgid "macOS:"
-msgstr ""
+msgstr "macOS："
 
 #: templates/help.html:540
 msgid "Убедитесь, что утилиты"
-msgstr ""
+msgstr "确保工具"
 
 #: templates/help.html:540
 msgid "доступны в системе"
-msgstr ""
+msgstr "在系统中可用"
 
 #: templates/help.html:541
 msgid "Windows:"
-msgstr ""
+msgstr "Windows："
 
 #: templates/help.html:541
 msgid "Установите библиотеку Pillow:"
-msgstr ""
+msgstr "安装Pillow库："
 
 #: templates/help.html:542
 msgid "Права доступа:"
-msgstr ""
+msgstr "访问权限："
 
 #: templates/help.html:542
 msgid "Убедитесь, что у приложения есть права на запись в папку"
-msgstr ""
+msgstr "确保应用程序有权写入文件夹"
 
 #: templates/help.html:545
 msgid "Проблема: Иконка размыта или низкого качества"
-msgstr ""
+msgstr "问题：图标模糊或质量低"
 
 #: templates/help.html:547
 msgid "Увеличьте разрешение исходника:"
-msgstr ""
+msgstr "增加源文件分辨率："
 
 #: templates/help.html:547
 msgid "Используйте PNG размером не менее 1024x1024 пикселей"
-msgstr ""
+msgstr "使用不小于1024x1024像素的PNG"
 
 #: templates/help.html:548
 msgid "Проверьте качество PNG:"
-msgstr ""
+msgstr "检查PNG质量："
 
 #: templates/help.html:548
 msgid "Убедитесь, что исходный файл не сжат с потерями"
-msgstr ""
+msgstr "确保源文件未进行有损压缩"
 
 #: templates/help.html:549
 msgid "Удалите старые иконки и пересоздайте их из нового PNG"
-msgstr ""
+msgstr "删除旧图标并从新的PNG重新创建"
 
 #: templates/help.html:552
 #, fuzzy
 msgid "Диагностика проблем"
-msgstr "诊断和IP检查"
+msgstr "问题诊断"
 
 #: templates/help.html:553
 msgid "Для диагностики проблем с иконками выполните следующие команды:"
-msgstr ""
+msgstr "要诊断图标问题，请执行以下命令："
 
 #: templates/help.html:554
 msgid "Проверьте размер и тип файлов иконок"
-msgstr ""
+msgstr "检查图标文件的大小和类型"
 
 #: templates/help.html:558
 #, fuzzy
 msgid "Проверьте исходный PNG"
-msgstr "确认新PIN"
+msgstr "检查源PNG"
 
 #: templates/help.html:562
 msgid ""
 "Если проблемы с иконками повторяются, создайте резервную копию рабочей "
 "иконки после успешной сборки. Это поможет быстро восстановить "
 "функциональность в случае проблем."
-msgstr ""
+msgstr "如果图标问题仍然存在，请在成功构建后创建工作图标的备份。这将有助于在出现问题时快速恢复功能。"
 
 #: templates/help.html:571
 msgid "Структура проекта и алгоритм работы"
-msgstr "项目结构和操作算法"
+msgstr "项目结构和工作流程"
 
 #: templates/help.html:576
 msgid "Дерево Проекта"
-msgstr ""
+msgstr "项目树"
 
 #: templates/help.html:597
 msgid "Описание Файлов и Директорий"
-msgstr ""
+msgstr "文件和目录说明"
 
 #: templates/help.html:599
 msgid ""
 "Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
 "интеграцию с PyWebView для создания окна."
-msgstr ""
+msgstr "应用程序的核心。包含Flask Web服务器、加密逻辑以及与PyWebView的集成以创建窗口。"
 
 #: templates/help.html:600
 msgid "Скрипт для сборки приложения в"
-msgstr ""
+msgstr "用于在"
 
 #: templates/help.html:600
 msgid "для macOS с помощью PyInstaller."
-msgstr ""
+msgstr "中使用PyInstaller为macOS构建应用程序的脚本。"
 
 #: templates/help.html:601
 msgid "Список всех библиотек Python, необходимых для работы."
-msgstr ""
+msgstr "运行所需的所有Python库的列表。"
 
 #: templates/help.html:602
 msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
-msgstr ""
+msgstr "设置文件，存储有关版本和外部服务URL的信息。"
 
 #: templates/help.html:603
 msgid "Самый важный файл. Это"
-msgstr ""
+msgstr "最重要的文件。这是"
 
 #: templates/help.html:603
 #, fuzzy
 msgid "зашифрованный"
-msgstr "加密形式"
+msgstr "加密的"
 
 #: templates/help.html:603
 msgid "JSON-файл, содержащий всю информацию о серверах."
-msgstr ""
+msgstr "包含所有服务器信息的JSON文件。"
 
 #: templates/help.html:604
 msgid ""
 "Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
 "веб-интерфейса."
-msgstr ""
+msgstr "包含静态资源（CSS、图像）和Web界面HTML模板的文件夹。"
 
 #: templates/help.html:607
 msgid "Алгоритм Работы Программы"
-msgstr ""
+msgstr "程序工作流程"
 
 #: templates/help.html:609
 #, fuzzy
 msgid "Запуск"
-msgstr "首次运行"
+msgstr "启动"
 
 #: templates/help.html:609
 msgid ""
 "`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
 "окно с помощью PyWebView."
-msgstr ""
+msgstr "`app.py`在后台线程中启动Flask Web服务器，并使用PyWebView创建本机窗口。"
 
 #: templates/help.html:610
 #, fuzzy
 msgid "Отображение"
-msgstr "显示密码："
+msgstr "显示"
 
 #: templates/help.html:610
 msgid "В окне загружается веб-страница. Flask расшифровывает данные из"
-msgstr ""
+msgstr "在窗口中加载网页。Flask解密来自"
 
 #: templates/help.html:610
 msgid "и показывает их."
-msgstr ""
+msgstr "的数据并显示它们。"
 
 #: templates/help.html:611
 #, fuzzy
 msgid "Взаимодействие"
-msgstr "选择操作："
+msgstr "互动"
 
 #: templates/help.html:611
 msgid ""
 "Все действия пользователя обрабатываются Flask, который изменяет данные и"
 " снова шифрует их."
-msgstr ""
+msgstr "所有用户操作都由Flask处理，它会更改数据并再次加密。"
 
 #: templates/help.html:612
 #, fuzzy
 msgid "Завершение"
-msgstr "替换"
+msgstr "完成"
 
 #: templates/help.html:612
 msgid ""
 "При закрытии окна PyWebView отправляет команду на выключение сервера "
 "Flask, который корректно завершает работу и освобождает порт."
-msgstr ""
+msgstr "关闭窗口时，PyWebView会发送关闭Flask服务器的命令，该服务器会正确终止并释放端口。"
 
 #: templates/help.html:621
 msgid "PIN-система защиты"
@@ -2357,54 +2654,53 @@ msgstr "为了最大安全性，请使用6-8个字符长的PIN码，包含数字
 
 #: templates/help.html:692
 msgid "Для разработчиков"
-msgstr "开发者"
+msgstr "给开发者"
 
 #: templates/help.html:697
 msgid "Ошибка `ModuleNotFoundError`"
-msgstr ""
+msgstr "错误 `ModuleNotFoundError`"
 
 #: templates/help.html:698
 msgid "Если при запуске приложения из исходного кода ("
-msgstr ""
+msgstr "如果从源代码运行应用程序时("
 
 #: templates/help.html:698
 msgid ") вы видите ошибку "
-msgstr ""
+msgstr ") 您看到错误 "
 
 #: templates/help.html:698
 msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
-msgstr ""
+msgstr "，这意味着您的环境中缺少必需的库。"
 
 #: templates/help.html:699
 msgid ""
 "Это происходит, когда в проект добавляется новая функциональность "
 "(например, как недавно был добавлен `pywebview`)."
-msgstr ""
+msgstr "当新功能被添加到项目中时（例如，最近添加了 `pywebview`），就会发生这种情况。"
 
 #: templates/help.html:700
-#, fuzzy
 msgid "Решение"
-msgstr "允许"
+msgstr "解决方案"
 
 #: templates/help.html:701
 msgid ""
 "Чтобы установить или обновить все зависимости, выполните в терминале "
 "следующую команду, находясь в папке проекта:"
-msgstr ""
+msgstr "要安装或更新所有依赖项，请在项目文件夹中的终端中执行以下命令："
 
 #: templates/help.html:703
 msgid "Эта команда прочитает файл"
-msgstr ""
+msgstr "该命令将读取文件"
 
 #: templates/help.html:703
 msgid ""
 "и установит точные версии всех библиотек, необходимых для корректной "
 "работы."
-msgstr ""
+msgstr "并安装正确操作所需的所有库的确切版本。"
 
 #: templates/index.html:22
 msgid "Интернет доступен"
-msgstr "网络可用"
+msgstr "互联网可用"
 
 #: templates/index.html:26
 msgid "Нет интернета"
@@ -2468,14 +2764,6 @@ msgstr "N/A"
 #: templates/index.html:103
 msgid "След. платёж"
 msgstr "下次付款"
-
-#: templates/index.html:127
-msgid "DNS OK"
-msgstr "DNS 正常"
-
-#: templates/index.html:129
-msgid "DNS ?"
-msgstr "DNS ?"
 
 #: templates/index.html:142
 #, fuzzy
@@ -2890,10 +3178,6 @@ msgstr "VPS管理器"
 msgid "Настройки"
 msgstr "设置"
 
-#: templates/layout.html:38
-msgid "Справка"
-msgstr "帮助"
-
 #: templates/layout.html:42 templates/manage_hints.html:3
 #: templates/manage_hints.html:7
 msgid "Управление подсказками"
@@ -3062,6 +3346,24 @@ msgstr "导入数据"
 msgid "Экспортировать ключ"
 msgstr "导入数据"
 
+#: templates/settings.html:104
+#, fuzzy
+msgid "Полный экспорт"
+msgstr "导入和导出"
+
+#: templates/settings.html:107
+#, fuzzy
+msgid "Включает PIN-код"
+msgstr "新PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr ""
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr ""
+
 #: templates/settings.html:121
 msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
 msgstr "您确定要解除数据文件的绑定吗？服务器列表将为空。"
@@ -3129,6 +3431,10 @@ msgstr "servers.json.enc文件"
 #: templates/settings.html:178
 msgid "Выберать зашифрованный файл данных из другой установки"
 msgstr "选择来自其他安装的加密数据文件"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
 
 #: templates/settings.html:186
 #, fuzzy
@@ -3525,6 +3831,5183 @@ msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
 
-#~ msgid "Копировать"
-#~ msgstr "复制"
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
 
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/settings.html:372
+msgid "Также сохранится в папку"
+msgstr ""
+
+#: templates/settings.html:373
+msgid "Проверьте папку Downloads после завершения"
+msgstr ""
+
+#: templates/settings.html:382
+msgid "Продолжить экспорт"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1084
+#: venv/lib/python3.13/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2807
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2810
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2814
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/core.py:2870
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:50
+#: venv/lib/python3.13/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:893
+msgid "file"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:897
+msgid "path"
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.13/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
+
+#: templates/settings.html:186
+#, fuzzy
+msgid "Внешний ключ шифрования"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:187
+msgid ""
+"Вставьте сюда ключ шифрования из файла .env другой установки (например: "
+"k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
+msgstr ""
+
+#: templates/settings.html:189
+msgid "Где найти ключ:"
+msgstr ""
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr ""
+
+#: templates/settings.html:190
+#, fuzzy
+msgid "в папке с другой установкой"
+msgstr "从其他安装导入服务器"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr ""
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr ""
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr ""
+
+#: templates/settings.html:199
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+
+#: templates/settings.html:204
+#, fuzzy
+msgid "Импортировать и объединить сервера"
+msgstr "导入数据"
+
+#: templates/settings.html:218
+#, fuzzy
+msgid "Экспортируются"
+msgstr "导入数据"
+
+#: templates/settings.html:232
+#, fuzzy
+msgid "Ключи не совпадают!"
+msgstr "错误：密钥不匹配。"
+
+#: templates/settings.html:236
+msgid ""
+"Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
+"данных и сохранит резервную копию старого."
+msgstr ""
+
+#: templates/settings.html:254 templates/settings.html:257
+#, fuzzy
+msgid "Ошибка при генерации ключа:"
+msgstr "复制时出错"
+
+#: templates/settings.html:271 templates/settings.html:403
+#, fuzzy
+msgid "Файл данных серверов (.enc)"
+msgstr "数据文件（.enc）"
+
+#: templates/settings.html:275 templates/settings.html:348
+#: templates/settings.html:407
+#, fuzzy
+msgid "Ключ шифрования (.env)"
+msgstr "加密密钥管理"
+
+#: templates/settings.html:279 templates/settings.html:411
+msgid "Полный архив (.zip)"
+msgstr ""
+
+#: templates/settings.html:337
+#, fuzzy
+msgid "Информация об экспорте"
+msgstr "处理器信息"
+
+#: templates/settings.html:343
+msgid "Экспортируется:"
+msgstr ""
+
+#: templates/settings.html:345
+msgid "Содержимое архива:"
+msgstr ""
+
+#: templates/settings.html:347
+msgid "Зашифрованные данные серверов"
+msgstr ""
+
+#: templates/settings.html:349
+#, fuzzy
+msgid "PIN-код для входа (PIN.txt)"
+msgstr "更改登录PIN码"
+
+#: templates/settings.html:350
+msgid "Загруженные файлы (uploads/)"
+msgstr ""
+
+#: templates/settings.html:351
+msgid "Инструкции по импорту (README.txt)"
+msgstr ""
+
+#: templates/settings.html:358
+msgid "Место сохранения:"
+msgstr ""
+
+#: templates/settings.html:371
+msgid "Файл будет автоматически загружен в браузере"
+msgstr ""
+
+#: templates/help.html:642
+msgid "Безопасность PIN-кода"
+msgstr "PIN码安全"
+
+#: templates/help.html:650
+msgid "Экспорт и импорт с PIN"
+msgstr "使用PIN导出和导入"
+
+#: templates/help.html:658
+msgid "Смена PIN-кода"
+msgstr "更改PIN码"
+
+#: templates/help.html:659
+msgid "Для смены PIN-кода:"
+msgstr "要更改PIN码："
+
+#: templates/help.html:661
+msgid "Войдите в приложение"
+msgstr "登录应用程序"
+
+#: templates/help.html:662
+msgid "Перейдите в \"Настройки\""
+msgstr "进入“设置”"
+
+#: templates/help.html:663
+msgid "Найдите раздел \"PIN-код\""
+msgstr "找到“PIN码”部分"
+
+#: templates/help.html:664
+msgid "Введите старый PIN и новый PIN дважды"
+msgstr "输入旧PIN码和新PIN码两次"
+
+#: templates/help.html:665
+msgid "Нажмите \"Сменить PIN\""
+msgstr "点击“更改PIN”"
+
+#: templates/help.html:668
+msgid "Выход из системы"
+msgstr "登出"
+
+#: templates/settings.html:104
+msgid "Полный экспорт"
+msgstr "完整导出"
+
+#: templates/settings.html:107
+msgid "Включает PIN-код"
+msgstr "包含PIN码"
+
+#: templates/settings.html:115
+msgid "Экспорт запущен!"
+msgstr "导出已开始！"
+
+#: templates/settings.html:117
+msgid "Файл сохранится в папку с приложением VPN Server Manager."
+msgstr "文件将保存到 VPN Server Manager 应用程序文件夹中。"
+
+#: templates/settings.html:184
+msgid ".env файл с SECRET_KEY"
+msgstr "包含SECRET_KEY的.env文件"
