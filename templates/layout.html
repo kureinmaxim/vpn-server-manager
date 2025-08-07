@@ -97,7 +97,7 @@
     
     <footer class="text-center text-muted small py-3 bg-dark">
         <div class="container">
-                            <p class="mb-0">{{ _('VPS Manager') }} v{{ app_info.version }} | {{ _('Разработчик') }}: {{ app_info.developer }}</p>
+            <p class="mb-0">{{ _('VPS Manager') }} v{{ app_info.version }} | {{ _('Разработчик') }}: {% if session.get('pin_authenticated') %}{{ app_info.developer }}{% else %}Куреин М. Н.{% endif %}</p>
         </div>
     </footer>
 

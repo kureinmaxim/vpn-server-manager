@@ -1,0 +1,11 @@
+#: templates/cheatsheet.html:230
+msgid "Управление процессами"
+msgstr "进程管理"
+
+#: templates/cheatsheet.html:259
+msgid "Управление службами (systemd)"
+msgstr "服务管理 (systemd)"
+
+#: templates/cheatsheet.html:263
+msgid "Проверить статус службы"
+msgstr "检查服务状态" 
