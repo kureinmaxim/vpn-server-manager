@@ -261,23 +261,31 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Проверить статус службы') }}</strong> ({{ _('замените') }} `nginx`)</p>
-                 <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Перезапустить службу:') }}</strong></p>
-                 <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Включить автозапуск службы:') }}</strong></p>
-                 <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Выключить автозапуск службы:') }}</strong></p>
-                 <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
         </ul>
     </div>
@@ -289,23 +297,31 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Обновить список пакетов:') }}</strong></p>
-                 <pre><code class="language-bash">sudo apt update</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt update</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Обновить установленные пакеты:') }}</strong></p>
-                 <pre><code class="language-bash">sudo apt upgrade</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt upgrade</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Установить пакет') }}</strong> ({{ _('замените') }} `htop`):</p>
-                 <pre><code class="language-bash">sudo apt install htop</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt install htop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>{{ _('Удалить пакет:') }}</strong></p>
-                 <pre><code class="language-bash">sudo apt remove htop</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt remove htop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
         </ul>
     </div>
