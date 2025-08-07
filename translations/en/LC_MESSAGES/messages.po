@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-06 17:48+0300\n"
+"POT-Creation-Date: 2025-08-07 17:52+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -541,7 +541,7 @@ msgstr "Key utilities"
 
 #: templates/add_server.html:250
 msgid "Управление службами"
-msgstr "Service management"
+msgstr "Service Management (systemd)"
 
 #: templates/add_server.html:260
 msgid "Управление пакетами"
@@ -709,9 +709,8 @@ msgid "Показать неудачные попытки входа (требу
 msgstr "Show failed login attempts (requires root):"
 
 #: templates/cheatsheet.html:230
-#, fuzzy
 msgid "Управление процессами"
-msgstr "Process management"
+msgstr "Process Management"
 
 #: templates/cheatsheet.html:234
 msgid "Показать все запущенные процессы"
@@ -731,12 +730,10 @@ msgid "Найти процесс по имени"
 msgstr "Find process by name"
 
 #: templates/cheatsheet.html:259
-#, fuzzy
 msgid "Управление службами (systemd)"
-msgstr "Service management (systemd)"
+msgstr "Service Management (systemd)"
 
 #: templates/cheatsheet.html:263
-#, fuzzy
 msgid "Проверить статус службы"
 msgstr "Check service status"
 
@@ -753,9 +750,8 @@ msgid "Выключить автозапуск службы:"
 msgstr "Disable service autostart:"
 
 #: templates/cheatsheet.html:287
-#, fuzzy
 msgid "Управление пакетами (apt)"
-msgstr "Package management (apt)"
+msgstr "Package Management (apt)"
 
 #: templates/cheatsheet.html:291
 msgid "Обновить список пакетов:"
@@ -1043,7 +1039,8 @@ msgid "Нажмите кнопку"
 msgstr "Click the button"
 
 #: templates/help.html:36
-msgid "\"Копировать SSH\", чтобы получить готовую команду для вставки в терминал."
+msgid ""
+"\"Копировать SSH\", чтобы получить готовую команду для вставки в терминал."
 msgstr "\"Copy SSH\" to get a ready command for pasting into terminal."
 
 #: templates/help.html:45
@@ -2088,7 +2085,7 @@ msgstr "Confirm new PIN"
 #: templates/help.html:562
 msgid ""
 "Если проблемы с иконками повторяются, создайте резервную копию рабочей "
-"иконки после успешной сборки. Это поможет быстро восстановить "
+"иконки после успешной сборки. Это поможет скоро восстановить "
 "функциональность в случае проблем."
 msgstr ""
 
@@ -2822,7 +2819,7 @@ msgid "Выбрать файл"
 msgstr "Select File"
 
 #: templates/index_locked.html:184 templates/index_locked.html:858
-#: templates/index_locked.html:954
+#: templates/index_locked.html:958
 msgid "Файл не выбран"
 msgstr "No file selected"
 
@@ -2960,7 +2957,7 @@ msgstr ""
 msgid "Импорт данных..."
 msgstr "Import Data File"
 
-#: templates/index_locked.html:950
+#: templates/index_locked.html:954
 msgid "Файл выбран"
 msgstr "File selected"
 
@@ -3619,6 +3616,19 @@ msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] ""
 msgstr[1] ""
 
-#~ msgid "Копировать"
-#~ msgstr "Copy"
+#: templates/cheatsheet.html:213
+msgid "Аудит и мониторинг"
+msgstr "Audit and Monitoring"
+
+#: templates/cheatsheet.html:230
+msgid "Управление процессами"
+msgstr "Process Management"
+
+#: templates/cheatsheet.html:259
+msgid "Управление службами (systemd)"
+msgstr "Service Management (systemd)"
+
+#: templates/cheatsheet.html:263
+msgid "Проверить статус службы"
+msgstr "Check service status"
 
