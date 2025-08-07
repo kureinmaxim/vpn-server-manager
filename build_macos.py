@@ -31,11 +31,11 @@ def cleanup_previous_builds():
 
 def convert_ico_to_icns():
     """Конвертация favicon.ico в icon.icns для macOS"""
-    favicon_path = PROJECT_ROOT / "static" / "favicon.ico"
-    icns_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+    favicon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.ico"
+    icns_path = PROJECT_ROOT / "static" / "images" / "icon_clean.icns"
     
     if not favicon_path.exists():
-        print("❌ favicon.ico не найден")
+        print("❌ icon_clean.ico не найден")
         return False
     
     # Создаем временную папку для конвертации
@@ -85,7 +85,7 @@ def convert_ico_to_icns():
             "iconutil", "-c", "icns", str(iconset_path), "-o", str(icns_path)
         ], check=True)
         
-        print(f"✅ favicon.ico конвертирован в {icns_path}")
+        print(f"✅ icon_clean.ico конвертирован в {icns_path}")
         return True
         
     except subprocess.CalledProcessError as e:
@@ -102,10 +102,13 @@ def convert_ico_to_icns():
 def build_app():
     """Создание .app файла с исправленными зависимостями"""
     
-    # Конвертируем favicon.ico в icon.icns
-    print("🔄 Конвертация иконки...")
-    if not convert_ico_to_icns():
-        print("⚠️ Не удалось конвертировать иконку, используем существующую")
+    # Проверяем наличие иконки
+    print("🔄 Проверка иконки...")
+    icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
+    if icon_path.exists():
+        print("✅ Иконка найдена")
+    else:
+        print("⚠️ Иконка не найдена")
     
     # Определяем файлы для включения в сборку
     datas = [
@@ -136,7 +139,10 @@ def build_app():
     datas_args = [f"--add-data={data}" for data in datas]
     
     # Проверяем наличие иконки
-    icon_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+    icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.icns"
+    if not icon_path.exists():
+        # Если нет .icns файла, используем .png
+        icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
     icon_arg = f"--icon={icon_path}" if icon_path.exists() else ""
     
     # КРИТИЧЕСКИ ВАЖНО: Скрытые импорты для Flask и офлайн режима
@@ -280,7 +286,7 @@ def build_app():
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
         "--windowed",                   # GUI приложение
-        "--name=VPNServerManager",
+        "--name=VPNServerManager-Clean",
         icon_arg,                       # Иконка (если есть)
         "--clean",
         "--noconfirm",
@@ -288,7 +294,7 @@ def build_app():
         "--workpath=build",
         "--noupx",
         "--strip",
-        "--osx-bundle-identifier=com.vpnservermanager.app",
+        "--osx-bundle-identifier=com.vpnservermanager.clean.app",
         "--debug=all",
         *datas_args,
         *hidden_imports,
@@ -312,7 +318,7 @@ def build_app():
 
 def create_app_bundle():
     """Создание .app бандла для macOS"""
-    app_name = "VPNServerManager"
+    app_name = "VPNServerManager-Clean"  # Изменено для избежания конфликтов
     
     # Проверяем, создалась ли папка с приложением
     app_dir = DIST_DIR / app_name
@@ -328,7 +334,7 @@ def create_app_bundle():
             # Проверяем и копируем иконку если её нет
             icon_path = app_path / "Contents" / "Resources" / "AppIcon.icns"
             if not icon_path.exists():
-                source_icon = PROJECT_ROOT / "static" / "images" / "icon.icns"
+                source_icon = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
                 if source_icon.exists():
                     shutil.copy2(source_icon, icon_path)
                     print(f"📁 Иконка скопирована: {source_icon}")
@@ -349,7 +355,7 @@ def create_app_bundle():
         # Получаем версию из config.json
         version = get_version_from_config()
         
-        # Создаем Info.plist
+        # Создаем Info.plist с уникальным идентификатором
         info_plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -357,7 +363,7 @@ def create_app_bundle():
     <key>CFBundleExecutable</key>
     <string>{app_name}</string>
     <key>CFBundleIdentifier</key>
-    <string>com.vpnservermanager.app</string>
+    <string>com.vpnservermanager.clean.app</string>
     <key>CFBundleName</key>
     <string>{app_name}</string>
     <key>CFBundlePackageType</key>
@@ -379,7 +385,7 @@ def create_app_bundle():
             f.write(info_plist_content)
         
         # Копируем иконку если есть
-        icon_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+        icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
         if icon_path.exists():
             shutil.copy2(icon_path, app_resources / "AppIcon.icns")
             print(f"📁 Иконка скопирована: {icon_path}")
@@ -394,7 +400,7 @@ def create_app_bundle():
 
 def create_readme():
     """Создание файла README.txt с инструкциями"""
-    readme_content = """# VPN Server Manager
+    readme_content = """# VPN Server Manager Clean
 
 ## Важно: Первый запуск
 
@@ -409,7 +415,7 @@ def create_readme():
 ## Хранение данных
 
 Приложение автоматически сохраняет все данные в вашей пользовательской директории:
-~/Library/Application Support/VPNServerManager/
+~/Library/Application Support/VPNServerManager-Clean/
 
 В этой директории хранятся:
 - Файлы конфигурации
@@ -419,7 +425,7 @@ def create_readme():
 ## Резервное копирование
 
 Для создания резервной копии данных, сохраните директорию:
-~/Library/Application Support/VPNServerManager/
+~/Library/Application Support/VPNServerManager-Clean/
 
 ## Проблемы с запуском
 
@@ -428,6 +434,11 @@ def create_readme():
 2. Наличие прав доступа к директории данных
 
 Для технической поддержки обратитесь к разработчику.
+
+## Отличие от основного проекта
+
+Это версия "Clean" - упрощенная версия VPN Server Manager 
+с полной поддержкой интернационализации (английский, русский, китайский языки).
 """
     
     readme_path = DIST_DIR / "README.txt"
@@ -495,10 +506,10 @@ def diagnose_app(app_path):
     try:
         # Ищем исполняемый файл в разных возможных местах
         possible_executables = [
-            app_path / "Contents" / "MacOS" / "VPNServerManager" / "VPNServerManager",
-            app_path / "Contents" / "MacOS" / "VPNServerManager",
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean" / "VPNServerManager-Clean",
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean",
             app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServerManager.app" / "VPNServerManager"
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean.app" / "VPNServerManager-Clean"
         ]
         
         executable_path = None
@@ -546,13 +557,13 @@ def diagnose_app(app_path):
         print("⚠️ Иконка отсутствует")
     
     # Проверяем структуру приложения
-    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager"
+    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager-Clean"
     if not app_dir.exists():
         # Проверяем альтернативные пути
         alt_paths = [
             app_path / "Contents" / "MacOS",
             app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServer.app"
+            app_path / "Contents" / "MacOS" / "VPNServer-Clean.app"
         ]
         for alt_path in alt_paths:
             if alt_path.exists():
