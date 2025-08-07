@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-06 17:48+0300\n"
+"POT-Creation-Date: 2025-08-07 17:52+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -655,7 +655,7 @@ msgstr "示例：删除规则："
 
 #: templates/cheatsheet.html:195
 msgid "Проверка Fail2Ban"
-msgstr "Fail2Ban检查"
+msgstr "Fail2Ban 检查"
 
 #: templates/cheatsheet.html:197
 msgid "Статус службы Fail2Ban:"
@@ -682,7 +682,6 @@ msgid "Показать неудачные попытки входа (требу
 msgstr "显示失败的登录尝试（需要root）："
 
 #: templates/cheatsheet.html:230
-#, fuzzy
 msgid "Управление процессами"
 msgstr "进程管理"
 
@@ -704,7 +703,6 @@ msgid "Найти процесс по имени"
 msgstr "按名称查找进程"
 
 #: templates/cheatsheet.html:259
-#, fuzzy
 msgid "Управление службами (systemd)"
 msgstr "服务管理 (systemd)"
 
@@ -726,7 +724,6 @@ msgid "Выключить автозапуск службы:"
 msgstr "禁用服务自动启动："
 
 #: templates/cheatsheet.html:287
-#, fuzzy
 msgid "Управление пакетами (apt)"
 msgstr "软件包管理 (apt)"
 
@@ -2743,7 +2740,7 @@ msgid "Выбрать файл"
 msgstr "选择文件"
 
 #: templates/index_locked.html:184 templates/index_locked.html:858
-#: templates/index_locked.html:954
+#: templates/index_locked.html:958
 msgid "Файл не выбран"
 msgstr "未选择文件"
 
@@ -2881,7 +2878,7 @@ msgstr ""
 msgid "Импорт данных..."
 msgstr "导入数据"
 
-#: templates/index_locked.html:950
+#: templates/index_locked.html:954
 msgid "Файл выбран"
 msgstr "文件已选择"
 
