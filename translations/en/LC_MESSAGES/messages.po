@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-08-07 18:36+0300\n"
+"POT-Creation-Date: 2025-08-07 19:30+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -249,7 +249,8 @@ msgstr "Inactive"
 msgid "Заблокирован"
 msgstr "Suspended"
 
-#: templates/add_server.html:44
+#: templates/add_server.html:44 templates/add_server.html:133
+#: templates/edit_server.html:163
 #, fuzzy
 msgid "URL панели управления"
 msgstr "VPS Control Panel"
@@ -366,10 +367,6 @@ msgstr "Enter password"
 msgid "Порт SSH"
 msgstr "SSH port"
 
-#: templates/add_server.html:113
-msgid "По умолчанию 22"
-msgstr "Default 22"
-
 #: templates/add_server.html:118
 #, fuzzy
 msgid "Пароль root"
@@ -389,10 +386,6 @@ msgstr "Root SSH login allowed"
 msgid "Панель управления (3x-ui и др.)"
 msgstr "Control panel (3x-ui etc.)"
 
-#: templates/add_server.html:133 templates/edit_server.html:163
-msgid "URL панели"
-msgstr "Panel URL"
-
 #: templates/add_server.html:138 templates/edit_server.html:168
 msgid "Логин панели"
 msgstr "Panel login"
@@ -402,12 +395,12 @@ msgstr "Panel login"
 msgid "Например, admin"
 msgstr "For example, admin"
 
-#: templates/add_server.html:142
+#: templates/add_server.html:142 templates/edit_server.html:172
 #, fuzzy
 msgid "Пароль панели"
 msgstr "Panel password"
 
-#: templates/add_server.html:143
+#: templates/add_server.html:143 templates/edit_server.html:173
 #, fuzzy
 msgid "Введите пароль панели"
 msgstr "Enter panel password"
@@ -445,7 +438,7 @@ msgstr "Via Apple"
 msgid "Другой"
 msgstr "Other"
 
-#: templates/add_server.html:165 templates/add_server.html:341
+#: templates/add_server.html:165 templates/add_server.html:301
 #: templates/edit_server.html:196 templates/edit_server.html:333
 #, fuzzy
 msgid "Логин хостера"
@@ -500,7 +493,7 @@ msgstr "Notes"
 msgid "Введите заметки"
 msgstr "Enter notes"
 
-#: templates/add_server.html:207 templates/edit_server.html:223
+#: templates/add_server.html:207
 #, fuzzy
 msgid "Информация о Docker"
 msgstr "Docker information"
@@ -539,27 +532,28 @@ msgstr "Command hints (Debian/Ubuntu)"
 msgid "Ключевые утилиты"
 msgstr "Key utilities"
 
-#: templates/add_server.html:250
-msgid "Управление службами"
+#: templates/add_server.html:250 templates/cheatsheet.html:259
+msgid "Управление службами (systemd)"
 msgstr "Service Management (systemd)"
 
-#: templates/add_server.html:260
-msgid "Управление пакетами"
-msgstr "Package management"
+#: templates/add_server.html:260 templates/cheatsheet.html:295
+msgid "Управление пакетами (apt)"
+msgstr "Package Management (apt)"
 
 #: templates/add_server.html:270
-msgid "Безопасность"
-msgstr "Security"
+#, fuzzy
+msgid "Безопасность (ufw / fail2ban)"
+msgstr "PIN Code Security"
 
-#: templates/add_server.html:341 templates/edit_server.html:336
+#: templates/add_server.html:302 templates/edit_server.html:336
 msgid "Email для входа"
 msgstr "Login email"
 
-#: templates/add_server.html:341
+#: templates/add_server.html:303
 msgid "Логин / Email"
 msgstr "Login / Email"
 
-#: templates/add_server.html:341
+#: templates/add_server.html:334
 msgid "Ошибка копирования: "
 msgstr "Copy error: "
 
@@ -729,10 +723,6 @@ msgstr "htop more convenient if installed"
 msgid "Найти процесс по имени"
 msgstr "Find process by name"
 
-#: templates/cheatsheet.html:259
-msgid "Управление службами (systemd)"
-msgstr "Service Management (systemd)"
-
 #: templates/cheatsheet.html:263
 msgid "Проверить статус службы"
 msgstr "Check service status"
@@ -748,10 +738,6 @@ msgstr "Enable service autostart:"
 #: templates/cheatsheet.html:284
 msgid "Выключить автозапуск службы:"
 msgstr "Disable service autostart:"
-
-#: templates/cheatsheet.html:295
-msgid "Управление пакетами (apt)"
-msgstr "Package Management (apt)"
 
 #: templates/cheatsheet.html:299
 msgid "Обновить список пакетов:"
@@ -837,7 +823,7 @@ msgid "Новый пароль SSH"
 msgstr ""
 
 #: templates/edit_server.html:138 templates/edit_server.html:149
-#: templates/edit_server.html:174 templates/edit_server.html:202
+#: templates/edit_server.html:202
 msgid "Оставьте пустым, чтобы не менять."
 msgstr ""
 
@@ -845,8 +831,8 @@ msgstr ""
 msgid "Новый пароль root"
 msgstr ""
 
-#: templates/edit_server.html:172
-msgid "Новый пароль панели"
+#: templates/edit_server.html:174
+msgid "Оставьте пустым, если не хотите менять."
 msgstr ""
 
 #: templates/edit_server.html:200
@@ -874,6 +860,11 @@ msgstr ""
 #: templates/edit_server.html:214
 msgid "Например, Оплата за январь 2024"
 msgstr ""
+
+#: templates/edit_server.html:223
+#, fuzzy
+msgid "Docker информация"
+msgstr "Information:"
 
 #: templates/edit_server.html:231
 msgid "Сохранить изменения"
@@ -4082,62 +4073,462 @@ msgstr[1] ""
 #~ "проблем."
 #~ msgstr ""
 
-#: templates/help.html:642
-msgid "Безопасность PIN-кода"
-msgstr "PIN Code Security"
+#~ msgid "По умолчанию 22"
+#~ msgstr "Default 22"
 
-#: templates/help.html:650
-msgid "Экспорт и импорт с PIN"
-msgstr "Export and Import with PIN"
+#~ msgid "URL панели"
+#~ msgstr "Panel URL"
 
-#: templates/help.html:658
-msgid "Смена PIN-кода"
-msgstr "Change PIN Code"
+#~ msgid "Управление службами"
+#~ msgstr "Service Management (systemd)"
 
-#: templates/help.html:659
-msgid "Для смены PIN-кода:"
-msgstr "To change the PIN code:"
+#~ msgid "Управление пакетами"
+#~ msgstr "Package management"
 
-#: templates/help.html:661
-msgid "Войдите в приложение"
-msgstr "Log into the application"
+#~ msgid "Безопасность"
+#~ msgstr "Security"
 
-#: templates/help.html:662
-msgid "Перейдите в \"Настройки\""
-msgstr "Go to \"Settings\""
+#~ msgid "Новый пароль панели"
+#~ msgstr ""
 
-#: templates/help.html:663
-msgid "Найдите раздел \"PIN-код\""
-msgstr "Find the \"PIN code\" section"
+#: templates/add_server.html:101
+#: templates/edit_server.html:112
+msgid "Период оплаты"
+msgstr "Payment Period"
 
-#: templates/help.html:664
-msgid "Введите старый PIN и новый PIN дважды"
-msgstr "Enter the old PIN and the new PIN twice"
+#: templates/add_server.html:103
+#: templates/edit_server.html:114
+msgid "Не указан"
+msgstr "Not specified"
 
-#: templates/help.html:665
-msgid "Нажмите \"Сменить PIN\""
-msgstr "Click \"Change PIN\""
+#: templates/add_server.html:104
+#: templates/edit_server.html:115
+msgid "Месяц"
+msgstr "Month"
 
-#: templates/help.html:668
-msgid "Выход из системы"
-msgstr "Logout"
+#: templates/add_server.html:105
+#: templates/edit_server.html:116
+msgid "3 месяца"
+msgstr "3 months"
 
-#: templates/settings.html:104
-msgid "Полный экспорт"
-msgstr "Full Export"
+#: templates/add_server.html:106
+#: templates/edit_server.html:117
+msgid "Год"
+msgstr "Year"
 
-#: templates/settings.html:107
-msgid "Включает PIN-код"
-msgstr "Includes PIN code"
+#: templates/add_server.html:107
+#: templates/edit_server.html:118
+msgid "Бессрочно"
+msgstr "Perpetual"
 
-#: templates/settings.html:115
-msgid "Экспорт запущен!"
-msgstr "Export started!"
+#: templates/add_server.html:119
+msgid "Введите пароль"
+msgstr "Enter password"
 
-#: templates/settings.html:117
-msgid "Файл сохранится в папку с приложением VPN Server Manager."
-msgstr "The file will be saved to the VPN Server Manager application folder."
+#: templates/add_server.html:143
+msgid "Введите пароль панели"
+msgstr "Enter panel password"
 
-#: templates/settings.html:184
-msgid ".env файл с SECRET_KEY"
-msgstr ".env file with SECRET_KEY"
+#: templates/edit_server.html:136
+msgid "Новый пароль SSH"
+msgstr "New SSH Password"
+
+#: templates/edit_server.html:138
+#: templates/edit_server.html:149
+#: templates/edit_server.html:174
+#: templates/edit_server.html:202
+msgid "Оставьте пустым, чтобы не менять."
+msgstr "Leave blank to keep current."
+
+#: templates/edit_server.html:147
+msgid "Новый пароль root"
+msgstr "New root Password"
+
+#: templates/edit_server.html:155
+msgid "Вход для root по SSH разрешен"
+msgstr "Root SSH login allowed"
+
+#: templates/edit_server.html:172
+msgid "Новый пароль панели"
+msgstr "New Panel Password"
+
+#: templates/edit_server.html:180
+msgid "URL кабинета"
+msgstr "Hoster URL"
+
+#: templates/edit_server.html:185
+msgid "Способ входа"
+msgstr "Login Method"
+
+#: templates/edit_server.html:186
+msgid "По логину/паролю"
+msgid_plural ""
+msgstr[0] "By login/password"
+msgstr[1] ""
+
+#: templates/edit_server.html:187
+msgid "Через Google"
+msgstr "Via Google"
+
+#: templates/edit_server.html:188
+msgid "Через Apple"
+msgstr "Via Apple"
+
+#: templates/edit_server.html:189
+msgid "Другой"
+msgstr "Other"
+
+#: templates/edit_server.html:196
+msgid "Логин хостера"
+msgstr "Hoster Login"
+
+#: templates/edit_server.html:200
+msgid "Новый пароль хостера"
+msgstr "New Hoster Password"
+
+#: templates/edit_server.html:206
+msgid "Быстрая загрузка чека"
+msgstr "Quick Receipt Upload"
+
+#: templates/edit_server.html:208
+msgid "Файл нового чека"
+msgstr "New Receipt File"
+
+#: templates/edit_server.html:210
+msgid "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку \"Управление чеками\"."
+msgstr "Use for quick upload of a single receipt. To view all receipts, use the 'Manage Receipts' button."
+
+#: templates/edit_server.html:217
+#: templates/settings.html:163
+msgid "Дополнительная информация"
+msgstr "Additional Information"
+
+#: templates/edit_server.html:227
+msgid "Установленное ПО"
+msgstr "Installed Software"
+
+#: templates/edit_server.html:231
+msgid "Сохранить изменения"
+msgstr "Save Changes"
+
+#: templates/edit_server.html:265
+msgid "Чеки по оплате:"
+msgstr "Payment Receipts:"
+
+#: templates/edit_server.html:273
+msgid "Добавить новый чек"
+msgstr "Add New Receipt"
+
+#: templates/edit_server.html:276
+msgid "Описание"
+msgstr "Description"
+
+#: templates/edit_server.html:277
+msgid "Напр., Оплата за февраль 2024"
+msgstr "e.g., Payment for February 2024"
+
+#: templates/edit_server.html:280
+msgid "Файл чека"
+msgstr "Receipt File"
+
+#: templates/edit_server.html:285
+#: templates/manage_hints.html:25
+msgid "Добавить"
+msgstr "Add"
+
+#: templates/edit_server.html:292
+msgid "Загруженные чеки"
+msgstr "Uploaded Receipts"
+
+#: templates/edit_server.html:298
+msgid "Чек"
+msgstr "Receipt"
+
+#: templates/edit_server.html:299
+msgid "Загружен:"
+msgstr "Uploaded:"
+
+#: templates/edit_server.html:308
+msgid "Чеки еще не загружены."
+msgstr "No receipts uploaded yet."
+
+#: templates/edit_server.html:333
+msgid "Email для входа"
+msgstr "Login Email"
+
+#: templates/edit_server.html:365
+msgid "Ошибка сети"
+msgstr "Network Error"
+
+#: templates/edit_server.html:397
+msgid "Ошибка при добавлении чека:"
+msgstr "Error adding receipt:"
+
+#: templates/edit_server.html:398
+msgid "Не удалось добавить чек:"
+msgstr "Failed to add receipt:"
+
+#: templates/edit_server.html:413
+msgid "Вы уверены, что хотите удалить этот чек? Это действие необратимо."
+msgstr "Are you sure you want to delete this receipt? This action is irreversible."
+
+#: templates/edit_server.html:442
+msgid "Не удалось удалить чек."
+msgstr "Failed to delete receipt."
+
+#: templates/edit_server.html:446
+msgid "Ошибка при удалении чека:"
+msgstr "Error deleting receipt:"
+
+#: templates/edit_server.html:447
+msgid "Не удалось удалить чек:"
+msgstr "Failed to delete receipt:"
+
+#: templates/settings.html:185
+msgid "Внешний ключ шифрования"
+msgstr "External Encryption Key"
+
+#: templates/settings.html:188
+msgid "Где найти ключ:"
+msgstr "Where to find the key:"
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr "In the file"
+
+#: templates/settings.html:190
+msgid "в папке с другой установкой"
+msgstr "in the folder of the other installation"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr "Look for the line"
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr "Copy the value after the equals sign"
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr "Note:"
+
+#: templates/settings.html:199
+msgid "Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr "Duplicate servers (by IP or name) will be skipped. Imported servers will receive new unique IDs and be added to your list."
+
+#: templates/settings.html:204
+msgid "Импортировать и объединить сервера"
+msgstr "Import and Merge Servers"
+
+#: templates/add_server.html:101
+#: templates/edit_server.html:112
+msgid "Период оплаты"
+msgstr "Payment Period"
+
+#: templates/add_server.html:103
+#: templates/edit_server.html:114
+msgid "Не указан"
+msgstr "Not specified"
+
+#: templates/add_server.html:104
+#: templates/edit_server.html:115
+msgid "Месяц"
+msgstr "Month"
+
+#: templates/add_server.html:105
+#: templates/edit_server.html:116
+msgid "3 месяца"
+msgstr "3 months"
+
+#: templates/add_server.html:106
+#: templates/edit_server.html:117
+msgid "Год"
+msgstr "Year"
+
+#: templates/add_server.html:107
+#: templates/edit_server.html:118
+msgid "Бессрочно"
+msgstr "Perpetual"
+
+#: templates/add_server.html:119
+msgid "Введите пароль"
+msgstr "Enter password"
+
+#: templates/add_server.html:143
+msgid "Введите пароль панели"
+msgstr "Enter panel password"
+
+#: templates/edit_server.html:136
+msgid "Новый пароль SSH"
+msgstr "New SSH Password"
+
+#: templates/edit_server.html:138
+#: templates/edit_server.html:149
+#: templates/edit_server.html:174
+#: templates/edit_server.html:202
+msgid "Оставьте пустым, чтобы не менять."
+msgstr "Leave blank to keep current."
+
+#: templates/edit_server.html:147
+msgid "Новый пароль root"
+msgstr "New root Password"
+
+#: templates/edit_server.html:155
+msgid "Вход для root по SSH разрешен"
+msgstr "Root SSH login allowed"
+
+#: templates/edit_server.html:172
+msgid "Новый пароль панели"
+msgstr "New Panel Password"
+
+#: templates/edit_server.html:180
+msgid "URL кабинета"
+msgstr "Hoster URL"
+
+#: templates/edit_server.html:185
+msgid "Способ входа"
+msgstr "Login Method"
+
+#: templates/edit_server.html:186
+msgid "По логину/паролю"
+msgid_plural ""
+msgstr[0] "By login/password"
+msgstr[1] ""
+
+#: templates/edit_server.html:187
+msgid "Через Google"
+msgstr "Via Google"
+
+#: templates/edit_server.html:188
+msgid "Через Apple"
+msgstr "Via Apple"
+
+#: templates/edit_server.html:189
+msgid "Другой"
+msgstr "Other"
+
+#: templates/edit_server.html:196
+msgid "Логин хостера"
+msgstr "Hoster Login"
+
+#: templates/edit_server.html:200
+msgid "Новый пароль хостера"
+msgstr "New Hoster Password"
+
+#: templates/edit_server.html:206
+msgid "Быстрая загрузка чека"
+msgstr "Quick Receipt Upload"
+
+#: templates/edit_server.html:208
+msgid "Файл нового чека"
+msgstr "New Receipt File"
+
+#: templates/edit_server.html:210
+msgid "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку \"Управление чеками\"."
+msgstr "Use for quick upload of a single receipt. To view all receipts, use the 'Manage Receipts' button."
+
+#: templates/edit_server.html:217
+#: templates/settings.html:163
+msgid "Дополнительная информация"
+msgstr "Additional Information"
+
+#: templates/edit_server.html:227
+msgid "Установленное ПО"
+msgstr "Installed Software"
+
+#: templates/edit_server.html:231
+msgid "Сохранить изменения"
+msgstr "Save Changes"
+
+#: templates/edit_server.html:265
+msgid "Чеки по оплате:"
+msgstr "Payment Receipts:"
+
+#: templates/edit_server.html:273
+msgid "Добавить новый чек"
+msgstr "Add New Receipt"
+
+#: templates/edit_server.html:276
+msgid "Описание"
+msgstr "Description"
+
+#: templates/edit_server.html:277
+msgid "Напр., Оплата за февраль 2024"
+msgstr "e.g., Payment for February 2024"
+
+#: templates/edit_server.html:280
+msgid "Файл чека"
+msgstr "Receipt File"
+
+#: templates/edit_server.html:285
+#: templates/manage_hints.html:25
+msgid "Добавить"
+msgstr "Add"
+
+#: templates/edit_server.html:292
+msgid "Загруженные чеки"
+msgstr "Uploaded Receipts"
+
+#: templates/edit_server.html:298
+msgid "Чек"
+msgstr "Receipt"
+
+#: templates/edit_server.html:299
+msgid "Загружен:"
+msgstr "Uploaded:"
+
+#: templates/edit_server.html:308
+msgid "Чеки еще не загружены."
+msgstr "No receipts uploaded yet."
+
+#: templates/edit_server.html:333
+msgid "Email для входа"
+msgstr "Login Email"
+
+#: templates/edit_server.html:365
+msgid "Ошибка сети"
+msgstr "Network Error"
+
+#: templates/edit_server.html:397
+msgid "Ошибка при добавлении чека:"
+msgstr "Error adding receipt:"
+
+#: templates/edit_server.html:398
+msgid "Не удалось добавить чек:"
+msgstr "Failed to add receipt:"
+
+#: templates/settings.html:185
+msgid "Внешний ключ шифрования"
+msgstr "External Encryption Key"
+
+#: templates/settings.html:188
+msgid "Где найти ключ:"
+msgstr "Where to find the key:"
+
+#: templates/settings.html:190
+msgid "В файле"
+msgstr "In the file"
+
+#: templates/settings.html:190
+msgid "в папке с другой установкой"
+msgstr "in the folder of the other installation"
+
+#: templates/settings.html:191
+msgid "Ищите строку"
+msgstr "Look for the line"
+
+#: templates/settings.html:192
+msgid "Скопируйте значение после знака равенства"
+msgstr "Copy the value after the equals sign"
+
+#: templates/settings.html:199
+msgid "Примечание:"
+msgstr "Note:"
+
+#: templates/settings.html:199
+msgid "Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr "Duplicate servers (by IP or name) will be skipped. Imported servers will receive new unique IDs and be added to your list."
+
+#: templates/settings.html:204
+msgid "Импортировать и объединить сервера"
+msgstr "Import and Merge Servers"
