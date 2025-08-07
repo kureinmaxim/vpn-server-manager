@@ -41,8 +41,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="panel_url" class="form-label">{{ _('URL панели управления') }}</label>
-                    <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="{{ _('Например, http://1.2.3.4:2053/panel') }}">
+                    <label for="panel_url_main" class="form-label">{{ _('URL панели управления') }}</label>
+                    <input type="text" class="form-control" id="panel_url_main" name="panel_url_main" placeholder="{{ _('Например, http://1.2.3.4:2053/panel') }}">
                 </div>
 
                 <h5 class="mt-4">{{ _('Оформление карточки') }}</h5>
@@ -110,7 +110,7 @@
                     </div>
                      <div class="col-md-6 mb-3">
                         <label for="ssh_port" class="form-label">{{ _('Порт SSH') }}</label>
-                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22" placeholder="{{ _('По умолчанию 22') }}">
+                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="22">
                     </div>
                 </div>
                  <div class="row">
@@ -130,13 +130,13 @@
 
                 <h5 class="mt-4">{{ _('Панель управления (3x-ui и др.)') }}</h5>
                 <div class="mb-3">
-                    <label for="panel_url" class="form-label">{{ _('URL панели') }}</label>
+                    <label for="panel_url" class="form-label">{{ _('URL панели управления') }}</label>
                     <input type="text" class="form-control" id="panel_url" name="panel_url" placeholder="{{ _('Например, http://1.2.3.4:2053/panel') }}">
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
-                        <input type="text" class="form-control" id="panel_user" name="panel_user" placeholder="{{ _('Например, admin') }}">
+                        <label for="panel_login" class="form-label">{{ _('Логин панели') }}</label>
+                        <input type="text" class="form-control" id="panel_login" name="panel_login" placeholder="{{ _('Например, admin') }}">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="panel_password" class="form-label">{{ _('Пароль панели') }}</label>
@@ -247,7 +247,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">{{ _('Управление службами') }}</h6>
+                    <h6 class="mt-3">{{ _('Управление службами (systemd)') }}</h6>
                      <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">systemctl status nginx</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -257,7 +257,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">{{ _('Управление пакетами') }}</h6>
+                    <h6 class="mt-3">{{ _('Управление пакетами (apt)') }}</h6>
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">apt update</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -267,7 +267,7 @@
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
                     </div>
 
-                    <h6 class="mt-3">{{ _('Безопасность') }}</h6>
+                    <h6 class="mt-3">{{ _('Безопасность (ufw / fail2ban)') }}</h6>
                      <div class="d-flex justify-content-between align-items-center mb-2">
                         <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">ufw status verbose</code></pre>
                         <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
@@ -298,9 +298,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordField = document.getElementById('hoster_password_field');
     const userLabel = document.getElementById('hoster_user_label');
     // Переводы для JS
-    const labelLoginHoster = document.body.getAttribute('data-label-login-hoster');
-    const labelEmailLogin = document.body.getAttribute('data-label-email-login');
-    const labelLoginEmail = document.body.getAttribute('data-label-login-email');
+    const labelLoginHoster = "{{ _('Логин хостера') }}";
+    const labelEmailLogin = "{{ _('Email для входа') }}";
+    const labelLoginEmail = "{{ _('Логин / Email') }}";
 
     function toggleFields() {
         if (loginMethodSelect.value === 'password') {
@@ -331,11 +331,11 @@ function copyHint(button) {
             icon.className = originalClass;
         }, 1500);
     }).catch(err => {
-        const copyError = document.body.getAttribute('data-copy-error');
+        const copyError = "{{ _('Ошибка копирования: ') }}";
         console.error(copyError, err);
     });
 }
 </script>
 {% endblock %}
 
-{% block body_attrs %}data-label-login-hoster="{{ _('Логин хостера') }}" data-label-email-login="{{ _('Email для входа') }}" data-label-login-email="{{ _('Логин / Email') }}" data-copy-error="{{ _('Ошибка копирования: ') }}"{% endblock %} 
+{% block body_attrs %}{% endblock %}
