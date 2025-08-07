@@ -321,19 +321,36 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // --- Localization Strings ---
+    const i18n = {
+        loginHoster: "{{ _('Логин хостера') }}",
+        loginEmail: "{{ _('Email для входа') }}",
+        networkError: "{{ _('Ошибка сети') }}",
+        receipt: "{{ _('Чек') }}",
+        uploaded: "{{ _('Загружен:') }}",
+        manageReceipts: "{{ _('Управление чеками') }}",
+        errorAddReceipt: "{{ _('Ошибка при добавлении чека:') }}",
+        failedAddReceipt: "{{ _('Не удалось добавить чек:') }}",
+        confirmDeleteReceipt: "{{ _('Вы уверены, что хотите удалить этот чек? Это действие необратимо.') }}",
+        noReceipts: "{{ _('Чеки еще не загружены.') }}",
+        failedDeleteReceipt: "{{ _('Не удалось удалить чек.') }}",
+        errorDeleteReceipt: "{{ _('Ошибка при удалении чека:') }}",
+        couldNotCopy: "{{ _('Could not copy text:') }}"
+    };
+
     // Helper to toggle hoster password field visibility
     const loginMethodSelect = document.getElementById('hoster_login_method');
     if (loginMethodSelect) {
-    const passwordField = document.getElementById('hoster_password_field');
-    const userLabel = document.getElementById('hoster_user_label');
+        const passwordField = document.getElementById('hoster_password_field');
+        const userLabel = document.getElementById('hoster_user_label');
 
         function togglePasswordField() {
-        if (loginMethodSelect.value === 'password') {
+            if (loginMethodSelect.value === 'password') {
                 passwordField.style.display = 'block';
-            userLabel.textContent = '{{ _('Логин хостера') }}';
-        } else {
-            passwordField.style.display = 'none';
-                userLabel.textContent = '{{ _('Email для входа') }}';
+                userLabel.textContent = i18n.loginHoster;
+            } else {
+                passwordField.style.display = 'none';
+                userLabel.textContent = i18n.loginEmail;
             }
         }
         loginMethodSelect.addEventListener('change', togglePasswordField);
@@ -362,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.error || '{{ _('Ошибка сети') }}') });
+                    return response.json().then(err => { throw new Error(err.error || i18n.networkError); });
                 }
                 return response.json();
             })
@@ -378,8 +395,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 listItem.id = `receipt-${safeFilenameId}`;
                 listItem.innerHTML = `
                     <div>
-                        <strong>${newReceipt.description || '{{ _('Чек') }}'}</strong><br>
-                        <small class="text-muted">{{ _('Загружен:') }} ${newReceipt.formatted_date}</small><br>
+                        <strong>${newReceipt.description || i18n.receipt}</strong><br>
+                        <small class="text-muted">${i18n.uploaded} ${newReceipt.formatted_date}</small><br>
                         <a href="/uploads/${newReceipt.filename}" target="_blank">${newReceipt.original_name}</a>
                     </div>
                     <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="${newReceipt.filename}">
@@ -391,11 +408,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
                 const count = receiptsList.getElementsByTagName('li').length;
-                receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> {{ _('Управление чеками') }} (${count})`;
+                receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> ${i18n.manageReceipts} (${count})`;
             })
             .catch(error => {
-                console.error('{{ _('Ошибка при добавлении чека:') }}', error);
-                alert(`{{ _('Не удалось добавить чек:') }} ${error.message}`);
+                console.error(i18n.errorAddReceipt, error);
+                alert(`${i18n.failedAddReceipt} ${error.message}`);
             })
             .finally(() => {
                 spinner.classList.add('d-none');
@@ -410,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const deleteButton = e.target.closest('.delete-receipt-btn');
             if (!deleteButton) return;
 
-            if (!confirm('{{ _('Вы уверены, что хотите удалить этот чек? Это действие необратимо.') }}')) {
+            if (!confirm(i18n.confirmDeleteReceipt)) {
                 return;
             }
 
@@ -423,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.error || '{{ _('Ошибка сети') }}') });
+                    return response.json().then(err => { throw new Error(err.error || i18n.networkError); });
                 }
                 return response.json();
             })
@@ -433,18 +450,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
                     const count = receiptsList.getElementsByTagName('li').length;
-                    receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> {{ _('Управление чеками') }} (${count})`;
+                    receiptBtn.innerHTML = `<i class="bi bi-receipt"></i> ${i18n.manageReceipts} (${count})`;
 
                     if (count === 0) {
-                        receiptsList.innerHTML = '<li id="no-receipts-placeholder" class="list-group-item text-center text-muted">{{ _('Чеки еще не загружены.') }}</li>';
+                        receiptsList.innerHTML = `<li id="no-receipts-placeholder" class="list-group-item text-center text-muted">${i18n.noReceipts}</li>`;
                     }
                 } else {
-                    throw new Error(data.message || '{{ _('Не удалось удалить чек.') }}');
+                    throw new Error(data.message || i18n.failedDeleteReceipt);
                 }
             })
             .catch(error => {
-                console.error('{{ _('Ошибка при удалении чека:') }}', error);
-                alert(`{{ _('Не удалось удалить чек:') }} ${error.message}`);
+                console.error(i18n.errorDeleteReceipt, error);
+                alert(`${i18n.failedDeleteReceipt} ${error.message}`);
             });
         });
     }
@@ -459,8 +476,8 @@ function copyHint(element) {
             element.innerHTML = originalIcon;
         }, 1500);
     }).catch(err => {
-        console.error('{{ _('Could not copy text:') }} ', err);
+        console.error(i18n.couldNotCopy, err);
     });
 }
 </script>
-{% endblock %} 
+{% endblock %}
