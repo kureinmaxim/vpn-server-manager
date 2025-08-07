@@ -66,7 +66,7 @@ def get_app_data_dir():
     is_frozen = getattr(sys, 'frozen', False)
     
     # Имя директории приложения
-    app_name = "VPNServerManager"
+    app_name = "VPNServerManager-Clean"
     
     if is_frozen:  # Приложение запущено как .app или .exe
         if sys.platform == 'darwin':  # macOS

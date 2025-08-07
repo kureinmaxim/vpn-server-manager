@@ -17,7 +17,7 @@ class PinAuth:
             is_frozen = getattr(sys, 'frozen', False)
             
             # Имя директории приложения
-            app_name = "VPNServerManager"
+            app_name = "VPNServerManager-Clean"
             
             if is_frozen:  # Приложение запущено как .app или .exe
                 if sys.platform == 'darwin':  # macOS
@@ -122,8 +122,8 @@ class PinAuth:
                 self.pin_attempts += 1
                 print(f"❌ Неверный PIN-код (попытка {self.pin_attempts})")
                 
-                # Блокируем после первой неудачной попытки
-                if self.pin_attempts >= 1:
+                # Блокируем после 3 неудачных попыток
+                if self.pin_attempts >= 3:
                     self.block_pin_login()
                     return False, f"Неверный PIN-код. Вход заблокирован на {self.pin_block_duration} секунд"
                 
