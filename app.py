@@ -23,9 +23,30 @@ load_dotenv()
 
 app = Flask(__name__)
 
+def get_translations_path() -> str:
+    """Возвращает путь к каталогу переводов с учётом упакованного приложения (PyInstaller)."""
+    try:
+        is_frozen = getattr(sys, 'frozen', False)
+        if is_frozen:
+            base_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+            candidates = [os.path.join(base_path, 'translations')]
+        else:
+            base_dir = os.path.dirname(__file__)
+            candidates = [
+                os.path.join(base_dir, 'translations'),
+                'translations',
+            ]
+        for candidate in candidates:
+            if os.path.isdir(candidate):
+                return candidate
+    except Exception:
+        pass
+    # Фолбэк — относительный путь; Flask-Babel поддерживает одиночный путь
+    return 'translations'
+
 # Конфигурация Flask-Babel для интернационализации
 app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
-app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = get_translations_path()
 app.config['BABEL_SUPPORTED_LOCALES'] = ['ru', 'en', 'zh']
 
 babel = Babel()
