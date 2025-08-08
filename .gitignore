@@ -132,6 +132,7 @@ logs/
 audit/
 
 # Конфигурационные файлы разработки
+.env
 .env.local
 .env.development
 .env.test
