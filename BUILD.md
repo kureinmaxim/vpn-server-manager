@@ -111,6 +111,14 @@ dist/
 └── VPNServerManager.dmg     # Установочный образ
 ```
 
+## Локализация (i18n)
+
+- Обзор и методы: см. `docs/i18n/README.md`
+- Классическая интеграция Flask-Babel: `docs/i18n/flask-babel.md`
+- Рабочий цикл Babel CLI: `docs/i18n/babel-cli-workflow.md`
+- Автоперевод `.po`: `docs/i18n/auto-translate.md`
+- Упаковка переводов в .app: `docs/i18n/pyinstaller.md`
+
 ## Дополнительные замечания
 
 - Приложение автоматически создает необходимые директории данных при первом запуске

@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from datetime import date
 from flask import Flask, render_template, request, redirect, url_for, make_response, send_from_directory, jsonify, flash, session
-from flask_babel import Babel, gettext, ngettext
+from flask_babel import Babel, gettext, ngettext, lazy_gettext as _l
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet, InvalidToken
 from werkzeug.utils import secure_filename
@@ -28,7 +28,7 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'ru'
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 app.config['BABEL_SUPPORTED_LOCALES'] = ['ru', 'en', 'zh']
 
-babel = Babel(app)
+babel = Babel()
 
 def get_locale():
     """Определяет язык для текущего запроса."""
@@ -2104,7 +2104,7 @@ def change_language(lang):
         
         # Показываем уведомление только если язык действительно изменился
         if previous_lang != lang:
-            flash(gettext('Язык изменен на %(lang)s') % {'lang': lang}, 'success')
+            flash(_l('Язык изменен на %(lang)s') % {'lang': lang}, 'success')
     
     return redirect(request.referrer or url_for('index'))
 
