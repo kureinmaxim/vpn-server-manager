@@ -5,78 +5,84 @@
 ## Дерево Проекта
 
 ```
-VPNserverManage/
+VPNserverManage-Clean/
 │
-├── app.py                      # Основной файл приложения (сервер Flask и логика GUI)
-├── build_macos.py              # Скрипт для сборки .app и .dmg для macOS
-├── requirements.txt            # Список зависимостей Python
-├── config.json                 # Конфигурация приложения (версия, URL-ы)
-├── VPNServerManager.spec       # Файл конфигурации для PyInstaller
-├── README.md                   # Главная страница проекта
-├── PROJECT_STRUCTURE.md        # Структура проекта
-├── SECRET_KEY.md               # Система шифрования
-├── BUILD.md                    # Инструкции по сборке
-├── CHANGELOG.md                # История изменений
-├── CONTRIBUTING.md             # Руководство по участию в проекте
-├── LICENSE                     # Лицензия MIT
-├── .env                        # Секретный ключ шифрования (не в Git)
-├── .gitignore                  # Исключения для Git
-├── generate_key.py             # Утилита для генерации SECRET_KEY
-├── decrypt_tool.py             # Инструмент для расшифровки данных
-├── pin_auth.py                 # Система PIN-аутентификации
+├── app.py                       # Основной файл (Flask + PyWebView)
+├── build_macos.py               # Сборка .app и .dmg для macOS
+├── requirements.txt             # Зависимости Python
+├── config.json                  # Конфигурация приложения (версия, URL-ы)
+├── VPNServerManager-Clean.spec  # Конфиг PyInstaller
+├── README.md                    # Главная страница проекта
+├── PROJECT_STRUCTURE.md         # Структура проекта (этот файл)
+├── SECRET_KEY.md                # Система шифрования
+├── BUILD.md                     # Инструкции по сборке
+├── CHANGELOG.md                 # История изменений
+├── CONTRIBUTING.md              # Руководство по участию
+├── LICENSE                      # Лицензия MIT
+├── .gitignore                   # Исключения для Git
+├── generate_key.py              # Утилита генерации SECRET_KEY
+├── decrypt_tool.py              # Инструмент для расшифровки данных
+├── pin_auth.py                  # Система PIN-аутентификации
 │
-├── data/
-│   ├── servers.json.enc        # Зашифрованный файл с данными о серверах
-│   ├── hints.json              # Подсказки для команд (шпаргалка)
-│   └── merged_*.enc           # Временные файлы слияния данных
+├── data/                        # Данные проекта (зашифрованные и служебные)
+│   ├── servers.json.enc
+│   ├── hints.json
+│   └── merged_*.enc
 │
 ├── static/
-│   ├── css/style.css           # Пользовательские стили для интерфейса
+│   ├── css/
 │   ├── images/
-│   │   ├── icon.png            # Иконка приложения в формате PNG
-│   │   ├── icon.icns           # Иконка для macOS
-│   │   └── icon_base64.txt     # Иконка в формате base64
-│   └── favicon.ico             # Иконка для веб-интерфейса
+│   ├── fonts/
+│   └── js/
 │
-├── templates/
-│   ├── layout.html             # Базовый HTML-шаблон (навигация, футер, масштабирование UI)
-│   ├── index.html              # Главная страница (список серверов) ⭐ ОБНОВЛЕНА
-│   ├── index_locked.html       # Экран блокировки с PIN-системой
-│   ├── add_server.html         # Форма добавления нового сервера
-│   ├── edit_server.html        # Форма редактирования сервера
-│   ├── settings.html           # Страница настроек (импорт/экспорт данных, управление ключами)
-│   ├── about.html              # Страница "О программе"
-│   ├── help.html               # Страница справки
-│   ├── cheatsheet.html         # Страница шпаргалки команд
-│   └── manage_hints.html       # Управление подсказками
+├── templates/                   # HTML-шаблоны интерфейса
+│   ├── layout.html
+│   ├── index.html
+│   ├── index_locked.html
+│   ├── add_server.html
+│   ├── edit_server.html
+│   ├── settings.html
+│   ├── about.html
+│   ├── help.html
+│   ├── cheatsheet.html
+│   └── manage_hints.html
 │
-├── uploads/                    # Загруженные пользователем файлы
-│   ├── *.png                   # Иконки серверов
-│   └── *                       # Чеки об оплате и другие документы
+├── translations/                # Переводы (.po/.mo)
+│   ├── en/LC_MESSAGES/messages.{po,mo}
+│   ├── zh/LC_MESSAGES/messages.{po,mo}
+│   └── ru/LC_MESSAGES/          # (опционально)
 │
-├── venv/                       # Виртуальное окружение Python
-└── .cursor/                    # Конфигурация IDE (автоматически создается)
+├── docs/
+│   └── i18n/                    # Документация по локализации
+│       ├── README.md
+│       ├── flask-babel.md
+│       ├── babel-cli-workflow.md
+│       ├── auto-translate.md
+│       ├── add-language.md
+│       ├── troubleshooting.md
+│       └── pyinstaller.md
+│
+├── tools/
+│   └── auto_translate_po.py     # Скрипт автоперевода `.po`
+│
+├── backup_tools/
+│   ├── README.md
+│   ├── QUICK_START.md
+│   ├── INDEX.md
+│   ├── CHANGE_CHECKLIST.md
+│   ├── CURRENT_STATE.md
+│   ├── BACKUP_SUMMARY.md
+│   ├── FINAL_REPORT.md
+│   ├── backup_strategy.md
+│   └── rollback.sh              # Скрипт отката (поддерживает -y)
+│
+├── dist/                        # Результаты сборки (.app, .dmg)
+├── build/                       # Временные файлы сборки
+├── uploads/                     # Загруженные пользователем файлы
+└── venv/                        # Виртуальное окружение Python
 ```
 
-## Описание Файлов и Директорий
-
-### Основные файлы
-
--   **`app.py`**: Сердце приложения. Содержит:
-    -   Веб-сервер на базе **Flask**, который обрабатывает все запросы (показать, добавить, удалить сервер).
-    -   Логику шифрования/дешифрования данных с помощью ключа из файла `.env`.
-    -   Интеграцию с **PyWebView** для отображения веб-интерфейса в нативном окне macOS.
-    -   Функцию корректного завершения работы (`/shutdown`) для освобождения порта.
-    -   **🆕 PIN-СИСТЕМА**: Система аутентификации и защиты:
-        -   `/pin/login_ajax` - AJAX вход по PIN-коду
-        -   `/pin/change_ajax` - смена PIN-кода
-        -   `/pin/check_auth` - проверка статуса аутентификации
-        -   `/pin/check_block` - проверка блокировки входа
-        -   `/pin/first_time_setup` - первичная настройка PIN
-        -   `/pin/import_archive` - импорт архива с PIN
-        -   `/pin/check_archive` - проверка архива на наличие PIN
-    -   **⭐ НОВОЕ**: Расширенные функции импорта/экспорта:
-        -   `/data/export` - экспорт данных (.enc файл)
-        -   `/data/export_key` - экспорт ключа шифрования (.env файл) 
-        -   `/data/export_package` - полный экспорт (ZIP с данными, ключом, PIN и файлами)
-        -   `/data/import_external` - импорт с объединением из другой установки
+## Примечания
+- Переводы компилируются в `.mo` через `pybabel compile -d translations`
+- Для упаковки в `.app` добавляйте `translations` в сборку (см. docs/i18n/pyinstaller.md)
+- Данные пользователя сохраняются в `~/Library/Application Support/VPNServerManager-Clean` (см. README)

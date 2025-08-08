@@ -10,12 +10,12 @@ msgstr ""
 "POT-Creation-Date: 2025-08-07 19:30+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.14.0\n"
 
 #: app.py:531
@@ -38,8 +38,8 @@ msgstr "Authentication successful"
 
 #: app.py:1017
 msgid ""
-"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
-" целостность файла данных."
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и "
+"целостность файла данных."
 msgstr ""
 "Failed to load server data. Check your internet connection and data file "
 "integrity."
@@ -62,11 +62,11 @@ msgstr "Data file successfully imported and attached!"
 
 #: app.py:1640
 msgid ""
-"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
-" с другим ключом."
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан с "
+"другим ключом."
 msgstr ""
-"Error: File cannot be decrypted or is corrupted. It may have been created"
-" with a different key."
+"Error: File cannot be decrypted or is corrupted. It may have been created "
+"with a different key."
 
 #: app.py:1648 app.py:1665
 msgid "Неверный тип файла. Пожалуйста, выберите файл .enc"
@@ -87,8 +87,10 @@ msgid "Все сервера из импортируемого файла уже
 msgstr "All servers from the imported file already exist in your list."
 
 #: app.py:1836
-msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
-msgstr "Error: Invalid encryption key. Check the correctness of the entered key."
+msgid ""
+"Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+msgstr ""
+"Error: Invalid encryption key. Check the correctness of the entered key."
 
 #: app.py:1838
 msgid "Ошибка: файл содержит некорректные данные."
@@ -116,8 +118,8 @@ msgid ""
 "✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
 "Резервная копия сохранена как: %(backup_filename)s"
 msgstr ""
-"✅ Key successfully changed! New data file created: %(new_filename)s. "
-"Backup saved as: %(backup_filename)s"
+"✅ Key successfully changed! New data file created: %(new_filename)s. Backup "
+"saved as: %(backup_filename)s"
 
 #: app.py:2030
 msgid "Необходимо выбрать файл и указать ключ для проверки."
@@ -179,8 +181,8 @@ msgstr "Developer:"
 
 #: templates/about.html:16
 msgid ""
-"Программа для удобного и безопасного хранения информации о VPS/VDS "
-"серверах от различных провайдеров."
+"Программа для удобного и безопасного хранения информации о VPS/VDS серверах "
+"от различных провайдеров."
 msgstr ""
 "Program for convenient and secure storage of information about VPS/VDS "
 "servers from various providers."
@@ -202,7 +204,6 @@ msgid "Название сервера"
 msgstr "Server name"
 
 #: templates/add_server.html:16
-#, fuzzy
 msgid "Например, VPS-1"
 msgstr "for example"
 
@@ -211,7 +212,6 @@ msgid "Хостинг-провайдер"
 msgstr "Hosting provider"
 
 #: templates/add_server.html:20
-#, fuzzy
 msgid "Например, Hetzner"
 msgstr "for example"
 
@@ -220,7 +220,6 @@ msgid "IP-адрес"
 msgstr "IP Address"
 
 #: templates/add_server.html:25
-#, fuzzy
 msgid "Например, 1.2.3.4"
 msgstr "For example, Ubuntu 22.04"
 
@@ -251,13 +250,12 @@ msgstr "Suspended"
 
 #: templates/add_server.html:44 templates/add_server.html:133
 #: templates/edit_server.html:163
-#, fuzzy
 msgid "URL панели управления"
 msgstr "VPS Control Panel"
 
 #: templates/add_server.html:45 templates/add_server.html:134
 msgid "Например, http://1.2.3.4:2053/panel"
-msgstr ""
+msgstr "For example, http://1.2.3.4:2053/panel"
 
 #: templates/add_server.html:48 templates/edit_server.html:64
 msgid "Оформление карточки"
@@ -353,27 +351,22 @@ msgid "Например, root"
 msgstr "For example, root"
 
 #: templates/add_server.html:108
-#, fuzzy
 msgid "Пароль SSH"
 msgstr "SSH password"
 
 #: templates/add_server.html:109
-#, fuzzy
 msgid "Введите пароль"
 msgstr "Enter password"
 
 #: templates/add_server.html:112 templates/edit_server.html:141
-#, fuzzy
 msgid "Порт SSH"
 msgstr "SSH port"
 
 #: templates/add_server.html:118
-#, fuzzy
 msgid "Пароль root"
 msgstr "Root password"
 
 #: templates/add_server.html:119
-#, fuzzy
 msgid "Введите пароль root"
 msgstr "Enter root password"
 
@@ -382,7 +375,6 @@ msgid "Вход для root по SSH разрешен"
 msgstr "Root SSH login allowed"
 
 #: templates/add_server.html:131 templates/edit_server.html:161
-#, fuzzy
 msgid "Панель управления (3x-ui и др.)"
 msgstr "Control panel (3x-ui etc.)"
 
@@ -391,17 +383,14 @@ msgid "Логин панели"
 msgstr "Panel login"
 
 #: templates/add_server.html:139
-#, fuzzy
 msgid "Например, admin"
 msgstr "For example, admin"
 
 #: templates/add_server.html:142 templates/edit_server.html:172
-#, fuzzy
 msgid "Пароль панели"
 msgstr "Panel password"
 
 #: templates/add_server.html:143 templates/edit_server.html:173
-#, fuzzy
 msgid "Введите пароль панели"
 msgstr "Enter panel password"
 
@@ -440,7 +429,6 @@ msgstr "Other"
 
 #: templates/add_server.html:165 templates/add_server.html:301
 #: templates/edit_server.html:196 templates/edit_server.html:333
-#, fuzzy
 msgid "Логин хостера"
 msgstr "Hoster login"
 
@@ -449,12 +437,10 @@ msgid "Например, user@example.com"
 msgstr "For example, user@example.com"
 
 #: templates/add_server.html:169
-#, fuzzy
 msgid "Пароль хостера"
 msgstr "Hoster password"
 
 #: templates/add_server.html:170
-#, fuzzy
 msgid "Введите пароль хостера"
 msgstr "Enter hoster password"
 
@@ -471,7 +457,6 @@ msgid "Стриминг-тест пройден (например, 9Now)"
 msgstr "Streaming test passed (e.g. 9Now)"
 
 #: templates/add_server.html:194
-#, fuzzy
 msgid "Загрузка файлов"
 msgstr "File upload"
 
@@ -484,22 +469,18 @@ msgid "Дополнительная информация"
 msgstr "Additional information"
 
 #: templates/add_server.html:203 templates/edit_server.html:219
-#, fuzzy
 msgid "Заметки"
 msgstr "Notes"
 
 #: templates/add_server.html:204
-#, fuzzy
 msgid "Введите заметки"
 msgstr "Enter notes"
 
 #: templates/add_server.html:207
-#, fuzzy
 msgid "Информация о Docker"
 msgstr "Docker information"
 
 #: templates/add_server.html:208
-#, fuzzy
 msgid "Информация о Docker-контейнерах"
 msgstr "Information about Docker containers"
 
@@ -541,7 +522,6 @@ msgid "Управление пакетами (apt)"
 msgstr "Package Management (apt)"
 
 #: templates/add_server.html:270
-#, fuzzy
 msgid "Безопасность (ufw / fail2ban)"
 msgstr "PIN Code Security"
 
@@ -558,7 +538,6 @@ msgid "Ошибка копирования: "
 msgstr "Copy error: "
 
 #: templates/cheatsheet.html:3
-#, fuzzy
 msgid "Шпаргалка по командам"
 msgstr "Command Cheatsheet"
 
@@ -649,12 +628,10 @@ msgid "Основы безопасности"
 msgstr "Security Basics"
 
 #: templates/cheatsheet.html:167
-#, fuzzy
 msgid "Управление файрволом (ufw)"
 msgstr "Firewall management (ufw)"
 
 #: templates/cheatsheet.html:169
-#, fuzzy
 msgid "Проверить статус и правила:"
 msgstr "Check status and rules:"
 
@@ -715,7 +692,6 @@ msgid "Интерактивный монитор процессов"
 msgstr "Interactive Process Monitor"
 
 #: templates/cheatsheet.html:241
-#, fuzzy
 msgid "htop более удобен, если установлен"
 msgstr "htop more convenient if installed"
 
@@ -768,142 +744,134 @@ msgid "Ошибка при копировании"
 msgstr "Error copying"
 
 #: templates/edit_server.html:3
-#, fuzzy
 msgid "Редактировать сервер"
 msgstr "Edit"
 
 #: templates/edit_server.html:7
-#, fuzzy
 msgid "Редактировать:"
 msgstr "Edit"
 
 #: templates/edit_server.html:38
-#, fuzzy
 msgid "Приостановлен"
 msgstr "Installed Software"
 
 #: templates/edit_server.html:39
-#, fuzzy
 msgid "Удален"
 msgstr "Delete"
 
 #: templates/edit_server.html:58
 msgid "Стриминг-тест пройден"
-msgstr ""
+msgstr "Streaming test passed"
 
 #: templates/edit_server.html:71
 msgid "Иконка сервера (заменит текущую)"
-msgstr ""
+msgstr "Server icon (replacing the current)"
 
 #: templates/edit_server.html:75
 msgid "Текущая:"
-msgstr ""
+msgstr "Current:"
 
 #: templates/edit_server.html:101
 msgid "Сумма платежа"
-msgstr ""
+msgstr "The amount of payment"
 
 #: templates/edit_server.html:109
-#, fuzzy
 msgid "Дата след. платежа"
 msgstr "Next Payment"
 
 #: templates/edit_server.html:115
 msgid "Не указан"
-msgstr ""
+msgstr "Not specified"
 
 #: templates/edit_server.html:124 templates/edit_server.html:394
 #: templates/edit_server.html:436
-#, fuzzy
 msgid "Управление чеками"
 msgstr "Hint Management"
 
 #: templates/edit_server.html:136
 msgid "Новый пароль SSH"
-msgstr ""
+msgstr "New password ssh"
 
 #: templates/edit_server.html:138 templates/edit_server.html:149
 #: templates/edit_server.html:202
 msgid "Оставьте пустым, чтобы не менять."
-msgstr ""
+msgstr "Leave empty so as not to change."
 
 #: templates/edit_server.html:147
 msgid "Новый пароль root"
-msgstr ""
+msgstr "New password Root"
 
 #: templates/edit_server.html:174
 msgid "Оставьте пустым, если не хотите менять."
-msgstr ""
+msgstr "Leave empty if you do not want to change."
 
 #: templates/edit_server.html:200
 msgid "Новый пароль хостера"
-msgstr ""
+msgstr "New password of the hoster"
 
 #: templates/edit_server.html:206
 msgid "Быстрая загрузка чека"
-msgstr ""
+msgstr "Fast a check load"
 
 #: templates/edit_server.html:208
 msgid "Файл нового чека"
-msgstr ""
+msgstr "The file of the new check"
 
 #: templates/edit_server.html:210
 msgid ""
 "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
 "используйте кнопку \"Управление чеками\"."
 msgstr ""
+"Use for quick loading of one check. To view all the checks, use the \"Chek "
+"Management\" button."
 
 #: templates/edit_server.html:213
 msgid "Описание чека"
-msgstr ""
+msgstr "The description is waiting"
 
 #: templates/edit_server.html:214
 msgid "Например, Оплата за январь 2024"
-msgstr ""
+msgstr "For example, payment for January 2024"
 
 #: templates/edit_server.html:223
-#, fuzzy
 msgid "Docker информация"
 msgstr "Information:"
 
 #: templates/edit_server.html:231
 msgid "Сохранить изменения"
-msgstr ""
+msgstr "Save changes"
 
 #: templates/edit_server.html:238
-#, fuzzy
 msgid "Подсказки по командам"
 msgstr "Command Cheatsheet"
 
 #: templates/edit_server.html:252
 msgid "Подсказок нет. Вы можете"
-msgstr ""
+msgstr "There are no tips. You can"
 
 #: templates/edit_server.html:252
-#, fuzzy
 msgid "добавить их"
 msgstr "Add Server"
 
 #: templates/edit_server.html:265
 msgid "Чеки по оплате:"
-msgstr ""
+msgstr "Payment checks:"
 
 #: templates/edit_server.html:273
-#, fuzzy
 msgid "Добавить новый чек"
 msgstr "Add First Server"
 
 #: templates/edit_server.html:276
 msgid "Описание"
-msgstr ""
+msgstr "Description"
 
 #: templates/edit_server.html:277
 msgid "Напр., Оплата за февраль 2024"
-msgstr ""
+msgstr "For example, payment for February 2024"
 
 #: templates/edit_server.html:280
 msgid "Файл чека"
-msgstr ""
+msgstr "Check"
 
 #: templates/edit_server.html:285 templates/manage_hints.html:25
 msgid "Добавить"
@@ -911,61 +879,55 @@ msgstr "Add"
 
 #: templates/edit_server.html:292
 msgid "Загруженные чеки"
-msgstr ""
+msgstr "Loaded checks"
 
 #: templates/edit_server.html:298 templates/edit_server.html:381
 msgid "Чек"
-msgstr ""
+msgstr "Check"
 
 #: templates/edit_server.html:299 templates/edit_server.html:382
 msgid "Загружен:"
-msgstr ""
+msgstr "Loaded:"
 
 #: templates/edit_server.html:308 templates/edit_server.html:439
 msgid "Чеки еще не загружены."
-msgstr ""
+msgstr "Checks are not yet loaded."
 
 #: templates/edit_server.html:314
 msgid "Закрыть"
-msgstr ""
+msgstr "Close"
 
 #: templates/edit_server.html:365 templates/edit_server.html:426
 msgid "Ошибка сети"
-msgstr ""
+msgstr "Network error"
 
 #: templates/edit_server.html:397
-#, fuzzy
 msgid "Ошибка при добавлении чека:"
 msgstr "Error copying"
 
 #: templates/edit_server.html:398
-#, fuzzy
 msgid "Не удалось добавить чек:"
 msgstr "Failed to copy text: "
 
 #: templates/edit_server.html:413
-#, fuzzy
 msgid "Вы уверены, что хотите удалить этот чек? Это действие необратимо."
 msgstr "Are you sure you want to delete this server?"
 
 #: templates/edit_server.html:442
-#, fuzzy
 msgid "Не удалось удалить чек."
 msgstr "Failed to copy text: "
 
 #: templates/edit_server.html:446
-#, fuzzy
 msgid "Ошибка при удалении чека:"
 msgstr "Error copying"
 
 #: templates/edit_server.html:447
-#, fuzzy
 msgid "Не удалось удалить чек:"
 msgstr "Failed to copy text: "
 
 #: templates/edit_server.html:462
 msgid "Could not copy text:"
-msgstr ""
+msgstr "Could not copy text:"
 
 #: templates/help.html:3 templates/layout.html:38
 msgid "Справка"
@@ -982,8 +944,8 @@ msgstr "Adding a New Server"
 #: templates/help.html:19
 msgid ""
 "Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
-"необходимые поля. Пароли будут автоматически зашифрованы перед "
-"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
+"необходимые поля. Пароли будут автоматически зашифрованы перед сохранением. "
+"Вы также можете прикрепить файл (например, чек об оплате)."
 msgstr ""
 "Click the \"Add Server\" button on the main page. Fill in all required "
 "fields. Passwords will be automatically encrypted before saving. You can "
@@ -998,8 +960,8 @@ msgid ""
 "Пароли намеренно не отображаются в открытом виде для безопасности. Чтобы "
 "увидеть сохраненный пароль, используйте иконку глаза."
 msgstr ""
-"Passwords are intentionally not displayed in plain text for security. To "
-"see the saved password, use the eye icon."
+"Passwords are intentionally not displayed in plain text for security. To see"
+" the saved password, use the eye icon."
 
 #: templates/help.html:34
 msgid "Отображение пароля:"
@@ -1048,8 +1010,8 @@ msgid ""
 "можете оставить поле пароля пустым, чтобы не изменять его."
 msgstr ""
 "Use the \"Edit\" and \"Delete\" buttons on each server card. Deletion "
-"requires confirmation. When editing, you can leave the password field "
-"empty to avoid changing it."
+"requires confirmation. When editing, you can leave the password field empty "
+"to avoid changing it."
 
 #: templates/help.html:58
 msgid "Безопасность и хранение паролей"
@@ -1069,9 +1031,9 @@ msgstr "SSH, Panel, Host (Passwords) - High Level"
 
 #: templates/help.html:67
 msgid ""
-"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
-"файле"
-msgstr "All passwords (for SSH, control panel and host cabinet) are stored in file"
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в файле"
+msgstr ""
+"All passwords (for SSH, control panel and host cabinet) are stored in file"
 
 #: templates/help.html:67
 msgid "в"
@@ -1083,8 +1045,8 @@ msgstr "encrypted form"
 
 #: templates/help.html:67
 msgid ""
-"с использованием надежного алгоритма. Для шифрования используется "
-"секретный ключ из файла"
+"с использованием надежного алгоритма. Для шифрования используется секретный "
+"ключ из файла"
 msgstr "using a reliable algorithm. For encryption, a secret key from file"
 
 #: templates/help.html:67
@@ -1105,8 +1067,8 @@ msgstr "plain text"
 
 #: templates/help.html:71
 msgid ""
-"Они не шифруются, но на главной странице их пути маскируются для защиты "
-"от случайных взглядов."
+"Они не шифруются, но на главной странице их пути маскируются для защиты от "
+"случайных взглядов."
 msgstr ""
 "They are not encrypted, but on the main page their paths are masked to "
 "protect from casual glances."
@@ -1121,8 +1083,8 @@ msgid ""
 "отображения на странице или при копировании в буфер обмена. В файле они "
 "всегда остаются зашифрованными."
 msgstr ""
-"All encrypted data is decrypted \"on the fly\" only when displayed on the"
-" page or copied to clipboard. In the file, they always remain encrypted."
+"All encrypted data is decrypted \"on the fly\" only when displayed on the "
+"page or copied to clipboard. In the file, they always remain encrypted."
 
 #: templates/help.html:85
 msgid "Диагностика и проверка IP"
@@ -1132,7 +1094,8 @@ msgstr "Diagnostics and IP Checking"
 msgid ""
 "Приложение включает в себя инструменты для быстрой диагностики сети и "
 "серверов."
-msgstr "The application includes tools for quick network and server diagnostics."
+msgstr ""
+"The application includes tools for quick network and server diagnostics."
 
 #: templates/help.html:92
 msgid "Тест IP и DNS:"
@@ -1140,11 +1103,11 @@ msgstr "IP and DNS Test:"
 
 #: templates/help.html:92
 msgid ""
-"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
-"которые ведут на внешние сервисы"
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", которые"
+" ведут на внешние сервисы"
 msgstr ""
-"At the top of the main page are \"IP Test\" and \"DNS Test\" buttons that"
-" lead to external services"
+"At the top of the main page are \"IP Test\" and \"DNS Test\" buttons that "
+"lead to external services"
 
 #: templates/help.html:92 templates/help.html:534 templates/help.html:540
 #: templates/help.html:604
@@ -1162,12 +1125,12 @@ msgstr "Automatic Geolocation:"
 #: templates/help.html:93
 msgid ""
 "При добавлении или редактировании сервера приложение автоматически "
-"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
-" шапке карточки."
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в "
+"шапке карточки."
 msgstr ""
-"When adding or editing a server, the application automatically determines"
-" its geolocation (country and city) by IP address and displays it in the "
-"card header."
+"When adding or editing a server, the application automatically determines "
+"its geolocation (country and city) by IP address and displays it in the card"
+" header."
 
 #: templates/help.html:94
 msgid "Проверка IP сервера:"
@@ -1182,8 +1145,8 @@ msgid ""
 "\"Проверить IP\". При нажатии на неё открывается всплывающее окно с "
 "подробной информацией об IP-адресе сервера от сервиса"
 msgstr ""
-"\"Check IP\". When clicked, a popup window opens with detailed "
-"information about the server's IP address from service"
+"\"Check IP\". When clicked, a popup window opens with detailed information "
+"about the server's IP address from service"
 
 #: templates/help.html:94
 msgid "включая данные об организации и хостинге."
@@ -1200,10 +1163,9 @@ msgid ""
 "стриминговыми сервисами, имеющими геолокационные ограничения (например, "
 "9Now, Hulu, BBC iPlayer)."
 msgstr ""
-"On each server card, there is a row with three indicators that help "
-"quickly assess whether the IP address is suitable for use with streaming "
-"services that have geolocation restrictions (e.g., 9Now, Hulu, BBC "
-"iPlayer)."
+"On each server card, there is a row with three indicators that help quickly "
+"assess whether the IP address is suitable for use with streaming services "
+"that have geolocation restrictions (e.g., 9Now, Hulu, BBC iPlayer)."
 
 #: templates/help.html:110 templates/help.html:113
 msgid "ISP/Residential"
@@ -1218,8 +1180,8 @@ msgid ""
 "Это результат автоматической проверки. Приложение анализирует, кому "
 "принадлежит IP-адрес."
 msgstr ""
-"This is the result of an automatic check. The application analyzes who "
-"owns the IP address."
+"This is the result of an automatic check. The application analyzes who owns "
+"the IP address."
 
 #: templates/help.html:113
 msgid "Отлично. IP-адрес \"домашний\", такие адреса редко блокируются."
@@ -1232,8 +1194,8 @@ msgid ""
 "Внимание. IP-адрес выдан дата-центром или VPN-провайдером. Вероятность "
 "блокировки на стриминговых платформах очень высока."
 msgstr ""
-"Attention. The IP address is issued by a data center or VPN provider. The"
-" probability of being blocked on streaming platforms is very high."
+"Attention. The IP address is issued by a data center or VPN provider. The "
+"probability of being blocked on streaming platforms is very high."
 
 #: templates/help.html:118 templates/help.html:121 templates/index.html:129
 msgid "DNS ?"
@@ -1245,15 +1207,15 @@ msgstr "DNS OK"
 
 #: templates/help.html:119
 msgid ""
-"Это результат ручной проверки, которую вы должны провести самостоятельно."
-" Многие стриминговые сервисы определяют ваше реальное местоположение "
-"через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
-"сервис поймет, что вы используете VPN."
+"Это результат ручной проверки, которую вы должны провести самостоятельно. "
+"Многие стриминговые сервисы определяют ваше реальное местоположение через "
+"DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), сервис "
+"поймет, что вы используете VPN."
 msgstr ""
-"This is the result of a manual check that you must perform yourself. Many"
-" streaming services determine your real location through DNS requests. If"
-" they \"leak\" (go past your VPN server), the service will understand "
-"that you are using a VPN."
+"This is the result of a manual check that you must perform yourself. Many "
+"streaming services determine your real location through DNS requests. If "
+"they \"leak\" (go past your VPN server), the service will understand that "
+"you are using a VPN."
 
 #: templates/help.html:121
 msgid "Статус неизвестен. Проверьте сервер на утечки DNS."
@@ -1294,8 +1256,8 @@ msgid ""
 "Вы подтвердили, что сервис работает, установив галочку \"Стриминг-тест "
 "пройден\"."
 msgstr ""
-"You have confirmed that the service is working by checking the "
-"\"Streaming test passed\" box."
+"You have confirmed that the service is working by checking the \"Streaming "
+"test passed\" box."
 
 #: templates/help.html:141
 msgid "Управление данными и шифрование"
@@ -1303,8 +1265,8 @@ msgstr "Data Management and Encryption"
 
 #: templates/help.html:146
 msgid ""
-"Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
-" обеспечивает как безопасность, так и портативность данных."
+"Вся информация о ваших серверах хранится в одном зашифрованном файле, что "
+"обеспечивает как безопасность, так и портативность данных."
 msgstr ""
 "All information about your servers is stored in a single encrypted file, "
 "which ensures both security and data portability."
@@ -1315,28 +1277,27 @@ msgstr "How does it work?"
 
 #: templates/help.html:150
 msgid ""
-"Все данные о серверах, которые вы вводите, собираются вместе и "
-"преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
-"полностью шифруется и сохраняется в файл с расширением .enc."
+"Все данные о серверах, которые вы вводите, собираются вместе и преобразуются"
+" в единый текстовый блок (в формате JSON). Затем этот блок полностью "
+"шифруется и сохраняется в файл с расширением .enc."
 msgstr ""
 "All server data you enter is collected and converted into a single text "
-"block (in JSON format). This block is then fully encrypted and saved to a"
-" file with the .enc extension."
+"block (in JSON format). This block is then fully encrypted and saved to a "
+"file with the .enc extension."
 
 #: templates/help.html:153
 msgid ""
-"Можно представить это как подробный чертеж (ваши данные), который "
-"разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
-"Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
-"сможет восстановить исходный чертеж."
+"Можно представить это как подробный чертеж (ваши данные), который разрезали "
+"на тысячи мельчайших кусочков и сложили в коробку (файл .enc). Без точной "
+"инструкции по сборке (ключа шифрования SECRET_KEY) никто не сможет "
+"восстановить исходный чертеж."
 msgstr ""
 "You can imagine it as a detailed blueprint (your data) that has been cut "
-"into thousands of tiny pieces and placed in a box (.enc file). Without "
-"the exact assembly instructions (the SECRET_KEY encryption key), no one "
-"can restore the original blueprint."
+"into thousands of tiny pieces and placed in a box (.enc file). Without the "
+"exact assembly instructions (the SECRET_KEY encryption key), no one can "
+"restore the original blueprint."
 
 #: templates/help.html:156
-#, fuzzy
 msgid "Импорт и Экспорт"
 msgstr "Import and Export"
 
@@ -1345,7 +1306,6 @@ msgid "На странице \"Настройки\" вы можете:"
 msgstr "On the \"Settings\" page, you can:"
 
 #: templates/help.html:159
-#, fuzzy
 msgid "Экспортировать данные:"
 msgstr "Export data:"
 
@@ -1358,44 +1318,40 @@ msgstr ""
 "backups or transferring data to another device."
 
 #: templates/help.html:160
-#, fuzzy
 msgid "Импортировать и прикрепить:"
 msgstr "Import and attach:"
 
 #: templates/help.html:160
 msgid ""
-"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
-"и все ваши серверы появятся в списке."
+"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, и "
+"все ваши серверы появятся в списке."
 msgstr ""
-"Upload a previously exported file. The application will start working "
-"with it, and all your servers will appear in the list."
+"Upload a previously exported file. The application will start working with "
+"it, and all your servers will appear in the list."
 
 #: templates/help.html:161
-#, fuzzy
 msgid "Открепить файл:"
 msgstr "Detach file:"
 
 #: templates/help.html:161
 msgid ""
-"Прекратить работу с текущим файлом. Список серверов станет пустым, как "
-"при первой установке. Сам файл при этом не удаляется."
+"Прекратить работу с текущим файлом. Список серверов станет пустым, как при "
+"первой установке. Сам файл при этом не удаляется."
 msgstr ""
-"Stop working with the current file. The server list will become empty, as"
-" in the first installation. The file itself is not deleted."
+"Stop working with the current file. The server list will become empty, as in"
+" the first installation. The file itself is not deleted."
 
 #: templates/help.html:164
-#, fuzzy
 msgid "Алгоритм шифрования Fernet"
 msgstr "Fernet encryption algorithm"
 
 #: templates/help.html:166
 msgid ""
-"Для защиты ваших данных используется Fernet — это высокоуровневая система"
-" симметричного (с секретным ключом) шифрования из библиотеки "
-"cryptography."
+"Для защиты ваших данных используется Fernet — это высокоуровневая система "
+"симметричного (с секретным ключом) шифрования из библиотеки cryptography."
 msgstr ""
-"Fernet is used to protect your data - it is a high-level symmetric "
-"(secret key) encryption system from the cryptography library."
+"Fernet is used to protect your data - it is a high-level symmetric (secret "
+"key) encryption system from the cryptography library."
 
 #: templates/help.html:168
 msgid "Ключевые особенности Fernet:"
@@ -1407,13 +1363,13 @@ msgstr "Authenticity guarantee:"
 
 #: templates/help.html:170
 msgid ""
-"Fernet гарантирует, что зашифрованные данные не были изменены или "
-"подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
-" он не сможет быть расшифрован."
+"Fernet гарантирует, что зашифрованные данные не были изменены или подделаны."
+" Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет"
+" быть расшифрован."
 msgstr ""
-"Fernet guarantees that encrypted data has not been altered or tampered "
-"with. If someone tries to change even one character in the .enc file, it "
-"cannot be decrypted."
+"Fernet guarantees that encrypted data has not been altered or tampered with."
+" If someone tries to change even one character in the .enc file, it cannot "
+"be decrypted."
 
 #: templates/help.html:171
 msgid "Надежные алгоритмы:"
@@ -1422,8 +1378,8 @@ msgstr "Reliable algorithms:"
 #: templates/help.html:171
 msgid ""
 "\"Под капотом\" Fernet использует стандартные и проверенные временем "
-"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
-" SHA256 для аутентификации (проверки подлинности)."
+"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с "
+"SHA256 для аутентификации (проверки подлинности)."
 msgstr ""
 "\"Under the hood\" Fernet uses standard and time-tested cryptographic "
 "algorithms: AES-128 in CBC mode for encryption and HMAC with SHA256 for "
@@ -1437,11 +1393,11 @@ msgstr "Important:"
 
 #: templates/help.html:174
 msgid ""
-"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
-" файле .env. Никогда и никому его не передавайте."
+"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в "
+"файле .env. Никогда и никому его не передавайте."
 msgstr ""
-"The entire security of the system depends on the secrecy of your "
-"SECRET_KEY in the .env file. Never share it with anyone."
+"The entire security of the system depends on the secrecy of your SECRET_KEY "
+"in the .env file. Never share it with anyone."
 
 #: templates/help.html:183
 msgid "Импорт из другой установки"
@@ -1449,24 +1405,23 @@ msgstr "Import from Another Installation"
 
 #: templates/help.html:188
 msgid ""
-"Эта функция позволяет перенести данные о серверах из другой установки VPN"
-" Server Manager, даже если у неё другой ключ шифрования."
+"Эта функция позволяет перенести данные о серверах из другой установки VPN "
+"Server Manager, даже если у неё другой ключ шифрования."
 msgstr ""
 "This feature allows you to transfer server data from another VPN Server "
 "Manager installation, even if it has a different encryption key."
 
 #: templates/help.html:190
-#, fuzzy
 msgid "Когда это нужно?"
 msgstr "When is this needed?"
 
 #: templates/help.html:192
 msgid ""
-"Вы настроили приложение на другом компьютере и хотите перенести данные на"
-" новый"
+"Вы настроили приложение на другом компьютере и хотите перенести данные на "
+"новый"
 msgstr ""
-"You have set up the application on another computer and want to transfer "
-"the data to a new one"
+"You have set up the application on another computer and want to transfer the"
+" data to a new one"
 
 #: templates/help.html:193
 msgid "У коллеги есть список серверов, и вы хотите добавить его к своему"
@@ -1487,7 +1442,6 @@ msgstr ""
 "created"
 
 #: templates/help.html:200
-#, fuzzy
 msgid "Подготовка данных:"
 msgstr "Data preparation:"
 
@@ -1496,7 +1450,6 @@ msgid "На исходном компьютере найдите два файл
 msgstr "On the source computer, find two files:"
 
 #: templates/help.html:202
-#, fuzzy
 msgid "Файл данных с расширением"
 msgstr "Data file with extension"
 
@@ -1509,7 +1462,6 @@ msgid ")"
 msgstr ")"
 
 #: templates/help.html:203
-#, fuzzy
 msgid "Ключ шифрования из файла"
 msgstr "Encryption key from the file"
 
@@ -1523,11 +1475,11 @@ msgstr "Transfer:"
 
 #: templates/help.html:206
 msgid ""
-"Скопируйте оба элемента на новый компьютер любым удобным способом "
-"(флешка, облако, email)"
+"Скопируйте оба элемента на новый компьютер любым удобным способом (флешка, "
+"облако, email)"
 msgstr ""
-"Copy both items to the new computer in any convenient way (USB flash "
-"drive, cloud, email)"
+"Copy both items to the new computer in any convenient way (USB flash drive, "
+"cloud, email)"
 
 #: templates/help.html:207 templates/help.html:654
 msgid "Импорт:"
@@ -1538,7 +1490,6 @@ msgid "На новом компьютере:"
 msgstr "On the new computer:"
 
 #: templates/help.html:209
-#, fuzzy
 msgid "Откройте раздел \"Настройки\" → \"Импорт из другой установки\""
 msgstr "Open \"Settings\" → \"Import from another installation\""
 
@@ -1548,7 +1499,6 @@ msgid "Выберите файл"
 msgstr "Select file"
 
 #: templates/help.html:211
-#, fuzzy
 msgid "Вставьте ключ шифрования в текстовое поле"
 msgstr "Paste the encryption key into the text box"
 
@@ -1557,7 +1507,6 @@ msgid "Нажмите \"Импортировать с внешним ключо�
 msgstr "Click \"Import with external key\""
 
 #: templates/help.html:217
-#, fuzzy
 msgid "Где найти ключ шифрования?"
 msgstr "Where to find the encryption key?"
 
@@ -1574,7 +1523,6 @@ msgid "На macOS:"
 msgstr "On macOS:"
 
 #: templates/help.html:220
-#, fuzzy
 msgid "откройте файл"
 msgstr "open the file"
 
@@ -1591,17 +1539,14 @@ msgid "выполните"
 msgstr "execute"
 
 #: templates/help.html:221
-#, fuzzy
 msgid "в папке приложения"
 msgstr "in the application folder"
 
 #: templates/help.html:222
-#, fuzzy
 msgid "Формат ключа:"
 msgstr "Key format:"
 
 #: templates/help.html:222
-#, fuzzy
 msgid "строка вида"
 msgstr "a line like"
 
@@ -1618,7 +1563,8 @@ msgid "Что происходит при импорте?"
 msgstr "What happens during import?"
 
 #: templates/help.html:228
-msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
+msgid ""
+"Приложение расшифровывает внешний файл с помощью предоставленного ключа"
 msgstr "The application decrypts the external file using the provided key"
 
 #: templates/help.html:229
@@ -1638,12 +1584,10 @@ msgid "Важные замечания:"
 msgstr "Important notes:"
 
 #: templates/help.html:238
-#, fuzzy
 msgid "Импорт"
 msgstr "Import"
 
 #: templates/help.html:238
-#, fuzzy
 msgid "заменит"
 msgstr "will replace"
 
@@ -1660,8 +1604,8 @@ msgid ""
 "Внешний ключ не сохраняется в системе - он используется только для "
 "одноразового импорта"
 msgstr ""
-"The external key is not saved in the system - it is used only for a one-"
-"time import"
+"The external key is not saved in the system - it is used only for a one-time"
+" import"
 
 #: templates/help.html:241
 msgid "После импорта все данные будут зашифрованы вашим текущим ключом"
@@ -1674,11 +1618,11 @@ msgstr "Tip:"
 
 #: templates/help.html:247
 msgid ""
-"Для регулярного обмена данными между установками рекомендуется "
-"использовать одинаковый"
+"Для регулярного обмена данными между установками рекомендуется использовать "
+"одинаковый"
 msgstr ""
-"For regular data exchange between installations, it is recommended to use"
-" the same"
+"For regular data exchange between installations, it is recommended to use "
+"the same"
 
 #: templates/help.html:247
 msgid "на всех устройствах. Тогда можно будет просто копировать"
@@ -1694,11 +1638,11 @@ msgstr "What is SECRET_KEY and where to get it?"
 
 #: templates/help.html:261
 msgid ""
-"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех "
-"данных в приложении. Он абсолютно необходим для работы."
+"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных "
+"в приложении. Он абсолютно необходим для работы."
 msgstr ""
-"<code>SECRET_KEY</code> is your master password for encrypting all data "
-"in the application. It is absolutely essential for operation."
+"<code>SECRET_KEY</code> is your master password for encrypting all data in "
+"the application. It is absolutely essential for operation."
 
 #: templates/help.html:263
 msgid "Где находится:"
@@ -1707,29 +1651,28 @@ msgstr "Where it is located:"
 #: templates/help.html:263
 msgid "Ключ хранится в файле <code>.env</code> в корневой папке приложения."
 msgstr ""
-"The key is stored in the <code>.env</code> file in the root folder of the"
-" application."
+"The key is stored in the <code>.env</code> file in the root folder of the "
+"application."
 
 #: templates/help.html:264
-#, fuzzy
 msgid "Как сгенерировать:"
 msgstr "How to generate:"
 
 #: templates/help.html:264
 msgid ""
-"Если вы запускаете приложение в первый раз, вам нужно создать его. Для "
-"этого можно использовать Python:"
+"Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого"
+" можно использовать Python:"
 msgstr ""
-"If you are running the application for the first time, you need to create"
-" it. To do this, you can use Python:"
+"If you are running the application for the first time, you need to create "
+"it. To do this, you can use Python:"
 
 #: templates/help.html:267
 msgid ""
-"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code>"
-" в таком виде:"
+"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в "
+"таком виде:"
 msgstr ""
-"Copy the resulting long code and paste it into the <code>.env</code> file"
-" in this form:"
+"Copy the resulting long code and paste it into the <code>.env</code> file in"
+" this form:"
 
 #: templates/help.html:268
 msgid "ваш_сгенерированный_ключ"
@@ -1741,13 +1684,13 @@ msgstr "IMPORTANT:"
 
 #: templates/help.html:270
 msgid ""
-"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете "
-"доступ ко всем данным. Если вы переносите приложение, обязательно "
-"скопируйте файл <code>.env</code> вместе с остальными данными."
+"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ "
+"ко всем данным. Если вы переносите приложение, обязательно скопируйте файл "
+"<code>.env</code> вместе с остальными данными."
 msgstr ""
-"Never share this key with anyone! If you lose it, you will lose access to"
-" all your data. If you are transferring the application, be sure to copy "
-"the <code>.env</code> file along with the rest of the data."
+"Never share this key with anyone! If you lose it, you will lose access to "
+"all your data. If you are transferring the application, be sure to copy the "
+"<code>.env</code> file along with the rest of the data."
 
 #: templates/help.html:279
 msgid "Структура и перенос приложения на другой компьютер?"
@@ -1763,14 +1706,13 @@ msgstr ""
 
 #: templates/help.html:287
 msgid ""
-"Эта инструкция предназначена для текущей \"портативной\" версии "
-"приложения. В будущем, для версий, установленных через инсталлятор "
-"(Windows, macOS), будет предусмотрен специальный механизм экспорта и "
-"импорта."
+"Эта инструкция предназначена для текущей \"портативной\" версии приложения. "
+"В будущем, для версий, установленных через инсталлятор (Windows, macOS), "
+"будет предусмотрен специальный механизм экспорта и импорта."
 msgstr ""
-"This instruction is for the current \"portable\" version of the "
-"application. In the future, for versions installed via an installer "
-"(Windows, macOS), a special export and import mechanism will be provided."
+"This instruction is for the current \"portable\" version of the application."
+" In the future, for versions installed via an installer (Windows, macOS), a "
+"special export and import mechanism will be provided."
 
 #: templates/help.html:290
 msgid "Шаг 1: Что нужно скопировать"
@@ -1781,8 +1723,8 @@ msgid ""
 "Для полного переноса вам нужно скопировать <strong>3 ключевых "
 "элемента</strong> из папки проекта:"
 msgstr ""
-"For a full transfer, you need to copy <strong>3 key elements</strong> "
-"from the project folder:"
+"For a full transfer, you need to copy <strong>3 key elements</strong> from "
+"the project folder:"
 
 #: templates/help.html:293
 msgid "Файл <code>.env</code>"
@@ -1790,13 +1732,11 @@ msgstr "File <code>.env</code>"
 
 #: templates/help.html:293
 msgid ""
-"— самый важный файл! В нем содержится ваш уникальный "
-"<code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все "
-"данные будут утеряны.</strong>"
+"— самый важный файл! В нем содержится ваш уникальный <code>SECRET_KEY</code>"
+" для расшифровки данных. <strong>Без него все данные будут утеряны.</strong>"
 msgstr ""
-"— the most important file! It contains your unique "
-"<code>SECRET_KEY</code> for decrypting data. <strong>Without it, all data"
-" will be lost.</strong>"
+"— the most important file! It contains your unique <code>SECRET_KEY</code> "
+"for decrypting data. <strong>Without it, all data will be lost.</strong>"
 
 #: templates/help.html:294
 msgid "Папка <code>/data/</code>"
@@ -1816,11 +1756,10 @@ msgstr "Folder <code>/uploads/</code>"
 
 #: templates/help.html:295
 msgid ""
-"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об "
-"оплате."
+"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об оплате."
 msgstr ""
-"— this is where all the files you have uploaded are stored: server icons "
-"and payment receipts."
+"— this is where all the files you have uploaded are stored: server icons and"
+" payment receipts."
 
 #: templates/help.html:298
 msgid "Шаг 2: Процесс переноса"
@@ -1832,9 +1771,9 @@ msgid ""
 "<code>VPNserverManage.zip</code>). Это самый надежный способ ничего не "
 "забыть."
 msgstr ""
-"On the old computer, create an archive of the entire application folder "
-"(for example, <code>VPNserverManage.zip</code>). This is the most "
-"reliable way to not forget anything."
+"On the old computer, create an archive of the entire application folder (for"
+" example, <code>VPNserverManage.zip</code>). This is the most reliable way "
+"to not forget anything."
 
 #: templates/help.html:301
 msgid "Перенесите этот архив на новый компьютер и распакуйте его."
@@ -1858,14 +1797,13 @@ msgstr ""
 
 #: templates/help.html:308
 msgid ""
-"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть"
-" на месте."
+"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на"
+" месте."
 msgstr ""
-"Launch the application. All your data, including receipts and icons, "
-"should be in place."
+"Launch the application. All your data, including receipts and icons, should "
+"be in place."
 
 #: templates/help.html:311
-#, fuzzy
 msgid "Структура файлов проекта (для разработчиков)"
 msgstr "Project file structure (for developers)"
 
@@ -1874,7 +1812,6 @@ msgid "Для понимания, где что лежит:"
 msgstr "To understand where everything is:"
 
 #: templates/help.html:314
-#, fuzzy
 msgid "Основной файл приложения."
 msgstr "Main application file."
 
@@ -1913,8 +1850,7 @@ msgid ""
 "Статические файлы (CSS, изображения, иконки <code>.png</code> и "
 "<code>.icns</code>)."
 msgstr ""
-"Static files (CSS, images, icons <code>.png</code> and "
-"<code>.icns</code>)."
+"Static files (CSS, images, icons <code>.png</code> and <code>.icns</code>)."
 
 #: templates/help.html:331
 msgid "Как посмотреть все пароли сразу (расшифровка)?"
@@ -1922,23 +1858,23 @@ msgstr "How to see all passwords at once (decryption)?"
 
 #: templates/help.html:337
 msgid ""
-"Хотя приложение позволяет просматривать пароли по одному через интерфейс,"
-" может возникнуть ситуация, когда вам нужно получить доступ ко всем "
-"данным сразу в читаемом виде. Например, для резервного копирования в "
-"текстовый файл или для переноса в другую систему."
+"Хотя приложение позволяет просматривать пароли по одному через интерфейс, "
+"может возникнуть ситуация, когда вам нужно получить доступ ко всем данным "
+"сразу в читаемом виде. Например, для резервного копирования в текстовый файл"
+" или для переноса в другую систему."
 msgstr ""
-"Although the application allows you to view passwords one at a time "
-"through the interface, there may be a situation where you need to access "
-"all the data at once in a readable form. For example, for backing up to a"
-" text file or for transferring to another system."
+"Although the application allows you to view passwords one at a time through "
+"the interface, there may be a situation where you need to access all the "
+"data at once in a readable form. For example, for backing up to a text file "
+"or for transferring to another system."
 
 #: templates/help.html:340
 msgid ""
-"Для этой цели в корневой папке проекта существует специальный инструмент "
-"— <code>decrypt_tool.py</code>."
+"Для этой цели в корневой папке проекта существует специальный инструмент — "
+"<code>decrypt_tool.py</code>."
 msgstr ""
-"For this purpose, there is a special tool in the root folder of the "
-"project — <code>decrypt_tool.py</code>."
+"For this purpose, there is a special tool in the root folder of the project "
+"— <code>decrypt_tool.py</code>."
 
 #: templates/help.html:343
 msgid "Что он делает?"
@@ -1950,17 +1886,16 @@ msgid ""
 "<code>.env</code> для полной расшифровки файла с данными "
 "<code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную "
 "структуру и расшифровывает все учетные данные: <strong>SSH, панель "
-"управления и кабинет хостера</strong>, после чего выводит все в терминал "
-"в структурированном виде."
+"управления и кабинет хостера</strong>, после чего выводит все в терминал в "
+"структурированном виде."
 msgstr ""
 "This script uses your <code>SECRET_KEY</code> from the <code>.env</code> "
-"file to fully decrypt the data file <code>data/servers.json.enc</code>. "
-"It correctly handles the nested structure and decrypts all credentials: "
-"<strong>SSH, control panel, and hoster's account</strong>, after which it"
-" outputs everything to the terminal in a structured form."
+"file to fully decrypt the data file <code>data/servers.json.enc</code>. It "
+"correctly handles the nested structure and decrypts all credentials: "
+"<strong>SSH, control panel, and hoster's account</strong>, after which it "
+"outputs everything to the terminal in a structured form."
 
 #: templates/help.html:348
-#, fuzzy
 msgid "Как использовать?"
 msgstr "How to use?"
 
@@ -1969,13 +1904,13 @@ msgid ""
 "Вам нужно выполнить одну команду в терминале, находясь в корневой папке "
 "проекта:"
 msgstr ""
-"You need to execute one command in the terminal, being in the root folder"
-" of the project:"
+"You need to execute one command in the terminal, being in the root folder of"
+" the project:"
 
 #: templates/help.html:353
 msgid ""
-"Эта команда сначала активирует необходимое виртуальное окружение, а затем"
-" запускает скрипт для расшифровки."
+"Эта команда сначала активирует необходимое виртуальное окружение, а затем "
+"запускает скрипт для расшифровки."
 msgstr ""
 "This command first activates the necessary virtual environment, and then "
 "launches the decryption script."
@@ -1987,12 +1922,12 @@ msgstr "Attention:"
 #: templates/help.html:356
 msgid ""
 "Выводимые данные (включая все пароли) будут видны в вашем терминале. "
-"Убедитесь, что вы делаете это в безопасной обстановке, где никто не "
-"сможет увидеть ваш экран."
+"Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет "
+"увидеть ваш экран."
 msgstr ""
-"The output data (including all passwords) will be visible in your "
-"terminal. Make sure you are doing this in a safe environment where no one"
-" can see your screen."
+"The output data (including all passwords) will be visible in your terminal. "
+"Make sure you are doing this in a safe environment where no one can see your"
+" screen."
 
 #: templates/help.html:365
 msgid "Особенности работы на macOS"
@@ -2001,14 +1936,12 @@ msgstr "Features of working on macOS"
 #: templates/help.html:370
 msgid ""
 "В установленной версии приложения для macOS данные хранятся в "
-"пользовательской директории для соответствия стандартам безопасности "
-"Apple."
+"пользовательской директории для соответствия стандартам безопасности Apple."
 msgstr ""
-"In the installed version of the application for macOS, data is stored in "
-"the user's directory to comply with Apple's security standards."
+"In the installed version of the application for macOS, data is stored in the"
+" user's directory to comply with Apple's security standards."
 
 #: templates/help.html:372 templates/help.html:393 templates/help.html:414
-#, fuzzy
 msgid "Расположение данных"
 msgstr "Data location"
 
@@ -2022,28 +1955,27 @@ msgstr ""
 
 #: templates/help.html:375
 msgid ""
-"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню "
-"«Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите "
-"появившийся пункт «Library». В открывшейся папке далее перейдите в "
-"«Application Support», а затем в «VPNServerManager»."
+"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» "
+"(Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт "
+"«Library». В открывшейся папке далее перейдите в «Application Support», а "
+"затем в «VPNServerManager»."
 msgstr ""
-"To quickly get to this folder: open Finder, click on the \"Go\" menu, "
-"hold down the <code>Option (⌥)</code> key and select the \"Library\" item"
-" that appears. In the folder that opens, then go to \"Application "
-"Support\", and then to \"VPNServerManager\"."
+"To quickly get to this folder: open Finder, click on the \"Go\" menu, hold "
+"down the <code>Option (⌥)</code> key and select the \"Library\" item that "
+"appears. In the folder that opens, then go to \"Application Support\", and "
+"then to \"VPNServerManager\"."
 
 #: templates/help.html:377 templates/help.html:398 templates/help.html:419
-#, fuzzy
 msgid "Версия для разработки"
 msgstr "Development version"
 
 #: templates/help.html:378 templates/help.html:399 templates/help.html:420
 msgid ""
-"Если вы запускаете приложение из исходного кода, все данные хранятся "
-"прямо в папке проекта для удобства отладки."
+"Если вы запускаете приложение из исходного кода, все данные хранятся прямо в"
+" папке проекта для удобства отладки."
 msgstr ""
-"If you run the application from the source code, all data is stored "
-"directly in the project folder for ease of debugging."
+"If you run the application from the source code, all data is stored directly"
+" in the project folder for ease of debugging."
 
 #: templates/help.html:386
 msgid "Особенности работы на Windows"
@@ -2086,10 +2018,11 @@ msgid "Особенности работы на Linux"
 msgstr "Features of working on Linux"
 
 #: templates/help.html:412
-msgid "В установленной версии приложения для Linux данные хранятся в директории"
+msgid ""
+"В установленной версии приложения для Linux данные хранятся в директории"
 msgstr ""
-"In the installed version of the application for Linux, data is stored in "
-"the directory"
+"In the installed version of the application for Linux, data is stored in the"
+" directory"
 
 #: templates/help.html:412
 msgid ""
@@ -2100,7 +2033,6 @@ msgstr ""
 "standards."
 
 #: templates/help.html:417
-#, fuzzy
 msgid "Папка"
 msgstr "Folder"
 
@@ -2109,8 +2041,8 @@ msgid ""
 "является скрытой. Чтобы увидеть её в файловом менеджере, включите "
 "отображение скрытых файлов (обычно по нажатию"
 msgstr ""
-"is hidden. To see it in the file manager, enable the display of hidden "
-"files (usually by pressing"
+"is hidden. To see it in the file manager, enable the display of hidden files"
+" (usually by pressing"
 
 #: templates/help.html:417
 msgid ")."
@@ -2122,11 +2054,11 @@ msgstr "Creating and configuring application icons"
 
 #: templates/help.html:433
 msgid ""
-"Приложение поддерживает кастомные иконки для каждой операционной системы."
-" Это позволяет создать единый визуальный стиль на всех платформах."
+"Приложение поддерживает кастомные иконки для каждой операционной системы. "
+"Это позволяет создать единый визуальный стиль на всех платформах."
 msgstr ""
-"The application supports custom icons for each operating system. This "
-"allows you to create a single visual style on all platforms."
+"The application supports custom icons for each operating system. This allows"
+" you to create a single visual style on all platforms."
 
 #: templates/help.html:435
 msgid "Требования к исходной иконке"
@@ -2146,14 +2078,13 @@ msgstr "pixels"
 
 #: templates/help.html:437
 msgid ""
-"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
-" включая Retina-дисплеи."
+"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, "
+"включая Retina-дисплеи."
 msgstr ""
 "with a transparent background. This will ensure the best quality on all "
 "devices, including Retina displays."
 
 #: templates/help.html:440 templates/help.html:521
-#, fuzzy
 msgid "Формат:"
 msgstr "Format:"
 
@@ -2182,7 +2113,6 @@ msgid "Расположение:"
 msgstr "Location:"
 
 #: templates/help.html:446
-#, fuzzy
 msgid "Автоматическое создание иконок"
 msgstr "Automatic icon creation"
 
@@ -2216,7 +2146,8 @@ msgstr "Manual icon creation"
 
 #: templates/help.html:454
 msgid "Если вы хотите создать иконки вручную или скрипты сборки не работают:"
-msgstr "If you want to create icons manually or the build scripts do not work:"
+msgstr ""
+"If you want to create icons manually or the build scripts do not work:"
 
 #: templates/help.html:456
 msgid "Для macOS (.icns)"
@@ -2235,7 +2166,6 @@ msgid "Создайте иконки разных размеров"
 msgstr "Create icons of different sizes"
 
 #: templates/help.html:473
-#, fuzzy
 msgid "Создайте .icns файл"
 msgstr "Create .icns file"
 
@@ -2260,12 +2190,10 @@ msgid "Создайте .ico файл"
 msgstr "Create .ico file"
 
 #: templates/help.html:493
-#, fuzzy
 msgid "Создан .ico файл:"
 msgstr "Created .ico file:"
 
 #: templates/help.html:495
-#, fuzzy
 msgid "PNG файл не найден:"
 msgstr "PNG file not found:"
 
@@ -2274,10 +2202,11 @@ msgid "Замена иконки в уже собранном приложени
 msgstr "Replacing the icon in an already built application"
 
 #: templates/help.html:499
-msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
+msgid ""
+"Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
 msgstr ""
-"If you want to replace the icon in an already finished application "
-"without rebuilding:"
+"If you want to replace the icon in an already finished application without "
+"rebuilding:"
 
 #: templates/help.html:501
 msgid "macOS"
@@ -2293,15 +2222,14 @@ msgstr "Right-click → \"Get Info\""
 
 #: templates/help.html:505
 msgid "Перетащите новую иконку на маленькую иконку в левом верхнем углу окна"
-msgstr "Drag the new icon to the small icon in the upper left corner of the window"
+msgstr ""
+"Drag the new icon to the small icon in the upper left corner of the window"
 
 #: templates/help.html:506
-#, fuzzy
 msgid "Или замените файл"
 msgstr "Or replace the file"
 
 #: templates/help.html:506
-#, fuzzy
 msgid "напрямую"
 msgstr "directly"
 
@@ -2357,32 +2285,30 @@ msgstr "Check how the icon looks on different backgrounds (light/dark)."
 
 #: templates/help.html:521
 msgid ""
-"Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
-"лучшую совместимость."
+"Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую "
+"совместимость."
 msgstr ""
-"Always use PNG with transparency as the source - this will ensure the "
-"best compatibility."
+"Always use PNG with transparency as the source - this will ensure the best "
+"compatibility."
 
 #: templates/help.html:525
 msgid ""
 "После замены иконки может потребоваться перезагрузка системы или очистка "
 "кэша иконок, чтобы изменения стали видны в файловом менеджере."
 msgstr ""
-"After replacing the icon, you may need to restart the system or clear the"
-" icon cache for the changes to become visible in the file manager."
+"After replacing the icon, you may need to restart the system or clear the "
+"icon cache for the changes to become visible in the file manager."
 
 #: templates/help.html:528
-#, fuzzy
 msgid "Устранение проблем с иконками"
 msgstr "Troubleshooting icons"
 
 #: templates/help.html:529
 msgid ""
-"Если иконки не отображаются или приложение собирается с дефектными "
-"иконками:"
+"Если иконки не отображаются или приложение собирается с дефектными иконками:"
 msgstr ""
-"If the icons are not displayed or the application is built with defective"
-" icons:"
+"If the icons are not displayed or the application is built with defective "
+"icons:"
 
 #: templates/help.html:531
 msgid "Проблема: Иконка не отображается в собранном приложении"
@@ -2407,7 +2333,6 @@ msgid "Пересоздайте иконки:"
 msgstr "Recreate the icons:"
 
 #: templates/help.html:534
-#, fuzzy
 msgid "Удалите"
 msgstr "Delete"
 
@@ -2484,7 +2409,6 @@ msgid "Удалите старые иконки и пересоздайте их
 msgstr "Delete the old icons and recreate them from the new PNG"
 
 #: templates/help.html:552
-#, fuzzy
 msgid "Диагностика проблем"
 msgstr "Troubleshooting"
 
@@ -2497,7 +2421,6 @@ msgid "Проверьте размер и тип файлов иконок"
 msgstr "Check the size and type of icon files"
 
 #: templates/help.html:558
-#, fuzzy
 msgid "Проверьте исходный PNG"
 msgstr "Check the source PNG"
 
@@ -2507,9 +2430,9 @@ msgid ""
 "иконки после успешной сборки. Это поможет быстро восстановить "
 "функциональность в случае проблем."
 msgstr ""
-"If problems with icons persist, create a backup of the working icon after"
-" a successful build. This will help to quickly restore functionality in "
-"case of problems."
+"If problems with icons persist, create a backup of the working icon after a "
+"successful build. This will help to quickly restore functionality in case of"
+" problems."
 
 #: templates/help.html:571
 msgid "Структура проекта и алгоритм работы"
@@ -2525,11 +2448,11 @@ msgstr "Description of Files and Directories"
 
 #: templates/help.html:599
 msgid ""
-"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
-"интеграцию с PyWebView для создания окна."
+"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию"
+" с PyWebView для создания окна."
 msgstr ""
-"The heart of the application. Contains a Flask web server, encryption "
-"logic and integration with PyWebView to create a window."
+"The heart of the application. Contains a Flask web server, encryption logic "
+"and integration with PyWebView to create a window."
 
 #: templates/help.html:600
 msgid "Скрипт для сборки приложения в"
@@ -2544,7 +2467,8 @@ msgid "Список всех библиотек Python, необходимых �
 msgstr "A list of all the Python libraries needed to run."
 
 #: templates/help.html:602
-msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
+msgid ""
+"Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
 msgstr ""
 "Settings file, stores information about the version and URLs of external "
 "services."
@@ -2554,7 +2478,6 @@ msgid "Самый важный файл. Это"
 msgstr "The most important file. This is"
 
 #: templates/help.html:603
-#, fuzzy
 msgid "зашифрованный"
 msgstr "encrypted"
 
@@ -2564,31 +2487,29 @@ msgstr "A JSON file containing all information about the servers."
 
 #: templates/help.html:604
 msgid ""
-"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
-"веб-интерфейса."
+"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-"
+"интерфейса."
 msgstr ""
-"Folders with static resources (CSS, images) and HTML templates for the "
-"web interface."
+"Folders with static resources (CSS, images) and HTML templates for the web "
+"interface."
 
 #: templates/help.html:607
 msgid "Алгоритм Работы Программы"
 msgstr "Program Operation Algorithm"
 
 #: templates/help.html:609
-#, fuzzy
 msgid "Запуск"
 msgstr "Launch"
 
 #: templates/help.html:609
 msgid ""
-"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
-"окно с помощью PyWebView."
+"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно"
+" с помощью PyWebView."
 msgstr ""
 "`app.py` starts a Flask web server in a background thread and creates a "
 "native window using PyWebView."
 
 #: templates/help.html:610
-#, fuzzy
 msgid "Отображение"
 msgstr "Display"
 
@@ -2601,30 +2522,28 @@ msgid "и показывает их."
 msgstr "and shows them."
 
 #: templates/help.html:611
-#, fuzzy
 msgid "Взаимодействие"
 msgstr "Interaction"
 
 #: templates/help.html:611
 msgid ""
-"Все действия пользователя обрабатываются Flask, который изменяет данные и"
-" снова шифрует их."
+"Все действия пользователя обрабатываются Flask, который изменяет данные и "
+"снова шифрует их."
 msgstr ""
-"All user actions are processed by Flask, which changes the data and "
-"encrypts it again."
+"All user actions are processed by Flask, which changes the data and encrypts"
+" it again."
 
 #: templates/help.html:612
-#, fuzzy
 msgid "Завершение"
 msgstr "Completion"
 
 #: templates/help.html:612
 msgid ""
-"При закрытии окна PyWebView отправляет команду на выключение сервера "
-"Flask, который корректно завершает работу и освобождает порт."
+"При закрытии окна PyWebView отправляет команду на выключение сервера Flask, "
+"который корректно завершает работу и освобождает порт."
 msgstr ""
-"When the window is closed, PyWebView sends a command to shut down the "
-"Flask server, which correctly terminates and releases the port."
+"When the window is closed, PyWebView sends a command to shut down the Flask "
+"server, which correctly terminates and releases the port."
 
 #: templates/help.html:621
 msgid "PIN-система защиты"
@@ -2645,27 +2564,25 @@ msgstr "First Launch"
 
 #: templates/help.html:629
 msgid ""
-"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У "
-"вас есть два варианта:"
+"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У вас "
+"есть два варианта:"
 msgstr ""
 "When you first launch the application, you will see the \"Access "
 "Restricted\" screen. You have two options:"
 
 #: templates/help.html:631
-#, fuzzy
 msgid "Создать новый PIN:"
 msgstr "Create a new PIN:"
 
 #: templates/help.html:631
 msgid ""
-"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый "
-"PIN и сбросит все данные."
+"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый PIN"
+" и сбросит все данные."
 msgstr ""
-"Click \"First Launch\" → \"Create a new PIN code\". This will create a "
-"new PIN and reset all data."
+"Click \"First Launch\" → \"Create a new PIN code\". This will create a new "
+"PIN and reset all data."
 
 #: templates/help.html:632
-#, fuzzy
 msgid "Импортировать архив:"
 msgstr "Import archive:"
 
@@ -2674,8 +2591,8 @@ msgid ""
 "Нажмите \"Первый запуск\" → \"Импортировать архив\". Это позволит "
 "восстановить данные из ранее созданного архива."
 msgstr ""
-"Click \"First Launch\" → \"Import archive\". This will allow you to "
-"restore data from a previously created archive."
+"Click \"First Launch\" → \"Import archive\". This will allow you to restore "
+"data from a previously created archive."
 
 #: templates/help.html:635
 msgid "Вход в приложение"
@@ -2695,14 +2612,12 @@ msgstr "Double-click on the developer's name:"
 
 #: templates/help.html:638
 msgid ""
-"Внизу страницы найдите имя разработчика в футере и дважды кликните по "
-"нему."
+"Внизу страницы найдите имя разработчика в футере и дважды кликните по нему."
 msgstr ""
 "At the bottom of the page, find the developer's name in the footer and "
 "double-click on it."
 
 #: templates/help.html:639
-#, fuzzy
 msgid "Через настройки:"
 msgstr "Through settings:"
 
@@ -2713,7 +2628,6 @@ msgstr ""
 "section."
 
 #: templates/help.html:642
-#, fuzzy
 msgid "Безопасность PIN-кода"
 msgstr "PIN Code Security"
 
@@ -2735,7 +2649,6 @@ msgid "После 2 неудачных попыток вход блокируе�
 msgstr "After 2 failed attempts, login is blocked for 30 seconds"
 
 #: templates/help.html:646
-#, fuzzy
 msgid "Автоматический счетчик:"
 msgstr "Automatic counter:"
 
@@ -2752,7 +2665,6 @@ msgid "PIN хранится в зашифрованном виде в файле
 msgstr "The PIN is stored in encrypted form in the configuration file"
 
 #: templates/help.html:650
-#, fuzzy
 msgid "Экспорт и импорт с PIN"
 msgstr "Export Key"
 
@@ -2765,7 +2677,6 @@ msgstr ""
 "included in the archive:"
 
 #: templates/help.html:653
-#, fuzzy
 msgid "Экспорт:"
 msgstr "Export:"
 
@@ -2774,7 +2685,6 @@ msgid "В созданный ZIP-архив добавляется файл"
 msgstr "A file is added to the created ZIP archive"
 
 #: templates/help.html:653
-#, fuzzy
 msgid "с вашим PIN-кодом"
 msgstr "Changing the PIN code"
 
@@ -2788,15 +2698,14 @@ msgstr "PIN display:"
 
 #: templates/help.html:655
 msgid "При импорте PIN отображается в отдельном окне для записи"
-msgstr "During import, the PIN is displayed in a separate window for recording"
+msgstr ""
+"During import, the PIN is displayed in a separate window for recording"
 
 #: templates/help.html:658
-#, fuzzy
 msgid "Смена PIN-кода"
 msgstr "Changing the PIN code"
 
 #: templates/help.html:659
-#, fuzzy
 msgid "Для смены PIN-кода:"
 msgstr "To change the PIN code:"
 
@@ -2813,37 +2722,32 @@ msgid "Найдите раздел \"PIN-код\""
 msgstr "Find the \"PIN code\" section"
 
 #: templates/help.html:664
-#, fuzzy
 msgid "Введите старый PIN и новый PIN дважды"
 msgstr "Enter the old PIN and the new PIN twice"
 
 #: templates/help.html:665
-#, fuzzy
 msgid "Нажмите \"Сменить PIN\""
 msgstr "Click \"Change PIN\""
 
 #: templates/help.html:668
-#, fuzzy
 msgid "Выход из системы"
 msgstr "Logging out"
 
 #: templates/help.html:669
 msgid ""
-"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели "
-"навигации. После выхода потребуется повторный ввод PIN-кода для доступа к"
-" данным."
+"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели навигации. "
+"После выхода потребуется повторный ввод PIN-кода для доступа к данным."
 msgstr ""
 "To log out, click the \"Logout\" button in the top navigation bar. After "
-"logging out, you will need to enter the PIN code again to access the "
-"data."
+"logging out, you will need to enter the PIN code again to access the data."
 
 #: templates/help.html:675
 msgid ""
-"Запишите PIN-код в надежном месте - без него вы не сможете получить "
-"доступ к данным"
+"Запишите PIN-код в надежном месте - без него вы не сможете получить доступ к"
+" данным"
 msgstr ""
-"Write down the PIN code in a safe place - without it, you will not be "
-"able to access your data"
+"Write down the PIN code in a safe place - without it, you will not be able "
+"to access your data"
 
 #: templates/help.html:676
 msgid "При создании нового PIN все существующие данные будут удалены"
@@ -2851,19 +2755,19 @@ msgstr "When creating a new PIN, all existing data will be deleted"
 
 #: templates/help.html:677
 msgid ""
-"PIN-код не восстанавливается - если вы его забудете, потребуется "
-"создавать новый"
+"PIN-код не восстанавливается - если вы его забудете, потребуется создавать "
+"новый"
 msgstr ""
-"The PIN code cannot be recovered - if you forget it, you will need to "
-"create a new one"
+"The PIN code cannot be recovered - if you forget it, you will need to create"
+" a new one"
 
 #: templates/help.html:683
 msgid ""
 "Для максимальной безопасности используйте PIN-код длиной 6-8 символов, "
 "содержащий цифры и буквы."
 msgstr ""
-"For maximum security, use a PIN code that is 6-8 characters long, "
-"containing both numbers and letters."
+"For maximum security, use a PIN code that is 6-8 characters long, containing"
+" both numbers and letters."
 
 #: templates/help.html:692
 msgid "Для разработчиков"
@@ -2882,16 +2786,17 @@ msgid ") вы видите ошибку "
 msgstr ") you see an error "
 
 #: templates/help.html:698
-msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
+msgid ""
+", это означает, что в вашем окружении отсутствует необходимая библиотека."
 msgstr ", it means that a required library is missing in your environment."
 
 #: templates/help.html:699
 msgid ""
-"Это происходит, когда в проект добавляется новая функциональность "
-"(например, как недавно был добавлен `pywebview`)."
+"Это происходит, когда в проект добавляется новая функциональность (например,"
+" как недавно был добавлен `pywebview`)."
 msgstr ""
-"This happens when new functionality is added to the project (for example,"
-" like `pywebview` was recently added)."
+"This happens when new functionality is added to the project (for example, "
+"like `pywebview` was recently added)."
 
 #: templates/help.html:700
 msgid "Решение"
@@ -2902,8 +2807,8 @@ msgid ""
 "Чтобы установить или обновить все зависимости, выполните в терминале "
 "следующую команду, находясь в папке проекта:"
 msgstr ""
-"To install or update all dependencies, execute the following command in "
-"the terminal while in the project folder:"
+"To install or update all dependencies, execute the following command in the "
+"terminal while in the project folder:"
 
 #: templates/help.html:703
 msgid "Эта команда прочитает файл"
@@ -2911,8 +2816,7 @@ msgstr "This command will read the file"
 
 #: templates/help.html:703
 msgid ""
-"и установит точные версии всех библиотек, необходимых для корректной "
-"работы."
+"и установит точные версии всех библиотек, необходимых для корректной работы."
 msgstr ""
 "and install the exact versions of all libraries required for correct "
 "operation."
@@ -2985,7 +2889,6 @@ msgid "След. платёж"
 msgstr "Next Payment"
 
 #: templates/index.html:142
-#, fuzzy
 msgid "Требуется интернет"
 msgstr "No internet"
 
@@ -3017,7 +2920,6 @@ msgstr "Show/hide password"
 
 #: templates/index.html:177 templates/index.html:220 templates/index.html:241
 #: templates/index.html:272
-#, fuzzy
 msgid "Копировать пароль"
 msgstr "Copy password"
 
@@ -3030,7 +2932,6 @@ msgid "Копировать SSH команду подключения"
 msgstr "Copy SSH connection command"
 
 #: templates/index.html:201
-#, fuzzy
 msgid "Копировать команду"
 msgstr "Copy command"
 
@@ -3040,10 +2941,9 @@ msgstr "User"
 
 #: templates/index.html:207
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 #: templates/index.html:210 templates/index.html:262
-#, fuzzy
 msgid "Копировать логин"
 msgstr "Copy login"
 
@@ -3072,12 +2972,10 @@ msgid "Перейти в панель"
 msgstr "Go to panel"
 
 #: templates/index.html:289
-#, fuzzy
 msgid "Редактировать"
 msgstr "Edit"
 
 #: templates/index.html:291
-#, fuzzy
 msgid "Вы уверены, что хотите удалить этот сервер?"
 msgstr "Are you sure you want to delete this server?"
 
@@ -3127,11 +3025,11 @@ msgstr "To access server data, you need to enter a PIN code."
 
 #: templates/index_locked.html:24
 msgid ""
-"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
-"для создания PIN-кода."
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" для"
+" создания PIN-кода."
 msgstr ""
-"If you are using the application for the first time, click the \"First "
-"Run\" button to create a PIN code."
+"If you are using the application for the first time, click the \"First Run\""
+" button to create a PIN code."
 
 #: templates/index_locked.html:31 templates/index_locked.html:482
 msgid "Вход заблокирован на"
@@ -3143,8 +3041,7 @@ msgstr "seconds"
 
 #: templates/index_locked.html:44
 msgid ""
-"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
-"защиту."
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту."
 msgstr ""
 "All data is protected by encryption. PIN code provides additional "
 "protection."
@@ -3284,107 +3181,105 @@ msgstr "Create PIN"
 
 #: templates/index_locked.html:242
 msgid "PIN-код из архива"
-msgstr ""
+msgstr "PIN-Code from the archive"
 
 #: templates/index_locked.html:249
 msgid "PIN-код найден!"
-msgstr ""
+msgstr "Pin-code is found!"
 
 #: templates/index_locked.html:249
 msgid "Запомните или запишите этот код."
-msgstr ""
+msgstr "Remember or write down this code."
 
 #: templates/index_locked.html:253
 msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
 msgstr ""
+"This PIN code will be required to enter the application after data import."
 
 #: templates/index_locked.html:257
 msgid "PIN-код будет показан только один раз. Запишите его!"
-msgstr ""
+msgstr "The PIN code will be shown only once. Write it down!"
 
 #: templates/index_locked.html:262
 msgid "Продолжить импорт"
-msgstr ""
+msgstr "Continue imports"
 
 #: templates/index_locked.html:263
-#, fuzzy
 msgid "Импортировать сейчас"
 msgstr "Import Data"
 
 #: templates/index_locked.html:394
 msgid "Введите PIN-код"
-msgstr ""
+msgstr "Enter the PIN code"
 
 #: templates/index_locked.html:400 templates/index_locked.html:525
 #: templates/index_locked.html:742
 msgid "Проверка..."
-msgstr ""
+msgstr "Checking ..."
 
 #: templates/index_locked.html:431 templates/index_locked.html:767
 #: templates/index_locked.html:844 templates/index_locked.html:895
 msgid "Ошибка соединения с сервером"
-msgstr ""
+msgstr "Error connection to the server"
 
 #: templates/index_locked.html:507
 msgid "Заполните все поля"
-msgstr ""
+msgstr "Fill all the fields"
 
 #: templates/index_locked.html:513
 msgid "Новые PIN-коды не совпадают"
-msgstr ""
+msgstr "New PIN codes do not match"
 
 #: templates/index_locked.html:535
 msgid "PIN успешно изменён!"
-msgstr ""
+msgstr "Pin is successfully changed!"
 
 #: templates/index_locked.html:543 templates/index_locked.html:688
 #: templates/index_locked.html:839 templates/index_locked.html:889
 msgid "Ошибка:"
-msgstr ""
+msgstr "Error:"
 
 #: templates/index_locked.html:548
 msgid "Произошла ошибка при смене PIN"
-msgstr ""
+msgstr "There was an error when changing PIN"
 
 #: templates/index_locked.html:622
 msgid "Произошла ошибка при проверке архива"
-msgstr ""
+msgstr "There was an error when checking the archive"
 
 #: templates/index_locked.html:664
 msgid "PIN-коды не совпадают"
-msgstr ""
+msgstr "Pin codes do not match"
 
 #: templates/index_locked.html:670
 msgid "Создание..."
-msgstr ""
+msgstr "Creation..."
 
 #: templates/index_locked.html:683
 msgid "PIN успешно создан!"
-msgstr ""
+msgstr "Pin has been successfully created!"
 
 #: templates/index_locked.html:683
 msgid "Приложение будет перезагружено."
-msgstr ""
+msgstr "The application will be rebooted."
 
 #: templates/index_locked.html:693
 msgid "Произошла ошибка при создании PIN"
-msgstr ""
+msgstr "An error occurred when creating PIN"
 
 #: templates/index_locked.html:816
 msgid "Импорт..."
-msgstr ""
+msgstr "Import ..."
 
 #: templates/index_locked.html:834 templates/index_locked.html:883
-#, fuzzy
 msgid "Данные успешно импортированы!"
 msgstr "Data file successfully imported and attached!"
 
 #: templates/index_locked.html:834 templates/index_locked.html:883
 msgid "Перенаправление..."
-msgstr ""
+msgstr "Reducation ..."
 
 #: templates/index_locked.html:869
-#, fuzzy
 msgid "Импорт данных..."
 msgstr "Import Data File"
 
@@ -3474,7 +3369,6 @@ msgid "Подсказок пока нет."
 msgstr "No hints yet."
 
 #: templates/settings.html:3 templates/settings.html:7
-#, fuzzy
 msgid "Управление данными"
 msgstr "Hint Management"
 
@@ -3488,11 +3382,11 @@ msgstr "Change Main Key"
 
 #: templates/settings.html:32
 msgid ""
-"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
-" сохранится как резервная копия."
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл "
+"сохранится как резервная копия."
 msgstr ""
-"When changing the key, a new encrypted data file will be created. The old"
-" file will be saved as a backup."
+"When changing the key, a new encrypted data file will be created. The old "
+"file will be saved as a backup."
 
 #: templates/settings.html:36
 msgid "Новый ключ"
@@ -3524,11 +3418,10 @@ msgstr "Key-Data Match Check"
 
 #: templates/settings.html:57
 msgid ""
-"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
-"приложение."
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение."
 msgstr ""
-"Quickly check if the key matches the data file without importing into the"
-" app."
+"Quickly check if the key matches the data file without importing into the "
+"app."
 
 #: templates/settings.html:61 templates/settings.html:176
 msgid "Файл данных (.enc)"
@@ -3567,25 +3460,24 @@ msgid "Экспортировать ключ"
 msgstr "Export Key"
 
 #: templates/settings.html:104
-#, fuzzy
 msgid "Полный экспорт"
 msgstr "Import and Export"
 
 #: templates/settings.html:107
-#, fuzzy
 msgid "Включает PIN-код"
 msgstr "New PIN code"
 
 #: templates/settings.html:115
 msgid "Экспорт запущен!"
-msgstr ""
+msgstr "Export is launched!"
 
 #: templates/settings.html:117
 msgid "Файл сохранится в папку с приложением VPN Server Manager."
-msgstr ""
+msgstr "The file will be saved in the VPN Server Manager application folder."
 
 #: templates/settings.html:121
-msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgid ""
+"Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
 msgstr ""
 "Are you sure you want to detach the data file? The server list will be "
 "empty."
@@ -3600,11 +3492,11 @@ msgstr "No data file attached."
 
 #: templates/settings.html:132
 msgid ""
-"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
-"можете импортировать существующий файл, чтобы восстановить свои записи."
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы можете"
+" импортировать существующий файл, чтобы восстановить свои записи."
 msgstr ""
-"The application is not currently working with any data file. You can "
-"import an existing file to restore your records."
+"The application is not currently working with any data file. You can import "
+"an existing file to restore your records."
 
 #: templates/settings.html:140
 msgid "Импорт файла данных"
@@ -3612,12 +3504,12 @@ msgstr "Import Data File"
 
 #: templates/settings.html:143
 msgid ""
-"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
-" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить "
+"его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
 "заменен."
 msgstr ""
-"Upload an encrypted data file (<code>.enc</code>) to attach and work with"
-" it. The current attached file (if any) will be replaced."
+"Upload an encrypted data file (<code>.enc</code>) to attach and work with "
+"it. The current attached file (if any) will be replaced."
 
 #: templates/settings.html:146
 msgid "Выбор файла данных"
@@ -3645,8 +3537,8 @@ msgstr "Requirements:"
 
 #: templates/settings.html:167
 msgid ""
-"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
-"установки приложения."
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой установки "
+"приложения."
 msgstr ""
 "<code>.env</code> file and <code>servers.json.enc</code> from another "
 "installation of the app."
@@ -3661,10 +3553,9 @@ msgstr "Select encrypted data file from another installation"
 
 #: templates/settings.html:184
 msgid ".env файл с SECRET_KEY"
-msgstr ""
+msgstr ".env file with secret_key"
 
 #: templates/settings.html:186
-#, fuzzy
 msgid "Внешний ключ шифрования"
 msgstr "Encryption Key Management"
 
@@ -3673,50 +3564,50 @@ msgid ""
 "Вставьте сюда ключ шифрования из файла .env другой установки (например: "
 "k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
 msgstr ""
+"Insert the encryption key from the .env file of another installation (for "
+"example: K-IGKHDDBZXQWR5OABNKZCJD71I2N3VCTHIFOA663W =)"
 
 #: templates/settings.html:189
 msgid "Где найти ключ:"
-msgstr ""
+msgstr "Where to find the key:"
 
 #: templates/settings.html:190
 msgid "В файле"
-msgstr ""
+msgstr "In the file"
 
 #: templates/settings.html:190
-#, fuzzy
 msgid "в папке с другой установкой"
 msgstr "Import servers from another installation"
 
 #: templates/settings.html:191
 msgid "Ищите строку"
-msgstr ""
+msgstr "Look for a line"
 
 #: templates/settings.html:192
 msgid "Скопируйте значение после знака равенства"
-msgstr ""
+msgstr "Copy the value after the equality sign"
 
 #: templates/settings.html:199
 msgid "Примечание:"
-msgstr ""
+msgstr "Note:"
 
 #: templates/settings.html:199
 msgid ""
 "Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
 "сервера получат новые уникальные ID и будут добавлены к вашему списку."
 msgstr ""
+"Duplicate servers (by IP or name) will be missed. Imported servers will "
+"receive new unique IDs and will be added to your list."
 
 #: templates/settings.html:204
-#, fuzzy
 msgid "Импортировать и объединить сервера"
 msgstr "Import and Attach"
 
 #: templates/settings.html:218
-#, fuzzy
 msgid "Экспортируются"
 msgstr "Export Key"
 
 #: templates/settings.html:232
-#, fuzzy
 msgid "Ключи не совпадают!"
 msgstr "Error: Keys do not match."
 
@@ -3725,399 +3616,381 @@ msgid ""
 "Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
 "данных и сохранит резервную копию старого."
 msgstr ""
+"Are you sure you want to change the encryption key? This will create a new "
+"data file and save the backup of the old."
 
 #: templates/settings.html:254 templates/settings.html:257
-#, fuzzy
 msgid "Ошибка при генерации ключа:"
 msgstr "Error copying"
 
 #: templates/settings.html:271 templates/settings.html:403
-#, fuzzy
 msgid "Файл данных серверов (.enc)"
 msgstr "Data file (.enc)"
 
 #: templates/settings.html:275 templates/settings.html:348
 #: templates/settings.html:407
-#, fuzzy
 msgid "Ключ шифрования (.env)"
 msgstr "Encryption Key Management"
 
 #: templates/settings.html:279 templates/settings.html:411
 msgid "Полный архив (.zip)"
-msgstr ""
+msgstr "Full archive (.zip)"
 
 #: templates/settings.html:337
-#, fuzzy
 msgid "Информация об экспорте"
 msgstr "Processor Information"
 
 #: templates/settings.html:343
 msgid "Экспортируется:"
-msgstr ""
+msgstr "Exported:"
 
 #: templates/settings.html:345
 msgid "Содержимое архива:"
-msgstr ""
+msgstr "The contents of the archive:"
 
 #: templates/settings.html:347
 msgid "Зашифрованные данные серверов"
-msgstr ""
+msgstr "Encrypted server data"
 
 #: templates/settings.html:349
-#, fuzzy
 msgid "PIN-код для входа (PIN.txt)"
 msgstr "Change PIN code for login"
 
 #: templates/settings.html:350
 msgid "Загруженные файлы (uploads/)"
-msgstr ""
+msgstr "Uploaded files (uploads/)"
 
 #: templates/settings.html:351
 msgid "Инструкции по импорту (README.txt)"
-msgstr ""
+msgstr "Import Instructions (Readme.txt)"
 
 #: templates/settings.html:358
 msgid "Место сохранения:"
-msgstr ""
+msgstr "Place of conservation:"
 
 #: templates/settings.html:371
 msgid "Файл будет автоматически загружен в браузере"
-msgstr ""
+msgstr "The file will be automatically downloaded in the browser"
 
 #: templates/settings.html:372
 msgid "Также сохранится в папку"
-msgstr ""
+msgstr "Will also remain in the folder"
 
 #: templates/settings.html:373
 msgid "Проверьте папку Downloads после завершения"
-msgstr ""
+msgstr "Check the Downloads folder after completing"
 
 #: templates/settings.html:382
 msgid "Продолжить экспорт"
-msgstr ""
+msgstr "Continue export"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
 msgid "{editor}: Editing failed"
-msgstr ""
+msgstr "{editor}: Editing failed"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
 msgid "{editor}: Editing failed: {e}"
-msgstr ""
+msgstr "{editor}: Editing failed: {e}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1084
 #: venv/lib/python3.13/site-packages/click/core.py:1121
 msgid "{text} {deprecated_message}"
-msgstr ""
+msgstr "{text} {deprecated_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1140
 msgid "Options"
-msgstr ""
+msgstr "Options"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1204
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Got unexpected extra argument ({args})"
+msgstr[1] "Got unexpected extra argument ({args})"
+msgstr[2] "Got unexpected extra arguments ({args})"
+msgstr[3] "Got unexpected extra arguments ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
 msgstr ""
+"DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1405
 msgid "Aborted!"
-msgstr ""
+msgstr "Aborted!"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1779
 msgid "Commands"
-msgstr ""
+msgstr "Commands"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1810
 msgid "Missing command."
-msgstr ""
+msgstr "Missing command."
 
 #: venv/lib/python3.13/site-packages/click/core.py:1888
 msgid "No such command {name!r}."
-msgstr ""
+msgstr "No such command {name!r}."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2303
 msgid "Value must be an iterable."
-msgstr ""
+msgstr "Value must be an iterable."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2326
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Takes {nargs} values but 1 was given."
+msgstr[1] "Takes {nargs} values but 1 was given."
+msgstr[2] "Takes {nargs} values but {len} were given."
+msgstr[3] "Takes {nargs} values but {len} were given."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
 msgid ""
-"DeprecationWarning: The {param_type} {name!r} is "
-"deprecated.{extra_message}"
+"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
 msgstr ""
+"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2807
 msgid "env var: {var}"
-msgstr ""
+msgstr "Env was: {was}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
 msgid "default: {default}"
-msgstr ""
+msgstr "default: {default}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2814
 msgid "required"
-msgstr ""
+msgstr "required"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2870
 msgid "(dynamic)"
-msgstr ""
+msgstr "(dynamic)"
 
 #: venv/lib/python3.13/site-packages/click/decorators.py:465
 #, python-format
 msgid "%(prog)s, version %(version)s"
-msgstr ""
+msgstr "%(prog)s, version %(version)s"
 
 #: venv/lib/python3.13/site-packages/click/decorators.py:522
 msgid "Show the version and exit."
-msgstr ""
+msgstr "Show the version and exit."
 
 #: venv/lib/python3.13/site-packages/click/decorators.py:548
 msgid "Show this message and exit."
-msgstr ""
+msgstr "Show this message and exit."
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:50
 #: venv/lib/python3.13/site-packages/click/exceptions.py:89
 msgid "Error: {message}"
-msgstr ""
+msgstr "Error: {message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:81
 msgid "Try '{command} {option}' for help."
-msgstr ""
+msgstr "Try '{command} {option}' for help."
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:130
 msgid "Invalid value: {message}"
-msgstr ""
+msgstr "Invalid value: {message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:132
 msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
+msgstr "Invalid value for {param_hint}: {message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:190
 msgid "Missing argument"
-msgstr ""
+msgstr "Missing argument"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:192
 msgid "Missing option"
-msgstr ""
+msgstr "Missing option"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:194
 msgid "Missing parameter"
-msgstr ""
+msgstr "Missing parameter"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:196
 msgid "Missing {param_type}"
-msgstr ""
+msgstr "Missing {param_type}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:203
 msgid "Missing parameter: {param_name}"
-msgstr ""
+msgstr "Missing parameter: {param_name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:223
 msgid "No such option: {name}"
-msgstr ""
+msgstr "No such option: {name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:237
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Did you mean {possibility}?"
+msgstr[1] "Did you mean {possibility}?"
+msgstr[2] "(Possible options: {possibilities})"
+msgstr[3] "(Possible options: {possibilities})"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:282
 msgid "unknown error"
-msgstr ""
+msgstr "unknown error"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:289
 msgid "Could not open file {filename!r}: {message}"
-msgstr ""
+msgstr "Could not open file {filename!r}: {message}"
 
 #: venv/lib/python3.13/site-packages/click/formatting.py:156
 msgid "Usage:"
-msgstr ""
+msgstr "Usage:"
 
 #: venv/lib/python3.13/site-packages/click/parser.py:200
 msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
+msgstr "Argument {name!r} takes {nargs} values."
 
 #: venv/lib/python3.13/site-packages/click/parser.py:383
 msgid "Option {name!r} does not take a value."
-msgstr ""
+msgstr "Option {name!r} does not take a value."
 
 #: venv/lib/python3.13/site-packages/click/parser.py:443
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Option {name!r} requires an argument."
+msgstr[1] "Option {name!r} requires an argument."
+msgstr[2] "Option {name!r} requires {nargs} arguments."
+msgstr[3] "Option {name!r} requires {nargs} arguments."
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
+msgstr "Shell completion is not supported for Bash versions older than 4.4."
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:333
 msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
+msgstr "Couldn't detect Bash version, shell completion is not supported."
 
 #: venv/lib/python3.13/site-packages/click/termui.py:162
 msgid "Repeat for confirmation"
-msgstr ""
+msgstr "Repeat for confirmation"
 
 #: venv/lib/python3.13/site-packages/click/termui.py:178
 msgid "Error: The value you entered was invalid."
-msgstr ""
+msgstr "Error: The value you entered was invalid."
 
 #: venv/lib/python3.13/site-packages/click/termui.py:180
 msgid "Error: {e.message}"
-msgstr ""
+msgstr "Error: {e.message}"
 
 #: venv/lib/python3.13/site-packages/click/termui.py:191
 msgid "Error: The two entered values do not match."
-msgstr ""
+msgstr "Error: The two entered values do not match."
 
 #: venv/lib/python3.13/site-packages/click/termui.py:247
 msgid "Error: invalid input"
-msgstr ""
+msgstr "Error: invalid input"
 
 #: venv/lib/python3.13/site-packages/click/termui.py:866
 msgid "Press any key to continue..."
-msgstr ""
+msgstr "Press any key to continue..."
 
 #: venv/lib/python3.13/site-packages/click/types.py:332
 msgid ""
 "Choose from:\n"
 "\t{choices}"
 msgstr ""
+"Choose from:\n"
+"\t{choices}"
 
 #: venv/lib/python3.13/site-packages/click/types.py:371
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{value!r} is not {choice}."
+msgstr[1] "{value!r} is not {choice}."
+msgstr[2] "{value!r} is not one of {choices}."
+msgstr[3] "{value!r} is not one of {choices}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{value!r} does not match the format {format}."
+msgstr[1] "{value!r} does not match the format {format}."
+msgstr[2] "{value!r} does not match the formats {formats}."
+msgstr[3] "{value!r} does not match the formats {formats}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
 msgid "{value!r} is not a valid {number_type}."
-msgstr ""
+msgstr "{value!r} is not a valid {number_type}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:538
 msgid "{value} is not in the range {range}."
-msgstr ""
+msgstr "{value} is not in the range {range}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:679
 msgid "{value!r} is not a valid boolean."
-msgstr ""
+msgstr "{value!r} is not a valid boolean."
 
 #: venv/lib/python3.13/site-packages/click/types.py:703
 msgid "{value!r} is not a valid UUID."
-msgstr ""
+msgstr "{value!r} is not a valid UUID."
 
 #: venv/lib/python3.13/site-packages/click/types.py:893
 msgid "file"
-msgstr ""
+msgstr "file"
 
 #: venv/lib/python3.13/site-packages/click/types.py:895
 msgid "directory"
-msgstr ""
+msgstr "directory"
 
 #: venv/lib/python3.13/site-packages/click/types.py:897
 msgid "path"
-msgstr ""
+msgstr "path"
 
 #: venv/lib/python3.13/site-packages/click/types.py:944
 msgid "{name} {filename!r} does not exist."
-msgstr ""
+msgstr "{name} {filename!r} does not exist."
 
 #: venv/lib/python3.13/site-packages/click/types.py:953
 msgid "{name} {filename!r} is a file."
-msgstr ""
+msgstr "{name} {filename!r} is a file."
 
 #: venv/lib/python3.13/site-packages/click/types.py:961
 msgid "{name} {filename!r} is a directory."
-msgstr ""
+msgstr "{name} {filename!r} is a directory."
 
 #: venv/lib/python3.13/site-packages/click/types.py:970
 msgid "{name} {filename!r} is not readable."
-msgstr ""
+msgstr "{name} {filename!r} is not readable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:979
 msgid "{name} {filename!r} is not writable."
-msgstr ""
+msgstr "{name} {filename!r} is not writable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:988
 msgid "{name} {filename!r} is not executable."
-msgstr ""
+msgstr "{name} {filename!r} is not executable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:1054
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{len_type} values are required, but {len_value} was given."
+msgstr[1] "{len_type} values are required, but {len_value} was given."
+msgstr[2] "{len_type} values are required, but {len_value} were given."
+msgstr[3] "{len_type} values are required, but {len_value} were given."
 
-#~ msgid ""
-#~ "Если проблемы с иконками повторяются, "
-#~ "создайте резервную копию рабочей иконки "
-#~ "после успешной сборки. Это поможет скоро"
-#~ " восстановить функциональность в случае "
-#~ "проблем."
-#~ msgstr ""
-
-#~ msgid "По умолчанию 22"
-#~ msgstr "Default 22"
-
-#~ msgid "URL панели"
-#~ msgstr "Panel URL"
-
-#~ msgid "Управление службами"
-#~ msgstr "Service Management (systemd)"
-
-#~ msgid "Управление пакетами"
-#~ msgstr "Package management"
-
-#~ msgid "Безопасность"
-#~ msgstr "Security"
-
-#~ msgid "Новый пароль панели"
-#~ msgstr ""
-
-#: templates/add_server.html:101
-#: templates/edit_server.html:112
+#: templates/add_server.html:101 templates/edit_server.html:112
 msgid "Период оплаты"
 msgstr "Payment Period"
 
-#: templates/add_server.html:103
-#: templates/edit_server.html:114
+#: templates/add_server.html:103 templates/edit_server.html:114
 msgid "Не указан"
 msgstr "Not specified"
 
-#: templates/add_server.html:104
-#: templates/edit_server.html:115
+#: templates/add_server.html:104 templates/edit_server.html:115
 msgid "Месяц"
 msgstr "Month"
 
-#: templates/add_server.html:105
-#: templates/edit_server.html:116
+#: templates/add_server.html:105 templates/edit_server.html:116
 msgid "3 месяца"
 msgstr "3 months"
 
-#: templates/add_server.html:106
-#: templates/edit_server.html:117
+#: templates/add_server.html:106 templates/edit_server.html:117
 msgid "Год"
 msgstr "Year"
 
-#: templates/add_server.html:107
-#: templates/edit_server.html:118
+#: templates/add_server.html:107 templates/edit_server.html:118
 msgid "Бессрочно"
 msgstr "Perpetual"
 
@@ -4133,10 +4006,8 @@ msgstr "Enter panel password"
 msgid "Новый пароль SSH"
 msgstr "New SSH Password"
 
-#: templates/edit_server.html:138
-#: templates/edit_server.html:149
-#: templates/edit_server.html:174
-#: templates/edit_server.html:202
+#: templates/edit_server.html:138 templates/edit_server.html:149
+#: templates/edit_server.html:174 templates/edit_server.html:202
 msgid "Оставьте пустым, чтобы не менять."
 msgstr "Leave blank to keep current."
 
@@ -4162,7 +4033,6 @@ msgstr "Login Method"
 
 #: templates/edit_server.html:186
 msgid "По логину/паролю"
-msgid_plural ""
 msgstr[0] "By login/password"
 msgstr[1] ""
 
@@ -4195,11 +4065,14 @@ msgid "Файл нового чека"
 msgstr "New Receipt File"
 
 #: templates/edit_server.html:210
-msgid "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку \"Управление чеками\"."
-msgstr "Use for quick upload of a single receipt. To view all receipts, use the 'Manage Receipts' button."
+msgid ""
+"Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
+"используйте кнопку \"Управление чеками\"."
+msgstr ""
+"Use for quick upload of a single receipt. To view all receipts, use the "
+"'Manage Receipts' button."
 
-#: templates/edit_server.html:217
-#: templates/settings.html:163
+#: templates/edit_server.html:217 templates/settings.html:163
 msgid "Дополнительная информация"
 msgstr "Additional Information"
 
@@ -4231,8 +4104,7 @@ msgstr "e.g., Payment for February 2024"
 msgid "Файл чека"
 msgstr "Receipt File"
 
-#: templates/edit_server.html:285
-#: templates/manage_hints.html:25
+#: templates/edit_server.html:285 templates/manage_hints.html:25
 msgid "Добавить"
 msgstr "Add"
 
@@ -4270,7 +4142,8 @@ msgstr "Failed to add receipt:"
 
 #: templates/edit_server.html:413
 msgid "Вы уверены, что хотите удалить этот чек? Это действие необратимо."
-msgstr "Are you sure you want to delete this receipt? This action is irreversible."
+msgstr ""
+"Are you sure you want to delete this receipt? This action is irreversible."
 
 #: templates/edit_server.html:442
 msgid "Не удалось удалить чек."
@@ -4313,40 +4186,38 @@ msgid "Примечание:"
 msgstr "Note:"
 
 #: templates/settings.html:199
-msgid "Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку."
-msgstr "Duplicate servers (by IP or name) will be skipped. Imported servers will receive new unique IDs and be added to your list."
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+"Duplicate servers (by IP or name) will be skipped. Imported servers will "
+"receive new unique IDs and be added to your list."
 
 #: templates/settings.html:204
 msgid "Импортировать и объединить сервера"
 msgstr "Import and Merge Servers"
 
-#: templates/add_server.html:101
-#: templates/edit_server.html:112
+#: templates/add_server.html:101 templates/edit_server.html:112
 msgid "Период оплаты"
 msgstr "Payment Period"
 
-#: templates/add_server.html:103
-#: templates/edit_server.html:114
+#: templates/add_server.html:103 templates/edit_server.html:114
 msgid "Не указан"
 msgstr "Not specified"
 
-#: templates/add_server.html:104
-#: templates/edit_server.html:115
+#: templates/add_server.html:104 templates/edit_server.html:115
 msgid "Месяц"
 msgstr "Month"
 
-#: templates/add_server.html:105
-#: templates/edit_server.html:116
+#: templates/add_server.html:105 templates/edit_server.html:116
 msgid "3 месяца"
 msgstr "3 months"
 
-#: templates/add_server.html:106
-#: templates/edit_server.html:117
+#: templates/add_server.html:106 templates/edit_server.html:117
 msgid "Год"
 msgstr "Year"
 
-#: templates/add_server.html:107
-#: templates/edit_server.html:118
+#: templates/add_server.html:107 templates/edit_server.html:118
 msgid "Бессрочно"
 msgstr "Perpetual"
 
@@ -4362,10 +4233,8 @@ msgstr "Enter panel password"
 msgid "Новый пароль SSH"
 msgstr "New SSH Password"
 
-#: templates/edit_server.html:138
-#: templates/edit_server.html:149
-#: templates/edit_server.html:174
-#: templates/edit_server.html:202
+#: templates/edit_server.html:138 templates/edit_server.html:149
+#: templates/edit_server.html:174 templates/edit_server.html:202
 msgid "Оставьте пустым, чтобы не менять."
 msgstr "Leave blank to keep current."
 
@@ -4391,7 +4260,6 @@ msgstr "Login Method"
 
 #: templates/edit_server.html:186
 msgid "По логину/паролю"
-msgid_plural ""
 msgstr[0] "By login/password"
 msgstr[1] ""
 
@@ -4424,11 +4292,14 @@ msgid "Файл нового чека"
 msgstr "New Receipt File"
 
 #: templates/edit_server.html:210
-msgid "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку \"Управление чеками\"."
-msgstr "Use for quick upload of a single receipt. To view all receipts, use the 'Manage Receipts' button."
+msgid ""
+"Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
+"используйте кнопку \"Управление чеками\"."
+msgstr ""
+"Use for quick upload of a single receipt. To view all receipts, use the "
+"'Manage Receipts' button."
 
-#: templates/edit_server.html:217
-#: templates/settings.html:163
+#: templates/edit_server.html:217 templates/settings.html:163
 msgid "Дополнительная информация"
 msgstr "Additional Information"
 
@@ -4460,8 +4331,7 @@ msgstr "e.g., Payment for February 2024"
 msgid "Файл чека"
 msgstr "Receipt File"
 
-#: templates/edit_server.html:285
-#: templates/manage_hints.html:25
+#: templates/edit_server.html:285 templates/manage_hints.html:25
 msgid "Добавить"
 msgstr "Add"
 
@@ -4526,9 +4396,40 @@ msgid "Примечание:"
 msgstr "Note:"
 
 #: templates/settings.html:199
-msgid "Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку."
-msgstr "Duplicate servers (by IP or name) will be skipped. Imported servers will receive new unique IDs and be added to your list."
+msgid ""
+"Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные "
+"сервера получат новые уникальные ID и будут добавлены к вашему списку."
+msgstr ""
+"Duplicate servers (by IP or name) will be skipped. Imported servers will "
+"receive new unique IDs and be added to your list."
 
 #: templates/settings.html:204
 msgid "Импортировать и объединить сервера"
 msgstr "Import and Merge Servers"
+
+#~ msgid ""
+#~ "Если проблемы с иконками повторяются, создайте резервную копию рабочей "
+#~ "иконки после успешной сборки. Это поможет скоро восстановить "
+#~ "функциональность в случае проблем."
+#~ msgstr ""
+#~ "If problems with the icons are repeated, create a backup copy of the working"
+#~ " icon after successful assembly. This will help soon to restore "
+#~ "functionality in case of problems."
+
+#~ msgid "По умолчанию 22"
+#~ msgstr "Default 22"
+
+#~ msgid "URL панели"
+#~ msgstr "Panel URL"
+
+#~ msgid "Управление службами"
+#~ msgstr "Service Management (systemd)"
+
+#~ msgid "Управление пакетами"
+#~ msgstr "Package management"
+
+#~ msgid "Безопасность"
+#~ msgstr "Security"
+
+#~ msgid "Новый пароль панели"
+#~ msgstr "New password panel"
