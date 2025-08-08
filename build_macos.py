@@ -120,6 +120,10 @@ def build_app():
         "requirements.txt:.",           # Зависимости
         
     ]
+
+    # ВКЛЮЧАЕМ ПЕРЕВОДЫ (.po/.mo). Достаточно добавить всю папку translations
+    if (PROJECT_ROOT / 'translations').exists():
+        datas.append("translations:translations")
     
     # Добавляем дополнительные файлы если они есть
     additional_files = [
