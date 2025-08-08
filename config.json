@@ -1,7 +1,7 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.6.5",
+    "version": "3.6.6",
     "release_date": "08.08.2025",
     "developer": "Developer",
     "last_updated": "2025-08-08"
