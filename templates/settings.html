@@ -421,4 +421,106 @@ function showExportInfo(exportType) {
 }
 </script>
 
+<!-- Управление PIN-кодом -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> {{ _('Управление PIN-кодом') }}</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-6">
+                <h6 class="text-primary"><i class="bi bi-unlock"></i> {{ _('Сброс блокировки PIN') }}</h6>
+                <p class="small text-muted">{{ _('Если PIN-код был заблокирован из-за неверных попыток входа, вы можете сбросить блокировку здесь.') }}</p>
+                
+                <button type="button" class="btn btn-warning" onclick="resetPinBlock()">
+                    <i class="bi bi-unlock"></i> {{ _('Сбросить блокировку PIN') }}
+                </button>
+                <div id="resetPinMessage" class="alert mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
+
+{% block scripts %}
+<script>
+    // Функция для сброса блокировки PIN
+    function resetPinBlock() {
+        const messageDiv = document.getElementById('resetPinMessage');
+        const resetButton = document.querySelector('button[onclick="resetPinBlock()"]');
+        
+        // Показываем индикатор загрузки
+        resetButton.disabled = true;
+        resetButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{ _("Сброс...") }}';
+        
+        // Отправляем запрос на сброс блокировки
+        fetch('/pin/reset_block', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageDiv.className = 'alert alert-success mt-3';
+                messageDiv.innerHTML = '<i class="bi bi-check-circle"></i> ' + data.message;
+            } else {
+                messageDiv.className = 'alert alert-danger mt-3';
+                messageDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + data.message;
+            }
+            messageDiv.style.display = 'block';
+            
+            // Восстанавливаем кнопку
+            resetButton.disabled = false;
+            resetButton.innerHTML = '<i class="bi bi-unlock"></i> {{ _("Сбросить блокировку PIN") }}';
+        })
+        .catch(error => {
+            messageDiv.className = 'alert alert-danger mt-3';
+            messageDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> {{ _("Ошибка соединения с сервером") }}';
+            messageDiv.style.display = 'block';
+            
+            // Восстанавливаем кнопку
+            resetButton.disabled = false;
+            resetButton.innerHTML = '<i class="bi bi-unlock"></i> {{ _("Сбросить блокировку PIN") }}';
+        });
+    }
+
+    // Функция для генерации случайного ключа
+    function generateRandomKey() {
+        fetch('/settings/generate-key', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('newKey').value = data.key;
+                document.getElementById('confirmKey').value = data.key;
+            } else {
+                alert('{{ _("Ошибка генерации ключа:") }} ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('{{ _("Ошибка:") }} ', error);
+            alert('{{ _("Ошибка соединения с сервером") }}');
+        });
+    }
+    
+    // Функция для подтверждения смены ключа
+    function confirmKeyChange() {
+        return confirm('{{ _("Вы уверены, что хотите сменить ключ шифрования? Это действие нельзя отменить.") }}');
+    }
+    
+    // Функция для показа информации об экспорте
+    function showExportInfo(type) {
+        if (type === 'data') {
+            window.location.href = '{{ url_for("export_data") }}';
+        } else if (type === 'key') {
+            window.location.href = '{{ url_for("export_key") }}';
+        } else if (type === 'package') {
+            window.location.href = '{{ url_for("export_package") }}';
+        }
+    }
+</script>
 {% endblock %} 
