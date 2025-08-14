@@ -25,15 +25,21 @@
                     </div>
                     
                     <!-- Счетчик блокировки -->
-                    <div id="blockCounter" class="alert alert-warning" style="display: none;">
+                    <div id="blockCounter" class="alert alert-danger" style="display: none;">
                         <div class="d-flex align-items-center justify-content-center">
-                            <i class="bi bi-clock me-2"></i>
+                            <i class="bi bi-lock-fill me-2"></i>
                             <span id="blockTimer">🔒 {{ _('Вход заблокирован на') }} <strong id="countdown">30</strong> {{ _('секунд') }}</span>
+                        </div>
+                        <div class="progress mt-2">
+                            <div id="blockProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
                         </div>
                     </div>
                     
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
-                        <button type="button" class="btn btn-primary btn-lg px-4" onclick="showFirstTimeSetup()">
+                        <button type="button" class="btn btn-primary btn-lg px-4" onclick="showPinLoginModal()" id="pinLoginButton">
+                            <i class="bi bi-key"></i> {{ _('Ввести PIN') }}
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-lg px-4" onclick="showFirstTimeSetup()">
                             <i class="bi bi-plus-circle"></i> {{ _('Первый запуск') }}
                         </button>
                     </div>
@@ -301,17 +307,26 @@
     function showBlockCounter(remainingSeconds) {
         const blockCounter = document.getElementById('blockCounter');
         const countdown = document.getElementById('countdown');
+        const progressBar = document.getElementById('blockProgressBar');
+        const pinLoginButton = document.getElementById('pinLoginButton');
         
         // Показываем счетчик
         blockCounter.style.display = 'block';
         
+        // Блокируем кнопку входа
+        if (pinLoginButton) {
+            pinLoginButton.disabled = true;
+            pinLoginButton.innerHTML = '<i class="bi bi-lock-fill"></i> ' + '{{ _("Вход заблокирован") }}';
+        }
+        
         // Запускаем таймер обратного отсчета
         let secondsLeft = remainingSeconds;
-        updateCountdown(secondsLeft);
+        const totalSeconds = remainingSeconds;
+        updateCountdown(secondsLeft, totalSeconds);
         
         const timer = setInterval(() => {
             secondsLeft--;
-            updateCountdown(secondsLeft);
+            updateCountdown(secondsLeft, totalSeconds);
             
             if (secondsLeft <= 0) {
                 clearInterval(timer);
@@ -321,18 +336,30 @@
             }
         }, 1000);
         
-        function updateCountdown(seconds) {
+        function updateCountdown(seconds, total) {
             const minutes = Math.floor(seconds / 60);
             const secs = seconds % 60;
             const timeStr = `${minutes}:${secs.toString().padStart(2, '0')}`;
             countdown.textContent = timeStr;
+            
+            // Обновляем прогресс-бар
+            const percentLeft = (seconds / total) * 100;
+            progressBar.style.width = percentLeft + '%';
         }
     }
     
     // Функция скрытия счетчика блокировки
     function hideBlockCounter() {
         const blockCounter = document.getElementById('blockCounter');
+        const pinLoginButton = document.getElementById('pinLoginButton');
+        
         blockCounter.style.display = 'none';
+        
+        // Разблокируем кнопку входа
+        if (pinLoginButton) {
+            pinLoginButton.disabled = false;
+            pinLoginButton.innerHTML = '<i class="bi bi-key"></i> ' + '{{ _("Ввести PIN") }}';
+        }
     }
     
     // Вызываем проверку блокировки сразу

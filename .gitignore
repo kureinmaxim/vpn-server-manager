@@ -68,7 +68,23 @@ instance/
 docs/_build/
 
 # Local documentation (not for GitHub)
-docs/
+docs/project_info/maintenance/
+docs/lessons/github_docs/
+docs/lessons/github_tutorials/
+docs/lessons/github-actions/
+docs/lessons/i18n/
+
+# Документация, перенесенная в docs/project_info
+/CODE_OF_CONDUCT.md
+/CONTRIBUTING.md
+/SECURITY.md
+/PROJECT_STRUCTURE.md
+/SECRET_KEY.md
+/BUILD.md
+/BACKUP_TOOLS.md
+/quick_cleanup.md
+/github_basics_tutorials
+/github_cli_tutorials
 
 # Jupyter Notebook
 .ipynb_checkpoints
