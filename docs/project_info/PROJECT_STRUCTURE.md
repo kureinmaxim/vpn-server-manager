@@ -13,11 +13,7 @@ VPNserverManage-Clean/
 ├── config.json                  # Конфигурация приложения (версия, URL-ы)
 ├── VPNServerManager-Clean.spec  # Конфиг PyInstaller
 ├── README.md                    # Главная страница проекта
-├── PROJECT_STRUCTURE.md         # Структура проекта (этот файл)
-├── SECRET_KEY.md                # Система шифрования
-├── BUILD.md                     # Инструкции по сборке
 ├── CHANGELOG.md                 # История изменений
-├── CONTRIBUTING.md              # Руководство по участию
 ├── LICENSE                      # Лицензия MIT
 ├── .gitignore                   # Исключения для Git
 ├── generate_key.py              # Утилита генерации SECRET_KEY
@@ -53,14 +49,41 @@ VPNserverManage-Clean/
 │   └── ru/LC_MESSAGES/          # (опционально)
 │
 ├── docs/
-│   └── i18n/                    # Документация по локализации
-│       ├── README.md
-│       ├── flask-babel.md
-│       ├── babel-cli-workflow.md
-│       ├── auto-translate.md
-│       ├── add-language.md
-│       ├── troubleshooting.md
-│       └── pyinstaller.md
+│   ├── project_info/            # Основная документация проекта
+│   │   ├── README.md
+│   │   ├── PROJECT_STRUCTURE.md # Этот файл
+│   │   ├── SECRET_KEY.md
+│   │   ├── BUILD.md
+│   │   ├── BACKUP_TOOLS.md
+│   │   └── maintenance/         # Документы по обслуживанию
+│   │       └── quick_cleanup.md
+│   │
+│   └── lessons/                 # Учебные материалы
+│       ├── i18n/                # Документация по локализации
+│       │   ├── README.md
+│       │   ├── flask-babel.md
+│       │   ├── babel-cli-workflow.md
+│       │   ├── auto-translate.md
+│       │   ├── add-language.md
+│       │   ├── troubleshooting.md
+│       │   └── pyinstaller.md
+│       │
+│       ├── github_docs/         # Документация для GitHub
+│       │   ├── CODE_OF_CONDUCT.md
+│       │   ├── CONTRIBUTING.md
+│       │   └── SECURITY.md
+│       │
+│       ├── github_tutorials/    # Туториалы по GitHub
+│       │   ├── github_basics_tutorials/
+│       │   └── github_cli_tutorials/
+│       │
+│       └── github-actions/      # Документация по GitHub Actions
+│           ├── README.md
+│           ├── PROJECT_USAGE.md
+│           ├── GITHUB_ACTIONS_INDEX.md
+│           ├── GITHUB_ACTIONS_FAQ.md
+│           ├── GITHUB_ACTIONS_LESSONS.md
+│           └── cleanup_summary.md
 │
 ├── tools/
 │   └── auto_translate_po.py     # Скрипт автоперевода `.po`
@@ -84,5 +107,5 @@ VPNserverManage-Clean/
 
 ## Примечания
 - Переводы компилируются в `.mo` через `pybabel compile -d translations`
-- Для упаковки в `.app` добавляйте `translations` в сборку (см. docs/i18n/pyinstaller.md)
+- Для упаковки в `.app` добавляйте `translations` в сборку (см. docs/lessons/i18n/pyinstaller.md)
 - Данные пользователя сохраняются в `~/Library/Application Support/VPNServerManager-Clean` (см. README)
