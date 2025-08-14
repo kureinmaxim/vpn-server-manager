@@ -1,5 +1,6 @@
 import json
 import os
+import time
 from datetime import datetime, timedelta
 from flask import session, redirect, url_for
 from flask_babel import gettext
@@ -48,6 +49,56 @@ class PinAuth:
         self.pin_attempts = 0
         self.pin_blocked_until = None
         self.pin_block_duration = 30  # секунд
+        
+        # Файл для хранения состояния блокировки
+        self.block_state_file = os.path.join(os.path.dirname(self.config_file), 'pin_block_state.json')
+        
+        # Загружаем состояние блокировки при инициализации
+        self._load_block_state()
+    
+    def _load_block_state(self):
+        """Загружает состояние блокировки из файла."""
+        try:
+            if os.path.exists(self.block_state_file):
+                with open(self.block_state_file, 'r') as f:
+                    state = json.load(f)
+                    blocked_until = state.get('blocked_until')
+                    attempts = state.get('attempts', 0)
+                    
+                    # Проверяем, не истекла ли блокировка
+                    if blocked_until:
+                        blocked_until_time = datetime.fromisoformat(blocked_until)
+                        if datetime.now() < blocked_until_time:
+                            self.pin_blocked_until = blocked_until_time
+                            print(f"🔒 Загружена активная блокировка до {blocked_until_time}")
+                        else:
+                            # Блокировка истекла, сбрасываем счетчик
+                            self.pin_attempts = 0
+                            self._save_block_state()
+                            print("🔓 Загруженная блокировка уже истекла, сброс")
+                    else:
+                        self.pin_attempts = attempts
+                        print(f"🔢 Загружено количество попыток: {attempts}")
+        except Exception as e:
+            print(f"⚠️ Ошибка загрузки состояния блокировки: {e}")
+    
+    def _save_block_state(self):
+        """Сохраняет состояние блокировки в файл."""
+        try:
+            state = {
+                'attempts': self.pin_attempts,
+                'blocked_until': self.pin_blocked_until.isoformat() if self.pin_blocked_until else None
+            }
+            
+            # Создаем директорию, если она не существует
+            os.makedirs(os.path.dirname(self.block_state_file), exist_ok=True)
+            
+            with open(self.block_state_file, 'w') as f:
+                json.dump(state, f)
+                
+            print(f"💾 Сохранено состояние блокировки: попытки={self.pin_attempts}, блокировка до={self.pin_blocked_until}")
+        except Exception as e:
+            print(f"⚠️ Ошибка сохранения состояния блокировки: {e}")
     
     def get_secret_pin(self):
         """Получает текущий секретный PIN из config.json."""
@@ -77,6 +128,7 @@ class PinAuth:
         if now >= self.pin_blocked_until:
             self.pin_blocked_until = None
             self.pin_attempts = 0
+            self._save_block_state()
             return False
         
         return True
@@ -92,8 +144,15 @@ class PinAuth:
     
     def block_pin_login(self):
         """Блокирует вход по PIN на заданное время."""
+        # Дополнительная проверка перед блокировкой
+        # Если попыток меньше 3, не блокируем
+        if self.pin_attempts < 3:
+            print(f"⚠️ Попытка блокировки при недостаточном количестве попыток: {self.pin_attempts}")
+            return
+            
         self.pin_blocked_until = datetime.now() + timedelta(seconds=self.pin_block_duration)
         print(f"🔒 Вход по PIN заблокирован на {self.pin_block_duration} секунд")
+        self._save_block_state()
     
     def authenticate_pin(self, pin):
         """Аутентификация через PIN-код с защитой от перебора."""
@@ -112,6 +171,7 @@ class PinAuth:
                 # Успешная аутентификация - сбрасываем счетчик попыток
                 self.pin_attempts = 0
                 self.pin_blocked_until = None
+                self._save_block_state()
                 
                 session['pin_authenticated'] = True
                 session['pin_login_used'] = True
@@ -122,12 +182,34 @@ class PinAuth:
                 self.pin_attempts += 1
                 print(f"❌ Неверный PIN-код (попытка {self.pin_attempts})")
                 
-                # Блокируем после 3 неудачных попыток
+                # Повторная проверка PIN перед блокировкой для избежания ошибок
+                # Это защита от случаев, когда PIN мог измениться в другой сессии
                 if self.pin_attempts >= 3:
+                    # Перепроверяем текущий PIN из конфига (на случай если он изменился)
+                    try:
+                        with open(self.config_file, 'r', encoding='utf-8') as f:
+                            config = json.load(f)
+                        fresh_pin = config.get('secret_pin', {}).get('current_pin', '1234')
+                        
+                        # Если PIN совпадает с актуальным из конфига, не блокируем
+                        if pin == fresh_pin:
+                            print("🔄 PIN совпадает с актуальным в конфиге, сбрасываем счетчик")
+                            self.pin_attempts = 0
+                            self._save_block_state()
+                            
+                            session['pin_authenticated'] = True
+                            session['pin_login_used'] = True
+                            return True, gettext("Аутентификация успешна")
+                    except Exception as e:
+                        print(f"⚠️ Ошибка при перепроверке PIN: {e}")
+                    
+                    # Если перепроверка не помогла, блокируем
                     self.block_pin_login()
+                    self._save_block_state()
                     return False, f"Неверный PIN-код. Вход заблокирован на {self.pin_block_duration} секунд"
-                
-                return False, "Неверный PIN-код"
+                else:
+                    self._save_block_state()
+                    return False, "Неверный PIN-код"
         except Exception as e:
             print(f"⚠️ Ошибка в authenticate_pin: {e}")
             return False, f"Ошибка аутентификации: {e}"
