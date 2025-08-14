@@ -1068,14 +1068,9 @@ def index():
         except Exception:
             return url_string 
 
-    # Проверяем доступность интернета
-    internet_available = True
-    try:
-        # Быстрая проверка интернета
-        import socket
-        socket.create_connection(("8.8.8.8", 53), timeout=3)
-    except OSError:
-        internet_available = False
+    # Улучшенная проверка доступности интернета
+    internet_available = check_internet_connection()
+    if not internet_available:
         flash(gettext('Нет подключения к интернету. Некоторые функции могут быть недоступны.'), 'info')
 
     for server in servers:
@@ -1083,6 +1078,67 @@ def index():
         server['masked_panel_url'] = mask_url_path(server.get('panel_url', ''))
         
     return render_template('index.html', servers=servers, internet_available=internet_available)
+
+def check_internet_connection():
+    """
+    Улучшенная функция проверки доступности интернета.
+    Проверяет несколько серверов, достаточно успешного соединения с одним из них.
+    """
+    # Список серверов для проверки (DNS и общедоступные IP)
+    servers_to_check = [
+        ("8.8.8.8", 53, 1),    # Google DNS, порт 53, таймаут 1 сек
+        ("1.1.1.1", 53, 1),    # Cloudflare DNS, порт 53, таймаут 1 сек
+        ("208.67.222.222", 53, 1),  # OpenDNS, порт 53, таймаут 1 сек
+    ]
+    
+    # Проверяем каждый сервер через сокеты
+    for server, port, timeout in servers_to_check:
+        try:
+            # Пытаемся создать соединение с текущим сервером
+            socket.create_connection((server, port), timeout=timeout)
+            print(f"✅ Socket: соединение с {server} успешно")
+            # Если хотя бы один сервер доступен, считаем что интернет есть
+            return True
+        except (socket.timeout, socket.error) as e:
+            print(f"❌ Socket: не удалось подключиться к {server}: {e}")
+            continue
+    
+    # Если сокет-соединения не удались, пробуем HTTPS запросы
+    https_urls = [
+        "https://www.google.com",
+        "https://www.cloudflare.com",
+        "https://www.example.com"
+    ]
+    
+    for url in https_urls:
+        try:
+            print(f"🔍 HTTPS: проверка {url}...")
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                print(f"✅ HTTPS: успешный запрос к {url}")
+                return True
+        except Exception as e:
+            print(f"❌ HTTPS: ошибка при запросе к {url}: {e}")
+    
+    # Если HTTPS-запросы не удались, пробуем HTTP запросы
+    http_urls = [
+        "http://www.google.com",
+        "http://www.example.com"
+    ]
+    
+    for url in http_urls:
+        try:
+            print(f"🔍 HTTP: проверка {url}...")
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                print(f"✅ HTTP: успешный запрос к {url}")
+                return True
+        except Exception as e:
+            print(f"❌ HTTP: ошибка при запросе к {url}: {e}")
+    
+    # Если все проверки не удались, считаем интернет недоступным
+    print("❌ Все проверки не удались, интернет считается недоступным")
+    return False
 
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
@@ -2141,6 +2197,64 @@ def run_flask():
     """Запускает Flask-приложение."""
     # debug=False и use_reloader=False важны для стабильной работы в потоке
     app.run(host='127.0.0.1', port=5050, debug=False, use_reloader=False)
+
+@app.route('/check_internet_status')
+def check_internet_status():
+    """API-эндпоинт для проверки статуса интернета."""
+    is_available = check_internet_connection()
+    return jsonify({
+        'available': is_available,
+        'timestamp': datetime.datetime.now().strftime('%H:%M:%S')
+    })
+
+@app.route('/check_site_availability/<path:url>')
+def check_site_availability(url):
+    """API-эндпоинт для проверки доступности конкретного сайта."""
+    try:
+        # Убедимся, что URL начинается с http:// или https://
+        if not url.startswith('http'):
+            url = 'https://' + url
+            
+        print(f"🔍 Проверка доступности сайта: {url}")
+        response = requests.get(url, timeout=5)
+        
+        result = {
+            'available': response.status_code == 200,
+            'status_code': response.status_code,
+            'url': url,
+            'timestamp': datetime.datetime.now().strftime('%H:%M:%S')
+        }
+        
+        print(f"✅ Сайт {url} доступен: {result['available']}, код: {result['status_code']}")
+        return jsonify(result)
+    except Exception as e:
+        print(f"❌ Ошибка при проверке сайта {url}: {str(e)}")
+        return jsonify({
+            'available': False,
+            'error': str(e),
+            'url': url,
+            'timestamp': datetime.datetime.now().strftime('%H:%M:%S')
+        }), 500
+
+@app.route('/pin/reset_block', methods=['POST'])
+@pin_auth.require_auth
+def reset_pin_block():
+    """Сбрасывает состояние блокировки PIN-кода (только для аутентифицированных пользователей)."""
+    try:
+        # Сбрасываем счетчик попыток и блокировку
+        pin_auth.pin_attempts = 0
+        pin_auth.pin_blocked_until = None
+        pin_auth._save_block_state()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Блокировка PIN-кода сброшена'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Ошибка при сбросе блокировки: {str(e)}'
+        }), 500
 
 if __name__ == "__main__":
     # Выполняем проверку и миграцию при старте приложения
