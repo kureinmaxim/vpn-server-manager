@@ -18,14 +18,17 @@
     {% if internet_available is defined %}
         <div class="d-flex justify-content-end mb-3">
             {% if internet_available %}
-                <span class="badge bg-success">
+                <span class="badge bg-success" id="internet-status">
                     <i class="bi bi-wifi"></i> {{ _('Интернет доступен') }}
                 </span>
             {% else %}
-                <span class="badge bg-warning text-dark">
+                <span class="badge bg-warning text-dark" id="internet-status">
                     <i class="bi bi-wifi-off"></i> {{ _('Нет интернета') }}
                 </span>
             {% endif %}
+            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="checkInternetStatus()" id="check-internet-btn" title="{{ _('Обновить статус интернета') }}">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     {% endif %}
 
@@ -327,7 +330,53 @@
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+        
+        // Инициализируем tooltip для кнопки проверки интернета
+        new bootstrap.Tooltip(document.getElementById('check-internet-btn'));
     });
+
+    // Функция для проверки статуса интернета
+    function checkInternetStatus() {
+        const statusBadge = document.getElementById('internet-status');
+        const checkButton = document.getElementById('check-internet-btn');
+        
+        // Показываем индикатор загрузки
+        checkButton.disabled = true;
+        checkButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        
+        // Отправляем запрос на проверку интернета
+        fetch('/check_internet_status')
+            .then(response => response.json())
+            .then(data => {
+                // Обновляем индикатор статуса
+                if (data.available) {
+                    statusBadge.className = 'badge bg-success';
+                    statusBadge.innerHTML = '<i class="bi bi-wifi"></i> {{ _("Интернет доступен") }}';
+                } else {
+                    statusBadge.className = 'badge bg-warning text-dark';
+                    statusBadge.innerHTML = '<i class="bi bi-wifi-off"></i> {{ _("Нет интернета") }}';
+                }
+                
+                // Добавляем временную метку
+                const timestamp = document.createElement('small');
+                timestamp.className = 'ms-1 text-muted';
+                timestamp.textContent = `(${data.timestamp})`;
+                statusBadge.appendChild(timestamp);
+                
+                // Восстанавливаем кнопку
+                checkButton.disabled = false;
+                checkButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            })
+            .catch(error => {
+                console.error('Ошибка при проверке интернета:', error);
+                statusBadge.className = 'badge bg-danger';
+                statusBadge.innerHTML = '<i class="bi bi-exclamation-triangle"></i> {{ _("Ошибка проверки") }}';
+                
+                // Восстанавливаем кнопку
+                checkButton.disabled = false;
+                checkButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            });
+    }
 
     function checkIpInfo(ipAddress) {
         const modal = new bootstrap.Modal(document.getElementById('ipInfoModal'));
