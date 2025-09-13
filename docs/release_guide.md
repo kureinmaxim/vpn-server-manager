@@ -226,6 +226,116 @@ gh release create v3.6.8 \
 
 ---
 
+## 8. Практический пример публикации (v3.6.8)
+
+Ниже приведены команды, использованные для публикации релиза 3.6.8: пуш изменений, создание тега, релиза на GitHub и добавление SHA256-суммы для DMG.
+
+### 8.1. Предварительные условия
+
+```bash
+# Активируйте виртуальное окружение (если потребуется сборка)
+source venv/bin/activate
+
+# Убедитесь, что установлен и настроен GitHub CLI
+gh --version
+gh auth status
+```
+
+### 8.2. Сборка приложения (macOS)
+
+```bash
+python3 build_macos.py
+```
+
+Результаты:
+- .app: dist/VPNServerManager-Clean.app
+- .dmg: dist/VPNServerManager-Clean_Installer.dmg
+
+### 8.3. Публикация изменений в репозиторий
+
+```bash
+# Проверка статуса и удалённого репозитория
+git status
+git remote -v
+
+# Публикация коммитов в main
+git push origin main
+```
+
+### 8.4. Создание и публикация тега v3.6.8
+
+```bash
+# Создание аннотированного тега
+git tag -a v3.6.8 -m "Release 3.6.8: dynamic port via make_server, unique session cookie, project-level config precedence, macOS build updated"
+
+# Публикация тега
+git push origin v3.6.8
+```
+
+### 8.5. Создание релиза на GitHub с загрузкой DMG
+
+```bash
+# Создание релиза для тега v3.6.8 и загрузка DMG
+gh release create v3.6.8 \
+  --repo kureinmaxim/vpn-server-manager \
+  --title "VPN Server Manager 3.6.8" \
+  --notes "- Новое: надёжный запуск Flask на свободном порте через make_server (host 127.0.0.1)\n- Уникальная cookie-сессия: vps_manager_session_vpn — исключает пересечение сессий с другим .app\n- Приоритет проектного config.json над пользовательским (для корректного отображения версии/разработчика)\n- Обновлена сборка macOS (.app и DMG)" \
+  dist/VPNServerManager-Clean_Installer.dmg
+```
+
+### 8.6. Подсчёт SHA256 для DMG и добавление в релиз
+
+```bash
+# Подсчёт хэш-суммы
+HASH=$(shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg" | awk '{print $1}'); echo "SHA256: $HASH"
+```
+
+Пример результата для 3.6.8:
+
+```text
+SHA256: b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba
+```
+
+Обновление заметок релиза и пометка как Latest:
+
+```bash
+gh release edit v3.6.8 \
+  --repo kureinmaxim/vpn-server-manager \
+  --latest \
+  --notes "- Новое: надёжный запуск Flask на свободном порте через make_server (host 127.0.0.1)\n- Уникальная cookie-сессия: vps_manager_session_vpn — исключает пересечение сессий с другим .app\n- Приоритет проектного config.json над пользовательским (для корректного отображения версии/разработчика)\n- Обновлена сборка macOS (.app и DMG)\n\nSHA256(DMG): b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba"
+```
+
+### 8.7. Обновление README (опционально)
+
+Добавьте раздел со ссылками на последний релиз и прямую ссылку на DMG, а также SHA256-сумму. Пример:
+
+```markdown
+## ⬇️ Скачать
+
+- Последний релиз: [Latest Release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest)
+- Прямая ссылка (v3.6.8, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v3.6.8/VPNServerManager-Clean_Installer.dmg)
+- SHA256(DMG): `b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba`
+```
+
+Команды для коммита изменений README:
+
+```bash
+git add README.md
+git commit -m "docs: add download section with latest release link and DMG SHA256 (v3.6.8)"
+git push origin main
+```
+
+### 8.8. Верификация релиза
+
+```bash
+# Быстрый просмотр в браузере
+gh release view v3.6.8 --web
+```
+
+После выполнения этих шагов релиз будет доступен на странице релизов и помечен как Latest, а DMG-файл — с опубликованной контрольной суммой.
+
+---
+
 ## Дополнительные ресурсы
 
 - [Документация PyInstaller](https://pyinstaller.org/en/stable/)
