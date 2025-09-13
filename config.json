@@ -1,8 +1,8 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.6.7",
-    "release_date": "14.08.2025",
+    "version": "3.6.8",
+    "release_date": "13.09.2025",
     "developer": "Developer",
     "last_updated": "2025-08-14"
   },
@@ -15,6 +15,6 @@
   "secret_pin": {
     "default_pin": "1234",
     "current_pin": "1234",
-    "last_changed": "2025-08-08"
+    "last_changed": "2025-09-13"
   }
 }
