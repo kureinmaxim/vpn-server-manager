@@ -2,8 +2,8 @@
 
 **Десктопное приложение для управления VPN-серверами с гибридной архитектурой (Flask + PyWebView)**
 
-[![Version](https://img.shields.io/badge/version-3.5.1-blue.svg)](https://github.com/your-repo/vpn-server-manager)
-[![Python](https://img.shields.io/badge/python-3.8+-green.svg)](https://python.org)
+[![Version](https://img.shields.io/badge/version-3.5.3-blue.svg)](https://github.com/your-repo/vpn-server-manager)
+[![Python](https://img.shields.io/badge/python-3.13+-green.svg)](https://python.org)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/your-repo/vpn-server-manager)
 
 ## 🚀 Особенности
@@ -37,7 +37,7 @@
 
 1. **Скачайте приложение**:
    ```bash
-   # Скачайте VPNServerManager_Installer.dmg
+   # Скачайте VPNServer_Installer.dmg
    # Или соберите из исходников:
    git clone https://github.com/your-repo/vpn-server-manager.git
    cd vpn-server-manager
@@ -45,8 +45,8 @@
    ```
 
 2. **Установите**:
-   - Откройте `VPNServerManager_Installer.dmg`
-   - Перетащите `VPNServerManager.app` в папку Applications
+   - Откройте `VPNServer_Installer.dmg`
+   - Перетащите `VPNServer.app` в папку Applications
    - При первом запуске: правый клик → "Открыть"
 
 ### Из исходников

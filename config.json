@@ -1,8 +1,8 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.5.2",
-    "release_date": "03.08.2025",
+    "version": "3.5.3",
+    "release_date": "13.09.2025",
     "developer": "Куреин М.Н.",
     "last_updated": "2025-08-03"
   },
@@ -15,6 +15,6 @@
   "secret_pin": {
     "default_pin": "5421",
     "current_pin": "5421",
-    "last_changed": "2025-08-03"
+    "last_changed": "2025-09-13"
   }
 }
