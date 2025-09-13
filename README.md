@@ -4,6 +4,12 @@
 
 ![VPN Server Manager](static/VPSc.png)
 
+## ⬇️ Скачать
+
+- Последний релиз: [Latest Release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest)
+- Прямая ссылка (v3.6.8, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v3.6.8/VPNServerManager-Clean_Installer.dmg)
+- SHA256(DMG): `b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba`
+
 ## 🚀 Возможности
 
 - Хранение данных о VPN-серверах в зашифрованном виде
