@@ -127,6 +127,9 @@ is_frozen = getattr(sys, 'frozen', False)
 # Путь к конфигу в директории данных пользователя
 user_config_path = Path(APP_DATA_DIR) / 'config.json'
 
+# Также путь к проектному конфигу рядом с исходниками
+project_config_path = Path(__file__).parent / 'config.json'
+
 def load_config_from_path(path):
     """Загружает JSON конфиг из указанного пути."""
     if not path.exists():
@@ -137,7 +140,10 @@ def load_config_from_path(path):
     except (json.JSONDecodeError, IOError):
         return None
 
-# Шаг 1: Загрузить "эталонный" конфиг из бандла (если применимо)
+# Шаг 1: Загрузить конфиг из проекта (приоритет)
+project_config = load_config_from_path(project_config_path)
+
+# Шаг 2: Загрузить "эталонный" конфиг из бандла (если применимо)
 bundle_config = None
 if is_frozen:
     try:
@@ -147,42 +153,19 @@ if is_frozen:
     except Exception as e:
         print(f"Не удалось найти или загрузить эталонный конфиг: {e}")
 
-# Шаг 2: Загрузить пользовательский конфиг
+# Шаг 3: Загрузить пользовательский конфиг
 user_config = load_config_from_path(user_config_path)
 
-# Шаг 3: Определить, какой конфиг использовать и нужно ли обновление
+# Шаг 4: Определить, какой конфиг использовать
 final_config = {}
-if user_config is None and bundle_config is not None:
-    # Случай 1: У пользователя нет конфига, копируем из бандла
-    print(f"Пользовательский конфиг не найден. Копирование из {bundle_config_path}")
-    try:
-        shutil.copy(bundle_config_path, user_config_path)
-        final_config = bundle_config
-    except Exception as e:
-        print(f"Ошибка копирования конфига: {e}")
-        final_config = {} # Используем пустой, чтобы избежать сбоя
-elif bundle_config is not None and user_config is not None:
-    # Случай 2: Оба конфига есть. Сравниваем и обновляем.
-    bundle_version = bundle_config.get('app_info', {}).get('version', '0.0.0')
-    user_version = user_config.get('app_info', {}).get('version', '0.0.0')
-
-    # Простое сравнение версий (можно заменить на более сложное, если нужно)
-    if bundle_version > user_version:
-        print(f"Найдена новая версия ({bundle_version} > {user_version}). Обновление конфига.")
-        # Обновляем информацию о приложении, сохраняя остальные настройки пользователя
-        user_config['app_info'] = bundle_config['app_info']
-        final_config = user_config
-        # Сохраняем обновленный конфиг
-        try:
-            with open(user_config_path, 'w', encoding='utf-8') as f:
-                json.dump(user_config, f, indent=2, ensure_ascii=False)
-        except IOError as e:
-            print(f"Ошибка сохранения обновленного конфига: {e}")
-    else:
-        # Версия не новее, используем конфиг пользователя как есть
-        final_config = user_config
+if project_config is not None:
+    # Явно используем конфиг из проекта, как запрошено
+    final_config = project_config
+elif bundle_config is not None:
+    # Если проектного нет (в упакованном варианте), используем конфиг из бандла
+    final_config = bundle_config
 else:
-    # Случай 3: Используем конфиг пользователя (или пустой, если его нет и нет бандла)
+    # Фолбэк: пользовательский конфиг (dev-режим без проектного файла)
     final_config = user_config if user_config is not None else {}
     if not is_frozen and not user_config_path.exists():
         print(f"ВНИМАНИЕ: {user_config_path} не найден в режиме разработки. Будет создан пустой.")
