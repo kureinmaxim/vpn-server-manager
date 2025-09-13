@@ -8,6 +8,7 @@ from flask import Flask, render_template, request, redirect, url_for, make_respo
 from dotenv import load_dotenv
 from cryptography.fernet import Fernet, InvalidToken
 from werkzeug.utils import secure_filename
+from werkzeug.serving import make_server
 import requests
 from urllib.parse import urlparse
 import copy
@@ -21,6 +22,7 @@ import socket
 load_dotenv()
 
 app = Flask(__name__)
+app.config['SESSION_COOKIE_NAME'] = 'vps_manager_session_vpn'
 
 # Функция для определения директории для хранения данных
 def get_app_data_dir():
@@ -2033,33 +2035,53 @@ def shutdown():
     os.kill(os.getpid(), signal.SIGINT)
     return 'Сервер выключается...'
 
-def run_flask():
-    """Запускает Flask-приложение."""
-    # debug=False и use_reloader=False важны для стабильной работы в потоке
-    app.run(host='127.0.0.1', port=5050, debug=False, use_reloader=False)
+# --- Надёжный запуск сервера на свободном порте (без конфликтов) ---
+from werkzeug.serving import make_server
+
+SERVER_PORT = None
+_WSGI_SERVER = None
+
+def _start_flask_server():
+    global SERVER_PORT, _WSGI_SERVER
+    try:
+        # Порт 0 — ОС выдаст гарантированно свободный порт
+        _WSGI_SERVER = make_server('127.0.0.1', 0, app)
+        SERVER_PORT = _WSGI_SERVER.server_port
+        print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
+        _WSGI_SERVER.serve_forever()
+    except Exception as e:
+        print(f"❌ Ошибка запуска Flask сервера: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     # Выполняем проверку и миграцию при старте приложения
     migrate_data_if_needed()
-    
-    # Запускаем Flask в отдельном потоке
-    flask_thread = threading.Thread(target=run_flask)
+
+    # Запускаем Flask в отдельном потоке через make_server
+    print("🔄 Запуск Flask в отдельном потоке...")
+    flask_thread = threading.Thread(target=_start_flask_server)
     flask_thread.daemon = True
     flask_thread.start()
+
+    # Ждём, пока сервер поднимется и задаст порт
+    import time
+    for _ in range(100):
+        if SERVER_PORT:
+            break
+        time.sleep(0.05)
 
     def on_closing():
         print("Окно закрывается, отправка запроса на выключение...")
         try:
-            # Отправляем запрос на выключение, чтобы корректно остановить сервер
-            requests.get('http://127.0.0.1:5050/shutdown', timeout=1)
+            requests.get(f'http://127.0.0.1:{SERVER_PORT}/shutdown', timeout=1)
         except requests.exceptions.RequestException:
-            # Это нормально, так как сервер умрет до получения ответа
             pass
 
-    # Создаем окно PyWebView
+    # Создаем окно PyWebView с динамическим портом
     window = webview.create_window(
         'VPN Server Manager',
-        'http://127.0.0.1:5050',
+        f'http://127.0.0.1:{SERVER_PORT or 5050}',
         width=1280,
         height=800,
         resizable=True
@@ -2067,7 +2089,7 @@ if __name__ == "__main__":
     window.events.closing += on_closing
 
     # Запускаем GUI
-    webview.start(debug=False) # debug=True может помочь с отладкой, если что-то пойдет не так
+    webview.start(debug=False)
 
     # После закрытия окна PyWebView, главный поток продолжится здесь.
     print("Приложение закрыто.")
