@@ -2,9 +2,15 @@
 
 **Десктопное приложение для управления VPN-серверами с гибридной архитектурой (Flask + PyWebView)**
 
-[![Version](https://img.shields.io/badge/version-3.5.3-blue.svg)](https://github.com/your-repo/vpn-server-manager)
+[![Version](https://img.shields.io/badge/version-3.5.4-blue.svg)](https://github.com/your-repo/vpn-server-manager)
 [![Python](https://img.shields.io/badge/python-3.13+-green.svg)](https://python.org)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey.svg)](https://github.com/your-repo/vpn-server-manager)
+
+## 🚀 Быстрый запуск
+
+```bash
+cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/activate && python3 app.py
+```
 
 ## 🚀 Особенности
 
@@ -16,6 +22,8 @@
 - **🔑 Управление ключами**: Смена ключей шифрования с автоматической перешифровкой
 - **📊 Мониторинг**: Автоматическое отслеживание статуса серверов и платежей
 - **🎨 Адаптивный дизайн**: Поддержка светлой и темной темы, масштабирование UI
+- **🌐 IP-анализ**: Интеграция с IP2Location для определения владельца IP-адресов
+- **📚 Шпаргалка**: Комплексная шпаргалка с командами NGINX, Docker, Systemd и содержанием
 
 ## 📋 Содержание
 
@@ -324,7 +332,14 @@ A: Без ключа данные невозможно восстановить.
 
 ## 📈 История версий
 
-### v3.5.1 (Текущая)
+### v3.5.4 (Текущая)
+- ✅ **Кнопка "Владелец IP"**: Интеграция с IP2Location для анализа IP-адресов
+- ✅ **Обновленная шпаргалка**: Добавлены разделы NGINX, Docker, Systemd
+- ✅ **Содержание шпаргалки**: Навигация по разделам с якорными ссылками
+- ✅ **Унифицированные кнопки**: Все кнопки копирования теперь с иконками
+- ✅ **Секции информации**: Отображение полей "Информация" и "Установленное ПО" на карточках серверов
+
+### v3.5.1
 - ✅ **PIN-система**: Дополнительная защита приложения PIN-кодом
 - ✅ **Офлайн режим**: Улучшенная работа без интернета
 - ✅ **Исправление иконки**: Автоматическая конвертация favicon.ico в icon.icns
