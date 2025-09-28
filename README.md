@@ -7,7 +7,7 @@
 ## ⬇️ Скачать
 
 - Последний релиз: [Latest Release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest)
-- Прямая ссылка (v3.6.8, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v3.6.8/VPNServerManager-Clean_Installer.dmg)
+- Прямая ссылка (v3.6.9, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v3.6.9/VPNServerManager-Clean_Installer.dmg)
 - SHA256(DMG): `b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba`
 
 ## 🚀 Возможности
@@ -19,6 +19,8 @@
 - Система подсказок и шпаргалок
 - Экспорт/импорт данных с шифрованием
 - Защита PIN-кодом
+- **🌐 IP-анализ**: Интеграция с IP2Location для определения владельца IP-адресов
+- **📚 Шпаргалка**: Комплексная шпаргалка с командами NGINX, Docker, Systemd и содержанием
 
 ## 📋 Документация
 
