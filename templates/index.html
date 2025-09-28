@@ -141,10 +141,13 @@
                         </div>
                     </div>
 
-                    <div class="d-grid mb-2">
+                    <div class="d-grid gap-2 mb-2">
                         <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="{{ _('Требуется интернет') }}"{% endif %}>
                             <i class="bi bi-search"></i> {{ _('Проверить IP') }}
                         </button>
+                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="{{ _('Требуется интернет') }}"{% endif %}>
+                            <i class="bi bi-building"></i> {{ _('Владелец IP') }}
+                        </a>
                     </div>
 
                     <div class="accordion accordion-flush" id="accordion-{{ server.id }}">
@@ -281,6 +284,38 @@
                                         <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в панель') }}</a>
                                     </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Блок Дополнительная информация -->
+                        {% if server.get('docker_info') %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-info-{{ server.id }}">{{ _('Информация') }}</button>
+                            </h2>
+                            <div id="collapse-info-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
+                                <div class="accordion-body py-2">
+                                    <div class="small text-muted">
+                                        {{ server.docker_info|replace('\n', '<br>')|safe }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Блок Установленное ПО -->
+                        {% if server.get('software_info') %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-software-{{ server.id }}">{{ _('Установленное ПО') }}</button>
+                            </h2>
+                            <div id="collapse-software-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
+                                <div class="accordion-body py-2">
+                                    <div class="small text-muted">
+                                        {{ server.software_info|replace('\n', '<br>')|safe }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
