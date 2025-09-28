@@ -7,7 +7,39 @@
     <h1 class="mb-4">Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)</h1>
     <p class="lead">Этот раздел объединяет наиболее полезные команды для быстрой оценки состояния сервера.</p>
     
+    <!-- Содержание -->
     <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-list-ul"></i> Содержание</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-3">Основные разделы</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#quick-summary" class="text-decoration-none">📊 Быстрая сводка</a></li>
+                        <li><a href="#installed-software" class="text-decoration-none">📦 Установленное ПО</a></li>
+                        <li><a href="#key-utilities" class="text-decoration-none">🔧 Ключевые утилиты</a></li>
+                        <li><a href="#disk-usage" class="text-decoration-none">💾 Подробнее о df (использование дискового пространства)</a></li>
+                        <li><a href="#security" class="text-decoration-none">🔒 Основы безопасности</a></li>
+                        <li><a href="#process-management" class="text-decoration-none">⚙️ Управление процессами</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-3">Специализированные разделы</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#systemd-services" class="text-decoration-none">🔧 Управление службами (systemd)</a></li>
+                        <li><a href="#package-management" class="text-decoration-none">📦 Управление пакетами (apt)</a></li>
+                        <li><a href="#nginx-commands" class="text-decoration-none">🌐 NGINX - Основные команды</a></li>
+                        <li><a href="#docker-commands" class="text-decoration-none">🐳 Docker - Основные команды</a></li>
+                        <li><a href="#systemd-management" class="text-decoration-none">⚙️ Systemd - Управление службами</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4" id="quick-summary">
         <div class="card-header">
             <h5 class="mb-0">Быстрая сводка</h5>
         </div>
@@ -16,14 +48,12 @@
                 <pre><code class="language-bash">echo "=== Система ===" && cat /etc/os-release | head -2 && \
 echo "=== Процессор ===" && cat /proc/cpuinfo | grep "model name" | head -1 && \
 echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
-                <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                    <i class="bi bi-clipboard"></i> Копировать
-                </button>
+                <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
             </div>
         </div>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="installed-software">
         <div class="card-header">
             <h5 class="mb-0">Установленное ПО</h5>
         </div>
@@ -52,7 +82,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         </ul>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="key-utilities">
         <div class="card-header">
             <h5 class="mb-0">Ключевые утилиты</h5>
         </div>
@@ -61,78 +91,62 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <p class="mb-1"><strong>Информация о ядре и системе</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">uname -a</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Информация о процессоре</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">lscpu | cat</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Использование оперативной памяти</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">free -h</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Использование дискового пространства</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Просмотр сетевых интерфейсов</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">ip a</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Просмотр активных сетевых портов</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">ss -tulnp | cat</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Кто сейчас в системе</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">w</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
             <li class="list-group-item">
                 <p class="mb-1"><strong>Системный журнал в реальном времени</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">tail -f /var/log/syslog</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
         </ul>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="disk-usage">
         <div class="card-header">
             <h5 class="mb-0">Подробнее о `df` (использование дискового пространства)</h5>
         </div>
@@ -141,24 +155,20 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
                 <p class="mb-1"><strong>Показать тип файловой системы</strong> (например, ext4, xfs)</p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -hT</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
              <li class="list-group-item">
                 <p class="mb-1"><strong>Показать итоговую строку с суммой по всем разделам</strong></p>
                 <div class="position-relative">
                     <pre><code class="language-bash">df -h --total</code></pre>
-                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;">
-                        <i class="bi bi-clipboard"></i> Копировать
-                    </button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
                 </div>
             </li>
         </ul>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="security">
         <div class="card-header">
             <h5 class="mb-0">Основы безопасности</h5>
         </div>
@@ -225,7 +235,7 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         </ul>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="process-management">
         <div class="card-header">
             <h5 class="mb-0">Управление процессами</h5>
         </div>
@@ -254,58 +264,287 @@ echo "=== Память ===" && cat /proc/meminfo | grep MemTotal</code></pre>
         </ul>
     </div>
 
-    <div class="card mb-4">
+    <div class="card mb-4" id="systemd-services">
         <div class="card-header">
             <h5 class="mb-0">Управление службами (systemd)</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                  <p class="mb-1"><strong>Проверить статус службы</strong> (замените `nginx`)</p>
-                 <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Перезапустить службу:</strong></p>
-                 <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Включить автозапуск службы:</strong></p>
-                 <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo systemctl enable nginx</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Выключить автозапуск службы:</strong></p>
-                 <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo systemctl disable nginx</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
         </ul>
     </div>
 
-     <div class="card mb-4">
+     <div class="card mb-4" id="package-management">
         <div class="card-header">
             <h5 class="mb-0">Управление пакетами (apt)</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
                  <p class="mb-1"><strong>Обновить список пакетов:</strong></p>
-                 <pre><code class="language-bash">sudo apt update</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo apt update</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Обновить установленные пакеты:</strong></p>
-                 <pre><code class="language-bash">sudo apt upgrade</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo apt upgrade</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Установить пакет</strong> (замените `htop`):</p>
-                 <pre><code class="language-bash">sudo apt install htop</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo apt install htop</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
             </li>
              <li class="list-group-item">
                  <p class="mb-1"><strong>Удалить пакет:</strong></p>
-                 <pre><code class="language-bash">sudo apt remove htop</code></pre>
-                 <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 <div class="position-relative">
+                     <pre><code class="language-bash">sudo apt remove htop</code></pre>
+                     <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                 </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4" id="nginx-commands">
+        <div class="card-header">
+            <h5 class="mb-0">NGINX - Основные команды</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверить статус NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl status nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Запустить NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl start nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Остановить NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl stop nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Перезапустить NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl restart nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Перезагрузить конфигурацию NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo nginx -s reload</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверить конфигурацию NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo nginx -t</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр логов NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo tail -f /var/log/nginx/access.log</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр логов ошибок NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo tail -f /var/log/nginx/error.log</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверить активные соединения NGINX:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo netstat -tulpn | grep nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4" id="docker-commands">
+        <div class="card-header">
+            <h5 class="mb-0">Docker - Основные команды</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверить статус Docker:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl status docker</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Список запущенных контейнеров:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker ps</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Список всех контейнеров (включая остановленные):</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker ps -a</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Список образов Docker:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker images</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Запустить контейнер:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker run -d --name my-container nginx</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Остановить контейнер:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker stop my-container</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Удалить контейнер:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker rm my-container</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр логов контейнера:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker logs my-container</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Выполнить команду в контейнере:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">docker exec -it my-container bash</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="card mb-4" id="systemd-management">
+        <div class="card-header">
+            <h5 class="mb-0">Systemd - Управление службами</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Проверить статус службы:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl status service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Запустить службу:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl start service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Остановить службу:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl stop service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Перезапустить службу:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl restart service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Включить автозапуск службы:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl enable service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Отключить автозапуск службы:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl disable service-name</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Перезагрузить конфигурацию systemd:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl daemon-reload</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Просмотр логов службы:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo journalctl -u service-name -f</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>Список всех служб:</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo systemctl list-units --type=service</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
             </li>
         </ul>
     </div>
