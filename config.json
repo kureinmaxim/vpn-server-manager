@@ -1,15 +1,16 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.6.8",
-    "release_date": "13.09.2025",
-    "developer": "Developer",
-    "last_updated": "2025-08-14"
+    "version": "3.6.9",
+    "release_date": "28.09.2025",
+    "developer": "Куреин М.Н.",
+    "last_updated": "2025-09-28"
   },
   "service_urls": {
     "ip_check_api": "https://ipinfo.io/{ip}/json",
     "general_ip_test": "https://browserleaks.com/ip",
-    "general_dns_test": "https://dnsleaktest.com/"
+    "general_dns_test": "https://dnsleaktest.com/",
+    "ip2location_demo": "https://www.ip2location.com/demo/{ip}"
   },
   "active_data_file": "data/servers.json.enc",
   "secret_pin": {
