@@ -138,7 +138,7 @@ graph TD
 
 **Файлы для изучения:**
 - `app.py` (функции encrypt/decrypt)
-- `generate_key.py`
+- `tools/generate_key.py`
 - `.env` (хранение ключа)
 - `data/servers.json.enc`
 
@@ -310,8 +310,10 @@ VPNserverManage/
 ├── requirements.txt        # Зависимости Python
 ├── build_macos.py         # Скрипт сборки для macOS
 ├── qt.conf                # Конфигурация Qt
-├── generate_key.py        # Генерация ключей шифрования
-├── decrypt_tool.py        # Утилита расшифровки
+├── tools/
+│   ├── generate_key.py        # Генерация ключей шифрования
+│   ├── decrypt_tool.py        # Утилита расшифровки
+│   └── pin_auth.py            # Модуль PIN-аутентификации
 │
 ├── data/
 │   ├── servers.json.enc   # Зашифрованные данные серверов
