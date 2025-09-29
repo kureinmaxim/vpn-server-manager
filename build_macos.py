@@ -124,8 +124,10 @@ def build_app():
         "env.example",
         "yubikey_auth.py",
         "security_logger.py",
-        "decrypt_tool.py",
-        "generate_key.py"
+        "tools/decrypt_tool.py",
+        "tools/generate_key.py",
+        "tools/generate_data_storage_pdf.py",
+        "tools/pin_auth.py"
     ]
     
     for file in additional_files:

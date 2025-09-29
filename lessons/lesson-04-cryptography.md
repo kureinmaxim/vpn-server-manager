@@ -469,7 +469,7 @@ def decrypt_data(encrypted_data):
 ### Генератор ключей
 
 ```python
-# generate_key.py - утилита для генерации ключей
+# tools/generate_key.py - утилита для генерации ключей
 import os
 import secrets
 from cryptography.fernet import Fernet

@@ -175,7 +175,7 @@ def inject_app_info():
 app.config['SECRET_KEY'] = os.getenv("FLASK_SECRET_KEY", "a-default-secret-key-for-flash")
 
 # Импортируем PIN-аутентификацию после настройки приложения
-from pin_auth import pin_auth
+from tools.pin_auth import pin_auth
 
 # Устанавливаем пути относительно директории данных приложения
 app.config['UPLOAD_FOLDER'] = os.path.join(APP_DATA_DIR, 'uploads')

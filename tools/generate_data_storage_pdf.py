@@ -267,18 +267,18 @@ def create_data_storage_pdf():
     # Утилиты для работы с данными
     story.append(Paragraph("🔧 Утилиты для работы с данными", heading1_style))
     
-    story.append(Paragraph("1. decrypt_tool.py - Просмотр данных", heading2_style))
+    story.append(Paragraph("1. tools/decrypt_tool.py - Просмотр данных", heading2_style))
     story.append(Paragraph(
         "<b>Назначение:</b> Просмотр расшифрованных данных без запуска GUI<br/>"
-        "<b>Использование:</b> python3 decrypt_tool.py",
+        "<b>Использование:</b> python3 tools/decrypt_tool.py",
         styles['Normal']
     ))
     story.append(Spacer(1, 8))
     
-    story.append(Paragraph("2. generate_key.py - Создание нового ключа", heading2_style))
+    story.append(Paragraph("2. tools/generate_key.py - Создание нового ключа", heading2_style))
     story.append(Paragraph(
         "<b>Назначение:</b> Генерация нового SECRET_KEY<br/>"
-        "<b>Использование:</b> python3 generate_key.py",
+        "<b>Использование:</b> python3 tools/generate_key.py",
         styles['Normal']
     ))
     story.append(Spacer(1, 20))

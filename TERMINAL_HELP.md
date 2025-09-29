@@ -92,7 +92,7 @@ cat .env
 Для расшифровки и просмотра данных используйте встроенную утилиту:
 
 ```bash
-source venv/bin/activate && python3 decrypt_tool.py
+source venv/bin/activate && python3 tools/decrypt_tool.py
 ```
 
 ---
