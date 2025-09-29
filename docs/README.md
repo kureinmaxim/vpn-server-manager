@@ -74,7 +74,7 @@ venv\Scripts\activate     # На Windows
 pip install -r requirements.txt
 
 # Создайте файл .env с ключом шифрования
-python3 generate_key.py
+python3 tools/generate_key.py
 
 # Запустите приложение
 python3 app.py
@@ -276,10 +276,10 @@ pip install -r requirements.txt
 python3 app.py
 
 # Генерация нового ключа
-python3 generate_key.py
+python3 tools/generate_key.py
 
 # Расшифровка данных (утилита)
-python3 decrypt_tool.py
+python3 tools/decrypt_tool.py
 ```
 
 ## 📚 Образовательные материалы
@@ -315,7 +315,7 @@ python3 decrypt_tool.py
 ### Часто задаваемые вопросы
 
 **Q: Приложение не запускается**
-A: Проверьте наличие файла `.env` с SECRET_KEY. Используйте `python3 generate_key.py` для создания.
+A: Проверьте наличие файла `.env` с SECRET_KEY. Используйте `python3 tools/generate_key.py` для создания.
 
 **Q: Не могу импортировать данные**
 A: Убедитесь, что ключ шифрования соответствует файлу данных. Используйте "Проверить соответствие" в настройках.
