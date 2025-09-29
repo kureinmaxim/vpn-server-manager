@@ -17,10 +17,12 @@ cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/
 ### 🔐 Безопасность
 - **[SECRET_KEY.md](SECRET_KEY.md)** - Система шифрования и управление криптографическими ключами
 - **[SECURITY_BEST_PRACTICES.md](SECURITY_BEST_PRACTICES.md)** - Рекомендации по безопасности
+- **[DATA_STORAGE_GUIDE.md](DATA_STORAGE_GUIDE.md)** - Руководство по хранению данных (MD + PDF)
 
 ### 🛠️ Разработка и сборка
 - **[BUILD.md](BUILD.md)** - Инструкции по сборке приложения
 - **[TERMINAL_HELP.md](../TERMINAL_HELP.md)** - Справка по работе с терминалом
+- **[MULTI_APP_IMPLEMENTATION.md](../MULTI_APP_IMPLEMENTATION.md)** - Реализация параллельной работы приложений
 
 ### 📈 История изменений
 - **[CHANGELOG_v3.4.0.md](CHANGELOG_v3.4.0.md)** - Исправление офлайн режима и иконки (текущая версия)
@@ -43,7 +45,9 @@ cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/
 ### По функциям
 - **Установка и настройка**: [README.md](README.md)
 - **Безопасность и шифрование**: [SECRET_KEY.md](SECRET_KEY.md), [SECURITY_BEST_PRACTICES.md](SECURITY_BEST_PRACTICES.md)
+- **Хранение данных**: [DATA_STORAGE_GUIDE.md](DATA_STORAGE_GUIDE.md) (MD + PDF)
 - **Архитектура проекта**: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
+- **Параллельная работа**: [MULTI_APP_IMPLEMENTATION.md](../MULTI_APP_IMPLEMENTATION.md)
 - **Сборка приложения**: [BUILD.md](BUILD.md)
 - **Работа с терминалом**: [TERMINAL_HELP.md](../TERMINAL_HELP.md)
 - **История изменений**: [CHANGELOG_v3.3.3.md](CHANGELOG_v3.3.3.md)
@@ -67,6 +71,8 @@ cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/
 Документация обновляется с каждой новой версией приложения. Последние изменения:
 
 - **v3.5.4**: Добавлена кнопка "Владелец IP" с интеграцией IP2Location, обновлена шпаргалка с разделами NGINX, Docker, Systemd и содержанием
+- **DATA_STORAGE_GUIDE.md**: Создано подробное руководство по хранению данных (MD + PDF)
+- **MULTI_APP_IMPLEMENTATION.md**: Документация по реализации параллельной работы приложений
 - **CHANGELOG_v3.4.0.md**: Добавлена информация об исправлении офлайн режима и иконки
 - **SECRET_KEY.md**: Добавлено подробное описание системы шифрования
 - **README.md**: Создан новый файл с полным описанием приложения
