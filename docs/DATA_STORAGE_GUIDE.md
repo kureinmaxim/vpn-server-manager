@@ -292,14 +292,14 @@ def get_app_data_dir():
 
 ## 🔧 Утилиты для работы с данными
 
-### 1. `decrypt_tool.py` - Просмотр данных
+### 1. `tools/decrypt_tool.py` - Просмотр данных
 
 **Назначение:** Просмотр расшифрованных данных без запуска GUI
 
 **Использование:**
 ```bash
 cd /path/to/project
-python3 decrypt_tool.py
+python3 tools/decrypt_tool.py
 ```
 
 **Функции:**
@@ -307,14 +307,14 @@ python3 decrypt_tool.py
 - Просмотр структуры данных
 - Проверка целостности файлов
 
-### 2. `generate_key.py` - Создание нового ключа
+### 2. `tools/generate_key.py` - Создание нового ключа
 
 **Назначение:** Генерация нового SECRET_KEY
 
 **Использование:**
 ```bash
 cd /path/to/project
-python3 generate_key.py
+python3 tools/generate_key.py
 ```
 
 **Функции:**
@@ -418,7 +418,7 @@ python3 generate_key.py
 ### Проверка целостности данных
 
 **Регулярные проверки:**
-- Запуск `decrypt_tool.py` для проверки данных
+- Запуск `tools/decrypt_tool.py` для проверки данных
 - Проверка размера файлов данных
 - Мониторинг свободного места
 
