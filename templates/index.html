@@ -145,7 +145,10 @@
                         <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="Требуется интернет"{% endif %}>
                             <i class="bi bi-building"></i> Владелец IP
                         </a>
-                    </div>
+                        <button class="btn btn-sm btn-outline-primary btn-show-stats" type="button" data-server-id="{{ server.id }}">
+                            <i class="bi bi-activity"></i> Статус
+                        </button>
+                        </div> <!-- Закрываем .d-grid gap-2 mb-2 -->
 
                     <div class="accordion accordion-flush" id="accordion-{{ server.id }}">
                         <!-- Блок Кабинет хостера -->
@@ -406,6 +409,219 @@
             eyeIcon.classList.remove('bi-eye-slash');
             eyeIcon.classList.add('bi-eye');
         }
+    }
+
+    // Делегирование клика, чтобы избежать синтаксических конфликтов в шаблоне
+    document.addEventListener('click', function(e){
+        var btn = e.target.closest && e.target.closest('.btn-show-stats');
+        if (!btn) return;
+        var sid = parseInt(btn.getAttribute('data-server-id'), 10);
+        if (!sid) return;
+        showServerStats(sid);
+    });
+
+    function showServerStats(serverId) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="bi bi-activity"></i> Статус сервера #${serverId}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center text-muted">
+                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                        Загрузка…
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>`;
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+
+        let refreshTimer = null;
+
+        function renderStats(s) {
+            const cpu = (s && s.cpu && s.cpu.used_pct != null) ? s.cpu.used_pct : 0;
+            const mt = (s && s.mem && s.mem.total_mb) || 0;
+            const mu = (s && s.mem && s.mem.used_mb) || 0;
+            const mm = mt ? Math.round(mu * 100 / mt) : 0;
+
+            const disks = (s && s.disks || []).map(d => `
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small">
+                        <span>${d.mount}</span><span>${d.pcent} (${d.used}/${d.size})</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar bg-info" role="progressbar" style="width:${(parseInt(d.pcent)||0)}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            const procs = (s && s.processes || []).map(p => `
+                <tr><td>${p.pid}</td><td class="text-truncate" style="max-width:220px">${p.cmd}</td><td>${p.cpu}</td><td>${p.mem}</td></tr>
+            `).join('');
+
+            // Сопоставление RX/TX к интерфейсам
+            const trafficMap = {};
+            (s && s.traffic || []).forEach(t => { trafficMap[t.iface] = t; });
+            const nets = (s && s.net || []).map(n => {
+                const t = trafficMap[n.iface] || {};
+                const rx = (typeof t.rx_bytes === 'number') ? (t.rx_bytes/1048576).toFixed(1) + ' MB' : '-';
+                const tx = (typeof t.tx_bytes === 'number') ? (t.tx_bytes/1048576).toFixed(1) + ' MB' : '-';
+                return `<li class="list-group-item d-flex justify-content-between align-items-center py-1">
+                            <span><code>${n.iface}</code> — ${n.addr || '-'}</span>
+                            <span>
+                                <span class="badge bg-info me-1">RX ${rx}</span>
+                                <span class="badge bg-info">TX ${tx}</span>
+                            </span>
+                        </li>`;
+            }).join('');
+
+            const cmdId = `installCmd_${serverId}_${Date.now()}`;
+            const missing = (s && s.missing_tools && s.missing_tools.length) ? s.missing_tools.join(', ') : '';
+            const toolsAlert = missing
+                ? `<div class="alert alert-warning">
+                        <div class="mb-1"><i class="bi bi-exclamation-triangle"></i> Для полной диагностики отсутствуют утилиты: <strong>${missing}</strong></div>
+                        ${(s && s.install_hint) ? `<div class="small mb-1">Установите командой:</div><div class="input-group input-group-sm"><pre id="${cmdId}" class="form-control" style="white-space: pre-wrap; margin:0;">${s.install_hint}</pre><button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, document.getElementById('${cmdId}').textContent)"><i class="bi bi-clipboard"></i></button></div>` : ''}
+                   </div>`
+                : '';
+
+            const cpuCores = (s && s.cpu && s.cpu.cores != null) ? s.cpu.cores : '-';
+            const kernel = (s && s.cpu && s.cpu.kernel) ? s.cpu.kernel : '-';
+            const dockerPresent = (s && s.docker && s.docker.present) ? 'есть' : 'нет';
+            const dockerRunning = (s && s.docker && s.docker.running != null) ? s.docker.running : 0;
+            const dockerVersion = (s && s.docker && s.docker.version) ? s.docker.version : '';
+            const dockerNames = (s && s.docker && Array.isArray(s.docker.names)) ? s.docker.names : [];
+            const dockerContainers = (s && s.docker && Array.isArray(s.docker.containers)) ? s.docker.containers : [];
+
+            // Uptime: keep English format (like "6 months, 18 days")
+            let engUptime = (s && s.uptime) ? String(s.uptime) : '-';
+            engUptime = engUptime.replace(/^up\s+/i, '').trim();
+
+            modal.querySelector('.modal-body').innerHTML = `
+                ${toolsAlert}
+                <div class="small text-muted mb-2">Uptime: ${engUptime}</div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card card-body">
+                            <div class="d-flex justify-content-between"><strong>CPU</strong><span>${cpu}%</span></div>
+                            <div class="progress" style="height: 10px;"> 
+                                <div class="progress-bar" role="progressbar" style="width:${cpu}%"></div>
+                            </div>
+                            <div class="mt-2 small">Ядер: <strong>${cpuCores}</strong>, Kernel: <code>${kernel}</code></div>
+                            <div class="mt-3 d-flex justify-content-between"><strong>Память</strong><span>${mm}% (${mu} / ${mt} МБ)</span></div>
+                            <div class="progress" style="height: 10px;"> 
+                                <div class="progress-bar bg-warning" role="progressbar" style="width:${mm}%"></div>
+                            </div>
+                            <div class="mt-3 small text-muted">
+                                <div>Load: ${(s && s.load && s.load['1m']) || '-'} / ${(s && s.load && s.load['5m']) || '-'} / ${(s && s.load && s.load['15m']) || '-'}</div>
+                                <div>Swap: ${((s && s.swap && s.swap.used_pct) || 0)}% (${((s && s.swap && s.swap.used_mb) || 0)} / ${((s && s.swap && s.swap.total_mb) || 0)} МБ)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6"> 
+                        <div class="card card-body"> 
+                            <strong class="mb-2">Хранилище</strong>
+                            ${disks || '<div class="text-muted small">Нет данных</div>'}
+                            ${(s && s.inodes && s.inodes.length) ? `
+                            <div class="mt-3">
+                                <strong>Inodes</strong>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-dark align-middle">
+                                        <thead><tr><th>Точка</th><th>Всего</th><th>Исп.</th><th>%</th></tr></thead>
+                                        <tbody>${(s.inodes||[]).map(i=>{
+                                            const m = i.mount || '';
+                                            const short = m.length>15 ? (m.slice(0,15) + '…') : m;
+                                            return `<tr><td title="${m}">${short}</td><td>${i.inodes}</td><td>${i.iused}</td><td>${i.ipcent}</td></tr>`;
+                                        }).join('')}</tbody>
+                                    </table>
+                                </div>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                    <div class="col-12"> 
+                        <div class="card card-body"> 
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>Процессы (топ по CPU)</strong>
+                            </div>
+                            <div class="table-responsive mt-2"> 
+                                <table class="table table-sm table-dark align-middle"> 
+                                    <thead><tr><th>PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead>
+                                    <tbody>${procs}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12"> 
+                        <div class="card card-body"> 
+                            <div class="d-flex justify-content-between align-items-center">
+                                <strong>Сети</strong>
+                                <span class="small text-truncate" title="${dockerVersion}">Docker: ${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}${dockerContainers.length?`, ${dockerContainers.slice(0,2).map(c=>`${c.name||''}:${c.size||''}`).join(', ')}${dockerContainers.length>2?`, +${dockerContainers.length-2}`:''}`:''}</span>
+                            </div>
+                            <div class="small text-muted mt-1">RX — принято, TX — отправлено (обновление каждые 10 с).</div>
+                            <ul class="list-group list-group-flush mb-2">${nets}</ul>
+                            ${dockerContainers && dockerContainers.length ? `
+                            <div class="mt-2 small">
+                                <strong>Docker containers (top):</strong>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-dark align-middle">
+                                        <thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead>
+                                        <tbody>${dockerContainers.map(c=>`<tr>
+                                            <td>${c.name||''}</td>
+                                            <td class="text-truncate" style="max-width:160px" title="${c.image||''}">${c.image||''}</td>
+                                            <td>${c.status||''}</td>
+                                            <td class="text-truncate" style="max-width:180px" title="${c.ports||''}">${c.ports||''}</td>
+                                            <td>${c.size||''}</td>
+                                        </tr>`).join('')}</tbody>
+                                    </table>
+                                </div>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Порог ошибок подряд до авто-остановки
+        let consecutiveErrors = 0;
+        const maxConsecutiveErrors = 3;
+        // Настраиваемый таймаут SSH (сек) и интервал обновления берутся статически здесь
+        const sshTimeoutSec = 10; // можно вынести в UI позже
+
+        function fetchAndRender() {
+            fetch(`/server/${serverId}/stats?timeout=${sshTimeoutSec}`)
+                .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
+                .then(({ ok, data }) => {
+                    if (!ok) throw new Error(data.error || 'Ошибка запроса');
+                    consecutiveErrors = 0;
+                    renderStats(data.stats || {});
+                })
+                .catch(err => {
+                    modal.querySelector('.modal-body').innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ${err.message}</div>`;
+                    consecutiveErrors += 1;
+                    if (consecutiveErrors >= maxConsecutiveErrors) {
+                        if (refreshTimer) clearInterval(refreshTimer);
+                        const stopNote = document.createElement('div');
+                        stopNote.className = 'alert alert-warning mt-2';
+                        stopNote.innerHTML = '<i class="bi bi-pause-circle"></i> Автообновление остановлено после нескольких ошибок.';
+                        const body = modal.querySelector('.modal-body');
+                        if (body) body.appendChild(stopNote);
+                    }
+                });
+        }
+
+        fetchAndRender();
+        refreshTimer = setInterval(fetchAndRender, 10000);
+
+        modal.addEventListener('hidden.bs.modal', () => {
+            if (refreshTimer) clearInterval(refreshTimer);
+            modal.remove();
+        });
     }
 </script>
 {% endblock %}
