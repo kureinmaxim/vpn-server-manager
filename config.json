@@ -1,7 +1,7 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.5.7",
+    "version": "3.6.0",
     "release_date": "01.10.2025",
     "developer": "Куреин М.Н.",
     "last_updated": "2025-10-01"
@@ -12,7 +12,7 @@
     "general_dns_test": "https://dnsleaktest.com/",
     "ip2location_demo": "https://www.ip2location.com/demo/{ip}"
   },
-  "active_data_file": "/Users/olgazaharova/Project/ProjectPython/VPNserverManage/data/merged_20250803_165014.enc",
+  "active_data_file": "/Users/olgazaharova/Project/ProjectPython/VPNserverManage/data/merged_20251001_215611.enc",
   "secret_pin": {
     "default_pin": "5421",
     "current_pin": "5421",

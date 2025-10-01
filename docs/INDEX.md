@@ -13,6 +13,7 @@ cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/
 ### 🚀 Основные документы
 - **[README.md](README.md)** - Главная страница проекта с описанием функций и инструкциями по установке
 - **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Подробная структура проекта и архитектура приложения
+- **[SERVER_STATS_IMPLEMENTATION.md](SERVER_STATS_IMPLEMENTATION.md)** - Реализация модалки статуса сервера и сбор метрик по SSH
 
 ### 🔐 Безопасность
 - **[SECRET_KEY.md](SECRET_KEY.md)** - Система шифрования и управление криптографическими ключами

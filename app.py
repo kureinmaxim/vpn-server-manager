@@ -18,6 +18,9 @@ import shutil
 import webview
 import signal
 import socket
+import paramiko
+import re
+from typing import List, Dict, Any
 
 load_dotenv()
 
@@ -109,15 +112,18 @@ if user_config is None and bundle_config is not None:
         print(f"Ошибка копирования конфига: {e}")
         final_config = {} # Используем пустой, чтобы избежать сбоя
 elif bundle_config is not None and user_config is not None:
-    # Случай 2: Оба конфига есть. Сравниваем и обновляем.
-    bundle_version = bundle_config.get('app_info', {}).get('version', '0.0.0')
-    user_version = user_config.get('app_info', {}).get('version', '0.0.0')
+    # Случай 2: Оба конфига есть. Сравниваем и синхронизируем app_info.
+    bundle_app_info = bundle_config.get('app_info', {}) or {}
+    user_app_info = user_config.get('app_info', {}) or {}
 
-    # Простое сравнение версий (можно заменить на более сложное, если нужно)
-    if bundle_version > user_version:
-        print(f"Найдена новая версия ({bundle_version} > {user_version}). Обновление конфига.")
-        # Обновляем информацию о приложении, сохраняя остальные настройки пользователя
-        user_config['app_info'] = bundle_config['app_info']
+    bundle_version = bundle_app_info.get('version', '0.0.0')
+    user_version = user_app_info.get('version', '0.0.0')
+
+    should_update_app_info = (bundle_app_info != user_app_info) or (bundle_version > user_version)
+
+    if should_update_app_info:
+        print("Синхронизация app_info из бандла в пользовательский конфиг")
+        user_config['app_info'] = bundle_app_info
         final_config = user_config
         # Сохраняем обновленный конфиг
         try:
@@ -126,7 +132,6 @@ elif bundle_config is not None and user_config is not None:
         except IOError as e:
             print(f"Ошибка сохранения обновленного конфига: {e}")
     else:
-        # Версия не новее, используем конфиг пользователя как есть
         final_config = user_config
 else:
     # Случай 3: Используем конфиг пользователя (или пустой, если его нет и нет бандла)
@@ -1829,6 +1834,167 @@ def check_ip(ip_address):
             "message": "Проблема с подключением к сервису"
         }), 500
 
+# --------- SSH metrics collection (server stats) ---------
+
+def _ssh_run(ssh: paramiko.SSHClient, cmd: str, timeout: int = 8) -> str:
+    stdin, stdout, stderr = ssh.exec_command(cmd, timeout=timeout)
+    out = stdout.read().decode('utf-8', errors='ignore').strip()
+    err = stderr.read().decode('utf-8', errors='ignore').strip()
+    return out if out else err
+
+
+def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, timeout: int = 8) -> Dict[str, Any]:
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh.connect(hostname=host, username=user, password=password, port=port, timeout=8, banner_timeout=8, auth_timeout=8, allow_agent=False, look_for_keys=False)
+    try:
+        uptime_h = _ssh_run(ssh, "uptime -p || true")
+        loadavg = _ssh_run(ssh, "cat /proc/loadavg | awk '{print $1\",\"$2\",\"$3}' || true")
+        load_parts = (loadavg.split(',') + ['', '', ''])[:3]
+        load1, load5, load15 = load_parts[0], load_parts[1], load_parts[2]
+
+        cpu_line = _ssh_run(ssh, "LANG=C LC_ALL=C top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1 || true")
+        m = re.search(r'([0-9]+(?:\\.[0-9]+)?)\\s*id', cpu_line)
+        cpu_used = round(100 - float(m.group(1)), 1) if m else None
+        # Доп. сведения о CPU и ядре
+        cpu_count_str = _ssh_run(ssh, "nproc 2>/dev/null || grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo 0").strip()
+        try:
+            cpu_cores = int(cpu_count_str)
+        except Exception:
+            cpu_cores = None
+        kernel = _ssh_run(ssh, "uname -r").strip()
+
+        mem_line = _ssh_run(ssh, "free -m | awk '/Mem:/ {print $2\",\"$3\",\"$7}' || true")
+        mem_parts = (mem_line.split(',') + ['0', '0', '0'])[:3]
+        try:
+            mt, mu, ma = int(mem_parts[0]), int(mem_parts[1]), int(mem_parts[2])
+        except ValueError:
+            mt, mu, ma = 0, 0, 0
+        mem_used_pct = round(mu * 100.0 / mt, 1) if mt else None
+
+        swap_line = _ssh_run(ssh, "free -m | awk '/Swap:/ {print $2\",\"$3}' || true")
+        swap_parts = (swap_line.split(',') + ['0', '0'])[:2]
+        try:
+            st, su = int(swap_parts[0]), int(swap_parts[1])
+        except ValueError:
+            st, su = 0, 0
+        swap_used_pct = round(su * 100.0 / st, 1) if st else 0
+
+        df_lines = _ssh_run(ssh, "df -hP / /boot/efi /var/lib/docker 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$4\",\"$5}' || true").splitlines()
+        disks: List[Dict[str, Any]] = []
+        for ln in df_lines:
+            parts = (ln.split(',') + ['', '', '', '', ''])[:5]
+            disks.append({
+                "mount": parts[0],
+                "size": parts[1],
+                "used": parts[2],
+                "avail": parts[3],
+                "pcent": parts[4]
+            })
+
+        # Inodes
+        di_lines = _ssh_run(ssh, "df -iP 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$5}' || true").splitlines()
+        inodes: List[Dict[str, Any]] = []
+        for ln in di_lines:
+            p = (ln.split(',') + ['', '', '', ''])[:4]
+            inodes.append({
+                "mount": p[0],
+                "inodes": p[1],
+                "iused": p[2],
+                "ipcent": p[3]
+            })
+
+        ps_lines = _ssh_run(ssh, "ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11 || true").splitlines()
+        procs: List[Dict[str, Any]] = []
+        for ln in ps_lines[1:]:
+            cols = ln.split(None, 3)
+            if len(cols) == 4:
+                pid, cmd, pcpu, pmem = cols
+                procs.append({"pid": pid, "cmd": cmd, "cpu": pcpu, "mem": pmem})
+
+        net_lines = _ssh_run(ssh, "ip -br -color=never a 2>/dev/null | awk '{print $1\",\"$3}' || (ifconfig -a | awk '/flags=/{iface=$1} /inet /{print iface\",\"$2}') || true").splitlines()
+        nets: List[Dict[str, Any]] = []
+        for ln in net_lines:
+            iface, addr = (ln.split(',', 1) + ['', ''])[:2]
+            nets.append({"iface": iface, "addr": addr})
+
+        # Traffic RX/TX по интерфейсам
+        rx_tx_lines = _ssh_run(ssh, "for i in /sys/class/net/*; do n=$(basename $i); rx=$(cat $i/statistics/rx_bytes 2>/dev/null||echo 0); tx=$(cat $i/statistics/tx_bytes 2>/dev/null||echo 0); echo $n,$rx,$tx; done 2>/dev/null || true").splitlines()
+        traffic: List[Dict[str, Any]] = []
+        for ln in rx_tx_lines:
+            p = (ln.split(',') + ['', '', ''])[:3]
+            try:
+                traffic.append({"iface": p[0], "rx_bytes": int(p[1] or 0), "tx_bytes": int(p[2] or 0)})
+            except Exception:
+                pass
+        traffic.sort(key=lambda x: x.get('rx_bytes',0)+x.get('tx_bytes',0), reverse=True)
+
+        # Docker
+        docker_present = _ssh_run(ssh, "command -v docker >/dev/null 2>&1 && echo yes || echo no").strip() == 'yes'
+        docker = {"present": docker_present, "running": 0}
+        if docker_present:
+            running_str = _ssh_run(ssh, "docker ps -q 2>/dev/null | wc -l || echo 0").strip()
+            try:
+                docker["running"] = int(running_str)
+            except Exception:
+                docker["running"] = 0
+
+        return {
+            "uptime": uptime_h,
+            "load": {"1m": load1, "5m": load5, "15m": load15},
+            "cpu": {"used_pct": cpu_used, "cores": cpu_cores, "kernel": kernel},
+            "mem": {"total_mb": mt, "used_mb": mu, "avail_mb": ma, "used_pct": mem_used_pct},
+            "swap": {"total_mb": st, "used_mb": su, "used_pct": swap_used_pct},
+            "disks": disks,
+            "inodes": inodes,
+            "processes": procs,
+            "net": nets,
+            "traffic": traffic,
+            "docker": docker,
+        }
+    finally:
+        ssh.close()
+
+@app.route('/server/<int:server_id>/stats')
+@pin_auth.require_auth
+def server_stats(server_id: int):
+    try:
+        servers = load_servers()
+        server = next((s for s in servers if s.get('id') == server_id), None)
+        if not server:
+            return jsonify({"error": "Сервер не найден"}), 404
+
+        sshc = server.get('ssh_credentials', {})
+        user = sshc.get('user')
+        port = int(sshc.get('port', 22) or 22)
+        # Берём расшифрованные логины, если уже были рассчитаны ранее
+        password = sshc.get('password_decrypted') or decrypt_data(sshc.get('password', ''))
+        if sshc.get('root_login_allowed') and sshc.get('root_password_decrypted'):
+            user = 'root'
+            password = sshc.get('root_password_decrypted')
+
+        if not server.get('ip_address'):
+            return jsonify({"error": "Не указан IP-адрес сервера"}), 400
+        if not user:
+            return jsonify({"error": "Не указан SSH-пользователь"}), 400
+        if not password:
+            return jsonify({"error": "Не указан SSH-пароль"}), 400
+
+        # Настраиваемый таймаут SSH из query (?timeout=сек), безопасные пределы 3..30 сек
+        t = request.args.get('timeout', default=8, type=int)
+        if not t:
+            t = 8
+        t = max(3, min(int(t), 30))
+        stats = _collect_stats_via_ssh(server.get('ip_address'), user, password, port, timeout=t)
+        return jsonify({"ok": True, "server_id": server_id, "stats": stats})
+    except paramiko.AuthenticationException:
+        return jsonify({"error": "Ошибка аутентификации SSH"}), 401
+    except paramiko.SSHException as e:
+        return jsonify({"error": f"SSH ошибка: {str(e)}"}), 502
+    except Exception as e:
+        # Возвращаем тип исключения для диагностики
+        return jsonify({"error": str(e), "exception": e.__class__.__name__}), 500
+
 @app.route('/settings/change-key', methods=['POST'])
 def change_main_key():
     """Смена главного ключа с перешифровкой всех данных."""
@@ -2083,7 +2249,7 @@ if __name__ == "__main__":
         'VPN Server Manager',
         f'http://127.0.0.1:{SERVER_PORT or 5050}',
         width=1280,
-        height=800,
+        height=840,
         resizable=True
     )
     window.events.closing += on_closing
@@ -2093,3 +2259,158 @@ if __name__ == "__main__":
 
     # После закрытия окна PyWebView, главный поток продолжится здесь.
     print("Приложение закрыто.")
+
+# --------- SSH metrics collection (server stats) ---------
+
+def _ssh_run(ssh: paramiko.SSHClient, cmd: str, timeout: int = 8) -> str:
+    stdin, stdout, stderr = ssh.exec_command(cmd, timeout=timeout)
+    out = stdout.read().decode('utf-8', errors='ignore').strip()
+    err = stderr.read().decode('utf-8', errors='ignore').strip()
+    return out if out else err
+
+
+def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, timeout: int = 8) -> Dict[str, Any]:
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    t = max(3, min(int(timeout or 8), 30))
+    ssh.connect(hostname=host, username=user, password=password, port=port, timeout=t, banner_timeout=t, auth_timeout=t, allow_agent=False, look_for_keys=False)
+    try:
+        uptime_h = _ssh_run(ssh, "uptime -p || true", timeout=t)
+        loadavg = _ssh_run(ssh, "cat /proc/loadavg | awk '{print $1\",\"$2\",\"$3}' || true", timeout=t)
+        load_parts = (loadavg.split(',') + ['', '', ''])[:3]
+        load1, load5, load15 = load_parts[0], load_parts[1], load_parts[2]
+
+        cpu_line = _ssh_run(ssh, "LANG=C LC_ALL=C top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1 || true", timeout=t)
+        m = re.search(r'([0-9]+(?:\\.[0-9]+)?)\\s*id', cpu_line)
+        cpu_used = round(100 - float(m.group(1)), 1) if m else None
+        # Доп. сведения о CPU и ядре
+        cpu_count_str = _ssh_run(ssh, "nproc 2>/dev/null || grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo 0", timeout=t).strip()
+        try:
+            cpu_cores = int(cpu_count_str)
+        except Exception:
+            cpu_cores = None
+        kernel = _ssh_run(ssh, "uname -r", timeout=t).strip()
+
+        mem_line = _ssh_run(ssh, "free -m | awk '/Mem:/ {print $2\",\"$3\",\"$7}' || true", timeout=t)
+        mem_parts = (mem_line.split(',') + ['0', '0', '0'])[:3]
+        try:
+            mt, mu, ma = int(mem_parts[0]), int(mem_parts[1]), int(mem_parts[2])
+        except ValueError:
+            mt, mu, ma = 0, 0, 0
+        mem_used_pct = round(mu * 100.0 / mt, 1) if mt else None
+
+        swap_line = _ssh_run(ssh, "free -m | awk '/Swap:/ {print $2\",\"$3}' || true", timeout=t)
+        swap_parts = (swap_line.split(',') + ['0', '0'])[:2]
+        try:
+            st, su = int(swap_parts[0]), int(swap_parts[1])
+        except ValueError:
+            st, su = 0, 0
+        swap_used_pct = round(su * 100.0 / st, 1) if st else 0
+
+        df_lines = _ssh_run(ssh, "df -hP / /boot/efi /var/lib/docker 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$4\",\"$5}' || true", timeout=t).splitlines()
+        disks: List[Dict[str, Any]] = []
+        for ln in df_lines:
+            parts = (ln.split(',') + ['', '', '', '', ''])[:5]
+            disks.append({
+                "mount": parts[0],
+                "size": parts[1],
+                "used": parts[2],
+                "avail": parts[3],
+                "pcent": parts[4]
+            })
+
+        # Inodes
+        di_lines = _ssh_run(ssh, "df -iP 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$5}' || true", timeout=t).splitlines()
+        inodes: List[Dict[str, Any]] = []
+        for ln in di_lines:
+            p = (ln.split(',') + ['', '', '', ''])[:4]
+            inodes.append({
+                "mount": p[0],
+                "inodes": p[1],
+                "iused": p[2],
+                "ipcent": p[3]
+            })
+
+        ps_lines = _ssh_run(ssh, "ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11 || true", timeout=t).splitlines()
+        procs: List[Dict[str, Any]] = []
+        for ln in ps_lines[1:]:
+            cols = ln.split(None, 3)
+            if len(cols) == 4:
+                pid, cmd, pcpu, pmem = cols
+                procs.append({"pid": pid, "cmd": cmd, "cpu": pcpu, "mem": pmem})
+
+        net_lines = _ssh_run(ssh, "ip -br -color=never a 2>/dev/null | awk '{print $1\",\"$3}' || (ifconfig -a | awk '/flags=/{iface=$1} /inet /{print iface\",\"$2}') || true", timeout=t).splitlines()
+        nets: List[Dict[str, Any]] = []
+        for ln in net_lines:
+            iface, addr = (ln.split(',', 1) + ['', ''])[:2]
+            nets.append({"iface": iface, "addr": addr})
+
+        # Traffic RX/TX по интерфейсам
+        rx_tx_lines = _ssh_run(ssh, "for i in /sys/class/net/*; do n=$(basename $i); rx=$(cat $i/statistics/rx_bytes 2>/dev/null||echo 0); tx=$(cat $i/statistics/tx_bytes 2>/dev/null||echo 0); echo $n,$rx,$tx; done 2>/dev/null || true", timeout=t).splitlines()
+        traffic: List[Dict[str, Any]] = []
+        for ln in rx_tx_lines:
+            p = (ln.split(',') + ['', '', ''])[:3]
+            try:
+                traffic.append({"iface": p[0], "rx_bytes": int(p[1] or 0), "tx_bytes": int(p[2] or 0)})
+            except Exception:
+                pass
+        traffic.sort(key=lambda x: x.get('rx_bytes',0)+x.get('tx_bytes',0), reverse=True)
+
+        # Docker
+        docker_present = _ssh_run(ssh, "command -v docker >/dev/null 2>&1 && echo yes || echo no", timeout=t).strip() == 'yes'
+        docker = {"present": docker_present, "running": 0, "version": "", "names": []}
+        if docker_present:
+            running_str = _ssh_run(ssh, "docker ps -q 2>/dev/null | wc -l || echo 0", timeout=t).strip()
+            try:
+                docker["running"] = int(running_str)
+            except Exception:
+                docker["running"] = 0
+            # Версия демона (кратко)
+            ver = _ssh_run(ssh, "docker --version 2>/dev/null | head -n1", timeout=t).strip()
+            docker["version"] = ver
+            # Имена запущенных контейнеров (первые 3-5)
+            names_out = _ssh_run(ssh, "docker ps --format '{{.Names}}' 2>/dev/null | head -n 5", timeout=t)
+            docker["names"] = [n for n in names_out.splitlines() if n]
+            # Подробности по контейнерам (имя, образ, статус, порты, размер)
+            ps_lines = _ssh_run(ssh, "docker ps -s --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}|{{.Size}}' 2>/dev/null | head -n 5", timeout=t).splitlines()
+            containers: List[Dict[str, Any]] = []
+            for ln in ps_lines:
+                parts = (ln.split('|') + ['', '', '', '', ''])[:5]
+                containers.append({
+                    "name": parts[0],
+                    "image": parts[1],
+                    "status": parts[2],
+                    "ports": parts[3],
+                    "size": parts[4],
+                    "mounts": ""
+                })
+            # Дополним mounts для первых N контейнеров
+            if containers:
+                names_join = ' '.join([c.get('name','') for c in containers if c.get('name')])
+                if names_join:
+                    mounts_out = _ssh_run(ssh, f"for n in {names_join}; do echo -n \"$n|\"; docker inspect -f '{{{{range .Mounts}}}}{{{{.Source}}}}->{{{{.Destination}}}};{{{{end}}}}' \"$n\" 2>/dev/null; echo; done", timeout=t)
+                    for line in mounts_out.splitlines():
+                        name, mounts = (line.split('|', 1) + ['', ''])[:2]
+                        for c in containers:
+                            if c.get('name') == name:
+                                c['mounts'] = mounts
+                                break
+            docker['containers'] = containers
+
+        return {
+            "uptime": uptime_h,
+            "load": {"1m": load1, "5m": load5, "15m": load15},
+            "cpu": {"used_pct": cpu_used, "cores": cpu_cores, "kernel": kernel},
+            "mem": {"total_mb": mt, "used_mb": mu, "avail_mb": ma, "used_pct": mem_used_pct},
+            "swap": {"total_mb": st, "used_mb": su, "used_pct": swap_used_pct},
+            "disks": disks,
+            "inodes": inodes,
+            "processes": procs,
+            "net": nets,
+            "traffic": traffic,
+            "docker": docker,
+        }
+    finally:
+        ssh.close()
+
+
