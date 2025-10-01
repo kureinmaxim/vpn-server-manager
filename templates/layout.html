@@ -38,8 +38,8 @@
                             Справка
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('help_page') }}">Справка по использованию</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manage_hints_page') }}">Управление подсказками</a></li>
+                            <li><a class="dropdown-item nav-link-force" data-href="{{ url_for('help_page') }}" href="{{ url_for('help_page') }}">Справка по использованию</a></li>
+                            <li><a class="dropdown-item nav-link-force" data-href="{{ url_for('manage_hints_page') }}" href="{{ url_for('manage_hints_page') }}">Управление подсказками</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
@@ -93,10 +93,12 @@
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script>
-        // Применить сохранённый масштаб при загрузке
+        // Применить сохранённый масштаб при загрузке (через корневой font-size, без размытия)
         document.addEventListener('DOMContentLoaded', function() {
             const savedZoom = getCookie('ui_zoom') || '100';
-            document.body.style.zoom = savedZoom + '%';
+            applyRootZoom(savedZoom);
+            setupDropdownHoverIntent();
+            setupDropdownClickFallback();
         });
 
         function getCookie(name) {
@@ -111,7 +113,7 @@
         }
 
         function setZoom(zoom) {
-            document.body.style.zoom = zoom + '%';
+            applyRootZoom(zoom);
             document.cookie = `ui_zoom=${zoom};path=/;max-age=31536000;SameSite=Lax`;
             // Показать уведомление о применении масштаба
             const alertDiv = document.createElement('div');
@@ -127,6 +129,90 @@
                     alertDiv.remove();
                 }
             }, 3000);
+        }
+
+        function applyRootZoom(zoom) {
+            // Масштабируем через корневой размер шрифта, чтобы избежать размытости и смещений хитбоксов
+            const value = String(zoom).replace('%','');
+            document.documentElement.style.fontSize = value + '%';
+        }
+
+        // Hover-intent для дропдаунов навбара (устраняет залипание и дребезг)
+        function setupDropdownHoverIntent() {
+            // Не применяем hover-логику на touch-устройствах
+            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouch) return;
+
+            document.querySelectorAll('.navbar .dropdown').forEach(function(dropdownEl) {
+                const toggleEl = dropdownEl.querySelector('[data-bs-toggle="dropdown"]');
+                if (!toggleEl) return;
+                const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(toggleEl);
+
+                let openTimer = null;
+                let closeTimer = null;
+
+                const openWithDelay = () => {
+                    clearTimeout(closeTimer);
+                    openTimer = setTimeout(() => {
+                        bsDropdown.show();
+                    }, 120);
+                };
+
+                const closeWithDelay = () => {
+                    clearTimeout(openTimer);
+                    closeTimer = setTimeout(() => {
+                        bsDropdown.hide();
+                    }, 180);
+                };
+
+                // Наводим на контейнер dropdown, чтобы исключить «зазор» между кнопкой и меню
+                dropdownEl.addEventListener('mouseenter', openWithDelay);
+                dropdownEl.addEventListener('mouseleave', closeWithDelay);
+                // При фокусе с клавиатуры — открываем мгновенно
+                toggleEl.addEventListener('focus', () => {
+                    clearTimeout(closeTimer);
+                    bsDropdown.show();
+                });
+                // При уходе фокуса — закрываем с небольшой задержкой
+                toggleEl.addEventListener('blur', () => {
+                    closeWithDelay();
+                });
+            });
+        }
+
+        // Надёжный клик-фоллбек: гарантирует открытие меню по клику, даже если события конфликтуют
+        function setupDropdownClickFallback() {
+            document.querySelectorAll('.navbar .dropdown-toggle').forEach(function(toggleEl) {
+                toggleEl.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const dd = bootstrap.Dropdown.getOrCreateInstance(this);
+                    dd.toggle();
+                });
+            });
+            // Принудительно осуществляем переход по ссылкам внутри dropdown
+            document.querySelectorAll('.navbar .dropdown-menu a.nav-link-force').forEach(function(link){
+                link.addEventListener('click', function(e){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const href = this.getAttribute('data-href') || this.getAttribute('href');
+                    // Закрываем все открытые меню, а затем переходим
+                    document.querySelectorAll('.navbar .dropdown-toggle.show').forEach(function(t){
+                        const dd = bootstrap.Dropdown.getInstance(t);
+                        if (dd) dd.hide();
+                    });
+                    window.location.assign(href);
+                });
+            });
+            // Закрывать открытые меню при клике вне навбара
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.navbar')) {
+                    document.querySelectorAll('.navbar .dropdown-toggle.show').forEach(function(t) {
+                        const dd = bootstrap.Dropdown.getInstance(t);
+                        if (dd) dd.hide();
+                    });
+                }
+            });
         }
 
         // Улучшенная функция проверки IP с обработкой ошибок
