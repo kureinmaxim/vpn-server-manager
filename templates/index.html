@@ -145,9 +145,6 @@
                         <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="Требуется интернет"{% endif %}>
                             <i class="bi bi-building"></i> Владелец IP
                         </a>
-                        <button class="btn btn-sm btn-outline-primary btn-show-stats" type="button" data-server-id="{{ server.id }}">
-                            <i class="bi bi-activity"></i> Статус
-                        </button>
                         </div> <!-- Закрываем .d-grid gap-2 mb-2 -->
 
                     <div class="accordion accordion-flush" id="accordion-{{ server.id }}">
@@ -326,9 +323,14 @@
                     <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
                         <i class="bi bi-pencil-square"></i> Редактировать
                     </a>
-                    <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить этот сервер?');">
-                        <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
-                    </form>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary btn-show-stats" type="button" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
+                            <i class="bi bi-activity"></i> Статус
+                        </button>
+                        <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить этот сервер?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -417,17 +419,21 @@
         if (!btn) return;
         var sid = parseInt(btn.getAttribute('data-server-id'), 10);
         if (!sid) return;
-        showServerStats(sid);
+        showServerStats(sid, btn.getAttribute('data-server-name') || '', btn.getAttribute('data-server-ip') || '');
     });
 
-    function showServerStats(serverId) {
+    function showServerStats(serverId, serverName, serverIp) {
         const modal = document.createElement('div');
         modal.className = 'modal fade';
         modal.innerHTML = `
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-activity"></i> Статус сервера #${serverId}</h5>
+                        <h5 class="modal-title"><i class="bi bi-activity"></i> Статус сервера <span id="statusServerName" class="text-muted ms-1 ${serverName? '' : 'd-none'}"></span> <small id="statusServerIp" class="text-muted ms-1 ${serverIp? '' : 'd-none'}"></small></h5>
+                        <div class="ms-auto small text-muted">
+                            <span id="lastUpdatedLabel"></span>
+                            <span id="refreshSpin" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
+                        </div>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body text-center text-muted">
@@ -436,6 +442,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button type="button" class="btn btn-primary" id="saveStatusImageBtn">Сохранить как PNG</button>
                     </div>
                 </div>
             </div>`;
@@ -445,11 +452,115 @@
 
         let refreshTimer = null;
 
+        // set header info
+        try {
+            var nameEl = modal.querySelector('#statusServerName');
+            var ipEl = modal.querySelector('#statusServerIp');
+            if (nameEl && serverName) nameEl.textContent = serverName;
+            if (ipEl && serverIp) ipEl.textContent = '(' + serverIp + ')';
+        } catch(_) {}
+
+        function ensureHtml2CanvasLoaded(cb){
+            if (window.html2canvas) { cb && cb(); return; }
+            var s = document.createElement('script');
+            s.src = '/vendor/html2canvas.min.js';
+            s.onload = function(){ cb && cb(); };
+            document.head.appendChild(s);
+        }
+
+        function captureStatusModal(){
+            var modalEl = modal;
+            if (!modalEl) return;
+            var content = modalEl.querySelector('.modal-content');
+            if (!content) return;
+            // Pause auto refresh and hide spinners to avoid animation artifacts
+            var prevTimer = refreshTimer;
+            try { if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; } } catch(_) {}
+            var spin = modalEl.querySelector('#refreshSpin');
+            var prevSpinDisplay = spin ? spin.style.display : '';
+            if (spin) spin.style.display = 'none';
+            var dialog = modalEl.querySelector('.modal-dialog');
+            var bodyEl = modalEl.querySelector('.modal-body');
+            var hadScrollable = dialog && dialog.classList.contains('modal-dialog-scrollable');
+            var prevDialogOverflow = dialog ? dialog.style.overflow : '';
+            var prevBodyMaxH = bodyEl ? bodyEl.style.maxHeight : '';
+            var prevBodyOverflow = bodyEl ? bodyEl.style.overflow : '';
+            if (dialog && hadScrollable) { dialog.classList.remove('modal-dialog-scrollable'); }
+            if (dialog) { dialog.style.overflow = 'visible'; }
+            if (bodyEl) { bodyEl.style.maxHeight = 'none'; bodyEl.style.overflow = 'visible'; bodyEl.scrollTop = 0; }
+            setTimeout(function(){
+                var scale = Math.max(2, (window.devicePixelRatio||1));
+                var prevTransform = content.style.transform;
+                content.style.transform = 'scale(1)';
+                var fullHeight = content.scrollHeight;
+                window.html2canvas(content, { backgroundColor: null, scale: scale, height: fullHeight, windowHeight: fullHeight })
+                    .then(function(canvas){
+                        content.style.transform = prevTransform || '';
+                        if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
+                        if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
+                        if (spin) spin.style.display = prevSpinDisplay;
+                        // resume timer
+                        try { if (!refreshTimer && prevTimer) { refreshTimer = setInterval(fetchAndRender, 30000); } } catch(_) {}
+                        var dataUrl = canvas.toDataURL('image/png');
+                        fetch('/snapshot/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data_url: dataUrl }) })
+                            .then(function(r){ return r.json(); })
+                            .then(function(resp){
+                                if (resp && resp.success) {
+                                    alert('PNG сохранён: ' + resp.filename + '\nПапка: ' + resp.dir);
+                                } else {
+                                    var a=document.createElement('a');
+                                    a.download='server_status.png';
+                                    a.href=dataUrl;
+                                    a.target='_blank';
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    setTimeout(function(){ try{ document.body.removeChild(a); }catch(_){} }, 100);
+                                    try { window.open(dataUrl, '_blank'); } catch(_) {}
+                                }
+                            })
+                            .catch(function(){
+                                var a=document.createElement('a');
+                                a.download='server_status.png';
+                                a.href=dataUrl;
+                                a.target='_blank';
+                                document.body.appendChild(a);
+                                a.click();
+                                setTimeout(function(){ try{ document.body.removeChild(a); }catch(_){} }, 100);
+                                try { window.open(dataUrl, '_blank'); } catch(_) {}
+                            });
+                    })
+                    .catch(function(err){
+                        if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
+                        if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
+                        if (spin) spin.style.display = prevSpinDisplay;
+                        // resume timer on error as well
+                        try { if (!refreshTimer && prevTimer) { refreshTimer = setInterval(fetchAndRender, 30000); } } catch(_) {}
+                        console.error('html2canvas error', err);
+                        alert('Не удалось сохранить изображение');
+                    });
+            }, 50);
+        }
+
+        modal.addEventListener('click', function(e){
+            if (e.target && e.target.id === 'saveStatusImageBtn'){
+                ensureHtml2CanvasLoaded(captureStatusModal);
+            }
+        });
+
+        function bytesToHuman(num){
+            var units=['B','KB','MB','GB','TB'];
+            var i=0; var n=Number(num)||0;
+            while(n>=1024 && i<units.length-1){ n/=1024; i++; }
+            return (Math.round(n*10)/10)+' '+units[i];
+        }
+
         function renderStats(s) {
             const cpu = (s && s.cpu && s.cpu.used_pct != null) ? s.cpu.used_pct : 0;
             const mt = (s && s.mem && s.mem.total_mb) || 0;
             const mu = (s && s.mem && s.mem.used_mb) || 0;
             const mm = mt ? Math.round(mu * 100 / mt) : 0;
+            const cpuClass = cpu < 50 ? 'bg-success' : (cpu < 80 ? 'bg-warning' : 'bg-danger');
+            const memClass = mm < 70 ? 'bg-info' : (mm < 90 ? 'bg-warning' : 'bg-danger');
 
             const disks = (s && s.disks || []).map(d => `
                 <div class="mb-2">
@@ -471,8 +582,8 @@
             (s && s.traffic || []).forEach(t => { trafficMap[t.iface] = t; });
             const nets = (s && s.net || []).map(n => {
                 const t = trafficMap[n.iface] || {};
-                const rx = (typeof t.rx_bytes === 'number') ? (t.rx_bytes/1048576).toFixed(1) + ' MB' : '-';
-                const tx = (typeof t.tx_bytes === 'number') ? (t.tx_bytes/1048576).toFixed(1) + ' MB' : '-';
+                const rx = (typeof t.rx_bytes === 'number') ? bytesToHuman(t.rx_bytes) : '-';
+                const tx = (typeof t.tx_bytes === 'number') ? bytesToHuman(t.tx_bytes) : '-';
                 return `<li class="list-group-item d-flex justify-content-between align-items-center py-1">
                             <span><code>${n.iface}</code> — ${n.addr || '-'}</span>
                             <span>
@@ -507,30 +618,31 @@
                 ${toolsAlert}
                 <div class="small text-muted mb-2">Uptime: ${engUptime}</div>
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-12 col-md-4">
                         <div class="card card-body">
-                            <div class="d-flex justify-content-between"><strong>CPU</strong><span>${cpu}%</span></div>
+                            <div class="d-flex justify-content-between align-items-center"><strong title="Процессор">CPU</strong><span class="small text-muted">${cpu}%</span></div>
                             <div class="progress" style="height: 10px;"> 
-                                <div class="progress-bar" role="progressbar" style="width:${cpu}%"></div>
+                                <div class="progress-bar ${'${cpuClass}'}" role="progressbar" style="width:${cpu}%"></div>
                             </div>
-                            <div class="mt-2 small">Ядер: <strong>${cpuCores}</strong>, Kernel: <code>${kernel}</code></div>
-                            <div class="mt-3 d-flex justify-content-between"><strong>Память</strong><span>${mm}% (${mu} / ${mt} МБ)</span></div>
+                            <div class="mt-2 small">Cores: <strong>${cpuCores}</strong>, Kernel: <code>${kernel}</code></div>
+                            <div class="mt-1 small">OS: <strong>${(s && s.os) ? s.os : ''}</strong></div>
+                            <div class="mt-3 d-flex justify-content-between align-items-center"><strong title="Оперативная память">Memory</strong><span class="small text-muted">${mm}% (${mu} / ${mt} MB)</span></div>
                             <div class="progress" style="height: 10px;"> 
-                                <div class="progress-bar bg-warning" role="progressbar" style="width:${mm}%"></div>
+                                <div class="progress-bar ${'${memClass}'}" role="progressbar" style="width:${mm}%"></div>
                             </div>
                             <div class="mt-3 small text-muted">
-                                <div>Load: ${(s && s.load && s.load['1m']) || '-'} / ${(s && s.load && s.load['5m']) || '-'} / ${(s && s.load && s.load['15m']) || '-'}</div>
-                                <div>Swap: ${((s && s.swap && s.swap.used_pct) || 0)}% (${((s && s.swap && s.swap.used_mb) || 0)} / ${((s && s.swap && s.swap.total_mb) || 0)} МБ)</div>
+                                <div title="Средняя системная нагрузка">Load: ${(s && s.load && s.load['1m']) || '-'} / ${(s && s.load && s.load['5m']) || '-'} / ${(s && s.load && s.load['15m']) || '-'}</div>
+                                <div title="Файл подкачки">Swap: ${((s && s.swap && s.swap.used_mb) || 0)} / ${((s && s.swap && s.swap.total_mb) || 0)} MB (${((s && s.swap && s.swap.used_pct) || 0)}%)</div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6"> 
+                    <div class="col-12 col-md-4"> 
                         <div class="card card-body"> 
-                            <strong class="mb-2">Хранилище</strong>
+                            <strong class="mb-2" title="Файловые системы (df -h)">Storage</strong>
                             ${disks || '<div class="text-muted small">Нет данных</div>'}
                             ${(s && s.inodes && s.inodes.length) ? `
                             <div class="mt-3">
-                                <strong>Inodes</strong>
+                                <strong title="Индексные дескрипторы (df -i)">Inodes</strong>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-dark align-middle">
                                         <thead><tr><th>Точка</th><th>Всего</th><th>Исп.</th><th>%</th></tr></thead>
@@ -544,10 +656,19 @@
                             </div>` : ''}
                         </div>
                     </div>
+                    <div class="col-12 col-md-4">
+                        <div class="card card-body h-100">
+                            <strong class="mb-2" title="Сводка">Summary</strong>
+                            <div class="small"><span class="text-muted">Uptime:</span> ${engUptime}</div>
+                            <div class="small mt-1"><span class="text-muted">Docker:</span> ${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}</div>
+                            <div class="small mt-1 text-truncate" title="${dockerVersion}"><span class="text-muted">Version:</span> ${dockerVersion||'-'}</div>
+                            ${dockerNames && dockerNames.length ? `<div class="small mt-1 text-truncate"><span class="text-muted">Containers:</span> ${dockerNames.slice(0,2).join(', ')}${dockerNames.length>2?` +${dockerNames.length-2}`:''}</div>` : ''}
+                        </div>
+                    </div>
                     <div class="col-12"> 
                         <div class="card card-body"> 
                             <div class="d-flex justify-content-between align-items-center">
-                                <strong>Процессы (топ по CPU)</strong>
+                                <strong title="Активные процессы">Processes (Top by CPU)</strong>
                             </div>
                             <div class="table-responsive mt-2"> 
                                 <table class="table table-sm table-dark align-middle"> 
@@ -559,11 +680,9 @@
                     </div>
                     <div class="col-12"> 
                         <div class="card card-body"> 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong>Сети</strong>
-                                <span class="small text-truncate" title="${dockerVersion}">Docker: ${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}${dockerContainers.length?`, ${dockerContainers.slice(0,2).map(c=>`${c.name||''}:${c.size||''}`).join(', ')}${dockerContainers.length>2?`, +${dockerContainers.length-2}`:''}`:''}</span>
+                            <div class="d-flex align-items-center">
+                                <strong title="Сетевые интерфейсы и трафик">Networks</strong>
                             </div>
-                            <div class="small text-muted mt-1">RX — принято, TX — отправлено (обновление каждые 10 с).</div>
                             <ul class="list-group list-group-flush mb-2">${nets}</ul>
                             ${dockerContainers && dockerContainers.length ? `
                             <div class="mt-2 small">
@@ -594,12 +713,19 @@
         const sshTimeoutSec = 10; // можно вынести в UI позже
 
         function fetchAndRender() {
+            var spin = modal.querySelector('#refreshSpin');
+            if (spin) spin.classList.remove('d-none');
             fetch(`/server/${serverId}/stats?timeout=${sshTimeoutSec}`)
                 .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
                 .then(({ ok, data }) => {
                     if (!ok) throw new Error(data.error || 'Ошибка запроса');
                     consecutiveErrors = 0;
                     renderStats(data.stats || {});
+                    var label = modal.querySelector('#lastUpdatedLabel');
+                    if (label) {
+                        var now = new Date();
+                        label.textContent = now.toLocaleTimeString();
+                    }
                 })
                 .catch(err => {
                     modal.querySelector('.modal-body').innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ${err.message}</div>`;
@@ -612,11 +738,15 @@
                         const body = modal.querySelector('.modal-body');
                         if (body) body.appendChild(stopNote);
                     }
+                })
+                .finally(() => {
+                    var spin = modal.querySelector('#refreshSpin');
+                    if (spin) spin.classList.add('d-none');
                 });
         }
 
         fetchAndRender();
-        refreshTimer = setInterval(fetchAndRender, 10000);
+        refreshTimer = setInterval(fetchAndRender, 30000);
 
         modal.addEventListener('hidden.bs.modal', () => {
             if (refreshTimer) clearInterval(refreshTimer);
