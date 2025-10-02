@@ -381,7 +381,8 @@
               <div class="card h-100">
                 <div class="card-body">
                   <h6 class="card-title">CPU</h6>
-                  <div class="d-flex justify-content-between"><span>Kernel:</span><span id="cpu-kernel"></span></div>
+                  <div class="d-flex justify-content-between"><span title="Версия ядра Linux">Kernel:</span><span id="cpu-kernel"></span></div>
+                  <div class="d-flex justify-content-between"><span title="Операционная система">OS:</span><span id="os-name"></span></div>
                   <div class="d-flex justify-content-between"><span>Cores:</span><span id="cpu-cores"></span></div>
                   <div class="mt-2">
                     <div class="progress" style="height: 20px;">
@@ -395,7 +396,7 @@
             <div class="col-md-4">
               <div class="card h-100">
                 <div class="card-body">
-                  <h6 class="card-title">Memory</h6>
+                  <h6 class="card-title" title="Оперативная память">Memory</h6>
                   <div class="d-flex justify-content-between"><span>Total:</span><span id="mem-total"></span></div>
                   <div class="d-flex justify-content-between"><span>Used/Avail:</span><span id="mem-used"></span></div>
                   <div class="mt-2">
@@ -412,7 +413,7 @@
             <div class="col-md-4">
               <div class="card h-100">
                 <div class="card-body">
-                  <h6 class="card-title">Load / Uptime</h6>
+                  <h6 class="card-title" title="Системная нагрузка и время работы">Load / Uptime</h6>
                   <div class="d-flex justify-content-between"><span>Load:</span><span id="load-avg"></span></div>
                   <div class="d-flex justify-content-between"><span>Uptime:</span><span id="uptime"></span></div>
                   <div class="d-flex justify-content-between mt-2"><span>Docker:</span><span id="docker-short"></span></div>
@@ -422,7 +423,7 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title d-flex align-items-center justify-content-between">
+                  <h6 class="card-title d-flex align-items-center justify-content-between" title="Сетевые интерфейсы и Docker">
                     <span>Networks</span>
                     <small id="docker-version" class="text-muted" title="Docker version"></small>
                   </h6>
@@ -433,7 +434,7 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Disks</h6>
+                  <h6 class="card-title" title="Файловые системы (df -h)">Disks</h6>
                   <div class="row" id="disks-list"></div>
                 </div>
               </div>
@@ -441,7 +442,7 @@
             <div class="col-12">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Inodes</h6>
+                  <h6 class="card-title" title="Индексные дескрипторы (df -i)">Inodes</h6>
                   <div class="row" id="inodes-list"></div>
                 </div>
               </div>
@@ -700,6 +701,7 @@
         document.getElementById('cpu-used-label').textContent = usedPct + '%';
         document.getElementById('cpu-cores').textContent = (stats.cpu && stats.cpu.cores) || 0;
         document.getElementById('cpu-kernel').textContent = (stats.cpu && stats.cpu.kernel) || '';
+        document.getElementById('os-name').textContent = stats.os || '';
 
         // Memory
         var mem = stats.mem || {};
@@ -711,6 +713,7 @@
         memBar.classList.remove('bg-info','bg-warning','bg-danger');
         memBar.classList.add(memPct < 70 ? 'bg-info' : (memPct < 90 ? 'bg-warning' : 'bg-danger'));
         document.getElementById('mem-used-label').textContent = memPct + '%';
+        memBar.textContent = memPct + '%';
         var swap = stats.swap || {};
         document.getElementById('swap-used').textContent = (swap.used_mb || 0) + ' / ' + (swap.total_mb || 0) + ' MB (' + (swap.used_pct || 0) + '%)';
 
@@ -768,7 +771,7 @@
             col.className = 'col-md-4 mb-2';
             var mountShort = truncateMount(d.mount);
             var mountTitle = d.mount || '';
-            col.innerHTML = '<div class="border rounded p-2" title="' + mountTitle + '">' +
+            col.innerHTML = '<div class="border rounded p-2">' +
                             '<div class="small text-muted">' + mountShort + '</div>' +
                             '<div>' + d.used + ' / ' + d.size + ' (' + d.pcent + ')</div>' +
                             '</div>';
@@ -785,7 +788,7 @@
             col2.className = 'col-md-4 mb-2';
             var mShort = truncateMount(inode.mount);
             var mTitle = inode.mount || '';
-            col2.innerHTML = '<div class="border rounded p-2" title="' + mTitle + '">' +
+            col2.innerHTML = '<div class="border rounded p-2">' +
                              '<div class="small text-muted">' + mShort + '</div>' +
                              '<div>' + inode.iused + ' / ' + inode.inodes + ' (' + inode.ipcent + ')</div>' +
                              '</div>';
@@ -812,7 +815,13 @@
             var dhtml = '<table class="table table-sm table-striped"><thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
             for (var c = 0; c < containers.length; c++) {
                 var ct = containers[c];
-                dhtml += '<tr><td>' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + (ct.ports || '') + '</td><td>' + (ct.size || '') + '</td></tr>';
+                var portsCell = (ct.ports || '—');
+                var sizeCell = (ct.size || '');
+                var sizeExplain = '';
+                if (sizeCell && sizeCell.indexOf('virtual') !== -1) {
+                    sizeExplain = ' <small class="text-muted" title="0B=изменяемый слой; virtual=размер образа">(0B=измен., virtual=образ)</small>';
+                }
+                dhtml += '<tr><td>' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
             }
             dhtml += '</tbody></table>';
             dockWrap.innerHTML = dhtml;
@@ -864,22 +873,40 @@
         if (!modalEl) { return; }
         var content = modalEl.querySelector('.modal-content');
         if (!content) { return; }
-        // Временно увеличим масштаб для лучшего качества
-        var scale = window.devicePixelRatio || 1;
-        var prevTransform = content.style.transform;
-        content.style.transform = 'scale(1)';
-        window.html2canvas(content, { backgroundColor: null, scale: Math.max(2, scale) })
+        // Разворачиваем модалку на время снимка, чтобы захватить весь контент
+        var dialog = modalEl.querySelector('.modal-dialog');
+        var bodyEl = modalEl.querySelector('.modal-body');
+        var hadScrollable = dialog && dialog.classList.contains('modal-dialog-scrollable');
+        var prevDialogOverflow = dialog ? dialog.style.overflow : '';
+        var prevBodyMaxH = bodyEl ? bodyEl.style.maxHeight : '';
+        var prevBodyOverflow = bodyEl ? bodyEl.style.overflow : '';
+        if (dialog && hadScrollable) { dialog.classList.remove('modal-dialog-scrollable'); }
+        if (dialog) { dialog.style.overflow = 'visible'; }
+        if (bodyEl) { bodyEl.style.maxHeight = 'none'; bodyEl.style.overflow = 'visible'; bodyEl.scrollTop = 0; }
+        // Небольшая задержка для перерасчёта лэйаута
+        setTimeout(function(){
+            var scale = window.devicePixelRatio || 1;
+            var prevTransform = content.style.transform;
+            content.style.transform = 'scale(1)';
+            var fullHeight = content.scrollHeight;
+            window.html2canvas(content, {
+                backgroundColor: null,
+                scale: Math.max(2, scale),
+                height: fullHeight,
+                windowHeight: fullHeight
+            })
             .then(function(canvas){
+                // Восстановим стили
                 content.style.transform = prevTransform || '';
+                if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
+                if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
                 var dataUrl = canvas.toDataURL('image/png');
-                // Отправим на бэкенд для сохранения в Downloads
                 fetch('/snapshot/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data_url: dataUrl }) })
                     .then(function(r){ return r.json(); })
                     .then(function(resp){
                         if (resp && resp.success) {
                             alert('PNG сохранён: ' + resp.filename + '\nПапка: ' + resp.dir);
                         } else {
-                            // фолбэк локальной загрузкой
                             var link = document.createElement('a');
                             link.download = 'server_status.png';
                             link.href = dataUrl;
@@ -894,9 +921,12 @@
                     });
             })
             .catch(function(err){
+                if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
+                if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
                 console.error('Ошибка сохранения изображения:', err);
                 alert('Не удалось сохранить изображение');
             });
+        }, 50);
     }
 </script>
 {% endblock %}

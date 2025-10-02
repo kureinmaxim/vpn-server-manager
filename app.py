@@ -2366,7 +2366,8 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
         "traffic": [],
         "docker": {"present": False, "running": 0, "version": "", "names": [], "containers": []},
         "missing_tools": [],
-        "install_hint": ""
+        "install_hint": "",
+        "os": ""
     }
     try:
         ssh.connect(hostname=host, port=port, username=user, password=password,
@@ -2644,6 +2645,14 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
                         "size": "",
                         "mounts": ""
                     })
+
+        # OS name (pretty)
+        os_pretty = _ssh_run(ssh, "grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '\"'")
+        if not os_pretty:
+            name = _ssh_run(ssh, "grep '^NAME=' /etc/os-release | cut -d= -f2 | tr -d '\"'")
+            ver = _ssh_run(ssh, "grep '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '\"'")
+            os_pretty = (name + " " + ver).strip() if name else _ssh_run(ssh, "uname -s")
+        result["os"] = os_pretty
 
     finally:
         try:
