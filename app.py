@@ -18,6 +18,9 @@ import shutil
 import webview
 import signal
 import socket
+import paramiko
+from paramiko.ssh_exception import SSHException, AuthenticationException
+import base64
 
 load_dotenv()
 
@@ -2238,6 +2241,505 @@ def reset_pin_block():
             'success': False,
             'message': f'Ошибка при сбросе блокировки: {str(e)}'
         }), 500
+
+# ---------------- SSH METRICS COLLECTION ----------------
+def _ssh_run(ssh_client: paramiko.SSHClient, command: str, timeout: int = 8) -> str:
+    """
+    Выполняет команду на удаленной машине через уже установленный SSH-клиент.
+    Возвращает stdout как строку. В случае ошибок возвращает пустую строку.
+    """
+    try:
+        stdin, stdout, stderr = ssh_client.exec_command(command, timeout=timeout)
+        # Не читаем stdin
+        out = stdout.read()
+        err = stderr.read()
+        if out:
+            try:
+                return out.decode('utf-8', errors='ignore').strip()
+            except Exception:
+                return str(out)
+        if err:
+            # Оставим на случай отладки, но не логируем чувствительные данные
+            return ""
+        return ""
+    except Exception:
+        return ""
+
+def _detect_package_manager_and_hint(ssh: paramiko.SSHClient) -> (list, str):
+    """
+    Определяет недостающие утилиты и формирует команду установки.
+    Возвращает (missing_tools, install_hint)
+    """
+    required_tools = ['top', 'free', 'df', 'ps', 'ip', 'ifconfig']
+    missing = []
+    for tool in required_tools:
+        out = _ssh_run(ssh, f"command -v {tool} || which {tool}")
+        if not out:
+            missing.append(tool)
+
+    install_hint = ""
+    if missing:
+        os_release = _ssh_run(ssh, "cat /etc/os-release")
+        id_like = ""
+        distro_id = ""
+        if os_release:
+            for line in os_release.splitlines():
+                if line.startswith('ID=') and not distro_id:
+                    distro_id = line.split('=', 1)[1].strip().strip('"')
+                if line.startswith('ID_LIKE=') and not id_like:
+                    id_like = line.split('=', 1)[1].strip().strip('"')
+        # Fallback: определить пакетный менеджер по наличию бинарника
+        pm = ''
+        for cand in ['apt', 'dnf', 'yum', 'apk', 'pacman', 'zypper', 'opkg']:
+            if _ssh_run(ssh, f"command -v {cand}"):
+                pm = cand
+                break
+        families = (distro_id + ' ' + id_like).lower()
+        # Составим простую команду установки
+        base_packages = {
+            'apt': 'apt update && apt install -y procps iproute2 net-tools coreutils util-linux findutils',
+            'dnf': 'dnf install -y procps-ng iproute net-tools coreutils util-linux findutils',
+            'yum': 'yum install -y procps-ng iproute net-tools coreutils util-linux findutils',
+            'apk': 'apk add procps iproute2 net-tools coreutils util-linux findutils',
+            'pacman': 'pacman -Sy --noconfirm procps-ng iproute2 net-tools coreutils util-linux findutils',
+            'zypper': 'zypper install -y procps iproute2 net-tools coreutils util-linux findutils',
+            'opkg': 'opkg update && opkg install procps ip ip-full net-tools coreutils util-linux findutils'
+        }
+        if pm:
+            install_hint = base_packages.get(pm, '')
+        else:
+            if 'debian' in families or 'ubuntu' in families:
+                install_hint = base_packages['apt']
+            elif 'fedora' in families or 'rhel' in families or 'centos' in families:
+                install_hint = base_packages['dnf']
+            elif 'alpine' in families:
+                install_hint = base_packages['apk']
+            elif 'arch' in families:
+                install_hint = base_packages['pacman']
+            elif 'suse' in families:
+                install_hint = base_packages['zypper']
+            else:
+                install_hint = 'Install required tools using your package manager: top free df ps ip ifconfig'
+    return missing, install_hint
+
+def _parse_uptime_seconds_to_english(seconds: int) -> str:
+    try:
+        seconds = int(seconds)
+    except Exception:
+        return "N/A"
+    minutes = seconds // 60
+    hours = minutes // 60
+    days = hours // 24
+    months = days // 30
+    years = days // 365
+    remaining_days = days - years * 365 - (months - years * 12) * 30
+    parts = []
+    if years > 0:
+        parts.append(f"{years} year" + ("s" if years != 1 else ""))
+    m_calc = months - years * 12
+    if m_calc > 0:
+        parts.append(f"{m_calc} month" + ("s" if m_calc != 1 else ""))
+    if remaining_days > 0 and len(parts) < 2:
+        parts.append(f"{remaining_days} day" + ("s" if remaining_days != 1 else ""))
+    if not parts:
+        if hours > 0:
+            parts.append(f"{hours} hour" + ("s" if hours != 1 else ""))
+        elif minutes > 0:
+            parts.append(f"{minutes} minute" + ("s" if minutes != 1 else ""))
+        else:
+            parts.append(f"{seconds} second" + ("s" if seconds != 1 else ""))
+    return ", ".join(parts)
+
+def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, timeout: int = 8) -> dict:
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    result = {
+        "uptime": "",
+        "load": {"1m": "", "5m": "", "15m": ""},
+        "cpu": {"used_pct": 0.0, "cores": 0, "kernel": ""},
+        "mem": {"total_mb": 0, "used_mb": 0, "avail_mb": 0, "used_pct": 0.0},
+        "swap": {"total_mb": 0, "used_mb": 0, "used_pct": 0.0},
+        "disks": [],
+        "inodes": [],
+        "processes": [],
+        "net": [],
+        "traffic": [],
+        "docker": {"present": False, "running": 0, "version": "", "names": [], "containers": []},
+        "missing_tools": [],
+        "install_hint": ""
+    }
+    try:
+        ssh.connect(hostname=host, port=port, username=user, password=password,
+                    timeout=timeout, banner_timeout=timeout, auth_timeout=timeout,
+                    allow_agent=False, look_for_keys=False)
+
+        # Missing tools and install hint
+        missing_tools, install_hint = _detect_package_manager_and_hint(ssh)
+        result["missing_tools"] = missing_tools
+        result["install_hint"] = install_hint
+
+        # Uptime
+        up_seconds = _ssh_run(ssh, "cut -d. -f1 /proc/uptime")
+        if up_seconds and up_seconds.isdigit():
+            result["uptime"] = _parse_uptime_seconds_to_english(int(up_seconds))
+        else:
+            # Fallback to uptime -p (human readable)
+            up_h = _ssh_run(ssh, "uptime -p")
+            result["uptime"] = up_h or ""
+
+        # Load average
+        loadavg = _ssh_run(ssh, "cat /proc/loadavg")
+        if loadavg:
+            parts = loadavg.split()
+            if len(parts) >= 3:
+                result["load"] = {"1m": parts[0], "5m": parts[1], "15m": parts[2]}
+
+        # CPU
+        cores_out = _ssh_run(ssh, "nproc || grep -c ^processor /proc/cpuinfo")
+        try:
+            result["cpu"]["cores"] = int(cores_out.strip()) if cores_out else 0
+        except Exception:
+            result["cpu"]["cores"] = 0
+        kernel = _ssh_run(ssh, "uname -r")
+        result["cpu"]["kernel"] = kernel
+        top_out = _ssh_run(ssh, "COLUMNS=512 top -b -n1 | head -n5")
+        # Parse line with Cpu(s): xx%us, ... or similar
+        used_pct = 0.0
+        if top_out:
+            for line in top_out.splitlines():
+                line_l = line.lower()
+                if 'cpu(s)' in line_l and ('id' in line_l or '%id' in line_l):
+                    # extract idle percentage
+                    # examples: Cpu(s):  2.3%us,  1.2%sy,  0.0%ni, 95.9%id, ...
+                    parts = line.replace(',', ' ').replace('%', ' ').split()
+                    idle = None
+                    for i, token in enumerate(parts):
+                        if token.endswith('id') or token == 'id':
+                            # previous token may be number
+                            if i > 0:
+                                try:
+                                    idle = float(parts[i-1])
+                                except Exception:
+                                    idle = None
+                            break
+                    if idle is not None:
+                        used_pct = max(0.0, min(100.0, 100.0 - idle))
+                        break
+        result["cpu"]["used_pct"] = round(used_pct, 1)
+
+        # Memory and Swap
+        free_out = _ssh_run(ssh, "free -m")
+        if free_out:
+            for line in free_out.splitlines():
+                if line.lower().startswith('mem:') or line.lower().startswith('mem '):
+                    cols = [c for c in line.split() if c]
+                    if len(cols) >= 4:
+                        try:
+                            total = int(cols[1]); used = int(cols[2]); avail = int(cols[-1])
+                            result["mem"] = {
+                                "total_mb": total,
+                                "used_mb": used,
+                                "avail_mb": avail,
+                                "used_pct": round((used / total) * 100.0, 1) if total > 0 else 0.0
+                            }
+                        except Exception:
+                            pass
+                if line.lower().startswith('swap:'):
+                    cols = [c for c in line.split() if c]
+                    if len(cols) >= 3:
+                        try:
+                            total = int(cols[1]); used = int(cols[2])
+                            result["swap"] = {
+                                "total_mb": total,
+                                "used_mb": used,
+                                "used_pct": round((used / total) * 100.0, 1) if total > 0 else 0.0
+                            }
+                        except Exception:
+                            pass
+
+        # Disks
+        df_out = _ssh_run(ssh, "df -h --output=target,size,used,avail,pcent | tail -n +2")
+        if df_out:
+            for line in df_out.splitlines():
+                cols = [c for c in line.split() if c]
+                if len(cols) >= 5:
+                    result["disks"].append({
+                        "mount": cols[0],
+                        "size": cols[1],
+                        "used": cols[2],
+                        "avail": cols[3],
+                        "pcent": cols[4]
+                    })
+        # Inodes with robust fallback
+        inode_out = _ssh_run(ssh, "df -i --output=target,inodes,iused,ipcent | tail -n +2")
+        if not inode_out:
+            # Fallback for older coreutils: POSIX output
+            inode_out = _ssh_run(ssh, "df -iP | tail -n +2")
+            if inode_out:
+                for line in inode_out.splitlines():
+                    cols = [c for c in line.split() if c]
+                    # POSIX: Filesystem Inodes IUsed IFree IUse% Mounted on
+                    if len(cols) >= 6:
+                        # mount point is last column
+                        mount = cols[-1]
+                        inodes = cols[1]
+                        iused = cols[2]
+                        ipcent = cols[4]
+                        result["inodes"].append({
+                            "mount": mount,
+                            "inodes": inodes,
+                            "iused": iused,
+                            "ipcent": ipcent
+                        })
+        else:
+            for line in inode_out.splitlines():
+                cols = [c for c in line.split() if c]
+                if len(cols) >= 4:
+                    result["inodes"].append({
+                        "mount": cols[0],
+                        "inodes": cols[1],
+                        "iused": cols[2],
+                        "ipcent": cols[3]
+                    })
+
+        # Processes (top 5 by CPU)
+        ps_out = _ssh_run(ssh, "ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 6")
+        if ps_out:
+            lines = [l for l in ps_out.splitlines() if l.strip()]
+            for line in lines[1:]:
+                cols = [c for c in line.split() if c]
+                if len(cols) >= 4:
+                    pid, cmd, cpu_p, mem_p = cols[0], cols[1], cols[2], cols[3]
+                    result["processes"].append({
+                        "pid": pid, "cmd": cmd, "cpu": cpu_p, "mem": mem_p
+                    })
+
+        # Network interfaces and addresses
+        ip_out = _ssh_run(ssh, "ip -o -4 addr show")
+        if not ip_out:
+            ip_out = _ssh_run(ssh, "ifconfig | grep -E '^[a-zA-Z0-9]+' -A1")
+        if ip_out:
+            for line in ip_out.splitlines():
+                if 'inet ' in line:
+                    try:
+                        parts = line.split()
+                        iface = parts[1]
+                        addr = parts[3].split('/')[0]
+                        result["net"].append({"iface": iface, "addr": addr})
+                    except Exception:
+                        pass
+
+        # Traffic counters
+        # List interfaces in /sys/class/net
+        ifaces_list = _ssh_run(ssh, "ls -1 /sys/class/net")
+        if ifaces_list:
+            for iface in [i for i in ifaces_list.splitlines() if i and i != 'lo']:
+                rx_b = _ssh_run(ssh, f"cat /sys/class/net/{iface}/statistics/rx_bytes")
+                tx_b = _ssh_run(ssh, f"cat /sys/class/net/{iface}/statistics/tx_bytes")
+                try:
+                    rx_val = int(rx_b.strip()) if rx_b else 0
+                    tx_val = int(tx_b.strip()) if tx_b else 0
+                except Exception:
+                    rx_val = 0; tx_val = 0
+                result["traffic"].append({"iface": iface, "rx_bytes": rx_val, "tx_bytes": tx_val})
+
+        # Docker info
+        docker_present = bool(_ssh_run(ssh, "command -v docker"))
+        result["docker"]["present"] = docker_present
+        if docker_present:
+            # Version
+            ver = _ssh_run(ssh, "docker -v") or _ssh_run(ssh, "docker version --format '{{.Server.Version}}'")
+            result["docker"]["version"] = ver
+            # Running containers count and names
+            names_out = _ssh_run(ssh, "docker ps --format '{{.Names}}' | head -n 5")
+            names = [n for n in (names_out.splitlines() if names_out else []) if n.strip()]
+            result["docker"]["names"] = names
+            result["docker"]["running"] = len(names)
+            # Prefer JSON line parsing (more robust)
+            cont_json = _ssh_run(ssh, "docker ps --format '{{json .}}'")
+            parsed_any = False
+            if cont_json:
+                for jline in cont_json.splitlines():
+                    try:
+                        jobj = json.loads(jline)
+                        result["docker"]["containers"].append({
+                            "name": jobj.get("Names", ""),
+                            "image": jobj.get("Image", ""),
+                            "status": jobj.get("Status", ""),
+                            "ports": jobj.get("Ports", ""),
+                            "size": jobj.get("Size", ""),
+                            "mounts": ""
+                        })
+                        parsed_any = True
+                    except Exception:
+                        continue
+            if not parsed_any:
+                # Detailed containers (compat format without .Size for older Docker)
+                fmt_compat = "{{{{.Names}}}}|{{{{.Image}}}}|{{{{.Status}}}}|{{{{.Ports}}}}"
+                cont_out = _ssh_run(ssh, f"docker ps --format '{fmt_compat}'")
+                if not cont_out:
+                    cont_out = _ssh_run(ssh, f"docker ps -a --format '{fmt_compat}'")
+                if cont_out:
+                    for line in cont_out.splitlines():
+                        if not line.strip():
+                            continue
+                        cols = line.split('|')
+                        while len(cols) < 4:
+                            cols.append('')
+                        result["docker"]["containers"].append({
+                            "name": cols[0],
+                            "image": cols[1],
+                            "status": cols[2],
+                            "ports": cols[3],
+                            "size": "",
+                            "mounts": ""
+                        })
+                        parsed_any = True
+            # Fallback per-name lookup if nothing parsed but names are present
+            if not parsed_any and names:
+                for nm in names:
+                    safe_nm = nm.replace("'", "'\''")
+                    fmt_compat = "{{{{.Names}}}}|{{{{.Image}}}}|{{{{.Status}}}}|{{{{.Ports}}}}"
+                    line = _ssh_run(ssh, f"docker ps -a --filter name=^{safe_nm}$ --format '{fmt_compat}'")
+                    if line:
+                        cols = line.split('|')
+                        while len(cols) < 4:
+                            cols.append('')
+                        result["docker"]["containers"].append({
+                            "name": cols[0],
+                            "image": cols[1],
+                            "status": cols[2],
+                            "ports": cols[3],
+                            "size": "",
+                            "mounts": ""
+                        })
+                        parsed_any = True
+            # Fallback per-name inspect if still empty
+            if not result["docker"]["containers"] and names:
+                for nm in names:
+                    safe_nm = nm.replace("'", "'\''")
+                    fmt_inspect = "{{{{.Name}}}}|{{{{.Config.Image}}}}|{{{{.State.Status}}}}|{{{{range $p,$v := .NetworkSettings.Ports}}}}{{$p}} {{{{end}}}}".replace("  ", " ")
+                    line = _ssh_run(ssh, f"docker inspect --format '{fmt_inspect}' {safe_nm}")
+                    if line:
+                        cols = line.split('|')
+                        while len(cols) < 4:
+                            cols.append('')
+                        name_clean = cols[0][1:] if cols[0].startswith('/') else cols[0]
+                        result["docker"]["containers"].append({
+                            "name": name_clean,
+                            "image": cols[1],
+                            "status": cols[2],
+                            "ports": cols[3].strip(),
+                            "size": "",
+                            "mounts": ""
+                        })
+            # As a last resort, if there are running names but containers still empty, synthesize minimal rows
+            if not result["docker"]["containers"] and names:
+                for nm in names:
+                    result["docker"]["containers"].append({
+                        "name": nm,
+                        "image": "",
+                        "status": "running",
+                        "ports": "",
+                        "size": "",
+                        "mounts": ""
+                    })
+
+    finally:
+        try:
+            ssh.close()
+        except Exception:
+            pass
+    return result
+
+@app.route('/server/<int:server_id>/stats', methods=['GET'])
+@pin_auth.require_auth
+def server_stats(server_id: int):
+    """
+    Возвращает метрики сервера по SSH.
+    Параметры:
+        timeout: 3..30 секунд (опционально, по умолчанию 10)
+    Ответ: { ok, server_id, stats } или { error, exception }
+    """
+    try:
+        # Получаем таймаут из запроса
+        try:
+            timeout = int(request.args.get('timeout', '10'))
+        except Exception:
+            timeout = 10
+        timeout = max(3, min(30, timeout))
+
+        servers = load_servers()
+        server = next((s for s in servers if s.get('id') == server_id), None)
+        if not server:
+            return jsonify({"error": "server_not_found"}), 404
+
+        creds = server.get('ssh_credentials', {})
+        host = server.get('ip_address', '')
+        user = creds.get('user', '')
+        # Обеспечиваем расшифровку, если временное поле отсутствует
+        password = creds.get('password_decrypted') or decrypt_data(creds.get('password', ''))
+        port = int(creds.get('port', 22) or 22)
+
+        if not host or not user:
+            return jsonify({"error": "missing_credentials"}), 400
+
+        try:
+            stats = _collect_stats_via_ssh(host=host, user=user, password=password, port=port, timeout=timeout)
+            return jsonify({"ok": True, "server_id": server_id, "stats": stats})
+        except AuthenticationException as e:
+            return jsonify({"error": "auth_failed", "exception": str(e)}) , 401
+        except SSHException as e:
+            return jsonify({"error": "ssh_error", "exception": str(e)}) , 500
+        except Exception as e:
+            return jsonify({"error": "unexpected_error", "exception": str(e)}) , 500
+    except Exception as e:
+        return jsonify({"error": "handler_failed", "exception": str(e)}), 500
+
+# ---------------- Vendor routes ----------------
+@app.route('/vendor/html2canvas.min.js')
+def vendor_html2canvas():
+    """Serves html2canvas locally with simple on-disk cache to avoid external CDN blocks."""
+    try:
+        cache_dir = os.path.join(get_app_data_dir(), 'data')
+        os.makedirs(cache_dir, exist_ok=True)
+        filename = 'html2canvas.min.js'
+        cached_path = os.path.join(cache_dir, filename)
+        if not os.path.exists(cached_path) or os.path.getsize(cached_path) < 10240:
+            url = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200 and r.content:
+                with open(cached_path, 'wb') as f:
+                    f.write(r.content)
+        if os.path.exists(cached_path):
+            return send_from_directory(cache_dir, filename, mimetype='application/javascript')
+        # Final fallback: return tiny stub that shows alert
+        return ("window.html2canvas||(alert('html2canvas загрузить не удалось'),console.error('html2canvas not available'));",
+                200, {'Content-Type': 'application/javascript'})
+    except Exception as e:
+        return ("console.error('vendor load failed:', '" + str(e) + "');",
+                200, {'Content-Type': 'application/javascript'})
+
+@app.route('/snapshot/save', methods=['POST'])
+def snapshot_save():
+    """Accepts a PNG data URL and saves it to Downloads (export dir). Returns JSON with filename."""
+    try:
+        data = request.get_json(silent=True) or {}
+        data_url = data.get('data_url', '')
+        if not data_url.startswith('data:image/png;base64,'):
+            return jsonify({"success": False, "error": "invalid_data_url"}), 400
+        b64 = data_url.split(',', 1)[1]
+        img_bytes = base64.b64decode(b64)
+        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'server_status_{ts}.png'
+        export_dir = get_export_dir()
+        os.makedirs(export_dir, exist_ok=True)
+        path = os.path.join(export_dir, filename)
+        with open(path, 'wb') as f:
+            f.write(img_bytes)
+        return jsonify({"success": True, "filename": filename, "dir": export_dir})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
     # Выполняем проверку и миграцию при старте приложения
