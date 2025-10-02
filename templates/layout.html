@@ -17,6 +17,24 @@
             flex: 1;
         }
     </style>
+    <script>
+        // Lazy-load html2canvas: try local vendor first, then fallback to CDN
+        function ensureHtml2CanvasLoaded(callback) {
+            if (window.html2canvas) { if (callback) callback(); return; }
+            var el = document.createElement('script');
+            var loaded = false;
+            el.src = '/vendor/html2canvas.min.js';
+            el.onload = function(){ loaded = true; if (callback) callback(); };
+            el.onerror = function(){
+                if (loaded) return;
+                var cdn = document.createElement('script');
+                cdn.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+                cdn.onload = function(){ if (callback) callback(); };
+                document.head.appendChild(cdn);
+            };
+            document.head.appendChild(el);
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
@@ -132,7 +150,7 @@
         }
 
         function applyRootZoom(zoom) {
-            // Масштабируем через корневой размер шрифта, чтобы избежать размытости и смещений хитбоксов
+            // Масштабируем через корневой размер шрифта, чтобы избежать размытия и смещений хитбоксов
             const value = String(zoom).replace('%','');
             document.documentElement.style.fontSize = value + '%';
         }

@@ -21,6 +21,7 @@ import socket
 import paramiko
 import re
 from typing import List, Dict, Any
+import base64
 
 load_dotenv()
 
@@ -1136,7 +1137,9 @@ def add_server():
             icon_file = request.files['server_icon']
             if icon_file and icon_file.filename != '' and allowed_file(icon_file.filename):
                 original_filename = secure_filename(icon_file.filename)
-                unique_filename = f"icon_{new_id}_{original_filename}"
+                _, extension = os.path.splitext(original_filename)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                unique_filename = f"icon_{new_id}_{timestamp}{extension}"
                 icon_file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                 new_server['icon_filename'] = unique_filename
 
@@ -1244,7 +1247,9 @@ def edit_server(server_id):
                         os.remove(old_icon_path)
                 
                 original_filename = secure_filename(icon_file.filename)
-                unique_filename = f"icon_{server_id}_{original_filename}"
+                _, extension = os.path.splitext(original_filename)
+                timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                unique_filename = f"icon_{server_id}_{timestamp}{extension}"
                 icon_file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
                 server['icon_filename'] = unique_filename
         
@@ -1863,6 +1868,26 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
         except Exception:
             cpu_cores = None
         kernel = _ssh_run(ssh, "uname -r").strip()
+        # Detect OS pretty name
+        os_name = ""
+        os_release = _ssh_run(ssh, "cat /etc/os-release | tr -d '\r' || true")
+        if os_release:
+            pretty = None
+            name = None
+            ver = None
+            for line in os_release.splitlines():
+                if line.startswith('PRETTY_NAME=') and pretty is None:
+                    pretty = line.split('=',1)[1].strip().strip('"')
+                elif line.startswith('NAME=') and name is None:
+                    name = line.split('=',1)[1].strip().strip('"')
+                elif line.startswith('VERSION_ID=') and ver is None:
+                    ver = line.split('=',1)[1].strip().strip('"')
+            if pretty:
+                os_name = pretty
+            elif name:
+                os_name = name + (" " + ver if ver else "")
+        if not os_name:
+            os_name = _ssh_run(ssh, "uname -s").strip()
 
         mem_line = _ssh_run(ssh, "free -m | awk '/Mem:/ {print $2\",\"$3\",\"$7}' || true")
         mem_parts = (mem_line.split(',') + ['0', '0', '0'])[:3]
@@ -1931,18 +1956,52 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
 
         # Docker
         docker_present = _ssh_run(ssh, "command -v docker >/dev/null 2>&1 && echo yes || echo no").strip() == 'yes'
-        docker = {"present": docker_present, "running": 0}
+        docker = {"present": docker_present, "running": 0, "version": "", "names": []}
         if docker_present:
             running_str = _ssh_run(ssh, "docker ps -q 2>/dev/null | wc -l || echo 0").strip()
             try:
                 docker["running"] = int(running_str)
             except Exception:
                 docker["running"] = 0
+            # Версия демона (кратко)
+            ver = _ssh_run(ssh, "docker --version 2>/dev/null | head -n1").strip()
+            docker["version"] = ver
+            # Имена запущенных контейнеров (первые 3-5)
+            names_out = _ssh_run(ssh, "docker ps --format '{{.Names}}' 2>/dev/null | head -n 5")
+            docker["names"] = [n for n in names_out.splitlines() if n]
+            # Подробности по контейнерам (имя, образ, статус, порты, размер)
+            ps_lines = _ssh_run(ssh, "docker ps -s --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}|{{.Size}}' 2>/dev/null | head -n 5").splitlines()
+            containers: List[Dict[str, Any]] = []
+            for ln in ps_lines:
+                parts = (ln.split('|') + ['', '', '', '', ''])[:5]
+                containers.append({
+                    "name": parts[0],
+                    "image": parts[1],
+                    "status": parts[2],
+                    "ports": parts[3],
+                    "size": parts[4],
+                    "mounts": ""
+                })
+            # Дополним mounts для первых N контейнеров
+            if containers:
+                names_join = ' '.join([c.get('name','') for c in containers if c.get('name')])
+                if names_join:
+                    mounts_out = _ssh_run(ssh, f"for n in {names_join}; do echo -n \"$n|\"; docker inspect -f '{{{{range .Mounts}}}}{{{{.Source}}}}->{{{{.Destination}}}};{{{{end}}}}' \"$n\" 2>/dev/null; echo; done")
+                    for line in mounts_out.splitlines():
+                        name, mounts = (line.split('|', 1) + ['', ''])[:2]
+                        for c in containers:
+                            if c.get('name') == name:
+                                c['mounts'] = mounts
+                                break
+            docker['containers'] = containers
+
+        missing_tools, install_hint = _detect_missing_tools_and_hint(ssh)
 
         return {
             "uptime": uptime_h,
             "load": {"1m": load1, "5m": load5, "15m": load15},
             "cpu": {"used_pct": cpu_used, "cores": cpu_cores, "kernel": kernel},
+            "os": os_name,
             "mem": {"total_mb": mt, "used_mb": mu, "avail_mb": ma, "used_pct": mem_used_pct},
             "swap": {"total_mb": st, "used_mb": su, "used_pct": swap_used_pct},
             "disks": disks,
@@ -1951,9 +2010,104 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
             "net": nets,
             "traffic": traffic,
             "docker": docker,
+            "missing_tools": missing_tools,
+            "install_hint": install_hint
         }
     finally:
         ssh.close()
+
+def _detect_missing_tools_and_hint(ssh: paramiko.SSHClient):
+    required_tools = ['top', 'free', 'df', 'ps', 'ip', 'ifconfig']
+    missing = []
+    for tool in required_tools:
+        out = _ssh_run(ssh, f"command -v {tool} || which {tool}")
+        if not out:
+            missing.append(tool)
+
+    install_hint = ""
+    if missing:
+        os_release = _ssh_run(ssh, "cat /etc/os-release")
+        id_like = ""
+        distro_id = ""
+        if os_release:
+            for line in os_release.splitlines():
+                if line.startswith('ID=') and not distro_id:
+                    distro_id = line.split('=', 1)[1].strip().strip('"')
+                if line.startswith('ID_LIKE=') and not id_like:
+                    id_like = line.split('=', 1)[1].strip().strip('"')
+        pm = ''
+        for cand in ['apt', 'dnf', 'yum', 'apk', 'pacman', 'zypper', 'opkg']:
+            if _ssh_run(ssh, f"command -v {cand}"):
+                pm = cand
+                break
+        families = (distro_id + ' ' + id_like).lower()
+        base_packages = {
+            'apt': 'apt update && apt install -y procps iproute2 net-tools coreutils util-linux findutils',
+            'dnf': 'dnf install -y procps-ng iproute net-tools coreutils util-linux findutils',
+            'yum': 'yum install -y procps-ng iproute net-tools coreutils util-linux findutils',
+            'apk': 'apk add procps iproute2 net-tools coreutils util-linux findutils',
+            'pacman': 'pacman -Sy --noconfirm procps-ng iproute2 net-tools coreutils util-linux findutils',
+            'zypper': 'zypper install -y procps iproute2 net-tools coreutils util-linux findutils',
+            'opkg': 'opkg update && opkg install procps ip ip-full net-tools coreutils util-linux findutils'
+        }
+        if pm:
+            install_hint = base_packages.get(pm, '')
+        else:
+            if 'debian' in families or 'ubuntu' in families:
+                install_hint = base_packages['apt']
+            elif 'fedora' in families or 'rhel' in families or 'centos' in families:
+                install_hint = base_packages['dnf']
+            elif 'alpine' in families:
+                install_hint = base_packages['apk']
+            elif 'arch' in families:
+                install_hint = base_packages['pacman']
+            elif 'suse' in families:
+                install_hint = base_packages['zypper']
+            else:
+                install_hint = 'Install required tools using your package manager: top free df ps ip ifconfig'
+    return missing, install_hint
+
+@app.route('/vendor/html2canvas.min.js')
+def vendor_html2canvas():
+    try:
+        cache_dir = os.path.join(get_app_data_dir(), 'data')
+        os.makedirs(cache_dir, exist_ok=True)
+        filename = 'html2canvas.min.js'
+        cached_path = os.path.join(cache_dir, filename)
+        if not os.path.exists(cached_path) or os.path.getsize(cached_path) < 10240:
+            url = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200 and r.content:
+                with open(cached_path, 'wb') as f:
+                    f.write(r.content)
+        if os.path.exists(cached_path):
+            return send_from_directory(cache_dir, filename, mimetype='application/javascript')
+        return ("window.html2canvas||(alert('html2canvas загрузить не удалось'),console.error('html2canvas not available'));",
+                200, {'Content-Type': 'application/javascript'})
+    except Exception as e:
+        return ("console.error('vendor load failed:', '" + str(e) + "');",
+                200, {'Content-Type': 'application/javascript'})
+
+@app.route('/snapshot/save', methods=['POST'])
+def snapshot_save():
+    """Accepts a PNG data URL and saves it to Downloads (export dir). Returns JSON with filename."""
+    try:
+        data = request.get_json(silent=True) or {}
+        data_url = data.get('data_url', '')
+        if not data_url.startswith('data:image/png;base64,'):
+            return jsonify({"success": False, "error": "invalid_data_url"}), 400
+        b64 = data_url.split(',', 1)[1]
+        img_bytes = base64.b64decode(b64)
+        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'server_status_{ts}.png'
+        export_dir = get_export_dir() or APP_DATA_DIR or os.getcwd()
+        os.makedirs(export_dir, exist_ok=True)
+        path = os.path.join(export_dir, filename)
+        with open(path, 'wb') as f:
+            f.write(img_bytes)
+        return jsonify({"success": True, "filename": filename, "dir": export_dir, "path": path})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/server/<int:server_id>/stats')
 @pin_auth.require_auth
@@ -2259,158 +2413,5 @@ if __name__ == "__main__":
 
     # После закрытия окна PyWebView, главный поток продолжится здесь.
     print("Приложение закрыто.")
-
-# --------- SSH metrics collection (server stats) ---------
-
-def _ssh_run(ssh: paramiko.SSHClient, cmd: str, timeout: int = 8) -> str:
-    stdin, stdout, stderr = ssh.exec_command(cmd, timeout=timeout)
-    out = stdout.read().decode('utf-8', errors='ignore').strip()
-    err = stderr.read().decode('utf-8', errors='ignore').strip()
-    return out if out else err
-
-
-def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, timeout: int = 8) -> Dict[str, Any]:
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    t = max(3, min(int(timeout or 8), 30))
-    ssh.connect(hostname=host, username=user, password=password, port=port, timeout=t, banner_timeout=t, auth_timeout=t, allow_agent=False, look_for_keys=False)
-    try:
-        uptime_h = _ssh_run(ssh, "uptime -p || true", timeout=t)
-        loadavg = _ssh_run(ssh, "cat /proc/loadavg | awk '{print $1\",\"$2\",\"$3}' || true", timeout=t)
-        load_parts = (loadavg.split(',') + ['', '', ''])[:3]
-        load1, load5, load15 = load_parts[0], load_parts[1], load_parts[2]
-
-        cpu_line = _ssh_run(ssh, "LANG=C LC_ALL=C top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1 || true", timeout=t)
-        m = re.search(r'([0-9]+(?:\\.[0-9]+)?)\\s*id', cpu_line)
-        cpu_used = round(100 - float(m.group(1)), 1) if m else None
-        # Доп. сведения о CPU и ядре
-        cpu_count_str = _ssh_run(ssh, "nproc 2>/dev/null || grep -c '^processor' /proc/cpuinfo 2>/dev/null || echo 0", timeout=t).strip()
-        try:
-            cpu_cores = int(cpu_count_str)
-        except Exception:
-            cpu_cores = None
-        kernel = _ssh_run(ssh, "uname -r", timeout=t).strip()
-
-        mem_line = _ssh_run(ssh, "free -m | awk '/Mem:/ {print $2\",\"$3\",\"$7}' || true", timeout=t)
-        mem_parts = (mem_line.split(',') + ['0', '0', '0'])[:3]
-        try:
-            mt, mu, ma = int(mem_parts[0]), int(mem_parts[1]), int(mem_parts[2])
-        except ValueError:
-            mt, mu, ma = 0, 0, 0
-        mem_used_pct = round(mu * 100.0 / mt, 1) if mt else None
-
-        swap_line = _ssh_run(ssh, "free -m | awk '/Swap:/ {print $2\",\"$3}' || true", timeout=t)
-        swap_parts = (swap_line.split(',') + ['0', '0'])[:2]
-        try:
-            st, su = int(swap_parts[0]), int(swap_parts[1])
-        except ValueError:
-            st, su = 0, 0
-        swap_used_pct = round(su * 100.0 / st, 1) if st else 0
-
-        df_lines = _ssh_run(ssh, "df -hP / /boot/efi /var/lib/docker 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$4\",\"$5}' || true", timeout=t).splitlines()
-        disks: List[Dict[str, Any]] = []
-        for ln in df_lines:
-            parts = (ln.split(',') + ['', '', '', '', ''])[:5]
-            disks.append({
-                "mount": parts[0],
-                "size": parts[1],
-                "used": parts[2],
-                "avail": parts[3],
-                "pcent": parts[4]
-            })
-
-        # Inodes
-        di_lines = _ssh_run(ssh, "df -iP 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$5}' || true", timeout=t).splitlines()
-        inodes: List[Dict[str, Any]] = []
-        for ln in di_lines:
-            p = (ln.split(',') + ['', '', '', ''])[:4]
-            inodes.append({
-                "mount": p[0],
-                "inodes": p[1],
-                "iused": p[2],
-                "ipcent": p[3]
-            })
-
-        ps_lines = _ssh_run(ssh, "ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 11 || true", timeout=t).splitlines()
-        procs: List[Dict[str, Any]] = []
-        for ln in ps_lines[1:]:
-            cols = ln.split(None, 3)
-            if len(cols) == 4:
-                pid, cmd, pcpu, pmem = cols
-                procs.append({"pid": pid, "cmd": cmd, "cpu": pcpu, "mem": pmem})
-
-        net_lines = _ssh_run(ssh, "ip -br -color=never a 2>/dev/null | awk '{print $1\",\"$3}' || (ifconfig -a | awk '/flags=/{iface=$1} /inet /{print iface\",\"$2}') || true", timeout=t).splitlines()
-        nets: List[Dict[str, Any]] = []
-        for ln in net_lines:
-            iface, addr = (ln.split(',', 1) + ['', ''])[:2]
-            nets.append({"iface": iface, "addr": addr})
-
-        # Traffic RX/TX по интерфейсам
-        rx_tx_lines = _ssh_run(ssh, "for i in /sys/class/net/*; do n=$(basename $i); rx=$(cat $i/statistics/rx_bytes 2>/dev/null||echo 0); tx=$(cat $i/statistics/tx_bytes 2>/dev/null||echo 0); echo $n,$rx,$tx; done 2>/dev/null || true", timeout=t).splitlines()
-        traffic: List[Dict[str, Any]] = []
-        for ln in rx_tx_lines:
-            p = (ln.split(',') + ['', '', ''])[:3]
-            try:
-                traffic.append({"iface": p[0], "rx_bytes": int(p[1] or 0), "tx_bytes": int(p[2] or 0)})
-            except Exception:
-                pass
-        traffic.sort(key=lambda x: x.get('rx_bytes',0)+x.get('tx_bytes',0), reverse=True)
-
-        # Docker
-        docker_present = _ssh_run(ssh, "command -v docker >/dev/null 2>&1 && echo yes || echo no", timeout=t).strip() == 'yes'
-        docker = {"present": docker_present, "running": 0, "version": "", "names": []}
-        if docker_present:
-            running_str = _ssh_run(ssh, "docker ps -q 2>/dev/null | wc -l || echo 0", timeout=t).strip()
-            try:
-                docker["running"] = int(running_str)
-            except Exception:
-                docker["running"] = 0
-            # Версия демона (кратко)
-            ver = _ssh_run(ssh, "docker --version 2>/dev/null | head -n1", timeout=t).strip()
-            docker["version"] = ver
-            # Имена запущенных контейнеров (первые 3-5)
-            names_out = _ssh_run(ssh, "docker ps --format '{{.Names}}' 2>/dev/null | head -n 5", timeout=t)
-            docker["names"] = [n for n in names_out.splitlines() if n]
-            # Подробности по контейнерам (имя, образ, статус, порты, размер)
-            ps_lines = _ssh_run(ssh, "docker ps -s --format '{{.Names}}|{{.Image}}|{{.Status}}|{{.Ports}}|{{.Size}}' 2>/dev/null | head -n 5", timeout=t).splitlines()
-            containers: List[Dict[str, Any]] = []
-            for ln in ps_lines:
-                parts = (ln.split('|') + ['', '', '', '', ''])[:5]
-                containers.append({
-                    "name": parts[0],
-                    "image": parts[1],
-                    "status": parts[2],
-                    "ports": parts[3],
-                    "size": parts[4],
-                    "mounts": ""
-                })
-            # Дополним mounts для первых N контейнеров
-            if containers:
-                names_join = ' '.join([c.get('name','') for c in containers if c.get('name')])
-                if names_join:
-                    mounts_out = _ssh_run(ssh, f"for n in {names_join}; do echo -n \"$n|\"; docker inspect -f '{{{{range .Mounts}}}}{{{{.Source}}}}->{{{{.Destination}}}};{{{{end}}}}' \"$n\" 2>/dev/null; echo; done", timeout=t)
-                    for line in mounts_out.splitlines():
-                        name, mounts = (line.split('|', 1) + ['', ''])[:2]
-                        for c in containers:
-                            if c.get('name') == name:
-                                c['mounts'] = mounts
-                                break
-            docker['containers'] = containers
-
-        return {
-            "uptime": uptime_h,
-            "load": {"1m": load1, "5m": load5, "15m": load15},
-            "cpu": {"used_pct": cpu_used, "cores": cpu_cores, "kernel": kernel},
-            "mem": {"total_mb": mt, "used_mb": mu, "avail_mb": ma, "used_pct": mem_used_pct},
-            "swap": {"total_mb": st, "used_mb": su, "used_pct": swap_used_pct},
-            "disks": disks,
-            "inodes": inodes,
-            "processes": procs,
-            "net": nets,
-            "traffic": traffic,
-            "docker": docker,
-        }
-    finally:
-        ssh.close()
 
 
