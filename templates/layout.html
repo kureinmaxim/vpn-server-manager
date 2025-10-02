@@ -17,6 +17,25 @@
             flex: 1;
         }
     </style>
+    <script>
+        // Лениво подгружаем html2canvas по требованию страниц
+        function ensureHtml2CanvasLoaded(callback) {
+            if (window.html2canvas) { callback && callback(); return; }
+            // Сперва пробуем локальный vendor-роут (same-origin), затем CDN
+            var el = document.createElement('script');
+            var loaded = false;
+            el.src = '/vendor/html2canvas.min.js';
+            el.onload = function(){ loaded = true; if (callback) callback(); };
+            el.onerror = function(){
+                if (loaded) return;
+                var cdn = document.createElement('script');
+                cdn.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+                cdn.onload = function(){ if (callback) callback(); };
+                document.head.appendChild(cdn);
+            };
+            document.head.appendChild(el);
+        }
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
