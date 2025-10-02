@@ -366,8 +366,19 @@
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title"><i class="bi bi-activity"></i> {{ _('Статус сервера') }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h5 class="modal-title d-flex align-items-center">
+            <i class="bi bi-activity me-2"></i> 
+            <span id="statusServerTitle">{{ _('Статус сервера') }}</span>
+            <span id="statusServerName" class="ms-2 fw-bold"></span>
+            <span id="statusServerIp" class="ms-1 text-muted"></span>
+        </h5>
+        <div class="ms-auto d-flex align-items-center">
+            <small id="lastUpdatedLabel" class="text-muted me-2"></small>
+            <div id="refreshSpin" class="spinner-border spinner-border-sm d-none" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div id="statsLoading" class="text-center my-3">
@@ -601,8 +612,24 @@
     function setStatusHeaderInfo(name, ip) {
         var nameEl = document.getElementById('statusServerName');
         var ipEl = document.getElementById('statusServerIp');
-        if (name && nameEl) { nameEl.textContent = name; nameEl.classList.remove('d-none'); }
-        if (ip && ipEl) { ipEl.textContent = '(' + ip + ')'; ipEl.classList.remove('d-none'); }
+        var titleEl = document.getElementById('statusServerTitle');
+
+        if (name && nameEl) { 
+            nameEl.textContent = name;
+        } else if (nameEl) {
+            nameEl.textContent = '';
+        }
+        
+        if (ip && ipEl) { 
+            ipEl.textContent = '(' + ip + ')';
+        } else if (ipEl) {
+            ipEl.textContent = '';
+        }
+        
+        // Показываем "Статус сервера", если нет имени
+        if (titleEl) {
+            titleEl.textContent = name ? '{{ _("Статус сервера:") }}' : '{{ _("Статус сервера") }}';
+        }
     }
 
     function openStatsModal(serverId) {
@@ -615,12 +642,12 @@
         document.getElementById('statsContent').classList.add('d-none');
         var warn = document.getElementById('statsWarning');
         warn.classList.add('d-none');
-        warn.textContent = '';
+        warn.innerHTML = ''; // Очищаем содержимое
         modal.show();
         fetchAndRender();
-        // setup auto-refresh every 10s
+        // setup auto-refresh every 30s
         if (statusIntervalId) { clearInterval(statusIntervalId); }
-        statusIntervalId = setInterval(fetchAndRender, 10000);
+        statusIntervalId = setInterval(fetchAndRender, 30000);
 
         // stop timer on hide
         function onHidden(){
@@ -829,21 +856,46 @@
 
         // Missing tools warning
         var warn = document.getElementById('statsWarning');
+        warn.innerHTML = ''; // Очищаем перед использованием
         if (stats.missing_tools && stats.missing_tools.length > 0) {
             var cmd = stats.install_hint || '';
-            var html = '<div class="d-flex justify-content-between align-items-center">' +
-                       '<div><strong>Отсутствуют утилиты:</strong> ' + stats.missing_tools.join(', ') + '</div>' +
-                       (cmd ? '<button class="btn btn-sm btn-outline-dark ms-2" id="copyInstallCmdBtn">Скопировать команду</button>' : '') +
-                       '</div>' + (cmd ? '<div class="mt-2"><code>' + cmd + '</code></div>' : '');
+            var html = `
+                <div class="alert alert-warning d-flex flex-column align-items-center">
+                    <div class="mb-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        {{ _('Для полной диагностики отсутствуют утилиты:') }} <strong>${stats.missing_tools.join(', ')}</strong>
+                    </div>
+                    ${cmd ? `
+                    <div class="text-center">{{ _('Установите командой:') }}</div>
+                    <div class="input-group mt-1" style="max-width: 600px;">
+                        <input type="text" class="form-control bg-dark text-light" value="${cmd}" readonly id="installCmdInput">
+                        <button class="btn btn-outline-secondary" type="button" id="copyInstallCmdBtn" title="{{ _('Копировать команду') }}">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>`;
+
             warn.innerHTML = html;
             warn.classList.remove('d-none');
+            
             var copyBtn = document.getElementById('copyInstallCmdBtn');
             if (copyBtn && cmd) {
-                copyBtn.addEventListener('click', function(){ navigator.clipboard.writeText(cmd); });
+                copyBtn.addEventListener('click', function(){ 
+                    var input = document.getElementById('installCmdInput');
+                    input.select();
+                    document.execCommand('copy');
+
+                    var originalIcon = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                    setTimeout(function() {
+                        copyBtn.innerHTML = originalIcon;
+                    }, 1500);
+                });
             }
         } else {
             warn.classList.add('d-none');
-            warn.textContent = '';
+            warn.innerHTML = '';
         }
     }
 </script>
