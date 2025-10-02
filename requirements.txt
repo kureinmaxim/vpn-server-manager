@@ -6,4 +6,5 @@ Werkzeug
 Jinja2
 pywebview
 Flask-Babel==4.0.0
-Babel==2.14.0 
+Babel==2.14.0
+paramiko 
