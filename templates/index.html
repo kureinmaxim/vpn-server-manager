@@ -326,9 +326,14 @@
                     <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
                         <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
                     </a>
-                    <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('{{ _('Вы уверены, что хотите удалить этот сервер?') }}');">
-                        <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
-                    </form>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
+                            <i class="bi bi-activity"></i> {{ _('Статус') }}
+                        </button>
+                        <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
+                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -351,6 +356,118 @@
       </div>
       <div class="modal-body">
         <pre id="ipInfoContent"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно статуса сервера -->
+<div class="modal fade" id="serverStatusModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-activity"></i> {{ _('Статус сервера') }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="statsLoading" class="text-center my-3">
+          <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+          <div class="mt-2">{{ _('Загрузка...') }}</div>
+        </div>
+        <div id="statsWarning" class="alert alert-warning d-none"></div>
+        <div id="statsContent" class="d-none">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="card-title">CPU</h6>
+                  <div class="d-flex justify-content-between"><span>Kernel:</span><span id="cpu-kernel"></span></div>
+                  <div class="d-flex justify-content-between"><span>Cores:</span><span id="cpu-cores"></span></div>
+                  <div class="mt-2">
+                    <div class="progress" style="height: 20px;">
+                      <div id="cpu-used" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div class="text-end small mt-1"><span id="cpu-used-label">0%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="card-title">Memory</h6>
+                  <div class="d-flex justify-content-between"><span>Total:</span><span id="mem-total"></span></div>
+                  <div class="d-flex justify-content-between"><span>Used/Avail:</span><span id="mem-used"></span></div>
+                  <div class="mt-2">
+                    <div class="progress" style="height: 20px;">
+                      <div id="mem-used-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%;"></div>
+                    </div>
+                    <div class="text-end small mt-1"><span id="mem-used-label">0%</span></div>
+                  </div>
+                  <hr>
+                  <div class="d-flex justify-content-between"><span>Swap:</span><span id="swap-used"></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h6 class="card-title">Load / Uptime</h6>
+                  <div class="d-flex justify-content-between"><span>Load:</span><span id="load-avg"></span></div>
+                  <div class="d-flex justify-content-between"><span>Uptime:</span><span id="uptime"></span></div>
+                  <div class="d-flex justify-content-between mt-2"><span>Docker:</span><span id="docker-short"></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title d-flex align-items-center justify-content-between">
+                    <span>Networks</span>
+                    <small id="docker-version" class="text-muted" title="Docker version"></small>
+                  </h6>
+                  <ul id="net-list" class="list-group"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Disks</h6>
+                  <div class="row" id="disks-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Inodes</h6>
+                  <div class="row" id="inodes-list"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Top processes</h6>
+                  <div id="proc-table" class="table-responsive"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Docker containers</h6>
+                  <div id="docker-table" class="table-responsive"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Закрыть') }}</button>
+        <button type="button" class="btn btn-primary" id="saveStatusImageBtn">{{ _('Сохранить как PNG') }}</button>
       </div>
     </div>
   </div>
@@ -455,6 +572,331 @@
             eyeIcon.classList.remove('bi-eye-slash');
             eyeIcon.classList.add('bi-eye');
         }
+    }
+</script>
+<script>
+    // Логика модалки статуса сервера
+    var statusIntervalId = null;
+    var consecutiveErrors = 0;
+    var maxConsecutiveErrors = 3;
+    var currentServerId = null;
+
+    document.addEventListener('click', function(e){
+        var target = e.target;
+        if (target.classList && target.classList.contains('btn-show-stats')) {
+            var sid = target.getAttribute('data-server-id');
+            var sname = target.getAttribute('data-server-name');
+            var sip = target.getAttribute('data-server-ip');
+            setStatusHeaderInfo(sname, sip);
+            openStatsModal(sid);
+        } else if (target.closest && target.closest('.btn-show-stats')) {
+            var btn = target.closest('.btn-show-stats');
+            var sid2 = btn.getAttribute('data-server-id');
+            setStatusHeaderInfo(btn.getAttribute('data-server-name'), btn.getAttribute('data-server-ip'));
+            openStatsModal(sid2);
+        }
+    });
+
+    function setStatusHeaderInfo(name, ip) {
+        var nameEl = document.getElementById('statusServerName');
+        var ipEl = document.getElementById('statusServerIp');
+        if (name && nameEl) { nameEl.textContent = name; nameEl.classList.remove('d-none'); }
+        if (ip && ipEl) { ipEl.textContent = '(' + ip + ')'; ipEl.classList.remove('d-none'); }
+    }
+
+    function openStatsModal(serverId) {
+        currentServerId = serverId;
+        consecutiveErrors = 0;
+        var modalEl = document.getElementById('serverStatusModal');
+        var modal = new bootstrap.Modal(modalEl);
+        // Reset UI
+        document.getElementById('statsLoading').classList.remove('d-none');
+        document.getElementById('statsContent').classList.add('d-none');
+        var warn = document.getElementById('statsWarning');
+        warn.classList.add('d-none');
+        warn.textContent = '';
+        modal.show();
+        fetchAndRender();
+        // setup auto-refresh every 10s
+        if (statusIntervalId) { clearInterval(statusIntervalId); }
+        statusIntervalId = setInterval(fetchAndRender, 10000);
+
+        // stop timer on hide
+        function onHidden(){
+            if (statusIntervalId) { clearInterval(statusIntervalId); }
+            statusIntervalId = null;
+            currentServerId = null;
+            modalEl.removeEventListener('hidden.bs.modal', onHidden);
+        }
+        modalEl.addEventListener('hidden.bs.modal', onHidden);
+    }
+
+    function bytesToHuman(num) {
+        var units = ['B','KB','MB','GB','TB'];
+        var i = 0;
+        var n = Number(num) || 0;
+        while (n >= 1024 && i < units.length - 1) { n = n / 1024; i++; }
+        return (Math.round(n * 10) / 10) + ' ' + units[i];
+    }
+
+    function fetchAndRender() {
+        if (!currentServerId) return;
+        var spin = document.getElementById('refreshSpin');
+        if (spin) spin.classList.remove('d-none');
+        fetch('/server/' + currentServerId + '/stats?timeout=10')
+            .then(function(r){ return r.json() })
+            .then(function(data){
+                if (!data || data.error) {
+                    consecutiveErrors += 1;
+                    showWarning(data && data.error ? data.error : 'Unknown error');
+                    if (consecutiveErrors >= maxConsecutiveErrors) {
+                        if (statusIntervalId) { clearInterval(statusIntervalId); }
+                        statusIntervalId = null;
+                    }
+                    return;
+                }
+                consecutiveErrors = 0;
+                renderStats(data.stats || {});
+                var label = document.getElementById('lastUpdatedLabel');
+                if (label) {
+                    var now = new Date();
+                    label.textContent = now.toLocaleTimeString();
+                }
+            })
+            .catch(function(err){
+                consecutiveErrors += 1;
+                showWarning('Fetch failed: ' + err);
+                if (consecutiveErrors >= maxConsecutiveErrors) {
+                    if (statusIntervalId) { clearInterval(statusIntervalId); }
+                    statusIntervalId = null;
+                }
+            })
+            .finally(function(){ if (spin) spin.classList.add('d-none'); });
+    }
+
+    function showWarning(text) {
+        var warn = document.getElementById('statsWarning');
+        warn.textContent = text;
+        warn.classList.remove('d-none');
+    }
+
+    function truncateMount(m) {
+        if (!m) return '';
+        if (m.length <= 15) return m;
+        return m.slice(0, 15) + '…';
+    }
+
+    function renderStats(stats) {
+        document.getElementById('statsLoading').classList.add('d-none');
+        document.getElementById('statsContent').classList.remove('d-none');
+
+        // CPU
+        var usedPct = Number((stats.cpu && stats.cpu.used_pct) || 0);
+        var usedBar = document.getElementById('cpu-used');
+        usedBar.style.width = usedPct + '%';
+        usedBar.textContent = usedPct + '%';
+        usedBar.classList.remove('bg-success','bg-warning','bg-danger');
+        usedBar.classList.add(usedPct < 50 ? 'bg-success' : (usedPct < 80 ? 'bg-warning' : 'bg-danger'));
+        document.getElementById('cpu-used-label').textContent = usedPct + '%';
+        document.getElementById('cpu-cores').textContent = (stats.cpu && stats.cpu.cores) || 0;
+        document.getElementById('cpu-kernel').textContent = (stats.cpu && stats.cpu.kernel) || '';
+
+        // Memory
+        var mem = stats.mem || {};
+        var memPct = Number(mem.used_pct || 0);
+        document.getElementById('mem-total').textContent = (mem.total_mb || 0) + ' MB';
+        document.getElementById('mem-used').textContent = (mem.used_mb || 0) + ' / ' + (mem.avail_mb || 0) + ' MB';
+        var memBar = document.getElementById('mem-used-bar');
+        memBar.style.width = memPct + '%';
+        memBar.classList.remove('bg-info','bg-warning','bg-danger');
+        memBar.classList.add(memPct < 70 ? 'bg-info' : (memPct < 90 ? 'bg-warning' : 'bg-danger'));
+        document.getElementById('mem-used-label').textContent = memPct + '%';
+        var swap = stats.swap || {};
+        document.getElementById('swap-used').textContent = (swap.used_mb || 0) + ' / ' + (swap.total_mb || 0) + ' MB (' + (swap.used_pct || 0) + '%)';
+
+        // Load / Uptime
+        var load = stats.load || {};
+        document.getElementById('load-avg').textContent = (load['1m'] || '-') + ', ' + (load['5m'] || '-') + ', ' + (load['15m'] || '-');
+        document.getElementById('uptime').textContent = stats.uptime || '';
+
+        // Docker short
+        var docker = stats.docker || {};
+        var dockerShortText = (docker.present ? 'present' : 'absent') + (docker.present ? (', running: ' + (docker.running || 0)) : '');
+        var names = docker.names || [];
+        if (names.length > 0) {
+            var shown = names.slice(0, 2).join(', ');
+            var extra = names.length - 2;
+            if (extra > 0) shown += ' +' + extra;
+            dockerShortText += ' [' + shown + ']';
+        }
+        document.getElementById('docker-short').textContent = dockerShortText;
+        var dockerVerEl = document.getElementById('docker-version');
+        dockerVerEl.textContent = docker.version || '';
+        dockerVerEl.title = docker.version || '';
+
+        // Networks + RX/TX badges
+        var netList = document.getElementById('net-list');
+        netList.innerHTML = '';
+        var nets = stats.net || [];
+        var traffic = stats.traffic || [];
+        function findTraffic(iface) {
+            for (var i = 0; i < traffic.length; i++) {
+                if (traffic[i].iface === iface) return traffic[i];
+            }
+            return { rx_bytes: 0, tx_bytes: 0 };
+        }
+        for (var i = 0; i < nets.length; i++) {
+            var n = nets[i];
+            var t = findTraffic(n.iface);
+            var li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = '<div><strong>' + n.iface + '</strong> <span class="text-muted">' + (n.addr || '') + '</span></div>' +
+                           '<div>' +
+                           '<span class="badge bg-secondary me-1" title="RX — принято">RX: ' + bytesToHuman(t.rx_bytes) + '</span>' +
+                           '<span class="badge bg-secondary" title="TX — отправлено">TX: ' + bytesToHuman(t.tx_bytes) + '</span>' +
+                           '</div>';
+            netList.appendChild(li);
+        }
+
+        // Disks
+        var disksEl = document.getElementById('disks-list');
+        disksEl.innerHTML = '';
+        var disks = stats.disks || [];
+        for (var j = 0; j < disks.length; j++) {
+            var d = disks[j];
+            var col = document.createElement('div');
+            col.className = 'col-md-4 mb-2';
+            var mountShort = truncateMount(d.mount);
+            var mountTitle = d.mount || '';
+            col.innerHTML = '<div class="border rounded p-2" title="' + mountTitle + '">' +
+                            '<div class="small text-muted">' + mountShort + '</div>' +
+                            '<div>' + d.used + ' / ' + d.size + ' (' + d.pcent + ')</div>' +
+                            '</div>';
+            disksEl.appendChild(col);
+        }
+
+        // Inodes
+        var inodesEl = document.getElementById('inodes-list');
+        inodesEl.innerHTML = '';
+        var inodes = stats.inodes || [];
+        for (var k = 0; k < inodes.length; k++) {
+            var inode = inodes[k];
+            var col2 = document.createElement('div');
+            col2.className = 'col-md-4 mb-2';
+            var mShort = truncateMount(inode.mount);
+            var mTitle = inode.mount || '';
+            col2.innerHTML = '<div class="border rounded p-2" title="' + mTitle + '">' +
+                             '<div class="small text-muted">' + mShort + '</div>' +
+                             '<div>' + inode.iused + ' / ' + inode.inodes + ' (' + inode.ipcent + ')</div>' +
+                             '</div>';
+            inodesEl.appendChild(col2);
+        }
+
+        // Processes table
+        var procWrap = document.getElementById('proc-table');
+        var procs = stats.processes || [];
+        var procHtml = '<table class="table table-sm table-striped"><thead><tr><th>PID</th><th>CMD</th><th>CPU %</th><th>MEM %</th></tr></thead><tbody>';
+        for (var p = 0; p < procs.length; p++) {
+            var pr = procs[p];
+            procHtml += '<tr><td>' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
+        }
+        procHtml += '</tbody></table>';
+        procWrap.innerHTML = procHtml;
+
+        // Docker table
+        var dockWrap = document.getElementById('docker-table');
+        var containers = (stats.docker && stats.docker.containers) || [];
+        if (containers.length === 0) {
+            dockWrap.innerHTML = '<div class="text-muted">No containers</div>';
+        } else {
+            var dhtml = '<table class="table table-sm table-striped"><thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
+            for (var c = 0; c < containers.length; c++) {
+                var ct = containers[c];
+                dhtml += '<tr><td>' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + (ct.ports || '') + '</td><td>' + (ct.size || '') + '</td></tr>';
+            }
+            dhtml += '</tbody></table>';
+            dockWrap.innerHTML = dhtml;
+        }
+
+        // Missing tools warning
+        var warn = document.getElementById('statsWarning');
+        if (stats.missing_tools && stats.missing_tools.length > 0) {
+            var cmd = stats.install_hint || '';
+            var html = '<div class="d-flex justify-content-between align-items-center">' +
+                       '<div><strong>Отсутствуют утилиты:</strong> ' + stats.missing_tools.join(', ') + '</div>' +
+                       (cmd ? '<button class="btn btn-sm btn-outline-dark ms-2" id="copyInstallCmdBtn">Скопировать команду</button>' : '') +
+                       '</div>' + (cmd ? '<div class="mt-2"><code>' + cmd + '</code></div>' : '');
+            warn.innerHTML = html;
+            warn.classList.remove('d-none');
+            var copyBtn = document.getElementById('copyInstallCmdBtn');
+            if (copyBtn && cmd) {
+                copyBtn.addEventListener('click', function(){ navigator.clipboard.writeText(cmd); });
+            }
+        } else {
+            warn.classList.add('d-none');
+            warn.textContent = '';
+        }
+    }
+</script>
+<script>
+    // Сохранение модалки статуса как PNG
+    document.addEventListener('DOMContentLoaded', function(){
+        var btn = document.getElementById('saveStatusImageBtn');
+        if (btn) {
+            btn.addEventListener('click', function(){
+                if (typeof ensureHtml2CanvasLoaded === 'function') {
+                    ensureHtml2CanvasLoaded(captureStatusModal);
+                } else if (window.html2canvas) {
+                    captureStatusModal();
+                } else {
+                    // Всегда пробуем локальный vendor-роут
+                    var s = document.createElement('script');
+                    s.src = '/vendor/html2canvas.min.js';
+                    s.onload = captureStatusModal;
+                    document.head.appendChild(s);
+                }
+            });
+        }
+    });
+
+    function captureStatusModal(){
+        var modalEl = document.getElementById('serverStatusModal');
+        if (!modalEl) { return; }
+        var content = modalEl.querySelector('.modal-content');
+        if (!content) { return; }
+        // Временно увеличим масштаб для лучшего качества
+        var scale = window.devicePixelRatio || 1;
+        var prevTransform = content.style.transform;
+        content.style.transform = 'scale(1)';
+        window.html2canvas(content, { backgroundColor: null, scale: Math.max(2, scale) })
+            .then(function(canvas){
+                content.style.transform = prevTransform || '';
+                var dataUrl = canvas.toDataURL('image/png');
+                // Отправим на бэкенд для сохранения в Downloads
+                fetch('/snapshot/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data_url: dataUrl }) })
+                    .then(function(r){ return r.json(); })
+                    .then(function(resp){
+                        if (resp && resp.success) {
+                            alert('PNG сохранён: ' + resp.filename + '\nПапка: ' + resp.dir);
+                        } else {
+                            // фолбэк локальной загрузкой
+                            var link = document.createElement('a');
+                            link.download = 'server_status.png';
+                            link.href = dataUrl;
+                            link.click();
+                        }
+                    })
+                    .catch(function(){
+                        var link = document.createElement('a');
+                        link.download = 'server_status.png';
+                        link.href = dataUrl;
+                        link.click();
+                    });
+            })
+            .catch(function(err){
+                console.error('Ошибка сохранения изображения:', err);
+                alert('Не удалось сохранить изображение');
+            });
     }
 </script>
 {% endblock %}

@@ -1,10 +1,10 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "3.6.9",
-    "release_date": "28.09.2025",
+    "version": "3.7.0",
+    "release_date": "02.10.2025",
     "developer": "Куреин М.Н.",
-    "last_updated": "2025-09-28"
+    "last_updated": "2025-10-02"
   },
   "service_urls": {
     "ip_check_api": "https://ipinfo.io/{ip}/json",
@@ -12,7 +12,7 @@
     "general_dns_test": "https://dnsleaktest.com/",
     "ip2location_demo": "https://www.ip2location.com/demo/{ip}"
   },
-  "active_data_file": "data/servers.json.enc",
+  "active_data_file": "/Users/olgazaharova/Project/ProjectPython/VPNserverManage-Clean/data/merged_20251002_125645.enc",
   "secret_pin": {
     "default_pin": "1234",
     "current_pin": "1234",
