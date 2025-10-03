@@ -921,21 +921,50 @@ def import_archive_with_pin():
 
 @app.route('/pin/first_time_setup', methods=['POST'])
 def first_time_setup():
-    """Настройка для первого запуска - создание нового PIN и сброс данных."""
+    """Настройка для первого запуска - создание нового PIN и сброс данных.
+    
+    БЕЗОПАСНОСТЬ: Эта функция разрешена ТОЛЬКО если:
+    - Данных еще нет (пустой файл или файл не существует)
+    - Это предотвращает удаление существующих данных посторонними лицами
+    """
     try:
+        # КРИТИЧЕСКАЯ ПРОВЕРКА БЕЗОПАСНОСТИ: проверяем, есть ли уже данные
+        active_file = get_active_data_path()
+        has_existing_data = False
+        
+        if active_file and os.path.exists(active_file):
+            try:
+                with open(active_file, 'rb') as f:
+                    encrypted_data = f.read()
+                    if encrypted_data:
+                        decrypted_data = fernet.decrypt(encrypted_data).decode('utf-8')
+                        servers = json.loads(decrypted_data)
+                        # Если есть хотя бы один сервер - данные существуют
+                        if servers and len(servers) > 0:
+                            has_existing_data = True
+            except Exception:
+                # Если не можем прочитать - считаем что данных нет
+                has_existing_data = False
+        
+        # БЛОКИРУЕМ "Первый запуск" если данные уже существуют
+        if has_existing_data:
+            return jsonify({
+                'success': False, 
+                'message': 'Ошибка безопасности: Данные уже существуют. Используйте обычный вход по PIN-коду. Если забыли PIN - используйте функцию "Импортировать из архива".'
+            }), 403
+        
         new_pin = request.form.get('new_pin', '').strip()
         
         if not new_pin or len(new_pin) < 4:
             return jsonify({'success': False, 'message': 'PIN должен содержать минимум 4 символа'})
         
-        # Создаем новый PIN без проверки старого
+        # Создаем новый PIN без проверки старого (разрешено только если данных нет)
         success, message = pin_auth.change_pin_without_old(new_pin)
         
         if success:
             # Сохраняем обновленную конфигурацию
             save_app_config()
-            # Сбрасываем данные - создаем пустой файл данных
-            active_file = get_active_data_path()
+            # Создаем пустой файл данных
             if active_file:
                 # Создаем пустой зашифрованный файл
                 empty_data = json.dumps([], ensure_ascii=False, indent=2)
@@ -2459,18 +2488,24 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
                             pass
 
         # Disks
-        df_out = _ssh_run(ssh, "df -h --output=target,size,used,avail,pcent | tail -n +2")
-        if df_out:
-            for line in df_out.splitlines():
-                cols = [c for c in line.split() if c]
-                if len(cols) >= 5:
-                    result["disks"].append({
-                        "mount": cols[0],
-                        "size": cols[1],
-                        "used": cols[2],
-                        "avail": cols[3],
-                        "pcent": cols[4]
-                    })
+        df_lines = _ssh_run(ssh, "df -hP / /boot/efi /var/lib/docker 2>/dev/null | tail -n +2 | awk '{{print $6\",\"$2\",\"$3\",\"$4\",\"$5}}' || true").splitlines()
+        disks: list[dict[str, any]] = []
+        seen_mounts = set()  # Для отслеживания уникальных точек монтирования
+        for ln in df_lines:
+            parts = (ln.split(',') + ['', '', '', '', ''])[:5]
+            mount_point = parts[0]
+            # Пропускаем дубликаты (например, /var/lib/docker на том же разделе что и /)
+            if mount_point and mount_point not in seen_mounts:
+                seen_mounts.add(mount_point)
+                disks.append({
+                    "mount": mount_point,
+                    "size": parts[1],
+                    "used": parts[2],
+                    "avail": parts[3],
+                    "pcent": parts[4]
+                })
+        result["disks"] = disks
+        
         # Inodes with robust fallback
         inode_out = _ssh_run(ssh, "df -i --output=target,inodes,iused,ipcent | tail -n +2")
         if not inode_out:
@@ -2515,20 +2550,49 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
                         "pid": pid, "cmd": cmd, "cpu": cpu_p, "mem": mem_p
                     })
 
-        # Network interfaces and addresses
-        ip_out = _ssh_run(ssh, "ip -o -4 addr show")
-        if not ip_out:
-            ip_out = _ssh_run(ssh, "ifconfig | grep -E '^[a-zA-Z0-9]+' -A1")
+        # Network interfaces and addresses (IPv4 & IPv6)
+        ip_out = _ssh_run(ssh, "ip -o addr show")
+        net_interfaces = {}
         if ip_out:
             for line in ip_out.splitlines():
-                if 'inet ' in line:
-                    try:
-                        parts = line.split()
-                        iface = parts[1]
-                        addr = parts[3].split('/')[0]
-                        result["net"].append({"iface": iface, "addr": addr})
-                    except Exception:
-                        pass
+                try:
+                    parts = line.split()
+                    iface, family, addr_full = parts[1], parts[2], parts[3]
+                    addr = addr_full
+                    if iface not in net_interfaces:
+                        net_interfaces[iface] = {"addr4": "", "addr6": ""}
+                    if family == "inet" and not net_interfaces[iface]["addr4"]:
+                        net_interfaces[iface]["addr4"] = addr
+                    elif family == "inet6" and not net_interfaces[iface]["addr6"]:
+                        net_interfaces[iface]["addr6"] = addr
+                except Exception:
+                    pass
+        
+        # Fallback to ifconfig if 'ip' tool is not available
+        if not net_interfaces:
+            ifconfig_out = _ssh_run(ssh, "ifconfig")
+            if ifconfig_out:
+                current_iface = ""
+                for line in ifconfig_out.splitlines():
+                    if line and not line.startswith(' '):
+                        current_iface = line.split()[0].strip().strip(':')
+                        if current_iface and current_iface not in net_interfaces:
+                            net_interfaces[current_iface] = {"addr4": "", "addr6": ""}
+                    elif 'inet ' in line and 'inet6' not in line:
+                        try:
+                            addr4 = line.split('inet ')[1].split()[0]
+                            if current_iface and not net_interfaces[current_iface]["addr4"]:
+                                net_interfaces[current_iface]["addr4"] = addr4
+                        except Exception: pass
+                    elif 'inet6 ' in line:
+                        try:
+                            addr6 = line.split('inet6 ')[1].split()[0]
+                            if current_iface and not net_interfaces[current_iface]["addr6"]:
+                                net_interfaces[current_iface]["addr6"] = addr6
+                        except Exception: pass
+        
+        result["net"] = [{"iface": name, **data} for name, data in net_interfaces.items()]
+
 
         # Traffic counters
         # List interfaces in /sys/class/net
@@ -2749,6 +2813,56 @@ def snapshot_save():
         return jsonify({"success": True, "filename": filename, "dir": export_dir})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/pin/check_first_setup_allowed', methods=['GET'])
+def check_first_setup_allowed():
+    """Проверяет, разрешен ли первый запуск (нет данных)."""
+    try:
+        active_file = get_active_data_path()
+        has_existing_data = False
+        
+        if active_file and os.path.exists(active_file):
+            try:
+                with open(active_file, 'rb') as f:
+                    encrypted_data = f.read()
+                    if encrypted_data:
+                        decrypted_data = fernet.decrypt(encrypted_data).decode('utf-8')
+                        servers = json.loads(decrypted_data)
+                        if servers and len(servers) > 0:
+                            has_existing_data = True
+            except Exception:
+                has_existing_data = False
+        
+        return jsonify({'allowed': not has_existing_data})
+    except Exception as e:
+        return jsonify({'allowed': False, 'error': str(e)})
+
+@app.route('/pin/change', methods=['POST'])
+@pin_auth.require_auth
+def change_pin():
+    """Изменяет PIN-код пользователя."""
+    try:
+        old_pin = request.form.get('old_pin', '').strip()
+        new_pin = request.form.get('new_pin', '').strip()
+        
+        if not old_pin or not new_pin:
+            return jsonify({'success': False, 'message': 'Необходимо ввести старый и новый PIN-код'}), 400
+        
+        if not pin_auth.is_authenticated():
+            return jsonify({'success': False, 'message': 'Пользователь не аутентифицирован'}), 401
+        
+        if not pin_auth.authenticate_pin(old_pin):
+            return jsonify({'success': False, 'message': 'Неверный старый PIN-код'}), 400
+        
+        success, message = pin_auth.change_pin(old_pin, new_pin)
+        
+        if success:
+            save_app_config()
+            return jsonify({'success': True, 'message': 'PIN-код успешно изменен'})
+        else:
+            return jsonify({'success': False, 'message': message}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Ошибка при изменении PIN: {str(e)}'}), 500
 
 if __name__ == "__main__":
     # Выполняем проверку и миграцию при старте приложения
