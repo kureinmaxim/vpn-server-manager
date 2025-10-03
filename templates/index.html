@@ -79,9 +79,14 @@
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
                     <h5 class="card-title mb-0 d-flex align-items-center">
                         {% if server.icon_filename %}
-                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" alt="icon" class="me-2" style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;">
+                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" 
+                                 alt="icon" 
+                                 class="me-2" 
+                                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                            <i class="bi {{ server.os_icon }} me-2" style="display: none; font-size: 32px;"></i>
                         {% else %}
-                            <i class="bi {{ server.os_icon }} me-2"></i>
+                            <i class="bi {{ server.os_icon }} me-2" style="font-size: 32px;"></i>
                         {% endif %}
                         {{ server.name }}
                     </h5>
@@ -659,10 +664,34 @@
                     <div class="col-12 col-md-4">
                         <div class="card card-body h-100">
                             <strong class="mb-2" title="Сводка">Summary</strong>
-                            <div class="small"><span class="text-muted">Uptime:</span> ${engUptime}</div>
-                            <div class="small mt-1"><span class="text-muted">Docker:</span> ${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}</div>
-                            <div class="small mt-1 text-truncate" title="${dockerVersion}"><span class="text-muted">Version:</span> ${dockerVersion||'-'}</div>
-                            ${dockerNames && dockerNames.length ? `<div class="small mt-1 text-truncate"><span class="text-muted">Containers:</span> ${dockerNames.slice(0,2).join(', ')}${dockerNames.length>2?` +${dockerNames.length-2}`:''}</div>` : ''}
+                            <div class="d-flex justify-content-between small">
+                                <span class="text-muted">Uptime:</span>
+                                <span class="text-end">${engUptime}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">OS:</span>
+                                <span class="text-end">${(s && s.os) ? s.os : '-'}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1" title="${kernel}">
+                                <span class="text-muted">Kernel:</span>
+                                <span class="text-end text-truncate" style="max-width: 60%;">${kernel}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">CPU Cores:</span>
+                                <span class="text-end">${cpuCores}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">Docker:</span>
+                                <span class="text-end">${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small mt-1" title="${dockerVersion}">
+                                <span class="text-muted">Version:</span>
+                                <span class="text-end text-truncate" style="max-width: 60%;">${dockerVersion||'-'}</span>
+                            </div>
+                            ${dockerNames && dockerNames.length ? `<div class="d-flex justify-content-between small mt-1">
+                                <span class="text-muted">Containers:</span>
+                                <span class="text-end text-truncate" style="max-width: 60%;">${dockerNames.slice(0,2).join(', ')}${dockerNames.length>2?` +${dockerNames.length-2}`:''}</span>
+                            </div>` : ''}
                         </div>
                     </div>
                     <div class="col-12"> 
@@ -685,8 +714,8 @@
                             </div>
                             <ul class="list-group list-group-flush mb-2">${nets}</ul>
                             ${dockerContainers && dockerContainers.length ? `
-                            <div class="mt-2 small">
-                                <strong>Docker containers (top):</strong>
+                            <div class="mt-2">
+                                <strong title="Запущенные Docker контейнеры">Docker containers</strong>
                                 <div class="table-responsive">
                                     <table class="table table-sm table-dark align-middle">
                                         <thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead>
