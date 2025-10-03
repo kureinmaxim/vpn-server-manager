@@ -888,21 +888,50 @@ def import_archive_with_pin():
 
 @app.route('/pin/first_time_setup', methods=['POST'])
 def first_time_setup():
-    """Настройка для первого запуска - создание нового PIN и сброс данных."""
+    """Настройка для первого запуска - создание нового PIN и сброс данных.
+    
+    БЕЗОПАСНОСТЬ: Эта функция разрешена ТОЛЬКО если:
+    - Данных еще нет (пустой файл или файл не существует)
+    - Это предотвращает удаление существующих данных посторонними лицами
+    """
     try:
+        # КРИТИЧЕСКАЯ ПРОВЕРКА БЕЗОПАСНОСТИ: проверяем, есть ли уже данные
+        active_file = get_active_data_path()
+        has_existing_data = False
+        
+        if active_file and os.path.exists(active_file):
+            try:
+                with open(active_file, 'rb') as f:
+                    encrypted_data = f.read()
+                    if encrypted_data:
+                        decrypted_data = fernet.decrypt(encrypted_data).decode('utf-8')
+                        servers = json.loads(decrypted_data)
+                        # Если есть хотя бы один сервер - данные существуют
+                        if servers and len(servers) > 0:
+                            has_existing_data = True
+            except Exception:
+                # Если не можем прочитать - считаем что данных нет
+                has_existing_data = False
+        
+        # БЛОКИРУЕМ "Первый запуск" если данные уже существуют
+        if has_existing_data:
+            return jsonify({
+                'success': False, 
+                'message': 'Ошибка безопасности: Данные уже существуют. Используйте обычный вход по PIN-коду. Если забыли PIN - используйте функцию "Импортировать из архива".'
+            }), 403
+        
         new_pin = request.form.get('new_pin', '').strip()
         
         if not new_pin or len(new_pin) < 4:
             return jsonify({'success': False, 'message': 'PIN должен содержать минимум 4 символа'})
         
-        # Создаем новый PIN без проверки старого
+        # Создаем новый PIN без проверки старого (разрешено только если данных нет)
         success, message = pin_auth.change_pin_without_old(new_pin)
         
         if success:
             # Сохраняем обновленную конфигурацию
             save_app_config()
-            # Сбрасываем данные - создаем пустой файл данных
-            active_file = get_active_data_path()
+            # Создаем пустой файл данных
             if active_file:
                 # Создаем пустой зашифрованный файл
                 empty_data = json.dumps([], ensure_ascii=False, indent=2)
@@ -921,6 +950,29 @@ def first_time_setup():
             
     except Exception as e:
         return jsonify({'success': False, 'message': f'Ошибка настройки: {e}'}), 500
+
+@app.route('/pin/check_first_setup_allowed', methods=['GET'])
+def check_first_setup_allowed():
+    """Проверяет, разрешен ли первый запуск (нет данных)."""
+    try:
+        active_file = get_active_data_path()
+        has_existing_data = False
+        
+        if active_file and os.path.exists(active_file):
+            try:
+                with open(active_file, 'rb') as f:
+                    encrypted_data = f.read()
+                    if encrypted_data:
+                        decrypted_data = fernet.decrypt(encrypted_data).decode('utf-8')
+                        servers = json.loads(decrypted_data)
+                        if servers and len(servers) > 0:
+                            has_existing_data = True
+            except Exception:
+                has_existing_data = False
+        
+        return jsonify({'allowed': not has_existing_data})
+    except Exception as e:
+        return jsonify({'allowed': False, 'error': str(e)})
 
 @app.route('/pin/logout', methods=['POST'])
 def pin_logout():
@@ -1907,15 +1959,20 @@ def _collect_stats_via_ssh(host: str, user: str, password: str, port: int = 22, 
 
         df_lines = _ssh_run(ssh, "df -hP / /boot/efi /var/lib/docker 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$4\",\"$5}' || true").splitlines()
         disks: List[Dict[str, Any]] = []
+        seen_mounts = set()  # Для отслеживания уникальных точек монтирования
         for ln in df_lines:
             parts = (ln.split(',') + ['', '', '', '', ''])[:5]
-            disks.append({
-                "mount": parts[0],
-                "size": parts[1],
-                "used": parts[2],
-                "avail": parts[3],
-                "pcent": parts[4]
-            })
+            mount_point = parts[0]
+            # Пропускаем дубликаты (например, /var/lib/docker на том же разделе что и /)
+            if mount_point and mount_point not in seen_mounts:
+                seen_mounts.add(mount_point)
+                disks.append({
+                    "mount": mount_point,
+                    "size": parts[1],
+                    "used": parts[2],
+                    "avail": parts[3],
+                    "pcent": parts[4]
+                })
 
         # Inodes
         di_lines = _ssh_run(ssh, "df -iP 2>/dev/null | tail -n +2 | awk '{print $6\",\"$2\",\"$3\",\"$5}' || true").splitlines()
