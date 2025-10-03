@@ -187,6 +187,11 @@ cache/
 data/*.backup
 data/temp_*
 
+# Конфиденциальные данные пользователя
+data/*.enc
+pin_block_state.json
+uploads/
+
 # Файлы сборки и дистрибуции
 *.dmg
 *.pkg
