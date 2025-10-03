@@ -82,9 +82,14 @@
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
                     <h5 class="card-title mb-0 d-flex align-items-center">
                         {% if server.icon_filename %}
-                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" alt="icon" class="me-2" style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;">
+                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" 
+                                 alt="icon" 
+                                 class="me-2" 
+                                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                            <i class="bi {{ server.os_icon }} me-2" style="display: none; font-size: 32px;"></i>
                         {% else %}
-                            <i class="bi {{ server.os_icon }} me-2"></i>
+                            <i class="bi {{ server.os_icon }} me-2" style="font-size: 32px;"></i>
                         {% endif %}
                         {{ server.name }}
                     </h5>
@@ -373,6 +378,7 @@
             <span id="statusServerIp" class="ms-1 text-muted"></span>
         </h5>
         <div class="ms-auto d-flex align-items-center">
+            <small id="uptime-header" class="text-muted me-2"></small>
             <small id="lastUpdatedLabel" class="text-muted me-2"></small>
             <div id="refreshSpin" class="spinner-border spinner-border-sm d-none" role="status">
                 <span class="visually-hidden">Loading...</span>
@@ -387,89 +393,77 @@
         </div>
         <div id="statsWarning" class="alert alert-warning d-none"></div>
         <div id="statsContent" class="d-none">
-          <div class="row g-3">
-            <div class="col-md-4">
+          <div class="row">
+            <!-- Top Row -->
+            <div class="col-lg-4 mb-3">
               <div class="card h-100">
                 <div class="card-body">
-                  <h6 class="card-title">CPU</h6>
-                  <div class="d-flex justify-content-between"><span title="Версия ядра Linux">Kernel:</span><span id="cpu-kernel"></span></div>
-                  <div class="d-flex justify-content-between"><span title="Операционная система">OS:</span><span id="os-name"></span></div>
-                  <div class="d-flex justify-content-between"><span>Cores:</span><span id="cpu-cores"></span></div>
-                  <div class="mt-2">
-                    <div class="progress" style="height: 20px;">
-                      <div id="cpu-used" class="progress-bar" role="progressbar" style="width: 0%;"></div>
-                    </div>
-                    <div class="text-end small mt-1"><span id="cpu-used-label">0%</span></div>
+                  <!-- CPU -->
+                  <h5>CPU</h5>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div id="cpu-used-thin-bar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="card h-100">
-                <div class="card-body">
-                  <h6 class="card-title" title="Оперативная память">Memory</h6>
-                  <div class="d-flex justify-content-between"><span>Total:</span><span id="mem-total"></span></div>
-                  <div class="d-flex justify-content-between"><span>Used/Avail:</span><span id="mem-used"></span></div>
-                  <div class="mt-2">
-                    <div class="progress" style="height: 20px;">
-                      <div id="mem-used-bar" class="progress-bar bg-info" role="progressbar" style="width: 0%;"></div>
-                    </div>
-                    <div class="text-end small mt-1"><span id="mem-used-label">0%</span></div>
+                  <div id="cpu-info" class="mb-3">
+                    <div class="d-flex justify-content-between small"><span>Cores:</span><strong id="cpu-cores"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Kernel:</span><strong id="cpu-kernel"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">OS:</span><strong id="os-name"></strong></div>
                   </div>
                   <hr>
-                  <div class="d-flex justify-content-between"><span>Swap:</span><span id="swap-used"></span></div>
+                  <!-- Memory -->
+                  <h5 class="mt-3">Memory</h5>
+                  <div class="progress mb-2" style="height: 20px;">
+                    <div id="mem-used-bar" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+                  </div>
+                   <div id="mem-info-2" class="mt-2">
+                    <div class="d-flex justify-content-between small"><span>Used/Total:</span><strong id="mem-used"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Load:</span><strong id="load-avg"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Swap:</span><strong id="swap-used"></strong></div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5>Storage</h5>
+                        <div id="disks-list"></div>
+                        <div id="inodes-table" class="mt-2 table-responsive"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-3">
               <div class="card h-100">
                 <div class="card-body">
-                  <h6 class="card-title" title="Системная нагрузка и время работы">Load / Uptime</h6>
-                  <div class="d-flex justify-content-between"><span>Load:</span><span id="load-avg"></span></div>
-                  <div class="d-flex justify-content-between"><span>Uptime:</span><span id="uptime"></span></div>
-                  <div class="d-flex justify-content-between mt-2"><span>Docker:</span><span id="docker-short"></span></div>
+                  <h5>Summary</h5>
+                  <div id="summary-list"></div>
                 </div>
               </div>
             </div>
-            <div class="col-12">
+
+            <!-- Full-width rows -->
+            <div class="col-12 mb-3">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title d-flex align-items-center justify-content-between" title="Сетевые интерфейсы и Docker">
-                    <span>Networks</span>
-                    <small id="docker-version" class="text-muted" title="Docker version"></small>
-                  </h6>
-                  <ul id="net-list" class="list-group"></ul>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title" title="Файловые системы (df -h)">Disks</h6>
-                  <div class="row" id="disks-list"></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title" title="Индексные дескрипторы (df -i)">Inodes</h6>
-                  <div class="row" id="inodes-list"></div>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="card">
-                <div class="card-body">
-                  <h6 class="card-title">Top processes</h6>
+                  <h5>Processes (Top by CPU)</h5>
                   <div id="proc-table" class="table-responsive"></div>
                 </div>
               </div>
             </div>
-            <div class="col-12">
+             <div class="col-12 mb-3">
               <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Docker containers</h6>
+                  <h5 class="d-flex justify-content-between">
+                    <span>Networks</span>
+                    <small id="docker-version" class="text-muted"></small>
+                  </h5>
+                  <ul id="net-list" class="list-group list-group-flush"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 title="Запущенные Docker контейнеры">Docker containers</h5>
                   <div id="docker-table" class="table-responsive"></div>
                 </div>
               </div>
@@ -613,6 +607,7 @@
         var nameEl = document.getElementById('statusServerName');
         var ipEl = document.getElementById('statusServerIp');
         var titleEl = document.getElementById('statusServerTitle');
+        var uptimeEl = document.getElementById('uptime-header');
 
         if (name && nameEl) { 
             nameEl.textContent = name;
@@ -629,6 +624,10 @@
         // Показываем "Статус сервера", если нет имени
         if (titleEl) {
             titleEl.textContent = name ? '{{ _("Статус сервера:") }}' : '{{ _("Статус сервера") }}';
+        }
+
+        if (uptimeEl) {
+            uptimeEl.textContent = ''; // Очищаем предыдущее содержимое
         }
     }
 
@@ -708,24 +707,27 @@
         warn.classList.remove('d-none');
     }
 
-    function truncateMount(m) {
+    function truncateMount(m, len) {
+        var a_len = len || 15;
         if (!m) return '';
-        if (m.length <= 15) return m;
-        return m.slice(0, 15) + '…';
+        if (m.length <= a_len) return m;
+        return m.slice(0, a_len) + '…';
     }
 
     function renderStats(stats) {
         document.getElementById('statsLoading').classList.add('d-none');
         document.getElementById('statsContent').classList.remove('d-none');
 
+        // Header Uptime
+        document.getElementById('uptime-header').textContent = 'Uptime: ' + (stats.uptime || '');
+
         // CPU
         var usedPct = Number((stats.cpu && stats.cpu.used_pct) || 0);
-        var usedBar = document.getElementById('cpu-used');
+        var usedBar = document.getElementById('cpu-used-thin-bar');
         usedBar.style.width = usedPct + '%';
-        usedBar.textContent = usedPct + '%';
+        // usedBar.textContent = usedPct.toFixed(1) + '%'; // Текст не нужен для тонкой полосы
         usedBar.classList.remove('bg-success','bg-warning','bg-danger');
         usedBar.classList.add(usedPct < 50 ? 'bg-success' : (usedPct < 80 ? 'bg-warning' : 'bg-danger'));
-        document.getElementById('cpu-used-label').textContent = usedPct + '%';
         document.getElementById('cpu-cores').textContent = (stats.cpu && stats.cpu.cores) || 0;
         document.getElementById('cpu-kernel').textContent = (stats.cpu && stats.cpu.kernel) || '';
         document.getElementById('os-name').textContent = stats.os || '';
@@ -733,36 +735,33 @@
         // Memory
         var mem = stats.mem || {};
         var memPct = Number(mem.used_pct || 0);
-        document.getElementById('mem-total').textContent = (mem.total_mb || 0) + ' MB';
-        document.getElementById('mem-used').textContent = (mem.used_mb || 0) + ' / ' + (mem.avail_mb || 0) + ' MB';
+        document.getElementById('mem-used').textContent = `${mem.used_mb || 0}MB (${memPct.toFixed(1)}%) / ${mem.total_mb || 0}MB`;
         var memBar = document.getElementById('mem-used-bar');
         memBar.style.width = memPct + '%';
+        memBar.textContent = memPct.toFixed(1) + '%';
         memBar.classList.remove('bg-info','bg-warning','bg-danger');
         memBar.classList.add(memPct < 70 ? 'bg-info' : (memPct < 90 ? 'bg-warning' : 'bg-danger'));
-        document.getElementById('mem-used-label').textContent = memPct + '%';
-        memBar.textContent = memPct + '%';
         var swap = stats.swap || {};
         document.getElementById('swap-used').textContent = (swap.used_mb || 0) + ' / ' + (swap.total_mb || 0) + ' MB (' + (swap.used_pct || 0) + '%)';
-
-        // Load / Uptime
         var load = stats.load || {};
         document.getElementById('load-avg').textContent = (load['1m'] || '-') + ', ' + (load['5m'] || '-') + ', ' + (load['15m'] || '-');
-        document.getElementById('uptime').textContent = stats.uptime || '';
 
-        // Docker short
+        // Summary
+        var summaryEl = document.getElementById('summary-list');
         var docker = stats.docker || {};
-        var dockerShortText = (docker.present ? 'present' : 'absent') + (docker.present ? (', running: ' + (docker.running || 0)) : '');
-        var names = docker.names || [];
-        if (names.length > 0) {
-            var shown = names.slice(0, 2).join(', ');
-            var extra = names.length - 2;
-            if (extra > 0) shown += ' +' + extra;
-            dockerShortText += ' [' + shown + ']';
-        }
-        document.getElementById('docker-short').textContent = dockerShortText;
-        var dockerVerEl = document.getElementById('docker-version');
-        dockerVerEl.textContent = docker.version || '';
-        dockerVerEl.title = docker.version || '';
+        var dockerStatus = docker.present ? ('есть, running: ' + (docker.running || 0)) : 'нет';
+        var containerNames = (docker.names || []).join(', ');
+        summaryEl.innerHTML = `
+            <div class="d-flex justify-content-between small"><span>Uptime:</span><strong>${stats.uptime || ''}</strong></div>
+            <div class="d-flex justify-content-between small"><span>OS:</span><strong class="text-end">${stats.os || '-'}</strong></div>
+            <div class="d-flex justify-content-between small" title="${stats.cpu.kernel || ''}"><span class="text-muted">Kernel:</span><strong class="text-end text-truncate" style="max-width: 60%;">${stats.cpu.kernel || '-'}</strong></div>
+            <div class="d-flex justify-content-between small"><span>CPU Cores:</span><strong>${stats.cpu.cores || '-'}</strong></div>
+            <div class="d-flex justify-content-between small"><span>Docker:</span><strong>${dockerStatus}</strong></div>
+            <div class="d-flex justify-content-between small" title="${docker.version || ''}"><span>Version:</span><strong class="text-end text-truncate" style="max-width: 60%;">${docker.version || '-'}</strong></div>
+            ${containerNames ? `<div class="d-flex justify-content-between small" title="${containerNames}"><span>Containers:</span><strong class="text-end text-truncate" style="max-width: 60%;">${containerNames}</strong></div>` : ''}
+        `;
+        document.getElementById('docker-version').textContent = docker.version || '';
+
 
         // Networks + RX/TX badges
         var netList = document.getElementById('net-list');
@@ -779,56 +778,62 @@
             var n = nets[i];
             var t = findTraffic(n.iface);
             var li = document.createElement('li');
-            li.className = 'list-group-item d-flex justify-content-between align-items-center';
-            li.innerHTML = '<div><strong>' + n.iface + '</strong> <span class="text-muted">' + (n.addr || '') + '</span></div>' +
+            li.className = 'list-group-item d-flex justify-content-between align-items-center ps-0';
+
+            var addrs = [];
+            if (n.addr4) addrs.push(n.addr4);
+            if (n.addr6) addrs.push(n.addr6);
+            var addrString = addrs.length > 0 ? addrs.join(' ') : '-';
+            
+            li.innerHTML = '<div><strong>' + n.iface + '</strong> - <span class="text-muted">' + addrString + '</span></div>' +
                            '<div>' +
-                           '<span class="badge bg-secondary me-1" title="RX — принято">RX: ' + bytesToHuman(t.rx_bytes) + '</span>' +
-                           '<span class="badge bg-secondary" title="TX — отправлено">TX: ' + bytesToHuman(t.tx_bytes) + '</span>' +
+                           '<span class="badge bg-primary me-1" title="RX — принято">RX: ' + bytesToHuman(t.rx_bytes) + '</span>' +
+                           '<span class="badge bg-info" title="TX — отправлено">TX: ' + bytesToHuman(t.tx_bytes) + '</span>' +
                            '</div>';
             netList.appendChild(li);
         }
 
-        // Disks
+        // Disks with progress bars
         var disksEl = document.getElementById('disks-list');
         disksEl.innerHTML = '';
         var disks = stats.disks || [];
         for (var j = 0; j < disks.length; j++) {
             var d = disks[j];
-            var col = document.createElement('div');
-            col.className = 'col-md-4 mb-2';
-            var mountShort = truncateMount(d.mount);
-            var mountTitle = d.mount || '';
-            col.innerHTML = '<div class="border rounded p-2">' +
-                            '<div class="small text-muted">' + mountShort + '</div>' +
-                            '<div>' + d.used + ' / ' + d.size + ' (' + d.pcent + ')</div>' +
-                            '</div>';
-            disksEl.appendChild(col);
+            var pcent = parseInt(d.pcent.replace('%', ''), 10);
+            var pbarClass = pcent < 70 ? 'bg-success' : (pcent < 90 ? 'bg-warning' : 'bg-danger');
+            var item = document.createElement('div');
+            item.className = 'mb-2';
+            item.innerHTML = `
+                <div class="d-flex w-100 justify-content-between small">
+                    <span class="text-truncate" style="max-width: 50%;" title="${d.mount}">${d.mount}</span>
+                    <small>${d.used} / ${d.size}</small>
+                </div>
+                <div class="progress" style="height: 15px;">
+                    <div class="progress-bar ${pbarClass}" role="progressbar" style="width: ${pcent}%;" aria-valuenow="${pcent}" aria-valuemin="0" aria-valuemax="100">${pcent}%</div>
+                </div>
+            `;
+            disksEl.appendChild(item);
         }
 
-        // Inodes
-        var inodesEl = document.getElementById('inodes-list');
+        // Inodes table
+        var inodesEl = document.getElementById('inodes-table');
         inodesEl.innerHTML = '';
         var inodes = stats.inodes || [];
+        var inodesHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Точка</th><th>Всего</th><th>Исп.</th><th>%</th></tr></thead><tbody>';
         for (var k = 0; k < inodes.length; k++) {
             var inode = inodes[k];
-            var col2 = document.createElement('div');
-            col2.className = 'col-md-4 mb-2';
-            var mShort = truncateMount(inode.mount);
-            var mTitle = inode.mount || '';
-            col2.innerHTML = '<div class="border rounded p-2">' +
-                             '<div class="small text-muted">' + mShort + '</div>' +
-                             '<div>' + inode.iused + ' / ' + inode.inodes + ' (' + inode.ipcent + ')</div>' +
-                             '</div>';
-            inodesEl.appendChild(col2);
+            inodesHtml += '<tr><td class="ps-0">' + truncateMount(inode.mount, 20) + '</td><td>' + inode.inodes + '</td><td>' + inode.iused + '</td><td>' + inode.ipcent + '</td></tr>';
         }
+        inodesHtml += '</tbody></table>';
+        inodesEl.innerHTML = inodesHtml;
 
         // Processes table
         var procWrap = document.getElementById('proc-table');
         var procs = stats.processes || [];
-        var procHtml = '<table class="table table-sm table-striped"><thead><tr><th>PID</th><th>CMD</th><th>CPU %</th><th>MEM %</th></tr></thead><tbody>';
+        var procHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead><tbody>';
         for (var p = 0; p < procs.length; p++) {
             var pr = procs[p];
-            procHtml += '<tr><td>' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
+            procHtml += '<tr><td class="ps-0">' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
         }
         procHtml += '</tbody></table>';
         procWrap.innerHTML = procHtml;
@@ -839,7 +844,7 @@
         if (containers.length === 0) {
             dockWrap.innerHTML = '<div class="text-muted">No containers</div>';
         } else {
-            var dhtml = '<table class="table table-sm table-striped"><thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
+            var dhtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
             for (var c = 0; c < containers.length; c++) {
                 var ct = containers[c];
                 var portsCell = (ct.ports || '—');
@@ -848,7 +853,7 @@
                 if (sizeCell && sizeCell.indexOf('virtual') !== -1) {
                     sizeExplain = ' <small class="text-muted" title="0B=изменяемый слой; virtual=размер образа">(0B=измен., virtual=образ)</small>';
                 }
-                dhtml += '<tr><td>' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
+                dhtml += '<tr><td class="ps-0">' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
             }
             dhtml += '</tbody></table>';
             dockWrap.innerHTML = dhtml;
