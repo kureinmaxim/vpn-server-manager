@@ -19,6 +19,7 @@ VPNserverManage-Clean/
 ├── generate_key.py              # Утилита генерации SECRET_KEY
 ├── decrypt_tool.py              # Инструмент для расшифровки данных
 ├── pin_auth.py                  # Система PIN-аутентификации
+├── pin_block_state.json         # Состояние блокировки PIN-кода
 │
 ├── data/                        # Данные проекта (зашифрованные и служебные)
 │   ├── servers.json.enc

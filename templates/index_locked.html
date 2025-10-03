@@ -19,7 +19,7 @@
                         {{ _('Для доступа к данным серверов необходимо ввести PIN-код.') }}
                     </p>
                     
-                    <div class="alert alert-info" role="alert">
+                    <div id="firstTimeHint" class="alert alert-info" role="alert" style="display: none;">
                         <i class="bi bi-lightbulb"></i>
                         <strong>{{ _('Совет:') }}</strong> {{ _('Если вы используете приложение впервые, нажмите кнопку "Первый запуск" для создания PIN-кода.') }}
                     </div>
@@ -39,7 +39,7 @@
                         <button type="button" class="btn btn-primary btn-lg px-4" onclick="showPinLoginModal()" id="pinLoginButton">
                             <i class="bi bi-key"></i> {{ _('Ввести PIN') }}
                         </button>
-                        <button type="button" class="btn btn-secondary btn-lg px-4" onclick="showFirstTimeSetup()">
+                        <button id="firstSetupButton" type="button" class="btn btn-secondary btn-lg px-4" onclick="showFirstTimeSetup()" style="display: none;">
                             <i class="bi bi-plus-circle"></i> {{ _('Первый запуск') }}
                         </button>
                     </div>
@@ -364,6 +364,35 @@
     
     // Вызываем проверку блокировки сразу
     checkBlockStatus();
+
+    // Проверка доступности "Первого запуска" (только если нет данных)
+    function checkFirstSetupAllowed() {
+        fetch('/pin/check_first_setup_allowed')
+            .then(response => response.json())
+            .then(data => {
+                const button = document.getElementById('firstSetupButton');
+                const hint = document.getElementById('firstTimeHint');
+                
+                if (data.allowed) {
+                    // Показываем кнопку и подсказку только если данных нет
+                    button.style.display = 'inline-block';
+                    hint.style.display = 'block';
+                } else {
+                    // Скрываем кнопку если данные уже существуют (защита от несанкционированного доступа)
+                    button.style.display = 'none';
+                    hint.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка проверки первого запуска:', error);
+                // В случае ошибки скрываем кнопку для безопасности
+                document.getElementById('firstSetupButton').style.display = 'none';
+                document.getElementById('firstTimeHint').style.display = 'none';
+            });
+    }
+
+    // Проверяем доступность "Первого запуска" при загрузке страницы
+    checkFirstSetupAllowed();
     
     // Функция показа модального окна входа по PIN
     function showPinLoginModal() {

@@ -114,3 +114,72 @@
         opacity: 1;
     }
 }
+
+/* Стили для модального окна статуса сервера */
+#serverStatusModal .modal-body {
+    font-size: 0.9rem;
+}
+
+#serverStatusModal h5 {
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding-bottom: 0.5rem;
+}
+
+#serverStatusModal .table {
+    margin-bottom: 0;
+}
+
+#serverStatusModal .table th,
+#serverStatusModal .table td {
+    vertical-align: middle;
+}
+
+#serverStatusModal .progress {
+    background-color: var(--bs-border-color);
+}
+
+#serverStatusModal .list-group-flush .list-group-item {
+    background-color: transparent;
+}
+
+#serverStatusModal .card {
+    border: 1px solid var(--bs-border-color);
+}
+
+#serverStatusModal .card-body {
+    padding: 1rem;
+}
+
+#serverStatusModal .table-responsive {
+    font-size: 0.85rem;
+}
+
+#serverStatusModal .table thead th {
+    border-bottom: 2px solid var(--bs-border-color);
+    font-weight: 600;
+}
+
+#serverStatusModal .table-borderless th,
+#serverStatusModal .table-borderless td {
+    border: 0;
+}
+
+#serverStatusModal .table-borderless tbody tr {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+#serverStatusModal .table-borderless tbody tr:last-child {
+    border-bottom: 0;
+}
+
+/* Центрирование текста в таблицах */
+#proc-table td:not(:nth-child(2)), #proc-table th:not(:nth-child(2)),
+#docker-table td:not(:nth-child(1)):not(:nth-child(2)), #docker-table th:not(:nth-child(1)):not(:nth-child(2)),
+#inodes-table td:not(:first-child), #inodes-table th:not(:first-child) {
+    text-align: center;
+}
+
+#proc-table, #docker-table, #inodes-table {
+    white-space: nowrap;
+}
