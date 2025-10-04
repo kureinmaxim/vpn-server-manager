@@ -367,7 +367,18 @@
 </div>
 
 <!-- Модальное окно статуса сервера -->
-<div class="modal fade" id="serverStatusModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="serverStatusModal" tabindex="-1" aria-hidden="true" 
+     data-title-status="{{ _('Статус сервера') }}" 
+     data-title-status-with-colon="{{ _('Статус сервера:') }}"
+     data-docker-size-tooltip="{{ _('0B=изменяемый слой; virtual=размер образа') }}"
+     data-docker-size-short="{{ _('0B=измен., virtual=образ') }}"
+     data-inodes-header-mount="{{ _('Точка') }}"
+     data-inodes-header-total="{{ _('Всего') }}"
+     data-inodes-header-used="{{ _('Исп.') }}"
+     data-inodes-header-percent="%"
+     data-docker-yes="{{ _('есть') }}"
+     data-docker-no="{{ _('нет') }}"
+     data-docker-running="{{ _('running:') }}">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
@@ -623,7 +634,10 @@
         
         // Показываем "Статус сервера", если нет имени
         if (titleEl) {
-            titleEl.textContent = name ? '{{ _("Статус сервера:") }}' : '{{ _("Статус сервера") }}';
+            var modalEl = document.getElementById('serverStatusModal');
+            var titleWithColon = modalEl.getAttribute('data-title-status-with-colon');
+            var titleSimple = modalEl.getAttribute('data-title-status');
+            titleEl.textContent = name ? titleWithColon : titleSimple;
         }
 
         if (uptimeEl) {
@@ -749,7 +763,11 @@
         // Summary
         var summaryEl = document.getElementById('summary-list');
         var docker = stats.docker || {};
-        var dockerStatus = docker.present ? ('есть, running: ' + (docker.running || 0)) : 'нет';
+        var statusModal = document.getElementById('serverStatusModal');
+        var dockerYes = statusModal.getAttribute('data-docker-yes');
+        var dockerNo = statusModal.getAttribute('data-docker-no');
+        var dockerRunning = statusModal.getAttribute('data-docker-running');
+        var dockerStatus = docker.present ? (dockerYes + ', ' + dockerRunning + ' ' + (docker.running || 0)) : dockerNo;
         var containerNames = (docker.names || []).join(', ');
         summaryEl.innerHTML = `
             <div class="d-flex justify-content-between small"><span>Uptime:</span><strong>${stats.uptime || ''}</strong></div>
@@ -819,7 +837,12 @@
         var inodesEl = document.getElementById('inodes-table');
         inodesEl.innerHTML = '';
         var inodes = stats.inodes || [];
-        var inodesHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Точка</th><th>Всего</th><th>Исп.</th><th>%</th></tr></thead><tbody>';
+        var statusModal = document.getElementById('serverStatusModal');
+        var hdrMount = statusModal.getAttribute('data-inodes-header-mount');
+        var hdrTotal = statusModal.getAttribute('data-inodes-header-total');
+        var hdrUsed = statusModal.getAttribute('data-inodes-header-used');
+        var hdrPercent = statusModal.getAttribute('data-inodes-header-percent');
+        var inodesHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">' + hdrMount + '</th><th>' + hdrTotal + '</th><th>' + hdrUsed + '</th><th>' + hdrPercent + '</th></tr></thead><tbody>';
         for (var k = 0; k < inodes.length; k++) {
             var inode = inodes[k];
             inodesHtml += '<tr><td class="ps-0">' + truncateMount(inode.mount, 20) + '</td><td>' + inode.inodes + '</td><td>' + inode.iused + '</td><td>' + inode.ipcent + '</td></tr>';
@@ -844,6 +867,9 @@
         if (containers.length === 0) {
             dockWrap.innerHTML = '<div class="text-muted">No containers</div>';
         } else {
+            var statusModal = document.getElementById('serverStatusModal');
+            var dockerSizeTooltip = statusModal.getAttribute('data-docker-size-tooltip');
+            var dockerSizeShort = statusModal.getAttribute('data-docker-size-short');
             var dhtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
             for (var c = 0; c < containers.length; c++) {
                 var ct = containers[c];
@@ -851,7 +877,7 @@
                 var sizeCell = (ct.size || '');
                 var sizeExplain = '';
                 if (sizeCell && sizeCell.indexOf('virtual') !== -1) {
-                    sizeExplain = ' <small class="text-muted" title="0B=изменяемый слой; virtual=размер образа">(0B=измен., virtual=образ)</small>';
+                    sizeExplain = ' <small class="text-muted" title="' + dockerSizeTooltip + '">(' + dockerSizeShort + ')</small>';
                 }
                 dhtml += '<tr><td class="ps-0">' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
             }
