@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Скрипт для сборки VPN Server Manager с исправленными зависимостями.
-Включает поддержку офлайн режима и улучшенную обработку ошибок.
+Скрипт для сборки VPN Server Manager v4.0.0 с новой модульной архитектурой.
+Включает поддержку Application Factory, Service Layer и современные практики разработки.
 """
 import os
 import sys
@@ -114,11 +114,12 @@ def build_app():
     datas = [
         "templates:templates",          # HTML шаблоны
         "static:static",                # CSS, изображения
-        "config.json:.",                # Конфигурация
+        "config.json:.",                # Конфигурация (legacy)
         "data:data",                    # Данные
-        
+        "app:app",                      # Новое приложение
+        "desktop:desktop",              # Desktop GUI
         "requirements.txt:.",           # Зависимости
-        
+        "env.example:.",                # Пример конфигурации
     ]
 
     # ВКЛЮЧАЕМ ПЕРЕВОДЫ (.po/.mo). Достаточно добавить всю папку translations
@@ -302,7 +303,7 @@ def build_app():
         "--debug=all",
         *datas_args,
         *hidden_imports,
-        "app.py"  # Основной файл приложения
+        "run.py"  # Новая точка входа приложения
     ]
     
     # Убираем пустые аргументы
@@ -355,6 +356,15 @@ def create_app_bundle():
         
         # Копируем все файлы из папки приложения
         shutil.copytree(app_dir, app_macos / app_name, dirs_exist_ok=True)
+        
+        # Создаем символическую ссылку на run.py для совместимости
+        run_py_link = app_macos / "run.py"
+        if not run_py_link.exists():
+            try:
+                os.symlink(app_name / "run.py", run_py_link)
+            except OSError:
+                # Если не удалось создать симлинк, копируем файл
+                shutil.copy2(app_dir / "run.py", run_py_link)
         
         # Получаем версию из config.json
         version = get_version_from_config()
@@ -630,13 +640,13 @@ def get_version_from_config():
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                return config.get('app_info', {}).get('version', '3.5.2')
+                return config.get('app_info', {}).get('version', '4.0.0')
         else:
             print("⚠️ config.json не найден, используем версию по умолчанию")
-            return '3.5.2'
+            return '4.0.0'
     except Exception as e:
         print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
-        return '3.5.2'
+        return '4.0.0'
 
 def main():
     """Основная функция сборки"""
@@ -671,15 +681,18 @@ def main():
                 print("🎉 Инсталлятор создан успешно!")
                 print(f"📦 DMG файл: {dmg_path}")
                 print()
-                print("🔧 Особенности сборки:")
-                print("   ✅ Поддержка офлайн режима")
-                print("   ✅ Улучшенная обработка ошибок")
-                print("   ✅ Криптографические функции")
-                print("   ✅ PyWebView GUI")
-                print("   ✅ Flask веб-сервер")
-                print("   ✅ Шифрование данных")
-                print("   ✅ DMG инсталлятор")
-                print("   ✅ Иконка приложения")
+                print("🔧 Особенности сборки v4.0.0:")
+                print("   ✅ Модульная архитектура")
+                print("   ✅ Application Factory Pattern")
+                print("   ✅ Service Layer")
+                print("   ✅ Blueprint Architecture")
+                print("   ✅ Dependency Injection")
+                print("   ✅ Custom Exceptions")
+                print("   ✅ Structured Logging")
+                print("   ✅ Comprehensive Testing")
+                print("   ✅ Docker Support")
+                print("   ✅ Security Enhancements")
+                print("   ✅ Modern Python Practices")
             else:
                 print("⚠️ Приложение создано, но DMG не создался")
                 print("Приложение доступно в папке dist/")

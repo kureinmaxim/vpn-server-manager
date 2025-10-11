@@ -20,6 +20,8 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -28,6 +30,7 @@ MANIFEST
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
 *.spec
 
 # Installer logs
@@ -44,6 +47,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
+*.py,cover
 .hypothesis/
 .pytest_cache/
 
@@ -67,32 +71,41 @@ instance/
 # Sphinx documentation
 docs/_build/
 
-# Local documentation (not for GitHub)
-docs/project_info/maintenance/
-docs/lessons/github_docs/
-docs/lessons/github_tutorials/
-docs/lessons/github-actions/
-docs/lessons/i18n/
-
-# Документация, перенесенная в docs/project_info
-/CODE_OF_CONDUCT.md
-/CONTRIBUTING.md
-/SECURITY.md
-/PROJECT_STRUCTURE.md
-/SECRET_KEY.md
-/BUILD.md
-/BACKUP_TOOLS.md
-/quick_cleanup.md
-/github_basics_tutorials
-/github_cli_tutorials
+# PyBuilder
+target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Virtualenv
-venv/
-.venv/
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
 env/
+venv/
 ENV/
 env.bak/
 venv.bak/
@@ -115,98 +128,39 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# macOS
-.DS_Store
-*.DS_Store
-
-# VSCode
-.vscode/
-
-# Временные и тестовые файлы
-*.tmp
-*.temp
-temp/
-tmp/
-*.bak
-*.backup
-*.orig
-*~
-
-# Тестовые файлы и директории
-test/
-tests/
-*_test.py
-*_tests.py
-test_*.py
-tests_*.py
-!test_basic.py
-
-# Логи и отчеты
-*.log
+# Application specific
 logs/
-*.audit
-audit/
+uploads/
+test_data/
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
 
-# Конфигурационные файлы разработки
-.env
-.env.local
-.env.development
-.env.test
-config.local.json
-config.dev.json
-
-# Файлы редакторов
+# IDE
+.vscode/
+.idea/
 *.swp
 *.swo
 *~
-.#*
-\#*#
 
-# Временные файлы IDE
-.idea/
-*.iml
-.project
-.settings/
-*.sublime-workspace
-*.sublime-project
-
-# Системные файлы
-Thumbs.db
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
+Thumbs.db
 
-# Файлы загрузок и кеша
-uploads/*.tmp
-uploads/*.temp
-cache/
-*.cache
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
 
-# Экспортированные данные (кроме примеров)
-*.enc.backup
-data/*.backup
-data/temp_*
-
-# Конфиденциальные данные пользователя
-data/*.enc
+# Application data
+data/servers.json.enc
+data/hints.json
 pin_block_state.json
-uploads/
-
-# Файлы сборки и дистрибуции
-*.dmg
-*.pkg
-*.msi
-*.exe
-*.deb
-*.rpm
-*.app/
-*.AppImage
-
-# Временные файлы Python
-*.pyc
-*.pyo
-*.pyd 
-
-# Tutorial Folders
-github_basics_tutorials/
-github_cli_tutorials/ 
