@@ -496,9 +496,14 @@ def login_ajax():
         
         # Проверяем PIN
         if pin == current_pin:
+            # Устанавливаем все необходимые флаги сессии
             session['pin_authenticated'] = True
+            session['authenticated'] = True  # Для @require_auth
+            session['pin_verified'] = True  # Для @require_pin
+            session.permanent = True  # Делаем сессию постоянной
             session.pop('block_until', None)  # Снимаем блокировку
             session.pop('failed_attempts', None)  # Сбрасываем счетчик
+            logger.info(f"PIN authenticated successfully. Session: {dict(session)}")
             return jsonify({
                 'success': True,
                 'message': _('Login successful')

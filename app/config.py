@@ -1,7 +1,49 @@
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
+
+def get_app_data_dir():
+    """
+    Возвращает директорию для хранения пользовательских данных приложения.
+    Учитывает различие между режимом разработки и запакованным приложением.
+    """
+    # Определяем, запущено ли приложение как пакет
+    is_frozen = getattr(sys, 'frozen', False)
+    
+    # Имя директории приложения
+    app_name = "VPNServerManager-Clean"
+    
+    if is_frozen:  # Приложение запущено как .app или .exe
+        if sys.platform == 'darwin':  # macOS
+            # ~/Library/Application Support/VPNServerManager
+            app_data_dir = os.path.join(
+                os.path.expanduser("~"), 
+                "Library", "Application Support", 
+                app_name
+            )
+        elif sys.platform == 'win32':  # Windows
+            # %APPDATA%\VPNServerManager
+            app_data_dir = os.path.join(
+                os.getenv('APPDATA', os.path.expanduser("~")),
+                app_name
+            )
+        else:  # Linux и другие Unix-подобные системы
+            # ~/.local/share/VPNServerManager
+            app_data_dir = os.path.join(
+                os.path.expanduser("~"),
+                ".local", "share",
+                app_name
+            )
+    else:  # Режим разработки
+        # Используем директорию проекта
+        app_data_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
+    # Создаем директорию, если её нет
+    os.makedirs(app_data_dir, exist_ok=True)
+    return app_data_dir
 
 class Config:
     """Базовая конфигурация"""
@@ -13,6 +55,10 @@ class Config:
     # Настройки приложения
     APP_VERSION = os.getenv('APP_VERSION', '4.0.0')
     APP_NAME = 'VPNServerManager-Clean'
+    APP_DATA_DIR = get_app_data_dir()
+    
+    # Allowed extensions
+    ALLOWED_EXTENSIONS = {'enc', 'env', 'txt', 'zip', 'json'}
     
     # Настройки данных
     DATA_DIR = os.getenv('DATA_DIR', 'data')
