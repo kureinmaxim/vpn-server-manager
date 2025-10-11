@@ -40,7 +40,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <i class="bi bi-hdd-stack"></i> {{ _('VPS Manager') }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -50,23 +50,23 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('settings_page') }}">{{ _('Настройки') }}</a>
+                        <a class="nav-link" href="{{ url_for('main.settings') }}">{{ _('Настройки') }}</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ _('Справка') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ url_for('help_page') }}">{{ _('Справка по использованию') }}</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('manage_hints_page') }}">{{ _('Управление подсказками') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.help') }}">{{ _('Справка по использованию') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.manage_hints') }}">{{ _('Управление подсказками') }}</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cheatsheet_page') }}">{{ _('Шпаргалка') }}</a>
+                        <a class="nav-link" href="{{ url_for('main.cheatsheet') }}">{{ _('Шпаргалка') }}</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about_page') }}">{{ _('О программе') }}</a>
+                        <a class="nav-link" href="{{ url_for('main.about') }}">{{ _('О программе') }}</a>
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
@@ -91,9 +91,9 @@
                             <i class="bi bi-translate"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='ru') }}">🇷🇺 Русский</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='en') }}">🇺🇸 English</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('change_language', lang='zh') }}">🇨🇳 中文</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='ru') }}">🇷🇺 Русский</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='en') }}">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='zh') }}">🇨🇳 中文</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -499,13 +499,13 @@
             submitButton.disabled = true;
             submitButton.textContent = 'Проверка...';
             
-            // Отправляем запрос на сервер
+            // Отправляем запрос на сервер (v4.0.0 - JSON format)
             fetch('/pin/login_ajax', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: `pin=${encodeURIComponent(pin)}`
+                body: JSON.stringify({pin: pin})
             })
             .then(response => response.json())
             .then(data => {

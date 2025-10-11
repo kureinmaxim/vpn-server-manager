@@ -229,7 +229,7 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary mt-3">{{ _('Сохранить изменения') }}</button>
-                <a href="{{ url_for('index') }}" class="btn btn-secondary mt-3">{{ _('Отмена') }}</a>
+                <a href="{{ url_for('main.index') }}" class="btn btn-secondary mt-3">{{ _('Отмена') }}</a>
             </form>
         </div>
         <div class="col-md-4">
@@ -249,7 +249,7 @@
                             {% endfor %}
                         {% endfor %}
                     {% else %}
-                        <p class="text-muted">{{ _('Подсказок нет. Вы можете') }} <a href="{{ url_for('manage_hints_page') }}">{{ _('добавить их') }}</a>.</p>
+                        <p class="text-muted">{{ _('Подсказок нет. Вы можете') }} <a href="{{ url_for('main.manage_hints') }}">{{ _('добавить их') }}</a>.</p>
                     {% endif %}
                 </div>
             </div>

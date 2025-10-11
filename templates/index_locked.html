@@ -455,13 +455,14 @@
         submitButton.disabled = true;
         submitButton.textContent = '{{ _("Проверка...") }}';
         
-        // Отправляем запрос на сервер
+        // Отправляем запрос на сервер (v4.0.0 - JSON format)
+        console.log('Sending PIN:', pin);
         fetch('/pin/login_ajax', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: `pin=${encodeURIComponent(pin)}`
+            body: JSON.stringify({pin: pin})
         })
         .then(response => response.json())
         .then(data => {

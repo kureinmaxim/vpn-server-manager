@@ -1,38 +1,81 @@
-# Структура Проекта VPN Server Manager
+# Структура Проекта VPN Server Manager v4.0.0
 
-Этот документ описывает организацию файлов и папок в проекте, а также основной алгоритм работы приложения.
+Этот документ описывает новую модульную архитектуру проекта, созданную в соответствии с современными принципами разработки Flask-приложений.
 
-## Дерево Проекта
+## 🏗️ Новая архитектура v4.0.0
+
+### Дерево Проекта
 
 ```
 VPNserverManage-Clean/
 │
-├── app.py                       # Основной файл (Flask + PyWebView)
-├── build_macos.py               # Сборка .app и .dmg для macOS
-├── requirements.txt             # Зависимости Python
-├── config.json                  # Конфигурация приложения (версия, URL-ы)
-├── VPNServerManager-Clean.spec  # Конфиг PyInstaller
-├── README.md                    # Главная страница проекта
-├── CHANGELOG.md                 # История изменений
-├── LICENSE                      # Лицензия MIT
-├── .gitignore                   # Исключения для Git
-├── generate_key.py              # Утилита генерации SECRET_KEY
-├── decrypt_tool.py              # Инструмент для расшифровки данных
-├── pin_auth.py                  # Система PIN-аутентификации
-├── pin_block_state.json         # Состояние блокировки PIN-кода
+├── run.py                       # Новая точка входа (web/desktop режимы)
+├── app/                         # Основное приложение (модульная архитектура)
+│   ├── __init__.py             # Application Factory
+│   ├── config.py               # Конфигурация через переменные окружения
+│   ├── exceptions.py           # Кастомные исключения
+│   ├── models/                 # Модели данных
+│   │   ├── __init__.py
+│   │   └── server.py
+│   ├── services/               # Бизнес-логика (Service Layer)
+│   │   ├── __init__.py
+│   │   ├── ssh_service.py      # SSH/SFTP сервисы
+│   │   ├── crypto_service.py   # Криптографические операции
+│   │   └── api_service.py      # HTTP API сервисы
+│   ├── routes/                 # Маршруты (Blueprint Architecture)
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   └── api.py
+│   └── utils/                  # Утилиты
+│       ├── __init__.py
+│       ├── validators.py
+│       └── decorators.py
 │
-├── data/                        # Данные проекта (зашифрованные и служебные)
+├── desktop/                    # Desktop GUI слой
+│   ├── __init__.py
+│   └── window.py
+│
+├── tests/                      # Тесты
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_services/
+│   └── test_routes/
+│
+├── build_macos.py              # Сборка .app и .dmg для macOS
+├── requirements.txt            # Зависимости Python
+├── config.json                 # Конфигурация приложения (legacy)
+├── env.example                 # Пример переменных окружения
+├── setup.py                    # Установка пакета
+├── Makefile                    # Команды разработки
+├── Dockerfile                  # Контейнеризация
+├── docker-compose.yml          # Docker Compose
+├── pytest.ini                 # Настройки тестов
+├── VPNServerManager-Clean.spec # Конфиг PyInstaller
+├── README.md                   # Главная страница проекта
+├── README_NEW_STRUCTURE.md     # Документация новой архитектуры
+├── RESTRUCTURING_REPORT.md     # Отчет о реструктуризации
+├── MIGRATION_GUIDE.md          # Руководство по миграции
+├── CHANGELOG.md                # История изменений
+├── LICENSE                     # Лицензия MIT
+├── .gitignore                  # Исключения для Git
+├── generate_key.py             # Утилита генерации SECRET_KEY
+├── decrypt_tool.py             # Инструмент для расшифровки данных
+├── test_basic.py               # Базовые тесты
+├── pin_auth.py                 # Система PIN-аутентификации (legacy)
+├── pin_block_state.json        # Состояние блокировки PIN-кода
+│
+├── data/                       # Данные проекта (зашифрованные и служебные)
 │   ├── servers.json.enc
 │   ├── hints.json
 │   └── merged_*.enc
 │
-├── static/
+├── static/                     # Статические файлы
 │   ├── css/
 │   ├── images/
 │   ├── fonts/
 │   └── js/
 │
-├── templates/                   # HTML-шаблоны интерфейса
+├── templates/                  # HTML-шаблоны интерфейса
 │   ├── layout.html
 │   ├── index.html
 │   ├── index_locked.html
@@ -44,10 +87,10 @@ VPNserverManage-Clean/
 │   ├── cheatsheet.html
 │   └── manage_hints.html
 │
-├── translations/                # Переводы (.po/.mo)
+├── translations/               # Переводы (.po/.mo)
 │   ├── en/LC_MESSAGES/messages.{po,mo}
 │   ├── zh/LC_MESSAGES/messages.{po,mo}
-│   └── ru/LC_MESSAGES/          # (опционально)
+│   └── ru/LC_MESSAGES/         # (опционально)
 │
 ├── docs/
 │   ├── project_info/            # Основная документация проекта
@@ -103,7 +146,75 @@ VPNserverManage-Clean/
 ├── dist/                        # Результаты сборки (.app, .dmg)
 ├── build/                       # Временные файлы сборки
 ├── uploads/                     # Загруженные пользователем файлы
+├── logs/                        # Логи приложения
 └── venv/                        # Виртуальное окружение Python
+```
+
+## 🔧 Ключевые компоненты новой архитектуры
+
+### Application Factory Pattern
+- **Файл**: `app/__init__.py`
+- **Функция**: `create_app(config_name)`
+- **Назначение**: Создание Flask-приложения с различными конфигурациями
+
+### Service Layer
+- **SSH Service**: `app/services/ssh_service.py` - SSH/SFTP операции
+- **Crypto Service**: `app/services/crypto_service.py` - Шифрование/дешифрование
+- **API Service**: `app/services/api_service.py` - HTTP запросы
+- **Registry**: `app/services/__init__.py` - Dependency Injection
+
+### Blueprint Architecture
+- **Main Blueprint**: `app/routes/main.py` - Основные маршруты
+- **API Blueprint**: `app/routes/api.py` - REST API endpoints
+
+### Models
+- **Server Model**: `app/models/server.py` - Модель сервера с валидацией
+
+### Utils
+- **Validators**: `app/utils/validators.py` - Валидация данных
+- **Decorators**: `app/utils/decorators.py` - Декораторы безопасности
+
+### Desktop Layer
+- **Desktop App**: `desktop/window.py` - PyWebView GUI
+
+### Testing
+- **Test Configuration**: `tests/conftest.py` - Pytest конфигурация
+- **Service Tests**: `tests/test_services/` - Тесты сервисов
+- **Route Tests**: `tests/test_routes/` - Тесты маршрутов
+
+## 🚀 Запуск приложения
+
+### Web режим
+```bash
+python run.py
+```
+
+### Desktop режим
+```bash
+python run.py --desktop
+```
+
+### Debug режим
+```bash
+python run.py --debug
+```
+
+## 🛠️ Инструменты разработки
+
+### Makefile команды
+- `make install-dev` - Установка зависимостей для разработки
+- `make test` - Запуск тестов
+- `make lint` - Проверка качества кода
+- `make format` - Форматирование кода
+- `make all` - Все проверки
+
+### Docker
+- `Dockerfile` - Контейнеризация приложения
+- `docker-compose.yml` - Оркестрация сервисов
+
+### Тестирование
+- `pytest.ini` - Конфигурация тестов
+- Покрытие кода и интеграционные тесты
 ```
 
 ## Примечания
