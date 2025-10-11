@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Basic tests for VPN Server Manager without GUI
+Basic tests for VPN Server Manager v4.0.0 with new modular architecture
 """
 
 import os
@@ -25,11 +25,31 @@ def test_config():
 def test_imports():
     """Test module imports"""
     try:
-        import app
-        print("OK: app.py imports successfully")
+        # Test new modular architecture
+        from app import create_app
+        print("OK: app module imports successfully")
         
-        import pin_auth
-        print("OK: pin_auth.py imports successfully")
+        from app.services import registry
+        print("OK: services module imports successfully")
+        
+        from app.routes import main_bp, api_bp
+        print("OK: routes module imports successfully")
+        
+        from app.models.server import Server
+        print("OK: models module imports successfully")
+        
+        from app.utils.validators import Validators
+        print("OK: utils module imports successfully")
+        
+        from desktop.window import DesktopApp
+        print("OK: desktop module imports successfully")
+        
+        # Test legacy modules (if they exist)
+        try:
+            import pin_auth
+            print("OK: pin_auth.py imports successfully (legacy)")
+        except ImportError:
+            print("INFO: pin_auth.py not found (expected in new architecture)")
         
         import decrypt_tool
         print("OK: decrypt_tool.py imports successfully")
@@ -45,8 +65,8 @@ def test_imports():
 def test_files():
     """Test required files presence"""
     required_files = [
-        'app.py',
-        'config.json',
+        'run.py',                    # New entry point
+        'config.json',               # Legacy config
         'requirements.txt',
         'README.md',
         'CHANGELOG.md',
@@ -54,7 +74,24 @@ def test_files():
         '.gitignore',
         'static/images/icon.png',
         'templates/index.html',
-        'data/hints.json'
+        'data/hints.json',
+        'app/__init__.py',           # New app structure
+        'app/config.py',
+        'app/exceptions.py',
+        'app/services/__init__.py',
+        'app/routes/__init__.py',
+        'app/models/__init__.py',
+        'app/utils/__init__.py',
+        'desktop/__init__.py',       # Desktop layer
+        'desktop/window.py',
+        'tests/__init__.py',         # Tests
+        'tests/conftest.py',
+        'env.example',               # Environment example
+        'setup.py',                  # Package setup
+        'Makefile',                  # Development tools
+        'Dockerfile',                # Containerization
+        'docker-compose.yml',
+        'pytest.ini'                 # Test configuration
     ]
     
     missing_files = []
@@ -86,16 +123,67 @@ def test_env():
         print(f"ERROR: Environment error: {e}")
         return False
 
+def test_new_architecture():
+    """Test new modular architecture"""
+    try:
+        # Test Application Factory
+        from app import create_app
+        app = create_app('testing')
+        print("OK: Application Factory works")
+        
+        # Test Service Registry
+        from app.services import registry
+        from app.services.ssh_service import SSHService
+        from app.services.crypto_service import CryptoService
+        from app.services.api_service import APIService
+        
+        registry.register('ssh', SSHService())
+        registry.register('crypto', CryptoService())
+        registry.register('api', APIService())
+        
+        ssh_service = registry.get('ssh')
+        crypto_service = registry.get('crypto')
+        api_service = registry.get('api')
+        
+        assert ssh_service is not None
+        assert crypto_service is not None
+        assert api_service is not None
+        
+        print("OK: Service Registry works")
+        
+        # Test Models
+        from app.models.server import Server
+        server = Server(
+            id='test-1',
+            name='Test Server',
+            hostname='192.168.1.1',
+            username='testuser'
+        )
+        assert server.is_valid()
+        print("OK: Models work")
+        
+        # Test Validators
+        from app.utils.validators import Validators
+        assert Validators.validate_ip_address('192.168.1.1')
+        assert not Validators.validate_ip_address('invalid-ip')
+        print("OK: Validators work")
+        
+        return True
+    except Exception as e:
+        print(f"ERROR: New architecture test failed: {e}")
+        return False
+
 def main():
     """Main testing function"""
-    print("Running basic tests for VPN Server Manager...")
-    print("=" * 50)
+    print("Running basic tests for VPN Server Manager v4.0.0...")
+    print("=" * 60)
     
     tests = [
         test_files,
         test_config,
         test_imports,
-        test_env
+        test_env,
+        test_new_architecture
     ]
     
     passed = 0
