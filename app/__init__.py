@@ -10,6 +10,7 @@ from .services import registry
 from .services.ssh_service import SSHService
 from .services.crypto_service import CryptoService
 from .services.api_service import APIService
+from .services.data_manager_service import DataManagerService
 
 def get_translations_path() -> str:
     """Возвращает путь к каталогу переводов с учётом упакованного приложения (PyInstaller)."""
@@ -112,14 +113,21 @@ def register_error_handlers(app):
             return render_template('500.html'), 500
 
 def load_app_info(app):
-    """Загрузка информации о приложении из config.json"""
+    """Загрузка информации о приложении и конфигурации из config.json"""
     try:
         import json
-        config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.json')
+        # Используем APP_DATA_DIR для поиска config.json
+        app_data_dir = app.config.get('APP_DATA_DIR')
+        config_path = os.path.join(app_data_dir, 'config.json') if app_data_dir else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.json')
+        
         if os.path.exists(config_path):
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
                 app.config['app_info'] = config.get('app_info', {})
+                # Загружаем active_data_file если он есть
+                if 'active_data_file' in config:
+                    app.config['active_data_file'] = config['active_data_file']
+                    app.logger.info(f"Loaded active_data_file: {config['active_data_file']}")
         else:
             # Заглушка если config.json не найден
             app.config['app_info'] = {
@@ -135,11 +143,29 @@ def load_app_info(app):
             "developer": "Куреин М.Н."
         }
 
-def register_services():
+def register_services(app):
     """Регистрация сервисов в реестре"""
     registry.register('ssh', SSHService())
     registry.register('crypto', CryptoService())
     registry.register('api', APIService())
+    
+    # DataManagerService требует secret_key и app_data_dir
+    secret_key = app.config.get('SECRET_KEY')
+    app_data_dir = app.config.get('APP_DATA_DIR')
+    
+    # Проверяем, что ключ валидный для Fernet
+    if secret_key and app_data_dir:
+        try:
+            from cryptography.fernet import Fernet
+            # Проверяем формат ключа
+            Fernet(secret_key.encode() if isinstance(secret_key, str) else secret_key)
+            data_manager = DataManagerService(secret_key, app_data_dir)
+            registry.register('data_manager', data_manager)
+        except Exception as e:
+            # Если ключ невалидный, логируем предупреждение но не падаем
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Cannot initialize DataManagerService: {e}. Some features may not work.")
 
 def create_app(config_name='development'):
     """Application Factory"""
@@ -165,7 +191,7 @@ def create_app(config_name='development'):
     setup_logging(app)
     
     # Регистрация сервисов
-    register_services()
+    register_services(app)
     
     # Регистрация blueprints
     from .routes import main_bp, api_bp, pin_bp
@@ -177,9 +203,12 @@ def create_app(config_name='development'):
     register_error_handlers(app)
     
     # Настройка сессий
-    app.config['SESSION_COOKIE_SECURE'] = not app.debug
+    # SESSION_COOKIE_SECURE должен быть False для локального HTTP-сервера
+    app.config['SESSION_COOKIE_SECURE'] = False
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    app.config['SESSION_TYPE'] = 'filesystem'  # Используем файловую систему для сессий
+    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 часа
     
     # Настройка загрузки файлов
     app.config['MAX_CONTENT_LENGTH'] = app.config.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)

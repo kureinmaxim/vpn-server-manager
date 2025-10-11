@@ -40,7 +40,7 @@
                 <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест DNS') }}</a>
             </div>
         </div>
-        <a href="{{ url_for('add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
+        <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
     </div>
 
     {% if not active_data_file and not servers %}
@@ -58,10 +58,10 @@
                 {% endif %}
             </p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                 <a href="{{ url_for('add_server') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                 <a href="{{ url_for('main.add_server') }}" class="btn btn-primary btn-lg px-4 gap-3">
                     <i class="bi bi-plus-circle"></i> {{ _('Добавить первый сервер') }}
                 </a>
-                <a href="{{ url_for('settings_page') }}" class="btn btn-outline-secondary btn-lg px-4">
+                <a href="{{ url_for('main.settings') }}" class="btn btn-outline-secondary btn-lg px-4">
                     <i class="bi bi-upload"></i> {{ _('Импортировать данные') }}
                 </a>
             </div>
@@ -82,7 +82,7 @@
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
                     <h5 class="card-title mb-0 d-flex align-items-center">
                         {% if server.icon_filename %}
-                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" 
+                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" 
                                  alt="icon" 
                                  class="me-2" 
                                  style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;"
@@ -328,14 +328,14 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
+                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
                         <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
                     </a>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
                             <i class="bi bi-activity"></i> {{ _('Статус') }}
                         </button>
-                        <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
+                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
                             <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
                         </form>
                     </div>
@@ -346,7 +346,7 @@
     </div>
     {% else %}
     <div class="alert alert-secondary text-center" role="alert">
-        {{ _('Серверов пока нет.') }} <a href="{{ url_for('add_server') }}" class="alert-link">{{ _('Добавьте первый') }}</a> {{ _('или') }} <a href="{{ url_for('settings_page') }}" class="alert-link">{{ _('импортируйте данные') }}</a>.
+        {{ _('Серверов пока нет.') }} <a href="{{ url_for('main.add_server') }}" class="alert-link">{{ _('Добавьте первый') }}</a> {{ _('или') }} <a href="{{ url_for('main.settings') }}" class="alert-link">{{ _('импортируйте данные') }}</a>.
     </div>
     {% endif %}
 </div>
