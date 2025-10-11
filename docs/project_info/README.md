@@ -10,6 +10,12 @@
 - [BUILD.md](BUILD.md) - инструкции по сборке
 - [BACKUP_TOOLS.md](BACKUP_TOOLS.md) - инструменты резервного копирования
 
+### 🔧 Технические отчеты (в корне проекта)
+- [PIN_AUTHENTICATION_FIX.md](../../PIN_AUTHENTICATION_FIX.md) - ✅ Исправление проблемы входа по PIN (11.10.2025)
+- [PORT_SOLUTION_REPORT.md](../../PORT_SOLUTION_REPORT.md) - Решение проблем с портами
+- [TESTING_REPORT_CHROME_MCP.md](../../TESTING_REPORT_CHROME_MCP.md) - Отчет о тестировании
+- [FINAL_TESTING_REPORT.md](../../FINAL_TESTING_REPORT.md) - Финальный отчет о тестировании
+
 ### 📝 GitHub-документация
 Документы для GitHub находятся в подпапке `github_docs/`:
 - [CODE_OF_CONDUCT.md](github_docs/CODE_OF_CONDUCT.md) - кодекс поведения участников
