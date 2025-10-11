@@ -469,10 +469,10 @@
             if (data.success) {
                 showPinLoginMessage(data.message, 'success');
                 setTimeout(() => {
-                    // Закрываем модальный диалог и перезагружаем страницу
+                    // Закрываем модальный диалог и перенаправляем на главную страницу
                     const modal = bootstrap.Modal.getInstance(document.getElementById('pinLoginModal'));
                     modal.hide();
-                    window.location.reload();
+                    window.location.href = '/';
                 }, 1000);
             } else {
                 if (data.blocked) {
