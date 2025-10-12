@@ -24,9 +24,13 @@ class DataManagerService:
             secret_key: Ключ шифрования Fernet
             app_data_dir: Директория для хранения данных приложения
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         self.secret_key = secret_key
         self.app_data_dir = app_data_dir
         self.fernet = Fernet(secret_key.encode())
+        logger.info(f"DataManagerService initialized. APP_DATA_DIR: '{self.app_data_dir}'")
         
     def get_export_dir(self) -> str:
         """
@@ -104,6 +108,156 @@ class DataManagerService:
         # Если не похоже на зашифрованные данные, возвращаем как есть
         return encrypted_data
     
+    def normalize_server_data(self, server: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Нормализует данные сервера, добавляя отсутствующие поля с дефолтными значениями.
+        
+        Args:
+            server: Данные сервера для нормализации
+            
+        Returns:
+            Нормализованные данные сервера
+        """
+        # Базовые поля верхнего уровня
+        defaults = {
+            'id': server.get('id', 0),
+            'name': server.get('name', ''),
+            'provider': server.get('provider', ''),
+            'ip_address': server.get('ip_address', ''),
+            'os': server.get('os', ''),
+            'status': server.get('status', 'Active'),
+            'notes': server.get('notes', ''),
+            'card_color': server.get('card_color', '#ffc107'),
+            'panel_url': server.get('panel_url', ''),
+            'hoster_url': server.get('hoster_url', ''),
+            'icon_filename': server.get('icon_filename', ''),
+            'os_icon': server.get('os_icon', 'bi-server'),
+            'docker_info': server.get('docker_info', ''),
+            'software_info': server.get('software_info', ''),
+        }
+        
+        # Вложенные объекты с дефолтными значениями
+        if 'specs' not in server or not isinstance(server['specs'], dict):
+            defaults['specs'] = {'cpu': '', 'ram': '', 'disk': ''}
+        else:
+            defaults['specs'] = {
+                'cpu': server['specs'].get('cpu', ''),
+                'ram': server['specs'].get('ram', ''),
+                'disk': server['specs'].get('disk', '')
+            }
+        
+        if 'payment_info' not in server or not isinstance(server['payment_info'], dict):
+            defaults['payment_info'] = {
+                'amount': 0.0,
+                'currency': 'USD',
+                'next_due_date': '',
+                'payment_period': 'Monthly',
+                'receipts': [],
+                'formatted_date': 'N/A'
+            }
+        else:
+            defaults['payment_info'] = {
+                'amount': server['payment_info'].get('amount', 0.0),
+                'currency': server['payment_info'].get('currency', 'USD'),
+                'next_due_date': server['payment_info'].get('next_due_date', ''),
+                'payment_period': server['payment_info'].get('payment_period', 'Monthly'),
+                'receipts': server['payment_info'].get('receipts', []),
+                'formatted_date': server['payment_info'].get('formatted_date', 'N/A')
+            }
+        
+        if 'ssh_credentials' not in server or not isinstance(server['ssh_credentials'], dict):
+            defaults['ssh_credentials'] = {
+                'user': '',
+                'password': '',
+                'port': 22,
+                'root_password': '',
+                'root_login_allowed': False,
+                'password_decrypted': '',
+                'root_password_decrypted': ''
+            }
+        else:
+            ssh = server['ssh_credentials']
+            defaults['ssh_credentials'] = {
+                'user': ssh.get('user', ''),
+                'password': ssh.get('password', ''),
+                'port': ssh.get('port', 22),
+                'root_password': ssh.get('root_password', ''),
+                'root_login_allowed': ssh.get('root_login_allowed', False),
+                'password_decrypted': ssh.get('password_decrypted', ''),
+                'root_password_decrypted': ssh.get('root_password_decrypted', '')
+            }
+        
+        if 'panel_credentials' not in server or not isinstance(server['panel_credentials'], dict):
+            defaults['panel_credentials'] = {
+                'user': '',
+                'password': '',
+                'user_decrypted': '',
+                'password_decrypted': ''
+            }
+        else:
+            panel = server['panel_credentials']
+            defaults['panel_credentials'] = {
+                'user': panel.get('user', ''),
+                'password': panel.get('password', ''),
+                'user_decrypted': panel.get('user_decrypted', ''),
+                'password_decrypted': panel.get('password_decrypted', '')
+            }
+        
+        if 'hoster_credentials' not in server or not isinstance(server['hoster_credentials'], dict):
+            defaults['hoster_credentials'] = {
+                'user': '',
+                'password': '',
+                'login_method': 'password',
+                'user_decrypted': '',
+                'password_decrypted': ''
+            }
+        else:
+            hoster = server['hoster_credentials']
+            defaults['hoster_credentials'] = {
+                'user': hoster.get('user', ''),
+                'password': hoster.get('password', ''),
+                'login_method': hoster.get('login_method', 'password'),
+                'user_decrypted': hoster.get('user_decrypted', ''),
+                'password_decrypted': hoster.get('password_decrypted', '')
+            }
+        
+        if 'geolocation' not in server or not isinstance(server['geolocation'], dict):
+            defaults['geolocation'] = {
+                'city': '',
+                'country': '',
+                'region': '',
+                'ip': server.get('ip_address', '')
+            }
+        else:
+            geo = server['geolocation']
+            defaults['geolocation'] = {
+                'city': geo.get('city', ''),
+                'country': geo.get('country', ''),
+                'region': geo.get('region', ''),
+                'ip': geo.get('ip', server.get('ip_address', ''))
+            }
+        
+        if 'checks' not in server or not isinstance(server['checks'], dict):
+            defaults['checks'] = {'dns_ok': False, 'streaming_ok': False}
+        else:
+            defaults['checks'] = {
+                'dns_ok': server['checks'].get('dns_ok', False),
+                'streaming_ok': server['checks'].get('streaming_ok', False)
+            }
+        
+        if 'hosting_analysis' not in server or not isinstance(server['hosting_analysis'], dict):
+            defaults['hosting_analysis'] = {'text': 'N/A', 'quality': 'secondary'}
+        else:
+            defaults['hosting_analysis'] = {
+                'text': server['hosting_analysis'].get('text', 'N/A'),
+                'quality': server['hosting_analysis'].get('quality', 'secondary')
+            }
+        
+        # Объединяем с оригинальными данными
+        normalized = {**server, **defaults}
+        
+        return normalized
+    
     def load_servers(self, config: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
         Загружает и расшифровывает серверы из активного зашифрованного файла.
@@ -130,6 +284,11 @@ class DataManagerService:
 
             decrypted_data = self.fernet.decrypt(encrypted_data)
             servers = json.loads(decrypted_data.decode('utf-8'))
+            
+            # Нормализуем каждый сервер
+            if isinstance(servers, list):
+                servers = [self.normalize_server_data(server) for server in servers]
+            
             return servers if isinstance(servers, list) else []
         except Exception as e:
             print(f"Ошибка загрузки серверов: {e}")
@@ -316,4 +475,40 @@ class DataManagerService:
         """
         return '.' in filename and \
                filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+    def update_user_config(self, new_settings: Dict[str, Any]) -> bool:
+        """
+        Безопасно обновляет config.json пользователя.
+
+        Args:
+            new_settings: Словарь с новыми настройками для добавления/обновления.
+
+        Returns:
+            True, если обновление прошло успешно.
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+
+        config_path = os.path.join(self.app_data_dir, 'config.json')
+        
+        try:
+            # Читаем существующую конфигурацию
+            try:
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config_data = json.load(f)
+            except (FileNotFoundError, json.JSONDecodeError):
+                config_data = {}
+
+            # Обновляем данные
+            config_data.update(new_settings)
+
+            # Записываем обратно в файл
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config_data, f, ensure_ascii=False, indent=2)
+            
+            logger.info(f"User config updated at {config_path} with keys: {list(new_settings.keys())}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to update user config at {config_path}: {e}")
+            return False
 

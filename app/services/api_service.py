@@ -3,6 +3,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from typing import Dict, Optional, Any
 import logging
+from flask import current_app
 from ..exceptions import APIError
 
 logger = logging.getLogger(__name__)
@@ -32,8 +33,12 @@ class APIService:
         session.mount("https://", adapter)
         
         # Устанавливаем заголовки по умолчанию
+        version = 'N/A'
+        if current_app:
+            version = current_app.config.get('app_info', {}).get('version', 'N/A')
+
         session.headers.update({
-            'User-Agent': 'VPNServerManager-Clean/3.7.3',
+            'User-Agent': f'VPNServerManager-Clean/{version}',
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         })

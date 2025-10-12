@@ -8,13 +8,18 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        html, body {
+            height: 100%;
+        }
         body {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
         .content {
-            flex: 1;
+            flex: 1 0 auto;
+        }
+        .footer {
+            flex-shrink: 0;
         }
     </style>
     <script>
@@ -70,7 +75,7 @@
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout()" title="{{ _('Выйти из системы') }}">
+                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </li>
@@ -81,9 +86,9 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('80')"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('90')"><i class="bi bi-search me-2"></i>90%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('100')"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('80', event); return false;"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('90', event); return false;"><i class="bi bi-search me-2"></i>90%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('100', event); return false;"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -101,8 +106,8 @@
                             <i class="bi bi-circle-half"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -114,9 +119,19 @@
         {% block content %}{% endblock %}
     </main>
     
-    <footer class="text-center text-muted small py-3 bg-dark">
+    <footer class="footer text-center small py-3 bg-dark text-light">
         <div class="container">
-            <p class="mb-0">{{ _('VPS Manager') }} v{{ app_info.version }} | {{ _('Разработчик') }}: {% if session.get('pin_authenticated') %}{{ app_info.developer }}{% else %}Куреин М. Н.{% endif %}</p>
+            <p class="mb-0 text-white">
+                {{ _('VPS Manager') }} v{{ app_info.version }} | 
+                {{ _('Разработчик') }}: {% if session.get('pin_authenticated') %}{{ app_info.developer }}{% else %}Куреин М. Н.{% endif %}
+            </p>
+            {% if server_info %}
+            <p class="mb-0 mt-1 text-info" style="font-size: 0.85em;">
+                <i class="bi bi-server"></i> {{ server_info.url }} 
+                <span class="text-white-50">|</span> 
+                <i class="bi bi-hdd-network"></i> {{ _('Порт') }}: {{ server_info.port }}
+            </p>
+            {% endif %}
         </div>
     </footer>
 
@@ -128,18 +143,107 @@
             document.body.style.zoom = savedZoom + '%';
         });
 
+        // Исправление для pywebview: улучшенная инициализация без клонирования
+        let isInitialized = false;
+        
+        function initializeNavigation() {
+            if (isInitialized) return;
+            isInitialized = true;
+            
+            // Инициализируем dropdown только один раз
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            dropdownElementList.forEach(function (dropdownToggleEl) {
+                // Проверяем, не инициализирован ли уже
+                if (!bootstrap.Dropdown.getInstance(dropdownToggleEl)) {
+                    new bootstrap.Dropdown(dropdownToggleEl, {
+                        autoClose: true,
+                        boundary: 'window'
+                    });
+                }
+            });
+            
+            // Улучшенная обработка навигационных ссылок для pywebview
+            document.querySelectorAll('a.nav-link:not([onclick])').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Для обычных ссылок (не с onclick и не #) - просто переходим
+                    if (this.getAttribute('href') && 
+                        this.getAttribute('href') !== '#' && 
+                        !this.hasAttribute('data-bs-toggle')) {
+                        e.stopPropagation();
+                        // Небольшая задержка для корректной работы в pywebview
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 50);
+                    }
+                });
+            });
+            
+            // Обработка dropdown items для более надёжной работы
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Если это не onclick-ссылка, то переходим напрямую
+                    if (!this.hasAttribute('onclick') && 
+                        this.getAttribute('href') && 
+                        this.getAttribute('href') !== '#') {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 50);
+                    }
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeNavigation);
+        
+        // Глобальная функция для подтверждения закрытия с локализацией
+        window.confirmClose = function() {
+            {% if session.get('pin_authenticated') %}
+                return confirm('{{ _("Вы уверены, что хотите закрыть приложение?") }}');
+            {% else %}
+                return true;
+            {% endif %}
+        };
+        
+        // Обработчик закрытия окна с локализованным подтверждением
+        window.addEventListener('beforeunload', function (e) {
+            // Показываем подтверждение только если есть сессия
+            {% if session.get('pin_authenticated') %}
+                // Стандартное сообщение браузера
+                e.preventDefault();
+                e.returnValue = '{{ _("Вы уверены, что хотите закрыть приложение?") }}';
+                return e.returnValue;
+            {% endif %}
+        });
+        
+        // Альтернативный обработчик для pywebview
+        if (window.pywebview) {
+            window.pywebview.api.on_window_close = function() {
+                return window.confirmClose();
+            };
+        }
+
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-        function setTheme(theme) {
+        function setTheme(theme, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             document.documentElement.setAttribute('data-bs-theme', theme);
             document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
+            return false;
         }
 
-        function setZoom(zoom) {
+        function setZoom(zoom, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             document.body.style.zoom = zoom + '%';
             document.cookie = `ui_zoom=${zoom};path=/;max-age=31536000;SameSite=Lax`;
             // Показать уведомление о применении масштаба
@@ -156,6 +260,7 @@
                     alertDiv.remove();
                 }
             }, 3000);
+            return false;
         }
 
         // Улучшенная функция проверки IP с обработкой ошибок
@@ -285,7 +390,11 @@
         }
         
         // Функция выхода из системы
-        function logout() {
+        function logout(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             if (confirm('{{ _('Вы уверены, что хотите выйти из системы?') }}')) {
                 fetch('/pin/logout', {
                     method: 'POST',
@@ -295,13 +404,28 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        window.location.reload();
+                        // Для desktop app закрываем окно через специальный endpoint
+                        if (window.pywebview) {
+                            // Сначала делаем запрос на закрытие приложения
+                            fetch('/pin/exit_app', { method: 'POST' })
+                                .then(() => {
+                                    console.log('Exit request sent, waiting for app to close...');
+                                })
+                                .catch(err => console.log('App closing...'));
+                        } else {
+                            // Для web перезагружаем страницу
+                            window.location.reload();
+                        }
                     }
                 })
                 .catch(error => {
                     console.error('{{ _('Ошибка выхода:') }}', error);
-                    // В случае ошибки все равно перезагружаем страницу
-                    window.location.reload();
+                    // В случае ошибки тоже пытаемся закрыть
+                    if (window.pywebview) {
+                        window.close();
+                    } else {
+                        window.location.reload();
+                    }
                 });
             }
         }

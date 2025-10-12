@@ -128,17 +128,18 @@
 
                     <div class="row text-center small border-bottom pb-2 mb-2">
                         <div class="col">
-                            <span class="badge bg-{{ server.hosting_analysis.quality }}">{{ server.hosting_analysis.text }}</span>
+                            {% set analysis = server.get('hosting_analysis', {}) %}
+                            <span class="badge bg-{{ analysis.get('quality', 'secondary') }}">{{ analysis.get('text', 'N/A') }}</span>
                         </div>
                         <div class="col">
-                             {% if server.checks.get('dns_ok') %}
+                             {% if server.get('checks', {}).get('dns_ok') %}
                                 <span class="badge bg-success">{{ _('DNS OK') }}</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark">{{ _('DNS ?') }}</span>
                             {% endif %}
                         </div>
                         <div class="col">
-                             {% if server.checks.get('streaming_ok') %}
+                             {% if server.get('checks', {}).get('streaming_ok') %}
                                 <span class="badge bg-success">{{ _('Стриминг OK') }}</span>
                             {% else %}
                                 <span class="badge bg-warning text-dark">{{ _('Стриминг ?') }}</span>

@@ -5309,3 +5309,11 @@ msgstr[1] "{len_type} values are required, but {len_value} was given."
 #~ msgid "%"
 #~ msgstr "%"
 
+
+#: templates/layout.html:132
+msgid "Порт"
+msgstr "Port"
+
+#: templates/layout.html:202 templates/layout.html:214 desktop/window.py:122
+msgid "Вы уверены, что хотите закрыть приложение?"
+msgstr "Are you sure you want to close the application?"
