@@ -646,7 +646,7 @@
                         // Показываем блокировку с таймером
                         showPinLoginBlocked(data.remaining_seconds);
                     } else {
-                        showPinLoginMessage(data.message, 'danger');
+                        showPinLoginMessage(data.error || data.message || 'Неверный PIN-код', 'danger');
                     }
                 }
             })

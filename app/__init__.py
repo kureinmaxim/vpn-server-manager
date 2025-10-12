@@ -174,14 +174,14 @@ def load_app_info(app):
         else:
             # Заглушка если config.json не найден
             app.config['app_info'] = {
-                "version": "4.0.3",
+                "version": "4.0.5",
                 "last_updated": "2025-10-12",
                 "developer": "Куреин М.Н."
             }
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.0.3",
+            "version": "4.0.5",
             "last_updated": "2025-10-12",
             "developer": "Куреин М.Н."
         }
@@ -240,10 +240,11 @@ def create_app(config_name='development'):
     register_services(app)
     
     # Регистрация blueprints
-    from .routes import main_bp, api_bp, pin_bp
+    from .routes import main_bp, api_bp, pin_bp, vendor_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(pin_bp)
+    app.register_blueprint(vendor_bp)
     
     # Обработчики ошибок
     register_error_handlers(app)

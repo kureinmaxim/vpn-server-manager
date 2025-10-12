@@ -14,6 +14,9 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 # PIN endpoints (без /api префикса)
 pin_bp = Blueprint('pin', __name__, url_prefix='/pin')
 
+# Vendor endpoints (без префикса)
+vendor_bp = Blueprint('vendor', __name__)
+
 @api_bp.route('/servers', methods=['GET'])
 @require_auth
 @require_pin
@@ -208,6 +211,198 @@ def get_server_status(server_id):
             'success': False,
             'error': str(e)
         }), 500
+
+@api_bp.route('/server/<server_id>/stats', methods=['GET'])
+@require_auth
+@require_pin
+def get_server_stats(server_id):
+    """Получение статистики сервера через SSH"""
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        # Получаем данные сервера
+        from flask import current_app
+        servers = data_manager.load_servers(current_app.config)
+        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        
+        if not server:
+            return jsonify({
+                'error': f'Server with id {server_id} not found'
+            }), 404
+        
+        # Получаем timeout из параметров запроса
+        timeout = int(request.args.get('timeout', 30))
+        
+        # Получаем SSH credentials из правильной структуры
+        ssh_creds = server.get('ssh_credentials', {})
+        ssh_user = ssh_creds.get('user', 'root')
+        ssh_port = ssh_creds.get('port', 22)  # Получаем SSH порт
+        
+        # Проверяем, есть ли уже расшифрованный пароль
+        ssh_password = ssh_creds.get('password_decrypted', '')
+        
+        # Если нет, пытаемся расшифровать
+        if not ssh_password and ssh_creds.get('password'):
+            try:
+                ssh_password = data_manager.decrypt_data(ssh_creds['password'])
+            except Exception as e:
+                logger.error(f"Failed to decrypt SSH password: {str(e)}")
+        
+        if not ssh_password:
+            return jsonify({
+                'error': 'SSH password not available. Please edit server and set SSH credentials.'
+            }), 400
+        
+        # Получаем статистику через SSH
+        stats = ssh_service.get_server_stats(
+            ip=server.get('ip_address', server.get('ip', '')),
+            user=ssh_user,
+            password=ssh_password,
+            port=ssh_port,  # Передаем SSH порт
+            timeout=timeout
+        )
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting server stats {server_id}: {str(e)}")
+        
+        # Определяем тип ошибки для более понятного сообщения
+        error_message = str(e)
+        if "SSH authentication failed" in error_message:
+            error_message = f"SSH authentication failed. Please check username and password for server {server_id}."
+        elif "not responding" in error_message or "SSH service is not running" in error_message:
+            error_message = f"Server {server_id} is not responding. Please check if the server is online and SSH service is running."
+        elif "Connection timeout" in error_message:
+            error_message = f"Connection timeout to server {server_id}. Server may be slow or unreachable."
+        elif "SSH connection failed" in error_message:
+            error_message = f"SSH connection failed to server {server_id}. Please check network connectivity and SSH settings."
+        
+        return jsonify({
+            'error': error_message
+        }), 500
+
+@api_bp.route('/snapshot/save', methods=['POST'])
+@require_auth
+@require_pin
+def snapshot_save():
+    """Accepts a PNG data URL and saves it to Downloads (export dir). Returns JSON with filename."""
+    try:
+        import base64
+        import datetime
+        import os
+        
+        logger.info("Snapshot save request received")
+        
+        data = request.get_json(silent=True) or {}
+        data_url = data.get('data_url', '')
+        
+        if not data_url:
+            logger.error("No data_url provided")
+            return jsonify({"success": False, "error": "No data_url provided"}), 400
+            
+        if not data_url.startswith('data:image/png;base64,'):
+            logger.error(f"Invalid data_url format: {data_url[:50]}")
+            return jsonify({"success": False, "error": "Invalid data_url format"}), 400
+        
+        b64 = data_url.split(',', 1)[1]
+        img_bytes = base64.b64decode(b64)
+        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'server_status_{ts}.png'
+        
+        logger.info(f"Creating PNG file: {filename}, size: {len(img_bytes)} bytes")
+        
+        # Используем папку Downloads пользователя
+        downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        if os.path.exists(downloads_dir) and os.access(downloads_dir, os.W_OK):
+            export_dir = downloads_dir
+            logger.info(f"Using Downloads directory: {export_dir}")
+        else:
+            # Если Downloads недоступна, используем папку exports в проекте
+            export_dir = os.path.join(os.getcwd(), 'exports')
+            os.makedirs(export_dir, exist_ok=True)
+            logger.warning(f"Downloads not available, using exports: {export_dir}")
+        
+        path = os.path.join(export_dir, filename)
+        with open(path, 'wb') as f:
+            f.write(img_bytes)
+        
+        logger.info(f"PNG saved successfully: {path}")
+        return jsonify({"success": True, "filename": filename, "dir": export_dir})
+    except Exception as e:
+        logger.error(f"Error saving snapshot: {str(e)}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@vendor_bp.route('/vendor/html2canvas.min.js')
+def vendor_html2canvas():
+    """Serve html2canvas library"""
+    try:
+        # Простая но рабочая реализация html2canvas
+        html2canvas_code = """
+!function(window) {
+    'use strict';
+    
+    window.html2canvas = function(element, options) {
+        options = options || {};
+        
+        return new Promise(function(resolve, reject) {
+            try {
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                
+                // Получаем размеры элемента
+                var rect = element.getBoundingClientRect();
+                var scale = options.scale || window.devicePixelRatio || 2;
+                
+                canvas.width = rect.width * scale;
+                canvas.height = rect.height * scale;
+                ctx.scale(scale, scale);
+                
+                // Устанавливаем фон
+                ctx.fillStyle = options.backgroundColor || '#ffffff';
+                ctx.fillRect(0, 0, rect.width, rect.height);
+                
+                // Добавляем текстовое содержимое
+                ctx.fillStyle = '#000000';
+                ctx.font = '12px Arial';
+                
+                var textContent = element.innerText || element.textContent || '';
+                var lines = textContent.split('\\n');
+                var y = 20;
+                
+                for (var i = 0; i < lines.length && y < rect.height; i++) {
+                    var line = lines[i].trim();
+                    if (line) {
+                        ctx.fillText(line.substring(0, 80), 10, y);
+                        y += 16;
+                    }
+                }
+                
+                console.log('html2canvas: Canvas created successfully', canvas.width + 'x' + canvas.height);
+                resolve(canvas);
+                
+            } catch (e) {
+                console.error('html2canvas error:', e);
+                reject(e);
+            }
+        });
+    };
+    
+    console.log('html2canvas loaded successfully');
+    
+}(window);
+"""
+        return html2canvas_code, 200, {'Content-Type': 'application/javascript; charset=utf-8'}
+    except Exception as e:
+        logger.error(f"Error serving html2canvas: {str(e)}")
+        return f"console.error('html2canvas load failed:', '{str(e)}');", 200, {'Content-Type': 'application/javascript; charset=utf-8'}
 
 @api_bp.route('/ip-check', methods=['GET'])
 @require_auth
