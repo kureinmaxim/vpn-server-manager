@@ -33,7 +33,7 @@ if __name__ == '__main__':
     setup_logging()
     
     print("=" * 60)
-    print("🚀 VPN Server Manager v4.0.3 - Starting")
+    print("🚀 VPN Server Manager v4.0.5 - Starting")
     print(f"📍 Working directory: {os.getcwd()}")
     print(f"🐍 Python: {sys.executable}")
     print(f"📦 sys.argv: {sys.argv}")

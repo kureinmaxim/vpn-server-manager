@@ -5052,3 +5052,31 @@ msgstr "端口"
 #: templates/layout.html:202 templates/layout.html:214 desktop/window.py:122
 msgid "Вы уверены, что хотите закрыть приложение?"
 msgstr "您确定要关闭应用程序吗？"
+
+#: templates/index.html
+msgid "Не удалось сохранить на сервере:"
+msgstr "无法保存到服务器："
+
+#: templates/index.html
+msgid "Ошибка сохранения:"
+msgstr "保存错误："
+
+#: templates/index.html
+msgid "PNG сохранён:"
+msgstr "PNG已保存："
+
+#: templates/index.html
+msgid "Папка:"
+msgstr "文件夹："
+
+#: templates/settings.html:178
+msgid "Выберите зашифрованный файл данных из другой установки"
+msgstr "选择其他安装中的加密数据文件"
+
+#: app/routes/api.py:724
+msgid "Invalid PIN"
+msgstr "PIN码错误"
+
+#: app/routes/api.py:718
+msgid "Too many failed attempts. Blocked for 30 seconds."
+msgstr "失败次数过多。已锁定30秒。"

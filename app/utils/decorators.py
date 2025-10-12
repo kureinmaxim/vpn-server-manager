@@ -6,13 +6,29 @@ from ..exceptions import AuthenticationError, ValidationError
 
 logger = logging.getLogger(__name__)
 
+def is_api_request():
+    """Проверяет, является ли запрос API запросом"""
+    # AJAX запрос
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return True
+    # JSON запрос
+    if request.is_json:
+        return True
+    # API пути
+    if request.path.startswith('/api/') or request.path.startswith('/server/'):
+        return True
+    # Accept заголовок указывает на JSON
+    if 'application/json' in request.headers.get('Accept', ''):
+        return True
+    return False
+
 def require_auth(f: Callable) -> Callable:
     """Декоратор для проверки аутентификации"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         # Проверяем, есть ли PIN в сессии
         if not session.get('authenticated'):
-            if request.is_json:
+            if is_api_request():
                 return jsonify({'error': 'Authentication required'}), 401
             else:
                 return redirect(url_for('main.index_locked'))
@@ -24,7 +40,7 @@ def require_pin(f: Callable) -> Callable:
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('pin_verified'):
-            if request.is_json:
+            if is_api_request():
                 return jsonify({'error': 'PIN verification required'}), 401
             else:
                 return redirect(url_for('main.index_locked'))

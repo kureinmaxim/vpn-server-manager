@@ -5317,3 +5317,31 @@ msgstr "Port"
 #: templates/layout.html:202 templates/layout.html:214 desktop/window.py:122
 msgid "Вы уверены, что хотите закрыть приложение?"
 msgstr "Are you sure you want to close the application?"
+
+#: templates/index.html
+msgid "Не удалось сохранить на сервере:"
+msgstr "Failed to save on server:"
+
+#: templates/index.html
+msgid "Ошибка сохранения:"
+msgstr "Save error:"
+
+#: templates/index.html
+msgid "PNG сохранён:"
+msgstr "PNG saved:"
+
+#: templates/index.html
+msgid "Папка:"
+msgstr "Folder:"
+
+#: templates/settings.html:178
+msgid "Выберите зашифрованный файл данных из другой установки"
+msgstr "Select encrypted data file from another installation"
+
+#: app/routes/api.py:724
+msgid "Invalid PIN"
+msgstr "Invalid PIN"
+
+#: app/routes/api.py:718
+msgid "Too many failed attempts. Blocked for 30 seconds."
+msgstr "Too many failed attempts. Blocked for 30 seconds."
