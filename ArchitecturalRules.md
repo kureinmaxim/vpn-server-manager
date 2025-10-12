@@ -1,96 +1,244 @@
-Content is user-generated and unverified.
-Архитектурные правила для Flask-приложения
-Контекст проекта
-Разработка Flask-приложения с desktop GUI (pywebview), поддержкой интернационализации, SSH/SFTP функциональностью и криптографией.
+# Архитектурные правила для Flask-приложения v4.0.3
 
-Структура проекта
-project_root/
-├── app/
-│   ├── __init__.py              # Application Factory
-│   ├── config.py                # Конфигурация приложения
+## Контекст проекта
+
+**VPN Server Manager** - Flask-приложение с desktop GUI (pywebview), поддержкой интернационализации, SSH/SFTP функциональностью и криптографией.
+
+**v4.0.3**: 
+- ✅ Централизованное управление версией из `config.json`
+- ✅ Multi-App Support (параллельный запуск)
+- ✅ Модульная архитектура (Application Factory, Service Layer)
+- ✅ DataManagerService для управления данными
+
+## Структура проекта (v4.0.3)
+
+```
+VPNserverManage-Clean/
+├── run.py                        # Точка входа (web/desktop режимы)
+├── config.json                   # 🎯 Конфигурация (version: 4.0.3)
+├── .env                          # Секреты (SECRET_KEY)
+├── .env.example
+├── .gitignore
+├── requirements.txt
+├── setup.py                      # Автоматически читает версию из config.json
+├── build_macos.py                # Сборка с версией из config.json
+├── Makefile                      # Команды разработки
+├── babel.cfg                     # Babel конфигурация
+│
+├── app/                          # Основное приложение
+│   ├── __init__.py              # Application Factory + load_app_info
+│   ├── config.py                # Конфигурация (APP_DATA_DIR, APP_VERSION)
+│   ├── exceptions.py            # Кастомные исключения
 │   ├── models/                  # Модели данных
 │   │   ├── __init__.py
-│   │   └── user.py
-│   ├── services/                # Бизнес-логика
+│   │   └── server.py           # Модель VPN сервера
+│   ├── services/                # Бизнес-логика (Service Layer)
+│   │   ├── __init__.py         # ServiceRegistry (Dependency Injection)
+│   │   ├── ssh_service.py      # SSH/SFTP операции
+│   │   ├── crypto_service.py   # Шифрование/дешифрование
+│   │   ├── api_service.py      # HTTP API запросы
+│   │   └── data_manager_service.py  # 🆕 Управление данными (v4.0.1+)
+│   ├── routes/                  # Маршруты (Blueprint Architecture)
 │   │   ├── __init__.py
-│   │   ├── ssh_service.py       # Paramiko сервисы
-│   │   ├── crypto_service.py    # Cryptography сервисы
-│   │   └── api_service.py       # Requests сервисы
-│   ├── routes/                  # Маршруты (blueprints)
-│   │   ├── __init__.py
-│   │   ├── main.py
-│   │   └── api.py
-│   ├── templates/               # Jinja2 шаблоны
-│   │   ├── base.html
-│   │   └── index.html
-│   ├── static/                  # Статические файлы
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── images/
-│   ├── translations/            # Flask-Babel переводы
-│   │   ├── en/
-│   │   └── ru/
-│   ├── utils/                   # Утилиты
-│   │   ├── __init__.py
-│   │   ├── validators.py
-│   │   └── decorators.py
-│   └── exceptions.py            # Кастомные исключения
-├── desktop/
+│   │   ├── main.py             # Основные роуты + /shutdown (v4.0.2)
+│   │   └── api.py              # API endpoints + PIN auth
+│   └── utils/                   # Утилиты
+│       ├── __init__.py
+│       ├── validators.py
+│       └── decorators.py       # @require_auth, @require_pin
+│
+├── desktop/                     # Desktop GUI слой
 │   ├── __init__.py
-│   └── window.py                # pywebview конфигурация
-├── tests/
+│   └── window.py               # 🆕 WSGI + динамические порты (v4.0.2)
+│
+├── templates/                   # Jinja2 шаблоны (вне app/)
+│   ├── layout.html
+│   ├── index.html
+│   ├── index_locked.html       # PIN вход
+│   ├── settings.html
+│   └── ...
+│
+├── static/                      # Статические файлы (вне app/)
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── fonts/
+│
+├── translations/                # Flask-Babel переводы (вне app/)
+│   ├── en/LC_MESSAGES/
+│   ├── ru/LC_MESSAGES/
+│   └── zh/LC_MESSAGES/
+│
+├── data/                        # Данные приложения
+│   ├── servers.json.enc        # Зашифрованные серверы
+│   └── merged_*.enc            # Импортированные данные
+│
+├── uploads/                     # Загруженные иконки серверов
+├── logs/                        # Логи приложения
+│   └── app.log
+│
+├── tests/                       # Тесты
 │   ├── __init__.py
 │   ├── conftest.py
 │   ├── test_services/
 │   └── test_routes/
-├── migrations/                   # Если используется Flask-Migrate
-├── .env.example
-├── .env
-├── .gitignore
-├── requirements.txt
-├── babel.cfg                     # Babel конфигурация
-├── run.py                        # Точка входа
-└── README.md
-1. Application Factory Pattern
-ОБЯЗАТЕЛЬНО: Используйте паттерн Application Factory для создания Flask-приложения.
+│
+├── docs/                        # Документация
+│   ├── project_info/
+│   │   ├── PROJECT_STRUCTURE.md
+│   │   ├── BUILD.md
+│   │   ├── BACKUP_TOOLS.md
+│   │   └── SECRET_KEY.md
+│   ├── release_guide.md
+│   └── github_push_guide.md
+│
+└── backup_tools/                # Инструменты резервного копирования
+    └── ...
+```
+## 1. Application Factory Pattern
 
-python
+**ОБЯЗАТЕЛЬНО**: Используйте паттерн Application Factory для создания Flask-приложения.
+
+**v4.0.3**: Application Factory автоматически загружает версию из `config.json`.
+
+```python
 # app/__init__.py
 from flask import Flask
 from flask_babel import Babel
 from .config import config_by_name
+
+def load_app_info(app):
+    """Загрузка информации о приложении из config.json"""
+    try:
+        import json
+        app_data_dir = app.config.get('APP_DATA_DIR')
+        config_path = os.path.join(app_data_dir, 'config.json') if app_data_dir \
+                      else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.json')
+        
+        if os.path.exists(config_path):
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                app.config['app_info'] = config.get('app_info', {})
+                # Загружаем active_data_file если он есть
+                if 'active_data_file' in config:
+                    app.config['active_data_file'] = config['active_data_file']
+    except Exception as e:
+        app.logger.warning(f"Could not load app_info: {e}")
+        # Fallback версия
+        app.config['app_info'] = {
+            "version": "4.0.3",
+            "last_updated": "2025-10-12",
+            "developer": "Куреин М.Н."
+        }
 
 def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config_by_name[config_name])
     
     # Инициализация расширений
-    babel = Babel(app)
+    babel = Babel(app, locale_selector=get_locale)
+    
+    # Регистрация сервисов
+    register_services(app)
     
     # Регистрация blueprints
-    from .routes import main_bp, api_bp
+    from .routes import main_bp, api_bp, pin_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(pin_bp, url_prefix='/pin')
     
     # Обработчики ошибок
     register_error_handlers(app)
     
+    # Настройка сессий (v4.0.2: уникальные cookie)
+    app.config['SESSION_COOKIE_NAME'] = 'vpn_manager_session_clean'
+    
+    # Загрузка app_info из config.json
+    load_app_info(app)
+    
+    # Контекстный процессор для app_info
+    @app.context_processor
+    def inject_app_info():
+        return {'app_info': app.config.get('app_info', {})}
+    
     return app
-2. Конфигурация через переменные окружения
-ПРАВИЛО: Все чувствительные данные и настройки окружения хранятся в .env файле.
+```
+## 2. Конфигурация через переменные окружения + config.json
 
-python
+**ПРАВИЛО**: Чувствительные данные в `.env`, настройки приложения в `config.json`.
+
+**v4.0.3**: Версия хранится **ТОЛЬКО** в `config.json` и загружается автоматически!
+
+```python
 # app/config.py
 import os
+import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_app_data_dir():
+    """
+    Возвращает директорию для хранения данных приложения.
+    Production: ~/Library/Application Support/VPNServerManager-Clean/ (macOS)
+    Development: текущая директория проекта
+    """
+    is_frozen = getattr(sys, 'frozen', False)
+    app_name = "VPNServerManager-Clean"
+    
+    if is_frozen:  # Упакованное приложение
+        if sys.platform == 'darwin':  # macOS
+            app_data_dir = os.path.join(
+                os.path.expanduser("~"), 
+                "Library", "Application Support", 
+                app_name
+            )
+        elif sys.platform == 'win32':  # Windows
+            app_data_dir = os.path.join(
+                os.getenv('APPDATA', os.path.expanduser("~")),
+                app_name
+            )
+        else:  # Linux
+            app_data_dir = os.path.join(
+                os.path.expanduser("~"),
+                ".local", "share",
+                app_name
+            )
+    else:  # Режим разработки
+        app_data_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
+    os.makedirs(app_data_dir, exist_ok=True)
+    return app_data_dir
+
 class Config:
     """Базовая конфигурация"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    BABEL_DEFAULT_LOCALE = os.getenv('BABEL_DEFAULT_LOCALE', 'en')
+    BABEL_DEFAULT_LOCALE = os.getenv('BABEL_DEFAULT_LOCALE', 'ru')
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
+    BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
+    
+    # v4.0.3: Версия из config.json (fallback)
+    APP_VERSION = os.getenv('APP_VERSION', '4.0.3')
+    APP_NAME = 'VPNServerManager-Clean'
+    APP_DATA_DIR = get_app_data_dir()
+    
+    # Настройки данных
+    DATA_DIR = os.getenv('DATA_DIR', 'data')
+    SERVERS_FILE = os.getenv('SERVERS_FILE', 'servers.json.enc')
+    
+    # API URLs
+    IP_CHECK_API = os.getenv('IP_CHECK_API', 'https://ipinfo.io/{ip}/json')
+    GENERAL_IP_TEST = os.getenv('GENERAL_IP_TEST', 'https://browserleaks.com/ip')
+    
+    # Настройки загрузки файлов
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
+    MAX_CONTENT_LENGTH = int(os.getenv('MAX_CONTENT_LENGTH', '16777216'))
+    ALLOWED_EXTENSIONS = {'enc', 'env', 'txt', 'zip', 'json'}
+    
+    # Настройки логирования
+    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
+    LOG_FILE = os.getenv('LOG_FILE', 'logs/app.log')
     
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -98,23 +246,82 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    # Дополнительные настройки production
+    LOG_LEVEL = 'WARNING'
 
 class TestingConfig(Config):
     TESTING = True
+    DEBUG = True
+    DATA_DIR = 'test_data'
     
 config_by_name = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
     'testing': TestingConfig
 }
-3. Слой сервисов (Service Layer)
-ПРИНЦИП: Вся бизнес-логика изолирована в отдельном слое сервисов.
+```
 
-python
+**config.json** (источник истины для версии):
+```json
+{
+  "SECRET_KEY_FILE": ".env",
+  "app_info": {
+    "version": "4.0.3",
+    "release_date": "12.10.2025",
+    "developer": "Куреин М.Н.",
+    "last_updated": "2025-10-12"
+  },
+  "service_urls": { ... },
+  "active_data_file": "...",
+  "secret_pin": { ... }
+}
+```
+## 3. Слой сервисов (Service Layer)
+
+**ПРИНЦИП**: Вся бизнес-логика изолирована в отдельном слое сервисов.
+
+**v4.0.3**: Добавлен `DataManagerService` для управления данными, экспорта/импорта.
+
+```python
+# app/services/__init__.py
+class ServiceRegistry:
+    """Реестр сервисов (Dependency Injection)"""
+    _services = {}
+    
+    @classmethod
+    def register(cls, name: str, service):
+        cls._services[name] = service
+    
+    @classmethod
+    def get(cls, name: str):
+        return cls._services.get(name)
+
+registry = ServiceRegistry()
+
+# app/__init__.py (регистрация сервисов)
+def register_services(app):
+    """Регистрация сервисов в реестре"""
+    from .services.ssh_service import SSHService
+    from .services.crypto_service import CryptoService
+    from .services.api_service import APIService
+    from .services.data_manager_service import DataManagerService
+    
+    registry.register('ssh', SSHService())
+    registry.register('crypto', CryptoService())
+    registry.register('api', APIService())
+    
+    # DataManagerService требует secret_key и app_data_dir
+    secret_key = app.config.get('SECRET_KEY')
+    app_data_dir = app.config.get('APP_DATA_DIR')
+    if secret_key and app_data_dir:
+        data_manager = DataManagerService(secret_key, app_data_dir)
+        registry.register('data_manager', data_manager)
+```
+
+### SSHService
+```python
 # app/services/ssh_service.py
 import paramiko
-from typing import Optional, Dict
+from typing import Optional
 from ..exceptions import SSHConnectionError
 
 class SSHService:
@@ -139,6 +346,13 @@ class SSHService:
         except Exception as e:
             raise SSHConnectionError(f"Failed to connect: {str(e)}")
     
+    def execute_command(self, command: str) -> tuple:
+        """Выполнение команды на сервере"""
+        if not self.client:
+            raise SSHConnectionError("Not connected")
+        stdin, stdout, stderr = self.client.exec_command(command)
+        return stdout.read().decode(), stderr.read().decode()
+    
     def disconnect(self) -> None:
         """Закрытие соединения"""
         if self.client:
@@ -149,11 +363,12 @@ class SSHService:
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.disconnect()
-python
+```
+
+### CryptoService
+```python
 # app/services/crypto_service.py
 from cryptography.fernet import Fernet
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
 import base64
 
 class CryptoService:
@@ -177,6 +392,58 @@ class CryptoService:
         f = Fernet(key)
         decrypted = f.decrypt(base64.b64decode(encrypted_data))
         return decrypted.decode()
+```
+
+### DataManagerService (v4.0.1+)
+```python
+# app/services/data_manager_service.py
+from cryptography.fernet import Fernet
+import json
+import os
+
+class DataManagerService:
+    """Сервис для управления данными (экспорт/импорт/бэкап)"""
+    
+    def __init__(self, secret_key: str, app_data_dir: str):
+        self.secret_key = secret_key
+        self.app_data_dir = app_data_dir
+        self.fernet = Fernet(secret_key.encode() if isinstance(secret_key, str) else secret_key)
+    
+    def load_servers(self, config):
+        """Загрузка серверов из активного файла"""
+        active_file = config.get('active_data_file')
+        if not active_file or not os.path.exists(active_file):
+            return []
+        
+        try:
+            with open(active_file, 'rb') as f:
+                encrypted_data = f.read()
+            decrypted = self.fernet.decrypt(encrypted_data)
+            return json.loads(decrypted.decode('utf-8'))
+        except Exception as e:
+            logger.error(f"Error loading servers: {e}")
+            return []
+    
+    def save_servers(self, servers, filepath):
+        """Сохранение серверов в зашифрованный файл"""
+        try:
+            json_data = json.dumps(servers, ensure_ascii=False, indent=2)
+            encrypted = self.fernet.encrypt(json_data.encode('utf-8'))
+            with open(filepath, 'wb') as f:
+                f.write(encrypted)
+            return True
+        except Exception as e:
+            logger.error(f"Error saving servers: {e}")
+            return False
+    
+    def export_data(self, export_dir):
+        """Экспорт данных"""
+        # ... реализация экспорта
+    
+    def import_data(self, file_path):
+        """Импорт данных"""
+        # ... реализация импорта
+```
 4. Blueprints для модульности
 ПРАВИЛО: Разделяйте функциональность на blueprints.
 
@@ -230,40 +497,136 @@ babel = Babel(app, locale_selector=get_locale)
 # В шаблонах и коде
 from flask_babel import gettext as _
 message = _('Welcome to application')
-7. Desktop GUI с pywebview
-АРХИТЕКТУРА: Разделяйте web и desktop слои.
+## 7. Desktop GUI с pywebview (v4.0.2 - Multi-App Support)
 
-python
+**АРХИТЕКТУРА**: Разделяйте web и desktop слои.
+
+**v4.0.2+**: WSGI сервер с динамическим портом (порт 0) для параллельного запуска.
+
+```python
 # desktop/window.py
 import webview
+import threading
+import time
+import signal
+from wsgiref.simple_server import make_server
 from app import create_app
 
+# Глобальные переменные для управления сервером
+SERVER_PORT = None
+_WSGI_SERVER = None
+
 class DesktopApp:
-    def __init__(self):
-        self.app = create_app('production')
+    def __init__(self, config_name='production'):
+        self.config_name = config_name
+        self.app = None
+        self.window = None
+        self.server_thread = None
+    
+    def create_flask_app(self):
+        """Создание Flask приложения"""
+        self.app = create_app(self.config_name)
+        return self.app
+    
+    def start_flask_server(self):
+        """Запуск Flask сервера с динамическим портом"""
+        global SERVER_PORT, _WSGI_SERVER
         
+        if self.app:
+            # Порт 0 = ОС автоматически выбирает свободный порт
+            _WSGI_SERVER = make_server('127.0.0.1', 0, self.app)
+            SERVER_PORT = _WSGI_SERVER.server_port
+            
+            logger.info(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
+            _WSGI_SERVER.serve_forever()
+    
     def start(self):
         """Запуск desktop приложения"""
-        webview.create_window(
-            'Application Name',
-            self.app,
+        global SERVER_PORT
+        
+        # Создаем Flask приложение
+        self.create_flask_app()
+        
+        # Запускаем Flask сервер в отдельном потоке
+        self.server_thread = threading.Thread(target=self.start_flask_server, daemon=True)
+        self.server_thread.start()
+        
+        # Ожидание инициализации сервера
+        for _ in range(100):
+            if SERVER_PORT:
+                break
+            time.sleep(0.05)
+        
+        # Создаем окно pywebview с динамическим URL
+        self.window = webview.create_window(
+            'VPN Server Manager - Clean',
+            f'http://127.0.0.1:{SERVER_PORT}',  # Динамический порт!
             width=1200,
             height=800,
             resizable=True
         )
+        
+        # Обработчик закрытия
+        self.window.events.closing += self.on_closing
+        
         webview.start()
+    
+    def on_closing(self):
+        """Graceful shutdown"""
+        global SERVER_PORT, _WSGI_SERVER
+        if SERVER_PORT and _WSGI_SERVER:
+            _WSGI_SERVER.shutdown()
 
-# run.py
-if __name__ == '__main__':
-    import sys
+# run.py (v4.0.3 с версией из config.json)
+import sys
+import os
+import socket
+import logging
+
+def find_free_port(start_port=5000, max_attempts=100):
+    """Находит свободный порт для web режима"""
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('127.0.0.1', port))
+                return port
+        except OSError:
+            continue
+    raise RuntimeError(f"Could not find free port")
+
+def main():
     if '--desktop' in sys.argv:
+        # Desktop режим (порт автоматический)
         from desktop.window import DesktopApp
-        app = DesktopApp()
+        config_name = 'development' if '--debug' in sys.argv else 'production'
+        app = DesktopApp(config_name)
         app.start()
     else:
+        # Web режим (динамический порт)
         from app import create_app
-        app = create_app()
-        app.run()
+        config_name = 'development' if '--debug' in sys.argv else 'production'
+        app = create_app(config_name)
+        
+        port = find_free_port(5000)
+        
+        # Загружаем версию из config.json
+        import json
+        version = "4.0.3"
+        try:
+            with open('config.json', 'r') as f:
+                config = json.load(f)
+                version = config['app_info']['version']
+        except:
+            pass
+        
+        print(f"\n🌐 VPN Server Manager v{version}")
+        print(f"📡 Web server: http://127.0.0.1:{port}\n")
+        
+        app.run(host='127.0.0.1', port=port, debug=(config_name == 'development'))
+
+if __name__ == '__main__':
+    main()
+```
 8. Работа с внешними API (requests)
 ПРИНЦИП: Изолируйте HTTP-запросы в отдельный сервис с retry-логикой.
 
@@ -377,27 +740,63 @@ def test_encryption_decryption():
     
     assert decrypted == original
     assert encrypted != original
-12. Dependency Injection
-ПРИНЦИП: Используйте DI для управления зависимостями сервисов.
+## 12. Dependency Injection (Service Registry)
 
-python
+**ПРИНЦИП**: Используйте DI для управления зависимостями сервисов.
+
+**v4.0.3**: Все сервисы регистрируются в `ServiceRegistry` при инициализации приложения.
+
+```python
 # app/services/__init__.py
 class ServiceRegistry:
-    """Реестр сервисов"""
+    """Реестр сервисов для Dependency Injection"""
     _services = {}
     
     @classmethod
     def register(cls, name: str, service):
+        """Регистрация сервиса"""
         cls._services[name] = service
     
     @classmethod
     def get(cls, name: str):
+        """Получение сервиса"""
         return cls._services.get(name)
+    
+    @classmethod
+    def clear(cls):
+        """Очистка реестра (для тестов)"""
+        cls._services = {}
 
-# Инициализация
 registry = ServiceRegistry()
-registry.register('ssh', SSHService())
-registry.register('crypto', CryptoService())
+
+# app/__init__.py (регистрация при создании приложения)
+def register_services(app):
+    """Регистрация всех сервисов"""
+    from .services.ssh_service import SSHService
+    from .services.crypto_service import CryptoService
+    from .services.api_service import APIService
+    from .services.data_manager_service import DataManagerService
+    
+    # Базовые сервисы
+    registry.register('ssh', SSHService())
+    registry.register('crypto', CryptoService())
+    registry.register('api', APIService())
+    
+    # DataManagerService с зависимостями
+    secret_key = app.config.get('SECRET_KEY')
+    app_data_dir = app.config.get('APP_DATA_DIR')
+    if secret_key and app_data_dir:
+        registry.register('data_manager', DataManagerService(secret_key, app_data_dir))
+
+# Использование в routes
+from app.services import registry
+
+@main_bp.route('/servers')
+def list_servers():
+    data_manager = registry.get('data_manager')
+    servers = data_manager.load_servers(current_app.config)
+    return render_template('index.html', servers=servers)
+```
 Контрольный список (Checklist)
  Application Factory реализован
  Все секреты в .env

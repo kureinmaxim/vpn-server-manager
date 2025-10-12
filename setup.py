@@ -1,5 +1,15 @@
 from setuptools import setup, find_packages
 import os
+import json
+
+# Читаем версию из config.json
+def get_version():
+    try:
+        with open("config.json", "r", encoding="utf-8") as fh:
+            config = json.load(fh)
+            return config.get('app_info', {}).get('version', '4.0.3')
+    except:
+        return '4.0.3'
 
 # Читаем README файл
 def read_readme():
@@ -13,7 +23,7 @@ def read_requirements():
 
 setup(
     name="vpn-server-manager-clean",
-    version="4.0.0",
+    version=get_version(),
     author="Куреин М.Н.",
     author_email="",
     description="VPN Server Manager - Clean - Управление VPN серверами",

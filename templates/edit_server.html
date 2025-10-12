@@ -8,7 +8,7 @@
     <hr>
     <div class="row">
         <div class="col-md-8">
-            <form action="{{ url_for('edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
+            <form action="{{ url_for('main.edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
                 <h5 class="mt-4">{{ _('Основная информация') }}</h5>
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -73,7 +73,7 @@
                         {% if server.icon_filename %}
                         <div class="mt-2">
                             <small>{{ _('Текущая:') }}</small>
-                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: contain; margin-left: 10px;">
+                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: contain; margin-left: 10px;">
                         </div>
                         {% endif %}
                     </div>
@@ -297,7 +297,7 @@
                     <div>
                         <strong>{{ receipt.description or _('Чек') }}</strong><br>
                         <small class="text-muted">{{ _('Загружен:') }} {{ receipt.upload_date | format_datetime }}</small><br>
-                        <a href="{{ url_for('uploaded_file', filename=receipt.filename) }}" target="_blank">{{ receipt.original_name }}</a>
+                        <a href="{{ url_for('main.uploaded_file', filename=receipt.filename) }}" target="_blank">{{ receipt.original_name }}</a>
                     </div>
                     <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="{{ receipt.filename }}">
                         <i class="bi bi-trash"></i>
