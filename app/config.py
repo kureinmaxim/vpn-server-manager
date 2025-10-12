@@ -67,7 +67,7 @@ class Config:
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
     # Настройки приложения
-    APP_VERSION = os.getenv('APP_VERSION', '4.0.3')
+    APP_VERSION = os.getenv('APP_VERSION', '4.0.5')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     

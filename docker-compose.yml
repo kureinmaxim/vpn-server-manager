@@ -1,14 +1,25 @@
 version: '3.8'
 
+# VPN Server Manager v4.0.5
+# Docker Compose конфигурация для запуска приложения
+
 services:
   vpn-manager:
     build: .
+    container_name: vpn-manager
     ports:
       - "5000:5000"
     environment:
       - FLASK_ENV=production
       - SECRET_KEY=your-production-secret-key-here
+      # Раскомментируйте для кастомизации:
+      # - APP_VERSION=4.0.5
+      # - BABEL_DEFAULT_LOCALE=ru
+      # - LOG_LEVEL=INFO
+      # - DEFAULT_PIN=1234
     volumes:
+      # Для macOS: добавьте :delegated для лучшей производительности
+      # Для Windows: убедитесь, что пути корректны
       - ./data:/app/data
       - ./logs:/app/logs
       - ./uploads:/app/uploads
@@ -19,17 +30,25 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    # Раскомментируйте для Apple Silicon (M1/M2/M3):
+    # platform: linux/arm64
+    # Или для совместимости с Intel:
+    # platform: linux/amd64
 
   # Опциональный сервис для разработки
+  # Запуск: docker-compose --profile dev up
   vpn-manager-dev:
     build: .
+    container_name: vpn-manager-dev
     ports:
       - "5001:5000"
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
       - SECRET_KEY=dev-secret-key
+      - APP_VERSION=4.0.5
     volumes:
+      # Hot reload - монтирование исходного кода
       - .:/app
       - ./data:/app/data
       - ./logs:/app/logs
@@ -37,3 +56,17 @@ services:
     command: python run.py --debug
     profiles:
       - dev
+    # Раскомментируйте для Apple Silicon:
+    # platform: linux/arm64
+
+# Volumes для persistent data (опционально)
+# volumes:
+#   vpn-manager-data:
+#     driver: local
+#   vpn-manager-logs:
+#     driver: local
+
+# Кастомная сеть (опционально)
+# networks:
+#   vpn-manager-network:
+#     driver: bridge
