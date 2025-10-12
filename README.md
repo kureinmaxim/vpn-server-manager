@@ -1,10 +1,25 @@
-# VPN Server Manager v4.0.3
+# VPN Server Manager v4.0.5
 
 Современное приложение для управления VPN-серверами с модульной архитектурой, шифрованием данных и поддержкой офлайн режима.
 
 ![VPN Server Manager](static/VPSc.png)
 
 ## 🆕 Последние обновления
+
+### v4.0.5 (12 октября 2025)
+- 🐛 **Функция "Сохранить как PNG"**: Полностью реализована функция сохранения статистики сервера в PNG-файл в папку Downloads
+- 🔐 **PIN аутентификация**: Исправлено отображение ошибки при неправильном PIN - теперь показывается текст "Неверный PIN-код"
+- 🌐 **SSH подключение**: Добавлена поддержка нестандартных SSH портов (например, 2222)
+- 🌍 **Переводы**: Добавлены и скомпилированы новые строки перевода для английского и китайского языков
+- 📝 **Опечатки**: Исправлена опечатка "Выберать" → "Выберите" в форме импорта данных
+
+### v4.0.4 (12 октября 2025)
+- 🪟 **Поддержка Windows**: Добавлены автоматические скрипты установки и запуска для Windows (`setup_windows.bat`, `start_windows.bat`).
+- 📖 **Документация для Windows**: Создано подробное руководство [README_WINDOWS.md](README_WINDOWS.md) с пошаговыми инструкциями.
+- 🔧 **Исправлен generate_key.py**: Теперь сохраняет все настройки из `env.example` при генерации ключа шифрования.
+- 📝 **Улучшенная документация**: Обновлены инструкции по установке с разделением команд для macOS/Linux и Windows.
+- 🎯 **Единая версия**: Синхронизация версии приложения во всех компонентах из `config.json`.
+- 🔄 **Git конфигурация**: Добавлен `.gitattributes` для корректной работы с line endings на разных платформах.
 
 ### v4.0.3 (12 октября 2025)
 - 📦 **Исправлена сборка для macOS**: Приложение (`.app`) теперь запускается корректно с правильной версией и путями к данным.
@@ -29,7 +44,7 @@
 ## ⬇️ Скачать
 
 - Последний релиз: [Latest Release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest)
-- Прямая ссылка (v4.0.3, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v4.0.3/VPNServerManager-Clean_Installer.dmg)
+- Прямая ссылка (v4.0.5, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v4.0.5/VPNServerManager-Clean_Installer.dmg)
 - SHA256(DMG): `[будет добавлен после сборки]`
 
 ## 🚀 Возможности v4.0
@@ -61,6 +76,7 @@
 ## 📋 Документация
 
 - 📚 **[Индекс документации](docs/INDEX.md)** - Полный каталог всей документации проекта
+- 🪟 **[Руководство для Windows](README_WINDOWS.md)** - Подробная инструкция для пользователей Windows
 
 ### Основная документация
 
@@ -97,7 +113,19 @@
 - Установленный pip
 - Виртуальное окружение Python (рекомендуется)
 
-### Шаги установки
+### Быстрая установка (Windows)
+
+Для пользователей Windows доступны готовые скрипты:
+
+```cmd
+# Автоматическая установка (создание venv, установка зависимостей, генерация ключа)
+setup_windows.bat
+
+# Запуск приложения
+start_windows.bat
+```
+
+### Ручная установка
 
 1. Клонируйте репозиторий:
    ```bash
@@ -106,29 +134,87 @@
    ```
 
 2. Создайте и активируйте виртуальное окружение:
+
+   **macOS/Linux:**
    ```bash
-   # macOS/Linux
    python3 -m venv venv
    source venv/bin/activate
+   ```
    
-   # Windows
+   **Windows (CMD):**
+   ```cmd
    python -m venv venv
    venv\Scripts\activate
    ```
+   
+   **Windows (PowerShell):**
+   ```powershell
+   python -m venv venv
+   venv\Scripts\Activate.ps1
+   
+   # Если возникает ошибка "execution policy":
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
 
 3. Установите зависимости:
+
+   **macOS/Linux:**
    ```bash
    pip install -r requirements.txt
    ```
-
-4. Настройте окружение:
-   ```bash
-   cp env.example .env
-   # Отредактируйте .env файл с вашими настройками
+   
+   **Windows:**
+   ```cmd
+   pip install -r requirements.txt
    ```
 
-5. Запустите приложение:
+4. Сгенерируйте ключ шифрования и создайте .env файл:
+
+   **macOS/Linux:**
    ```bash
+   python3 generate_key.py
+   ```
+   
+   **Windows:**
+   ```cmd
+   python generate_key.py
+   ```
+   
+   Скрипт автоматически:
+   - Скопирует `env.example` в `.env` (если `.env` не существует)
+   - Сгенерирует и установит безопасный `SECRET_KEY`
+   - Сохранит все остальные настройки из `env.example`
+
+5. (Опционально) Настройте дополнительные параметры в `.env`:
+
+   **macOS/Linux:**
+   ```bash
+   nano .env
+   # или
+   vim .env
+   ```
+   
+   **Windows:**
+   ```cmd
+   notepad .env
+   ```
+
+6. Запустите приложение:
+
+   **macOS/Linux:**
+   ```bash
+   # Web режим
+   python3 run.py
+   
+   # Desktop режим
+   python3 run.py --desktop
+   
+   # Debug режим
+   python3 run.py --debug
+   ```
+   
+   **Windows:**
+   ```cmd
    # Web режим
    python run.py
    
@@ -137,11 +223,6 @@
    
    # Debug режим
    python run.py --debug
-   ```
-
-6. Сгенерируйте ключ шифрования (при первом запуске):
-   ```bash
-   python generate_key.py
    ```
 
 ### 🐳 Docker

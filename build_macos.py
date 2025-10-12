@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Скрипт для сборки VPN Server Manager v4.0.3 с новой модульной архитектурой.
+Скрипт для сборки VPN Server Manager v4.0.5 с новой модульной архитектурой.
 Включает поддержку Application Factory, Service Layer и современные практики разработки.
 Версия автоматически загружается из config.json.
 """
@@ -368,6 +368,20 @@ def build_app():
                 print(f"✅ Info.plist обновлен: версия {version}")
             except Exception as e:
                 print(f"⚠️ Не удалось обновить Info.plist: {e}")
+        
+        # Копируем config.json в пользовательскую папку для обновления версии
+        try:
+            import os
+            user_config_dir = os.path.expanduser('~/Library/Application Support/VPNServerManager-Clean')
+            if os.path.exists(user_config_dir):
+                import shutil
+                project_config = PROJECT_ROOT / 'config.json'
+                user_config = os.path.join(user_config_dir, 'config.json')
+                if project_config.exists():
+                    shutil.copy2(project_config, user_config)
+                    print(f"✅ config.json обновлен в пользовательской папке (версия {version})")
+        except Exception as e:
+            print(f"⚠️ Не удалось обновить пользовательский config.json: {e}")
     
     return True
 
@@ -690,13 +704,13 @@ def get_version_from_config():
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                return config.get('app_info', {}).get('version', '4.0.3')
+                return config.get('app_info', {}).get('version', '4.0.5')
         else:
             print("⚠️ config.json не найден, используем версию по умолчанию")
-            return '4.0.3'
+            return '4.0.5'
     except Exception as e:
         print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
-        return '4.0.3'
+        return '4.0.5'
 
 def main():
     """Основная функция сборки"""

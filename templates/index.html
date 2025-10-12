@@ -685,12 +685,21 @@
         if (!currentServerId) return;
         var spin = document.getElementById('refreshSpin');
         if (spin) spin.classList.remove('d-none');
-        fetch('/server/' + currentServerId + '/stats?timeout=10')
-            .then(function(r){ return r.json() })
+        fetch('/api/server/' + currentServerId + '/stats?timeout=10')
+            .then(function(r){
+                // Проверяем статус ответа
+                if (r.status === 302 || r.status === 401) {
+                    throw new Error('{{ _("Сессия истекла. Пожалуйста, войдите заново.") }}');
+                }
+                if (!r.ok) {
+                    throw new Error('HTTP ' + r.status + ': ' + r.statusText);
+                }
+                return r.json();
+            })
             .then(function(data){
                 if (!data || data.error) {
                     consecutiveErrors += 1;
-                    showWarning(data && data.error ? data.error : 'Unknown error');
+                    showWarning(data && data.error ? data.error : '{{ _("Неизвестная ошибка") }}');
                     if (consecutiveErrors >= maxConsecutiveErrors) {
                         if (statusIntervalId) { clearInterval(statusIntervalId); }
                         statusIntervalId = null;
@@ -707,7 +716,8 @@
             })
             .catch(function(err){
                 consecutiveErrors += 1;
-                showWarning('Fetch failed: ' + err);
+                var errorMsg = err.message || err.toString();
+                showWarning('{{ _("Ошибка") }}: ' + errorMsg);
                 if (consecutiveErrors >= maxConsecutiveErrors) {
                     if (statusIntervalId) { clearInterval(statusIntervalId); }
                     statusIntervalId = null;
@@ -818,7 +828,7 @@
         var disks = stats.disks || [];
         for (var j = 0; j < disks.length; j++) {
             var d = disks[j];
-            var pcent = parseInt(d.pcent.replace('%', ''), 10);
+            var pcent = parseInt(d.used_pct || 0, 10);
             var pbarClass = pcent < 70 ? 'bg-success' : (pcent < 90 ? 'bg-warning' : 'bg-danger');
             var item = document.createElement('div');
             item.className = 'mb-2';
@@ -854,13 +864,33 @@
         // Processes table
         var procWrap = document.getElementById('proc-table');
         var procs = stats.processes || [];
-        var procHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead><tbody>';
-        for (var p = 0; p < procs.length; p++) {
-            var pr = procs[p];
-            procHtml += '<tr><td class="ps-0">' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
+        if (procs.length === 0) {
+            procWrap.innerHTML = '<div class="text-muted">{{ _("Нет данных о процессах") }}</div>';
+        } else {
+            var procHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead><tbody>';
+            for (var p = 0; p < procs.length; p++) {
+                var pr = procs[p];
+                procHtml += '<tr><td class="ps-0">' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
+            }
+            procHtml += '</tbody></table>';
+            procWrap.innerHTML = procHtml;
         }
-        procHtml += '</tbody></table>';
-        procWrap.innerHTML = procHtml;
+
+        // Networks list
+        var netList = document.getElementById('net-list');
+        netList.innerHTML = '';
+        var nets = stats.net || [];
+        if (nets.length === 0) {
+            netList.innerHTML = '<li class="list-group-item text-muted">{{ _("Нет данных о сетевых интерфейсах") }}</li>';
+        } else {
+            for (var i = 0; i < nets.length; i++) {
+                var n = nets[i];
+                var li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center py-1';
+                li.innerHTML = '<span><strong>' + (n.interface || '') + '</strong> <small class="text-muted">(' + (n.family || '') + ')</small></span><span class="text-end text-truncate ms-2" style="max-width: 60%;">' + (n.address || '') + '</span>';
+                netList.appendChild(li);
+            }
+        }
 
         // Docker table
         var dockWrap = document.getElementById('docker-table');
@@ -937,80 +967,102 @@
         var btn = document.getElementById('saveStatusImageBtn');
         if (btn) {
             btn.addEventListener('click', function(){
-                if (typeof ensureHtml2CanvasLoaded === 'function') {
-                    ensureHtml2CanvasLoaded(captureStatusModal);
-                } else if (window.html2canvas) {
+                console.log('Save PNG button clicked');
+                if (window.html2canvas) {
                     captureStatusModal();
                 } else {
-                    // Всегда пробуем локальный vendor-роут
+                    // Загружаем html2canvas
+                    console.log('Loading html2canvas...');
                     var s = document.createElement('script');
                     s.src = '/vendor/html2canvas.min.js';
-                    s.onload = captureStatusModal;
+                    s.type = 'text/javascript';
+                    s.async = false; // Загружаем синхронно
+                    s.onload = function() {
+                        console.log('html2canvas loaded successfully');
+                        if (window.html2canvas) {
+                            captureStatusModal();
+                        } else {
+                            console.error('html2canvas not available after load');
+                            alert('Библиотека html2canvas не загрузилась корректно');
+                        }
+                    };
+                    s.onerror = function(e) {
+                        console.error('Failed to load html2canvas:', e);
+                        alert('Ошибка загрузки библиотеки html2canvas. Попробуйте обновить страницу.');
+                    };
                     document.head.appendChild(s);
                 }
             });
+        } else {
+            console.error('Save PNG button not found');
         }
     });
 
     function captureStatusModal(){
-        var modalEl = document.getElementById('serverStatusModal');
-        if (!modalEl) { return; }
-        var content = modalEl.querySelector('.modal-content');
-        if (!content) { return; }
-        // Разворачиваем модалку на время снимка, чтобы захватить весь контент
-        var dialog = modalEl.querySelector('.modal-dialog');
-        var bodyEl = modalEl.querySelector('.modal-body');
-        var hadScrollable = dialog && dialog.classList.contains('modal-dialog-scrollable');
-        var prevDialogOverflow = dialog ? dialog.style.overflow : '';
-        var prevBodyMaxH = bodyEl ? bodyEl.style.maxHeight : '';
-        var prevBodyOverflow = bodyEl ? bodyEl.style.overflow : '';
-        if (dialog && hadScrollable) { dialog.classList.remove('modal-dialog-scrollable'); }
-        if (dialog) { dialog.style.overflow = 'visible'; }
-        if (bodyEl) { bodyEl.style.maxHeight = 'none'; bodyEl.style.overflow = 'visible'; bodyEl.scrollTop = 0; }
+        console.log('captureStatusModal called');
+        var modal = document.getElementById('serverStatusModal');
+        var content = document.getElementById('statsContent');
+        
+        if (!modal || !content) {
+            console.error('Modal or content not found');
+            alert('{{ _("Модальное окно не найдено") }}');
+            return;
+        }
+        
+        console.log('Starting html2canvas capture...');
+        
         // Небольшая задержка для перерасчёта лэйаута
         setTimeout(function(){
             var scale = window.devicePixelRatio || 1;
             var prevTransform = content.style.transform;
             content.style.transform = 'scale(1)';
             var fullHeight = content.scrollHeight;
+            
             window.html2canvas(content, {
-                backgroundColor: null,
+                backgroundColor: '#ffffff',
                 scale: Math.max(2, scale),
                 height: fullHeight,
-                windowHeight: fullHeight
+                windowHeight: fullHeight,
+                useCORS: true,
+                allowTaint: true
             })
             .then(function(canvas){
+                console.log('Canvas created, size:', canvas.width, 'x', canvas.height);
+                
                 // Восстановим стили
                 content.style.transform = prevTransform || '';
-                if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
-                if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
+                
                 var dataUrl = canvas.toDataURL('image/png');
-                fetch('/snapshot/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data_url: dataUrl }) })
-                    .then(function(r){ return r.json(); })
-                    .then(function(resp){
-                        if (resp && resp.success) {
-                            alert('PNG сохранён: ' + resp.filename + '\nПапка: ' + resp.dir);
-                        } else {
-                            var link = document.createElement('a');
-                            link.download = 'server_status.png';
-                            link.href = dataUrl;
-                            link.click();
-                        }
-                    })
-                    .catch(function(){
-                        var link = document.createElement('a');
-                        link.download = 'server_status.png';
-                        link.href = dataUrl;
-                        link.click();
-                    });
+                console.log('Data URL created, length:', dataUrl.length);
+                
+                fetch('/api/snapshot/save', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ data_url: dataUrl }) 
+                })
+                .then(function(r){ 
+                    console.log('Response status:', r.status);
+                    return r.json(); 
+                })
+                .then(function(resp){
+                    console.log('Response:', resp);
+                    if (resp && resp.success) {
+                        alert('✅ {{ _("PNG сохранён:") }} ' + resp.filename + '\\n📁 {{ _("Папка:") }} ' + resp.dir);
+                    } else {
+                        console.error('Save failed:', resp);
+                        alert('❌ {{ _("Не удалось сохранить на сервере:") }} ' + (resp.error || '{{ _("Неизвестная ошибка") }}'));
+                    }
+                })
+                .catch(function(err){
+                    console.error('Fetch error:', err);
+                    alert('❌ {{ _("Ошибка сохранения:") }} ' + err.message);
+                });
             })
             .catch(function(err){
-                if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
-                if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
-                console.error('Ошибка сохранения изображения:', err);
-                alert('Не удалось сохранить изображение');
+                console.error('html2canvas error:', err);
+                alert('{{ _("Ошибка создания скриншота:") }} ' + err.message);
             });
-        }, 50);
+        }, 100);
     }
 </script>
 {% endblock %}
