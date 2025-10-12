@@ -500,7 +500,7 @@ def login_ajax():
             session['pin_authenticated'] = True
             session['authenticated'] = True  # Для @require_auth
             session['pin_verified'] = True  # Для @require_pin
-            session.permanent = True  # Делаем сессию постоянной
+            session.permanent = False  # Сессия НЕ постоянная - сбрасывается при закрытии браузера/приложения
             session.pop('block_until', None)  # Снимаем блокировку
             session.pop('failed_attempts', None)  # Сбрасываем счетчик
             logger.info(f"PIN authenticated successfully. Session: {dict(session)}")
@@ -567,6 +567,81 @@ def change_ajax():
             
     except Exception as e:
         logger.error(f"Error in change_ajax: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pin_bp.route('/logout', methods=['POST'])
+def logout():
+    """Выход из системы (сброс сессии)"""
+    try:
+        # Очищаем все данные сессии
+        session.clear()
+        logger.info("User logged out, session cleared")
+        return jsonify({
+            'success': True,
+            'message': _('Logged out successfully')
+        })
+    except Exception as e:
+        logger.error(f"Error in logout: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pin_bp.route('/check_auth', methods=['GET'])
+def check_auth():
+    """Проверка статуса аутентификации"""
+    try:
+        authenticated = session.get('pin_authenticated', False) or session.get('authenticated', False)
+        return jsonify({
+            'authenticated': authenticated
+        })
+    except Exception as e:
+        logger.error(f"Error checking auth: {str(e)}")
+        return jsonify({
+            'authenticated': False
+        })
+
+@pin_bp.route('/exit_app', methods=['POST'])
+def exit_app():
+    """Закрытие приложения (только для desktop mode)"""
+    try:
+        # Очищаем сессию
+        session.clear()
+        logger.info("Exit app request received, session cleared")
+        
+        # Пытаемся остановить приложение (работает только в desktop mode)
+        import sys
+        import os
+        
+        # Проверяем, запущено ли приложение в desktop режиме
+        if '--desktop' in sys.argv or os.environ.get('DESKTOP_MODE') == '1':
+            # Отправляем сигнал на остановку через threading
+            import threading
+            def stop_app():
+                import time
+                time.sleep(0.5)  # Даём время на отправку ответа
+                # Останавливаем pywebview
+                try:
+                    import webview
+                    # Получаем все окна и закрываем их
+                    for window in webview.windows:
+                        window.destroy()
+                except Exception as e:
+                    logger.error(f"Error destroying windows: {e}")
+                    # Если не получилось закрыть через webview, выходим из процесса
+                    os._exit(0)
+            
+            threading.Thread(target=stop_app, daemon=True).start()
+        
+        return jsonify({
+            'success': True,
+            'message': _('Application closing...')
+        })
+    except Exception as e:
+        logger.error(f"Error in exit_app: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)

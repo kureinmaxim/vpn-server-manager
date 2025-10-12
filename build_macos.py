@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Скрипт для сборки VPN Server Manager v4.0.0 с новой модульной архитектурой.
+Скрипт для сборки VPN Server Manager v4.0.3 с новой модульной архитектурой.
 Включает поддержку Application Factory, Service Layer и современные практики разработки.
+Версия автоматически загружается из config.json.
 """
 import os
 import sys
@@ -102,6 +103,10 @@ def convert_ico_to_icns():
 def build_app():
     """Создание .app файла с исправленными зависимостями"""
     
+    # Получаем версию из config.json для PyInstaller
+    version = get_version_from_config()
+    print(f"📦 Версия для сборки: {version}")
+    
     # Проверяем наличие иконки
     print("🔄 Проверка иконки...")
     icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
@@ -114,7 +119,8 @@ def build_app():
     datas = [
         "templates:templates",          # HTML шаблоны
         "static:static",                # CSS, изображения
-        "config.json:.",                # Конфигурация (legacy)
+        "config.json:.",                # Конфигурация (version source)
+        ".env:.",                       # КРИТИЧНО: SECRET_KEY для шифрования
         "data:data",                    # Данные
         "app:app",                      # Новое приложение
         "desktop:desktop",              # Desktop GUI
@@ -225,6 +231,11 @@ def build_app():
         "--hidden-import=webview.platforms.mshtml",
         "--hidden-import=webview.platforms.qt",
         
+        # macOS AppKit для GUI активации
+        "--hidden-import=AppKit",
+        "--hidden-import=Foundation",
+        "--hidden-import=objc",
+        
         # Криптография и безопасность
         "--hidden-import=cryptography",
         "--hidden-import=cryptography.fernet",
@@ -290,7 +301,7 @@ def build_app():
         "python3",
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
-        "--windowed",                   # GUI приложение
+        "--windowed",                   # GUI приложение (обязательно для .app)
         "--name=VPNServerManager-Clean",
         icon_arg,                       # Иконка (если есть)
         "--clean",
@@ -300,10 +311,10 @@ def build_app():
         "--noupx",
         "--strip",
         "--osx-bundle-identifier=com.vpnservermanager.clean.app",
-        "--debug=all",
+        # "--debug=all",  # Отключаем debug для чистой сборки
         *datas_args,
         *hidden_imports,
-        "run.py"  # Новая точка входа приложения
+        "launch_gui.py"  # GUI Launcher с активацией foreground для macOS
     ]
     
     # Убираем пустые аргументы
@@ -318,6 +329,45 @@ def build_app():
     if result.returncode != 0:
         print(f"❌ ОШИБКА: PyInstaller завершился с кодом {result.returncode}")
         return False
+    
+    # Используем кастомный Info.plist с правильной версией
+    app_path = DIST_DIR / "VPNServerManager-Clean.app"
+    if app_path.exists():
+        info_plist_path = app_path / "Contents" / "Info.plist"
+        info_template_path = Path(__file__).parent / "Info.plist.template"
+        
+        if info_template_path.exists():
+            print(f"🔧 Установка кастомного Info.plist с версией {version}...")
+            try:
+                # Читаем шаблон
+                with open(info_template_path, 'r') as f:
+                    plist_content = f.read()
+                
+                # Заменяем {{VERSION}} на реальную версию
+                plist_content = plist_content.replace('{{VERSION}}', version)
+                
+                # Записываем кастомный plist
+                with open(info_plist_path, 'w') as f:
+                    f.write(plist_content)
+                
+                print(f"✅ Info.plist установлен: версия {version}, NSPrincipalClass=NSApplication")
+            except Exception as e:
+                print(f"⚠️ Не удалось установить Info.plist: {e}")
+        else:
+            print(f"⚠️ Шаблон Info.plist.template не найден, используем версию PyInstaller")
+            try:
+                # Fallback: просто обновляем версию
+                with open(info_plist_path, 'r') as f:
+                    plist_content = f.read()
+                
+                plist_content = plist_content.replace('<string>0.0.0</string>', f'<string>{version}</string>')
+                
+                with open(info_plist_path, 'w') as f:
+                    f.write(plist_content)
+                
+                print(f"✅ Info.plist обновлен: версия {version}")
+            except Exception as e:
+                print(f"⚠️ Не удалось обновить Info.plist: {e}")
     
     return True
 
@@ -640,13 +690,13 @@ def get_version_from_config():
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                return config.get('app_info', {}).get('version', '4.0.0')
+                return config.get('app_info', {}).get('version', '4.0.3')
         else:
             print("⚠️ config.json не найден, используем версию по умолчанию")
-            return '4.0.0'
+            return '4.0.3'
     except Exception as e:
         print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
-        return '4.0.0'
+        return '4.0.3'
 
 def main():
     """Основная функция сборки"""
@@ -681,10 +731,12 @@ def main():
                 print("🎉 Инсталлятор создан успешно!")
                 print(f"📦 DMG файл: {dmg_path}")
                 print()
-                print("🔧 Особенности сборки v4.0.0:")
+                print(f"🔧 Особенности сборки v{version}:")
+                print("   ✅ Централизованная версия из config.json")
+                print("   ✅ Multi-App Support (параллельный запуск)")
                 print("   ✅ Модульная архитектура")
                 print("   ✅ Application Factory Pattern")
-                print("   ✅ Service Layer")
+                print("   ✅ Service Layer (DataManagerService)")
                 print("   ✅ Blueprint Architecture")
                 print("   ✅ Dependency Injection")
                 print("   ✅ Custom Exceptions")

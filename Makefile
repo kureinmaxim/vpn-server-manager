@@ -77,7 +77,31 @@ check-security: ## Проверить безопасность
 docker-build: ## Собрать Docker образ
 	docker build -t vpn-manager-clean .
 
-docker-run: ## Запустить в Docker
+docker-run: ## Запустить в Docker (порт 5000:5000)
 	docker run -p 5000:5000 vpn-manager-clean
+
+docker-run-custom: ## Запустить в Docker с кастомным портом (make docker-run-custom PORT=5001)
+	@PORT=$${PORT:-5000}; \
+	echo "🐳 Запуск контейнера на порту $$PORT"; \
+	docker run -p $$PORT:5000 -e PORT=5000 vpn-manager-clean
+
+docker-run-multi: ## Запустить несколько контейнеров (порты 5000, 5001, 5002)
+	@echo "🚀 Запуск 3 экземпляров Docker контейнеров..."
+	docker run -d -p 5000:5000 --name vpn-manager-1 vpn-manager-clean
+	docker run -d -p 5001:5000 --name vpn-manager-2 vpn-manager-clean
+	docker run -d -p 5002:5000 --name vpn-manager-3 vpn-manager-clean
+	@echo "✅ Запущено 3 контейнера:"
+	@echo "   📡 http://localhost:5000 (vpn-manager-1)"
+	@echo "   📡 http://localhost:5001 (vpn-manager-2)"
+	@echo "   📡 http://localhost:5002 (vpn-manager-3)"
+
+docker-stop-multi: ## Остановить все запущенные контейнеры
+	@echo "⏹️  Остановка контейнеров..."
+	-docker stop vpn-manager-1 vpn-manager-2 vpn-manager-3 2>/dev/null
+	-docker rm vpn-manager-1 vpn-manager-2 vpn-manager-3 2>/dev/null
+	@echo "✅ Все контейнеры остановлены"
+
+version: ## Показать текущую версию из config.json
+	@python3 -c "import json; config = json.load(open('config.json')); print(f\"VPN Server Manager v{config['app_info']['version']}\")"
 
 all: clean install-dev test lint format ## Выполнить все проверки

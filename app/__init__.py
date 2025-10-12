@@ -112,15 +112,58 @@ def register_error_handlers(app):
             from flask import render_template
             return render_template('500.html'), 500
 
+def manage_user_config(app):
+    """
+    Управляет конфигурационным файлом пользователя (config.json) в APP_DATA_DIR.
+    При первом запуске копирует config.json из бандла и удаляет active_data_file.
+    """
+    if not getattr(sys, 'frozen', False):
+        return  # В режиме разработки ничего не делаем
+
+    import json
+    import shutil
+    
+    app_data_dir = app.config.get('APP_DATA_DIR')
+    user_config_path = os.path.join(app_data_dir, 'config.json')
+
+    if not os.path.exists(user_config_path):
+        try:
+            # Копируем config.json из бандла (_MEIPASS) в папку данных пользователя
+            bundle_config_path = os.path.join(getattr(sys, '_MEIPASS', '.'), 'config.json')
+            if os.path.exists(bundle_config_path):
+                shutil.copy2(bundle_config_path, user_config_path)
+                app.logger.info(f"Copied config.json to {user_config_path}")
+
+                # Удаляем ключ active_data_file, чтобы заставить пользователя выбрать файл
+                with open(user_config_path, 'r+') as f:
+                    config = json.load(f)
+                    if 'active_data_file' in config:
+                        del config['active_data_file']
+                        f.seek(0)
+                        json.dump(config, f, indent=2, ensure_ascii=False)
+                        f.truncate()
+                        app.logger.info("Removed 'active_data_file' from user config on first run.")
+        except Exception as e:
+            app.logger.error(f"Failed to manage user config on first run: {e}")
+
+
 def load_app_info(app):
     """Загрузка информации о приложении и конфигурации из config.json"""
     try:
         import json
-        # Используем APP_DATA_DIR для поиска config.json
-        app_data_dir = app.config.get('APP_DATA_DIR')
-        config_path = os.path.join(app_data_dir, 'config.json') if app_data_dir else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'config.json')
         
-        if os.path.exists(config_path):
+        # В режиме разработки используем config.json из корня проекта
+        # В собранном приложении используем config.json из APP_DATA_DIR
+        if getattr(sys, 'frozen', False):
+            # Режим PyInstaller: используем папку данных приложения
+            base_path = app.config.get('APP_DATA_DIR')
+        else:
+            # Обычный режим: корень проекта
+            base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            
+        config_path = os.path.join(base_path, 'config.json') if base_path else None
+
+        if config_path and os.path.exists(config_path):
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
                 app.config['app_info'] = config.get('app_info', {})
@@ -131,15 +174,15 @@ def load_app_info(app):
         else:
             # Заглушка если config.json не найден
             app.config['app_info'] = {
-                "version": "4.0.0",
-                "last_updated": "2025-01-15",
+                "version": "4.0.3",
+                "last_updated": "2025-10-12",
                 "developer": "Куреин М.Н."
             }
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.0.0",
-            "last_updated": "2025-01-15",
+            "version": "4.0.3",
+            "last_updated": "2025-10-12",
             "developer": "Куреин М.Н."
         }
 
@@ -180,6 +223,9 @@ def create_app(config_name='development'):
     
     # Загрузка конфигурации
     app.config.from_object(config_by_name[config_name])
+
+    # Управление пользовательским config.json (только для frozen-режима)
+    manage_user_config(app)
     
     # Настройка переводов
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = get_translations_path()
@@ -207,16 +253,29 @@ def create_app(config_name='development'):
     app.config['SESSION_COOKIE_SECURE'] = False
     app.config['SESSION_COOKIE_HTTPONLY'] = True
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    app.config['SESSION_TYPE'] = 'filesystem'  # Используем файловую систему для сессий
-    app.config['PERMANENT_SESSION_LIFETIME'] = 86400  # 24 часа
+    # НЕ используем filesystem - сессии хранятся только в cookie и сбрасываются при закрытии
+    # app.config['SESSION_TYPE'] = 'filesystem'  # Закомментировано: сохраняет сессии между запусками!
+    app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 час (если session.permanent = True)
+    
+    # Уникальное имя cookie для изоляции сессий при параллельном запуске
+    app.config['SESSION_COOKIE_NAME'] = 'vpn_manager_session_clean'
     
     # Настройка загрузки файлов
     app.config['MAX_CONTENT_LENGTH'] = app.config.get('MAX_CONTENT_LENGTH', 16 * 1024 * 1024)
     
-    # Создание необходимых директорий
-    for directory in ['uploads', 'logs', 'data']:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+    # Создаём необходимые директории - используем пути из конфига
+    upload_dir = app.config.get('UPLOAD_FOLDER')
+    data_dir = app.config.get('DATA_DIR')
+    
+    # Создаём директории, если указаны
+    if upload_dir:
+        os.makedirs(upload_dir, exist_ok=True)
+    if data_dir:
+        os.makedirs(data_dir, exist_ok=True)
+    
+    # Создаём директорию для логов (если не frozen)
+    if not getattr(sys, 'frozen', False):
+        os.makedirs('logs', exist_ok=True)
     
     # Загрузка app_info из config.json
     load_app_info(app)
@@ -225,7 +284,21 @@ def create_app(config_name='development'):
     @app.context_processor
     def inject_app_info():
         """Инжектирует информацию о приложении во все шаблоны."""
-        return {'app_info': app.config.get('app_info', {})}
+        from flask import request
+        
+        # Определяем адрес и порт сервера
+        server_host = request.host.split(':')[0] if ':' in request.host else request.host
+        server_port = request.host.split(':')[1] if ':' in request.host else '5000'
+        server_url = f"http://{request.host}"
+        
+        return {
+            'app_info': app.config.get('app_info', {}),
+            'server_info': {
+                'host': server_host,
+                'port': server_port,
+                'url': server_url
+            }
+        }
     
     # Jinja фильтр для форматирования даты
     @app.template_filter('format_datetime')

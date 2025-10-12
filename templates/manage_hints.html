@@ -11,7 +11,7 @@
             {{ _('Добавить новую подсказку') }}
         </div>
         <div class="card-body">
-            <form action="{{ url_for('add_hint') }}" method="post">
+            <form action="{{ url_for('main.add_hint') }}" method="post">
                 <div class="row">
                     <div class="col-md-5">
                         <label for="group" class="form-label">{{ _('Группа') }}</label>
@@ -44,7 +44,7 @@
                 <td>{{ hint.group_display }}</td>
                 <td><pre class="mb-0"><code>{{ hint.command }}</code></pre></td>
                 <td>
-                    <form action="{{ url_for('delete_hint', hint_id=hint.id) }}" method="post" onsubmit="return confirm('{{ _('Вы уверены, что хотите удалить эту подсказку?') }}');">
+                    <form action="{{ url_for('main.delete_hint', hint_id=hint.id) }}" method="post" onsubmit="return confirm('{{ _('Вы уверены, что хотите удалить эту подсказку?') }}');">
                         <button type="submit" class="btn btn-sm btn-danger">{{ _('Удалить') }}</button>
                     </form>
                 </td>

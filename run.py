@@ -69,8 +69,11 @@ def main():
                 logger.error(f"Could not find free port: {e}")
                 sys.exit(1)
             
+            # Получаем версию из конфигурации приложения
+            version = app.config.get('app_info', {}).get('version', 'N/A')
+            
             logger.info(f"Starting web server on {host}:{port}")
-            print(f"\n🌐 VPN Server Manager v4.0.0")
+            print(f"\n🌐 VPN Server Manager v{version}")
             print(f"📡 Web server: http://{host}:{port}")
             print(f"🔧 Mode: {'Development' if debug else 'Production'}")
             print(f"⏹️  Press Ctrl+C to stop\n")

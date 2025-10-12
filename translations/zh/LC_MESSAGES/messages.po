@@ -5044,3 +5044,11 @@ msgstr[0] "{len_type}需要{len_value}。"
 #~ msgid "%"
 #~ msgstr "%"
 
+
+#: templates/layout.html:132
+msgid "Порт"
+msgstr "端口"
+
+#: templates/layout.html:202 templates/layout.html:214 desktop/window.py:122
+msgid "Вы уверены, что хотите закрыть приложение?"
+msgstr "您确定要关闭应用程序吗？"

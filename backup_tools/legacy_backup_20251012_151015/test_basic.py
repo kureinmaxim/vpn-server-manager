@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Basic tests for VPN Server Manager v4.0.0 with new modular architecture
+Basic tests for VPN Server Manager v4.0.3 with new modular architecture
 """
 
 import os

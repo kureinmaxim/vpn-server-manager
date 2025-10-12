@@ -7,6 +7,7 @@ import json
 import datetime
 import shutil
 import zipfile
+import signal
 from ..services import registry
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
 from ..exceptions import ValidationError, AuthenticationError
@@ -116,28 +117,24 @@ def delete_server(server_id):
     try:
         data_manager = registry.get('data_manager')
         if not data_manager:
-            flash(_('DataManager not available'), 'error')
+            flash(_('Сервис данных не инициализирован.'), 'danger')
             return redirect(url_for('main.index'))
-        
-        # Загружаем текущие серверы
+            
         servers = data_manager.load_servers(current_app.config)
         
-        # Фильтруем сервер для удаления
+        # Фильтруем список, исключая сервер с нужным ID
         original_count = len(servers)
-        servers = [s for s in servers if s.get('id') != server_id]
+        servers_to_keep = [s for s in servers if str(s.get('id')) != str(server_id)]
         
-        if len(servers) == original_count:
-            flash(_('Сервер не найден'), 'warning')
-            return redirect(url_for('main.index'))
-        
-        # Сохраняем обновленный список
-        active_file = data_manager.get_active_data_path(current_app.config)
-        if active_file:
-            data_manager.save_servers(servers, active_file)
-            flash(_('Сервер успешно удален'), 'success')
-            logger.info(f"Server {server_id} deleted successfully")
+        if len(servers_to_keep) < original_count:
+            active_file = data_manager.get_active_data_path(current_app.config)
+            if active_file:
+                data_manager.save_servers(servers_to_keep, active_file)
+                flash(_('Сервер успешно удален.'), 'success')
+            else:
+                flash(_('Нет активного файла данных для сохранения изменений.'), 'error')
         else:
-            flash(_('Нет активного файла данных'), 'error')
+            flash(_('Сервер с ID %(server_id)s не найден.', server_id=server_id), 'warning')
         
         return redirect(url_for('main.index'))
     except Exception as e:
@@ -145,24 +142,118 @@ def delete_server(server_id):
         flash(f'Ошибка при удалении сервера: {str(e)}', 'danger')
         return redirect(url_for('main.index'))
 
-@main_bp.route('/edit_server/<server_id>')
+@main_bp.route('/edit_server/<server_id>', methods=['GET', 'POST'])
 @require_auth
 @require_pin
 @log_request
 def edit_server(server_id):
     """Страница редактирования сервера"""
     try:
-        # Здесь должна быть логика загрузки сервера по ID
-        server = None  # Временно None
+        data_manager = registry.get('data_manager')
+        crypto_service = registry.get('crypto')
+        
+        if not data_manager:
+            flash(_('Сервис данных не инициализирован.'), 'danger')
+            return redirect(url_for('main.index'))
+            
+        servers = data_manager.load_servers(current_app.config)
+        
+        # Ищем сервер по ID, приводя ID к строке для надежного сравнения
+        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
         
         if not server:
-            flash(_('Server not found'), 'error')
+            flash(_('Сервер с ID %(server_id)s не найден.', server_id=server_id), 'error')
             return redirect(url_for('main.index'))
         
+        # Если POST - сохраняем изменения
+        if request.method == 'POST':
+            try:
+                # Обновляем базовые поля
+                server['name'] = request.form.get('name', server.get('name'))
+                server['provider'] = request.form.get('provider', server.get('provider'))
+                server['ip_address'] = request.form.get('ip_address', server.get('ip_address'))
+                server['os'] = request.form.get('os', server.get('os'))
+                server['status'] = request.form.get('status', server.get('status'))
+                server['notes'] = request.form.get('notes', server.get('notes', ''))
+                server['docker_info'] = request.form.get('docker_info', server.get('docker_info', ''))
+                server['software_info'] = request.form.get('software_info', server.get('software_info', ''))
+                server['card_color'] = request.form.get('card_color', server.get('card_color', '#ffc107'))
+                server['panel_url'] = request.form.get('panel_url', server.get('panel_url', ''))
+                server['hoster_url'] = request.form.get('hoster_url', server.get('hoster_url', ''))
+                
+                # Обновляем характеристики
+                server['specs']['cpu'] = request.form.get('cpu', server['specs'].get('cpu', ''))
+                server['specs']['ram'] = request.form.get('ram', server['specs'].get('ram', ''))
+                server['specs']['disk'] = request.form.get('disk', server['specs'].get('disk', ''))
+                
+                # Обновляем платежную информацию
+                server['payment_info']['amount'] = float(request.form.get('amount', 0) or 0)
+                server['payment_info']['currency'] = request.form.get('currency', 'USD')
+                server['payment_info']['next_due_date'] = request.form.get('next_due_date', '')
+                server['payment_info']['payment_period'] = request.form.get('payment_period', 'Monthly')
+                
+                # Обновляем SSH данные
+                server['ssh_credentials']['user'] = request.form.get('ssh_user', server['ssh_credentials'].get('user', ''))
+                server['ssh_credentials']['port'] = int(request.form.get('ssh_port', 22) or 22)
+                server['ssh_credentials']['root_login_allowed'] = bool(request.form.get('root_login_allowed'))
+                
+                # Обновляем пароли SSH если указаны новые
+                new_ssh_password = request.form.get('ssh_password', '').strip()
+                if new_ssh_password and crypto_service:
+                    server['ssh_credentials']['password'] = crypto_service.encrypt(new_ssh_password)
+                    server['ssh_credentials']['password_decrypted'] = new_ssh_password
+                
+                new_root_password = request.form.get('ssh_root_password', '').strip()
+                if new_root_password and crypto_service:
+                    server['ssh_credentials']['root_password'] = crypto_service.encrypt(new_root_password)
+                    server['ssh_credentials']['root_password_decrypted'] = new_root_password
+                
+                # Обновляем данные панели управления
+                new_panel_user = request.form.get('panel_user', '').strip()
+                if new_panel_user and crypto_service:
+                    server['panel_credentials']['user'] = crypto_service.encrypt(new_panel_user)
+                    server['panel_credentials']['user_decrypted'] = new_panel_user
+                
+                new_panel_password = request.form.get('panel_password', '').strip()
+                if new_panel_password and crypto_service:
+                    server['panel_credentials']['password'] = crypto_service.encrypt(new_panel_password)
+                    server['panel_credentials']['password_decrypted'] = new_panel_password
+                
+                # Обновляем данные хостера
+                server['hoster_credentials']['login_method'] = request.form.get('hoster_login_method', 'password')
+                
+                new_hoster_user = request.form.get('hoster_user', '').strip()
+                if new_hoster_user and crypto_service:
+                    server['hoster_credentials']['user'] = crypto_service.encrypt(new_hoster_user)
+                    server['hoster_credentials']['user_decrypted'] = new_hoster_user
+                
+                new_hoster_password = request.form.get('hoster_password', '').strip()
+                if new_hoster_password and crypto_service:
+                    server['hoster_credentials']['password'] = crypto_service.encrypt(new_hoster_password)
+                    server['hoster_credentials']['password_decrypted'] = new_hoster_password
+                
+                # Обновляем проверки
+                server['checks']['dns_ok'] = bool(request.form.get('check_dns_ok'))
+                server['checks']['streaming_ok'] = bool(request.form.get('check_streaming_ok'))
+                
+                # Сохраняем обновленный список серверов
+                active_file = data_manager.get_active_data_path(current_app.config)
+                if active_file:
+                    data_manager.save_servers(servers, active_file)
+                    flash(_('Изменения успешно сохранены.'), 'success')
+                    return redirect(url_for('main.index'))
+                else:
+                    flash(_('Нет активного файла данных для сохранения изменений.'), 'error')
+                    
+            except Exception as save_error:
+                logger.error(f"Error saving server {server_id}: {str(save_error)}")
+                flash(_('Ошибка при сохранении изменений: %(error)s', error=str(save_error)), 'error')
+        
         return render_template('edit_server.html', server=server)
+        
     except Exception as e:
         logger.error(f"Error loading server {server_id}: {str(e)}")
-        flash(_('Error loading server'), 'error')
+        flash(_('Ошибка при загрузке данных сервера.'), 'error')
         return redirect(url_for('main.index'))
 
 @main_bp.route('/settings')
@@ -381,6 +472,10 @@ def import_data():
     """Импорт зашифрованного файла данных"""
     try:
         data_manager = registry.get('data_manager')
+        if not data_manager:
+            flash(_('Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ шифрования.'), 'danger')
+            return redirect(url_for('main.settings'))
+
         uploaded_file = request.files['data_file']
         
         if uploaded_file and data_manager.allowed_file(uploaded_file.filename, current_app.config.get('ALLOWED_EXTENSIONS')) and uploaded_file.filename.endswith('.enc'):
@@ -419,17 +514,9 @@ def import_data():
             # Обновляем конфигурацию для использования нового файла
             current_app.config['active_data_file'] = file_path
             
-            # Сохраняем конфигурацию в config.json
-            config_path = os.path.join(app_data_dir, 'config.json')
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config_data = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                config_data = {}
-            
-            config_data['active_data_file'] = file_path
-            with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(config_data, f, ensure_ascii=False, indent=2)
+            # Сохраняем конфигурацию через DataManagerService
+            if not data_manager.update_user_config({'active_data_file': file_path}):
+                flash(_('Не удалось сохранить путь к новому файлу данных. Изменение будет временным.'), 'warning')
             
             # Перенаправляем на главную страницу, чтобы пользователь увидел импортированные серверы
             flash('💡 Обновите страницу (F5), если серверы не отображаются сразу.', 'info')
@@ -770,7 +857,99 @@ def cheatsheet():
 @log_request
 def manage_hints():
     """Страница управления подсказками"""
-    return render_template('manage_hints.html')
+    hints = _load_hints()
+    
+    # Словарь переводов для названий групп
+    group_translations = {
+        'Ключевые утилиты': {
+            'ru': 'Ключевые утилиты',
+            'en': 'Key utilities',
+            'zh': '关键工具'
+        },
+        'Управление службами': {
+            'ru': 'Управление службами',
+            'en': 'Service management',
+            'zh': '服务管理'
+        },
+        'Управление пакетами': {
+            'ru': 'Управление пакетами',
+            'en': 'Package management',
+            'zh': '包管理'
+        },
+        'Безопасность': {
+            'ru': 'Безопасность',
+            'en': 'Security',
+            'zh': '安全'
+        }
+    }
+    
+    # Получаем текущий язык
+    from flask_babel import get_locale
+    current_lang = str(get_locale())
+    
+    # Переводим названия групп
+    for hint in hints:
+        if hint['group'] in group_translations:
+            hint['group_display'] = group_translations[hint['group']].get(current_lang, hint['group'])
+        else:
+            hint['group_display'] = hint['group']
+    
+    return render_template('manage_hints.html', hints=hints)
+
+@main_bp.route('/add_hint', methods=['POST'])
+@require_auth
+@require_pin
+@log_request
+def add_hint():
+    """Добавить новую подсказку"""
+    hints = _load_hints()
+    new_id = max([h['id'] for h in hints] + [0]) + 1
+    
+    new_hint = {
+        "id": new_id,
+        "group": request.form['group'],
+        "command": request.form['command']
+    }
+    hints.append(new_hint)
+    _save_hints(hints)
+    flash(_('Hint added successfully'), 'success')
+    return redirect(url_for('main.manage_hints'))
+
+@main_bp.route('/delete_hint/<int:hint_id>', methods=['POST'])
+@require_auth
+@require_pin
+@log_request
+def delete_hint(hint_id):
+    """Удалить подсказку"""
+    hints = _load_hints()
+    hints = [h for h in hints if h['id'] != hint_id]
+    _save_hints(hints)
+    flash(_('Hint deleted successfully'), 'success')
+    return redirect(url_for('main.manage_hints'))
+
+# Helper functions for hints
+def _load_hints():
+    """Загрузка подсказок из JSON файла"""
+    try:
+        app_data_dir = current_app.config.get('APP_DATA_DIR', '.')
+        hints_path = os.path.join(app_data_dir, 'data', 'hints.json')
+        if os.path.exists(hints_path):
+            with open(hints_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.error(f"Error loading hints: {e}")
+    return []
+
+def _save_hints(hints):
+    """Сохранение подсказок в JSON файл"""
+    try:
+        app_data_dir = current_app.config.get('APP_DATA_DIR', '.')
+        hints_path = os.path.join(app_data_dir, 'data', 'hints.json')
+        os.makedirs(os.path.dirname(hints_path), exist_ok=True)
+        with open(hints_path, 'w', encoding='utf-8') as f:
+            json.dump(hints, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Error saving hints: {e}")
 
 @main_bp.route('/change_language/<language>')
 @log_request
@@ -900,3 +1079,13 @@ def favicon():
     from flask import send_from_directory
     import os
     return send_from_directory(os.path.join(main_bp.root_path, '..', '..', 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
+
+@main_bp.route('/shutdown')
+def shutdown():
+    """Эндпоинт для корректного завершения сервера"""
+    logger.info("Shutdown request received")
+    
+    # Отправляем сигнал завершения процессу
+    os.kill(os.getpid(), signal.SIGINT)
+    
+    return 'Сервер выключается...', 200
