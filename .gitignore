@@ -164,3 +164,4 @@ Thumbs.db
 data/servers.json.enc
 data/hints.json
 pin_block_state.json
+config.json
