@@ -1,8 +1,14 @@
-# Архитектурные правила для Flask-приложения v4.0.3
+# Архитектурные правила для Flask-приложения v4.0.6
 
 ## Контекст проекта
 
 **VPN Server Manager** - Flask-приложение с desktop GUI (pywebview), поддержкой интернационализации, SSH/SFTP функциональностью и криптографией.
+
+**v4.0.6 (13 октября 2025)**: 
+- ✅ **БЕЗОПАСНОСТЬ**: Конфиденциальные файлы (.env, config.json) исключены из Git
+- ✅ config.json теперь локальный файл (шаблон: config.json.example)
+- ✅ Исправлена сборка DMG - не включает секреты
+- ✅ Полная документация по безопасности (SECURITY.md)
 
 **v4.0.3**: 
 - ✅ Централизованное управление версией из `config.json`
@@ -15,9 +21,10 @@
 ```
 VPNserverManage-Clean/
 ├── run.py                        # Точка входа (web/desktop режимы)
-├── config.json                   # 🎯 Конфигурация (version: 4.0.3)
-├── .env                          # Секреты (SECRET_KEY)
-├── .env.example
+├── config.json                   # 🎯 Конфигурация (version: 4.0.6) - ЛОКАЛЬНЫЙ ФАЙЛ
+├── config.json.example           # 📋 Шаблон конфигурации (в Git)
+├── .env                          # Секреты (SECRET_KEY) - НЕ В GIT
+├── .env.example                  # 📋 Шаблон env (в Git)
 ├── .gitignore
 ├── requirements.txt
 ├── setup.py                      # Автоматически читает версию из config.json
@@ -218,8 +225,8 @@ class Config:
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
-    # v4.0.3: Версия из config.json (fallback)
-    APP_VERSION = os.getenv('APP_VERSION', '4.0.3')
+    # v4.0.6: Версия из config.json (fallback)
+    APP_VERSION = os.getenv('APP_VERSION', '4.0.6')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     
@@ -265,10 +272,11 @@ config_by_name = {
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "4.0.3",
-    "release_date": "12.10.2025",
+    "version": "4.0.6",
+    "release_date": "13.10.2025",
     "developer": "Куреин М.Н.",
-    "last_updated": "2025-10-12"
+    "last_updated": "2025-10-13",
+    "release_notes": "Security fixes: removed sensitive files from repository"
   },
   "service_urls": { ... },
   "active_data_file": "...",
