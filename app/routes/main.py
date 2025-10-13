@@ -538,6 +538,10 @@ def import_external_data():
     
     try:
         data_manager = registry.get('data_manager')
+        if not data_manager:
+            flash(_('Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ шифрования.'), 'danger')
+            return redirect(url_for('main.settings'))
+            
         uploaded_file = request.files['external_file']
         external_key = request.form.get('external_key', '').strip()
         
