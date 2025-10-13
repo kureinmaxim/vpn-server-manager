@@ -6,14 +6,59 @@ from dotenv import load_dotenv
 # Явным образом находим и загружаем .env, особенно для собранных приложений
 is_frozen = getattr(sys, 'frozen', False)
 if is_frozen:
-    # Для PyInstaller .env находится в той же папке, что и исполняемый файл
-    base_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
-    dotenv_path = os.path.join(base_path, '.env')
-    if os.path.exists(dotenv_path):
-        load_dotenv(dotenv_path=dotenv_path)
-    else:
-        # Это может произойти, если .env не был включен в сборку
-        print("ПРЕДУПРЕЖДЕНИЕ: .env файл не найден в бандле приложения.")
+    # В frozen режиме .env должен быть в APP_DATA_DIR
+    # Сначала определяем APP_DATA_DIR
+    app_name = "VPNServerManager-Clean"
+    if sys.platform == 'darwin':  # macOS
+        app_data_dir = os.path.join(
+            os.path.expanduser("~"), 
+            "Library", "Application Support", 
+            app_name
+        )
+    elif sys.platform == 'win32':  # Windows
+        app_data_dir = os.path.join(
+            os.getenv('APPDATA', os.path.expanduser("~")),
+            app_name
+        )
+    else:  # Linux
+        app_data_dir = os.path.join(
+            os.path.expanduser("~"),
+            ".local", "share",
+            app_name
+        )
+    
+    os.makedirs(app_data_dir, exist_ok=True)
+    dotenv_path = os.path.join(app_data_dir, '.env')
+    
+    # Если .env не существует, создаем его с новым ключом
+    if not os.path.exists(dotenv_path):
+        from cryptography.fernet import Fernet
+        secret_key = Fernet.generate_key().decode()
+        
+        # Копируем шаблон из бандла если есть
+        bundle_env_example = os.path.join(getattr(sys, '_MEIPASS', '.'), 'env.example')
+        if os.path.exists(bundle_env_example):
+            import shutil
+            shutil.copy2(bundle_env_example, dotenv_path)
+            # Заменяем SECRET_KEY в скопированном файле
+            with open(dotenv_path, 'r') as f:
+                content = f.read()
+            content = content.replace(
+                'SECRET_KEY=your-secret-key-here-change-in-production',
+                f'SECRET_KEY={secret_key}'
+            )
+            with open(dotenv_path, 'w') as f:
+                f.write(content)
+            print(f"✅ Created .env with new SECRET_KEY at {dotenv_path}")
+        else:
+            # Создаем минимальный .env
+            with open(dotenv_path, 'w') as f:
+                f.write(f"SECRET_KEY={secret_key}\n")
+                f.write("APP_VERSION=4.0.6\n")
+                f.write("BABEL_DEFAULT_LOCALE=ru\n")
+            print(f"✅ Created minimal .env at {dotenv_path}")
+    
+    load_dotenv(dotenv_path=dotenv_path)
 else:
     # В режиме разработки ищем .env в корне проекта
     load_dotenv()
