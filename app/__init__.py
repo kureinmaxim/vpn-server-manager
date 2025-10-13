@@ -188,6 +188,9 @@ def load_app_info(app):
 
 def register_services(app):
     """Регистрация сервисов в реестре"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     registry.register('ssh', SSHService())
     registry.register('crypto', CryptoService())
     registry.register('api', APIService())
@@ -196,19 +199,33 @@ def register_services(app):
     secret_key = app.config.get('SECRET_KEY')
     app_data_dir = app.config.get('APP_DATA_DIR')
     
+    logger.info(f"Attempting to register DataManagerService...")
+    logger.info(f"  SECRET_KEY exists: {secret_key is not None}")
+    logger.info(f"  SECRET_KEY length: {len(secret_key) if secret_key else 0}")
+    logger.info(f"  APP_DATA_DIR: {app_data_dir}")
+    
     # Проверяем, что ключ валидный для Fernet
     if secret_key and app_data_dir:
         try:
             from cryptography.fernet import Fernet
             # Проверяем формат ключа
+            logger.info(f"  Validating Fernet key...")
             Fernet(secret_key.encode() if isinstance(secret_key, str) else secret_key)
+            logger.info(f"  Fernet key is valid ✓")
             data_manager = DataManagerService(secret_key, app_data_dir)
             registry.register('data_manager', data_manager)
+            logger.info(f"✅ DataManagerService registered successfully")
         except Exception as e:
             # Если ключ невалидный, логируем предупреждение но не падаем
-            import logging
-            logger = logging.getLogger(__name__)
-            logger.warning(f"Cannot initialize DataManagerService: {e}. Some features may not work.")
+            logger.error(f"❌ Cannot initialize DataManagerService: {e}")
+            logger.error(f"   SECRET_KEY type: {type(secret_key)}")
+            logger.error(f"   SECRET_KEY preview: {secret_key[:20] if secret_key else 'None'}...")
+    else:
+        logger.error(f"❌ DataManagerService NOT registered: missing SECRET_KEY or APP_DATA_DIR")
+        if not secret_key:
+            logger.error(f"   SECRET_KEY is missing!")
+        if not app_data_dir:
+            logger.error(f"   APP_DATA_DIR is missing!")
 
 def create_app(config_name='development'):
     """Application Factory"""
