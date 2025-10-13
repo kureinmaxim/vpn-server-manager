@@ -16,7 +16,8 @@
   "secret_pin": {
     "default_pin": "1234",
     "current_pin": "1234",
-    "last_changed": "YYYY-MM-DD"
+    "last_changed": "YYYY-MM-DD",
+    "_comment": "ВАЖНО: PIN 1234 - тестовый! Измените для production!"
   }
 }
 
