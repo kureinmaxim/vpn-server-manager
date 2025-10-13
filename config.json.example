@@ -1,0 +1,22 @@
+{
+  "SECRET_KEY_FILE": ".env",
+  "app_info": {
+    "version": "4.0.5",
+    "release_date": "12.10.2025",
+    "developer": "Куреин М.Н.",
+    "last_updated": "2025-10-12"
+  },
+  "service_urls": {
+    "ip_check_api": "https://ipinfo.io/{ip}/json",
+    "general_ip_test": "https://browserleaks.com/ip",
+    "general_dns_test": "https://dnsleaktest.com/",
+    "ip2location_demo": "https://www.ip2location.com/demo/{ip}"
+  },
+  "active_data_file": "data/merged_YYYYMMDD_HHMMSS.enc",
+  "secret_pin": {
+    "default_pin": "1234",
+    "current_pin": "1234",
+    "last_changed": "YYYY-MM-DD"
+  }
+}
+
