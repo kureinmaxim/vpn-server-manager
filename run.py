@@ -8,9 +8,23 @@ import sys
 import os
 import logging
 import socket
+import atexit
 
 # Добавляем текущую директорию в путь для импортов
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Graceful shutdown для SSH подключений
+@atexit.register
+def cleanup():
+    """Очистка ресурсов при остановке приложения"""
+    logger = logging.getLogger(__name__)
+    logger.info("🧹 Cleaning up SSH connections...")
+    try:
+        from app.services.ssh_service import SSHService
+        SSHService.close_all()
+        logger.info("✅ SSH connections closed")
+    except Exception as e:
+        logger.warning(f"⚠️ Error during cleanup: {e}")
 
 def find_free_port(start_port=5000, max_attempts=100):
     """Находит свободный порт, начиная с start_port"""
