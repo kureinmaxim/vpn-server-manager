@@ -7,9 +7,9 @@ def get_version():
     try:
         with open("config.json", "r", encoding="utf-8") as fh:
             config = json.load(fh)
-            return config.get('app_info', {}).get('version', '4.0.5')
+            return config.get('app_info', {}).get('version', '4.0.7')
     except:
-        return '4.0.5'
+        return '4.0.7'
 
 # Читаем README файл
 def read_readme():

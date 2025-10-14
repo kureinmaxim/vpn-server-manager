@@ -174,7 +174,7 @@ VPNserverManage-Clean/
 ## 🔗 Связанные документы
 
 - **Сборка приложения**: [BUILD.md](BUILD.md)
-- **Структура проекта**: [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
+- **Структура проекта**: [../../PROJECT_DOCUMENTATION.md](../../PROJECT_DOCUMENTATION.md)
 - **Безопасность ключей**: [SECRET_KEY.md](SECRET_KEY.md)
 - **README**: [README.md](../../README.md)
 

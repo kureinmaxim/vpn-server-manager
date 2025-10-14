@@ -1,4 +1,44 @@
-/* VPN Server Manager - Monitoring Styles */
+/* VPN Server Manager - Monitoring Styles v2.0 - Compact & Modern */
+
+/* Global Compact Styles */
+.monitoring-page h1 {
+    font-size: 1.5rem !important;
+    font-weight: 600;
+}
+
+.monitoring-page h2 {
+    font-size: 1.2rem !important;
+    font-weight: 600;
+}
+
+.monitoring-page h3 {
+    font-size: 1.1rem !important;
+    font-weight: 600;
+}
+
+.monitoring-page h4 {
+    font-size: 1rem !important;
+    font-weight: 600;
+}
+
+.monitoring-page h5 {
+    font-size: 0.95rem !important;
+    font-weight: 600;
+}
+
+.monitoring-page .bi {
+    font-size: 1.2rem !important;
+}
+
+.monitoring-page .card {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 15px;
+}
+
+.monitoring-page .card-body {
+    padding: 1rem;
+}
 
 /* Loading indicator */
 .loading-indicator {
@@ -7,12 +47,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(22, 27, 34, 0.95);
-    padding: 30px;
-    border-radius: 12px;
+    padding: 20px 30px;
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     z-index: 9999;
     border: 1px solid #30363d;
 }
@@ -20,20 +60,38 @@
 .loading-indicator span {
     color: #c9d1d9;
     font-weight: 500;
+    font-size: 0.9rem;
 }
 
-/* Connection Error Alert Styles */
+/* Connection Error Alert Styles - Compact */
 #connection-error-alert {
-    border-left: 4px solid #dc3545;
+    border-left: 3px solid #dc3545;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+#connection-error-alert .alert-heading {
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem;
+}
+
+#connection-error-alert h5, #connection-error-alert h6 {
+    font-size: 0.9rem !important;
+    margin-bottom: 0.5rem;
 }
 
 #connection-error-alert ul {
     margin-bottom: 0;
     padding-left: 1.2rem;
+    font-size: 0.85rem;
 }
 
 #connection-error-alert ul li {
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.25rem;
+}
+
+#connection-error-alert .me-3 {
+    font-size: 1.5rem !important;
 }
 
 /* Tools Alert Styles */
@@ -76,37 +134,41 @@
     font-size: 0.9rem;
 }
 
-/* Network Traffic */
+/* Network Traffic - Compact */
 .network-traffic .traffic-stats {
     display: flex;
-    gap: 20px;
-    margin: 15px 0;
+    gap: 12px;
+    margin: 10px 0;
     flex-wrap: wrap;
 }
 
 .network-traffic .stat {
     flex: 1;
-    min-width: 250px;
-    padding: 15px;
-    background: #f8f9fa;
+    min-width: 200px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 6px;
+    border: 1px solid #dee2e6;
 }
 
 .network-traffic .stat .label {
     color: #6c757d;
-    font-size: 14px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .network-traffic .stat .value {
     display: block;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #0d6efd;
-    margin: 8px 0;
+    margin: 5px 0;
 }
 
 .network-traffic .stat .peak {
-    font-size: 12px;
+    font-size: 0.7rem;
     color: #6c757d;
 }
 
@@ -192,45 +254,51 @@
     color: #0d6efd;
 }
 
-/* Security Events */
+/* Security Events - Compact */
 .security-events .events-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin: 15px 0;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin: 10px 0;
 }
 
 .event-card {
-    background: #f8f9fa;
-    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 12px;
     border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     transition: transform 0.2s;
+    border: 1px solid #dee2e6;
 }
 
 .event-card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .event-card.warning {
     border: 2px solid #dc3545;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
 }
 
 .event-icon {
-    font-size: 32px;
+    font-size: 1.5rem;
 }
 
 .event-value {
-    font-size: 28px;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #0d6efd;
 }
 
 .event-label {
-    font-size: 12px;
+    font-size: 0.7rem;
     color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .top-threats {
@@ -295,13 +363,23 @@
     height: 200px !important;
 }
 
-/* Card shadows */
+/* Card shadows and compact spacing */
 .network-traffic,
 .firewall-status,
 .active-services,
 .security-events,
 .mini-charts {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.network-traffic .card-title,
+.firewall-status .card-title,
+.active-services .card-title,
+.security-events .card-title,
+.mini-charts .card-title {
+    font-size: 1rem !important;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
 }
 
 /* Responsive */
@@ -319,53 +397,57 @@
     }
 }
 
-/* Installation Panel */
+/* Installation Panel - Compact */
 .installation-panel {
-    max-width: 800px;
-    margin: 40px auto;
+    max-width: 700px;
+    margin: 20px auto;
 }
 
 .install-card {
     background: white;
     border: 1px solid #dee2e6;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
 .install-header {
-    padding: 30px;
+    padding: 20px;
     text-align: center;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: none;
 }
 
 .install-header h3 {
-    margin: 0 0 10px 0;
-    font-size: 24px;
-    color: #0d6efd;
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: white;
+    font-weight: 600;
 }
 
 .install-header p {
     margin: 0;
-    color: #6c757d;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
 }
 
 .install-body {
-    padding: 30px;
+    padding: 20px;
 }
 
 .install-features {
     background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 25px;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 1px solid #e9ecef;
 }
 
 .install-features h4 {
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     color: #212529;
-    font-size: 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .install-features ul {
@@ -375,16 +457,17 @@
 }
 
 .install-features li {
-    padding: 8px 0;
+    padding: 5px 0;
     color: #6c757d;
-    font-size: 14px;
+    font-size: 0.85rem;
 }
 
 .btn-lg {
     width: 100%;
-    padding: 15px;
-    font-size: 16px;
+    padding: 12px;
+    font-size: 0.95rem;
     font-weight: 600;
+    border-radius: 6px;
 }
 
 /* Progress Bar */
@@ -467,16 +550,16 @@
     margin-top: 25px;
 }
 
-/* Settings Panel (выезжает справа) */
+/* Settings Panel - Compact */
 .settings-panel {
     position: fixed;
-    right: -400px;
+    right: -350px;
     top: 0;
-    width: 400px;
+    width: 350px;
     height: 100vh;
     background: white;
     border-left: 1px solid #dee2e6;
-    box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
     transition: right 0.3s ease;
     z-index: 1050;
     overflow-y: auto;
@@ -487,9 +570,9 @@
 }
 
 .settings-header {
-    padding: 20px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -497,55 +580,67 @@
 
 .settings-header h4 {
     margin: 0;
-    color: #0d6efd;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 .btn-close-settings {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
-    color: #6c757d;
-    font-size: 24px;
+    color: white;
+    font-size: 20px;
     cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
+    padding: 5px;
+    width: 28px;
+    height: 28px;
     line-height: 1;
+    border-radius: 4px;
+    transition: background 0.2s;
 }
 
 .btn-close-settings:hover {
-    color: #212529;
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .settings-body {
-    padding: 20px;
+    padding: 15px;
 }
 
 .setting-item {
     background: #f8f9fa;
-    padding: 20px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
     border: 1px solid #dee2e6;
 }
 
 .setting-item h5 {
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
     color: #212529;
-    font-size: 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .setting-item p {
-    margin: 0 0 15px 0;
-    font-size: 13px;
+    margin: 0 0 12px 0;
+    font-size: 0.8rem;
+    color: #6c757d;
 }
 
 .btn-block {
     width: 100%;
     padding: 10px;
+    font-size: 0.9rem;
 }
 
 .monitoring-controls {
     text-align: right;
+}
+
+.monitoring-controls .btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
 }
 
 /* Progress bar для удаления (красная) */
