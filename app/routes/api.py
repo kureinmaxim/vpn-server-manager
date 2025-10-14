@@ -885,7 +885,19 @@ def install_monitoring(server_id):
             # Получаем credentials
             ip = server.get('ip_address')
             user = server.get('ssh_credentials', {}).get('user', 'root')
-            password = server.get('ssh_credentials', {}).get('password_decrypted', '')
+            
+            # Расшифровываем пароль
+            crypto_service = registry.get('crypto')
+            encrypted_password = server.get('ssh_credentials', {}).get('password', '')
+            password = ''
+            if encrypted_password and crypto_service:
+                try:
+                    password = crypto_service.decrypt(encrypted_password)
+                except Exception as e:
+                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                    return
+            
             port = server.get('ssh_credentials', {}).get('port', 22)
             
             # Функция проверки отмены
@@ -893,6 +905,31 @@ def install_monitoring(server_id):
                 if installation_cancelled.get(server_id, False):
                     return True
                 return False
+            
+            # Проверка: не установлен ли уже мониторинг
+            yield f"data: {json.dumps({'step': 0, 'total': 7, 'message': 'Проверка существующей установки...', 'status': 'running'})}\n\n"
+            import paramiko
+            check_client = None
+            try:
+                check_client = paramiko.SSHClient()
+                check_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                check_client.connect(hostname=ip, username=user, password=password, port=port, timeout=30, 
+                                   banner_timeout=60, auth_timeout=30, look_for_keys=False, allow_agent=False)
+                
+                # Проверяем наличие файла мониторинга
+                _, stdout, _ = check_client.exec_command('test -f /usr/local/bin/monitoring/get-all-stats.sh && echo "exists"', timeout=10)
+                result = stdout.read().decode('utf-8').strip()
+                check_client.close()
+                
+                if result == 'exists':
+                    logger.warning(f"Monitoring already installed on server {server_id}, aborting installation")
+                    yield f"data: {json.dumps({'error': 'Мониторинг уже установлен на этом сервере! Обновите страницу.', 'status': 'error'})}\n\n"
+                    return
+            except Exception as e:
+                if check_client:
+                    check_client.close()
+                # Игнорируем ошибку проверки, продолжаем установку
+                logger.debug(f"Pre-installation check failed (this is OK): {e}")
             
             # Шаг 1: Подключение
             yield f"data: {json.dumps({'step': 1, 'total': 7, 'message': 'Подключение к серверу...', 'status': 'running'})}\n\n"
@@ -902,7 +939,6 @@ def install_monitoring(server_id):
             time.sleep(0.3)
             
             # Проверяем SSH подключение
-            import paramiko
             client = None
             try:
                 client = paramiko.SSHClient()
@@ -965,7 +1001,7 @@ def install_monitoring(server_id):
                 script_content = '''#!/bin/bash
 # VPN Server Manager - Metrics Collection Script
 HISTORY_FILE="/var/tmp/metrics_history.json"
-MAX_POINTS=60
+MAX_POINTS=288  # 24 часа истории (288 точек × 5 минут)
 
 # Получаем текущие метрики
 CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - $1}')
@@ -1073,7 +1109,19 @@ def uninstall_monitoring(server_id):
             # Получаем credentials
             ip = server.get('ip_address')
             user = server.get('ssh_credentials', {}).get('user', 'root')
-            password = server.get('ssh_credentials', {}).get('password_decrypted', '')
+            
+            # Расшифровываем пароль
+            crypto_service = registry.get('crypto')
+            encrypted_password = server.get('ssh_credentials', {}).get('password', '')
+            password = ''
+            if encrypted_password and crypto_service:
+                try:
+                    password = crypto_service.decrypt(encrypted_password)
+                except Exception as e:
+                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                    return
+            
             port = server.get('ssh_credentials', {}).get('port', 22)
             
             # Шаг 1: Подключение
