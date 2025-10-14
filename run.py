@@ -92,7 +92,9 @@ def main():
             print(f"🔧 Mode: {'Development' if debug else 'Production'}")
             print(f"⏹️  Press Ctrl+C to stop\n")
             
-            app.run(host=host, port=port, debug=debug)
+            # threaded=True позволяет обрабатывать несколько запросов одновременно
+            # Это критично важно для SSH операций с долгими таймаутами
+            app.run(host=host, port=port, debug=debug, threaded=True)
             
     except KeyboardInterrupt:
         logger.info("Application interrupted by user")

@@ -5,7 +5,7 @@ import sys
 import os
 import signal
 import time
-from wsgiref.simple_server import make_server
+from werkzeug.serving import make_server
 from app import create_app
 
 logger = logging.getLogger(__name__)
@@ -40,11 +40,12 @@ class DesktopApp:
         try:
             if self.app:
                 # Используем порт 0 для автоматического выделения свободного порта ОС
-                _WSGI_SERVER = make_server('127.0.0.1', 0, self.app)
+                # threaded=True для обработки нескольких запросов одновременно
+                _WSGI_SERVER = make_server('127.0.0.1', 0, self.app, threaded=True)
                 SERVER_PORT = _WSGI_SERVER.server_port
                 
-                logger.info(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
-                print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
+                logger.info(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT} (многопоточный)")
+                print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT} (многопоточный)")
                 
                 _WSGI_SERVER.serve_forever()
         except Exception as e:

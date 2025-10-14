@@ -2,8 +2,8 @@
 
 {% block head %}
 {{ super() }}
-<!-- Monitoring CSS -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}">
+<!-- Monitoring CSS with cache buster -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.1">
 {% endblock %}
 
 {% block content %}
@@ -20,37 +20,46 @@
         </div>
         <div>
             <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left" style="font-size: 0.9rem;"></i> {{ _('Назад к списку') }}
+                <i class="bi bi-arrow-left"></i> {{ _('Назад к списку') }}
             </a>
         </div>
+    </div>
+
+    <!-- Loading Indicator (показывается сразу, скрывается через JS) -->
+    <div id="initial-loading" class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">{{ _('Загрузка...') }}</span>
+        </div>
+        <h5 class="text-muted">{{ _('Проверка системы мониторинга...') }}</h5>
+        <p class="small text-muted">{{ _('Подключение к серверу...') }}</p>
     </div>
 
     <!-- Installation Panel (показывается если не установлено) -->
     <div id="installation-panel" class="installation-panel" style="display: none;">
         <div class="install-card">
             <div class="install-header">
-                <h3 style="font-size: 1.2rem; margin: 0 0 5px 0;">
-                    <i class="bi bi-box-seam" style="font-size: 1.1rem;"></i> {{ _('Установка системы мониторинга') }}
+                <h3>
+                    <i class="bi bi-box-seam"></i> {{ _('Установка системы мониторинга') }}
                 </h3>
-                <p style="margin: 0; font-size: 0.85rem;">{{ _('Мониторинг еще не установлен на этом сервере') }}</p>
+                <p>{{ _('Мониторинг еще не установлен на этом сервере') }}</p>
             </div>
             
             <div class="install-body">
                 <div class="install-features">
-                    <h4 style="font-size: 0.95rem; font-weight: 600;">{{ _('Что будет установлено:') }}</h4>
+                    <h4>{{ _('Что будет установлено:') }}</h4>
                     <ul>
-                        <li style="font-size: 0.85rem;">✅ {{ _('vnstat - для статистики трафика') }}</li>
-                        <li style="font-size: 0.85rem;">✅ {{ _('jq - для обработки JSON') }}</li>
-                        <li style="font-size: 0.85rem;">✅ {{ _('net-tools - для сетевой статистики') }}</li>
-                        <li style="font-size: 0.85rem;">⚠️ {{ _('ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)') }}</li>
+                        <li>✅ {{ _('vnstat - для статистики трафика') }}</li>
+                        <li>✅ {{ _('jq - для обработки JSON') }}</li>
+                        <li>✅ {{ _('net-tools - для сетевой статистики') }}</li>
+                        <li>⚠️ {{ _('ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)') }}</li>
                     </ul>
-                    <p class="mt-2 text-muted" style="font-size: 0.75rem;">
-                        <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i> {{ _('Установка займет 1-2 минуты') }}
+                    <p class="mt-2 text-muted small">
+                        <i class="bi bi-info-circle"></i> {{ _('Установка займет 1-2 минуты') }}
                     </p>
                 </div>
                 
-                <button id="install-btn" class="btn btn-primary btn-lg" style="font-size: 0.95rem; padding: 12px;">
-                    <i class="bi bi-download" style="font-size: 1rem;"></i> {{ _('Установить мониторинг') }}
+                <button id="install-btn" class="btn btn-primary btn-lg">
+                    <i class="bi bi-download"></i> {{ _('Установить мониторинг') }}
                 </button>
                 
                 <!-- Progress section -->
@@ -73,15 +82,17 @@
         </div>
     </div>
 
-    <!-- Stats Container (показывается после установки) -->
-    <div id="stats-container">
+    <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
+    <div id="stats-container" style="display: none;">
         
-        <!-- Settings button in header -->
-        <div class="monitoring-controls mb-3">
+        <!-- Settings button removed - not needed -->
+        <!--
+        <div class="monitoring-controls mb-3" style="display: none;" id="monitoring-controls">
             <button id="show-settings-btn" class="btn btn-secondary btn-sm">
-                <i class="bi bi-gear" style="font-size: 0.95rem;"></i> {{ _('Настройки') }}
+                <i class="bi bi-gear"></i> {{ _('Настройки') }}
             </button>
         </div>
+        -->
 
     <!-- Connection Error Alert -->
     <div id="connection-error-alert" class="alert alert-danger d-none mb-4" role="alert">
@@ -113,7 +124,7 @@
     <!-- Tools Check Alert -->
     <div id="tools-alert" class="alert alert-warning d-none mb-4" role="alert">
         <div class="d-flex align-items-start">
-            <div class="me-3" style="font-size: 2rem;">⚙️</div>
+            <div class="me-3" style="font-size: 2rem;"><i class="bi bi-tools"></i></div>
             <div class="flex-grow-1">
                 <h5 class="alert-heading mb-2">
                     <i class="bi bi-exclamation-triangle"></i> {{ _('Рекомендуется установить дополнительные утилиты') }}
@@ -142,14 +153,14 @@
             <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
             <div class="traffic-stats">
                 <div class="stat">
-                    <span class="label">↓ {{ _('Download:') }}</span>
+                    <span class="label">↓ {{ _('Загрузка:') }}</span>
                     <span class="value" id="rx-speed">0 MB/s</span>
-                    <span class="peak">Peak: <span id="rx-peak">0</span> MB/s</span>
+                    <span class="peak">{{ _('Пик:') }} <span id="rx-peak">0</span> MB/s</span>
                 </div>
                 <div class="stat">
-                    <span class="label">↑ {{ _('Upload:') }}</span>
+                    <span class="label">↑ {{ _('Отдача:') }}</span>
                     <span class="value" id="tx-speed">0 MB/s</span>
-                    <span class="peak">Peak: <span id="tx-peak">0</span> MB/s</span>
+                    <span class="peak">{{ _('Пик:') }} <span id="tx-peak">0</span> MB/s</span>
                 </div>
             </div>
             <div class="daily-stats">
@@ -234,17 +245,32 @@
         <div class="card-body">
             <h3><i class="bi bi-graph-up-arrow"></i> {{ _('История производительности (60 мин)') }}</h3>
             <div class="charts-container">
-                <div class="chart-wrapper">
-                    <h4>CPU Usage</h4>
-                    <canvas id="cpu-chart"></canvas>
+                <div class="chart-card card">
+                    <div class="card-body">
+                        <h4>{{ _('Использование CPU') }}</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="cpu-chart"></canvas>
+                        </div>
+                    </div>
                 </div>
-                <div class="chart-wrapper">
-                    <h4>Memory Usage</h4>
-                    <canvas id="memory-chart"></canvas>
+                <div class="chart-card card">
+                    <div class="card-body">
+                        <h4>{{ _('Использование памяти') }}</h4>
+                        <div class="chart-wrapper">
+                            <canvas id="memory-chart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+        <!-- Delete Monitoring Button -->
+        <div class="mt-4 text-end">
+            <button class="btn btn-outline-danger" id="uninstall-btn-main">
+                <i class="bi bi-trash"></i> {{ _('Удалить мониторинг') }}
+            </button>
+        </div>
 
     </div> <!-- End #stats-container -->
 </div>
@@ -287,30 +313,7 @@
     </div>
 </div>
 
-<!-- Settings Panel (выезжает справа) -->
-<div class="settings-panel" id="settings-panel">
-    <div class="settings-header">
-        <h4>⚙️ {{ _('Настройки мониторинга') }}</h4>
-        <button class="btn-close-settings" id="close-settings-btn">&times;</button>
-    </div>
-    <div class="settings-body">
-        <div class="setting-item">
-            <h5>🗑️ {{ _('Удаление') }}</h5>
-            <p class="text-muted">{{ _('Полностью удалить систему мониторинга с сервера') }}</p>
-            <button class="btn btn-danger btn-block" id="uninstall-btn">
-                <i class="bi bi-trash"></i> {{ _('Удалить мониторинг') }}
-            </button>
-        </div>
-        
-        <div class="setting-item">
-            <h5>ℹ️ {{ _('Информация') }}</h5>
-            <p class="text-muted">
-                {{ _('Версия:') }} 1.0<br>
-                {{ _('Сервер:') }} {{ server.name }}
-            </p>
-        </div>
-    </div>
-</div>
+<!-- Settings Panel removed - delete button now on main page -->
 
 <!-- Styles moved to static/css/monitoring.css -->
 
@@ -783,20 +786,40 @@ let currentEventSource = null;
 
 async function checkInstallation() {
     console.log('🔧 Checking monitoring installation status...');
+    console.log('🔗 URL:', `/api/monitoring/${serverId}/check-installed`);
     try {
         const response = await fetch(`/api/monitoring/${serverId}/check-installed`);
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('❌ Response not OK:', response.status, response.statusText);
+            return false;
+        }
+        
         const data = await response.json();
         console.log('📊 Installation check result:', data);
+        console.log('✅ Installed:', data.installed);
+        
+        if (!data.installed && data.error) {
+            console.error('❌ Check error:', data.error);
+        }
         
         return data.installed || false;
     } catch (error) {
-        console.error('Error checking installation:', error);
+        console.error('💥 Error checking installation:', error);
         return false;
     }
 }
 
 function showInstallationPanel() {
     console.log('📦 Showing installation panel');
+    
+    // Скрываем индикатор загрузки
+    const loadingIndicator = document.getElementById('initial-loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+    
     document.getElementById('installation-panel').style.display = 'block';
     document.getElementById('stats-container').style.display = 'none';
     
@@ -808,40 +831,80 @@ function showInstallationPanel() {
 
 function showMonitoring() {
     console.log('📊 Showing monitoring stats');
+    
+    // Скрываем индикатор загрузки
+    const loadingIndicator = document.getElementById('initial-loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+    
+    // Показываем кнопку настроек
+    const monitoringControls = document.getElementById('monitoring-controls');
+    if (monitoringControls) {
+        monitoringControls.style.display = 'block';
+    }
+    
     document.getElementById('installation-panel').style.display = 'none';
     document.getElementById('stats-container').style.display = 'block';
     
     // Инициализируем мониторинг
     initMonitoring();
     
-    // Настройка панели settings
-    setupSettingsPanel();
+    // setupSettingsPanel() уже вызван в DOMContentLoaded
 }
 
 function setupSettingsPanel() {
-    // Кнопка открытия настроек
+    console.log('⚙️ Setting up settings panel...');
+    
+    // Кнопка открытия настроек (если есть)
     const showSettingsBtn = document.getElementById('show-settings-btn');
     if (showSettingsBtn) {
-        showSettingsBtn.addEventListener('click', function() {
+        const newShowBtn = showSettingsBtn.cloneNode(true);
+        showSettingsBtn.parentNode.replaceChild(newShowBtn, showSettingsBtn);
+        
+        newShowBtn.addEventListener('click', function() {
+            console.log('🔧 Opening settings panel');
             document.getElementById('settings-panel').classList.add('active');
         });
     }
     
-    // Кнопка закрытия настроек
+    // Кнопка закрытия настроек (если есть)
     const closeSettingsBtn = document.getElementById('close-settings-btn');
     if (closeSettingsBtn) {
-        closeSettingsBtn.addEventListener('click', function() {
+        const newCloseBtn = closeSettingsBtn.cloneNode(true);
+        closeSettingsBtn.parentNode.replaceChild(newCloseBtn, closeSettingsBtn);
+        
+        newCloseBtn.addEventListener('click', function() {
+            console.log('❌ Closing settings panel');
             document.getElementById('settings-panel').classList.remove('active');
         });
     }
     
-    // Кнопка удаления
+    // Кнопка удаления в боковой панели (если есть)
     const uninstallBtn = document.getElementById('uninstall-btn');
     if (uninstallBtn) {
-        uninstallBtn.addEventListener('click', function() {
+        const newUninstallBtn = uninstallBtn.cloneNode(true);
+        uninstallBtn.parentNode.replaceChild(newUninstallBtn, uninstallBtn);
+        
+        newUninstallBtn.addEventListener('click', function() {
+            console.log('🗑️ Uninstall button (sidebar) clicked');
             showUninstallModal();
         });
     }
+    
+    // Кнопка удаления на главной странице (новая)
+    const uninstallBtnMain = document.getElementById('uninstall-btn-main');
+    if (uninstallBtnMain) {
+        const newUninstallBtnMain = uninstallBtnMain.cloneNode(true);
+        uninstallBtnMain.parentNode.replaceChild(newUninstallBtnMain, uninstallBtnMain);
+        
+        newUninstallBtnMain.addEventListener('click', function() {
+            console.log('🗑️ Uninstall button (main) clicked');
+            showUninstallModal();
+        });
+    }
+    
+    console.log('✅ Settings panel configured');
 }
 
 async function startInstallation() {
@@ -938,11 +1001,13 @@ async function startInstallation() {
                 // Установка завершена
                 currentEventSource.close();
                 addLog(logsContainer, '🎉 Установка завершена успешно!', 'success');
+                addLog(logsContainer, '🔄 Перезагрузка через 3 секунды...', 'info');
                 cancelBtn.style.display = 'none';
                 
+                // Перезагружаем страницу для чистого старта
                 setTimeout(function() {
-                    showMonitoring();
-                }, 2000);
+                    window.location.reload();
+                }, 3000);
                 return;
             }
             
@@ -998,24 +1063,40 @@ function resetInstallation() {
 }
 
 function showUninstallModal() {
-    const modal = new bootstrap.Modal(document.getElementById('uninstallModal'));
+    console.log('🗑️ Opening uninstall modal');
+    
+    const modalEl = document.getElementById('uninstallModal');
+    const modal = new bootstrap.Modal(modalEl);
     modal.show();
     
     // Сбрасываем состояние модального окна
-    document.getElementById('confirm-uninstall-btn').style.display = 'block';
-    document.getElementById('cancel-uninstall-btn').style.display = 'block';
+    const confirmBtn = document.getElementById('confirm-uninstall-btn');
+    const cancelBtn = document.getElementById('cancel-uninstall-btn');
+    
+    confirmBtn.style.display = 'block';
+    cancelBtn.style.display = 'block';
     document.getElementById('uninstall-progress').style.display = 'none';
     document.getElementById('uninstall-logs').innerHTML = '';
     
-    // Кнопка подтверждения удаления
-    document.getElementById('confirm-uninstall-btn').onclick = function() {
+    // Удаляем старые обработчики и добавляем новые
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.onclick = function() {
+        console.log('✅ User confirmed uninstallation');
         startUninstallation();
     };
+    
+    console.log('✅ Uninstall modal configured');
 }
 
 async function startUninstallation() {
-    if (isUninstalling) return;
+    if (isUninstalling) {
+        console.warn('⚠️ Uninstallation already in progress');
+        return;
+    }
     
+    console.log('🗑️ Starting uninstallation process...');
     isUninstalling = true;
     
     // Скрываем кнопки, показываем прогресс
@@ -1026,6 +1107,8 @@ async function startUninstallation() {
     const progressBar = document.getElementById('uninstall-progress-bar');
     const progressText = document.getElementById('uninstall-progress-text');
     const logsContainer = document.getElementById('uninstall-logs');
+    
+    console.log('📡 Connecting to uninstall endpoint...');
     
     try {
         const eventSource = new EventSource(`/api/monitoring/${serverId}/uninstall`);
@@ -1043,18 +1126,12 @@ async function startUninstallation() {
             if (data.complete) {
                 eventSource.close();
                 addLog(logsContainer, data.message || '🎉 Мониторинг удален!', 'success');
+                addLog(logsContainer, '🔄 Перезагрузка через 3 секунды...', 'info');
                 
+                // Перезагружаем страницу для чистого старта
                 setTimeout(function() {
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('uninstallModal'));
-                    if (modal) modal.hide();
-                    
-                    // Закрываем панель настроек
-                    document.getElementById('settings-panel').classList.remove('active');
-                    
-                    // Показываем панель установки
-                    showInstallationPanel();
-                    isUninstalling = false;
-                }, 2000);
+                    window.location.reload();
+                }, 3000);
                 return;
             }
             
@@ -1120,6 +1197,9 @@ function initMonitoring() {
 // Initialize
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Page loaded, checking installation...');
+    
+    // ВАЖНО: Настраиваем панель настроек ВСЕГДА (кнопки существуют в DOM)
+    setupSettingsPanel();
     
     // Проверяем, установлен ли мониторинг
     const isInstalled = await checkInstallation();

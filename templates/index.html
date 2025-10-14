@@ -974,14 +974,14 @@
                 if (window.html2canvas) {
                     captureStatusModal();
                 } else {
-                    // Загружаем html2canvas
-                    console.log('Loading html2canvas...');
+                    // Загружаем настоящую библиотеку html2canvas
+                    console.log('Loading real html2canvas library...');
                     var s = document.createElement('script');
-                    s.src = '/vendor/html2canvas.min.js';
+                    s.src = '{{ url_for("static", filename="js/html2canvas.min.js") }}';
                     s.type = 'text/javascript';
                     s.async = false; // Загружаем синхронно
                     s.onload = function() {
-                        console.log('html2canvas loaded successfully');
+                        console.log('✅ Real html2canvas loaded successfully');
                         if (window.html2canvas) {
                             captureStatusModal();
                         } else {
@@ -1004,36 +1004,56 @@
     function captureStatusModal(){
         console.log('captureStatusModal called');
         var modal = document.getElementById('serverStatusModal');
-        var content = document.getElementById('statsContent');
         
-        if (!modal || !content) {
-            console.error('Modal or content not found');
+        if (!modal) {
+            console.error('Modal not found');
             alert('{{ _("Модальное окно не найдено") }}');
             return;
         }
         
-        console.log('Starting html2canvas capture...');
+        // Захватываем весь modal-content (с заголовком и стилями)
+        var modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+            console.error('Modal content not found');
+            alert('{{ _("Содержимое модального окна не найдено") }}');
+            return;
+        }
+        
+        console.log('Starting html2canvas capture of full modal...');
         
         // Небольшая задержка для перерасчёта лэйаута
         setTimeout(function(){
-            var scale = window.devicePixelRatio || 1;
-            var prevTransform = content.style.transform;
-            content.style.transform = 'scale(1)';
-            var fullHeight = content.scrollHeight;
+            var scale = Math.max(2, (window.devicePixelRatio || 1));
             
-            window.html2canvas(content, {
+            // Сохраняем текущее состояние
+            var modalBody = modalContent.querySelector('.modal-body');
+            var prevBodyMaxH = modalBody ? modalBody.style.maxHeight : '';
+            var prevBodyOverflow = modalBody ? modalBody.style.overflow : '';
+            
+            // Разворачиваем для захвата
+            if (modalBody) {
+                modalBody.style.maxHeight = 'none';
+                modalBody.style.overflow = 'visible';
+            }
+            
+            // Используем настоящую библиотеку html2canvas с правильными параметрами
+            window.html2canvas(modalContent, {
                 backgroundColor: '#ffffff',
-                scale: Math.max(2, scale),
-                height: fullHeight,
-                windowHeight: fullHeight,
+                scale: scale,
+                logging: true,
                 useCORS: true,
-                allowTaint: true
+                allowTaint: true,
+                imageTimeout: 0,
+                removeContainer: true
             })
             .then(function(canvas){
                 console.log('Canvas created, size:', canvas.width, 'x', canvas.height);
                 
-                // Восстановим стили
-                content.style.transform = prevTransform || '';
+                // Восстанавливаем стили
+                if (modalBody) {
+                    modalBody.style.maxHeight = prevBodyMaxH;
+                    modalBody.style.overflow = prevBodyOverflow;
+                }
                 
                 var dataUrl = canvas.toDataURL('image/png');
                 console.log('Data URL created, length:', dataUrl.length);

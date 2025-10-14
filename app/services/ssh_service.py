@@ -19,7 +19,7 @@ class SSHService:
         self.sftp_client: Optional[paramiko.SFTPClient] = None
     
     @classmethod
-    def get_connection_pooled(cls, hostname: str, port: int, username: str, password: Optional[str] = None):
+    def get_connection_pooled(cls, hostname: str, port: int, username: str, password: Optional[str] = None, connection_timeout: int = 30):
         """Получить или создать SSH подключение (с переиспользованием)"""
         key = f"{hostname}:{port}:{username}"
         
@@ -42,21 +42,25 @@ class SSHService:
                         del cls._connection_pool[key]
             
             # Создаем новое подключение
-            logger.info(f"🔌 Creating new SSH connection to {hostname}")
+            logger.info(f"🔌 Creating new SSH connection to {hostname} (timeout: {connection_timeout}s)")
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             
             try:
+                # Для быстрых проверок используем короткие таймауты
+                banner_timeout = min(connection_timeout * 2, 60)
+                auth_timeout = min(connection_timeout, 30)
+                
                 ssh.connect(
                     hostname,
                     port=port,
                     username=username,
                     password=password,
-                    timeout=30,              # Увеличили с 10 до 30
-                    banner_timeout=60,       # Время ожидания SSH banner
-                    auth_timeout=30,         # Время на аутентификацию
-                    look_for_keys=False,     # Не искать SSH ключи (быстрее)
-                    allow_agent=False        # Не использовать SSH agent
+                    timeout=connection_timeout,     # Настраиваемый таймаут
+                    banner_timeout=banner_timeout,  # Динамический на основе connection_timeout
+                    auth_timeout=auth_timeout,      # Динамический на основе connection_timeout
+                    look_for_keys=False,            # Не искать SSH ключи (быстрее)
+                    allow_agent=False               # Не использовать SSH agent
                 )
                 
                 cls._connection_pool[key] = ssh
@@ -154,6 +158,39 @@ class SSHService:
         except Exception as e:
             logger.error(f"Error executing command '{command}': {str(e)}")
             raise SSHConnectionError(f"Command execution failed: {str(e)}")
+    
+    def execute_remote_command(self, ip: str, user: str, password: str, command: str, 
+                               port: int = 22, timeout: int = 30, connection_timeout: int = None) -> Dict:
+        """Выполнение команды на удаленном сервере (без предварительного подключения)"""
+        try:
+            # Если connection_timeout не указан, используем timeout для подключения
+            if connection_timeout is None:
+                connection_timeout = timeout
+            
+            # Используем connection pooling с настраиваемым таймаутом
+            client = self.get_connection_pooled(ip, port, user, password, connection_timeout=connection_timeout)
+            
+            logger.info(f"Executing remote command on {ip}: {command}")
+            _, stdout, stderr = client.exec_command(command, timeout=timeout)
+            
+            output = stdout.read().decode('utf-8')
+            error = stderr.read().decode('utf-8')
+            exit_status = stdout.channel.recv_exit_status()
+            
+            return {
+                'success': exit_status == 0,
+                'output': output,
+                'error': error,
+                'exit_status': exit_status
+            }
+        except Exception as e:
+            logger.error(f"Error executing remote command on {ip}: {str(e)}")
+            return {
+                'success': False,
+                'output': '',
+                'error': str(e),
+                'exit_status': -1
+            }
     
     def get_sftp_client(self) -> paramiko.SFTPClient:
         """Получение SFTP клиента"""
