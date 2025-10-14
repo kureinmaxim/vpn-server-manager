@@ -1,43 +1,61 @@
-/* VPN Server Manager - Monitoring Styles v2.0 - Compact & Modern */
+/* VPN Server Manager - Monitoring Styles v2.2 - Extra Compact & Minimalist */
 
-/* Global Compact Styles */
+/* Global Extra Compact Styles */
 .monitoring-page h1 {
-    font-size: 1.5rem !important;
+    font-size: 0.95rem !important;
     font-weight: 600;
+    margin-bottom: 0.4rem;
 }
 
 .monitoring-page h2 {
-    font-size: 1.2rem !important;
+    font-size: 0.9rem !important;
     font-weight: 600;
 }
 
 .monitoring-page h3 {
-    font-size: 1.1rem !important;
+    font-size: 0.85rem !important;
     font-weight: 600;
 }
 
 .monitoring-page h4 {
-    font-size: 1rem !important;
+    font-size: 0.8rem !important;
     font-weight: 600;
 }
 
 .monitoring-page h5 {
-    font-size: 0.95rem !important;
+    font-size: 0.75rem !important;
     font-weight: 600;
 }
 
 .monitoring-page .bi {
-    font-size: 1.2rem !important;
+    font-size: 0.85rem !important;
 }
 
 .monitoring-page .card {
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    margin-bottom: 15px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.monitoring-page .card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
 .monitoring-page .card-body {
-    padding: 1rem;
+    padding: 0.75rem;
+}
+
+.monitoring-page .card-title {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem;
+}
+
+.monitoring-page p {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Loading indicator */
@@ -47,12 +65,12 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(22, 27, 34, 0.95);
-    padding: 20px 30px;
+    padding: 12px 20px;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     z-index: 9999;
     border: 1px solid #30363d;
 }
@@ -60,7 +78,23 @@
 .loading-indicator span {
     color: #c9d1d9;
     font-weight: 500;
+    font-size: 0.8rem;
+}
+
+/* Buttons - более компактные */
+.monitoring-page .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
+.monitoring-page .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+}
+
+.monitoring-page .btn-lg {
     font-size: 0.9rem;
+    padding: 0.6rem 1rem;
 }
 
 /* Connection Error Alert Styles - Compact */
@@ -91,7 +125,12 @@
 }
 
 #connection-error-alert .me-3 {
-    font-size: 1.5rem !important;
+    font-size: 1.3rem !important;
+}
+
+/* Tools alert emoji */
+#tools-alert .me-3 {
+    font-size: 1.3rem !important;
 }
 
 /* Tools Alert Styles */
@@ -134,18 +173,18 @@
     font-size: 0.9rem;
 }
 
-/* Network Traffic - Compact */
+/* Network Traffic - Extra Compact */
 .network-traffic .traffic-stats {
     display: flex;
-    gap: 12px;
-    margin: 10px 0;
+    gap: 10px;
+    margin: 8px 0;
     flex-wrap: wrap;
 }
 
 .network-traffic .stat {
     flex: 1;
-    min-width: 200px;
-    padding: 12px;
+    min-width: 180px;
+    padding: 10px;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     border-radius: 6px;
     border: 1px solid #dee2e6;
@@ -153,15 +192,15 @@
 
 .network-traffic .stat .label {
     color: #6c757d;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .network-traffic .stat .value {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #0d6efd;
     margin: 5px 0;
@@ -284,11 +323,11 @@
 }
 
 .event-icon {
-    font-size: 1.5rem;
+    font-size: 1rem;
 }
 
 .event-value {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #0d6efd;
 }
@@ -348,6 +387,23 @@
     margin-top: 15px;
 }
 
+.mini-charts .chart-card {
+    height: 320px !important;
+    max-height: 320px !important;
+}
+
+.mini-charts .chart-wrapper {
+    position: relative;
+    height: 240px !important;
+    max-height: 240px !important;
+}
+
+.mini-charts canvas {
+    max-height: 240px !important;
+    width: 100% !important;
+    height: 240px !important;
+}
+
 .chart-wrapper {
     background: #f8f9fa;
     padding: 15px;
@@ -382,6 +438,40 @@
     margin-bottom: 0.75rem;
 }
 
+/* Таблицы и списки - компактные */
+.monitoring-page table {
+    font-size: 0.8rem;
+}
+
+.monitoring-page .table-sm th,
+.monitoring-page .table-sm td {
+    padding: 0.4rem;
+    font-size: 0.75rem;
+}
+
+.monitoring-page ul,
+.monitoring-page ol {
+    font-size: 0.85rem;
+}
+
+.monitoring-page li {
+    margin-bottom: 0.3rem;
+}
+
+.monitoring-page .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.monitoring-page .alert {
+    font-size: 0.85rem;
+    padding: 0.75rem;
+}
+
+.monitoring-page .small {
+    font-size: 0.75rem !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .network-traffic .traffic-stats {
@@ -395,6 +485,10 @@
     .mini-charts .charts-container {
         grid-template-columns: 1fr;
     }
+    
+    .monitoring-page h1 {
+        font-size: 0.9rem !important;
+    }
 }
 
 /* Installation Panel - Compact */
@@ -405,22 +499,22 @@
 
 .install-card {
     background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .install-header {
-    padding: 20px;
+    padding: 12px 18px;
     text-align: center;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-bottom: none;
 }
 
 .install-header h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
+    margin: 0 0 3px 0;
+    font-size: 0.95rem;
     color: white;
     font-weight: 600;
 }
@@ -428,25 +522,25 @@
 .install-header p {
     margin: 0;
     color: rgba(255, 255, 255, 0.9);
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .install-body {
-    padding: 20px;
+    padding: 18px;
 }
 
 .install-features {
     background: #f8f9fa;
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
     border: 1px solid #e9ecef;
 }
 
 .install-features h4 {
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
     color: #212529;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 600;
 }
 
@@ -457,9 +551,9 @@
 }
 
 .install-features li {
-    padding: 5px 0;
+    padding: 4px 0;
     color: #6c757d;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .btn-lg {
@@ -467,7 +561,13 @@
     padding: 12px;
     font-size: 0.95rem;
     font-weight: 600;
-    border-radius: 6px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-lg:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
 }
 
 /* Progress Bar */
@@ -570,7 +670,7 @@
 }
 
 .settings-header {
-    padding: 15px;
+    padding: 12px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-bottom: none;
     display: flex;
@@ -581,7 +681,7 @@
 .settings-header h4 {
     margin: 0;
     color: white;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 600;
 }
 
@@ -609,29 +709,35 @@
 
 .setting-item {
     background: #f8f9fa;
-    padding: 15px;
+    padding: 10px;
     border-radius: 6px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     border: 1px solid #dee2e6;
 }
 
 .setting-item h5 {
-    margin: 0 0 8px 0;
+    margin: 0 0 5px 0;
     color: #212529;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 600;
 }
 
 .setting-item p {
-    margin: 0 0 12px 0;
-    font-size: 0.8rem;
+    margin: 0 0 8px 0;
+    font-size: 0.7rem;
     color: #6c757d;
 }
 
 .btn-block {
     width: 100%;
-    padding: 10px;
-    font-size: 0.9rem;
+    padding: 8px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-block:hover {
+    transform: translateY(-1px);
 }
 
 .monitoring-controls {
@@ -639,8 +745,18 @@
 }
 
 .monitoring-controls .btn {
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.monitoring-controls .btn:hover {
+    transform: translateY(-1px);
+}
+
+.monitoring-controls .bi {
+    font-size: 0.8rem !important;
 }
 
 /* Progress bar для удаления (красная) */

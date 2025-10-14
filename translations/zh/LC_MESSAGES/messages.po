@@ -7,151 +7,484 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-04 19:11+0300\n"
+"POT-Creation-Date: 2025-10-14 20:32+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: zh\n"
 "Language-Team: zh <LL@li.org>\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.14.0\n"
 
-#: app.py:538
-msgid "Ошибка чтения файла данных. Файл может быть поврежден."
-msgstr "读取数据文件时出错。文件可能已损坏。"
+#: app/routes/api.py:81
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:81
+msgid "Server created successfully"
+msgstr "服务器创建成功"
 
-#: app.py:543
-msgid ""
-"Не удалось расшифровать файл данных. Проверьте ваш SECRET_KEY или "
-"целостность файла."
-msgstr "无法解密数据文件。请检查您的SECRET_KEY或文件完整性。"
+#: app/routes/api.py:104
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:104
+msgid "Server not found"
+msgstr "找不到服务器"
 
-#: app.py:550
-msgid "Ошибка: не указан активный файл данных. Сохранение невозможно."
-msgstr "错误：未指定活动数据文件。无法保存。"
+#: app/routes/api.py:138
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:138
+msgid "Server updated successfully"
+msgstr "服务器更新成功"
 
-#: app.py:711 pin_auth.py:179 pin_auth.py:202
-msgid "Аутентификация успешна"
-msgstr "认证成功"
+#: app/routes/api.py:159
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:159
+msgid "Server deleted successfully"
+msgstr "服务器删除成功"
 
-#: app.py:1053
-msgid ""
-"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
-" целостность файла данных."
-msgstr "无法加载服务器数据。请检查互联网连接和数据文件完整性。"
+#: app/routes/api.py:180 app/routes/main.py:983 app/routes/main.py:986
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:180
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:983
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:986
+msgid "Connection test successful"
+msgstr "连接测试成功"
 
-#: app.py:1089
-msgid "Нет подключения к интернету. Некоторые функции могут быть недоступны."
-msgstr "没有互联网连接。某些功能可能不可用。"
+#: app/routes/api.py:1281
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1324
+msgid "Backup created successfully"
+msgstr "备份创建成功"
 
-#: app.py:1187
-msgid "Создан новый файл для хранения серверов. Теперь можно добавить первый."
-msgstr "已创建新文件用于存储服务器。现在可以添加第一个。"
+#: app/routes/api.py:1310
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1353
+msgid "Backup restored successfully"
+msgstr "备份恢复成功"
 
-#: app.py:1576 app.py:1636
-msgid "Нет активного файла данных для экспорта."
+#: app/routes/api.py:1361
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1404
+msgid "Settings updated successfully"
+msgstr "设置更新成功"
+
+#: app/routes/api.py:1459 app/routes/main.py:82
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1502
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:82
+msgid "PIN is required"
+msgstr "必需的"
+
+#: app/routes/api.py:1489
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1532
+msgid "Login successful"
+msgstr "登录成功"
+
+#: app/routes/api.py:1503
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1546
+msgid "Too many failed attempts. Blocked for 30 seconds."
+msgstr "失败次数过多。已锁定30秒。"
+
+#: app/routes/api.py:1509 app/routes/main.py:93
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1552
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:93
+msgid "Invalid PIN"
+msgstr "PIN码错误"
+
+#: app/routes/api.py:1531
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1574
+msgid "Both old and new PIN are required"
+msgstr "新旧 PIN 码均需要"
+
+#: app/routes/api.py:1540
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1583
+msgid "PIN changed successfully"
+msgstr "PIN 码更改成功"
+
+#: app/routes/api.py:1545
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1588
+msgid "Invalid old PIN"
+msgstr "PIN码错误"
+
+#: app/routes/api.py:1564 app/routes/main.py:101
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1607
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:101
+msgid "Logged out successfully"
+msgstr "退出成功"
+
+#: app/routes/api.py:1621
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1664
+msgid "Application closing..."
+msgstr "申请关闭..."
+
+#: app/routes/main.py:60
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:60
+msgid "Error loading servers"
+msgstr "加载服务器时出错"
+
+#: app/routes/main.py:90
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:90
+msgid "PIN verified successfully"
+msgstr "PIN 码验证成功"
+
+#: app/routes/main.py:120 app/routes/main.py:156 app/routes/main.py:1028
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:120
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:156
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1028
+msgid "Сервис данных не инициализирован."
+msgstr "数据服务尚未初始化。"
+
+#: app/routes/main.py:133
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:133
+msgid "Сервер успешно удален."
+msgstr "服务器已成功删除。"
+
+#: app/routes/main.py:135 app/routes/main.py:246
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:135
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:246
+msgid "Нет активного файла данных для сохранения изменений."
 msgstr "没有可导出的活动数据文件。"
 
-#: app.py:1728
-msgid "Файл данных успешно импортирован и прикреплен!"
-msgstr "数据文件已成功导入并附加！"
+#: app/routes/main.py:137 app/routes/main.py:165 app/routes/main.py:1035
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:137
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:165
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1035
+#, python-format
+msgid "Сервер с ID %(server_id)s не найден."
+msgstr "未找到 ID 为 %(server_id)s 的服务器。"
 
-#: app.py:1732
+#: app/routes/main.py:243
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:243
+msgid "Изменения успешно сохранены."
+msgstr "更改已成功保存。"
+
+#: app/routes/main.py:250
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:250
+#, python-format
+msgid "Ошибка при сохранении изменений: %(error)s"
+msgstr "保存更改时出错：%(error)s"
+
+#: app/routes/main.py:256
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:256
+msgid "Ошибка при загрузке данных сервера."
+msgstr "加载数据时出错："
+
+#: app/routes/main.py:284
+#: backup_tools/legacy_backup_20251012_151015/app.py:2001
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:284
+msgid "Ошибка: ключи не совпадают."
+msgstr "错误：密钥不匹配。"
+
+#: app/routes/main.py:289
+#: backup_tools/legacy_backup_20251012_151015/app.py:2006
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:289
+msgid "Ошибка: новый ключ не может быть пустым."
+msgstr "错误：新密钥不能为空。"
+
+#: app/routes/main.py:296
+#: backup_tools/legacy_backup_20251012_151015/app.py:2013
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:296
+msgid "Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet."
+msgstr "错误：密钥格式不正确。密钥必须是Fernet格式。"
+
+#: app/routes/main.py:396
+#: backup_tools/legacy_backup_20251012_151015/app.py:2122
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:396
+msgid "Необходимо выбрать файл и указать ключ для проверки."
+msgstr "必须选择文件并指定密钥进行验证。"
+
+#: app/routes/main.py:400
+#: backup_tools/legacy_backup_20251012_151015/app.py:2126
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:400
+msgid "Неверный тип файла. Выберите файл .enc"
+msgstr "文件类型无效。选择.enc文件"
+
+#: app/routes/main.py:423
+#: backup_tools/legacy_backup_20251012_151015/app.py:2166
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:423
+msgid "✅ Ключ подходит, но структура данных неожиданная."
+msgstr "✅ 密钥有效，但数据结构意外。"
+
+#: app/routes/main.py:427
+#: backup_tools/legacy_backup_20251012_151015/app.py:2169
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:427
+msgid "❌ Ключ не подходит к этому файлу данных."
+msgstr "❌ 密钥与此数据文件不匹配。"
+
+#: app/routes/main.py:429
+#: backup_tools/legacy_backup_20251012_151015/app.py:2171
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:429
+msgid "❌ Файл расшифрован, но содержит некорректные JSON данные."
+msgstr "❌ 文件已解密，但包含无效的JSON数据。"
+
+#: app/routes/main.py:461
+#: backup_tools/legacy_backup_20251012_151015/app.py:1949
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:461
+msgid "Файл данных успешно откреплен."
+msgstr "数据文件已成功分离。"
+
+#: app/routes/main.py:476 app/routes/main.py:542
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:476
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:542
 msgid ""
-"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
-" с другим ключом."
+"Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ "
+"шифрования."
+msgstr "数据管理服务尚未初始化。检查配置和加密密钥。"
+
+#: app/routes/main.py:511
+#: backup_tools/legacy_backup_20251012_151015/app.py:1732
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:511
+msgid ""
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан с "
+"другим ключом."
 msgstr "错误：文件无法解密或已损坏。可能是用不同的密钥创建的。"
 
-#: app.py:1740 app.py:1757
+#: app/routes/main.py:519
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:519
+msgid ""
+"Не удалось сохранить путь к новому файлу данных. Изменение будет временным."
+msgstr "无法保存新数据文件的路径。这种变化将是暂时的。"
+
+#: app/routes/main.py:525 app/routes/main.py:553
+#: backup_tools/legacy_backup_20251012_151015/app.py:1740
+#: backup_tools/legacy_backup_20251012_151015/app.py:1757
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:525
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:553
 msgid "Неверный тип файла. Пожалуйста, выберите файл .enc"
 msgstr "文件类型无效。请选择.enc文件"
 
-#: app.py:1753
+#: app/routes/main.py:549
+#: backup_tools/legacy_backup_20251012_151015/app.py:1753
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:549
 msgid "Необходимо выбрать файл и указать внешний ключ шифрования."
 msgstr "必须选择文件并指定外部加密密钥。"
 
-#: app.py:1766
+#: app/routes/main.py:560
+#: backup_tools/legacy_backup_20251012_151015/app.py:1766
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:560
 msgid ""
 "Неверный формат ключа шифрования. Ключ должен быть действительным ключом "
 "Fernet."
 msgstr "加密密钥格式无效。密钥必须是有效的Fernet密钥。"
 
-#: app.py:1925
+#: app/routes/main.py:671
+#: backup_tools/legacy_backup_20251012_151015/app.py:1925
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:671
 msgid "Все сервера из импортируемого файла уже существуют в вашем списке."
 msgstr "导入文件中的所有服务器已存在于您的列表中。"
 
-#: app.py:1928
-msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+#: app/routes/main.py:674
+#: backup_tools/legacy_backup_20251012_151015/app.py:1928
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:674
+msgid ""
+"Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
 msgstr "错误：加密密钥无效。请检查输入的密钥是否正确。"
 
-#: app.py:1930
+#: app/routes/main.py:676
+#: backup_tools/legacy_backup_20251012_151015/app.py:1930
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:676
 msgid "Ошибка: файл содержит некорректные данные."
 msgstr "错误：文件包含不正确的数据。"
 
-#: app.py:1949
-msgid "Файл данных успешно откреплен."
-msgstr "数据文件已成功分离。"
+#: app/routes/main.py:701 app/routes/main.py:767
+#: backup_tools/legacy_backup_20251012_151015/app.py:1576
+#: backup_tools/legacy_backup_20251012_151015/app.py:1636
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:701
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:767
+msgid "Нет активного файла данных для экспорта."
+msgstr "没有可导出的活动数据文件。"
 
-#: app.py:2001
-msgid "Ошибка: ключи не совпадают."
-msgstr "错误：密钥不匹配。"
+#: app/routes/main.py:919
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:919
+msgid "Hint added successfully"
+msgstr "提示添加成功"
 
-#: app.py:2006
-msgid "Ошибка: новый ключ не может быть пустым."
-msgstr "错误：新密钥不能为空。"
+#: app/routes/main.py:931
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:931
+msgid "Hint deleted successfully"
+msgstr "提示删除成功"
 
-#: app.py:2013
-msgid "Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet."
-msgstr "错误：密钥格式不正确。密钥必须是Fernet格式。"
+#: app/routes/main.py:964
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:964
+msgid "Language changed successfully"
+msgstr "语言更改成功"
 
-#: app.py:2086
+#: app/routes/main.py:966
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:966
+msgid "Unsupported language"
+msgstr "不支持的语言"
+
+#: app/routes/main.py:998
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:998
+#, python-format
+msgid "Connection test failed: %(error)s"
+msgstr "连接测试失败：%(error)s"
+
+#: app/routes/main.py:1042
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1042
+msgid "Ошибка при загрузке страницы мониторинга."
+msgstr "加载数据时出错："
+
+#: app/routes/main.py:1058 app/routes/main.py:1063
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1058
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1063
+msgid "No file selected"
+msgstr "未选择文件"
+
+#: app/routes/main.py:1069
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1069
+msgid "Icon uploaded successfully"
+msgstr "图标上传成功"
+
+#: app/routes/main.py:1080
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1080
+msgid "Backup download not implemented yet"
+msgstr "备份下载尚未实现"
+
+#: app/routes/main.py:1084
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1084
+msgid "Error creating backup"
+msgstr "创建备份时出错"
+
+#: app/routes/main.py:1094 app/routes/main.py:1099
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1094
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1099
+msgid "No backup file selected"
+msgstr "未选择备份文件"
+
+#: app/routes/main.py:1103
+#: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:1103
+msgid "Backup restore not implemented yet"
+msgstr "备份恢复尚未实现"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:538
+msgid "Ошибка чтения файла данных. Файл может быть поврежден."
+msgstr "读取数据文件时出错。文件可能已损坏。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:543
+msgid ""
+"Не удалось расшифровать файл данных. Проверьте ваш SECRET_KEY или "
+"целостность файла."
+msgstr "无法解密数据文件。请检查您的SECRET_KEY或文件完整性。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:550
+msgid "Ошибка: не указан активный файл данных. Сохранение невозможно."
+msgstr "错误：未指定活动数据文件。无法保存。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:711
+#: backup_tools/legacy_backup_20251012_151015/pin_auth.py:179
+#: backup_tools/legacy_backup_20251012_151015/pin_auth.py:202
+msgid "Аутентификация успешна"
+msgstr "认证成功"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:1053
+msgid ""
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и "
+"целостность файла данных."
+msgstr "无法加载服务器数据。请检查互联网连接和数据文件完整性。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:1089
+msgid "Нет подключения к интернету. Некоторые функции могут быть недоступны."
+msgstr "没有互联网连接。某些功能可能不可用。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:1187
+msgid "Создан новый файл для хранения серверов. Теперь можно добавить первый."
+msgstr "已创建新文件用于存储服务器。现在可以添加第一个。"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:1728
+msgid "Файл данных успешно импортирован и прикреплен!"
+msgstr "数据文件已成功导入并附加！"
+
+#: backup_tools/legacy_backup_20251012_151015/app.py:2086
 #, python-format
 msgid ""
 "✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
 "Резервная копия сохранена как: %(backup_filename)s"
 msgstr "✅ 密钥已成功更改！已创建新数据文件：%(new_filename)s。 备份保存为：%(backup_filename)s"
 
-#: app.py:2122
-msgid "Необходимо выбрать файл и указать ключ для проверки."
-msgstr "必须选择文件并指定密钥进行验证。"
-
-#: app.py:2126
-msgid "Неверный тип файла. Выберите файл .enc"
-msgstr "文件类型无效。选择.enc文件"
-
-#: app.py:2133
+#: backup_tools/legacy_backup_20251012_151015/app.py:2133
 msgid "❌ Некорректный формат ключа Fernet."
 msgstr "❌ Fernet密钥格式不正确。"
 
-#: app.py:2164
+#: backup_tools/legacy_backup_20251012_151015/app.py:2164
 #, python-format
 msgid ""
 "✅ Ключ подходит! Найдено серверов: %(server_count)s. Провайдеры: "
 "%(provider_list)s. Серверы: %(name_preview)s"
-msgstr "✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
-
-#: app.py:2166
-msgid "✅ Ключ подходит, но структура данных неожиданная."
-msgstr "✅ 密钥有效，但数据结构意外。"
-
-#: app.py:2169
-msgid "❌ Ключ не подходит к этому файлу данных."
-msgstr "❌ 密钥与此数据文件不匹配。"
-
-#: app.py:2171
-msgid "❌ Файл расшифрован, но содержит некорректные JSON данные."
-msgstr "❌ 文件已解密，但包含无效的JSON数据。"
-
-#: app.py:2199
-#, python-format
-msgid "Язык изменен на %(lang)s"
 msgstr ""
+"✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:10
+#: templates/404.html:10
+msgid "Страница не найдена"
+msgstr "找不到页面"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:17
+#: templates/404.html:17
+msgid "404 - Страница не найдена"
+msgstr "404 - 页面未找到"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:19
+#: templates/404.html:19
+msgid "Запрашиваемая страница не существует или была перемещена."
+msgstr "请求的页面不存在或已被移动。"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:24
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:34
+#: templates/404.html:24 templates/500.html:34
+msgid "На главную"
+msgstr "更换主密钥"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:27
+#: templates/404.html:27
+msgid "Назад"
+msgstr "后退"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:34
+#: templates/404.html:34
+msgid "Если вы считаете, что это ошибка, обратитесь к администратору."
+msgstr "如果您认为这是一个错误，请联系您的管理员。"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:10
+#: templates/500.html:10
+msgid "Внутренняя ошибка сервера"
+msgstr "内部服务器错误"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:17
+#: templates/500.html:17
+msgid "500 - Внутренняя ошибка сервера"
+msgstr "500 - 内部服务器错误"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:19
+#: templates/500.html:19
+msgid "Произошла внутренняя ошибка сервера. Мы работаем над её устранением."
+msgstr "发生内部服务器错误。我们正在努力消除它。"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:24
+#: templates/500.html:24
+msgid "Что можно сделать:"
+msgstr "它有什么作用？"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:26
+#: templates/500.html:26
+msgid "Обновите страницу через несколько минут"
+msgstr "几分钟后刷新页面"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:27
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:596
+#: templates/500.html:27 templates/monitoring.html:596
+msgid "Проверьте подключение к интернету"
+msgstr "检查您的互联网连接"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:28
+#: templates/500.html:28
+msgid "Обратитесь к администратору, если проблема повторяется"
+msgstr "如果问题仍然存在，请联系您的管理员"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:37
+#: templates/500.html:37
+msgid "Обновить"
+msgstr "添加"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:44
+#: templates/500.html:44
+msgid "Ошибка зафиксирована в логах системы."
+msgstr "该错误已记录在系统日志中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/about.html:3
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:69
-#: templates/about.html:3 templates/layout.html:69
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:74
+#: templates/about.html:3 templates/layout.html:74
 msgid "О программе"
 msgstr "关于"
 
@@ -162,7 +495,8 @@ msgid "Панель управления VPS"
 msgstr "VPS控制面板"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/about.html:11
-#: templates/about.html:11
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:317
+#: templates/about.html:11 templates/monitoring.html:317
 msgid "Версия:"
 msgstr "版本："
 
@@ -179,8 +513,8 @@ msgstr "开发者："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/about.html:16
 #: templates/about.html:16
 msgid ""
-"Программа для удобного и безопасного хранения информации о VPS/VDS "
-"серверах от различных провайдеров."
+"Программа для удобного и безопасного хранения информации о VPS/VDS серверах "
+"от различных провайдеров."
 msgstr "用于方便安全地存储来自各种提供商的VPS/VDS服务器信息的程序。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:3
@@ -248,9 +582,9 @@ msgstr "例如，Ubuntu 22.04"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:34
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:34
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:115
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:336
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:337
 #: templates/add_server.html:34 templates/edit_server.html:34
-#: templates/index.html:115 templates/index.html:336
+#: templates/index.html:115 templates/index.html:337
 msgid "Статус"
 msgstr "状态"
 
@@ -396,9 +730,9 @@ msgstr "永久"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:101
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:129
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:206
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:207
 #: templates/add_server.html:101 templates/edit_server.html:129
-#: templates/index.html:206
+#: templates/index.html:207
 msgid "SSH-доступ"
 msgstr "SSH访问"
 
@@ -474,9 +808,9 @@ msgstr "输入面板密码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:147
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:178
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:163
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:164
 #: templates/add_server.html:147 templates/edit_server.html:178
-#: templates/index.html:163
+#: templates/index.html:164
 msgid "Кабинет хостера"
 msgstr "主机商面板"
 
@@ -591,10 +925,10 @@ msgstr "输入备注"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:207
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:223
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:301
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:302
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:315
 #: templates/add_server.html:207 templates/edit_server.html:223
-#: templates/index.html:301
-#, fuzzy
+#: templates/index.html:302 templates/monitoring.html:315
 msgid "Информация"
 msgstr "信息："
 
@@ -608,10 +942,10 @@ msgstr "Docker容器信息"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:21
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:60
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:227
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:317
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:318
 #: templates/add_server.html:211 templates/add_server.html:226
 #: templates/cheatsheet.html:21 templates/cheatsheet.html:60
-#: templates/edit_server.html:227 templates/index.html:317
+#: templates/edit_server.html:227 templates/index.html:318
 msgid "Установленное ПО"
 msgstr "已安装软件"
 
@@ -632,13 +966,14 @@ msgstr "保存"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:196
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:235
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:267
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:402
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:526
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:289
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:379
 #: templates/add_server.html:216 templates/edit_server.html:232
 #: templates/index_locked.html:123 templates/index_locked.html:157
 #: templates/index_locked.html:196 templates/index_locked.html:235
-#: templates/index_locked.html:267 templates/layout.html:402
-#: templates/settings.html:379
+#: templates/index_locked.html:267 templates/layout.html:526
+#: templates/monitoring.html:289 templates/settings.html:379
 msgid "Отмена"
 msgstr "取消"
 
@@ -711,7 +1046,6 @@ msgstr "本节汇集了用于快速评估服务器状态的最有用命令。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:13
 #: templates/cheatsheet.html:13
-#, fuzzy
 msgid "Содержание"
 msgstr "创建..."
 
@@ -728,7 +1062,6 @@ msgstr "快速摘要"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:23
 #: templates/cheatsheet.html:23
-#, fuzzy
 msgid "Подробнее о df (использование дискового пространства)"
 msgstr "关于 `df` 的更多信息（磁盘空间使用）"
 
@@ -982,141 +1315,132 @@ msgstr "删除包："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:367
 #: templates/cheatsheet.html:367
-#, fuzzy
 msgid "Проверить статус NGINX:"
 msgstr "检查服务状态"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:374
 #: templates/cheatsheet.html:374
 msgid "Запустить NGINX:"
-msgstr ""
+msgstr "启动 NGINX："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:381
 #: templates/cheatsheet.html:381
-#, fuzzy
 msgid "Остановить NGINX:"
 msgstr "安装包"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:388
 #: templates/cheatsheet.html:388
-#, fuzzy
 msgid "Перезапустить NGINX:"
 msgstr "重启服务："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:395
 #: templates/cheatsheet.html:395
 msgid "Перезагрузить конфигурацию NGINX:"
-msgstr ""
+msgstr "重新加载 NGINX 配置："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:402
 #: templates/cheatsheet.html:402
 msgid "Проверить конфигурацию NGINX:"
-msgstr ""
+msgstr "检查 NGINX 配置："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:409
 #: templates/cheatsheet.html:409
 msgid "Просмотр логов NGINX:"
-msgstr ""
+msgstr "查看NGINX日志："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:416
 #: templates/cheatsheet.html:416
 msgid "Просмотр логов ошибок NGINX:"
-msgstr ""
+msgstr "查看NGINX错误日志："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:423
 #: templates/cheatsheet.html:423
 msgid "Проверить активные соединения NGINX:"
-msgstr ""
+msgstr "检查活动的 NGINX 连接："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:438
 #: templates/cheatsheet.html:438
-#, fuzzy
 msgid "Проверить статус Docker:"
 msgstr "检查服务状态"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:445
 #: templates/cheatsheet.html:445
 msgid "Список запущенных контейнеров:"
-msgstr ""
+msgstr "正在运行的容器列表："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:452
 #: templates/cheatsheet.html:452
 msgid "Список всех контейнеров (включая остановленные):"
-msgstr ""
+msgstr "所有容器列表（包括已停止的容器）："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:459
 #: templates/cheatsheet.html:459
 msgid "Список образов Docker:"
-msgstr ""
+msgstr "Docker 镜像列表："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:466
 #: templates/cheatsheet.html:466
 msgid "Запустить контейнер:"
-msgstr ""
+msgstr "启动容器："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:473
 #: templates/cheatsheet.html:473
-#, fuzzy
 msgid "Остановить контейнер:"
 msgstr "安装包"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:480
 #: templates/cheatsheet.html:480
-#, fuzzy
 msgid "Удалить контейнер:"
 msgstr "删除包："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:487
 #: templates/cheatsheet.html:487
 msgid "Просмотр логов контейнера:"
-msgstr ""
+msgstr "查看容器日志："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:494
 #: templates/cheatsheet.html:494
 msgid "Выполнить команду в контейнере:"
-msgstr ""
+msgstr "在容器中运行命令："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:509
 #: templates/cheatsheet.html:509
-#, fuzzy
 msgid "Проверить статус службы:"
 msgstr "检查服务状态"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:516
 #: templates/cheatsheet.html:516
-#, fuzzy
 msgid "Запустить службу:"
 msgstr "重启服务："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:523
 #: templates/cheatsheet.html:523
-#, fuzzy
 msgid "Остановить службу:"
 msgstr "重启服务："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:544
 #: templates/cheatsheet.html:544
-#, fuzzy
 msgid "Отключить автозапуск службы:"
 msgstr "启用服务自动启动："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:551
 #: templates/cheatsheet.html:551
 msgid "Перезагрузить конфигурацию systemd:"
-msgstr ""
+msgstr "重新加载系统配置："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:558
 #: templates/cheatsheet.html:558
 msgid "Просмотр логов службы:"
-msgstr ""
+msgstr "查看服务日志："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:565
 #: templates/cheatsheet.html:565
 msgid "Список всех служб:"
-msgstr ""
+msgstr "所有服务列表："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:589
-#: templates/cheatsheet.html:589
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:713
+#: templates/cheatsheet.html:589 templates/monitoring.html:713
 msgid "Скопировано!"
 msgstr "已复制！"
 
@@ -1207,7 +1531,6 @@ msgstr "新密码根"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:163
 #: templates/edit_server.html:163
-#, fuzzy
 msgid "URL панели"
 msgstr "控制面板URL"
 
@@ -1323,8 +1646,8 @@ msgid "Чеки еще не загружены."
 msgstr "检查尚未加载。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:314
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:483
-#: templates/edit_server.html:314 templates/index.html:486
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:490
+#: templates/edit_server.html:314 templates/index.html:490
 msgid "Закрыть"
 msgstr "关闭"
 
@@ -1364,14 +1687,14 @@ msgid "Could not copy text:"
 msgstr "无法复制文本："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:3
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:57
-#: templates/help.html:3 templates/layout.html:57
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:62
+#: templates/help.html:3 templates/layout.html:62
 msgid "Справка"
 msgstr "帮助"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:8
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:60
-#: templates/help.html:8 templates/layout.html:60
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:65
+#: templates/help.html:8 templates/layout.html:65
 msgid "Справка по использованию"
 msgstr "使用帮助"
 
@@ -1384,8 +1707,8 @@ msgstr "添加新服务器"
 #: templates/help.html:19
 msgid ""
 "Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
-"необходимые поля. Пароли будут автоматически зашифрованы перед "
-"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
+"необходимые поля. Пароли будут автоматически зашифрованы перед сохранением. "
+"Вы также можете прикрепить файл (например, чек об оплате)."
 msgstr "点击主页上的\"添加服务器\"按钮。填写所有必填字段。密码将在保存前自动加密。您还可以附加文件（例如付款收据）。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:27
@@ -1478,8 +1801,7 @@ msgstr "SSH、面板、主机（密码）- 高级别"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
-"файле"
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в файле"
 msgstr "所有密码（SSH、控制面板和主机账户）都存储在文件中"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
@@ -1495,8 +1817,8 @@ msgstr "加密形式"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"с использованием надежного алгоритма. Для шифрования используется "
-"секретный ключ из файла"
+"с использованием надежного алгоритма. Для шифрования используется секретный "
+"ключ из файла"
 msgstr "使用可靠的算法。加密使用文件中的密钥"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
@@ -1522,8 +1844,8 @@ msgstr "明文形式"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:71
 #: templates/help.html:71
 msgid ""
-"Они не шифруются, но на главной странице их пути маскируются для защиты "
-"от случайных взглядов."
+"Они не шифруются, но на главной странице их пути маскируются для защиты от "
+"случайных взглядов."
 msgstr "它们不加密，但在主页上路径被屏蔽以保护免受随意查看。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:74
@@ -1559,8 +1881,8 @@ msgstr "IP和DNS测试："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
 #: templates/help.html:92
 msgid ""
-"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
-"которые ведут на внешние сервисы"
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", которые"
+" ведут на внешние сервисы"
 msgstr "主页顶部有\"IP测试\"和\"DNS测试\"按钮，它们指向外部服务"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
@@ -1586,8 +1908,8 @@ msgstr "自动地理定位："
 #: templates/help.html:93
 msgid ""
 "При добавлении или редактировании сервера приложение автоматически "
-"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
-" шапке карточки."
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в "
+"шапке карточки."
 msgstr "添加或编辑服务器时，应用程序会根据IP地址自动确定其地理定位（国家和城市）并在卡片标题中显示。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:94
@@ -1615,24 +1937,24 @@ msgstr "包括组织和托管数据。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid "Определение владельца IP:"
-msgstr ""
+msgstr "IP 所有者确定："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid "Кнопка"
-msgstr ""
+msgstr "按钮"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid "\"Владелец IP\" открывает сервис"
-msgstr ""
+msgstr "“IP拥有者”开通服务"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid ""
-"в новой вкладке для детального анализа владельца IP-адреса сервера, "
-"включая информацию об организации, провайдере и геолокации."
-msgstr ""
+"в новой вкладке для детального анализа владельца IP-адреса сервера, включая "
+"информацию об организации, провайдере и геолокации."
+msgstr "在新选项卡中详细分析服务器 IP 地址的所有者，包括有关组织、提供商和地理位置的信息。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:104
 #: templates/help.html:104
@@ -1646,7 +1968,8 @@ msgid ""
 "помогают быстро оценить, подходит ли IP-адрес для использования со "
 "стриминговыми сервисами, имеющими геолокационные ограничения (например, "
 "9Now, Hulu, BBC iPlayer)."
-msgstr "每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
+msgstr ""
+"每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:111
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:114
@@ -1681,26 +2004,27 @@ msgstr "注意。IP地址由数据中心或VPN提供商颁发。在流媒体平�
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:119
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:122
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:137
-#: templates/help.html:119 templates/help.html:122 templates/index.html:137
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:138
+#: templates/help.html:119 templates/help.html:122 templates/index.html:138
 msgid "DNS ?"
 msgstr "DNS？"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:119
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:123
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:135
-#: templates/help.html:119 templates/help.html:123 templates/index.html:135
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:136
+#: templates/help.html:119 templates/help.html:123 templates/index.html:136
 msgid "DNS OK"
 msgstr "DNS 正常"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:120
 #: templates/help.html:120
 msgid ""
-"Это результат ручной проверки, которую вы должны провести самостоятельно."
-" Многие стриминговые сервисы определяют ваше реальное местоположение "
-"через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
-"сервис поймет, что вы используете VPN."
-msgstr "这是您必须自己执行的手动检查的结果。许多流媒体服务通过DNS请求确定您的真实位置。如果它们\"泄漏\"（绕过您的VPN服务器），服务将知道您正在使用VPN。"
+"Это результат ручной проверки, которую вы должны провести самостоятельно. "
+"Многие стриминговые сервисы определяют ваше реальное местоположение через "
+"DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), сервис "
+"поймет, что вы используете VPN."
+msgstr ""
+"这是您必须自己执行的手动检查的结果。许多流媒体服务通过DNS请求确定您的真实位置。如果它们\"泄漏\"（绕过您的VPN服务器），服务将知道您正在使用VPN。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:122
 #: templates/help.html:122
@@ -1716,15 +2040,15 @@ msgstr "您已在服务器编辑表中勾选\"DNS测试通过\"框，确认没�
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:127
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:130
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:144
-#: templates/help.html:127 templates/help.html:130 templates/index.html:144
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:145
+#: templates/help.html:127 templates/help.html:130 templates/index.html:145
 msgid "Стриминг ?"
 msgstr "流媒体 ?"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:127
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:131
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:142
-#: templates/help.html:127 templates/help.html:131 templates/index.html:142
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:143
+#: templates/help.html:127 templates/help.html:131 templates/index.html:143
 msgid "Стриминг OK"
 msgstr "流媒体正常"
 
@@ -1755,8 +2079,8 @@ msgstr "数据管理和加密"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:147
 #: templates/help.html:147
 msgid ""
-"Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
-" обеспечивает как безопасность, так и портативность данных."
+"Вся информация о ваших серверах хранится в одном зашифрованном файле, что "
+"обеспечивает как безопасность, так и портативность данных."
 msgstr "有关您服务器的所有信息都存储在一个加密文件中，这既保证了安全性，又保证了数据的可移植性。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:149
@@ -1768,19 +2092,20 @@ msgstr "它是如何工作的？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:151
 #: templates/help.html:151
 msgid ""
-"Все данные о серверах, которые вы вводите, собираются вместе и "
-"преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
-"полностью шифруется и сохраняется в файл с расширением .enc."
+"Все данные о серверах, которые вы вводите, собираются вместе и преобразуются"
+" в единый текстовый блок (в формате JSON). Затем этот блок полностью "
+"шифруется и сохраняется в файл с расширением .enc."
 msgstr "您输入的所有服务器数据都被收集并转换为单个文本块（JSON格式）。然后，该块被完全加密并保存到扩展名为.enc的文件中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:154
 #: templates/help.html:154
 msgid ""
-"Можно представить это как подробный чертеж (ваши данные), который "
-"разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
-"Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
-"сможет восстановить исходный чертеж."
-msgstr "您可以把它想象成一张详细的蓝图（您的数据），被切成成千上万个小块，然后放进一个盒子里（.enc文件）。没有精确的组装说明（SECRET_KEY加密密钥），任何人都无法恢复原始蓝图。"
+"Можно представить это как подробный чертеж (ваши данные), который разрезали "
+"на тысячи мельчайших кусочков и сложили в коробку (файл .enc). Без точной "
+"инструкции по сборке (ключа шифрования SECRET_KEY) никто не сможет "
+"восстановить исходный чертеж."
+msgstr ""
+"您可以把它想象成一张详细的蓝图（您的数据），被切成成千上万个小块，然后放进一个盒子里（.enc文件）。没有精确的组装说明（SECRET_KEY加密密钥），任何人都无法恢复原始蓝图。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:157
 #: templates/help.html:157
@@ -1812,8 +2137,8 @@ msgstr "导入并附加："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:161
 #: templates/help.html:161
 msgid ""
-"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
-"и все ваши серверы появятся в списке."
+"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, и "
+"все ваши серверы появятся в списке."
 msgstr "上传先前导出的文件。应用程序将开始使用它，您的所有服务器将出现在列表中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
@@ -1824,8 +2149,8 @@ msgstr "分离文件："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
 #: templates/help.html:162
 msgid ""
-"Прекратить работу с текущим файлом. Список серверов станет пустым, как "
-"при первой установке. Сам файл при этом не удаляется."
+"Прекратить работу с текущим файлом. Список серверов станет пустым, как при "
+"первой установке. Сам файл при этом не удаляется."
 msgstr "停止使用当前文件。服务器列表将变为空，就像第一次安装时一样。文件本身不会被删除。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:165
@@ -1836,9 +2161,8 @@ msgstr "Fernet加密算法"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:167
 #: templates/help.html:167
 msgid ""
-"Для защиты ваших данных используется Fernet — это высокоуровневая система"
-" симметричного (с секретным ключом) шифрования из библиотеки "
-"cryptography."
+"Для защиты ваших данных используется Fernet — это высокоуровневая система "
+"симметричного (с секретным ключом) шифрования из библиотеки cryptography."
 msgstr "为了保护您的数据，我们使用了Fernet——这是一个来自密码学库的高级对称（带密钥）加密系统。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:169
@@ -1854,9 +2178,9 @@ msgstr "真实性保证："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:171
 #: templates/help.html:171
 msgid ""
-"Fernet гарантирует, что зашифрованные данные не были изменены или "
-"подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
-" он не сможет быть расшифрован."
+"Fernet гарантирует, что зашифрованные данные не были изменены или подделаны."
+" Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет"
+" быть расшифрован."
 msgstr "Fernet保证加密数据没有被更改或篡改。如果有人试图更改.enc文件中的任何一个字符，它将无法解密。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:172
@@ -1868,9 +2192,10 @@ msgstr "可靠的算法："
 #: templates/help.html:172
 msgid ""
 "\"Под капотом\" Fernet использует стандартные и проверенные временем "
-"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
-" SHA256 для аутентификации (проверки подлинности)."
-msgstr "“在底层”，Fernet使用标准且经过时间考验的加密算法：用于加密的CBC模式下的AES-128和用于身份验证（真实性检查）的带SHA256的HMAC。"
+"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с "
+"SHA256 для аутентификации (проверки подлинности)."
+msgstr ""
+"“在底层”，Fernet使用标准且经过时间考验的加密算法：用于加密的CBC模式下的AES-128和用于身份验证（真实性检查）的带SHA256的HMAC。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:175
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:288
@@ -1887,8 +2212,8 @@ msgstr "重要："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:175
 #: templates/help.html:175
 msgid ""
-"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
-" файле .env. Никогда и никому его не передавайте."
+"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в "
+"файле .env. Никогда и никому его не передавайте."
 msgstr "整个系统的安全性取决于您在.env文件中的SECRET_KEY的保密性。切勿与任何人分享。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:184
@@ -1899,8 +2224,8 @@ msgstr "从其他安装导入"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:189
 #: templates/help.html:189
 msgid ""
-"Эта функция позволяет перенести данные о серверах из другой установки VPN"
-" Server Manager, даже если у неё другой ключ шифрования."
+"Эта функция позволяет перенести данные о серверах из другой установки VPN "
+"Server Manager, даже если у неё другой ключ шифрования."
 msgstr "此功能允许您从另一个VPN服务器管理器安装中传输服务器数据，即使它具有不同的加密密钥。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:191
@@ -1911,8 +2236,8 @@ msgstr "何时需要？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:193
 #: templates/help.html:193
 msgid ""
-"Вы настроили приложение на другом компьютере и хотите перенести данные на"
-" новый"
+"Вы настроили приложение на другом компьютере и хотите перенести данные на "
+"новый"
 msgstr "您已在另一台计算机上设置了该应用程序，并希望将数据传输到新计算机"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:194
@@ -1979,8 +2304,8 @@ msgstr "转移："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:207
 #: templates/help.html:207
 msgid ""
-"Скопируйте оба элемента на новый компьютер любым удобным способом "
-"(флешка, облако, email)"
+"Скопируйте оба элемента на новый компьютер любым удобным способом (флешка, "
+"облако, email)"
 msgstr "以任何方便的方式将两个项目复制到新计算机（U盘、云、电子邮件）"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:208
@@ -2000,11 +2325,11 @@ msgid "Откройте раздел \"Настройки\" → \"Импорт �
 msgstr "打开\"设置\"→\"从其他安装导入\""
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:211
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:653
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:790
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:864
-#: templates/help.html:211 templates/index_locked.html:653
-#: templates/index_locked.html:790 templates/index_locked.html:864
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:654
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:791
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:865
+#: templates/help.html:211 templates/index_locked.html:654
+#: templates/index_locked.html:791 templates/index_locked.html:865
 msgid "Выберите файл"
 msgstr "选择文件"
 
@@ -2090,7 +2415,8 @@ msgstr "导入时会发生什么？"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:229
 #: templates/help.html:229
-msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
+msgid ""
+"Приложение расшифровывает внешний файл с помощью предоставленного ключа"
 msgstr "应用程序使用提供的密钥解密外部文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:230
@@ -2157,8 +2483,8 @@ msgstr "提示："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
 #: templates/help.html:248
 msgid ""
-"Для регулярного обмена данными между установками рекомендуется "
-"использовать одинаковый"
+"Для регулярного обмена данными между установками рекомендуется использовать "
+"одинаковый"
 msgstr "为定期在安装之间交换数据，建议使用相同的"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
@@ -2179,8 +2505,8 @@ msgstr "什么是SECRET_KEY以及如何获取？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:262
 #: templates/help.html:262
 msgid ""
-"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех "
-"данных в приложении. Он абсолютно необходим для работы."
+"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных "
+"в приложении. Он абсолютно необходим для работы."
 msgstr "<code>SECRET_KEY</code> 是您加密应用程序中所有数据的主密码。它对于操作至关重要。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:264
@@ -2201,15 +2527,15 @@ msgstr "如何生成："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:265
 #: templates/help.html:265
 msgid ""
-"Если вы запускаете приложение в первый раз, вам нужно создать его. Для "
-"этого можно использовать Python:"
+"Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого"
+" можно использовать Python:"
 msgstr "如果您是第一次运行该应用程序，您需要创建它。为此，您可以使用 Python："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:268
 #: templates/help.html:268
 msgid ""
-"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code>"
-" в таком виде:"
+"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в "
+"таком виде:"
 msgstr "复制生成的长代码并将其以此形式粘贴到 <code>.env</code> 文件中："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:269
@@ -2225,12 +2551,11 @@ msgstr "重要："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:271
 #: templates/help.html:271
 msgid ""
-"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете "
-"доступ ко всем данным. Если вы переносите приложение, обязательно "
-"скопируйте файл <code>.env</code> вместе с остальными данными."
+"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ "
+"ко всем данным. Если вы переносите приложение, обязательно скопируйте файл "
+"<code>.env</code> вместе с остальными данными."
 msgstr ""
-"切勿与任何人分享此密钥！如果丢失，您将无法访问所有数据。如果您正在传输应用程序，请务必将 <code>.env</code> "
-"文件与其余数据一起复制。"
+"切勿与任何人分享此密钥！如果丢失，您将无法访问所有数据。如果您正在传输应用程序，请务必将 <code>.env</code> 文件与其余数据一起复制。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:280
 #: templates/help.html:280
@@ -2247,10 +2572,9 @@ msgstr "传输包含所有服务器、收据和设置的应用程序需要复制
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:288
 #: templates/help.html:288
 msgid ""
-"Эта инструкция предназначена для текущей \"портативной\" версии "
-"приложения. В будущем, для версий, установленных через инсталлятор "
-"(Windows, macOS), будет предусмотрен специальный механизм экспорта и "
-"импорта."
+"Эта инструкция предназначена для текущей \"портативной\" версии приложения. "
+"В будущем, для версий, установленных через инсталлятор (Windows, macOS), "
+"будет предусмотрен специальный механизм экспорта и импорта."
 msgstr "本说明适用于应用程序的当前\"便携式\"版本。将来，对于通过安装程序（Windows、macOS）安装的版本，将提供特殊的导出和导入机制。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:291
@@ -2273,12 +2597,10 @@ msgstr "文件 <code>.env</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:294
 #: templates/help.html:294
 msgid ""
-"— самый важный файл! В нем содержится ваш уникальный "
-"<code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все "
-"данные будут утеряны.</strong>"
+"— самый важный файл! В нем содержится ваш уникальный <code>SECRET_KEY</code>"
+" для расшифровки данных. <strong>Без него все данные будут утеряны.</strong>"
 msgstr ""
-"— "
-"最重要的文件！它包含您用于解密数据的唯一<code>SECRET_KEY</code>。<strong>没有它，所有数据都将丢失。</strong>"
+"— 最重要的文件！它包含您用于解密数据的唯一<code>SECRET_KEY</code>。<strong>没有它，所有数据都将丢失。</strong>"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:295
 #: templates/help.html:295
@@ -2300,8 +2622,7 @@ msgstr "文件夹 <code>/uploads/</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:296
 #: templates/help.html:296
 msgid ""
-"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об "
-"оплате."
+"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об оплате."
 msgstr "— 这里存放着您上传的所有文件：服务器图标和付款收据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:299
@@ -2315,7 +2636,8 @@ msgid ""
 "На старом компьютере создайте архив всей папки с приложением (например, "
 "<code>VPNserverManage.zip</code>). Это самый надежный способ ничего не "
 "забыть."
-msgstr "在旧电脑上，创建整个应用程序文件夹的存档（例如，<code>VPNserverManage.zip</code>）。这是确保不会忘记任何东西的最可靠方法。"
+msgstr ""
+"在旧电脑上，创建整个应用程序文件夹的存档（例如，<code>VPNserverManage.zip</code>）。这是确保不会忘记任何东西的最可靠方法。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:302
 #: templates/help.html:302
@@ -2342,8 +2664,8 @@ msgstr "使用命令<code>pip install -r requirements.txt</code>安装依赖项�
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:309
 #: templates/help.html:309
 msgid ""
-"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть"
-" на месте."
+"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на"
+" месте."
 msgstr "启动应用程序。您的所有数据，包括收据和图标，都应该在原位。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:312
@@ -2413,17 +2735,17 @@ msgstr "如何一次性查看所有密码（解密）？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:338
 #: templates/help.html:338
 msgid ""
-"Хотя приложение позволяет просматривать пароли по одному через интерфейс,"
-" может возникнуть ситуация, когда вам нужно получить доступ ко всем "
-"данным сразу в читаемом виде. Например, для резервного копирования в "
-"текстовый файл или для переноса в другую систему."
+"Хотя приложение позволяет просматривать пароли по одному через интерфейс, "
+"может возникнуть ситуация, когда вам нужно получить доступ ко всем данным "
+"сразу в читаемом виде. Например, для резервного копирования в текстовый файл"
+" или для переноса в другую систему."
 msgstr "虽然应用程序允许您通过界面逐个查看密码，但有时您可能需要以可读格式一次性访问所有数据。例如，备份到文本文件或传输到另一个系统。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:341
 #: templates/help.html:341
 msgid ""
-"Для этой цели в корневой папке проекта существует специальный инструмент "
-"— <code>decrypt_tool.py</code>."
+"Для этой цели в корневой папке проекта существует специальный инструмент — "
+"<code>decrypt_tool.py</code>."
 msgstr "为此，项目根文件夹中有一个专用工具——<code>decrypt_tool.py</code>。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:344
@@ -2438,9 +2760,10 @@ msgid ""
 "<code>.env</code> для полной расшифровки файла с данными "
 "<code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную "
 "структуру и расшифровывает все учетные данные: <strong>SSH, панель "
-"управления и кабинет хостера</strong>, после чего выводит все в терминал "
-"в структурированном виде."
-msgstr "此脚本使用您<code>.env</code>文件中的<code>SECRET_KEY</code>来完全解密数据文件<code>data/servers.json.enc</code>。它能正确处理嵌套结构并解密所有凭据：<strong>SSH、控制面板和主机帐户</strong>，然后以结构化形式将所有内容输出到终端。"
+"управления и кабинет хостера</strong>, после чего выводит все в терминал в "
+"структурированном виде."
+msgstr ""
+"此脚本使用您<code>.env</code>文件中的<code>SECRET_KEY</code>来完全解密数据文件<code>data/servers.json.enc</code>。它能正确处理嵌套结构并解密所有凭据：<strong>SSH、控制面板和主机帐户</strong>，然后以结构化形式将所有内容输出到终端。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:349
 #: templates/help.html:349
@@ -2457,12 +2780,13 @@ msgstr "您需要在项目的根文件夹中，在终端中执行一个命令：
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:354
 #: templates/help.html:354
 msgid ""
-"Эта команда сначала активирует необходимое виртуальное окружение, а затем"
-" запускает скрипт для расшифровки."
+"Эта команда сначала активирует необходимое виртуальное окружение, а затем "
+"запускает скрипт для расшифровки."
 msgstr "此命令首先激活必要的虚拟环境，然后运行解密脚本。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:357
-#: templates/help.html:357
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:276
+#: templates/help.html:357 templates/monitoring.html:276
 msgid "Внимание:"
 msgstr "注意："
 
@@ -2470,8 +2794,8 @@ msgstr "注意："
 #: templates/help.html:357
 msgid ""
 "Выводимые данные (включая все пароли) будут видны в вашем терминале. "
-"Убедитесь, что вы делаете это в безопасной обстановке, где никто не "
-"сможет увидеть ваш экран."
+"Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет "
+"увидеть ваш экран."
 msgstr "输出数据（包括所有密码）将在您的终端中可见。请确保您在安全的环境中执行此操作，以免他人看到您的屏幕。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:366
@@ -2483,8 +2807,7 @@ msgstr "在macOS上工作的特点"
 #: templates/help.html:371
 msgid ""
 "В установленной версии приложения для macOS данные хранятся в "
-"пользовательской директории для соответствия стандартам безопасности "
-"Apple."
+"пользовательской директории для соответствия стандартам безопасности Apple."
 msgstr "在macOS应用程序的安装版本中，数据存储在用户目录中，以符合Apple的安全标准。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:373
@@ -2504,10 +2827,10 @@ msgstr "所有应用程序数据（文件<code>servers.json.enc</code>、配置�
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:376
 #: templates/help.html:376
 msgid ""
-"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню "
-"«Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите "
-"появившийся пункт «Library». В открывшейся папке далее перейдите в "
-"«Application Support», а затем в «VPNServerManager»."
+"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» "
+"(Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт "
+"«Library». В открывшейся папке далее перейдите в «Application Support», а "
+"затем в «VPNServerManager»."
 msgstr ""
 "要快速进入此文件夹：打开Finder，点击\"前往\"菜单，按住<code>Option "
 "(⌥)</code>键，然后选择出现的\"资源库\"项。在打开的文件夹中，接着进入\"Application "
@@ -2525,8 +2848,8 @@ msgstr "开发版本"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:421
 #: templates/help.html:379 templates/help.html:400 templates/help.html:421
 msgid ""
-"Если вы запускаете приложение из исходного кода, все данные хранятся "
-"прямо в папке проекта для удобства отладки."
+"Если вы запускаете приложение из исходного кода, все данные хранятся прямо в"
+" папке проекта для удобства отладки."
 msgstr "如果您从源代码运行应用程序，所有数据都直接存储在项目文件夹中，以方便调试。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:387
@@ -2583,7 +2906,8 @@ msgstr "在Linux上工作的特点"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
 #: templates/help.html:413
-msgid "В установленной версии приложения для Linux данные хранятся в директории"
+msgid ""
+"В установленной версии приложения для Linux данные хранятся в директории"
 msgstr "在Linux应用程序的安装版本中，数据存储在目录中"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
@@ -2618,8 +2942,8 @@ msgstr "创建和配置应用程序图标"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:434
 #: templates/help.html:434
 msgid ""
-"Приложение поддерживает кастомные иконки для каждой операционной системы."
-" Это позволяет создать единый визуальный стиль на всех платформах."
+"Приложение поддерживает кастомные иконки для каждой операционной системы. "
+"Это позволяет создать единый визуальный стиль на всех платформах."
 msgstr "该应用程序支持每个操作系统的自定义图标。这使您可以在所有平台上创建统一的视觉风格。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:436
@@ -2645,8 +2969,8 @@ msgstr "像素的PNG文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:438
 #: templates/help.html:438
 msgid ""
-"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
-" включая Retina-дисплеи."
+"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, "
+"включая Retina-дисплеи."
 msgstr "带透明背景。这将确保在所有设备上（包括Retina显示屏）获得最佳质量。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:441
@@ -2696,8 +3020,8 @@ msgid "При использовании скриптов сборки ("
 msgstr "使用构建脚本时（"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:448
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:349
-#: templates/help.html:448 templates/index.html:349
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:353
+#: templates/help.html:448 templates/index.html:353
 msgid "или"
 msgstr "或"
 
@@ -2799,7 +3123,8 @@ msgstr "在已构建的应用程序中替换图标"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:500
 #: templates/help.html:500
-msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
+msgid ""
+"Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
 msgstr "如果您想在不重新构建的情况下替换已完成应用程序中的图标："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:502
@@ -2894,8 +3219,8 @@ msgstr "检查图标在不同背景（浅色/深色）下的显示效果。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:522
 #: templates/help.html:522
 msgid ""
-"Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
-"лучшую совместимость."
+"Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую "
+"совместимость."
 msgstr "始终使用带透明度的PNG作为源文件——这将确保最佳兼容性。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:526
@@ -2913,8 +3238,7 @@ msgstr "图标问题排查"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:530
 #: templates/help.html:530
 msgid ""
-"Если иконки не отображаются или приложение собирается с дефектными "
-"иконками:"
+"Если иконки не отображаются или приложение собирается с дефектными иконками:"
 msgstr "如果图标不显示或应用程序构建时图标有缺陷："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:532
@@ -3084,8 +3408,8 @@ msgstr "文件和目录说明"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:600
 #: templates/help.html:600
 msgid ""
-"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
-"интеграцию с PyWebView для создания окна."
+"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию"
+" с PyWebView для создания окна."
 msgstr "应用程序的核心。包含Flask Web服务器、加密逻辑以及与PyWebView的集成以创建窗口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:601
@@ -3105,7 +3429,8 @@ msgstr "运行所需的所有Python库的列表。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:603
 #: templates/help.html:603
-msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
+msgid ""
+"Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
 msgstr "设置文件，存储有关版本和外部服务URL的信息。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:604
@@ -3126,8 +3451,8 @@ msgstr "包含所有服务器信息的JSON文件。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:605
 #: templates/help.html:605
 msgid ""
-"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
-"веб-интерфейса."
+"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-"
+"интерфейса."
 msgstr "包含静态资源（CSS、图像）和Web界面HTML模板的文件夹。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:608
@@ -3143,8 +3468,8 @@ msgstr "启动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:610
 #: templates/help.html:610
 msgid ""
-"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
-"окно с помощью PyWebView."
+"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно"
+" с помощью PyWebView."
 msgstr "`app.py`在后台线程中启动Flask Web服务器，并使用PyWebView创建本机窗口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:611
@@ -3170,8 +3495,8 @@ msgstr "互动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:612
 #: templates/help.html:612
 msgid ""
-"Все действия пользователя обрабатываются Flask, который изменяет данные и"
-" снова шифрует их."
+"Все действия пользователя обрабатываются Flask, который изменяет данные и "
+"снова шифрует их."
 msgstr "所有用户操作都由Flask处理，它会更改数据并再次加密。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
@@ -3182,8 +3507,8 @@ msgstr "完成"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
 #: templates/help.html:613
 msgid ""
-"При закрытии окна PyWebView отправляет команду на выключение сервера "
-"Flask, который корректно завершает работу и освобождает порт."
+"При закрытии окна PyWebView отправляет команду на выключение сервера Flask, "
+"который корректно завершает работу и освобождает порт."
 msgstr "关闭窗口时，PyWebView会发送关闭Flask服务器的命令，该服务器会正确终止并释放端口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:622
@@ -3209,8 +3534,8 @@ msgstr "首次启动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:630
 #: templates/help.html:630
 msgid ""
-"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У "
-"вас есть два варианта:"
+"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У вас "
+"есть два варианта:"
 msgstr "首次启动应用程序时，您将看到\"访问受限\"屏幕。您有两个选择："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:632
@@ -3221,8 +3546,8 @@ msgstr "创建新PIN码"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:632
 #: templates/help.html:632
 msgid ""
-"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый "
-"PIN и сбросит все данные."
+"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый PIN"
+" и сбросит все данные."
 msgstr "点击\"首次启动\"→\"创建新PIN码\"。这将创建新的PIN码并重置所有数据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:633
@@ -3257,8 +3582,7 @@ msgstr "双击开发者姓名："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:639
 #: templates/help.html:639
 msgid ""
-"Внизу страницы найдите имя разработчика в футере и дважды кликните по "
-"нему."
+"Внизу страницы найдите имя разработчика в футере и дважды кликните по нему."
 msgstr "在页面底部找到页脚中的开发者姓名，然后双击它。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:640
@@ -3283,10 +3607,10 @@ msgstr "最小长度："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:645
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:224
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:575
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:714
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:576
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:715
 #: templates/help.html:645 templates/index_locked.html:224
-#: templates/index_locked.html:575 templates/index_locked.html:714
+#: templates/index_locked.html:576 templates/index_locked.html:715
 msgid "PIN должен содержать минимум 4 символа"
 msgstr "PIN码必须至少包含4个字符"
 
@@ -3405,16 +3729,15 @@ msgstr "退出登录"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:670
 #: templates/help.html:670
 msgid ""
-"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели "
-"навигации. После выхода потребуется повторный ввод PIN-кода для доступа к"
-" данным."
+"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели навигации. "
+"После выхода потребуется повторный ввод PIN-кода для доступа к данным."
 msgstr "要退出登录，请点击顶部导航栏中的\"退出\"按钮。退出后，需要重新输入PIN码才能访问数据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:676
 #: templates/help.html:676
 msgid ""
-"Запишите PIN-код в надежном месте - без него вы не сможете получить "
-"доступ к данным"
+"Запишите PIN-код в надежном месте - без него вы не сможете получить доступ к"
+" данным"
 msgstr "将PIN码记在安全的地方 - 没有它，您将无法访问数据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:677
@@ -3425,8 +3748,8 @@ msgstr "创建新PIN码时，所有现有数据将被删除"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:678
 #: templates/help.html:678
 msgid ""
-"PIN-код не восстанавливается - если вы его забудете, потребуется "
-"создавать новый"
+"PIN-код не восстанавливается - если вы его забудете, потребуется создавать "
+"новый"
 msgstr "PIN码无法恢复 - 如果您忘记了它，需要创建新的PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:684
@@ -3458,14 +3781,15 @@ msgstr ") 您看到错误 "
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:699
 #: templates/help.html:699
-msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
+msgid ""
+", это означает, что в вашем окружении отсутствует необходимая библиотека."
 msgstr "，这意味着您的环境中缺少必需的库。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:700
 #: templates/help.html:700
 msgid ""
-"Это происходит, когда в проект добавляется новая функциональность "
-"(например, как недавно был добавлен `pywebview`)."
+"Это происходит, когда в проект добавляется новая функциональность (например,"
+" как недавно был добавлен `pywebview`)."
 msgstr "当新功能被添加到项目中时（例如，最近添加了 `pywebview`），就会发生这种情况。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:701
@@ -3488,25 +3812,23 @@ msgstr "该命令将读取文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:704
 #: templates/help.html:704
 msgid ""
-"и установит точные версии всех библиотек, необходимых для корректной "
-"работы."
+"и установит точные версии всех библиотек, необходимых для корректной работы."
 msgstr "并安装正确操作所需的所有库的确切版本。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:22
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:520
-#: templates/index.html:22 templates/index.html:523
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:527
+#: templates/index.html:22 templates/index.html:527
 msgid "Интернет доступен"
 msgstr "互联网可用"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:26
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:523
-#: templates/index.html:26 templates/index.html:526
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:530
+#: templates/index.html:26 templates/index.html:530
 msgid "Нет интернета"
 msgstr "无网络"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:29
 #: templates/index.html:29
-#, fuzzy
 msgid "Обновить статус интернета"
 msgstr "无网络"
 
@@ -3554,9 +3876,9 @@ msgstr "添加第一个服务器"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:65
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:198
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:905
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:906
 #: templates/index.html:65 templates/index_locked.html:198
-#: templates/index_locked.html:905
+#: templates/index_locked.html:906
 msgid "Импортировать данные"
 msgstr "导入数据"
 
@@ -3585,55 +3907,46 @@ msgstr "N/A。"
 msgid "След. платёж"
 msgstr "下次付款"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:150
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:153
-#: templates/index.html:150 templates/index.html:153
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:151
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:154
+#: templates/index.html:151 templates/index.html:154
 msgid "Требуется интернет"
 msgstr "需要网络"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:151
-#: templates/index.html:151
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:152
+#: templates/index.html:152
 msgid "Проверить IP"
 msgstr "检查IP"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:154
-#: templates/index.html:154
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:155
+#: templates/index.html:155
 msgid "Владелец IP"
 msgstr "IP所有者"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:169
-#: templates/index.html:169
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:170
+#: templates/index.html:170
 msgid "Вход через"
 msgstr "通过"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:174
-#: templates/index.html:174
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:175
+#: templates/index.html:175
 msgid "Email"
 msgstr "邮箱"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:174
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:270
-#: templates/index.html:174 templates/index.html:270
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:175
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:271
+#: templates/index.html:175 templates/index.html:271
 msgid "Логин"
 msgstr "登录"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:184
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:227
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:248
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:279
-#: templates/index.html:184 templates/index.html:227 templates/index.html:248
-#: templates/index.html:279
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:185
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:228
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:249
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:280
+#: templates/index.html:185 templates/index.html:228 templates/index.html:249
+#: templates/index.html:280
 msgid "Пароль"
 msgstr "密码"
-
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:187
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:230
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:251
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:282
-#: templates/index.html:187 templates/index.html:230 templates/index.html:251
-#: templates/index.html:282
-msgid "Показать/скрыть пароль"
-msgstr "显示/隐藏密码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:188
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:231
@@ -3641,180 +3954,275 @@ msgstr "显示/隐藏密码"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:283
 #: templates/index.html:188 templates/index.html:231 templates/index.html:252
 #: templates/index.html:283
+msgid "Показать/скрыть пароль"
+msgstr "显示/隐藏密码"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:189
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:232
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:253
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:284
+#: templates/index.html:189 templates/index.html:232 templates/index.html:253
+#: templates/index.html:284
 msgid "Копировать пароль"
 msgstr "复制密码"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:195
-#: templates/index.html:195
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:196
+#: templates/index.html:196
 msgid "Перейти в кабинет"
 msgstr "进入面板"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:211
-#: templates/index.html:211
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:212
+#: templates/index.html:212
 msgid "Копировать SSH команду подключения"
 msgstr "复制SSH连接命令"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:212
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:896
-#: templates/index.html:212 templates/index.html:903
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:213
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:937
+#: templates/index.html:213 templates/index.html:937
 msgid "Копировать команду"
 msgstr "复制命令"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:215
-#: templates/index.html:215
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:216
+#: templates/index.html:216
 msgid "Пользователь"
 msgstr "用户"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:218
-#: templates/index.html:218
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:219
+#: templates/index.html:219
 msgid "Login"
 msgstr "登录"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:221
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:273
-#: templates/index.html:221 templates/index.html:273
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:222
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:274
+#: templates/index.html:222 templates/index.html:274
 msgid "Копировать логин"
 msgstr "复制登录"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:237
-#: templates/index.html:237
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:238
+#: templates/index.html:238
 msgid "Root"
 msgstr "根"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:239
-#: templates/index.html:239
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:240
+#: templates/index.html:240
 msgid "Вход по SSH"
 msgstr "SSH登录"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:241
-#: templates/index.html:241
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:242
+#: templates/index.html:242
 msgid "Разрешен"
 msgstr "允许"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:243
-#: templates/index.html:243
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:244
+#: templates/index.html:244
 msgid "Запрещен"
 msgstr "禁止"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:264
-#: templates/index.html:264
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:265
+#: templates/index.html:265
 msgid "Панель (3x-ui)"
 msgstr "面板 (3x-ui)"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:289
-#: templates/index.html:289
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:290
+#: templates/index.html:290
 msgid "Перейти в панель"
 msgstr "进入面板"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:332
-#: templates/index.html:332
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:333
+#: templates/index.html:333
 msgid "Редактировать"
 msgstr "编辑"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:338
-#: templates/index.html:338
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:340
+#: templates/index.html:340
+msgid "Мониторинг"
+msgstr "审计和监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:342
+#: templates/index.html:342
 msgid "Вы уверены, что хотите удалить этот сервер?"
 msgstr "您确定要删除这个服务器吗？"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:339
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:343
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/manage_hints.html:48
-#: templates/index.html:339 templates/manage_hints.html:48
+#: templates/index.html:343 templates/manage_hints.html:48
 msgid "Удалить"
 msgstr "删除"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:349
-#: templates/index.html:349
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:353
+#: templates/index.html:353
 msgid "Серверов пока нет."
 msgstr "暂无服务器。"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:349
-#: templates/index.html:349
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:353
+#: templates/index.html:353
 msgid "Добавьте первый"
 msgstr "添加第一个"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:349
-#: templates/index.html:349
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:353
+#: templates/index.html:353
 msgid "импортируйте данные"
 msgstr "导入数据"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:359
-#: templates/index.html:359
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:363
+#: templates/index.html:363
 msgid "Информация об IP"
 msgstr "IP信息"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:371
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:384
-#: templates/index.html:371 templates/index.html:387
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:375
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:391
+#: templates/index.html:375 templates/index.html:391
 msgid "Статус сервера"
 msgstr "服务器状态"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:372
-#: templates/index.html:372
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:376
+#: templates/index.html:376
 msgid "Статус сервера:"
 msgstr "服务器状态："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:373
-#: templates/index.html:373
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:377
+#: templates/index.html:377
 msgid "0B=изменяемый слой; virtual=размер образа"
 msgstr "0B=可变层; virtual=镜像大小"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:374
-#: templates/index.html:374
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:378
+#: templates/index.html:378
 msgid "0B=измен., virtual=образ"
 msgstr "0B=可变, virtual=镜像"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:375
-#: templates/index.html:375
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:379
+#: templates/index.html:379
 msgid "Точка"
 msgstr "挂载点"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:376
-#: templates/index.html:376
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:380
+#: templates/index.html:380
 msgid "Всего"
 msgstr "总计"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:377
-#: templates/index.html:377
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:381
+#: templates/index.html:381
 msgid "Исп."
 msgstr "已用"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:400
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:550
-#: templates/index.html:403 templates/index.html:553
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:383
+#: templates/index.html:383
+msgid "есть"
+msgstr "有"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:384
+#: templates/index.html:384
+msgid "нет"
+msgstr "无"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:385
+#: templates/index.html:385
+msgid "running:"
+msgstr "运行中:"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:407
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:557
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:79
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:176
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:196
+#: templates/index.html:407 templates/index.html:557
+#: templates/monitoring.html:79 templates/monitoring.html:176
+#: templates/monitoring.html:196
 msgid "Загрузка..."
 msgstr "加载中..."
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:484
-#: templates/index.html:487
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:491
+#: templates/index.html:491
 msgid "Сохранить как PNG"
 msgstr "另存为PNG"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:539
-#: templates/index.html:542
-#, fuzzy
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:546
+#: templates/index.html:546
 msgid "Ошибка проверки"
 msgstr "复制错误："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:559
-#: templates/index.html:562
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:566
+#: templates/index.html:566
 msgid "Ошибка при загрузке данных:"
 msgstr "加载数据时出错："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:571
-#: templates/index.html:574
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:578
+#: templates/index.html:578
 msgid "Ошибка копирования:"
 msgstr "复制错误："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:890
-#: templates/index.html:897
-msgid "Для полной диагностики отсутствуют утилиты:"
-msgstr ""
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:695
+#: templates/index.html:695
+msgid "Сессия истекла. Пожалуйста, войдите заново."
+msgstr "会话已过期。请重新登录。"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:893
-#: templates/index.html:900
-#, fuzzy
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:705
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1073
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:594
+#: templates/index.html:705 templates/index.html:1076
+#: templates/monitoring.html:594
+msgid "Неизвестная ошибка"
+msgstr "未知错误"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:723
+#: templates/index.html:723
+msgid "Ошибка"
+msgstr "错误："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:871
+#: templates/index.html:871
+msgid "Нет данных о процессах"
+msgstr "无过程数据"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:887
+#: templates/index.html:887
+msgid "Нет данных о сетевых интерфейсах"
+msgstr "查看网络接口"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:931
+#: templates/index.html:931
+msgid "Для полной диагностики отсутствуют утилиты:"
+msgstr "没有用于完整诊断的实用程序："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:934
+#: templates/index.html:934
 msgid "Установите командой:"
 msgstr "安装包"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1010
+#: templates/index.html:1010
+msgid "Модальное окно не найдено"
+msgstr "未找到模态窗口"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1018
+#: templates/index.html:1018
+msgid "Содержимое модального окна не найдено"
+msgstr "未找到模态窗口内容"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1070
+#: templates/index.html:1073
+msgid "PNG сохранён:"
+msgstr "PNG已保存："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1070
+#: templates/index.html:1073
+msgid "Папка:"
+msgstr "文件夹："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1073
+#: templates/index.html:1076
+msgid "Не удалось сохранить на сервере:"
+msgstr "无法保存到服务器："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1078
+#: templates/index.html:1081
+msgid "Ошибка сохранения:"
+msgstr "保存错误："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1083
+#: templates/index.html:1086
+msgid "Ошибка создания скриншота:"
+msgstr "保存错误："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:10
 #: templates/index_locked.html:10
@@ -3834,34 +4242,32 @@ msgstr "要访问服务器数据，需要输入PIN码。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:24
 #: templates/index_locked.html:24
 msgid ""
-"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
-"для создания PIN-кода."
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" для"
+" создания PIN-кода."
 msgstr "如果您是第一次使用应用程序，请点击\"首次运行\"按钮创建PIN码。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:31
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:538
-#: templates/index_locked.html:31 templates/index_locked.html:538
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:539
+#: templates/index_locked.html:31 templates/index_locked.html:539
 msgid "Вход заблокирован на"
 msgstr "登录被阻止"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:31
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:538
-#: templates/index_locked.html:31 templates/index_locked.html:538
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:539
+#: templates/index_locked.html:31 templates/index_locked.html:539
 msgid "секунд"
 msgstr "秒"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:40
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:361
 #: templates/index_locked.html:40 templates/index_locked.html:361
-#, fuzzy
 msgid "Ввести PIN"
 msgstr "输入PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:50
 #: templates/index_locked.html:50
 msgid ""
-"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
-"защиту."
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту."
 msgstr "所有数据都通过加密保护。PIN码提供额外的保护。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:64
@@ -3870,88 +4276,88 @@ msgid "Вход по PIN-коду"
 msgstr "使用PIN码登录"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:74
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:353
-#: templates/index_locked.html:74 templates/layout.html:353
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:477
+#: templates/index_locked.html:74 templates/layout.html:477
 msgid "Вход"
 msgstr "登录"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:79
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:609
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:962
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:358
-#: templates/index_locked.html:79 templates/index_locked.html:609
-#: templates/index_locked.html:962 templates/layout.html:358
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:610
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:963
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:482
+#: templates/index_locked.html:79 templates/index_locked.html:610
+#: templates/index_locked.html:963 templates/layout.html:482
 msgid "Сменить PIN"
 msgstr "更换PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:88
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:367
-#: templates/index_locked.html:88 templates/layout.html:367
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:491
+#: templates/index_locked.html:88 templates/layout.html:491
 msgid "Введите PIN-код для входа в систему"
 msgstr "输入PIN码以访问系统"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:90
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:369
-#: templates/index_locked.html:90 templates/layout.html:369
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:493
+#: templates/index_locked.html:90 templates/layout.html:493
 msgid "PIN-код"
 msgstr "PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:92
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:371
-#: templates/index_locked.html:92 templates/layout.html:371
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:495
+#: templates/index_locked.html:92 templates/layout.html:495
 msgid "Введите PIN"
 msgstr "输入PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:100
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:379
-#: templates/index_locked.html:100 templates/layout.html:379
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:503
+#: templates/index_locked.html:100 templates/layout.html:503
 msgid "Смените PIN-код для входа"
 msgstr "更改登录PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:103
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:382
-#: templates/index_locked.html:103 templates/layout.html:382
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:506
+#: templates/index_locked.html:103 templates/layout.html:506
 msgid "Старый PIN"
 msgstr "旧PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:105
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:384
-#: templates/index_locked.html:105 templates/layout.html:384
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:508
+#: templates/index_locked.html:105 templates/layout.html:508
 msgid "Введите старый PIN"
 msgstr "输入旧PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:108
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:387
-#: templates/index_locked.html:108 templates/layout.html:387
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:511
+#: templates/index_locked.html:108 templates/layout.html:511
 msgid "Новый PIN"
 msgstr "新PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:110
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:389
-#: templates/index_locked.html:110 templates/layout.html:389
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:513
+#: templates/index_locked.html:110 templates/layout.html:513
 msgid "Введите новый PIN"
 msgstr "输入新PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:113
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:392
-#: templates/index_locked.html:113 templates/layout.html:392
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:516
+#: templates/index_locked.html:113 templates/layout.html:516
 msgid "Подтвердите новый PIN"
 msgstr "确认新PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:115
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:229
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:394
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:518
 #: templates/index_locked.html:115 templates/index_locked.html:229
-#: templates/layout.html:394
+#: templates/layout.html:518
 msgid "Повторите новый PIN"
 msgstr "重复新PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:125
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:492
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:966
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:404
-#: templates/index_locked.html:125 templates/index_locked.html:492
-#: templates/index_locked.html:966 templates/layout.html:404
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:493
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:967
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:528
+#: templates/index_locked.html:125 templates/index_locked.html:493
+#: templates/index_locked.html:967 templates/layout.html:528
 msgid "Войти"
 msgstr "登录"
 
@@ -4009,16 +4415,16 @@ msgid "Выбрать файл"
 msgstr "选择文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:190
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:914
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1014
-#: templates/index_locked.html:190 templates/index_locked.html:914
-#: templates/index_locked.html:1014
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:915
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1015
+#: templates/index_locked.html:190 templates/index_locked.html:915
+#: templates/index_locked.html:1015
 msgid "Файл не выбран"
 msgstr "未选择文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:197
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:828
-#: templates/index_locked.html:197 templates/index_locked.html:828
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:829
+#: templates/index_locked.html:197 templates/index_locked.html:829
 msgid "Проверить PIN"
 msgstr "检查PIN"
 
@@ -4048,8 +4454,8 @@ msgid "Подтвердите PIN-код"
 msgstr "确认PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:236
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:754
-#: templates/index_locked.html:236 templates/index_locked.html:754
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:755
+#: templates/index_locked.html:236 templates/index_locked.html:755
 msgid "Создать PIN"
 msgstr "创建PIN"
 
@@ -4090,7 +4496,6 @@ msgstr "导入数据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:319
 #: templates/index_locked.html:319
-#, fuzzy
 msgid "Вход заблокирован"
 msgstr "登录被阻止"
 
@@ -4100,174 +4505,187 @@ msgid "Введите PIN-код"
 msgstr "输入PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:456
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:581
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:798
-#: templates/index_locked.html:456 templates/index_locked.html:581
-#: templates/index_locked.html:798
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:582
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:799
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:904
+#: templates/index_locked.html:456 templates/index_locked.html:582
+#: templates/index_locked.html:799 templates/monitoring.html:904
 msgid "Проверка..."
 msgstr "检查..."
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:487
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:823
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:900
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:951
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:488
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:824
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:901
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:952
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:481
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:506
-#: templates/index_locked.html:487 templates/index_locked.html:823
-#: templates/index_locked.html:900 templates/index_locked.html:951
+#: templates/index_locked.html:488 templates/index_locked.html:824
+#: templates/index_locked.html:901 templates/index_locked.html:952
 #: templates/settings.html:481 templates/settings.html:506
 msgid "Ошибка соединения с сервером"
 msgstr "与服务器的错误连接"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:563
-#: templates/index_locked.html:563
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:564
+#: templates/index_locked.html:564
 msgid "Заполните все поля"
 msgstr "填写所有字段"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:569
-#: templates/index_locked.html:569
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:570
+#: templates/index_locked.html:570
 msgid "Новые PIN-коды не совпадают"
 msgstr "新的针代码不匹配"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:591
-#: templates/index_locked.html:591
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:592
+#: templates/index_locked.html:592
 msgid "PIN успешно изменён!"
 msgstr "PIN已成功改变！"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:599
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:744
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:895
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:945
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:600
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:745
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:896
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:946
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:505
-#: templates/index_locked.html:599 templates/index_locked.html:744
-#: templates/index_locked.html:895 templates/index_locked.html:945
+#: templates/index_locked.html:600 templates/index_locked.html:745
+#: templates/index_locked.html:896 templates/index_locked.html:946
 #: templates/settings.html:505
 msgid "Ошибка:"
 msgstr "错误："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:604
-#: templates/index_locked.html:604
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:605
+#: templates/index_locked.html:605
 msgid "Произошла ошибка при смене PIN"
 msgstr "更改PIN时有错误"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:678
-#: templates/index_locked.html:678
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:679
+#: templates/index_locked.html:679
 msgid "Произошла ошибка при проверке архива"
 msgstr "检查档案时有错误"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:720
-#: templates/index_locked.html:720
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:721
+#: templates/index_locked.html:721
 msgid "PIN-коды не совпадают"
 msgstr "引脚代码不匹配"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:726
-#: templates/index_locked.html:726
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:727
+#: templates/index_locked.html:727
 msgid "Создание..."
 msgstr "创建..."
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:739
-#: templates/index_locked.html:739
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:740
+#: templates/index_locked.html:740
 msgid "PIN успешно создан!"
 msgstr "PIN已成功创建！"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:739
-#: templates/index_locked.html:739
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:740
+#: templates/index_locked.html:740
 msgid "Приложение будет перезагружено."
 msgstr "该应用程序将被重新启动。"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:749
-#: templates/index_locked.html:749
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:750
+#: templates/index_locked.html:750
 msgid "Произошла ошибка при создании PIN"
 msgstr "创建PIN时发生错误"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:872
-#: templates/index_locked.html:872
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:873
+#: templates/index_locked.html:873
 msgid "Импорт..."
 msgstr "进口 ..."
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:890
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:939
-#: templates/index_locked.html:890 templates/index_locked.html:939
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:891
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:940
+#: templates/index_locked.html:891 templates/index_locked.html:940
 msgid "Данные успешно импортированы!"
 msgstr "数据文件已成功导入并附加！"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:890
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:939
-#: templates/index_locked.html:890 templates/index_locked.html:939
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:891
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:940
+#: templates/index_locked.html:891 templates/index_locked.html:940
 msgid "Перенаправление..."
 msgstr "还原..."
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:925
-#: templates/index_locked.html:925
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:926
+#: templates/index_locked.html:926
 msgid "Импорт данных..."
 msgstr "导入数据"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1010
-#: templates/index_locked.html:1010
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1011
+#: templates/index_locked.html:1011
 msgid "Файл выбран"
 msgstr "文件已选择"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:44
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:119
-#: templates/layout.html:44 templates/layout.html:119
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:49
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:125
+#: templates/layout.html:49 templates/layout.html:125
 msgid "VPS Manager"
 msgstr "VPS管理器"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:53
-#: templates/layout.html:53
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:58
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:91
+#: templates/layout.html:58 templates/monitoring.html:91
 msgid "Настройки"
 msgstr "设置"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:61
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:66
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/manage_hints.html:3
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/manage_hints.html:7
-#: templates/layout.html:61 templates/manage_hints.html:3
+#: templates/layout.html:66 templates/manage_hints.html:3
 #: templates/manage_hints.html:7
 msgid "Управление подсказками"
 msgstr "提示管理"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:65
-#: templates/layout.html:65
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:70
+#: templates/layout.html:70
 msgid "Шпаргалка"
 msgstr "备忘单"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:73
-#: templates/layout.html:73
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:78
+#: templates/layout.html:78
 msgid "Выйти из системы"
 msgstr "退出系统"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:83
-#: templates/layout.html:83
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:88
+#: templates/layout.html:88
 msgid "Масштаб интерфейса"
 msgstr "界面缩放"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:104
-#: templates/layout.html:104
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:109
+#: templates/layout.html:109
 msgid "Светлая"
 msgstr "浅色"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:105
-#: templates/layout.html:105
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:110
+#: templates/layout.html:110
 msgid "Темная"
 msgstr "深色"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:119
-#: templates/layout.html:119
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:126
+#: templates/layout.html:126
 msgid "Разработчик"
 msgstr "开发者"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:289
-#: templates/layout.html:289
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:132
+#: templates/layout.html:132
+msgid "Порт"
+msgstr "端口"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:202
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:214
+#: templates/layout.html:202 templates/layout.html:214
+msgid "Вы уверены, что хотите закрыть приложение?"
+msgstr "您确定要关闭应用程序吗？"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:398
+#: templates/layout.html:398
 msgid "Вы уверены, что хотите выйти из системы?"
 msgstr "您确定要删除这个服务器吗？"
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:302
-#: templates/layout.html:302
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:422
+#: templates/layout.html:422
 msgid "Ошибка выхода:"
 msgstr "复制错误："
 
-#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:343
-#: templates/layout.html:343
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:467
+#: templates/layout.html:467
 msgid "Вход по PIN"
 msgstr "使用PIN码登录"
 
@@ -4313,6 +4731,393 @@ msgstr "您确定要删除这个提示吗？"
 msgid "Подсказок пока нет."
 msgstr "暂无提示。"
 
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:14
+#: templates/monitoring.html:14
+msgid "Расширенный мониторинг"
+msgstr "审计和监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:23
+#: templates/monitoring.html:23
+msgid "Назад к списку"
+msgstr "返回列表"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:33
+#: templates/monitoring.html:33
+msgid "Установка системы мониторинга"
+msgstr "安装监控系统"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:35
+#: templates/monitoring.html:35
+msgid "Мониторинг еще не установлен на этом сервере"
+msgstr "此服务器上尚未安装监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:40
+#: templates/monitoring.html:40
+msgid "Что будет установлено:"
+msgstr "将安装什么："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:42
+#: templates/monitoring.html:42
+msgid "vnstat - для статистики трафика"
+msgstr "vnstat - 用于流量统计"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:43
+#: templates/monitoring.html:43
+msgid "jq - для обработки JSON"
+msgstr "jq - 用于处理 JSON"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:44
+#: templates/monitoring.html:44
+msgid "net-tools - для сетевой статистики"
+msgstr "net-tools - 用于网络统计"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:45
+#: templates/monitoring.html:45
+msgid "ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)"
+msgstr "ufw - 仅包（不包括在内！）"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:48
+#: templates/monitoring.html:48
+msgid "Установка займет 1-2 минуты"
+msgstr "安装需要 1-2 分钟"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:53
+#: templates/monitoring.html:53
+msgid "Установить мониторинг"
+msgstr "审计和监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:69
+#: templates/monitoring.html:69
+msgid "Отменить установку"
+msgstr "取消安装"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:81
+#: templates/monitoring.html:81
+msgid "Проверка системы мониторинга..."
+msgstr "检查监控系统..."
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:82
+#: templates/monitoring.html:82
+msgid "Это может занять до 30 секунд"
+msgstr "这可能需要长达 30 秒的时间"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:101
+#: templates/monitoring.html:101
+msgid "Ошибка подключения к серверу"
+msgstr "与服务器的错误连接"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:106
+#: templates/monitoring.html:106
+msgid "Что делать:"
+msgstr "它有什么作用？"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:111
+#: templates/monitoring.html:111
+msgid "Проверить настройки сервера"
+msgstr "添加新服务器"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:114
+#: templates/monitoring.html:114
+msgid "Повторить попытку"
+msgstr "重复新密钥"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:128
+#: templates/monitoring.html:128
+msgid "Рекомендуется установить дополнительные утилиты"
+msgstr "建议安装额外的实用程序"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:135
+#: templates/monitoring.html:135
+msgid "Установить все одной командой:"
+msgstr "安装包"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:139
+#: templates/monitoring.html:139
+msgid "Копировать"
+msgstr "复制登录"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:151
+#: templates/monitoring.html:151
+msgid "Сетевой трафик"
+msgstr "网络流量"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:154
+#: templates/monitoring.html:154
+msgid "Загрузка:"
+msgstr "加载中..."
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:156
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:161
+#: templates/monitoring.html:156 templates/monitoring.html:161
+msgid "Пик:"
+msgstr "文件夹："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:159
+#: templates/monitoring.html:159
+msgid "Отдача:"
+msgstr "畏缩："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:165
+#: templates/monitoring.html:165
+msgid "За 24 часа:"
+msgstr "24小时："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:173
+#: templates/monitoring.html:173
+msgid "Статус брандмауэра"
+msgstr "防火墙的状态"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:179
+#: templates/monitoring.html:179
+msgid "Открытые порты:"
+msgstr "开放端口："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
+#: templates/monitoring.html:180
+msgid "Заблокировано за 24ч:"
+msgstr "已阻止"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:467
+#: templates/monitoring.html:180 templates/monitoring.html:467
+msgid "попыток"
+msgstr "尝试"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:182
+#: templates/monitoring.html:182
+msgid "Последний блок:"
+msgstr "最后一块："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:184
+#: templates/monitoring.html:184
+msgid "порт:"
+msgstr "端口"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:194
+#: templates/monitoring.html:194
+msgid "Системные сервисы"
+msgstr "系统服务"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:204
+#: templates/monitoring.html:204
+msgid "События безопасности (24ч)"
+msgstr "安全基础"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:210
+#: templates/monitoring.html:210
+msgid "Неудачные SSH попытки"
+msgstr "SSH 尝试失败"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:218
+#: templates/monitoring.html:218
+msgid "Обновления безопасности"
+msgstr "安全基础"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:226
+#: templates/monitoring.html:226
+msgid "Новые открытые порты"
+msgstr "新开放端口"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:236
+#: templates/monitoring.html:236
+msgid "Последнее обновление системы:"
+msgstr "最新系统更新："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:236
+#: templates/monitoring.html:236
+msgid "дней назад"
+msgstr "未指定"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:244
+#: templates/monitoring.html:244
+msgid "История производительности (60 мин)"
+msgstr "表演历史（60 分钟）"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:247
+#: templates/monitoring.html:247
+msgid "Использование CPU"
+msgstr "用户"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:251
+#: templates/monitoring.html:251
+msgid "Использование памяти"
+msgstr "内存使用情况"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:266
+#: templates/monitoring.html:266
+msgid "Подтверждение удаления"
+msgstr "密钥确认"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:270
+#: templates/monitoring.html:270
+msgid "Вы уверены, что хотите удалить систему мониторинга?"
+msgstr "您确定要删除这个提示吗？"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:271
+#: templates/monitoring.html:271
+msgid "Это действие удалит:"
+msgstr "此操作将删除："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:273
+#: templates/monitoring.html:273
+msgid "Файлы истории метрик"
+msgstr "指标历史文件"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:274
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:302
+#: templates/monitoring.html:274 templates/monitoring.html:302
+msgid "Настройки мониторинга"
+msgstr "审计和监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:276
+#: templates/monitoring.html:276
+msgid "История метрик будет потеряна!"
+msgstr "公制历史将会丢失！"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:292
+#: templates/monitoring.html:292
+msgid "Да, удалить"
+msgstr "删除"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:307
+#: templates/monitoring.html:307
+msgid "Удаление"
+msgstr "删除"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:308
+#: templates/monitoring.html:308
+msgid "Полностью удалить систему мониторинга с сервера"
+msgstr "从服务器上彻底删除监控系统"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:310
+#: templates/monitoring.html:310
+msgid "Удалить мониторинг"
+msgstr "审计和监控"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:318
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:576
+#: templates/monitoring.html:318 templates/monitoring.html:576
+msgid "Сервер:"
+msgstr "服务器状态："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:462
+#: templates/monitoring.html:462
+msgid "Top атакующих IP:"
+msgstr "主要攻击 IP："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:575
+#: templates/monitoring.html:575
+msgid "Не удается подключиться к серверу по SSH. Превышен timeout ожидания."
+msgstr "无法通过 SSH 连接到服务器。等待超时。"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:578
+#: templates/monitoring.html:578
+msgid "Проверьте, что сервер включен и доступен"
+msgstr "检查服务器是否已开启且可访问"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:579
+#: templates/monitoring.html:579
+msgid "Убедитесь, что SSH порт открыт (обычно 22)"
+msgstr "确保 SSH 端口已打开（通常为 22）"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:580
+#: templates/monitoring.html:580
+msgid "Проверьте правильность IP адреса в настройках"
+msgstr "检查设置中的IP地址是否正确"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:581
+#: templates/monitoring.html:581
+msgid "Попробуйте подключиться вручную: ssh user@"
+msgstr "尝试手动连接：ssh user@"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:582
+#: templates/monitoring.html:582
+msgid "Проверьте firewall на вашем компьютере"
+msgstr "检查计算机上的防火墙"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:585
+#: templates/monitoring.html:585
+msgid "Ошибка аутентификации SSH"
+msgstr "SSH 验证错误"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:586
+#: templates/monitoring.html:586
+msgid "Неверное имя пользователя или пароль"
+msgstr "用户名或密码无效"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:588
+#: templates/monitoring.html:588
+msgid "Проверьте имя пользователя SSH в настройках сервера"
+msgstr "检查服务器设置中的 SSH 用户名"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:589
+#: templates/monitoring.html:589
+msgid "Проверьте пароль SSH в настройках сервера"
+msgstr "检查服务器设置中的 SSH 密码"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:590
+#: templates/monitoring.html:590
+msgid "Убедитесь, что парольный доступ разрешен на сервере"
+msgstr "确保服务器允许密码访问"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:593
+#: templates/monitoring.html:593
+msgid "Произошла ошибка при получении данных мониторинга"
+msgstr "创建PIN时发生错误"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:597
+#: templates/monitoring.html:597
+msgid "Проверьте настройки сервера в приложении"
+msgstr "检查应用程序中的服务器设置"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:598
+#: templates/monitoring.html:598
+msgid "См. logs/app.log для подробной информации"
+msgstr "详细信息请参见logs/app.log"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:637
+#: templates/monitoring.html:637
+msgid "Установлено:"
+msgstr "已安装软件"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:638
+#: templates/monitoring.html:638
+msgid "Недостающих утилит:"
+msgstr "缺少实用程序："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:680
+#: templates/monitoring.html:680
+msgid "Исправить"
+msgstr "保存"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:749
+#: templates/monitoring.html:749
+msgid ""
+"Потеряно соединение с сервером. Автообновление остановлено. Обновите "
+"страницу."
+msgstr "与服务器的连接已丢失。自动更新已停止。刷新页面。"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:771
+#: templates/monitoring.html:771
+msgid "Ошибка подключения"
+msgstr "保存错误："
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:775
+#: templates/monitoring.html:775
+msgid "Обновить страницу"
+msgstr "无网络"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:924
+#: templates/monitoring.html:924
+msgid "Мониторинг уже установлен"
+msgstr "监控已经安装"
+
+#: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:925
+#: templates/monitoring.html:925
+msgid ""
+"Система мониторинга уже активна на этом сервере. Сейчас загрузим данные..."
+msgstr "该服务器上的监控系统已处于活动状态。现在让我们加载数据..."
+
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:3
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:7
 #: templates/settings.html:3 templates/settings.html:7
@@ -4332,8 +5137,8 @@ msgstr "更换主密钥"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:32
 #: templates/settings.html:32
 msgid ""
-"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
-" сохранится как резервная копия."
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл "
+"сохранится как резервная копия."
 msgstr "更换密钥时，将创建新的加密数据文件。旧文件将作为备份保存。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:36
@@ -4374,8 +5179,7 @@ msgstr "密钥-数据匹配检查"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:57
 #: templates/settings.html:57
 msgid ""
-"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
-"приложение."
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение."
 msgstr "快速检查密钥是否与数据文件匹配，无需导入应用。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:61
@@ -4446,7 +5250,8 @@ msgstr "该文件将保存在VPN服务器管理器应用程序文件夹中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:121
 #: templates/settings.html:121
-msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgid ""
+"Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
 msgstr "您确定要解除数据文件的绑定吗？服务器列表将为空。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:123
@@ -4462,8 +5267,8 @@ msgstr "数据文件已成功分离。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:132
 #: templates/settings.html:132
 msgid ""
-"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
-"можете импортировать существующий файл, чтобы восстановить свои записи."
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы можете"
+" импортировать существующий файл, чтобы восстановить свои записи."
 msgstr "应用当前未使用任何数据文件。您可以导入现有文件以恢复记录。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:140
@@ -4474,8 +5279,8 @@ msgstr "导入数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:143
 #: templates/settings.html:143
 msgid ""
-"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
-" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить "
+"его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
 "заменен."
 msgstr "上传加密数据文件（<code>.enc</code>）以绑定并使用。如有已绑定文件将被替换。"
 
@@ -4509,8 +5314,8 @@ msgstr "所需内容："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:167
 #: templates/settings.html:167
 msgid ""
-"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
-"установки приложения."
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой установки "
+"приложения."
 msgstr "来自其他安装的<code>.env</code>文件和<code>servers.json.enc</code>文件。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:174
@@ -4520,8 +5325,8 @@ msgstr "servers.json.enc文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:178
 #: templates/settings.html:178
-msgid "Выберать зашифрованный файл данных из другой установки"
-msgstr "选择来自其他安装的加密数据文件"
+msgid "Выберите зашифрованный файл данных из другой установки"
+msgstr "选择其他安装中的加密数据文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:184
 #: templates/settings.html:184
@@ -4687,21 +5492,20 @@ msgstr "继续出口"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:427
 #: templates/settings.html:427
-#, fuzzy
 msgid "Управление PIN-кодом"
 msgstr "数据管理"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:432
 #: templates/settings.html:432
 msgid "Сброс блокировки PIN"
-msgstr ""
+msgstr "重置 PIN 锁"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:433
 #: templates/settings.html:433
 msgid ""
 "Если PIN-код был заблокирован из-за неверных попыток входа, вы можете "
 "сбросить блокировку здесь."
-msgstr ""
+msgstr "如果您的 PIN 因无效登录尝试而被阻止，您可以在此处重置阻止。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:436
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:477
@@ -4709,38 +5513,24 @@ msgstr ""
 #: templates/settings.html:436 templates/settings.html:477
 #: templates/settings.html:486
 msgid "Сбросить блокировку PIN"
-msgstr ""
+msgstr "重置 PIN 锁"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:455
 #: templates/settings.html:455
 msgid "Сброс..."
-msgstr ""
+msgstr "重置..."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:501
 #: templates/settings.html:501
-#, fuzzy
 msgid "Ошибка генерации ключа:"
 msgstr "复制时出错"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:512
 #: templates/settings.html:512
-#, fuzzy
 msgid ""
 "Вы уверены, что хотите сменить ключ шифрования? Это действие нельзя "
 "отменить."
 msgstr "您确定要删除这个服务器吗？"
-
-#: templates/index.html:379
-msgid "есть"
-msgstr "有"
-
-#: templates/index.html:380
-msgid "нет"
-msgstr "无"
-
-#: templates/index.html:381
-msgid "running:"
-msgstr "运行中:"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
 msgid "{editor}: Editing failed"
@@ -4763,6 +5553,9 @@ msgstr "选项"
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "有意外的额外参数（{args}）"
+msgstr[1] "得到意外的额外参数 ({args})"
+msgstr[2] "得到意外的额外参数 ({args})"
+msgstr[3] "得到意外的额外参数 ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
@@ -4792,18 +5585,20 @@ msgstr "价值必须是一个觉得的。"
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "取{nargs}值，但给出了1个。"
+msgstr[1] "接受 {nargs} 值，但给出了 {len}。"
+msgstr[2] "接受 {nargs} 值，但给出了 {len}。"
+msgstr[3] "接受 {nargs} 值，但给出了 {len}。"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
 msgid ""
-"DeprecationWarning: The {param_type} {name!r} is "
-"deprecated.{extra_message}"
+"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
 msgstr "debrecationwarning：{param_type} {name！r}已弃用。{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2807
 msgid "env var: {var}"
 msgstr ""
-"Error 500 (Server Error)!!1500.That's an error.There was an error. Please"
-" try again later.That's all we know."
+"Error 500 (Server Error)!!1500.That's an error.There was an error. Please "
+"try again later.That's all we know."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
 msgid "default: {default}"
@@ -4875,6 +5670,9 @@ msgstr "没有这样的选项：{name}"
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "您的意思是{可能性}吗？"
+msgstr[1] "（可能的选项：{可能性}）"
+msgstr[2] "（可能的选项：{可能性}）"
+msgstr[3] "（可能的选项：{可能性}）"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:282
 msgid "unknown error"
@@ -4900,6 +5698,9 @@ msgstr "选项{name！r}不采用值。"
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "选项{name！r}需要一个参数。"
+msgstr[1] "选项 {name!r} 需要 {nargs} 参数。"
+msgstr[2] "选项 {name!r} 需要 {nargs} 参数。"
+msgstr[3] "选项 {name!r} 需要 {nargs} 参数。"
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
@@ -4945,11 +5746,17 @@ msgstr ""
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value！r}不是{选择}。"
+msgstr[1] "{value!r} 不是 {choices} 之一。"
+msgstr[2] "{value!r} 不是 {choices} 之一。"
+msgstr[3] "{value!r} 不是 {choices} 之一。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value！r}与格式{格式}不匹配。"
+msgstr[1] "{value!r} 与格式 {formats} 不匹配。"
+msgstr[2] "{value!r} 与格式 {formats} 不匹配。"
+msgstr[3] "{value!r} 与格式 {formats} 不匹配。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
 msgid "{value!r} is not a valid {number_type}."
@@ -5007,6 +5814,13 @@ msgstr "{name} {fileName！r}无法执行。"
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type}需要{len_value}。"
+msgstr[1] "{len_type} 值是必需的，但已给出 {len_value}。"
+msgstr[2] "{len_type} 值是必需的，但已给出 {len_value}。"
+msgstr[3] "{len_type} 值是必需的，但已给出 {len_value}。"
+
+#: venv/lib/python3.13/site-packages/isort/main.py:159
+msgid "show this help message and exit"
+msgstr "显示此消息并退出。"
 
 #~ msgid "По умолчанию 22"
 #~ msgstr "默认22"
@@ -5027,7 +5841,7 @@ msgstr[0] "{len_type}需要{len_value}。"
 #~ msgstr "新密码面板"
 
 #~ msgid "Язык изменен на %(lang)s"
-#~ msgstr "语言已更改为 %(lang)s"
+#~ msgstr "语言更改为 %(lang)s"
 
 #~ msgid "Информация о Docker"
 #~ msgstr "Docker信息"
@@ -5044,39 +5858,5 @@ msgstr[0] "{len_type}需要{len_value}。"
 #~ msgid "%"
 #~ msgstr "%"
 
-
-#: templates/layout.html:132
-msgid "Порт"
-msgstr "端口"
-
-#: templates/layout.html:202 templates/layout.html:214 desktop/window.py:122
-msgid "Вы уверены, что хотите закрыть приложение?"
-msgstr "您确定要关闭应用程序吗？"
-
-#: templates/index.html
-msgid "Не удалось сохранить на сервере:"
-msgstr "无法保存到服务器："
-
-#: templates/index.html
-msgid "Ошибка сохранения:"
-msgstr "保存错误："
-
-#: templates/index.html
-msgid "PNG сохранён:"
-msgstr "PNG已保存："
-
-#: templates/index.html
-msgid "Папка:"
-msgstr "文件夹："
-
-#: templates/settings.html:178
-msgid "Выберите зашифрованный файл данных из другой установки"
-msgstr "选择其他安装中的加密数据文件"
-
-#: app/routes/api.py:724
-msgid "Invalid PIN"
-msgstr "PIN码错误"
-
-#: app/routes/api.py:718
-msgid "Too many failed attempts. Blocked for 30 seconds."
-msgstr "失败次数过多。已锁定30秒。"
+#~ msgid "Выберать зашифрованный файл данных из другой установки"
+#~ msgstr "选择来自其他安装的加密数据文件"
