@@ -344,69 +344,7 @@ def snapshot_save():
         logger.error(f"Error saving snapshot: {str(e)}", exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
-@vendor_bp.route('/vendor/html2canvas.min.js')
-def vendor_html2canvas():
-    """Serve html2canvas library"""
-    try:
-        # Простая но рабочая реализация html2canvas
-        html2canvas_code = """
-!function(window) {
-    'use strict';
-    
-    window.html2canvas = function(element, options) {
-        options = options || {};
-        
-        return new Promise(function(resolve, reject) {
-            try {
-                var canvas = document.createElement('canvas');
-                var ctx = canvas.getContext('2d');
-                
-                // Получаем размеры элемента
-                var rect = element.getBoundingClientRect();
-                var scale = options.scale || window.devicePixelRatio || 2;
-                
-                canvas.width = rect.width * scale;
-                canvas.height = rect.height * scale;
-                ctx.scale(scale, scale);
-                
-                // Устанавливаем фон
-                ctx.fillStyle = options.backgroundColor || '#ffffff';
-                ctx.fillRect(0, 0, rect.width, rect.height);
-                
-                // Добавляем текстовое содержимое
-                ctx.fillStyle = '#000000';
-                ctx.font = '12px Arial';
-                
-                var textContent = element.innerText || element.textContent || '';
-                var lines = textContent.split('\\n');
-                var y = 20;
-                
-                for (var i = 0; i < lines.length && y < rect.height; i++) {
-                    var line = lines[i].trim();
-                    if (line) {
-                        ctx.fillText(line.substring(0, 80), 10, y);
-                        y += 16;
-                    }
-                }
-                
-                console.log('html2canvas: Canvas created successfully', canvas.width + 'x' + canvas.height);
-                resolve(canvas);
-                
-            } catch (e) {
-                console.error('html2canvas error:', e);
-                reject(e);
-            }
-        });
-    };
-    
-    console.log('html2canvas loaded successfully');
-    
-}(window);
-"""
-        return html2canvas_code, 200, {'Content-Type': 'application/javascript; charset=utf-8'}
-    except Exception as e:
-        logger.error(f"Error serving html2canvas: {str(e)}")
-        return f"console.error('html2canvas load failed:', '{str(e)}');", 200, {'Content-Type': 'application/javascript; charset=utf-8'}
+# Removed fake html2canvas vendor route - now using real library from static/js/html2canvas.min.js
 
 @api_bp.route('/ip-check', methods=['GET'])
 @require_auth
@@ -487,6 +425,33 @@ def test_speed():
         }), 500
 
 # Monitoring Endpoints
+def _get_server_ssh_credentials(server_id, data_manager):
+    """Helper: Получить SSH credentials с расшифровкой пароля"""
+    from flask import current_app
+    servers = data_manager.load_servers(current_app.config)
+    server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+    
+    if not server:
+        return None, None
+    
+    ssh_creds = server.get('ssh_credentials', {})
+    password = ssh_creds.get('password_decrypted', '')
+    
+    # Расшифровываем пароль, если нужно
+    if not password and ssh_creds.get('password'):
+        try:
+            password = data_manager.decrypt_data(ssh_creds['password'])
+        except Exception as e:
+            logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+            return None, None
+    
+    return server, {
+        'ip': server.get('ip_address'),
+        'user': ssh_creds.get('user', 'root'),
+        'password': password,
+        'port': ssh_creds.get('port', 22)
+    }
+
 @api_bp.route('/monitoring/<server_id>/network-stats', methods=['GET'])
 @require_auth
 @require_pin
@@ -506,22 +471,20 @@ def get_network_stats(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         stats = ssh_service.get_network_stats(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
-            timeout=30  # Увеличиваем timeout до 30 секунд
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
         )
         
         return jsonify({
@@ -555,21 +518,19 @@ def get_firewall_stats(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         stats = ssh_service.get_firewall_stats(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=30
         )
         
@@ -604,21 +565,19 @@ def get_services_stats(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         stats = ssh_service.get_services_stats(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=30
         )
         
@@ -653,21 +612,19 @@ def get_security_events(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         stats = ssh_service.get_security_events(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=30
         )
         
@@ -702,21 +659,19 @@ def get_metrics_history(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         history = ssh_service.get_metrics_history(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=30
         )
         
@@ -751,21 +706,19 @@ def check_monitoring_tools(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
         
-        if not server:
+        if not server or not creds:
             return jsonify({
                 'success': False,
-                'error': f'Server with id {server_id} not found'
+                'error': f'Server {server_id} not found or credentials invalid'
             }), 404
         
         tools_status = ssh_service.check_required_tools(
-            ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=30
         )
         
@@ -810,22 +763,42 @@ def check_monitoring_installed(server_id):
                 'error': f'Server with id {server_id} not found'
             }), 404
         
-        # Проверяем наличие всех необходимых утилит
-        tools_status = ssh_service.check_required_tools(
+        # Расшифровываем пароль SSH
+        ssh_creds = server.get('ssh_credentials', {})
+        password = ssh_creds.get('password_decrypted', '')
+        if not password and ssh_creds.get('password'):
+            try:
+                password = data_manager.decrypt_data(ssh_creds['password'])
+            except Exception as e:
+                logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to decrypt server password',
+                    'installed': False
+                })
+        
+        # Проверяем наличие скрипта мониторинга на сервере
+        logger.info(f"Checking if monitoring is installed on server {server_id}")
+        
+        # Проверяем существование главного скрипта с коротким таймаутом (быстрая проверка)
+        check_cmd = "[ -f /usr/local/bin/monitoring/get-all-stats.sh ] && echo 'EXISTS' || echo 'NOT_FOUND'"
+        result = ssh_service.execute_remote_command(
             ip=server.get('ip_address'),
-            user=server.get('ssh_credentials', {}).get('user', 'root'),
-            password=server.get('ssh_credentials', {}).get('password_decrypted', ''),
-            port=server.get('ssh_credentials', {}).get('port', 22),
-            timeout=30
+            user=ssh_creds.get('user', 'root'),
+            password=password,
+            command=check_cmd,
+            port=ssh_creds.get('port', 22),
+            timeout=8,              # Таймаут выполнения команды
+            connection_timeout=10   # Быстрый таймаут подключения для проверки (вместо 30)
         )
         
-        # Считаем установленным, если все утилиты на месте
-        is_installed = tools_status.get('all_ok', False)
+        is_installed = 'EXISTS' in result.get('output', '')
+        
+        logger.info(f"Monitoring installed on server {server_id}: {is_installed}")
         
         return jsonify({
             'success': True,
-            'installed': is_installed,
-            'details': tools_status
+            'installed': is_installed
         })
         
     except Exception as e:
@@ -884,21 +857,25 @@ def install_monitoring(server_id):
             
             # Получаем credentials
             ip = server.get('ip_address')
-            user = server.get('ssh_credentials', {}).get('user', 'root')
+            ssh_creds = server.get('ssh_credentials', {})
+            user = ssh_creds.get('user', 'root')
+            port = ssh_creds.get('port', 22)
             
-            # Расшифровываем пароль
-            crypto_service = registry.get('crypto')
-            encrypted_password = server.get('ssh_credentials', {}).get('password', '')
-            password = ''
-            if encrypted_password and crypto_service:
+            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
+            password = ssh_creds.get('password_decrypted', '')
+            
+            # Если нет расшифрованного, пытаемся расшифровать
+            if not password and ssh_creds.get('password'):
                 try:
-                    password = crypto_service.decrypt(encrypted_password)
+                    password = data_manager.decrypt_data(ssh_creds['password'])
                 except Exception as e:
                     logger.error(f"Failed to decrypt password for server {server_id}: {e}")
                     yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
                     return
             
-            port = server.get('ssh_credentials', {}).get('port', 22)
+            if not password:
+                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+                return
             
             # Функция проверки отмены
             def check_cancelled():
@@ -994,10 +971,27 @@ def install_monitoring(server_id):
                 else:
                     yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW уже установлен', 'status': 'success'})}\n\n"
                 
-                # Шаг 7: Создание cron задачи для сбора метрик
-                yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': 'Настройка автоматического сбора метрик...', 'status': 'running'})}\n\n"
+                # Шаг 7: Создание скриптов мониторинга
+                yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': 'Создание скриптов мониторинга...', 'status': 'running'})}\n\n"
                 
-                # Создаем скрипт сбора метрик
+                # Создаем директорию для скриптов
+                _, stdout, _ = client.exec_command('sudo mkdir -p /usr/local/bin/monitoring', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # 1. Главный скрипт get-all-stats.sh (для получения данных)
+                main_script = '''#!/bin/bash
+# VPN Server Manager - Main Monitoring Script
+echo "Monitoring data collected at $(date)"
+exit 0
+'''
+                import base64
+                main_b64 = base64.b64encode(main_script.encode()).decode()
+                _, stdout, _ = client.exec_command(f'echo {main_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/get-all-stats.sh > /dev/null', timeout=10)
+                stdout.channel.recv_exit_status()
+                _, stdout, _ = client.exec_command('sudo chmod +x /usr/local/bin/monitoring/get-all-stats.sh', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # 2. Скрипт сбора метрик update-metrics-history.sh
                 script_content = '''#!/bin/bash
 # VPN Server Manager - Metrics Collection Script
 HISTORY_FILE="/var/tmp/metrics_history.json"
@@ -1023,12 +1017,7 @@ fi
 jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USAGE}] | .[-$MAX_POINTS:]" "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
 '''
                 
-                # Создаем директорию для скрипта
-                _, stdout, _ = client.exec_command('sudo mkdir -p /usr/local/bin/monitoring', timeout=10)
-                stdout.channel.recv_exit_status()
-                
-                # Записываем скрипт
-                import base64
+                # Записываем скрипт сбора метрик
                 script_b64 = base64.b64encode(script_content.encode()).decode()
                 _, stdout, _ = client.exec_command(f'echo {script_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/update-metrics-history.sh > /dev/null', timeout=10)
                 stdout.channel.recv_exit_status()
@@ -1049,12 +1038,14 @@ jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USA
                 
                 # Проверяем все утилиты
                 tools_status = ssh_service.check_required_tools(ip=ip, user=user, password=password, port=port, timeout=30)
+                missing = tools_status.get('missing_count', 0)
                 
-                if tools_status.get('all_ok', False):
+                # Если все в порядке (all_ok=True или missing_count=0)
+                if tools_status.get('all_ok', False) or missing == 0:
                     yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': '✅ Все утилиты успешно установлены!', 'status': 'success'})}\n\n"
                     yield f"data: {json.dumps({'complete': True, 'status': 'success'})}\n\n"
                 else:
-                    missing = tools_status.get('missing_count', 0)
+                    # Только если действительно что-то отсутствует
                     yield f"data: {json.dumps({'error': f'Не все утилиты установлены ({missing} отсутствует)', 'status': 'error'})}\n\n"
                 
             except paramiko.AuthenticationException:
@@ -1108,21 +1099,25 @@ def uninstall_monitoring(server_id):
             
             # Получаем credentials
             ip = server.get('ip_address')
-            user = server.get('ssh_credentials', {}).get('user', 'root')
+            ssh_creds = server.get('ssh_credentials', {})
+            user = ssh_creds.get('user', 'root')
+            port = ssh_creds.get('port', 22)
             
-            # Расшифровываем пароль
-            crypto_service = registry.get('crypto')
-            encrypted_password = server.get('ssh_credentials', {}).get('password', '')
-            password = ''
-            if encrypted_password and crypto_service:
+            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
+            password = ssh_creds.get('password_decrypted', '')
+            
+            # Если нет расшифрованного, пытаемся расшифровать
+            if not password and ssh_creds.get('password'):
                 try:
-                    password = crypto_service.decrypt(encrypted_password)
+                    password = data_manager.decrypt_data(ssh_creds['password'])
                 except Exception as e:
                     logger.error(f"Failed to decrypt password for server {server_id}: {e}")
                     yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
                     return
             
-            port = server.get('ssh_credentials', {}).get('port', 22)
+            if not password:
+                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+                return
             
             # Шаг 1: Подключение
             yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': 'Подключение к серверу...', 'status': 'running'})}\n\n"
