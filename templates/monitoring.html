@@ -7,20 +7,20 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid mt-3 monitoring-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <div>
             <h1>
                 <i class="bi bi-bar-chart-line"></i> {{ _('Расширенный мониторинг') }}
             </h1>
-            <p class="text-muted mb-0">
+            <p class="text-muted mb-0 small">
                 <strong>{{ server.name }}</strong> - {{ server.ip_address }}
                 {% if server.provider %}<span class="badge bg-secondary">{{ server.provider }}</span>{% endif %}
             </p>
         </div>
         <div>
-            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> {{ _('Назад к списку') }}
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left" style="font-size: 0.9rem;"></i> {{ _('Назад к списку') }}
             </a>
         </div>
     </div>
@@ -29,26 +29,28 @@
     <div id="installation-panel" class="installation-panel" style="display: none;">
         <div class="install-card">
             <div class="install-header">
-                <h3>📦 {{ _('Установка системы мониторинга') }}</h3>
-                <p>{{ _('Мониторинг еще не установлен на этом сервере') }}</p>
+                <h3 style="font-size: 1.2rem; margin: 0 0 5px 0;">
+                    <i class="bi bi-box-seam" style="font-size: 1.1rem;"></i> {{ _('Установка системы мониторинга') }}
+                </h3>
+                <p style="margin: 0; font-size: 0.85rem;">{{ _('Мониторинг еще не установлен на этом сервере') }}</p>
             </div>
             
             <div class="install-body">
                 <div class="install-features">
-                    <h4>{{ _('Что будет установлено:') }}</h4>
+                    <h4 style="font-size: 0.95rem; font-weight: 600;">{{ _('Что будет установлено:') }}</h4>
                     <ul>
-                        <li>✅ {{ _('vnstat - для статистики трафика') }}</li>
-                        <li>✅ {{ _('jq - для обработки JSON') }}</li>
-                        <li>✅ {{ _('net-tools - для сетевой статистики') }}</li>
-                        <li>✅ {{ _('ufw - файрвол (если отсутствует)') }}</li>
+                        <li style="font-size: 0.85rem;">✅ {{ _('vnstat - для статистики трафика') }}</li>
+                        <li style="font-size: 0.85rem;">✅ {{ _('jq - для обработки JSON') }}</li>
+                        <li style="font-size: 0.85rem;">✅ {{ _('net-tools - для сетевой статистики') }}</li>
+                        <li style="font-size: 0.85rem;">⚠️ {{ _('ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)') }}</li>
                     </ul>
-                    <p class="mt-3 text-muted small">
-                        <i class="bi bi-info-circle"></i> {{ _('Установка займет 1-2 минуты') }}
+                    <p class="mt-2 text-muted" style="font-size: 0.75rem;">
+                        <i class="bi bi-info-circle" style="font-size: 0.9rem;"></i> {{ _('Установка займет 1-2 минуты') }}
                     </p>
                 </div>
                 
-                <button id="install-btn" class="btn btn-primary btn-lg">
-                    <i class="bi bi-download"></i> {{ _('Установить мониторинг') }}
+                <button id="install-btn" class="btn btn-primary btn-lg" style="font-size: 0.95rem; padding: 12px;">
+                    <i class="bi bi-download" style="font-size: 1rem;"></i> {{ _('Установить мониторинг') }}
                 </button>
                 
                 <!-- Progress section -->
@@ -76,8 +78,8 @@
         
         <!-- Settings button in header -->
         <div class="monitoring-controls mb-3">
-            <button id="show-settings-btn" class="btn btn-secondary">
-                <i class="bi bi-gear"></i> {{ _('Настройки') }}
+            <button id="show-settings-btn" class="btn btn-secondary btn-sm">
+                <i class="bi bi-gear" style="font-size: 0.95rem;"></i> {{ _('Настройки') }}
             </button>
         </div>
 
@@ -843,13 +845,58 @@ function setupSettingsPanel() {
 }
 
 async function startInstallation() {
-    if (isInstalling) return;
+    if (isInstalling) {
+        console.warn('⚠️ Installation already in progress');
+        return;
+    }
+    
+    // Блокируем кнопку на время проверки
+    const installBtn = document.getElementById('install-btn');
+    const originalText = installBtn.innerHTML;
+    installBtn.disabled = true;
+    installBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>{{ _("Проверка...") }}';
+    
+    // Проверяем, не установлен ли уже мониторинг
+    console.log('🔍 Checking if monitoring is already installed...');
+    const alreadyInstalled = await checkInstallation();
+    if (alreadyInstalled) {
+        console.warn('⚠️ Monitoring is already installed on this server!');
+        
+        // Показываем красивое уведомление
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-info alert-dismissible fade show';
+        notification.style.position = 'fixed';
+        notification.style.top = '80px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '9999';
+        notification.style.maxWidth = '400px';
+        notification.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div style="font-size: 2rem; margin-right: 15px;">✅</div>
+                <div>
+                    <strong>{{ _("Мониторинг уже установлен") }}</strong><br>
+                    <span class="small">{{ _("Система мониторинга уже активна на этом сервере. Сейчас загрузим данные...") }}</span>
+                </div>
+                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Через 2 секунды перезагружаем страницу
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        return;
+    }
+    
+    // Восстанавливаем текст кнопки и продолжаем установку
+    installBtn.innerHTML = originalText;
     
     isInstalling = true;
     console.log('🚀 Starting installation...');
     
     // Показываем прогресс
-    document.getElementById('install-btn').disabled = true;
+    installBtn.disabled = true;
     document.getElementById('install-progress').style.display = 'block';
     
     const progressBar = document.getElementById('progress-bar');
