@@ -1,10 +1,10 @@
-# Архитектурные правила для Flask-приложения v4.0.6
+# Архитектурные правила для Flask-приложения v4.0.7
 
 ## Контекст проекта
 
 **VPN Server Manager** - Flask-приложение с desktop GUI (pywebview), поддержкой интернационализации, SSH/SFTP функциональностью и криптографией.
 
-**v4.0.6 (13 октября 2025)**: 
+**v4.0.7 (13 октября 2025)**: 
 - ✅ **БЕЗОПАСНОСТЬ**: Конфиденциальные файлы (.env, config.json) исключены из Git
 - ✅ config.json теперь локальный файл (шаблон: config.json.example)
 - ✅ Исправлена сборка DMG - не включает секреты
@@ -21,7 +21,7 @@
 ```
 VPNserverManage-Clean/
 ├── run.py                        # Точка входа (web/desktop режимы)
-├── config.json                   # 🎯 Конфигурация (version: 4.0.6) - ЛОКАЛЬНЫЙ ФАЙЛ
+├── config.json                   # 🎯 Конфигурация (version: 4.0.7) - ЛОКАЛЬНЫЙ ФАЙЛ
 ├── config.json.example           # 📋 Шаблон конфигурации (в Git)
 ├── .env                          # Секреты (SECRET_KEY) - НЕ В GIT
 ├── .env.example                  # 📋 Шаблон env (в Git)
@@ -92,7 +92,7 @@ VPNserverManage-Clean/
 │
 ├── docs/                        # Документация
 │   ├── project_info/
-│   │   ├── PROJECT_STRUCTURE.md
+│   │   ├── PROJECT_DOCUMENTATION.md
 │   │   ├── BUILD.md
 │   │   ├── BACKUP_TOOLS.md
 │   │   └── SECRET_KEY.md
@@ -225,8 +225,8 @@ class Config:
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
-    # v4.0.6: Версия из config.json (fallback)
-    APP_VERSION = os.getenv('APP_VERSION', '4.0.6')
+    # v4.0.7: Версия из config.json (fallback)
+    APP_VERSION = os.getenv('APP_VERSION', '4.0.7')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     
@@ -272,7 +272,7 @@ config_by_name = {
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "4.0.6",
+    "version": "4.0.7",
     "release_date": "13.10.2025",
     "developer": "Куреин М.Н.",
     "last_updated": "2025-10-13",

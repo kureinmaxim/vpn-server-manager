@@ -800,10 +800,11 @@ class SSHService:
                 },
                 'ufw': {
                     'name': 'ufw',
-                    'description': 'Брандмауэр для мониторинга безопасности',
-                    'install_cmd': 'sudo apt-get install -y ufw && sudo ufw enable',
+                    'description': 'Брандмауэр для мониторинга безопасности (НЕ РЕКОМЕНДУЕТСЯ включать)',
+                    'install_cmd': 'sudo apt-get install -y ufw',
                     'category': 'optional',
-                    'installed': False
+                    'installed': False,
+                    'warning': '⚠️ НЕ включайте UFW! Мониторинг работает и без него. Включение UFW без правильной настройки заблокирует SSH доступ!'
                 },
                 'netstat': {
                     'name': 'netstat',
@@ -837,8 +838,11 @@ class SSHService:
                 ufw_status = stdout.read().decode('utf-8').strip()
                 tools['ufw']['enabled'] = ufw_status.lower() == 'active'
                 if ufw_status.lower() != 'active':
-                    tools['ufw']['warning'] = 'Установлен, но не включен'
-                    tools['ufw']['fix_cmd'] = 'sudo ufw enable'
+                    tools['ufw']['warning'] = '⚠️ UFW выключен (это ПРАВИЛЬНО! Оставьте выключенным)'
+                    tools['ufw']['fix_cmd'] = '# НЕ включайте UFW! Команда: sudo ufw disable'
+                else:
+                    tools['ufw']['warning'] = '⚠️ UFW включен! Убедитесь что порт 22 (SSH) разрешен!'
+                    tools['ufw']['fix_cmd'] = 'sudo ufw status numbered  # Проверьте правила'
             
             # Подсчитываем статистику
             total = len(tools)
