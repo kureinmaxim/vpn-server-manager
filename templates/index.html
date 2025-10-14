@@ -336,6 +336,9 @@
                         <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
                             <i class="bi bi-activity"></i> {{ _('Статус') }}
                         </button>
+                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-bar-chart-line"></i> {{ _('Мониторинг') }}
+                        </a>
                         <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
                             <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
                         </form>

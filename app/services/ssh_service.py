@@ -3,21 +3,89 @@ from typing import Optional, Dict, List
 from paramiko.ssh_exception import SSHException, AuthenticationException
 from ..exceptions import SSHConnectionError, AuthenticationError
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
 class SSHService:
-    """Сервис для работы с SSH/SFTP"""
+    """Сервис для работы с SSH/SFTP с connection pooling"""
+    
+    # Кэш подключений
+    _connection_pool = {}
+    _pool_lock = threading.Lock()
     
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
         self.sftp_client: Optional[paramiko.SFTPClient] = None
     
+    @classmethod
+    def get_connection_pooled(cls, hostname: str, port: int, username: str, password: Optional[str] = None):
+        """Получить или создать SSH подключение (с переиспользованием)"""
+        key = f"{hostname}:{port}:{username}"
+        
+        with cls._pool_lock:
+            # Проверяем есть ли живое подключение
+            if key in cls._connection_pool:
+                conn = cls._connection_pool[key]
+                try:
+                    if conn.get_transport() and conn.get_transport().is_active():
+                        # Проверяем что подключение работает
+                        conn.exec_command('echo test', timeout=5)
+                        logger.info(f"♻️ Reusing existing connection to {hostname}")
+                        return conn
+                    else:
+                        logger.info(f"💀 Old connection dead, removing")
+                        del cls._connection_pool[key]
+                except Exception as e:
+                    logger.warning(f"Connection check failed: {e}")
+                    if key in cls._connection_pool:
+                        del cls._connection_pool[key]
+            
+            # Создаем новое подключение
+            logger.info(f"🔌 Creating new SSH connection to {hostname}")
+            ssh = paramiko.SSHClient()
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            
+            try:
+                ssh.connect(
+                    hostname,
+                    port=port,
+                    username=username,
+                    password=password,
+                    timeout=30,              # Увеличили с 10 до 30
+                    banner_timeout=60,       # Время ожидания SSH banner
+                    auth_timeout=30,         # Время на аутентификацию
+                    look_for_keys=False,     # Не искать SSH ключи (быстрее)
+                    allow_agent=False        # Не использовать SSH agent
+                )
+                
+                cls._connection_pool[key] = ssh
+                logger.info(f"✅ New connection created and pooled: {hostname}")
+                return ssh
+                
+            except Exception as e:
+                logger.error(f"Failed to connect to {hostname}: {e}")
+                raise
+    
+    @classmethod
+    def close_all(cls):
+        """Закрыть все подключения (вызывать при остановке приложения)"""
+        logger.info("Closing all SSH connections...")
+        with cls._pool_lock:
+            for key, conn in list(cls._connection_pool.items()):
+                try:
+                    logger.info(f"Closing connection: {key}")
+                    conn.close()
+                except Exception as e:
+                    logger.warning(f"Error closing connection {key}: {e}")
+            cls._connection_pool.clear()
+        logger.info("All SSH connections closed")
+    
     def connect(self, hostname: str, username: str, 
                 password: Optional[str] = None,
                 key_filename: Optional[str] = None,
                 port: int = 22,
-                timeout: int = 10) -> None:
+                timeout: int = 30) -> None:  # Увеличен с 10 до 30
         """Установка SSH соединения"""
         try:
             self.client = paramiko.SSHClient()
@@ -31,7 +99,11 @@ class SSHService:
                 password=password,
                 key_filename=key_filename,
                 port=port,
-                timeout=timeout
+                timeout=timeout,
+                banner_timeout=60,    # Время ожидания SSH banner
+                auth_timeout=30,      # Время на аутентификацию
+                look_for_keys=False,  # Не искать SSH ключи (быстрее)
+                allow_agent=False     # Не использовать SSH agent
             )
             
             logger.info(f"Successfully connected to {hostname}")
@@ -144,21 +216,10 @@ class SSHService:
     def get_server_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
         """Получение статистики сервера через SSH"""
         stats = {}
-        client = None
         
         try:
-            # Создаем новый SSH клиент для этого запроса
-            client = paramiko.SSHClient()
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            
-            logger.info(f"Connecting to {ip}:{port} for stats collection")
-            client.connect(
-                hostname=ip,
-                username=user,
-                password=password,
-                port=port,
-                timeout=timeout
-            )
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
             
             # Uptime
             try:
@@ -342,12 +403,6 @@ class SSHService:
         except Exception as e:
             logger.error(f"Error collecting stats from {ip}: {str(e)}")
             raise SSHConnectionError(f"Failed to collect stats from {ip}: {str(e)}")
-        finally:
-            if client:
-                try:
-                    client.close()
-                except:
-                    pass
     
     def __enter__(self):
         return self
@@ -359,3 +414,465 @@ class SSHService:
     def is_connected(self) -> bool:
         """Проверка состояния соединения"""
         return self.client is not None and self.client.get_transport() is not None
+    
+    def get_network_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Получение статистики сетевого трафика"""
+        import time
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            # Определяем основной сетевой интерфейс
+            _, stdout, _ = client.exec_command("ip route | grep default | awk '{print $5}' | head -1")
+            interface = stdout.read().decode('utf-8').strip() or 'eth0'
+            
+            # Получаем начальные значения
+            _, stdout, _ = client.exec_command(f"cat /sys/class/net/{interface}/statistics/rx_bytes /sys/class/net/{interface}/statistics/tx_bytes")
+            initial = stdout.read().decode('utf-8').strip().split('\n')
+            if len(initial) < 2:
+                raise ValueError("Could not read network statistics")
+            
+            rx1 = int(initial[0])
+            tx1 = int(initial[1])
+            time1 = time.time()
+            
+            # Ждем 1 секунду
+            time.sleep(1)
+            
+            # Получаем конечные значения
+            _, stdout, _ = client.exec_command(f"cat /sys/class/net/{interface}/statistics/rx_bytes /sys/class/net/{interface}/statistics/tx_bytes")
+            final = stdout.read().decode('utf-8').strip().split('\n')
+            if len(final) < 2:
+                raise ValueError("Could not read network statistics")
+            
+            rx2 = int(final[0])
+            tx2 = int(final[1])
+            time2 = time.time()
+            
+            # Вычисляем скорость
+            time_diff = time2 - time1
+            rx_speed = (rx2 - rx1) / time_diff / 1048576  # MB/s
+            tx_speed = (tx2 - tx1) / time_diff / 1048576  # MB/s
+            
+            # Получаем суточную статистику (если vnstat установлен)
+            _, stdout, _ = client.exec_command('which vnstat')
+            has_vnstat = bool(stdout.read().decode('utf-8').strip())
+            
+            daily_rx = "N/A"
+            daily_tx = "N/A"
+            if has_vnstat:
+                try:
+                    _, stdout, _ = client.exec_command(f'vnstat -i {interface} --oneline 2>/dev/null')
+                    vnstat_output = stdout.read().decode('utf-8').strip()
+                    if vnstat_output:
+                        parts = vnstat_output.split(';')
+                        if len(parts) > 5:
+                            daily_rx = parts[3].strip()
+                            daily_tx = parts[4].strip()
+                except:
+                    pass
+            
+            return {
+                'interface': interface,
+                'current': {
+                    'download': f"{rx_speed:.2f}",
+                    'upload': f"{tx_speed:.2f}",
+                    'unit': 'MB/s'
+                },
+                'daily': {
+                    'download': daily_rx,
+                    'upload': daily_tx
+                },
+                'timestamp': int(time.time())
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting network stats from {ip}: {str(e)}")
+            return {
+                'interface': 'N/A',
+                'current': {'download': '0.00', 'upload': '0.00', 'unit': 'MB/s'},
+                'daily': {'download': 'N/A', 'upload': 'N/A'},
+                'timestamp': int(time.time()),
+                'error': str(e)
+            }
+    
+    def get_firewall_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Получение статистики брандмауэра (UFW)"""
+        import datetime
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            # Проверяем статус UFW
+            _, stdout, _ = client.exec_command('sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'')
+            ufw_status = stdout.read().decode('utf-8').strip() or 'inactive'
+            
+            # Получаем открытые порты
+            _, stdout, _ = client.exec_command('sudo ufw status numbered 2>/dev/null | grep -E "^\\[" | awk \'{print $3}\' | cut -d\'/\' -f1 | sort -u')
+            open_ports_list = stdout.read().decode('utf-8').strip().split('\n')
+            open_ports = ','.join([p for p in open_ports_list if p]) if open_ports_list[0] else 'none'
+            
+            # Считаем заблокированные попытки за 24 часа
+            today = datetime.datetime.now().strftime('%b %e')
+            _, stdout, _ = client.exec_command(f'sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | grep "{today}" | wc -l')
+            blocked_24h = stdout.read().decode('utf-8').strip()
+            blocked_24h = int(blocked_24h) if blocked_24h.isdigit() else 0
+            
+            # Получаем последний заблокированный IP
+            _, stdout, _ = client.exec_command('sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | tail -1')
+            last_block_line = stdout.read().decode('utf-8').strip()
+            
+            last_blocked_ip = 'none'
+            last_blocked_port = '0'
+            if last_block_line:
+                import re
+                ip_match = re.search(r'SRC=([0-9.]+)', last_block_line)
+                port_match = re.search(r'DPT=([0-9]+)', last_block_line)
+                if ip_match:
+                    last_blocked_ip = ip_match.group(1)
+                if port_match:
+                    last_blocked_port = port_match.group(1)
+            
+            return {
+                'status': ufw_status,
+                'open_ports': open_ports,
+                'blocked_24h': blocked_24h,
+                'last_blocked': {
+                    'ip': last_blocked_ip,
+                    'port': last_blocked_port,
+                    'time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting firewall stats from {ip}: {str(e)}")
+            return {
+                'status': 'unknown',
+                'open_ports': 'N/A',
+                'blocked_24h': 0,
+                'last_blocked': {'ip': 'none', 'port': '0', 'time': 'N/A'},
+                'error': str(e)
+            }
+    
+    def get_services_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> List[Dict]:
+        """Получение статистики системных сервисов"""
+        import time
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            # Список основных сервисов для мониторинга
+            services_to_check = ['nginx', 'apache2', 'ssh', 'sshd', 'postgresql', 'mysql', 'docker', 'redis-server']
+            services = []
+            
+            for service in services_to_check:
+                # Проверяем существование сервиса
+                _, stdout, _ = client.exec_command(f'systemctl list-unit-files | grep "^{service}.service"')
+                if not stdout.read().decode('utf-8').strip():
+                    continue
+                
+                # Получаем статус
+                _, stdout, _ = client.exec_command(f'systemctl is-active {service} 2>/dev/null')
+                status = stdout.read().decode('utf-8').strip()
+                
+                # Получаем enabled статус
+                _, stdout, _ = client.exec_command(f'systemctl is-enabled {service} 2>/dev/null')
+                enabled = stdout.read().decode('utf-8').strip()
+                
+                # Получаем uptime
+                uptime_str = 'stopped'
+                if status == 'active':
+                    try:
+                        _, stdout, _ = client.exec_command(f'systemctl show {service} --property=ActiveEnterTimestamp')
+                        timestamp_line = stdout.read().decode('utf-8').strip()
+                        if timestamp_line and '=' in timestamp_line:
+                            timestamp_str = timestamp_line.split('=')[1].strip()
+                            if timestamp_str:
+                                # Парсим timestamp и вычисляем uptime
+                                _, stdout, _ = client.exec_command(f'date -d "{timestamp_str}" +%s')
+                                start_time = stdout.read().decode('utf-8').strip()
+                                if start_time.isdigit():
+                                    seconds = int(time.time()) - int(start_time)
+                                    days = seconds // 86400
+                                    hours = (seconds % 86400) // 3600
+                                    mins = (seconds % 3600) // 60
+                                    
+                                    if days > 0:
+                                        uptime_str = f"{days}d {hours}h"
+                                    elif hours > 0:
+                                        uptime_str = f"{hours}h {mins}m"
+                                    else:
+                                        uptime_str = f"{mins}m"
+                    except:
+                        uptime_str = 'active'
+                
+                services.append({
+                    'name': service,
+                    'status': status,
+                    'enabled': enabled,
+                    'uptime': uptime_str
+                })
+            
+            return services
+            
+        except Exception as e:
+            logger.error(f"Error getting services stats from {ip}: {str(e)}")
+            return [{'name': 'error', 'status': 'unknown', 'enabled': 'unknown', 'uptime': str(e)}]
+    
+    def get_security_events(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Получение событий безопасности"""
+        import datetime
+        import time
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            # SSH неудачные попытки за последние 24 часа
+            today = datetime.datetime.now().strftime('%b %e')
+            _, stdout, _ = client.exec_command(f'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | grep "{today}" | wc -l')
+            ssh_failures = stdout.read().decode('utf-8').strip()
+            ssh_failures = int(ssh_failures) if ssh_failures.isdigit() else 0
+            
+            # Топ IP с неудачными попытками
+            _, stdout, _ = client.exec_command(f'''sudo grep "Failed password" /var/log/auth.log 2>/dev/null | grep "{today}" | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk '{{print $2}}' | sort | uniq -c | sort -rn | head -3''')
+            top_ips_output = stdout.read().decode('utf-8').strip().split('\n')
+            top_failed_ips = []
+            for line in top_ips_output:
+                if line.strip():
+                    parts = line.strip().split()
+                    if len(parts) >= 2:
+                        top_failed_ips.append({
+                            'ip': parts[1],
+                            'count': int(parts[0])
+                        })
+            
+            # Проверяем обновления безопасности
+            _, stdout, _ = client.exec_command('apt list --upgradable 2>/dev/null | grep -i security | wc -l')
+            security_updates = stdout.read().decode('utf-8').strip()
+            security_updates = int(security_updates) if security_updates.isdigit() else 0
+            
+            # Последнее обновление системы
+            _, stdout, _ = client.exec_command('stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null')
+            last_update_timestamp = stdout.read().decode('utf-8').strip()
+            days_since_update = 0
+            if last_update_timestamp.isdigit():
+                days_since_update = (int(time.time()) - int(last_update_timestamp)) // 86400
+            
+            # Проверяем новые открытые порты
+            baseline_file = '/var/tmp/open_ports_baseline.txt'
+            _, stdout, _ = client.exec_command(f'test -f {baseline_file} && echo "exists" || echo "not_exists"')
+            baseline_exists = stdout.read().decode('utf-8').strip() == 'exists'
+            
+            _, stdout, _ = client.exec_command('sudo netstat -tuln 2>/dev/null | grep LISTEN | awk \'{print $4}\' | sed \'s/.*://\' | sort -u')
+            current_ports = stdout.read().decode('utf-8').strip().split('\n')
+            
+            new_open_ports = 0
+            if not baseline_exists:
+                # Создаем baseline
+                ports_str = '\n'.join(current_ports)
+                client.exec_command(f'echo "{ports_str}" > {baseline_file}')
+            else:
+                # Сравниваем с baseline
+                _, stdout, _ = client.exec_command(f'cat {baseline_file}')
+                baseline_ports = stdout.read().decode('utf-8').strip().split('\n')
+                new_ports = set(current_ports) - set(baseline_ports)
+                new_open_ports = len(new_ports)
+            
+            return {
+                'ssh_failures_24h': ssh_failures,
+                'top_failed_ips': top_failed_ips,
+                'security_updates_available': security_updates,
+                'days_since_update': days_since_update,
+                'new_open_ports': new_open_ports,
+                'timestamp': int(time.time())
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting security events from {ip}: {str(e)}")
+            return {
+                'ssh_failures_24h': 0,
+                'top_failed_ips': [],
+                'security_updates_available': 0,
+                'days_since_update': 0,
+                'new_open_ports': 0,
+                'timestamp': int(time.time()),
+                'error': str(e)
+            }
+    
+    def get_metrics_history(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> List[Dict]:
+        """Получение истории метрик CPU/Memory"""
+        import time
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            history_file = '/var/tmp/metrics_history.json'
+            max_points = 60
+            
+            # Получаем текущие метрики
+            _, stdout, _ = client.exec_command('top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'')
+            cpu_usage = stdout.read().decode('utf-8').strip()
+            cpu_usage = float(cpu_usage) if cpu_usage else 0.0
+            
+            _, stdout, _ = client.exec_command('free | grep Mem | awk \'{printf "%.1f", $3/$2 * 100}\'')
+            mem_usage = stdout.read().decode('utf-8').strip()
+            mem_usage = float(mem_usage) if mem_usage else 0.0
+            
+            timestamp = int(time.time())
+            
+            # Проверяем, установлен ли jq
+            _, stdout, _ = client.exec_command('which jq')
+            has_jq = bool(stdout.read().decode('utf-8').strip())
+            
+            # Читаем существующую историю
+            _, stdout, _ = client.exec_command(f'test -f {history_file} && cat {history_file} || echo "[]"')
+            history_json = stdout.read().decode('utf-8').strip() or '[]'
+            
+            if has_jq:
+                # Используем jq для обновления истории
+                new_point = f'{{"timestamp":{timestamp},"cpu":{cpu_usage},"memory":{mem_usage}}}'
+                cmd = f'echo \'{history_json}\' | jq ". += [{new_point}] | .[-{max_points}:]" > {history_file} && cat {history_file}'
+                _, stdout, _ = client.exec_command(cmd)
+                result = stdout.read().decode('utf-8').strip()
+                
+                import json
+                history = json.loads(result) if result else []
+            else:
+                # Без jq - используем Python для парсинга
+                import json
+                try:
+                    history = json.loads(history_json) if history_json != '[]' else []
+                except:
+                    history = []
+                
+                history.append({
+                    'timestamp': timestamp,
+                    'cpu': cpu_usage,
+                    'memory': mem_usage
+                })
+                
+                # Оставляем только последние max_points точек
+                history = history[-max_points:]
+                
+                # Сохраняем обратно
+                history_str = json.dumps(history)
+                client.exec_command(f'echo \'{history_str}\' > {history_file}')
+            
+            return history
+            
+        except Exception as e:
+            logger.error(f"Error getting metrics history from {ip}: {str(e)}")
+            # Возвращаем хотя бы текущие данные
+            import time
+            return [{
+                'timestamp': int(time.time()),
+                'cpu': 0.0,
+                'memory': 0.0,
+                'error': str(e)
+            }]
+    
+    def check_required_tools(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Проверка наличия необходимых утилит для мониторинга"""
+        
+        try:
+            # Используем connection pooling
+            client = self.get_connection_pooled(ip, port, user, password)
+            
+            tools = {
+                'vnstat': {
+                    'name': 'vnstat',
+                    'description': 'Статистика сетевого трафика за 24 часа',
+                    'install_cmd': 'sudo apt-get install -y vnstat && sudo systemctl enable vnstat && sudo systemctl start vnstat',
+                    'category': 'optional',
+                    'installed': False
+                },
+                'jq': {
+                    'name': 'jq',
+                    'description': 'JSON процессор для графиков истории',
+                    'install_cmd': 'sudo apt-get install -y jq',
+                    'category': 'optional',
+                    'installed': False
+                },
+                'ufw': {
+                    'name': 'ufw',
+                    'description': 'Брандмауэр для мониторинга безопасности',
+                    'install_cmd': 'sudo apt-get install -y ufw && sudo ufw enable',
+                    'category': 'optional',
+                    'installed': False
+                },
+                'netstat': {
+                    'name': 'netstat',
+                    'description': 'Статистика сетевых соединений',
+                    'install_cmd': 'sudo apt-get install -y net-tools',
+                    'category': 'recommended',
+                    'installed': False
+                }
+            }
+            
+            # Проверяем каждую утилиту
+            for tool_key, tool_info in tools.items():
+                _, stdout, _ = client.exec_command(f'which {tool_info["name"]}')
+                tool_path = stdout.read().decode('utf-8').strip()
+                tools[tool_key]['installed'] = bool(tool_path)
+                if tool_path:
+                    tools[tool_key]['path'] = tool_path
+            
+            # Проверяем, запущен ли vnstat
+            if tools['vnstat']['installed']:
+                _, stdout, _ = client.exec_command('systemctl is-active vnstat 2>/dev/null')
+                vnstat_status = stdout.read().decode('utf-8').strip()
+                tools['vnstat']['running'] = vnstat_status == 'active'
+                if vnstat_status != 'active':
+                    tools['vnstat']['warning'] = 'Установлен, но не запущен'
+                    tools['vnstat']['fix_cmd'] = 'sudo systemctl enable vnstat && sudo systemctl start vnstat'
+            
+            # Проверяем, включен ли UFW
+            if tools['ufw']['installed']:
+                _, stdout, _ = client.exec_command('sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'')
+                ufw_status = stdout.read().decode('utf-8').strip()
+                tools['ufw']['enabled'] = ufw_status.lower() == 'active'
+                if ufw_status.lower() != 'active':
+                    tools['ufw']['warning'] = 'Установлен, но не включен'
+                    tools['ufw']['fix_cmd'] = 'sudo ufw enable'
+            
+            # Подсчитываем статистику
+            total = len(tools)
+            installed = sum(1 for t in tools.values() if t['installed'])
+            missing = [t for t in tools.values() if not t['installed']]
+            warnings = [t for t in tools.values() if t.get('warning')]
+            
+            # Генерируем команду для установки всех недостающих
+            if missing:
+                install_all_cmd = 'sudo apt-get update && ' + ' && '.join([t['install_cmd'] for t in missing])
+            else:
+                install_all_cmd = None
+            
+            return {
+                'total': total,
+                'installed': installed,
+                'missing_count': len(missing),
+                'tools': tools,
+                'missing': missing,
+                'warnings': warnings,
+                'install_all_cmd': install_all_cmd,
+                'all_ok': installed == total and not warnings
+            }
+            
+        except Exception as e:
+            logger.error(f"Error checking tools on {ip}: {str(e)}")
+            return {
+                'total': 0,
+                'installed': 0,
+                'missing_count': 0,
+                'tools': {},
+                'missing': [],
+                'warnings': [],
+                'install_all_cmd': None,
+                'all_ok': False,
+                'error': str(e)
+            }

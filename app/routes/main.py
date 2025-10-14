@@ -1016,6 +1016,32 @@ def server_status(server_id):
         logger.error(f"Error getting server status {server_id}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@main_bp.route('/monitoring/<server_id>')
+@require_auth
+@require_pin
+@log_request
+def monitoring(server_id):
+    """Страница расширенного мониторинга сервера"""
+    try:
+        data_manager = registry.get('data_manager')
+        if not data_manager:
+            flash(_('Сервис данных не инициализирован.'), 'danger')
+            return redirect(url_for('main.index'))
+            
+        servers = data_manager.load_servers(current_app.config)
+        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        
+        if not server:
+            flash(_('Сервер с ID %(server_id)s не найден.', server_id=server_id), 'error')
+            return redirect(url_for('main.index'))
+        
+        return render_template('monitoring.html', server=server)
+        
+    except Exception as e:
+        logger.error(f"Error loading monitoring page for server {server_id}: {str(e)}")
+        flash(_('Ошибка при загрузке страницы мониторинга.'), 'error')
+        return redirect(url_for('main.index'))
+
 @main_bp.route('/uploads/<filename>')
 def uploaded_file(filename):
     """Отдает загруженный файл (иконку сервера)"""
