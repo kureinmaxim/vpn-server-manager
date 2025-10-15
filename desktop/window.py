@@ -44,8 +44,8 @@ class DesktopApp:
                 _WSGI_SERVER = make_server('127.0.0.1', 0, self.app, threaded=True)
                 SERVER_PORT = _WSGI_SERVER.server_port
                 
-                logger.info(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT} (многопоточный)")
-                print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT} (многопоточный)")
+                logger.info(f"[OK] Flask server started on http://127.0.0.1:{SERVER_PORT} (threaded)")
+                print(f"[OK] Flask server started on http://127.0.0.1:{SERVER_PORT} (threaded)")
                 
                 _WSGI_SERVER.serve_forever()
         except Exception as e:
@@ -76,7 +76,7 @@ class DesktopApp:
             
             # Создаем окно pywebview с динамическим URL
             logger.info(f"Creating pywebview window for http://127.0.0.1:{SERVER_PORT}")
-            print(f"🪟 Creating pywebview window for http://127.0.0.1:{SERVER_PORT}")
+            print(f"[WINDOW] Creating pywebview window for http://127.0.0.1:{SERVER_PORT}")
             
             self.window = webview.create_window(
                 'VPN Server Manager - Clean',
@@ -95,18 +95,17 @@ class DesktopApp:
             self.window.events.closing += self.on_closing
             
             logger.info("Starting pywebview...")
-            print("🚀 Starting pywebview...")
+            print("[START] Starting pywebview...")
             
             # Настройки окна
             webview.start(
                 debug=False,
                 http_server=False,
-                private_mode=True,  # Приватный режим - не сохраняет сессии между запусками
-                gui='cocoa'  # Явно указываем Cocoa для macOS
+                private_mode=True  # Приватный режим - не сохраняет сессии между запусками
             )
             
             logger.info("PyWebView closed")
-            print("✅ PyWebview closed")
+            print("[OK] PyWebview closed")
             
         except Exception as e:
             logger.error(f"Error starting desktop app: {str(e)}")

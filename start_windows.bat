@@ -25,6 +25,21 @@ if not exist .env (
     echo.
 )
 
+REM Check if config.json exists
+if not exist config.json (
+    echo [WARNING] config.json file not found!
+    if exist config.json.example (
+        echo Creating from config.json.example...
+        copy config.json.example config.json >nul
+        echo [OK] Config file created
+    ) else (
+        echo [ERROR] config.json.example not found!
+        pause
+        exit /b 1
+    )
+    echo.
+)
+
 REM Activate virtual environment and start application
 echo Starting application in Desktop mode...
 echo.

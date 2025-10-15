@@ -205,18 +205,24 @@
             {% endif %}
         };
         
-        // Обработчик закрытия окна с локализованным подтверждением
-        window.addEventListener('beforeunload', function (e) {
-            // Показываем подтверждение только если есть сессия
-            {% if session.get('pin_authenticated') %}
-                // Стандартное сообщение браузера
-                e.preventDefault();
-                e.returnValue = '{{ _("Вы уверены, что хотите закрыть приложение?") }}';
-                return e.returnValue;
-            {% endif %}
-        });
+        // Обработчик закрытия окна
+        // В desktop режиме (pywebview) НЕ используем beforeunload, так как он вызывает
+        // надоедливые диалоги на Windows. Вместо этого используем нативный API pywebview.
+        if (!window.pywebview) {
+            // Только для веб-браузера (не desktop)
+            window.addEventListener('beforeunload', function (e) {
+                // Показываем подтверждение только если есть сессия
+                {% if session.get('pin_authenticated') %}
+                    // Стандартное сообщение браузера
+                    e.preventDefault();
+                    e.returnValue = '{{ _("Вы уверены, что хотите закрыть приложение?") }}';
+                    return e.returnValue;
+                {% endif %}
+            });
+        }
         
-        // Альтернативный обработчик для pywebview
+        // Обработчик для pywebview (desktop режим)
+        // Это работает корректно и не вызывает лишних диалогов
         if (window.pywebview) {
             window.pywebview.api.on_window_close = function() {
                 return window.confirmClose();
