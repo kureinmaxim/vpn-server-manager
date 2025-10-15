@@ -4,11 +4,11 @@ REM VPN Server Manager v4.0.7
 
 echo ========================================
 echo Проверка подлинности инсталлятора
-echo VPN Server Manager v4.0.8
+echo VPN Server Manager v4.0.9
 echo ========================================
 echo.
 
-set INSTALLER=VPN-Server-Manager-Setup-v4.0.8.exe
+set INSTALLER=VPN-Server-Manager-Setup-v4.0.9.exe
 set CHECKSUM_FILE=checksum.txt
 
 REM Проверяем наличие файлов
