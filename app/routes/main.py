@@ -961,6 +961,8 @@ def change_language(language):
     """Смена языка интерфейса"""
     if language in ['ru', 'en', 'zh']:
         session['language'] = language
+        session.permanent = True  # Сохраняем сессию
+        session.modified = True   # Явно помечаем как измененную
         flash(_('Language changed successfully'), 'success')
     else:
         flash(_('Unsupported language'), 'error')
