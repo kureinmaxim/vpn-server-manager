@@ -1,9 +1,9 @@
 @echo off
 REM Start script for VPN Server Manager on Windows
-REM VPN Server Manager v4.0.5
+REM VPN Server Manager v4.0.9
 
 echo ========================================
-echo VPN Server Manager v4.0.5
+echo VPN Server Manager v4.0.9
 echo ========================================
 echo.
 
