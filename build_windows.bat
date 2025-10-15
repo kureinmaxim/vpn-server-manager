@@ -9,7 +9,7 @@ echo ========================================
 echo.
 
 REM Проверяем версию
-set APP_VERSION=4.0.8
+set APP_VERSION=4.0.9
 echo Building installer for version %APP_VERSION%
 echo.
 
