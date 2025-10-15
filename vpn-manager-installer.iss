@@ -1,5 +1,5 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.0.7
+; Version 4.0.9
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"

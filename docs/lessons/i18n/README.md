@@ -1,5 +1,18 @@
 ### Обзор: локализация (i18n) в VPN Server Manager
 
+⚠️ **ВАЖНО:** После любых изменений в `.po` файлах **ОБЯЗАТЕЛЬНО** компилируйте переводы:
+```bash
+# Windows
+venv\Scripts\activate
+pybabel compile -d translations
+
+# macOS/Linux
+source venv/bin/activate && pybabel compile -d translations
+```
+**Без компиляции переводы НЕ РАБОТАЮТ!** Flask-Babel читает только `.mo` файлы, а не `.po`.
+
+---
+
 В этом разделе собраны практические инструкции по добавлению и поддержке переводов в проекте. Вы можете выбрать любой путь:
 
 - Метод 1: Flask-Babel (ручной, классический, продакшн-надёжный)

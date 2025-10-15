@@ -1,5 +1,5 @@
 # Автоматическая проверка контрольной суммы инсталлятора
-# VPN Server Manager v4.0.7
+# VPN Server Manager v4.0.9
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Проверка подлинности инсталлятора" -ForegroundColor Cyan

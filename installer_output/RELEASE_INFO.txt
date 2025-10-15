@@ -1,281 +1,34 @@
-========================================
-VPN Server Manager v4.0.9 - Release Info
-========================================
+VPN Server Manager v4.0.9 - Release Information
+===============================================
 
-Build Date: 15.10.2025
-Installer: VPN-Server-Manager-Setup-v4.0.9.exe
-Size: 6.4 MB (6,710,106 bytes)
-Build Time: 2.3 seconds
+Installer Details:
+- Filename: VPN-Server-Manager-Setup-v4.0.9.exe
+- Size: 6.34 MB
+- Build Time: 2025-10-15 08:27:07
+- SHA-256: F5E880C27315C3A596757C02D1C8CE1D128E4E974F593B24154087ED2B173D73
 
-========================================
-SHA-256 Checksum
-========================================
+What's New in v4.0.9:
+- ✅ ИСПРАВЛЕНО: Переключение языков теперь работает корректно
+- ✅ Скомпилированы переводы (.mo файлы) для EN и ZH
+- ✅ Исправлена функция get_locale() для правильного чтения языка из сессии
+- ✅ Улучшен роут change_language с явным сохранением сессии
+- ✅ Обновлена документация i18n с критически важной информацией о компиляции
+- ✅ Все версии синхронизированы на 4.0.9
 
-32941E672FEC116DD55B4A66F59F684AB417AE9DF66BDA17B50B60AF32C7956B
-
-Verification command (PowerShell):
-  Get-FileHash "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
-
-Verification command (CMD):
-  certutil -hashfile "VPN-Server-Manager-Setup-v4.0.9.exe" SHA256
-
-========================================
-What's New in v4.0.9
-========================================
-
-CRITICAL FIX - Removed annoying confirmation dialogs on Windows!
-
-Before v4.0.9:
-  ❌ Confirmation dialog appeared when navigating between pages
-  ❌ "Leave site?" dialog on F5 refresh
-  ❌ Confirmation required when closing the app
-
-After v4.0.9:
-  ✅ Smooth navigation without interruptions
-  ✅ F5 refresh works instantly
-  ✅ App closes immediately when clicking X
-  ✅ Much better user experience on Windows desktop mode
-
-Technical Changes:
-  - Modified templates/layout.html:
-    * Disabled 'beforeunload' event for pywebview (desktop mode)
-    * Changed window.confirmClose() to always return true
-    * Kept beforeunload only for web browser mode
-  
-  - Why this happened:
-    * Windows' pywebview triggers confirm() dialogs more aggressively
-    * macOS doesn't have this behavior
-    * The fix ensures cross-platform consistency
-
-  - Compatibility:
-    * ✅ Works perfectly on Windows 10/11
-    * ✅ macOS behavior unchanged
-    * ✅ Web browser mode still protected by beforeunload
-
-========================================
-Previous Changes (v4.0.8)
-========================================
-
-  ✅ Fixed desktop shortcut not appearing by default
-  ✅ Removed outdated "Quick Launch" icon option
-  ✅ Made setup progress visible (removed runhidden flag)
-  ✅ Improved installation feedback with detailed messages
-  ✅ Updated all emojis to text indicators for better Windows compatibility
-  ✅ Removed hardcoded 'gui=cocoa' for cross-platform pywebview
-  ✅ Comprehensive SHA-256 checksum documentation (CHECKSUM_GUIDE.md)
-  ✅ Created automated verification scripts (verify_installer.ps1/bat)
-  ✅ Added TROUBLESHOOTING_WINDOWS.md for common issues
-
-========================================
-System Requirements
-========================================
-
-Operating System:
-  - Windows 10 (64-bit) or newer
-  - Windows 11 (64-bit) recommended
-
-Python:
-  - Python 3.8 or higher
-  - Automatically checked during installation
-
-Disk Space:
-  - Installation: ~15 MB
-  - With dependencies: ~120 MB
-  - Recommended free space: 500 MB
-
-Memory:
-  - Minimum: 2 GB RAM
-  - Recommended: 4 GB RAM or more
-
-========================================
-Installation Steps
-========================================
-
-1. Download files:
-   - VPN-Server-Manager-Setup-v4.0.9.exe
-   - checksum.txt
-   - verify_installer.ps1 (or verify_installer.bat)
-
-2. Verify integrity (recommended):
-   PowerShell:
-     .\verify_installer.ps1
-   
-   Or CMD:
-     verify_installer.bat
-
-3. Run installer:
-   - Double-click VPN-Server-Manager-Setup-v4.0.9.exe
-   - Follow the installation wizard
-   - Check "Create desktop shortcut" (recommended)
-   - Wait 3-5 minutes for dependency installation
-
-4. Launch application:
-   - Desktop: Double-click "VPN Server Manager" shortcut
-   - Start Menu: VPN Server Manager
-   - Manual: Run start_windows.bat in installation folder
-
-========================================
-Files Included in Installer
-========================================
-
-Application Files:
-  ✅ run.py - Main application entry point
-  ✅ generate_key.py - Encryption key generator
-  ✅ app/ - Core application modules
-  ✅ desktop/ - Desktop (pywebview) integration
-  ✅ static/ - CSS, JS, images, fonts
-  ✅ templates/ - HTML templates (with v4.0.9 fix!)
-  ✅ translations/ - i18n support (en, zh)
-  ✅ tests/ - Unit tests
-
-Configuration:
-  ✅ requirements.txt - Python dependencies
-  ✅ env.example - Environment variables template
-  ✅ config.json.example - Configuration template
-  ✅ babel.cfg - Internationalization config
-
-Scripts:
-  ✅ setup_windows.bat - Initial setup script
-  ✅ start_windows.bat - Application launcher
-
-Documentation:
-  ✅ README.md - Main project documentation
-  ✅ README_WINDOWS.md - Windows-specific guide
-  ✅ CHANGELOG.md - Version history
-  ✅ LICENSE - MIT License
-  ✅ SECURITY.md - Security policy
-  ✅ docs/ - Comprehensive documentation
-
-Data:
-  ✅ data/hints.json - UI hints and tips
-
-========================================
-Verification
-========================================
-
-After installation, verify:
-
-1. Check installed version:
-   PowerShell:
-     Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
-       Where-Object { $_.DisplayName -like "*VPN Server Manager*" } | 
-       Select-Object DisplayName, DisplayVersion
-
-   Expected: "VPN Server Manager, версия 4.0.9"
-
-2. Verify files:
-   Check installation directory:
-     C:\Users\<YourUsername>\AppData\Local\Programs\VPN Server Manager\
-
-   Key files:
-     ✅ venv\ - Virtual environment
-     ✅ .env - Encryption key
-     ✅ config.json - Configuration
-     ✅ templates\layout.html - Fixed template
-     ✅ start_windows.bat - Launcher
-
-3. Test functionality:
-   ✅ Launch application
-   ✅ Navigate between pages (NO dialogs should appear!)
-   ✅ Press F5 to refresh (NO "Leave site?" dialog!)
-   ✅ Close app with X button (closes immediately!)
-
-========================================
-Troubleshooting
-========================================
-
-If you experience issues:
-
-1. Installation fails:
-   - Check Python is installed (python --version)
-   - Run as Administrator
-   - Disable antivirus temporarily
-   - See: TROUBLESHOOTING_WINDOWS.md
-
-2. Application doesn't start:
-   - Delete venv folder
-   - Run setup_windows.bat again
-   - Check logs in logs/app.log
-
-3. Confirmation dialogs still appear:
-   - Verify you installed v4.0.9 (not older version)
-   - Uninstall ALL old versions first
-   - Check templates\layout.html is updated
-
-4. Get help:
-   - Read TROUBLESHOOTING_WINDOWS.md
-   - Check README_WINDOWS.md
-   - Create GitHub Issue with logs
-
-========================================
-Documentation
-========================================
-
-Available in installer_output/ and project root:
-
-Core Documentation:
-  - README.md - Main project guide
-  - README_WINDOWS.md - Windows installation & usage
-  - WINDOWS_INSTALLER_GUIDE.md - Detailed installer guide
-  - TROUBLESHOOTING_WINDOWS.md - Problem solving
-  - CHECKSUM_GUIDE.md - SHA-256 verification guide
-  - WINDOWS_BUILD_COMPLETE.md - Complete Windows improvements summary
+Installation:
+1. Run the installer as Administrator
+2. Follow the setup wizard
+3. The application will be installed to:
+   C:\Users\USERNAME\AppData\Local\Programs\VPN Server Manager
 
 Verification:
-  - checksum.txt - Official SHA-256 hash
-  - HOW_TO_VERIFY.txt - Quick verification steps
-  - verify_installer.ps1 - Automated PowerShell verification
-  - verify_installer.bat - Automated CMD verification
+Before installation, verify the SHA-256 checksum:
 
-Build:
-  - RELEASE_INFO.txt - This file
-  - README.md - Installer output summary
+Windows (Command Prompt):
+certutil -hashfile VPN-Server-Manager-Setup-v4.0.9.exe SHA256
 
-========================================
-Support
-========================================
+Windows (PowerShell):
+Get-FileHash -Path "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
 
-GitHub Repository:
-  https://github.com/kureinmaxim/vpn-server-manager
-
-Report Issues:
-  https://github.com/kureinmaxim/vpn-server-manager/issues
-
-Documentation:
-  - Project README.md
-  - Windows Guide: README_WINDOWS.md
-  - Troubleshooting: TROUBLESHOOTING_WINDOWS.md
-
-========================================
-License
-========================================
-
-MIT License
-
-Copyright (c) 2024-2025 Куреин М.Н.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-
-========================================
-
-VPN Server Manager v4.0.9 - Installer built successfully!
-Ready for distribution on Windows 10/11 (64-bit)
-
-Build completed: 15.10.2025
-Builder: Inno Setup 6.5.3
+The checksum should match:
+F5E880C27315C3A596757C02D1C8CE1D128E4E974F593B24154087ED2B173D73

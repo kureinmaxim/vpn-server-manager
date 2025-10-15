@@ -35,28 +35,28 @@ def get_translations_path() -> str:
 
 def get_locale():
     """Определяет язык для текущего запроса."""
+    from flask import session
+    
     # Сначала проверяем параметр в URL
     if request.args.get('lang'):
-        return request.args.get('lang')
+        lang = request.args.get('lang')
+        session['language'] = lang
+        session.permanent = True
+        return lang
     
     # Затем проверяем сохраненный язык в сессии
-    from flask import session
-    if session.get('language'):
+    if 'language' in session:
         return session.get('language')
     
-    # Если язык не установлен в сессии, устанавливаем по умолчанию только один раз
-    if 'language_initialized' not in session:
-        # Автоопределение языка браузера
-        detected_lang = request.accept_languages.best_match(['ru', 'en', 'zh'])
-        if detected_lang:
-            session['language'] = detected_lang
-        else:
-            session['language'] = 'ru'  # По умолчанию русский
-        session['language_initialized'] = True
-        return session['language']
+    # Если язык не установлен, автоопределяем по браузеру
+    detected_lang = request.accept_languages.best_match(['ru', 'en', 'zh'])
+    if detected_lang:
+        session['language'] = detected_lang
+    else:
+        session['language'] = 'ru'  # По умолчанию русский
     
-    # Если язык уже инициализирован, возвращаем русский по умолчанию
-    return 'ru'
+    session.permanent = True
+    return session['language']
 
 def setup_logging(app):
     """Настройка логирования"""
@@ -269,8 +269,9 @@ def create_app(config_name='development'):
     # Настройка сессий
     # SESSION_COOKIE_SECURE должен быть False для локального HTTP-сервера
     app.config['SESSION_COOKIE_SECURE'] = False
-    app.config['SESSION_COOKIE_HTTPONLY'] = True
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+    # Для pywebview на Windows нужно отключить HTTPONLY и SAMESITE
+    app.config['SESSION_COOKIE_HTTPONLY'] = False  # pywebview требует доступ к cookies
+    app.config['SESSION_COOKIE_SAMESITE'] = None  # Иначе не работает в desktop режиме
     # НЕ используем filesystem - сессии хранятся только в cookie и сбрасываются при закрытии
     # app.config['SESSION_TYPE'] = 'filesystem'  # Закомментировано: сохраняет сессии между запусками!
     app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 час (если session.permanent = True)
