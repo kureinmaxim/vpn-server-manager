@@ -3,32 +3,95 @@ VPN Server Manager v4.0.9 - Release Information
 
 Installer Details:
 - Filename: VPN-Server-Manager-Setup-v4.0.9.exe
-- Size: 6.34 MB
-- Build Time: 2025-10-15 08:27:07
-- SHA-256: F5E880C27315C3A596757C02D1C8CE1D128E4E974F593B24154087ED2B173D73
+- Size: 6.34 MB (6,650,135 bytes)
+- Build Date: 2025-10-15
+- SHA-256: B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90
 
 What's New in v4.0.9:
-- ✅ ИСПРАВЛЕНО: Переключение языков теперь работает корректно
-- ✅ Скомпилированы переводы (.mo файлы) для EN и ZH
-- ✅ Исправлена функция get_locale() для правильного чтения языка из сессии
-- ✅ Улучшен роут change_language с явным сохранением сессии
-- ✅ Обновлена документация i18n с критически важной информацией о компиляции
-- ✅ Все версии синхронизированы на 4.0.9
+═══════════════════════════════════════════════════════════════
+
+🔧 Критические исправления мониторинга:
+
+1. ✅ Точный учет сетевого трафика:
+   - ИСПРАВЛЕНО: Мониторинг теперь учитывает ВСЕ сетевые интерфейсы
+   - Поддержка VPN-интерфейсов: tun0, tap0, wg0, ppp0, ipsec0
+   - Автоматическое обнаружение и суммирование трафика
+   - Отображение списка мониторимых интерфейсов в UI
+   - Результат: показываются реальные значения трафика при использовании VPN
+
+2. ✅ UX улучшения:
+   - ИСПРАВЛЕНО: Убраны надоедливые диалоги "Уйти/Остаться"
+   - Свободная навигация между страницами приложения
+   - Защита от случайного закрытия сохранена
+
+3. ✅ Производительность:
+   - Исправлена задержка 40 секунд при открытии мониторинга
+   - Многопоточный режим Flask (threaded=True)
+   - Ускорена проверка установки мониторинга
+   - Мгновенная загрузка страниц
+
+4. ✅ Другие исправления:
+   - Правильная расшифровка SSH паролей
+   - Корректное сохранение PNG скриншотов
+   - Улучшенный индикатор загрузки
+   - Исправлено переключение языков (EN/RU/ZH)
+
+═══════════════════════════════════════════════════════════════
 
 Installation:
-1. Run the installer as Administrator
-2. Follow the setup wizard
-3. The application will be installed to:
-   C:\Users\USERNAME\AppData\Local\Programs\VPN Server Manager
+1. Verify SHA-256 checksum (see below)
+2. Run the installer as Administrator
+3. Follow the setup wizard
+4. The application will be installed to:
+   %LOCALAPPDATA%\Programs\VPN Server Manager
 
 Verification:
-Before installation, verify the SHA-256 checksum:
+═══════════════════════════════════════════════════════════════
+Before installation, ALWAYS verify the SHA-256 checksum:
 
-Windows (Command Prompt):
-certutil -hashfile VPN-Server-Manager-Setup-v4.0.9.exe SHA256
+Windows Command Prompt:
+  certutil -hashfile VPN-Server-Manager-Setup-v4.0.9.exe SHA256
 
-Windows (PowerShell):
-Get-FileHash -Path "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
+Windows PowerShell:
+  Get-FileHash -Path "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
 
-The checksum should match:
-F5E880C27315C3A596757C02D1C8CE1D128E4E974F593B24154087ED2B173D73
+The checksum MUST match:
+B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90
+
+If the checksum does NOT match:
+❌ DO NOT RUN THE INSTALLER
+❌ The file may be corrupted or tampered with
+✅ Download again from official source
+
+═══════════════════════════════════════════════════════════════
+
+System Requirements:
+- Windows 10/11 (64-bit)
+- 200 MB free disk space
+- Python 3.8+ (optional, can be installed by installer)
+- Internet connection for initial setup
+
+Documentation:
+- Full documentation: https://github.com/kureinmaxim/vpn-server-manager
+- User guide: README_WINDOWS.md (included in installation)
+- Troubleshooting: TROUBLESHOOTING_WINDOWS.md
+
+Support:
+- GitHub Issues: https://github.com/kureinmaxim/vpn-server-manager/issues
+- Email: support@example.com
+
+═══════════════════════════════════════════════════════════════
+
+Build Information:
+- Compiler: Inno Setup 6.5.3
+- Build Script: build_windows.ps1
+- Compression: LZMA2/Max with Solid Compression
+- Non-commercial use only
+
+═══════════════════════════════════════════════════════════════
+
+License: MIT License
+Copyright (c) 2025 Kurein M.N.
+
+This software is provided "as is", without warranty of any kind.
+See LICENSE file for full terms.

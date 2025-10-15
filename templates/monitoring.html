@@ -151,6 +151,9 @@
     <div class="network-traffic card mb-4">
         <div class="card-body">
             <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
+            <div class="mb-2" style="font-size: 0.85rem; color: #6c757d;">
+                <span id="monitored-interfaces">🔍 {{ _('Мониторинг всех сетевых интерфейсов') }}</span>
+            </div>
             <div class="traffic-stats">
                 <div class="stat">
                     <span class="label">↓ {{ _('Загрузка:') }}</span>
@@ -363,6 +366,16 @@ async function updateNetworkStats() {
             
             document.getElementById('daily-rx').textContent = stats.daily.download;
             document.getElementById('daily-tx').textContent = stats.daily.upload;
+            
+            // Отображаем список мониторимых интерфейсов
+            if (stats.interfaces && stats.interfaces.length > 0) {
+                const interfacesList = stats.interfaces.join(', ');
+                document.getElementById('monitored-interfaces').innerHTML = 
+                    `🔍 Мониторинг: <strong>${interfacesList}</strong> (${stats.interfaces.length} интерфейс${stats.interfaces.length > 1 ? 'ов' : ''})`;
+            } else if (stats.interface) {
+                document.getElementById('monitored-interfaces').textContent = 
+                    `🔍 Мониторинг: ${stats.interface}`;
+            }
         } else {
             handleError(data.error || 'Failed to load network stats', 'NetworkStats');
         }
