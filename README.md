@@ -119,6 +119,7 @@
 ### Сборка и распространение
 
 - **[Windows Build Complete](WINDOWS_BUILD_COMPLETE.md)** - Финальная сводка всех улучшений для Windows
+- **[Troubleshooting & Fixes Windows](TROUBLESHOOTING_WINDOWS.md)** - Полное руководство: решение проблем и исправления v4.0.9
 - [Windows Complete Guide](WINDOWS_COMPLETE_GUIDE.md) - Полное руководство по Windows (запуск + инсталлятор)
 - [Windows Installer Guide](WINDOWS_INSTALLER_GUIDE.md) - Детальное руководство по созданию Windows инсталлятора
 - [Checksum Guide](CHECKSUM_GUIDE.md) - Руководство по проверке контрольных сумм SHA-256

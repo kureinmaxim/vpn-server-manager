@@ -1,6 +1,6 @@
 @echo off
 REM Setup script for VPN Server Manager on Windows
-REM VPN Server Manager v4.0.8
+REM VPN Server Manager v4.0.9
 
 echo ========================================
 echo VPN Server Manager - Windows Setup
@@ -23,7 +23,17 @@ if errorlevel 1 (
 )
 
 echo [1/4] Creating virtual environment...
-if not exist venv (
+REM Check if venv exists AND is valid (has activate.bat)
+if exist venv\Scripts\activate.bat (
+    echo [INFO] Virtual environment already exists
+) else (
+    REM Remove broken venv folder if it exists
+    if exist venv (
+        echo [INFO] Removing broken virtual environment...
+        rmdir /s /q venv
+    )
+    
+    echo [INFO] Creating new virtual environment...
     python -m venv venv
     if errorlevel 1 (
         echo [ERROR] Failed to create virtual environment
@@ -31,8 +41,6 @@ if not exist venv (
         exit /b 1
     )
     echo [OK] Virtual environment created
-) else (
-    echo [INFO] Virtual environment already exists
 )
 echo.
 
@@ -40,6 +48,7 @@ echo [2/4] Activating virtual environment...
 call venv\Scripts\activate.bat
 if errorlevel 1 (
     echo [ERROR] Failed to activate virtual environment
+    echo [INFO] Try deleting the venv folder and run this script again
     pause
     exit /b 1
 )
