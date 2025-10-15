@@ -18,13 +18,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 def cleanup():
     """Очистка ресурсов при остановке приложения"""
     logger = logging.getLogger(__name__)
-    logger.info("🧹 Cleaning up SSH connections...")
+    logger.info("[CLEANUP] Cleaning up SSH connections...")
     try:
         from app.services.ssh_service import SSHService
         SSHService.close_all()
-        logger.info("✅ SSH connections closed")
+        logger.info("[OK] SSH connections closed")
     except Exception as e:
-        logger.warning(f"⚠️ Error during cleanup: {e}")
+        logger.warning(f"[WARNING] Error during cleanup: {e}")
 
 def find_free_port(start_port=5000, max_attempts=100):
     """Находит свободный порт, начиная с start_port"""
@@ -87,10 +87,10 @@ def main():
             version = app.config.get('app_info', {}).get('version', 'N/A')
             
             logger.info(f"Starting web server on {host}:{port}")
-            print(f"\n🌐 VPN Server Manager v{version}")
-            print(f"📡 Web server: http://{host}:{port}")
-            print(f"🔧 Mode: {'Development' if debug else 'Production'}")
-            print(f"⏹️  Press Ctrl+C to stop\n")
+            print(f"\n[INFO] VPN Server Manager v{version}")
+            print(f"[WEB] Web server: http://{host}:{port}")
+            print(f"[MODE] Mode: {'Development' if debug else 'Production'}")
+            print(f"[INFO] Press Ctrl+C to stop\n")
             
             # threaded=True позволяет обрабатывать несколько запросов одновременно
             # Это критично важно для SSH операций с долгими таймаутами
