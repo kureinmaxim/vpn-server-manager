@@ -196,18 +196,9 @@
         
         document.addEventListener('DOMContentLoaded', initializeNavigation);
         
-        // Глобальная функция для подтверждения закрытия с локализацией
-        window.confirmClose = function() {
-            {% if session.get('pin_authenticated') %}
-                return confirm('{{ _("Вы уверены, что хотите закрыть приложение?") }}');
-            {% else %}
-                return true;
-            {% endif %}
-        };
-        
         // Обработчик закрытия окна
-        // В desktop режиме (pywebview) НЕ используем beforeunload, так как он вызывает
-        // надоедливые диалоги на Windows. Вместо этого используем нативный API pywebview.
+        // В desktop режиме (pywebview) полностью отключаем ВСЕ обработчики!
+        // Это единственный способ избежать надоедливых диалогов на Windows.
         if (!window.pywebview) {
             // Только для веб-браузера (не desktop)
             window.addEventListener('beforeunload', function (e) {
@@ -221,13 +212,9 @@
             });
         }
         
-        // Обработчик для pywebview (desktop режим)
-        // Это работает корректно и не вызывает лишних диалогов
-        if (window.pywebview) {
-            window.pywebview.api.on_window_close = function() {
-                return window.confirmClose();
-            };
-        }
+        // ДЛЯ PYWEBVIEW НЕ УСТАНАВЛИВАЕМ НИКАКИХ ОБРАБОТЧИКОВ!
+        // Любые обработчики (даже возвращающие true) вызывают системные диалоги на Windows.
+        // Пусть окно закрывается нативно через системные механизмы.
 
         function getCookie(name) {
             const value = `; ${document.cookie}`;

@@ -3,11 +3,11 @@
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Проверка подлинности инсталлятора" -ForegroundColor Cyan
-Write-Host "VPN Server Manager v4.0.8" -ForegroundColor Cyan
+Write-Host "VPN Server Manager v4.0.9" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$InstallerFile = "VPN-Server-Manager-Setup-v4.0.8.exe"
+$InstallerFile = "VPN-Server-Manager-Setup-v4.0.9.exe"
 $ChecksumFile = "checksum.txt"
 
 # Проверяем наличие файлов

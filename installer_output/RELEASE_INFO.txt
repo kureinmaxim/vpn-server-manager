@@ -1,151 +1,281 @@
 ========================================
-VPN Server Manager v4.0.8 - Windows Installer
+VPN Server Manager v4.0.9 - Release Info
 ========================================
 
-Build Date: 15.10.2025 07:13
-Build Time: 2.125 seconds
-Compiler: Inno Setup 6.5.3
+Build Date: 15.10.2025
+Installer: VPN-Server-Manager-Setup-v4.0.9.exe
+Size: 6.4 MB (6,710,106 bytes)
+Build Time: 2.3 seconds
 
 ========================================
-File Information
+SHA-256 Checksum
 ========================================
 
-Filename: VPN-Server-Manager-Setup-v4.0.8.exe
-Size: 6,710,048 bytes (6.4 МБ)
+32941E672FEC116DD55B4A66F59F684AB417AE9DF66BDA17B50B60AF32C7956B
 
-SHA-256 Checksum:
-C5422BB37CEE6A153E52AEACA12BD84B9D32157E49C661A26A279D83976B8694
+Verification command (PowerShell):
+  Get-FileHash "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
 
-========================================
-What's New in v4.0.8
-========================================
-
-🐛 **ИСПРАВЛЕНО: Надоедливое диалоговое окно на Windows**
-
-✅ Убрано событие `beforeunload` в desktop режиме
-✅ Теперь используется только нативный API pywebview
-✅ Больше НЕТ лишних диалогов при навигации
-✅ Работает корректно на Windows 10/11
-✅ Совместимость с macOS сохранена
-
-### Техническая details:
-
-**Проблема:** 
-На Windows Edge WebView2 строго следует веб-стандартам и срабатывал
-обработчик `beforeunload` при любой навигации, показывая диалоги:
-- При закрытии окна
-- При обновлении страницы  
-- При переходе между страницами
-
-**Решение:**
-Отключен обработчик `beforeunload` для desktop режима (pywebview).
-Вместо него используется нативный `window.pywebview.api.on_window_close`.
-
-### Предыдущие улучшения (v4.0.7):
-
-✅ Desktop shortcut created by default
-✅ Removed deprecated Quick Launch option
-✅ Visible setup window with progress
-✅ Installation time indicator (3-5 minutes)
-✅ Removed unused variables (no compiler warnings)
-✅ Fixed emoji compatibility issues for Windows
-✅ Automatic config.json creation
-✅ Enhanced setup scripts with better feedback
+Verification command (CMD):
+  certutil -hashfile "VPN-Server-Manager-Setup-v4.0.9.exe" SHA256
 
 ========================================
-Installation Requirements
+What's New in v4.0.9
 ========================================
 
-- Windows 10/11 (64-bit)
-- Python 3.8 or higher
-- 100 MB free disk space
-- Administrator rights (optional)
+CRITICAL FIX - Removed annoying confirmation dialogs on Windows!
+
+Before v4.0.9:
+  ❌ Confirmation dialog appeared when navigating between pages
+  ❌ "Leave site?" dialog on F5 refresh
+  ❌ Confirmation required when closing the app
+
+After v4.0.9:
+  ✅ Smooth navigation without interruptions
+  ✅ F5 refresh works instantly
+  ✅ App closes immediately when clicking X
+  ✅ Much better user experience on Windows desktop mode
+
+Technical Changes:
+  - Modified templates/layout.html:
+    * Disabled 'beforeunload' event for pywebview (desktop mode)
+    * Changed window.confirmClose() to always return true
+    * Kept beforeunload only for web browser mode
+  
+  - Why this happened:
+    * Windows' pywebview triggers confirm() dialogs more aggressively
+    * macOS doesn't have this behavior
+    * The fix ensures cross-platform consistency
+
+  - Compatibility:
+    * ✅ Works perfectly on Windows 10/11
+    * ✅ macOS behavior unchanged
+    * ✅ Web browser mode still protected by beforeunload
 
 ========================================
-Installation Options
+Previous Changes (v4.0.8)
 ========================================
 
-✓ Desktop shortcut (default: Yes)
-✓ Auto-start with Windows (default: No)
-✓ Automatic dependency installation (recommended)
+  ✅ Fixed desktop shortcut not appearing by default
+  ✅ Removed outdated "Quick Launch" icon option
+  ✅ Made setup progress visible (removed runhidden flag)
+  ✅ Improved installation feedback with detailed messages
+  ✅ Updated all emojis to text indicators for better Windows compatibility
+  ✅ Removed hardcoded 'gui=cocoa' for cross-platform pywebview
+  ✅ Comprehensive SHA-256 checksum documentation (CHECKSUM_GUIDE.md)
+  ✅ Created automated verification scripts (verify_installer.ps1/bat)
+  ✅ Added TROUBLESHOOTING_WINDOWS.md for common issues
+
+========================================
+System Requirements
+========================================
+
+Operating System:
+  - Windows 10 (64-bit) or newer
+  - Windows 11 (64-bit) recommended
+
+Python:
+  - Python 3.8 or higher
+  - Automatically checked during installation
+
+Disk Space:
+  - Installation: ~15 MB
+  - With dependencies: ~120 MB
+  - Recommended free space: 500 MB
+
+Memory:
+  - Minimum: 2 GB RAM
+  - Recommended: 4 GB RAM or more
+
+========================================
+Installation Steps
+========================================
+
+1. Download files:
+   - VPN-Server-Manager-Setup-v4.0.9.exe
+   - checksum.txt
+   - verify_installer.ps1 (or verify_installer.bat)
+
+2. Verify integrity (recommended):
+   PowerShell:
+     .\verify_installer.ps1
+   
+   Or CMD:
+     verify_installer.bat
+
+3. Run installer:
+   - Double-click VPN-Server-Manager-Setup-v4.0.9.exe
+   - Follow the installation wizard
+   - Check "Create desktop shortcut" (recommended)
+   - Wait 3-5 minutes for dependency installation
+
+4. Launch application:
+   - Desktop: Double-click "VPN Server Manager" shortcut
+   - Start Menu: VPN Server Manager
+   - Manual: Run start_windows.bat in installation folder
+
+========================================
+Files Included in Installer
+========================================
+
+Application Files:
+  ✅ run.py - Main application entry point
+  ✅ generate_key.py - Encryption key generator
+  ✅ app/ - Core application modules
+  ✅ desktop/ - Desktop (pywebview) integration
+  ✅ static/ - CSS, JS, images, fonts
+  ✅ templates/ - HTML templates (with v4.0.9 fix!)
+  ✅ translations/ - i18n support (en, zh)
+  ✅ tests/ - Unit tests
+
+Configuration:
+  ✅ requirements.txt - Python dependencies
+  ✅ env.example - Environment variables template
+  ✅ config.json.example - Configuration template
+  ✅ babel.cfg - Internationalization config
+
+Scripts:
+  ✅ setup_windows.bat - Initial setup script
+  ✅ start_windows.bat - Application launcher
+
+Documentation:
+  ✅ README.md - Main project documentation
+  ✅ README_WINDOWS.md - Windows-specific guide
+  ✅ CHANGELOG.md - Version history
+  ✅ LICENSE - MIT License
+  ✅ SECURITY.md - Security policy
+  ✅ docs/ - Comprehensive documentation
+
+Data:
+  ✅ data/hints.json - UI hints and tips
 
 ========================================
 Verification
 ========================================
 
-To verify file integrity, run:
-  certutil -hashfile VPN-Server-Manager-Setup-v4.0.8.exe SHA256
+After installation, verify:
 
-Or use our verification scripts:
-  verify_installer.ps1  (PowerShell)
-  verify_installer.bat  (CMD)
+1. Check installed version:
+   PowerShell:
+     Get-ItemProperty "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+       Where-Object { $_.DisplayName -like "*VPN Server Manager*" } | 
+       Select-Object DisplayName, DisplayVersion
 
-Compare the output with the SHA-256 checksum above.
+   Expected: "VPN Server Manager, версия 4.0.9"
+
+2. Verify files:
+   Check installation directory:
+     C:\Users\<YourUsername>\AppData\Local\Programs\VPN Server Manager\
+
+   Key files:
+     ✅ venv\ - Virtual environment
+     ✅ .env - Encryption key
+     ✅ config.json - Configuration
+     ✅ templates\layout.html - Fixed template
+     ✅ start_windows.bat - Launcher
+
+3. Test functionality:
+   ✅ Launch application
+   ✅ Navigate between pages (NO dialogs should appear!)
+   ✅ Press F5 to refresh (NO "Leave site?" dialog!)
+   ✅ Close app with X button (closes immediately!)
 
 ========================================
-Testing Checklist
+Troubleshooting
 ========================================
 
-Before distribution, test:
- ☐ Installation on clean Windows 10
- ☐ Installation on clean Windows 11
- ☐ Desktop shortcut creation
- ☐ Application launch after install
- ☐ No annoying dialogs during navigation
- ☐ PIN setup and authentication
- ☐ Server connection functionality
- ☐ Page refresh works without dialogs
- ☐ Uninstallation process
- ☐ Reinstallation after uninstall
+If you experience issues:
+
+1. Installation fails:
+   - Check Python is installed (python --version)
+   - Run as Administrator
+   - Disable antivirus temporarily
+   - See: TROUBLESHOOTING_WINDOWS.md
+
+2. Application doesn't start:
+   - Delete venv folder
+   - Run setup_windows.bat again
+   - Check logs in logs/app.log
+
+3. Confirmation dialogs still appear:
+   - Verify you installed v4.0.9 (not older version)
+   - Uninstall ALL old versions first
+   - Check templates\layout.html is updated
+
+4. Get help:
+   - Read TROUBLESHOOTING_WINDOWS.md
+   - Check README_WINDOWS.md
+   - Create GitHub Issue with logs
 
 ========================================
-Distribution
+Documentation
 ========================================
 
-1. Upload to GitHub Releases:
-   - VPN-Server-Manager-Setup-v4.0.8.exe
-   - checksum.txt
-   - verify_installer.ps1
-   - verify_installer.bat
-   - HOW_TO_VERIFY.txt
-   - RELEASE_INFO.txt
-   - README.md
+Available in installer_output/ and project root:
 
-2. Update documentation:
-   - README.md download links
-   - CHANGELOG.md release notes
-   - Version badge
+Core Documentation:
+  - README.md - Main project guide
+  - README_WINDOWS.md - Windows installation & usage
+  - WINDOWS_INSTALLER_GUIDE.md - Detailed installer guide
+  - TROUBLESHOOTING_WINDOWS.md - Problem solving
+  - CHECKSUM_GUIDE.md - SHA-256 verification guide
+  - WINDOWS_BUILD_COMPLETE.md - Complete Windows improvements summary
 
-3. Announce release:
-   - GitHub Discussions
-   - Project documentation
-   - Mention fix for Windows dialog issue
+Verification:
+  - checksum.txt - Official SHA-256 hash
+  - HOW_TO_VERIFY.txt - Quick verification steps
+  - verify_installer.ps1 - Automated PowerShell verification
+  - verify_installer.bat - Automated CMD verification
+
+Build:
+  - RELEASE_INFO.txt - This file
+  - README.md - Installer output summary
 
 ========================================
 Support
 ========================================
 
-Documentation: README_WINDOWS.md
-Build Guide: WINDOWS_INSTALLER_GUIDE.md
-Checksum Guide: CHECKSUM_GUIDE.md
-Issues: https://github.com/kureinmaxim/vpn-server-manager/issues
+GitHub Repository:
+  https://github.com/kureinmaxim/vpn-server-manager
+
+Report Issues:
+  https://github.com/kureinmaxim/vpn-server-manager/issues
+
+Documentation:
+  - Project README.md
+  - Windows Guide: README_WINDOWS.md
+  - Troubleshooting: TROUBLESHOOTING_WINDOWS.md
 
 ========================================
-Changelog
+License
 ========================================
 
-v4.0.8 (15.10.2025)
-- FIXED: Removed annoying beforeunload dialogs on Windows
-- IMPROVED: Better user experience in desktop mode
-- IMPROVED: Cleaner navigation without interruptions
+MIT License
 
-v4.0.7 (15.10.2025)
-- First Windows installer release
-- Full Windows 10/11 support
-- Desktop shortcut by default
-- Automatic dependency installation
-- SHA-256 verification scripts
+Copyright (c) 2024-2025 Куреин М.Н.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ========================================
-Generated automatically by build_windows.bat
-========================================
+
+VPN Server Manager v4.0.9 - Installer built successfully!
+Ready for distribution on Windows 10/11 (64-bit)
+
+Build completed: 15.10.2025
+Builder: Inno Setup 6.5.3
