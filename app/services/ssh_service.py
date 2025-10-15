@@ -453,46 +453,74 @@ class SSHService:
         return self.client is not None and self.client.get_transport() is not None
     
     def get_network_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
-        """Получение статистики сетевого трафика"""
+        """Получение статистики сетевого трафика (суммарно со всех интерфейсов)"""
         import time
         
         try:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password)
             
-            # Определяем основной сетевой интерфейс
-            _, stdout, _ = client.exec_command("ip route | grep default | awk '{print $5}' | head -1")
-            interface = stdout.read().decode('utf-8').strip() or 'eth0'
+            # Получаем список всех активных сетевых интерфейсов (кроме lo - loopback)
+            # Включаем физические (eth0, ens3) и виртуальные VPN-интерфейсы (tun0, wg0, tap0)
+            _, stdout, _ = client.exec_command(
+                "ls /sys/class/net/ | grep -v '^lo$' | grep -E '^(eth|ens|eno|enp|wlan|wlp|tun|tap|wg|ppp|ipsec)'"
+            )
+            interfaces = stdout.read().decode('utf-8').strip().split('\n')
+            interfaces = [i.strip() for i in interfaces if i.strip()]
             
-            # Получаем начальные значения
-            _, stdout, _ = client.exec_command(f"cat /sys/class/net/{interface}/statistics/rx_bytes /sys/class/net/{interface}/statistics/tx_bytes")
-            initial = stdout.read().decode('utf-8').strip().split('\n')
-            if len(initial) < 2:
-                raise ValueError("Could not read network statistics")
+            if not interfaces:
+                # Fallback на eth0, если ничего не найдено
+                interfaces = ['eth0']
             
-            rx1 = int(initial[0])
-            tx1 = int(initial[1])
+            logger.info(f"Monitoring network traffic on interfaces: {', '.join(interfaces)}")
+            
+            # Получаем начальные значения для всех интерфейсов
+            total_rx1 = 0
+            total_tx1 = 0
+            
+            for iface in interfaces:
+                try:
+                    _, stdout, _ = client.exec_command(
+                        f"cat /sys/class/net/{iface}/statistics/rx_bytes /sys/class/net/{iface}/statistics/tx_bytes 2>/dev/null"
+                    )
+                    data = stdout.read().decode('utf-8').strip().split('\n')
+                    if len(data) >= 2:
+                        total_rx1 += int(data[0])
+                        total_tx1 += int(data[1])
+                except:
+                    # Пропускаем интерфейсы, которые не удалось прочитать
+                    continue
+            
             time1 = time.time()
             
             # Ждем 1 секунду
             time.sleep(1)
             
-            # Получаем конечные значения
-            _, stdout, _ = client.exec_command(f"cat /sys/class/net/{interface}/statistics/rx_bytes /sys/class/net/{interface}/statistics/tx_bytes")
-            final = stdout.read().decode('utf-8').strip().split('\n')
-            if len(final) < 2:
-                raise ValueError("Could not read network statistics")
+            # Получаем конечные значения для всех интерфейсов
+            total_rx2 = 0
+            total_tx2 = 0
             
-            rx2 = int(final[0])
-            tx2 = int(final[1])
+            for iface in interfaces:
+                try:
+                    _, stdout, _ = client.exec_command(
+                        f"cat /sys/class/net/{iface}/statistics/rx_bytes /sys/class/net/{iface}/statistics/tx_bytes 2>/dev/null"
+                    )
+                    data = stdout.read().decode('utf-8').strip().split('\n')
+                    if len(data) >= 2:
+                        total_rx2 += int(data[0])
+                        total_tx2 += int(data[1])
+                except:
+                    continue
+            
             time2 = time.time()
             
             # Вычисляем скорость
             time_diff = time2 - time1
-            rx_speed = (rx2 - rx1) / time_diff / 1048576  # MB/s
-            tx_speed = (tx2 - tx1) / time_diff / 1048576  # MB/s
+            rx_speed = (total_rx2 - total_rx1) / time_diff / 1048576  # MB/s
+            tx_speed = (total_tx2 - total_tx1) / time_diff / 1048576  # MB/s
             
             # Получаем суточную статистику (если vnstat установлен)
+            # Для vnstat используем основной интерфейс или сумму всех
             _, stdout, _ = client.exec_command('which vnstat')
             has_vnstat = bool(stdout.read().decode('utf-8').strip())
             
@@ -500,18 +528,60 @@ class SSHService:
             daily_tx = "N/A"
             if has_vnstat:
                 try:
-                    _, stdout, _ = client.exec_command(f'vnstat -i {interface} --oneline 2>/dev/null')
-                    vnstat_output = stdout.read().decode('utf-8').strip()
-                    if vnstat_output:
-                        parts = vnstat_output.split(';')
-                        if len(parts) > 5:
-                            daily_rx = parts[3].strip()
-                            daily_tx = parts[4].strip()
-                except:
+                    # Пытаемся получить суммарную статистику за 24 часа
+                    # vnstat может показывать общую статистику через --json (если поддерживается)
+                    _, stdout, _ = client.exec_command('vnstat --json 2>/dev/null')
+                    vnstat_json = stdout.read().decode('utf-8').strip()
+                    
+                    if vnstat_json:
+                        # Если есть JSON поддержка - парсим её
+                        import json
+                        try:
+                            vnstat_data = json.loads(vnstat_json)
+                            # Суммируем трафик за сегодня по всем интерфейсам
+                            total_rx_bytes = 0
+                            total_tx_bytes = 0
+                            
+                            for iface_data in vnstat_data.get('interfaces', []):
+                                traffic = iface_data.get('traffic', {})
+                                days = traffic.get('day', [])
+                                if days:
+                                    # Берем последний день (сегодня)
+                                    today = days[-1]
+                                    total_rx_bytes += today.get('rx', 0)
+                                    total_tx_bytes += today.get('tx', 0)
+                            
+                            # Конвертируем в удобные единицы
+                            if total_rx_bytes >= 1073741824:  # >= 1 GiB
+                                daily_rx = f"{total_rx_bytes / 1073741824:.2f} GiB"
+                            else:
+                                daily_rx = f"{total_rx_bytes / 1048576:.2f} MiB"
+                            
+                            if total_tx_bytes >= 1073741824:  # >= 1 GiB
+                                daily_tx = f"{total_tx_bytes / 1073741824:.2f} GiB"
+                            else:
+                                daily_tx = f"{total_tx_bytes / 1048576:.2f} MiB"
+                                
+                        except (json.JSONDecodeError, KeyError):
+                            pass
+                    
+                    # Если JSON не сработал, пробуем старый формат для основного интерфейса
+                    if daily_rx == "N/A":
+                        main_interface = interfaces[0] if interfaces else 'eth0'
+                        _, stdout, _ = client.exec_command(f'vnstat -i {main_interface} --oneline 2>/dev/null')
+                        vnstat_output = stdout.read().decode('utf-8').strip()
+                        if vnstat_output:
+                            parts = vnstat_output.split(';')
+                            if len(parts) > 5:
+                                daily_rx = parts[3].strip()
+                                daily_tx = parts[4].strip()
+                except Exception as e:
+                    logger.debug(f"Could not get vnstat data: {e}")
                     pass
             
             return {
-                'interface': interface,
+                'interface': f"all ({len(interfaces)} interfaces)",
+                'interfaces': interfaces,
                 'current': {
                     'download': f"{rx_speed:.2f}",
                     'upload': f"{tx_speed:.2f}",
