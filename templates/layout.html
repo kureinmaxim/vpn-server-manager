@@ -199,10 +199,39 @@
         // Обработчик закрытия окна
         // В desktop режиме (pywebview) полностью отключаем ВСЕ обработчики!
         // Это единственный способ избежать надоедливых диалогов на Windows.
+        
+        // Флаг для отслеживания внутренних переходов
+        let isInternalNavigation = false;
+        
         if (!window.pywebview) {
+            // Отслеживаем клики по внутренним ссылкам
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href) {
+                    // Проверяем, является ли ссылка внутренней (на тот же домен)
+                    try {
+                        const linkUrl = new URL(link.href);
+                        const currentUrl = new URL(window.location.href);
+                        if (linkUrl.origin === currentUrl.origin) {
+                            // Это внутренняя ссылка - не показываем предупреждение
+                            isInternalNavigation = true;
+                        }
+                    } catch (e) {
+                        // Если не удалось распарсить URL, считаем внутренней
+                        isInternalNavigation = true;
+                    }
+                }
+            });
+            
             // Только для веб-браузера (не desktop)
             window.addEventListener('beforeunload', function (e) {
-                // Показываем подтверждение только если есть сессия
+                // НЕ показываем предупреждение при переходах внутри приложения
+                if (isInternalNavigation) {
+                    isInternalNavigation = false; // Сбрасываем флаг
+                    return; // Не показываем предупреждение
+                }
+                
+                // Показываем подтверждение только при закрытии вкладки/браузера
                 {% if session.get('pin_authenticated') %}
                     // Стандартное сообщение браузера
                     e.preventDefault();
