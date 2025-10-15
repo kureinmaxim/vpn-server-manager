@@ -1,9 +1,9 @@
 # VPN Server Manager - Windows Installer Builder (PowerShell)
-# Version 4.0.7
+# Version 4.0.9
 
 # Настройки
 $ErrorActionPreference = "Stop"
-$AppVersion = "4.0.7"
+$AppVersion = "4.0.9"
 $IsccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 
 # Цвета для вывода
