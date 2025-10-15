@@ -3,7 +3,7 @@
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.0.8"
+#define MyAppVersion "4.0.9"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"

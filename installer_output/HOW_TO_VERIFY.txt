@@ -25,7 +25,7 @@
 
 3. Выполните команду:
    
-   Get-FileHash "VPN-Server-Manager-Setup-v4.0.8.exe" -Algorithm SHA256
+   Get-FileHash "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
 
 4. Сравните результат с checksum.txt
 
@@ -36,7 +36,7 @@
 Скопируйте и вставьте в PowerShell:
 
 $Expected = Get-Content "checksum.txt" -Raw | ForEach-Object {$_.Trim()}
-$Actual = (Get-FileHash "VPN-Server-Manager-Setup-v4.0.8.exe" -Algorithm SHA256).Hash
+$Actual = (Get-FileHash "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256).Hash
 if ($Expected -eq $Actual) {
     Write-Host "OK: Файл подлинный!" -ForegroundColor Green
 } else {
@@ -55,7 +55,7 @@ if ($Expected -eq $Actual) {
 
 3. Выполните:
    
-   certutil -hashfile "VPN-Server-Manager-Setup-v4.0.8.exe" SHA256
+   certutil -hashfile "VPN-Server-Manager-Setup-v4.0.9.exe" SHA256
 
 4. Сравните с checksum.txt
 
