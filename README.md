@@ -116,6 +116,14 @@
 - [Инструменты резервного копирования](docs/project_info/BACKUP_TOOLS.md)
 - [Управление ключами шифрования](docs/project_info/SECRET_KEY.md)
 
+### Сборка и распространение
+
+- **[Windows Build Complete](WINDOWS_BUILD_COMPLETE.md)** - Финальная сводка всех улучшений для Windows
+- [Windows Complete Guide](WINDOWS_COMPLETE_GUIDE.md) - Полное руководство по Windows (запуск + инсталлятор)
+- [Windows Installer Guide](WINDOWS_INSTALLER_GUIDE.md) - Детальное руководство по созданию Windows инсталлятора
+- [Checksum Guide](CHECKSUM_GUIDE.md) - Руководство по проверке контрольных сумм SHA-256
+- [Инструкция по сборке для macOS](docs/project_info/BUILD.md)
+
 ### Учебные материалы
 
 - [Уроки по GitHub](docs/lessons/github_tutorials/)
@@ -136,12 +144,14 @@
 Для пользователей Windows доступны готовые скрипты:
 
 ```cmd
-# Автоматическая установка (создание venv, установка зависимостей, генерация ключа)
+# Автоматическая установка (создание venv, установка зависимостей, генерация ключа, config.json)
 setup_windows.bat
 
 # Запуск приложения
 start_windows.bat
 ```
+
+> **Примечание:** Скрипты автоматически создают все необходимые файлы, включая `.env` и `config.json`
 
 ### Ручная установка
 
@@ -203,7 +213,21 @@ start_windows.bat
    - Сгенерирует и установит безопасный `SECRET_KEY`
    - Сохранит все остальные настройки из `env.example`
 
-5. (Опционально) Настройте дополнительные параметры в `.env`:
+5. Создайте файл конфигурации:
+
+   **macOS/Linux:**
+   ```bash
+   cp config.json.example config.json
+   ```
+   
+   **Windows:**
+   ```cmd
+   copy config.json.example config.json
+   ```
+   
+   Этот файл содержит настройки приложения, включая PIN-код (по умолчанию `1234`), версию и другие параметры.
+
+6. (Опционально) Настройте дополнительные параметры в `.env`:
 
    **macOS/Linux:**
    ```bash
@@ -217,7 +241,7 @@ start_windows.bat
    notepad .env
    ```
 
-6. Запустите приложение:
+7. Запустите приложение:
 
    **macOS/Linux:**
    ```bash

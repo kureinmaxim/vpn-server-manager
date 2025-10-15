@@ -1,0 +1,151 @@
+========================================
+VPN Server Manager v4.0.8 - Windows Installer
+========================================
+
+Build Date: 15.10.2025 07:13
+Build Time: 2.125 seconds
+Compiler: Inno Setup 6.5.3
+
+========================================
+File Information
+========================================
+
+Filename: VPN-Server-Manager-Setup-v4.0.8.exe
+Size: 6,710,048 bytes (6.4 МБ)
+
+SHA-256 Checksum:
+C5422BB37CEE6A153E52AEACA12BD84B9D32157E49C661A26A279D83976B8694
+
+========================================
+What's New in v4.0.8
+========================================
+
+🐛 **ИСПРАВЛЕНО: Надоедливое диалоговое окно на Windows**
+
+✅ Убрано событие `beforeunload` в desktop режиме
+✅ Теперь используется только нативный API pywebview
+✅ Больше НЕТ лишних диалогов при навигации
+✅ Работает корректно на Windows 10/11
+✅ Совместимость с macOS сохранена
+
+### Техническая details:
+
+**Проблема:** 
+На Windows Edge WebView2 строго следует веб-стандартам и срабатывал
+обработчик `beforeunload` при любой навигации, показывая диалоги:
+- При закрытии окна
+- При обновлении страницы  
+- При переходе между страницами
+
+**Решение:**
+Отключен обработчик `beforeunload` для desktop режима (pywebview).
+Вместо него используется нативный `window.pywebview.api.on_window_close`.
+
+### Предыдущие улучшения (v4.0.7):
+
+✅ Desktop shortcut created by default
+✅ Removed deprecated Quick Launch option
+✅ Visible setup window with progress
+✅ Installation time indicator (3-5 minutes)
+✅ Removed unused variables (no compiler warnings)
+✅ Fixed emoji compatibility issues for Windows
+✅ Automatic config.json creation
+✅ Enhanced setup scripts with better feedback
+
+========================================
+Installation Requirements
+========================================
+
+- Windows 10/11 (64-bit)
+- Python 3.8 or higher
+- 100 MB free disk space
+- Administrator rights (optional)
+
+========================================
+Installation Options
+========================================
+
+✓ Desktop shortcut (default: Yes)
+✓ Auto-start with Windows (default: No)
+✓ Automatic dependency installation (recommended)
+
+========================================
+Verification
+========================================
+
+To verify file integrity, run:
+  certutil -hashfile VPN-Server-Manager-Setup-v4.0.8.exe SHA256
+
+Or use our verification scripts:
+  verify_installer.ps1  (PowerShell)
+  verify_installer.bat  (CMD)
+
+Compare the output with the SHA-256 checksum above.
+
+========================================
+Testing Checklist
+========================================
+
+Before distribution, test:
+ ☐ Installation on clean Windows 10
+ ☐ Installation on clean Windows 11
+ ☐ Desktop shortcut creation
+ ☐ Application launch after install
+ ☐ No annoying dialogs during navigation
+ ☐ PIN setup and authentication
+ ☐ Server connection functionality
+ ☐ Page refresh works without dialogs
+ ☐ Uninstallation process
+ ☐ Reinstallation after uninstall
+
+========================================
+Distribution
+========================================
+
+1. Upload to GitHub Releases:
+   - VPN-Server-Manager-Setup-v4.0.8.exe
+   - checksum.txt
+   - verify_installer.ps1
+   - verify_installer.bat
+   - HOW_TO_VERIFY.txt
+   - RELEASE_INFO.txt
+   - README.md
+
+2. Update documentation:
+   - README.md download links
+   - CHANGELOG.md release notes
+   - Version badge
+
+3. Announce release:
+   - GitHub Discussions
+   - Project documentation
+   - Mention fix for Windows dialog issue
+
+========================================
+Support
+========================================
+
+Documentation: README_WINDOWS.md
+Build Guide: WINDOWS_INSTALLER_GUIDE.md
+Checksum Guide: CHECKSUM_GUIDE.md
+Issues: https://github.com/kureinmaxim/vpn-server-manager/issues
+
+========================================
+Changelog
+========================================
+
+v4.0.8 (15.10.2025)
+- FIXED: Removed annoying beforeunload dialogs on Windows
+- IMPROVED: Better user experience in desktop mode
+- IMPROVED: Cleaner navigation without interruptions
+
+v4.0.7 (15.10.2025)
+- First Windows installer release
+- Full Windows 10/11 support
+- Desktop shortcut by default
+- Automatic dependency installation
+- SHA-256 verification scripts
+
+========================================
+Generated automatically by build_windows.bat
+========================================

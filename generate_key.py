@@ -44,9 +44,9 @@ def generate_key():
     with open(env_file, 'w', encoding='utf-8') as f:
         f.writelines(lines)
     
-    print("✅ Key successfully generated and saved in .env file.")
-    print("⚠️  IMPORTANT: If you overwrote an existing key, restart the application and recreate password records.")
-    print("🚀 To start the application, use: python run.py")
+    print("[OK] Key successfully generated and saved in .env file.")
+    print("[WARNING] IMPORTANT: If you overwrote an existing key, restart the application and recreate password records.")
+    print("[INFO] To start the application, use: python run.py")
 
 if __name__ == "__main__":
     generate_key() 
