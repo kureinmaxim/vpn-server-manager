@@ -174,15 +174,15 @@ def load_app_info(app):
         else:
             # Заглушка если config.json не найден
             app.config['app_info'] = {
-                "version": "4.0.9",
-                "last_updated": "2025-10-25",
+                "version": "4.0.10",
+                "last_updated": "2025-10-26",
                 "developer": "Куреин М.Н."
             }
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.0.9",
-            "last_updated": "2025-10-25",
+            "version": "4.0.10",
+            "last_updated": "2025-10-26",
             "developer": "Куреин М.Н."
         }
 
