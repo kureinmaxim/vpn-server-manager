@@ -1,6 +1,6 @@
 @echo off
 REM Automatic builder for VPN Server Manager Windows Installer
-REM VPN Server Manager v4.0.7
+REM Version is read from config/config.json.template
 REM Uses Inno Setup Compiler to create installer
 
 echo ========================================
@@ -8,8 +8,12 @@ echo VPN Server Manager - Installer Builder
 echo ========================================
 echo.
 
-REM Проверяем версию
-set APP_VERSION=4.0.9
+REM Читаем версию из шаблона конфигурации
+for /f "tokens=2 delims=:," %%a in ('findstr /C:"\"version\"" config\config.json.template') do (
+    set APP_VERSION=%%~a
+)
+set APP_VERSION=%APP_VERSION: =%
+set APP_VERSION=%APP_VERSION:"=%
 echo Building installer for version %APP_VERSION%
 echo.
 
@@ -51,8 +55,8 @@ if not exist "LICENSE" (
     set FILES_OK=0
 )
 
-if not exist "README_WINDOWS.md" (
-    echo [WARNING] README_WINDOWS.md not found
+if not exist "docs\WINDOWS_GUIDE.md" (
+    echo [WARNING] docs\WINDOWS_GUIDE.md not found
     set FILES_OK=0
 )
 
@@ -61,8 +65,8 @@ if not exist "static\favicon.ico" (
     set FILES_OK=0
 )
 
-if not exist "config.json.example" (
-    echo [WARNING] config.json.example not found
+if not exist "config\config.json.template" (
+    echo [WARNING] config\config.json.template not found
     set FILES_OK=0
 )
 
