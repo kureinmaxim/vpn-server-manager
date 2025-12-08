@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.1.0
+; Version 4.1.1
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.1.0"
+#define MyAppVersion "4.1.1"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -56,7 +56,7 @@ Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs cre
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion
-Source: "SECURITY.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "BUILD.md"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Python скрипты
 Source: "run.py"; DestDir: "{app}"; Flags: ignoreversion
