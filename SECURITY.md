@@ -1,265 +1,51 @@
-# 🔒 Руководство по безопасности VPN Server Manager
+# 🔒 Безопасность VPN Server Manager
 
-## ⚠️ КРИТИЧЕСКИ ВАЖНО
+## ⚠️ Файлы, которые НЕ ДОЛЖНЫ попадать в Git
 
-Этот проект содержит конфиденциальную информацию и требует особого внимания к безопасности при работе с Git и GitHub.
+| Файл | Содержит |
+|------|----------|
+| `.env` | SECRET_KEY, DEFAULT_PIN |
+| `config.json` | PIN-код, пути к данным |
+| `data/*.enc` | Зашифрованные данные серверов |
+| `*.key`, `*.pem` | Ключи и сертификаты |
 
----
-
-## 📋 Файлы, которые НЕ ДОЛЖНЫ попадать в Git
-
-### 🔴 Критические файлы (НИКОГДА не коммитить!)
-
-1. **`.env`** - содержит:
-   - `SECRET_KEY` для шифрования Flask сессий
-   - `DEFAULT_PIN` для доступа к приложению
-   - Конфигурацию окружения
-
-2. **`config.json`** - содержит:
-   - Текущий PIN-код
-   - Пути к зашифрованным файлам
-   - Персональные настройки
-
-3. **`data/*.enc`** - зашифрованные файлы с данными серверов:
-   - `servers.json.enc`
-   - `merged_*.enc`
-   - Любые другие `.enc` файлы
-
-4. **`logs/*.log`** - могут содержать:
-   - IP-адреса
-   - Имена пользователей
-   - Трассировки ошибок с конфиденциальной информацией
-
-5. **`pin_block_state.json`** - состояние блокировки PIN
-
-6. **Файлы с ключами и сертификатами:**
-   - `*.key`
-   - `*.pem`
-   - `*.crt`
-   - `*.p12`
-   - `*.pfx`
-
----
-
-## ✅ Безопасные файлы-примеры (можно коммитить)
-
-- `env.example` - шаблон для `.env` без реальных значений
-- `config.json.example` - шаблон для `config.json` без реальных данных
-
----
-
-## 🛡️ Проверка перед коммитом
-
-### Быстрая проверка
+## ✅ Проверка перед коммитом
 
 ```bash
-# Проверить, что .env не в индексе
-git ls-files | grep -E "\.env$|config\.json$|\.enc$|\.log$"
-
-# Если команда что-то выводит - СТОП! Не коммитьте!
+# Проверить, что секреты не в индексе
+git ls-files | grep -E "\.env$|config\.json$|\.enc$"
+# Если команда что-то выводит - НЕ КОММИТЬТЕ!
 ```
 
-### Детальная проверка с помощью gh CLI
+## 🚨 Если секреты уже в Git
 
 ```bash
-# Проверить, что конфиденциальные файлы не на GitHub
-gh api repos/:owner/:repo/contents/.env 2>&1 | grep "Not Found"
-gh api repos/:owner/:repo/contents/config.json 2>&1 | grep "Not Found"
-```
-
----
-
-## 🚨 Что делать, если секреты уже в Git/GitHub?
-
-### 1. Удалить из истории Git
-
-```bash
-# Удалить .env из всей истории
+# 1. Удалить из истории
 git filter-branch --force --index-filter \
-  "git rm --cached --ignore-unmatch .env" \
+  "git rm --cached --ignore-unmatch .env config.json" \
   --prune-empty --tag-name-filter cat -- --all
 
-# Удалить config.json из всей истории
-git filter-branch --force --index-filter \
-  "git rm --cached --ignore-unmatch config.json" \
-  --prune-empty --tag-name-filter cat -- --all
-
-# Удалить все .enc файлы из истории
-git filter-branch --force --index-filter \
-  "git rm --cached --ignore-unmatch 'data/*.enc'" \
-  --prune-empty --tag-name-filter cat -- --all
-
-# Очистить рефлоги и сборка мусора
+# 2. Очистить и запушить
 git reflog expire --expire=now --all
 git gc --prune=now --aggressive
-```
-
-### 2. Принудительно отправить на GitHub
-
-```bash
-# ВНИМАНИЕ: Это перезапишет историю на GitHub!
 git push origin --force --all
-git push origin --force --tags
+
+# 3. Сгенерировать новые ключи
+python generate_key.py
 ```
 
-### 3. Сгенерировать новые секреты
+## 🛡️ Первоначальная настройка
 
 ```bash
-# Сгенерировать новый SECRET_KEY
-python3 generate_key.py
-
-# Изменить PIN-код в приложении
-# (через интерфейс приложения или вручную в config.json)
+cp env.example .env
+python generate_key.py
+cp config/config.json.template config.json
+# Измените PIN в config.json!
 ```
 
-### 4. Уведомить команду
-
-Если проект публичный или есть другие разработчики:
-- Сообщите о компрометации секретов
-- Попросите всех обновить локальные репозитории
-- Убедитесь, что все изменили PIN-коды и ключи
-
----
-
-## 🔧 Настройка .gitignore
-
-Убедитесь, что ваш `.gitignore` содержит:
-
-```gitignore
-# Environments
-.env
-.venv
-env/
-venv/
-
-# Application data
-data/servers.json.enc
-data/*.enc
-data/hints.json
-pin_block_state.json
-config.json
-
-# Logs
-logs/
-*.log
-
-# Keys and certificates
-*.key
-*.pem
-*.crt
-*.p12
-*.pfx
-```
-
----
-
-## 📝 Первоначальная настройка проекта
-
-### Для новых разработчиков:
-
-1. **Клонировать репозиторий:**
-   ```bash
-   git clone <repository-url>
-   cd VPNserverManage-Clean
-   ```
-
-2. **Создать .env из шаблона:**
-   ```bash
-   cp env.example .env
-   ```
-
-3. **Сгенерировать SECRET_KEY:**
-   ```bash
-   python3 generate_key.py
-   ```
-
-4. **Создать config.json из шаблона:**
-   ```bash
-   cp config.json.example config.json
-   ```
-
-5. **Настроить свой PIN-код:**
-   - Отредактируйте `config.json`
-   - Измените `default_pin` и `current_pin`
-
----
-
-## 🔍 Регулярные проверки безопасности
-
-### Еженедельно:
-
-```bash
-# Проверить, что секреты не попали в Git
-git ls-files | grep -E "\.env$|config\.json$|\.enc$|\.log$"
-
-# Проверить размер репозитория (не должен сильно расти)
-du -sh .git
-```
-
-### Перед каждым push:
-
-```bash
-# Проверить, что коммитите
-git status
-git diff --cached
-
-# Проверить историю последних коммитов
-git log --oneline -5 --stat
-```
-
----
-
-## 🚀 Безопасный workflow
-
-### Правильный порядок действий:
-
-1. ✅ Проверить `.gitignore`
-2. ✅ Убедиться, что `.env` и `config.json` не в индексе
-3. ✅ Сделать изменения в коде
-4. ✅ Проверить `git status`
-5. ✅ Добавить только нужные файлы: `git add <specific-files>`
-6. ✅ НЕ использовать `git add .` или `git add -A` без проверки!
-7. ✅ Коммитить: `git commit -m "описание"`
-8. ✅ Еще раз проверить перед push
-9. ✅ Push: `git push`
-
----
-
-## 📞 Контакты при инциденте безопасности
-
-Если вы обнаружили утечку секретов:
-
-1. **Немедленно** остановите все операции с Git
-2. **Не делайте** новых коммитов до решения проблемы
-3. **Свяжитесь** с администратором проекта
-4. **Следуйте** инструкциям из раздела "Что делать, если секреты уже в Git/GitHub?"
-
----
-
-## 📚 Дополнительные ресурсы
-
-- [GitHub: Removing sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository)
-- [Git filter-branch documentation](https://git-scm.com/docs/git-filter-branch)
-- [OWASP Secure Coding Practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/)
-
----
-
-## ✅ Чеклист безопасности
+## ✅ Чеклист
 
 - [ ] `.env` в `.gitignore`
 - [ ] `config.json` в `.gitignore`
-- [ ] `data/*.enc` в `.gitignore`
-- [ ] `logs/` в `.gitignore`
-- [ ] Создан `env.example` без секретов
-- [ ] Создан `config.json.example` без секретов
-- [ ] Проверено, что `.env` не на GitHub
-- [ ] Проверено, что `config.json` не на GitHub
 - [ ] Сгенерирован уникальный `SECRET_KEY`
-- [ ] Изменен `DEFAULT_PIN` с 1234 на свой
-- [ ] Все члены команды знают о правилах безопасности
-
----
-
-**Последнее обновление:** 13 октября 2025  
-**Версия:** 1.0
-
+- [ ] Изменён PIN с 1234 на свой

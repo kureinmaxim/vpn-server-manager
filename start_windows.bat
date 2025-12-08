@@ -1,9 +1,8 @@
 @echo off
 REM Start script for VPN Server Manager on Windows
-REM VPN Server Manager v4.0.9
 
 echo ========================================
-echo VPN Server Manager v4.0.9
+echo VPN Server Manager
 echo ========================================
 echo.
 
@@ -28,12 +27,12 @@ if not exist .env (
 REM Check if config.json exists
 if not exist config.json (
     echo [WARNING] config.json file not found!
-    if exist config.json.example (
-        echo Creating from config.json.example...
-        copy config.json.example config.json >nul
+    if exist config\config.json.template (
+        echo Creating from template...
+        copy config\config.json.template config.json >nul
         echo [OK] Config file created
     ) else (
-        echo [ERROR] config.json.example not found!
+        echo [ERROR] config\config.json.template not found!
         pause
         exit /b 1
     )
