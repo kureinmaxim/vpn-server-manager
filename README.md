@@ -45,6 +45,8 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # 3. Установить зависимости
+python -m pip install -r requirements.txt
+OR
 pip install -r requirements.txt
 
 # 4. Сгенерировать ключ шифрования
@@ -52,6 +54,9 @@ python generate_key.py
 
 # 5. Создать конфигурацию
 copy config\config.json.template config.json
+
+# 6. Скомпилировать переводы
+python -m babel.messages.frontend compile -d translations
 ```
 
 ## ▶️ Запуск
@@ -73,11 +78,23 @@ python run.py --debug
 docker-compose up
 ```
 
+## 🌍 Переводы
+
+Для работы переключения языков необходимо скомпилировать `.po` файлы:
+
+```bash
+# Компиляция переводов (.po → .mo)
+python -m babel.messages.frontend compile -d translations
+```
+
+Поддерживаемые языки: русский (по умолчанию), английский, китайский.
+
 ## 📚 Документация
 
 Вся документация находится в папке `docs/`:
 
 - [Индекс документации](docs/INDEX.md)
+- [Руководство по сборке](BUILD.md)
 - [Управление версиями](docs/VERSION_MANAGEMENT.md)
 - [Windows Guide](docs/WINDOWS_GUIDE.md)
 - [Docker Guide](docs/DOCKER_GUIDE.md)
