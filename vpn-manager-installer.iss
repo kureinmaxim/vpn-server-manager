@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.0.9
+; Version 4.1.0
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.0.9"
+#define MyAppVersion "4.1.0"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -22,7 +22,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=LICENSE
-InfoBeforeFile=README_WINDOWS.md
+InfoBeforeFile=docs\WINDOWS_GUIDE.md
 OutputDir=installer_output
 OutputBaseFilename=VPN-Server-Manager-Setup-v{#MyAppVersion}
 SetupIconFile=static\favicon.ico
@@ -54,12 +54,9 @@ Source: "tests\*"; DestDir: "{app}\tests"; Flags: ignoreversion recursesubdirs c
 ; Документация
 Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "README_WINDOWS.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 Source: "SECURITY.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "PROJECT_DOCUMENTATION.md"; DestDir: "{app}"; Flags: ignoreversion
-Source: "DOCKER_GUIDE.md"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Python скрипты
 Source: "run.py"; DestDir: "{app}"; Flags: ignoreversion
@@ -76,7 +73,7 @@ Source: "setup.py"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Шаблоны конфигурации (НЕ сами конфиги!)
 Source: "env.example"; DestDir: "{app}"; Flags: ignoreversion
-Source: "config.json.example"; DestDir: "{app}"; Flags: ignoreversion
+Source: "config\config.json.template"; DestDir: "{app}\config"; Flags: ignoreversion
 
 ; Bat-скрипты для Windows
 Source: "setup_windows.bat"; DestDir: "{app}"; Flags: ignoreversion
@@ -89,6 +86,7 @@ Source: "data\hints.json"; DestDir: "{app}\data"; Flags: ignoreversion
 
 [Dirs]
 ; Создание необходимых директорий
+Name: "{app}\config"; Permissions: users-full
 Name: "{app}\data"; Permissions: users-full
 Name: "{app}\logs"; Permissions: users-full
 Name: "{app}\venv"; Permissions: users-full
@@ -98,7 +96,7 @@ Name: "{app}\backup"; Permissions: users-full
 ; Иконки в меню Пуск
 Name: "{group}\{#MyAppName}"; Filename: "{app}\start_windows.bat"; IconFilename: "{app}\static\favicon.ico"; WorkingDir: "{app}"
 Name: "{group}\Открыть папку приложения"; Filename: "{app}"
-Name: "{group}\Документация"; Filename: "{app}\README_WINDOWS.md"
+Name: "{group}\Документация"; Filename: "{app}\docs\WINDOWS_GUIDE.md"
 Name: "{group}\Удалить {#MyAppName}"; Filename: "{uninstallexe}"
 
 ; Иконка на рабочем столе
@@ -118,7 +116,7 @@ Filename: "{app}\setup_windows.bat"; Description: "Установить зави
 Filename: "{app}\start_windows.bat"; Description: "Запустить {#MyAppName}"; Flags: postinstall skipifsilent nowait; Check: CheckSetupCompleted
 
 ; Открыть README
-Filename: "{app}\README_WINDOWS.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent
+Filename: "{app}\docs\WINDOWS_GUIDE.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent
 
 [UninstallDelete]
 ; Удаление созданных файлов и папок при деинсталляции
