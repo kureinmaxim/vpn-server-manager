@@ -266,7 +266,7 @@ class DataManagerService:
             config: Конфигурация приложения Flask
             
         Returns:
-            Список серверов
+            Список серверов с расшифрованными паролями для отображения
         """
         active_file = self.get_active_data_path(config)
         if not active_file:
@@ -288,6 +288,26 @@ class DataManagerService:
             # Нормализуем каждый сервер
             if isinstance(servers, list):
                 servers = [self.normalize_server_data(server) for server in servers]
+                
+                # 🔑 Расшифровываем пароли для отображения в интерфейсе
+                for server in servers:
+                    # SSH credentials
+                    if 'ssh_credentials' in server:
+                        ssh = server['ssh_credentials']
+                        ssh['password_decrypted'] = self.decrypt_data(ssh.get('password', ''))
+                        ssh['root_password_decrypted'] = self.decrypt_data(ssh.get('root_password', ''))
+                    
+                    # Panel credentials
+                    if 'panel_credentials' in server:
+                        panel = server['panel_credentials']
+                        panel['user_decrypted'] = self.decrypt_data(panel.get('user', ''))
+                        panel['password_decrypted'] = self.decrypt_data(panel.get('password', ''))
+                    
+                    # Hoster credentials
+                    if 'hoster_credentials' in server:
+                        hoster = server['hoster_credentials']
+                        hoster['user_decrypted'] = self.decrypt_data(hoster.get('user', ''))
+                        hoster['password_decrypted'] = self.decrypt_data(hoster.get('password', ''))
             
             return servers if isinstance(servers, list) else []
         except Exception as e:
