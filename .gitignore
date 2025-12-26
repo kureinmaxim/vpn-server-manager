@@ -140,6 +140,8 @@ config.dev.json
 *~
 .#*
 \#*#
+debug_log*.txt
+
 
 # Временные файлы IDE
 .idea/
