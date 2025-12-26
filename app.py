@@ -644,6 +644,47 @@ def migrate_data_if_needed():
 migrate_data_if_needed()
 
 
+@app.route('/servers/reorder', methods=['POST'])
+def reorder_servers():
+    """Переупорядочивает серверы на основе списка ID."""
+    try:
+        data = request.get_json()
+        if not data or 'order' not in data:
+            return jsonify({'success': False, 'message': 'Неверные данные'}), 400
+        
+        new_order_ids = data['order']
+        if not isinstance(new_order_ids, list):
+            return jsonify({'success': False, 'message': 'order должен быть списком'}), 400
+            
+        servers = load_servers()
+        if not servers:
+            return jsonify({'success': False, 'message': 'Серверы не найдены'}), 404
+            
+        # Создаем словарь для быстрого поиска серверов по ID
+        servers_map = {str(s.get('id')): s for s in servers}
+        
+        reordered_servers = []
+        # Добавляем серверы в новом порядке
+        for server_id in new_order_ids:
+            str_id = str(server_id)
+            if str_id in servers_map:
+                reordered_servers.append(servers_map[str_id])
+                del servers_map[str_id] # Удаляем, чтобы отследить оставшиеся
+        
+        # Если какие-то серверы не были в списке (например, новые или ошибки), добавляем их в конец
+        for server in servers_map.values():
+            reordered_servers.append(server)
+            
+        # Сохраняем новый порядок
+        save_servers(reordered_servers)
+        
+        return jsonify({'success': True, 'message': 'Порядок сохранен'})
+        
+    except Exception as e:
+        print(f"Ошибка при переупорядочивании: {e}")
+        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'}), 500
+
+
 @app.after_request
 def add_security_headers(response):
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
