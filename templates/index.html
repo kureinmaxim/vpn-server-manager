@@ -72,9 +72,9 @@
         </div>
     </div>
     {% elif servers %}
-    <div class="row">
+    <div class="row" id="server-list">
         {% for server in servers %}
-        <div class="col-md-6 col-lg-6 mb-4">
+        <div class="col-md-6 col-lg-6 mb-4 server-card-container" data-id="{{ server.id }}" tabindex="0">
             <div class="card h-100">
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
                     <h5 class="card-title mb-0 d-flex align-items-center">
@@ -365,7 +365,94 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/Sortable.min.js') }}"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- Drag and Drop (SortableJS) ---
+        var el = document.getElementById('server-list');
+        if (el) {
+            var sortable = Sortable.create(el, {
+                animation: 150,
+                ghostClass: 'bg-light',
+                handle: '.card-header', // Drag handle
+                onEnd: function (evt) {
+                    saveNewOrder();
+                }
+            });
+        }
+
+        // --- Keyboard Navigation ---
+        const serverCards = document.querySelectorAll('.server-card-container');
+        serverCards.forEach(card => {
+            card.addEventListener('keydown', function(e) {
+                const currentCard = e.currentTarget;
+                const parent = currentCard.parentNode;
+                const allCards = Array.from(parent.children);
+                const currentIndex = allCards.indexOf(currentCard);
+                
+                let targetIndex = -1;
+
+                if (e.key === 'ArrowRight') {
+                    targetIndex = currentIndex + 1;
+                } else if (e.key === 'ArrowLeft') {
+                    targetIndex = currentIndex - 1;
+                } else if (e.key === 'ArrowDown') {
+                    // Assuming 2 columns on md/lg screens as per 'col-md-6'
+                    // This is a simple approximation. For robust grid Nav, more complex logic is needed.
+                    // But 'col-md-6' implies 2 columns.
+                   targetIndex = currentIndex + 2;
+                } else if (e.key === 'ArrowUp') {
+                   targetIndex = currentIndex - 2;
+                }
+
+                if (targetIndex >= 0 && targetIndex < allCards.length && (e.key.startsWith('Arrow'))) {
+                    e.preventDefault();
+                    
+                    // Swap logic
+                    const targetCard = allCards[targetIndex];
+                    
+                    // If moving right or down (forward in DOM)
+                    if (targetIndex > currentIndex) {
+                        parent.insertBefore(currentCard, targetCard.nextSibling);
+                    } else {
+                        // Moving left or up (backward in DOM)
+                        parent.insertBefore(currentCard, targetCard);
+                    }
+                    
+                    // Re-focus the moved card
+                    currentCard.focus();
+                    
+                    saveNewOrder();
+                }
+            });
+        });
+
+        function saveNewOrder() {
+            const allCards = document.querySelectorAll('.server-card-container');
+            const order = Array.from(allCards).map(c => parseInt(c.getAttribute('data-id')));
+            
+            fetch('/servers/reorder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ order: order })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Optional: show a small toast/check
+                    console.log('Order saved');
+                } else {
+                    console.error('Failed to save order:', data.message);
+                }
+            })
+            .catch(error => {
+               console.error('Error saving order:', error);
+            });
+        }
+    });
+
     // Инициализация tooltips при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

@@ -261,6 +261,14 @@ def build_app():
         "--hidden-import=os",
         "--hidden-import=sys",
         
+        # SSH и сетевые модули
+        "--hidden-import=paramiko",
+        "--hidden-import=bcrypt",
+        "--hidden-import=nacl",
+        "--hidden-import=cryptography",
+        "--hidden-import=cryptography.hazmat.backends.openssl.backend",
+
+        
         # Исключения для уменьшения размера
         "--exclude-module=PyQt6",
         "--exclude-module=PyQt5",
