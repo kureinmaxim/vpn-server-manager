@@ -55,8 +55,8 @@ if not exist "LICENSE" (
     set FILES_OK=0
 )
 
-if not exist "docs\WINDOWS_GUIDE.md" (
-    echo [WARNING] docs\WINDOWS_GUIDE.md not found
+if not exist "README.md" (
+    echo [WARNING] README.md not found
     set FILES_OK=0
 )
 
@@ -211,7 +211,7 @@ if exist "%OUTPUT_FILE%" (
     echo    - Update download links
     echo.
     echo 4. Documentation:
-    echo    - See WINDOWS_INSTALLER_GUIDE.md
+    echo    - See README.md and BUILD.md
     echo.
     
     REM Опционально: открыть папку с результатом

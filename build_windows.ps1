@@ -64,7 +64,7 @@ Write-Host "[2/5] Checking project files..." -ForegroundColor Yellow
 
 $RequiredFiles = @(
     "LICENSE",
-    "docs\WINDOWS_GUIDE.md",
+    "README.md",
     "static\favicon.ico",
     "config.json",
     "env.example"
@@ -211,7 +211,7 @@ try {
         Write-Host "   - Update download links" -ForegroundColor Gray
         Write-Host ""
         Write-Host "4. Documentation:" -ForegroundColor White
-        Write-Host "   - See WINDOWS_INSTALLER_GUIDE.md" -ForegroundColor Gray
+        Write-Host "   - See README.md and BUILD.md" -ForegroundColor Gray
         Write-Host ""
         
         # Открываем папку с результатом
