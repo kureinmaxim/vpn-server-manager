@@ -5,7 +5,7 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и проект следует [Semantic Versioning](https://semver.org/lang/ru/).
 
-## [4.1.1] - 2026-04-06
+## [4.2.1] - 2026-04-06
 
 ### ✨ Добавлено
 
@@ -53,7 +53,7 @@
   - `tools/update_version.py` переписан в полноценный инструмент для `status`, `sync` и `bump`
   - `tools/bump_version.py` оставлен как совместимый wrapper
   - Синхронизация версий теперь обновляет `README.md`, `config/config.json.template`, `vpn-manager-installer.iss`, `env.example`, `app/config.py`, `app/__init__.py`, `setup.py`
-- **Проект приведен к консистентной версии `4.1.1`**:
+- **Проект приведен к консистентной версии `4.2.1`**:
   - Убрана рассинхронизация между `config.json`, инсталлятором и документацией
 
 ### 📚 Документация
