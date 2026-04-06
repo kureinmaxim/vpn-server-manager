@@ -246,3 +246,60 @@ class TestSSHService:
 
         with patch.object(service, '_read_command_output', side_effect=['', 'tcp|0.0.0.0:80\nudp|0.0.0.0:53']):
             assert service._get_listening_ports(client) == ['53', '80']
+
+    def test_parse_top_processes_skips_monitoring_helper_commands(self):
+        """Служебные процессы самой команды мониторинга не должны попадать в топ."""
+        service = SSHService()
+
+        output = "\n".join([
+            "PID COMMAND %CPU %MEM",
+            "18647 ps 133 0.4",
+            "18646 bash 50.0 0.3",
+            "18239 sshd 0.6 1.1",
+            "17103 python 0.3 9.3",
+            "15727 xray 0.1 3.9",
+            "99999 head 0.1 0.1",
+        ])
+
+        assert service._parse_top_processes(output) == [
+            {'pid': '18239', 'cmd': 'sshd', 'cpu': '0.6', 'mem': '1.1'},
+            {'pid': '17103', 'cmd': 'python', 'cpu': '0.3', 'mem': '9.3'},
+            {'pid': '15727', 'cmd': 'xray', 'cpu': '0.1', 'mem': '3.9'},
+        ]
+
+    def test_check_required_tools_uses_server_ssh_port_in_ufw_warning(self):
+        """UFW warning must reference actual server SSH port."""
+        service = SSHService()
+        client = Mock()
+
+        def make_result(output: str):
+            stdin = Mock()
+            stdout = Mock()
+            stderr = Mock()
+            stdout.read.return_value = output.encode('utf-8')
+            return stdin, stdout, stderr
+
+        def exec_side_effect(command):
+            mapping = {
+                'which vnstat': '/usr/bin/vnstat\n',
+                'which jq': '/usr/bin/jq\n',
+                'which ufw': '/usr/sbin/ufw\n',
+                'which netstat': '/usr/bin/netstat\n',
+                'systemctl is-active vnstat 2>/dev/null': 'active\n',
+                'sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'': 'active\n',
+            }
+            return make_result(mapping.get(command, ''))
+
+        client.exec_command.side_effect = exec_side_effect
+
+        with patch.object(service, 'get_connection_pooled', return_value=client):
+            result = service.check_required_tools(
+                ip='127.0.0.1',
+                user='root',
+                password='secret',
+                port=22542,
+            )
+
+        ufw_tool = result['tools']['ufw']
+        assert ufw_tool['warning'] == '⚠️ UFW включен! Убедитесь что SSH-порт 22542 разрешен!'
+        assert ufw_tool['fix_cmd'] == 'sudo ufw allow 22542/tcp && sudo ufw status numbered'
