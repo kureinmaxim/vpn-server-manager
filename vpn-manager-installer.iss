@@ -22,7 +22,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=LICENSE
-InfoBeforeFile=docs\WINDOWS_GUIDE.md
+InfoBeforeFile=README.md
 OutputDir=installer_output
 OutputBaseFilename=VPN-Server-Manager-Setup-v{#MyAppVersion}
 SetupIconFile=static\favicon.ico
@@ -96,7 +96,7 @@ Name: "{app}\backup"; Permissions: users-full
 ; Иконки в меню Пуск
 Name: "{group}\{#MyAppName}"; Filename: "{app}\start_windows.bat"; IconFilename: "{app}\static\favicon.ico"; WorkingDir: "{app}"
 Name: "{group}\Открыть папку приложения"; Filename: "{app}"
-Name: "{group}\Документация"; Filename: "{app}\docs\WINDOWS_GUIDE.md"
+Name: "{group}\Документация"; Filename: "{app}\README.md"
 Name: "{group}\Удалить {#MyAppName}"; Filename: "{uninstallexe}"
 
 ; Иконка на рабочем столе
@@ -116,7 +116,7 @@ Filename: "{app}\setup_windows.bat"; Description: "Установить зави
 Filename: "{app}\start_windows.bat"; Description: "Запустить {#MyAppName}"; Flags: postinstall skipifsilent nowait; Check: CheckSetupCompleted
 
 ; Открыть README
-Filename: "{app}\docs\WINDOWS_GUIDE.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent
+Filename: "{app}\README.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent
 
 [UninstallDelete]
 ; Удаление созданных файлов и папок при деинсталляции

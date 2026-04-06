@@ -96,7 +96,7 @@ python -m babel.messages.frontend compile -d translations
 - [Индекс документации](docs/INDEX.md)
 - [Руководство по сборке](BUILD.md)
 - [Управление версиями](VERSION_MANAGEMENT.md)
-- [Windows Guide](docs/WINDOWS_GUIDE.md)
+- [Windows proxy troubleshooting](docs/WINDOWS_PROXY_TROUBLESHOOTING.md)
 - [Docker Guide](docs/DOCKER_GUIDE.md)
 - [Мониторинг](docs/README_MONITORING.md)
 
