@@ -1,17 +1,17 @@
 # VPN Server Manager - Windows Installer Builder (PowerShell)
-# Reads version from config/config.json.template
+# Reads version from config.json
 
 # Настройки
 $ErrorActionPreference = "Stop"
 $IsccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 
-# Читаем версию из шаблона конфигурации
-$ConfigTemplate = "config\config.json.template"
-if (Test-Path $ConfigTemplate) {
-    $Config = Get-Content $ConfigTemplate | ConvertFrom-Json
+# Читаем версию из основного config.json
+$ConfigPath = "config.json"
+if (Test-Path $ConfigPath) {
+    $Config = Get-Content $ConfigPath | ConvertFrom-Json
     $AppVersion = $Config.app_info.version
 } else {
-    Write-Host "[ERROR] Config template not found: $ConfigTemplate" -ForegroundColor Red
+    Write-Host "[ERROR] Config not found: $ConfigPath" -ForegroundColor Red
     exit 1
 }
 
@@ -66,7 +66,7 @@ $RequiredFiles = @(
     "LICENSE",
     "docs\WINDOWS_GUIDE.md",
     "static\favicon.ico",
-    "config\config.json.template",
+    "config.json",
     "env.example"
 )
 
