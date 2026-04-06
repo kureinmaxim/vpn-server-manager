@@ -272,7 +272,7 @@ python -m babel.messages.frontend compile -d translations
 
 ## 📚 Дополнительная информация
 
-- [Руководство по версионированию](docs/VERSION_MANAGEMENT.md)
+- [Руководство по версионированию](VERSION_MANAGEMENT.md)
 - [Руководство по релизам](docs/release_guide.md)
 - [Docker руководство](docs/DOCKER_GUIDE.md)
 - [Windows руководство](docs/WINDOWS_GUIDE.md)
