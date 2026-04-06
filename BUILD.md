@@ -124,6 +124,8 @@ build_windows.bat
 - Все зависимости установлены в venv
 - Выполнена первоначальная настройка
 
+Если установка зависимостей в Windows падает с `ProxyError` или `No matching distribution found`, см. `docs/WINDOWS_PROXY_TROUBLESHOOTING.md`.
+
 Результат: `installer_output\VPN-Server-Manager-Setup-v{version}.exe`
 
 ### macOS
