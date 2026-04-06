@@ -86,8 +86,8 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('80', event); return false;"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('90', event); return false;"><i class="bi bi-search me-2"></i>90%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('60', event); return false;"><i class="bi bi-zoom-out me-2"></i>60%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('80', event); return false;"><i class="bi bi-search me-2"></i>80%</a></li>
                             <li><a class="dropdown-item" href="#" onclick="setZoom('100', event); return false;"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
                         </ul>
                     </li>
@@ -139,9 +139,12 @@
     <script>
         // Применить сохранённый масштаб при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            const savedZoom = getCookie('ui_zoom') || '100';
+            const allowedZooms = ['60', '80', '100'];
+            const savedZoom = allowedZooms.includes(getCookie('ui_zoom')) ? getCookie('ui_zoom') : '80';
             document.body.style.zoom = savedZoom + '%';
         });
+
+        const isDesktopApp = {{ 'true' if is_desktop_app else 'false' }};
 
         // Исправление для pywebview: улучшенная инициализация без клонирования
         let isInitialized = false;
@@ -203,7 +206,7 @@
         // Флаг для отслеживания внутренних переходов
         let isInternalNavigation = false;
         
-        if (!window.pywebview) {
+        if (!isDesktopApp) {
             // Отслеживаем клики по внутренним ссылкам
             document.addEventListener('click', function(e) {
                 const link = e.target.closest('a');
@@ -427,7 +430,7 @@
                 .then(response => {
                     if (response.ok) {
                         // Для desktop app закрываем окно через специальный endpoint
-                        if (window.pywebview) {
+                        if (isDesktopApp) {
                             // Сначала делаем запрос на закрытие приложения
                             fetch('/pin/exit_app', { method: 'POST' })
                                 .then(() => {
@@ -443,7 +446,7 @@
                 .catch(error => {
                     console.error('{{ _('Ошибка выхода:') }}', error);
                     // В случае ошибки тоже пытаемся закрыть
-                    if (window.pywebview) {
+                    if (isDesktopApp) {
                         window.close();
                     } else {
                         window.location.reload();

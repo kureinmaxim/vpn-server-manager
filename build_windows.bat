@@ -1,6 +1,6 @@
 @echo off
 REM Automatic builder for VPN Server Manager Windows Installer
-REM Version is read from config/config.json.template
+REM Version is read from config.json
 REM Uses Inno Setup Compiler to create installer
 
 echo ========================================
@@ -8,8 +8,8 @@ echo VPN Server Manager - Installer Builder
 echo ========================================
 echo.
 
-REM Читаем версию из шаблона конфигурации
-for /f "tokens=2 delims=:," %%a in ('findstr /C:"\"version\"" config\config.json.template') do (
+REM Читаем версию из основного config.json
+for /f %%a in ('powershell -NoProfile -Command "(Get-Content ''config.json'' -Raw | ConvertFrom-Json).app_info.version"') do (
     set APP_VERSION=%%~a
 )
 set APP_VERSION=%APP_VERSION: =%
@@ -65,8 +65,8 @@ if not exist "static\favicon.ico" (
     set FILES_OK=0
 )
 
-if not exist "config\config.json.template" (
-    echo [WARNING] config\config.json.template not found
+if not exist "config.json" (
+    echo [WARNING] config.json not found
     set FILES_OK=0
 )
 
