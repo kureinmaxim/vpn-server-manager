@@ -181,7 +181,10 @@
                     <span id="fw-status">{{ _('Загрузка...') }}</span>
                 </div>
                 <div class="fw-details">
-                    <p><strong>{{ _('Открытые порты:') }}</strong> <span id="open-ports">-</span></p>
+                    <p><strong>{{ _('Backend:') }}</strong> <span id="fw-backend">-</span></p>
+                    <p><strong>{{ _('Listening ports:') }}</strong> <span id="open-ports">-</span></p>
+                    <p><strong>{{ _('Количество listening ports:') }}</strong> <span id="listening-ports-count">0</span></p>
+                    <p id="fw-rules-row" class="d-none"><strong>{{ _('Порты в правилах UFW:') }}</strong> <span id="fw-rules-ports">-</span></p>
                     <p><strong>{{ _('Заблокировано за 24ч:') }}</strong> <span id="blocked-count">0</span> {{ _('попыток') }}</p>
                     <p class="last-block">
                         <strong>{{ _('Последний блок:') }}</strong> 
@@ -208,7 +211,7 @@
         <div class="card-body">
             <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
             <div class="events-grid">
-                <div class="event-card">
+                <div class="event-card" id="ssh-failures-card">
                     <div class="event-icon">⚠️</div>
                     <div class="event-content">
                         <div class="event-value" id="ssh-failures">0</div>
@@ -216,7 +219,7 @@
                     </div>
                 </div>
                 
-                <div class="event-card">
+                <div class="event-card" id="security-updates-card">
                     <div class="event-icon">🔄</div>
                     <div class="event-content">
                         <div class="event-value" id="security-updates">0</div>
@@ -224,11 +227,35 @@
                     </div>
                 </div>
                 
-                <div class="event-card">
+                <div class="event-card" id="new-ports-card">
                     <div class="event-icon">🔌</div>
                     <div class="event-content">
                         <div class="event-value" id="new-ports">0</div>
                         <div class="event-label">{{ _('Новые открытые порты') }}</div>
+                    </div>
+                </div>
+
+                <div class="event-card" id="fail2ban-card">
+                    <div class="event-icon">🔒</div>
+                    <div class="event-content">
+                        <div class="event-value" id="fail2ban-banned">0</div>
+                        <div class="event-label">{{ _('Fail2ban забанил IP') }}</div>
+                    </div>
+                </div>
+
+                <div class="event-card" id="failed-services-card">
+                    <div class="event-icon">🛠️</div>
+                    <div class="event-content">
+                        <div class="event-value" id="failed-services">0</div>
+                        <div class="event-label">{{ _('Проблемные systemd unit\'ы') }}</div>
+                    </div>
+                </div>
+
+                <div class="event-card" id="journal-errors-card">
+                    <div class="event-icon">📕</div>
+                    <div class="event-content">
+                        <div class="event-value" id="journal-errors">0</div>
+                        <div class="event-label">{{ _('Ошибки journal') }}</div>
                     </div>
                 </div>
             </div>
@@ -394,6 +421,8 @@ async function updateFirewallStatus() {
         if (data.success) {
             const stats = data.data;
             const statusElement = document.getElementById('fw-status');
+            const backendElement = document.getElementById('fw-backend');
+            const fwRulesRow = document.getElementById('fw-rules-row');
             if (stats.status && stats.status.toLowerCase() === 'active') {
                 statusElement.textContent = '✅ Active';
                 statusElement.className = 'status-active';
@@ -402,10 +431,20 @@ async function updateFirewallStatus() {
                 statusElement.className = 'status-inactive';
             }
             
+            backendElement.textContent = stats.backend || 'none';
             document.getElementById('open-ports').textContent = stats.open_ports || 'none';
+            document.getElementById('listening-ports-count').textContent = stats.listening_ports_count || 0;
             document.getElementById('blocked-count').textContent = stats.blocked_24h || 0;
             document.getElementById('last-blocked-ip').textContent = stats.last_blocked?.ip || 'none';
             document.getElementById('last-blocked-port').textContent = stats.last_blocked?.port || '-';
+
+            if ((stats.backend || '').toLowerCase() === 'ufw') {
+                document.getElementById('fw-rules-ports').textContent = stats.firewall_ports || 'none';
+                fwRulesRow.classList.remove('d-none');
+            } else {
+                document.getElementById('fw-rules-ports').textContent = '-';
+                fwRulesRow.classList.add('d-none');
+            }
         }
     } catch (error) {
         console.error('Error fetching firewall stats:', error);
@@ -457,18 +496,32 @@ async function updateSecurityEvents() {
             document.getElementById('ssh-failures').textContent = stats.ssh_failures_24h || 0;
             document.getElementById('security-updates').textContent = stats.security_updates_available || 0;
             document.getElementById('new-ports').textContent = stats.new_open_ports || 0;
+            document.getElementById('fail2ban-banned').textContent = stats.fail2ban_banned || 0;
+            document.getElementById('failed-services').textContent = stats.failed_services || 0;
+            document.getElementById('journal-errors').textContent = stats.error_events_24h || 0;
             document.getElementById('days-since-update').textContent = stats.days_since_update || '-';
             
-            const sshCard = document.getElementById('ssh-failures').closest('.event-card');
-            if (stats.ssh_failures_24h > 50) {
-                sshCard.classList.add('warning');
-            }
+            const sshCard = document.getElementById('ssh-failures-card');
+            const updatesCard = document.getElementById('security-updates-card');
+            const newPortsCard = document.getElementById('new-ports-card');
+            const fail2banCard = document.getElementById('fail2ban-card');
+            const failedServicesCard = document.getElementById('failed-services-card');
+            const journalErrorsCard = document.getElementById('journal-errors-card');
+
+            sshCard.classList.toggle('warning', (stats.ssh_failures_24h || 0) > 50);
+            updatesCard.classList.toggle('warning', (stats.security_updates_available || 0) > 0);
+            newPortsCard.classList.toggle('warning', (stats.new_open_ports || 0) > 0);
+            fail2banCard.classList.toggle('warning', (stats.fail2ban_banned || 0) > 0);
+            failedServicesCard.classList.toggle('warning', (stats.failed_services || 0) > 0);
+            journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) > 0);
             
             const threatsContainer = document.getElementById('top-threats');
+            let threatHtml = '';
+
             if (stats.top_failed_ips && stats.top_failed_ips.length > 0) {
-                threatsContainer.innerHTML = '<h4>{{ _("Top атакующих IP:") }}</h4>';
+                threatHtml += '<h4>{{ _("Top атакующих IP:") }}</h4>';
                 stats.top_failed_ips.forEach(item => {
-                    threatsContainer.innerHTML += `
+                    threatHtml += `
                         <div class="threat-item">
                             <span class="threat-ip">${item.ip}</span>
                             <span class="threat-count">${item.count} {{ _("попыток") }}</span>
@@ -476,6 +529,31 @@ async function updateSecurityEvents() {
                     `;
                 });
             }
+
+            const summaryItems = [];
+            if ((stats.fail2ban_banned || 0) > 0) {
+                summaryItems.push(`{{ _("Сейчас забаненных IP через fail2ban:") }} <strong>${stats.fail2ban_banned}</strong>`);
+            }
+            if ((stats.failed_services || 0) > 0) {
+                summaryItems.push(`{{ _("Есть failed systemd unit'ы:") }} <strong>${stats.failed_services}</strong>`);
+            }
+            if ((stats.error_events_24h || 0) > 0) {
+                summaryItems.push(`{{ _("Ошибок в journal за 24ч:") }} <strong>${stats.error_events_24h}</strong>`);
+            }
+
+            if (summaryItems.length > 0) {
+                threatHtml += `
+                    <div class="mt-3 small text-muted">
+                        ${summaryItems.join('<br>')}
+                    </div>
+                `;
+            }
+
+            if (!threatHtml) {
+                threatHtml = '<div class="small text-muted">{{ _("Критичных событий не обнаружено") }}</div>';
+            }
+
+            threatsContainer.innerHTML = threatHtml;
         }
     } catch (error) {
         console.error('Error fetching security events:', error);
