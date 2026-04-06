@@ -1,4 +1,4 @@
-# VPN Server Manager v4.0.10
+# VPN Server Manager v4.1.1
 
 Приложение для управления VPN-серверами с шифрованием данных и поддержкой офлайн режима.
 
@@ -95,7 +95,7 @@ python -m babel.messages.frontend compile -d translations
 
 - [Индекс документации](docs/INDEX.md)
 - [Руководство по сборке](BUILD.md)
-- [Управление версиями](docs/VERSION_MANAGEMENT.md)
+- [Управление версиями](VERSION_MANAGEMENT.md)
 - [Windows Guide](docs/WINDOWS_GUIDE.md)
 - [Docker Guide](docs/DOCKER_GUIDE.md)
 - [Мониторинг](docs/README_MONITORING.md)

@@ -141,17 +141,21 @@
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle"></i>
-                    <strong>{{ _('Информация:') }}</strong> {{ _('Вы можете создать новый PIN-код или импортировать существующие данные.') }}
+                    <strong>{{ _('Информация:') }}</strong> {{ _('Вы можете задать свой PIN-код, использовать PIN по умолчанию 1234 или импортировать существующие данные.') }}
                 </div>
                 <p>{{ _('Выберите действие:') }}</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-outline-primary" onclick="setupNewPin()">
                         <i class="bi bi-plus-circle"></i> {{ _('Создать новый PIN-код') }}
                     </button>
+                    <button type="button" class="btn btn-outline-success" onclick="useDefaultPin()">
+                        <i class="bi bi-key-fill"></i> {{ _('Использовать PIN 1234') }}
+                    </button>
                     <button type="button" class="btn btn-outline-secondary" onclick="showArchiveUpload()">
                         <i class="bi bi-upload"></i> {{ _('Импортировать из архива') }}
                     </button>
                 </div>
+                <div id="firstSetupMessage" class="alert mt-3" style="display: none;"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
@@ -365,6 +369,8 @@
     // Вызываем проверку блокировки сразу
     checkBlockStatus();
 
+    let firstSetupAutoPrompted = false;
+
     // Проверка доступности "Первого запуска" (только если нет данных)
     function checkFirstSetupAllowed() {
         fetch('/pin/check_first_setup_allowed')
@@ -377,6 +383,12 @@
                     // Показываем кнопку и подсказку только если данных нет
                     button.style.display = 'inline-block';
                     hint.style.display = 'block';
+                    if (!firstSetupAutoPrompted) {
+                        firstSetupAutoPrompted = true;
+                        setTimeout(() => {
+                            showFirstTimeSetup();
+                        }, 400);
+                    }
                 } else {
                     // Скрываем кнопку если данные уже существуют (защита от несанкционированного доступа)
                     button.style.display = 'none';
@@ -414,6 +426,7 @@
     
     // Функция показа модального окна первого запуска
     function showFirstTimeSetup() {
+        showFirstSetupMessage('', 'info', true);
         const modal = new bootstrap.Modal(document.getElementById('firstTimeSetupModal'));
         modal.show();
     }
@@ -479,7 +492,7 @@
                     // Показываем блокировку с таймером
                     showPinLoginBlocked(data.remaining_seconds);
                 } else {
-                    showPinLoginMessage(data.message, 'danger');
+                        showPinLoginMessage(data.error || data.message, 'danger');
                 }
             }
         })
@@ -597,7 +610,7 @@
                     document.getElementById('login-tab').click();
                 }, 1500);
             } else {
-                showChangePinMessage('{{ _("Ошибка:") }} ' + data.message, 'danger');
+                showChangePinMessage('{{ _("Ошибка:") }} ' + (data.message || data.error), 'danger');
             }
         })
         .catch(error => {
@@ -630,6 +643,10 @@
             const createPinModal = new bootstrap.Modal(document.getElementById('createPinModal'));
             createPinModal.show();
         }, 500);
+    }
+
+    function useDefaultPin() {
+        submitFirstTimeSetup('');
     }
     
     // Функция показа модального окна загрузки архива
@@ -707,8 +724,6 @@
     function submitCreatePin() {
         const newPin = document.getElementById('newPinInput').value;
         const confirmPin = document.getElementById('confirmPinInput').value;
-        const messageDiv = document.getElementById('createPinMessage');
-        const submitButton = document.querySelector('#createPinModal .btn-primary');
         
         // Проверяем, что PIN введен
         if (!newPin || newPin.length < 4) {
@@ -721,14 +736,26 @@
             showCreatePinMessage('{{ _("PIN-коды не совпадают") }}', 'danger');
             return;
         }
-        
-        // Отключаем кнопку во время запроса
-        submitButton.disabled = true;
-        submitButton.textContent = '{{ _("Создание...") }}';
-        
-        // Отправляем запрос
+
+        submitFirstTimeSetup(newPin);
+    }
+
+    function submitFirstTimeSetup(newPin) {
+        const createPinButton = document.querySelector('#createPinModal .btn-primary');
+        const defaultPinButton = document.querySelector('#firstTimeSetupModal .btn-outline-success');
+
+        if (createPinButton) {
+            createPinButton.disabled = true;
+            createPinButton.textContent = '{{ _("Создание...") }}';
+        }
+        if (defaultPinButton) {
+            defaultPinButton.disabled = true;
+        }
+
         const formData = new FormData();
-        formData.append('new_pin', newPin);
+        if (newPin) {
+            formData.append('new_pin', newPin);
+        }
         
         fetch('/pin/first_time_setup', {
             method: 'POST',
@@ -737,22 +764,33 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showCreatePinMessage('{{ _("PIN успешно создан!") }} {{ _("Приложение будет перезагружено.") }}', 'success');
+                const successMessage = data.used_default_pin
+                    ? '{{ _("Будет использован PIN 1234. Приложение будет перезагружено.") }}'
+                    : '{{ _("PIN успешно создан!") }} {{ _("Приложение будет перезагружено.") }}';
+                showCreatePinMessage(successMessage, 'success');
+                showFirstSetupMessage(successMessage, 'success');
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             } else {
-                showCreatePinMessage('{{ _("Ошибка:") }} ' + data.message, 'danger');
+                const errorMessage = '{{ _("Ошибка:") }} ' + (data.message || data.error || 'Unknown error');
+                showCreatePinMessage(errorMessage, 'danger');
+                showFirstSetupMessage(errorMessage, 'danger');
             }
         })
         .catch(error => {
             console.error('Ошибка:', error);
             showCreatePinMessage('{{ _("Произошла ошибка при создании PIN") }}', 'danger');
+            showFirstSetupMessage('{{ _("Произошла ошибка при создании PIN") }}', 'danger');
         })
         .finally(() => {
-            // Восстанавливаем кнопку
-            submitButton.disabled = false;
-            submitButton.textContent = '{{ _("Создать PIN") }}';
+            if (createPinButton) {
+                createPinButton.disabled = false;
+                createPinButton.textContent = '{{ _("Создать PIN") }}';
+            }
+            if (defaultPinButton) {
+                defaultPinButton.disabled = false;
+            }
         });
     }
     
@@ -760,6 +798,21 @@
     function showCreatePinMessage(message, type) {
         const messageDiv = document.getElementById('createPinMessage');
         messageDiv.className = `alert alert-${type}`;
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+    }
+
+    function showFirstSetupMessage(message, type, hide = false) {
+        const messageDiv = document.getElementById('firstSetupMessage');
+        if (!messageDiv) {
+            return;
+        }
+        if (hide) {
+            messageDiv.style.display = 'none';
+            messageDiv.textContent = '';
+            return;
+        }
+        messageDiv.className = `alert alert-${type} mt-3`;
         messageDiv.textContent = message;
         messageDiv.style.display = 'block';
     }
