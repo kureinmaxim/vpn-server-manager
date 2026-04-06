@@ -3,6 +3,7 @@ from typing import Optional, Dict, List
 from paramiko.ssh_exception import SSHException, AuthenticationException
 from ..exceptions import SSHConnectionError, AuthenticationError
 import logging
+import re
 import threading
 
 logger = logging.getLogger(__name__)
@@ -17,6 +18,47 @@ class SSHService:
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
         self.sftp_client: Optional[paramiko.SFTPClient] = None
+
+    @staticmethod
+    def _sort_ports(ports: List[str]) -> List[str]:
+        return sorted(ports, key=lambda p: (not p.isdigit(), int(p) if p.isdigit() else p))
+
+    @classmethod
+    def _parse_listener_ports(cls, output: str) -> List[str]:
+        ports = set()
+        for raw_line in output.splitlines():
+            line = raw_line.strip()
+            if not line:
+                continue
+
+            endpoint = line.split('|', 1)[-1].strip()
+            match = re.search(r':(\d+)$', endpoint)
+            if match:
+                ports.add(match.group(1))
+
+        return cls._sort_ports(list(ports))
+
+    def _read_command_output(self, client, command: str, timeout: int = 30) -> str:
+        _, stdout, _ = client.exec_command(command, timeout=timeout)
+        return stdout.read().decode('utf-8').strip()
+
+    def _get_listening_ports(self, client) -> List[str]:
+        output = self._read_command_output(
+            client,
+            "ss -tulnH 2>/dev/null | awk '{print $1 \"|\" $5}'",
+            timeout=15
+        )
+
+        ports = self._parse_listener_ports(output)
+        if ports:
+            return ports
+
+        output = self._read_command_output(
+            client,
+            "netstat -tuln 2>/dev/null | awk 'NR>2 {print $1 \"|\" $4}'",
+            timeout=15
+        )
+        return self._parse_listener_ports(output)
     
     @classmethod
     def get_connection_pooled(cls, hostname: str, port: int, username: str, password: Optional[str] = None, connection_timeout: int = 30):
@@ -605,46 +647,82 @@ class SSHService:
             }
     
     def get_firewall_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
-        """Получение статистики брандмауэра (UFW)"""
+        """Получение статистики брандмауэра и listening ports"""
         import datetime
         
         try:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password)
-            
-            # Проверяем статус UFW
-            _, stdout, _ = client.exec_command('sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'')
-            ufw_status = stdout.read().decode('utf-8').strip() or 'inactive'
-            
-            # Получаем открытые порты
-            _, stdout, _ = client.exec_command('sudo ufw status numbered 2>/dev/null | grep -E "^\\[" | awk \'{print $3}\' | cut -d\'/\' -f1 | sort -u')
-            open_ports_list = stdout.read().decode('utf-8').strip().split('\n')
-            open_ports = ','.join([p for p in open_ports_list if p]) if open_ports_list[0] else 'none'
-            
-            # Считаем заблокированные попытки за 24 часа
-            today = datetime.datetime.now().strftime('%b %e')
-            _, stdout, _ = client.exec_command(f'sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | grep "{today}" | wc -l')
-            blocked_24h = stdout.read().decode('utf-8').strip()
-            blocked_24h = int(blocked_24h) if blocked_24h.isdigit() else 0
-            
-            # Получаем последний заблокированный IP
-            _, stdout, _ = client.exec_command('sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | tail -1')
-            last_block_line = stdout.read().decode('utf-8').strip()
-            
+
+            listening_ports = self._get_listening_ports(client)
+            open_ports = ', '.join(listening_ports) if listening_ports else 'none'
+
+            backend = 'none'
+            status = 'inactive'
+            firewall_ports = 'none'
+            blocked_24h = 0
+            last_block_line = ''
+
+            ufw_installed = bool(self._read_command_output(client, 'command -v ufw', timeout=10))
+            if ufw_installed:
+                backend = 'ufw'
+                status = self._read_command_output(
+                    client,
+                    'sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'',
+                    timeout=10
+                ) or 'inactive'
+                firewall_ports_output = self._read_command_output(
+                    client,
+                    'sudo ufw status numbered 2>/dev/null | grep -E "^\\[" | awk \'{print $3}\' | cut -d\'/\' -f1 | sort -u',
+                    timeout=10
+                )
+                firewall_ports_list = [p for p in firewall_ports_output.split('\n') if p]
+                firewall_ports = ', '.join(firewall_ports_list) if firewall_ports_list else 'none'
+
+                today = datetime.datetime.now().strftime('%b %e')
+                blocked_output = self._read_command_output(
+                    client,
+                    f'sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | grep "{today}" | wc -l',
+                    timeout=10
+                )
+                blocked_24h = int(blocked_output) if blocked_output.isdigit() else 0
+                last_block_line = self._read_command_output(
+                    client,
+                    'sudo grep "UFW BLOCK" /var/log/ufw.log 2>/dev/null | tail -1',
+                    timeout=10
+                )
+            else:
+                firewalld_state = self._read_command_output(client, 'systemctl is-active firewalld 2>/dev/null', timeout=10)
+                if firewalld_state in {'active', 'inactive', 'failed'}:
+                    backend = 'firewalld'
+                    status = 'active' if firewalld_state == 'active' else 'inactive'
+                else:
+                    nft_rules = self._read_command_output(client, 'sudo nft list ruleset 2>/dev/null | head -20', timeout=10)
+                    if nft_rules:
+                        backend = 'nftables'
+                        status = 'active'
+                    else:
+                        iptables_rules = self._read_command_output(client, 'sudo iptables -S 2>/dev/null | head -20', timeout=10)
+                        if iptables_rules:
+                            backend = 'iptables'
+                            status = 'active'
+
             last_blocked_ip = 'none'
             last_blocked_port = '0'
             if last_block_line:
-                import re
                 ip_match = re.search(r'SRC=([0-9.]+)', last_block_line)
                 port_match = re.search(r'DPT=([0-9]+)', last_block_line)
                 if ip_match:
                     last_blocked_ip = ip_match.group(1)
                 if port_match:
                     last_blocked_port = port_match.group(1)
-            
+
             return {
-                'status': ufw_status,
+                'status': status,
+                'backend': backend,
                 'open_ports': open_ports,
+                'firewall_ports': firewall_ports,
+                'listening_ports_count': len(listening_ports),
                 'blocked_24h': blocked_24h,
                 'last_blocked': {
                     'ip': last_blocked_ip,
@@ -657,7 +735,10 @@ class SSHService:
             logger.error(f"Error getting firewall stats from {ip}: {str(e)}")
             return {
                 'status': 'unknown',
+                'backend': 'none',
                 'open_ports': 'N/A',
+                'firewall_ports': 'N/A',
+                'listening_ports_count': 0,
                 'blocked_24h': 0,
                 'last_blocked': {'ip': 'none', 'port': '0', 'time': 'N/A'},
                 'error': str(e)
@@ -731,22 +812,38 @@ class SSHService:
     
     def get_security_events(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
         """Получение событий безопасности"""
-        import datetime
         import time
         
         try:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password)
             
-            # SSH неудачные попытки за последние 24 часа
-            today = datetime.datetime.now().strftime('%b %e')
-            _, stdout, _ = client.exec_command(f'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | grep "{today}" | wc -l')
-            ssh_failures = stdout.read().decode('utf-8').strip()
-            ssh_failures = int(ssh_failures) if ssh_failures.isdigit() else 0
-            
-            # Топ IP с неудачными попытками
-            _, stdout, _ = client.exec_command(f'''sudo grep "Failed password" /var/log/auth.log 2>/dev/null | grep "{today}" | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk '{{print $2}}' | sort | uniq -c | sort -rn | head -3''')
-            top_ips_output = stdout.read().decode('utf-8').strip().split('\n')
+            ssh_failures_output = self._read_command_output(
+                client,
+                'sudo journalctl --since "24 hours ago" --no-pager 2>/dev/null | grep -E "Failed password|authentication failure" | wc -l',
+                timeout=15
+            )
+            if not ssh_failures_output.isdigit():
+                ssh_failures_output = self._read_command_output(
+                    client,
+                    'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | tail -1000 | wc -l',
+                    timeout=15
+                )
+            ssh_failures = int(ssh_failures_output) if ssh_failures_output.isdigit() else 0
+
+            top_failed_output = self._read_command_output(
+                client,
+                'sudo journalctl --since "24 hours ago" --no-pager 2>/dev/null | grep -E "Failed password|authentication failure" | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk \'{print $2}\' | sort | uniq -c | sort -rn | head -3',
+                timeout=15
+            )
+            if not top_failed_output:
+                top_failed_output = self._read_command_output(
+                    client,
+                    'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | tail -1000 | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk \'{print $2}\' | sort | uniq -c | sort -rn | head -3',
+                    timeout=15
+                )
+
+            top_ips_output = top_failed_output.split('\n')
             top_failed_ips = []
             for line in top_ips_output:
                 if line.strip():
@@ -769,13 +866,36 @@ class SSHService:
             if last_update_timestamp.isdigit():
                 days_since_update = (int(time.time()) - int(last_update_timestamp)) // 86400
             
+            fail2ban_output = self._read_command_output(
+                client,
+                'sudo fail2ban-client status sshd 2>/dev/null | grep "Currently banned:" | awk \'{print $4}\'',
+                timeout=10
+            )
+            fail2ban_banned = int(fail2ban_output) if fail2ban_output.isdigit() else 0
+
+            failed_services_output = self._read_command_output(
+                client,
+                'systemctl --failed --no-legend --plain 2>/dev/null | wc -l',
+                timeout=10
+            )
+            failed_services = int(failed_services_output) if failed_services_output.isdigit() else 0
+
+            error_events_output = self._read_command_output(
+                client,
+                'sudo journalctl --since "24 hours ago" -p err..alert --no-pager 2>/dev/null | wc -l',
+                timeout=15
+            )
+            error_events_24h = int(error_events_output) if error_events_output.isdigit() else 0
+
             # Проверяем новые открытые порты
             baseline_file = '/var/tmp/open_ports_baseline.txt'
-            _, stdout, _ = client.exec_command(f'test -f {baseline_file} && echo "exists" || echo "not_exists"')
-            baseline_exists = stdout.read().decode('utf-8').strip() == 'exists'
-            
-            _, stdout, _ = client.exec_command('sudo netstat -tuln 2>/dev/null | grep LISTEN | awk \'{print $4}\' | sed \'s/.*://\' | sort -u')
-            current_ports = stdout.read().decode('utf-8').strip().split('\n')
+            baseline_exists = self._read_command_output(
+                client,
+                f'test -f {baseline_file} && echo "exists" || echo "not_exists"',
+                timeout=10
+            ) == 'exists'
+
+            current_ports = self._get_listening_ports(client)
             
             new_open_ports = 0
             if not baseline_exists:
@@ -795,6 +915,9 @@ class SSHService:
                 'security_updates_available': security_updates,
                 'days_since_update': days_since_update,
                 'new_open_ports': new_open_ports,
+                'fail2ban_banned': fail2ban_banned,
+                'failed_services': failed_services,
+                'error_events_24h': error_events_24h,
                 'timestamp': int(time.time())
             }
             
@@ -806,6 +929,9 @@ class SSHService:
                 'security_updates_available': 0,
                 'days_since_update': 0,
                 'new_open_ports': 0,
+                'fail2ban_banned': 0,
+                'failed_services': 0,
+                'error_events_24h': 0,
                 'timestamp': int(time.time()),
                 'error': str(e)
             }

@@ -224,3 +224,25 @@ class TestSSHService:
         # Мокаем отключенного клиента
         service.client.get_transport.return_value = None
         assert service.is_connected is False
+
+    def test_parse_listener_ports(self):
+        """Парсинг портов из ss/netstat вывода"""
+        service = SSHService()
+
+        output = "\n".join([
+            "tcp|0.0.0.0:22",
+            "tcp|127.0.0.1:5432",
+            "udp|*:1194",
+            "tcp|[::]:443",
+            "tcp|0.0.0.0:22",
+        ])
+
+        assert service._parse_listener_ports(output) == ['22', '443', '1194', '5432']
+
+    def test_get_listening_ports_falls_back_to_netstat(self):
+        """Если ss пустой, используется netstat fallback"""
+        service = SSHService()
+        client = Mock()
+
+        with patch.object(service, '_read_command_output', side_effect=['', 'tcp|0.0.0.0:80\nudp|0.0.0.0:53']):
+            assert service._get_listening_ports(client) == ['53', '80']
