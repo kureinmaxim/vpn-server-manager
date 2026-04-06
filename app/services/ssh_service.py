@@ -14,6 +14,7 @@ class SSHService:
     # Кэш подключений
     _connection_pool = {}
     _pool_lock = threading.Lock()
+    _process_exclusions = {'ps', 'head', 'bash', 'sh', 'sudo', 'timeout'}
     
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
@@ -37,6 +38,37 @@ class SSHService:
                 ports.add(match.group(1))
 
         return cls._sort_ports(list(ports))
+
+    @classmethod
+    def _parse_top_processes(cls, output: str, limit: int = 5) -> List[Dict[str, str]]:
+        processes: List[Dict[str, str]] = []
+
+        for idx, raw_line in enumerate(output.splitlines()):
+            line = raw_line.strip()
+            if not line:
+                continue
+            if idx == 0 and 'PID' in line and '%CPU' in line:
+                continue
+
+            parts = line.split()
+            if len(parts) < 4:
+                continue
+
+            cmd = parts[1].strip()
+            if cmd in cls._process_exclusions:
+                continue
+
+            processes.append({
+                'pid': parts[0],
+                'cmd': cmd,
+                'cpu': parts[2],
+                'mem': parts[3],
+            })
+
+            if len(processes) >= limit:
+                break
+
+        return processes
 
     def _read_command_output(self, client, command: str, timeout: int = 30) -> str:
         _, stdout, _ = client.exec_command(command, timeout=timeout)
@@ -400,20 +432,9 @@ class SSHService:
             
             # Processes (Top 5 by CPU)
             try:
-                _, stdout, _ = client.exec_command('ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 6')
-                ps_lines = stdout.read().decode('utf-8').strip().split('\n')
-                processes = []
-                for line in ps_lines[1:]:  # Skip header
-                    if line.strip():
-                        parts = line.split()
-                        if len(parts) >= 4:
-                            processes.append({
-                                'pid': parts[0],
-                                'cmd': parts[1],
-                                'cpu': parts[2],
-                                'mem': parts[3]
-                            })
-                stats['processes'] = processes
+                _, stdout, _ = client.exec_command('ps -eo pid,comm,%cpu,%mem --sort=-%cpu | head -n 15')
+                ps_output = stdout.read().decode('utf-8').strip()
+                stats['processes'] = self._parse_top_processes(ps_output)
             except:
                 stats['processes'] = []
             
@@ -473,7 +494,10 @@ class SSHService:
         except paramiko.SSHException as e:
             logger.error(f"SSH connection error to {ip}: {str(e)}")
             if "Error reading SSH protocol banner" in str(e):
-                raise SSHConnectionError(f"Server {ip} is not responding or SSH service is not running. Please check if the server is online and SSH port (22) is accessible.")
+                raise SSHConnectionError(
+                    f"Server {ip} is not responding or SSH service is not running. "
+                    f"Please check if the server is online and SSH port ({port}) is accessible."
+                )
             else:
                 raise SSHConnectionError(f"SSH connection failed to {ip}: {str(e)}")
         except paramiko.socket.timeout as e:
@@ -1074,8 +1098,8 @@ class SSHService:
                     tools['ufw']['warning'] = '⚠️ UFW выключен (это ПРАВИЛЬНО! Оставьте выключенным)'
                     tools['ufw']['fix_cmd'] = '# НЕ включайте UFW! Команда: sudo ufw disable'
                 else:
-                    tools['ufw']['warning'] = '⚠️ UFW включен! Убедитесь что порт 22 (SSH) разрешен!'
-                    tools['ufw']['fix_cmd'] = 'sudo ufw status numbered  # Проверьте правила'
+                    tools['ufw']['warning'] = f'⚠️ UFW включен! Убедитесь что SSH-порт {port} разрешен!'
+                    tools['ufw']['fix_cmd'] = f'sudo ufw allow {port}/tcp && sudo ufw status numbered'
             
             # Подсчитываем статистику
             total = len(tools)
