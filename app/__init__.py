@@ -174,15 +174,15 @@ def load_app_info(app):
         else:
             # Заглушка если config.json не найден
             app.config['app_info'] = {
-                "version": "4.0.10",
-                "last_updated": "2025-10-26",
+                "version": "4.1.1",
+                "last_updated": "2026-04-06",
                 "developer": "Куреин М.Н."
             }
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.0.10",
-            "last_updated": "2025-10-26",
+            "version": "4.1.1",
+            "last_updated": "2026-04-06",
             "developer": "Куреин М.Н."
         }
 
@@ -240,6 +240,7 @@ def create_app(config_name='development'):
     
     # Загрузка конфигурации
     app.config.from_object(config_by_name[config_name])
+    app.config['IS_DESKTOP_APP'] = '--desktop' in sys.argv or os.environ.get('DESKTOP_MODE') == '1'
 
     # Управление пользовательским config.json (только для frozen-режима)
     manage_user_config(app)
@@ -312,6 +313,7 @@ def create_app(config_name='development'):
         
         return {
             'app_info': app.config.get('app_info', {}),
+            'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': {
                 'host': server_host,
                 'port': server_port,

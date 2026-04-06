@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, current_app
 from flask_babel import gettext as _
+from datetime import datetime
+import json
 import logging
+import os
 from ..services import registry
 from ..utils.decorators import require_auth, require_pin, validate_json, handle_errors
 from ..utils.validators import Validators
@@ -20,6 +23,94 @@ pin_bp = Blueprint('pin', __name__, url_prefix='/pin')
 
 # Vendor endpoints (без префикса)
 vendor_bp = Blueprint('vendor', __name__)
+
+
+def _get_default_pin():
+    return current_app.config.get('DEFAULT_PIN', '1234')
+
+
+def _get_runtime_config_path():
+    app_data_dir = current_app.config.get('APP_DATA_DIR') or '.'
+    return os.path.join(app_data_dir, 'config.json')
+
+
+def _load_runtime_config():
+    config_path = _get_runtime_config_path()
+    template_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        'config.json'
+    )
+
+    config = {}
+
+    if os.path.exists(template_path):
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        except Exception as e:
+            logger.warning(f"Could not load template config: {e}")
+
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                runtime_config = json.load(f)
+            config.update(runtime_config)
+        except Exception as e:
+            logger.warning(f"Could not load runtime config: {e}")
+
+    secret_pin = config.setdefault('secret_pin', {})
+    default_pin = _get_default_pin()
+    secret_pin.setdefault('default_pin', default_pin)
+    secret_pin.setdefault('current_pin', secret_pin.get('default_pin', default_pin))
+    secret_pin.setdefault('last_changed', '')
+    secret_pin.setdefault('setup_completed', False)
+
+    return config
+
+
+def _save_runtime_config(config):
+    config_path = _get_runtime_config_path()
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    with open(config_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
+
+
+def _get_current_pin():
+    return _load_runtime_config().get('secret_pin', {}).get('current_pin', _get_default_pin())
+
+
+def _save_current_pin(new_pin, setup_completed=True):
+    config = _load_runtime_config()
+    secret_pin = config.setdefault('secret_pin', {})
+    secret_pin['default_pin'] = _get_default_pin()
+    secret_pin['current_pin'] = new_pin
+    secret_pin['last_changed'] = datetime.now().strftime('%Y-%m-%d')
+    secret_pin['setup_completed'] = setup_completed
+    _save_runtime_config(config)
+
+
+def _has_existing_server_data():
+    data_dir = current_app.config.get('DATA_DIR') or os.path.join(current_app.config.get('APP_DATA_DIR', '.'), 'data')
+    servers_file = current_app.config.get('SERVERS_FILE', 'servers.json.enc')
+    servers_path = os.path.join(data_dir, servers_file)
+    return os.path.exists(servers_path) and os.path.getsize(servers_path) > 0
+
+
+def _is_first_setup_allowed():
+    if _has_existing_server_data():
+        return False
+
+    secret_pin = _load_runtime_config().get('secret_pin', {})
+    return not secret_pin.get('setup_completed', False)
+
+
+def _set_authenticated_session():
+    session['pin_authenticated'] = True
+    session['authenticated'] = True
+    session['pin_verified'] = True
+    session.permanent = False
+    session.pop('block_until', None)
+    session.pop('failed_attempts', None)
 
 @api_bp.route('/servers', methods=['GET'])
 @require_auth
@@ -1430,17 +1521,21 @@ def check_block():
 def check_first_setup_allowed():
     """Проверка, разрешен ли первый запуск"""
     try:
-        # Проверяем, есть ли уже данные серверов
-        import os
-        servers_file = os.path.join('data', 'servers.json.enc')
-        if os.path.exists(servers_file) and os.path.getsize(servers_file) > 0:
+        if _has_existing_server_data():
             return jsonify({
                 'allowed': False,
                 'reason': 'Data already exists'
             })
-        
+
+        if not _is_first_setup_allowed():
+            return jsonify({
+                'allowed': False,
+                'reason': 'PIN already configured'
+            })
+
         return jsonify({
-            'allowed': True
+            'allowed': True,
+            'default_pin': _get_default_pin()
         })
     except Exception as e:
         logger.error(f"Error checking first setup: {str(e)}")
@@ -1448,6 +1543,45 @@ def check_first_setup_allowed():
             'allowed': False,
             'error': str(e)
         })
+
+
+@pin_bp.route('/first_time_setup', methods=['POST'])
+def first_time_setup():
+    """Первичная настройка PIN на чистой установке"""
+    try:
+        if not _is_first_setup_allowed():
+            return jsonify({
+                'success': False,
+                'message': _('First setup is not available')
+            }), 403
+
+        if request.is_json:
+            data = request.get_json() or {}
+            new_pin = data.get('new_pin', '').strip()
+        else:
+            new_pin = request.form.get('new_pin', '').strip()
+
+        selected_pin = new_pin or _get_default_pin()
+        if len(selected_pin) < 4:
+            return jsonify({
+                'success': False,
+                'message': _('PIN должен содержать минимум 4 символа')
+            }), 400
+
+        _save_current_pin(selected_pin, setup_completed=True)
+        _set_authenticated_session()
+
+        return jsonify({
+            'success': True,
+            'message': _('PIN configured successfully'),
+            'used_default_pin': not bool(new_pin)
+        })
+    except Exception as e:
+        logger.error(f"Error in first_time_setup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
 
 @pin_bp.route('/login_ajax', methods=['POST', 'OPTIONS'])
 def login_ajax():
@@ -1461,6 +1595,18 @@ def login_ajax():
         return response
     
     try:
+        block_until = session.get('block_until')
+        if block_until:
+            import time
+            if time.time() < block_until:
+                remaining = int(block_until - time.time())
+                return jsonify({
+                    'success': False,
+                    'error': _('Too many failed attempts. Blocked for 30 seconds.'),
+                    'blocked': True,
+                    'remaining_seconds': remaining
+                }), 429
+
         # Логируем для отладки
         logger.info(f"Request method: {request.method}")
         logger.info(f"Request content type: {request.content_type}")
@@ -1487,30 +1633,11 @@ def login_ajax():
                 'error': _('PIN is required')
             }), 400
         
-        # Получаем правильный PIN из config.json
-        def get_secret_pin():
-            try:
-                import json
-                import os
-                config_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'config.json')
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config = json.load(f)
-                return config.get('secret_pin', {}).get('current_pin', '1234')
-            except Exception as e:
-                logger.error(f"Error loading PIN from config: {e}")
-                return '1234'
-        
-        current_pin = get_secret_pin()
+        current_pin = _get_current_pin()
         
         # Проверяем PIN
         if pin == current_pin:
-            # Устанавливаем все необходимые флаги сессии
-            session['pin_authenticated'] = True
-            session['authenticated'] = True  # Для @require_auth
-            session['pin_verified'] = True  # Для @require_pin
-            session.permanent = False  # Сессия НЕ постоянная - сбрасывается при закрытии браузера/приложения
-            session.pop('block_until', None)  # Снимаем блокировку
-            session.pop('failed_attempts', None)  # Сбрасываем счетчик
+            _set_authenticated_session()
             logger.info(f"PIN authenticated successfully. Session: {dict(session)}")
             return jsonify({
                 'success': True,
@@ -1529,7 +1656,8 @@ def login_ajax():
                 return jsonify({
                     'success': False,
                     'error': _('Too many failed attempts. Blocked for 30 seconds.'),
-                    'blocked': True
+                    'blocked': True,
+                    'remaining_seconds': 30
                 }), 429
             
             return jsonify({
@@ -1549,20 +1677,34 @@ def login_ajax():
 def change_ajax():
     """AJAX смена PIN"""
     try:
-        data = request.get_json()
-        old_pin = data.get('old_pin', '').strip()
-        new_pin = data.get('new_pin', '').strip()
+        if request.is_json:
+            data = request.get_json() or {}
+            old_pin = data.get('old_pin', '').strip()
+            new_pin = data.get('new_pin', '').strip()
+        else:
+            old_pin = request.form.get('old_pin', '').strip()
+            new_pin = request.form.get('new_pin', '').strip() or request.form.get('new_pin1', '').strip()
+            confirm_pin = request.form.get('new_pin2', '').strip()
+            if confirm_pin and new_pin != confirm_pin:
+                return jsonify({
+                    'success': False,
+                    'message': _('Новые PIN-коды не совпадают')
+                }), 400
         
         if not old_pin or not new_pin:
             return jsonify({
                 'success': False,
                 'error': _('Both old and new PIN are required')
             }), 400
-        
-        # Здесь должна быть проверка старого PIN и сохранение нового
-        # Временно используем простую проверку
-        if old_pin == '1234':  # Дефолтный PIN
-            # Здесь должно быть сохранение нового PIN
+
+        if len(new_pin) < 4:
+            return jsonify({
+                'success': False,
+                'message': _('PIN должен содержать минимум 4 символа')
+            }), 400
+
+        if old_pin == _get_current_pin():
+            _save_current_pin(new_pin, setup_completed=True)
             return jsonify({
                 'success': True,
                 'message': _('PIN changed successfully')

@@ -1,569 +1,321 @@
-# Руководство по сборке и релизу VPN Server Manager v4.0.3
+# Руководство по сборке и релизу VPN Server Manager
 
-Данное руководство описывает полный процесс сборки приложения VPN Server Manager, создания тега и публикации релиза на GitHub.
+Это актуальный релизный процесс для `VPN Server Manager` после перехода на централизованное управление версиями через `config.json` и `tools/update_version.py`.
 
-**v4.0.3**: Версия автоматически читается из `config.json`, упрощая процесс релиза!
+Связанные документы:
+- `VERSION_MANAGEMENT.md` — правила хранения и синхронизации версий
+- `BUILD.md` — общая инструкция по сборке
+- `CHANGELOG.md` — история изменений
 
-## Содержание
+## 1. Перед релизом
 
-1. [Подготовка к сборке](#1-подготовка-к-сборке)
-2. [Обновление версии](#2-обновление-версии)
-3. [Сборка приложения](#3-сборка-приложения)
-4. [Тестирование сборки](#4-тестирование-сборки)
-5. [Создание тега в Git](#5-создание-тега-в-git)
-6. [Создание релиза на GitHub](#6-создание-релиза-на-github)
-7. [Решение проблем](#7-решение-проблем)
+Убедитесь, что:
+- рабочее дерево чистое или вы понимаете все локальные изменения
+- установлен GitHub CLI, если релиз создаётся через `gh`
+- есть рабочее окружение Python с зависимостями проекта
+- сборка выполняется после синхронизации версии
 
-## 1. Подготовка к сборке
+### Windows
 
-### 1.1. Требования
-
-- macOS 10.14 или выше
-- Python 3.8 или выше
-- Установленный pip
-- PyInstaller (`pip install pyinstaller`)
-- Xcode Command Line Tools
-- Git и GitHub CLI (опционально)
-
-### 1.2. Клонирование репозитория
-
-```bash
-# Клонирование репозитория
-git clone https://github.com/kureinmaxim/vpn-server-manager.git
-cd vpn-server-manager
-
-# Создание и активация виртуального окружения
-python3 -m venv venv
-source venv/bin/activate
-
-# Установка зависимостей
-pip install -r requirements.txt
-pip install pyinstaller
+```powershell
+venv\Scripts\python.exe tools\update_version.py status
 ```
 
-### 1.3. Установка GitHub CLI (опционально)
-
-Если у вас еще не установлен GitHub CLI:
+### macOS / Linux
 
 ```bash
-# Для macOS с Homebrew
-brew install gh
-
-# Авторизация
-gh auth login
+venv/bin/python3 tools/update_version.py status
 ```
+
+Если используется `.venv`, замените путь на `.venv`.
+
+---
 
 ## 2. Обновление версии
 
-### 2.1. Изменение версии в config.json (v4.0.3)
+Источник правды:
+- `config.json`
 
-**ВАЖНО**: В v4.0.3 версия хранится **ТОЛЬКО** в `config.json`. Все компоненты читают её оттуда автоматически!
+Менять версию вручную в нескольких файлах больше не нужно. Для этого используется `tools/update_version.py`.
 
-Откройте файл `config.json` и обновите версию в разделе `app_info`:
+### Поднять patch-версию
 
-```json
-{
-  "SECRET_KEY_FILE": ".env",
-  "app_info": {
-    "version": "4.0.4",                    // ← Увеличьте номер версии ЗДЕСЬ
-    "release_date": "12.10.2025",          // ← Обновите дату
-    "developer": "Куреин М.Н.",
-    "last_updated": "2025-10-12"           // ← Обновите дату
-  },
-  "service_urls": { ... },
-  "active_data_file": "...",
-  "secret_pin": { ... }
-}
+```powershell
+venv\Scripts\python.exe tools\update_version.py bump patch
 ```
 
-**Что обновится автоматически:**
-- ✅ `run.py` - отобразит новую версию при запуске
-- ✅ `setup.py` - использует для сборки пакета
-- ✅ `build_macos.py` - использует для .app и .dmg
-- ✅ `app/__init__.py` - загрузит из config.json
-- ✅ `make version` - покажет текущую версию
+### Поднять minor-версию
 
-**Проверка версии перед релизом:**
-```bash
-# Быстрая проверка
-make version
-# Вывод: VPN Server Manager v4.0.4
-
-# Или вручную
-jq -r .app_info.version config.json
+```powershell
+venv\Scripts\python.exe tools\update_version.py bump minor
 ```
 
-### 2.2. Обновление CHANGELOG.md
+### Поставить конкретную версию
 
-Добавьте информацию о новом релизе в начало файла `CHANGELOG.md`:
+```powershell
+venv\Scripts\python.exe tools\update_version.py sync 4.1.2
+```
+
+### Проверить итог
+
+```powershell
+venv\Scripts\python.exe tools\update_version.py status
+```
+
+После этого автоматически синхронизируются:
+- `config/config.json.template`
+- `README.md`
+- `vpn-manager-installer.iss`
+- `env.example`
+- `app/config.py`
+- `app/__init__.py`
+- `setup.py`
+
+---
+
+## 3. Обновление CHANGELOG
+
+После bump/sync обновите `CHANGELOG.md`.
+
+Рекомендуемый формат:
 
 ```markdown
-## [4.0.4] - 2025-10-12
+## [4.1.2] - 2026-04-06
 
-### Добавлено
-- 🎯 Новая функциональность 1
-- 🚀 Новая функциональность 2
+### Added
+- ...
 
-### Улучшено
-- ⚡ Улучшение 1
-- 📊 Улучшение 2
+### Changed
+- ...
 
-### Исправлено
-- 🐛 Исправление ошибки 1
-- 🔧 Исправление ошибки 2
-
-### Технические детали
-- Подробности реализации
+### Fixed
+- ...
 ```
 
-**Формат v4.0.3:**
-- Используйте эмодзи для наглядности (🎯 🚀 ⚡ 🐛 🔧)
-- Группируйте по категориям: Добавлено, Улучшено, Исправлено, Технические детали
-- Следуйте [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/)
+Если в проекте уже используется более подробный формат с эмодзи и подзаголовками, сохраняйте его стиль, но версия в заголовке должна совпадать с `config.json`.
 
-## 3. Сборка приложения
+---
 
-### 3.1. Запуск скрипта сборки (v4.0.3)
+## 4. Сборка релизных артефактов
 
-**Способ 1: Через Makefile (рекомендуется)**
+### macOS
+
 ```bash
-# Активация виртуального окружения
 source venv/bin/activate
-
-# Полная сборка (.app + .dmg)
-make dist
-
-# Или только .app
-make build
-
-# Проверка версии перед сборкой
-make version
-# Вывод: VPN Server Manager v4.0.4
-```
-
-**Способ 2: Напрямую через скрипт**
-```bash
-# Активация виртуального окружения
-source venv/bin/activate
-
-# Запуск скрипта сборки (автоматически использует версию из config.json)
 python3 build_macos.py
 ```
 
-Скрипт выполнит следующие действия:
-1. Прочитает версию из `config.json`
-2. Очистит предыдущие сборки
-3. Создаст `.app` бандл с правильной версией
-4. Создаст `.dmg` установочный образ
-5. Выполнит диагностику приложения
+Ожидаемые артефакты:
+- `dist/VPNServerManager-Clean.app`
+- `dist/VPNServerManager-Clean_Installer.dmg`
 
-### 3.2. Результаты сборки
+### Windows
 
-После успешной сборки вы найдете:
-- `.app` файл в директории `dist/VPNServerManager-Clean.app`
-- `.dmg` файл в директории `dist/VPNServerManager-Clean_Installer.dmg`
+```powershell
+venv\Scripts\python.exe tools\update_version.py status
+.\build_windows.ps1
+```
 
-## 4. Тестирование сборки
+или
 
-### 4.1. Проверка приложения
+```powershell
+build_windows.bat
+```
 
-1. Откройте `.app` файл двойным щелчком
-2. Проверьте основные функции:
-   - Вход с PIN-кодом
-   - Добавление/редактирование/удаление серверов
-   - Работа в офлайн режиме
-   - Экспорт/импорт данных
-   - Проверка подсказок и шпаргалок
+Ожидаемый артефакт:
+- `installer_output/VPN-Server-Manager-Setup-vX.Y.Z.exe`
 
-### 4.2. Проверка установочного образа
+Важно:
+- Windows-сборщики теперь читают версию из `config.json`
+- перед сборкой не нужно отдельно править `vpn-manager-installer.iss`
 
-1. Смонтируйте `.dmg` файл двойным щелчком
-2. Проверьте интерфейс установки
-3. Перетащите приложение в папку Applications
-4. Запустите установленное приложение и проверьте его работу
+---
 
-## 5. Создание тега в Git
+## 5. Проверка собранного релиза
 
-### 5.1. Коммит изменений (v4.0.3)
+Минимум проверьте:
+- приложение запускается
+- версия в UI совпадает с версией релиза
+- вход по PIN работает
+- основные страницы открываются
+- Windows `.exe` или macOS `.dmg` действительно собраны с нужной версией в имени файла
+
+### Быстрая проверка macOS `.app`
 
 ```bash
-# Проверка версии перед коммитом
-make version
-# Вывод: VPN Server Manager v4.0.4
+/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" \
+  dist/VPNServerManager-Clean.app/Contents/Info.plist
+```
 
-# Добавление всех изменений
-git add config.json CHANGELOG.md
+### Быстрая проверка Windows-инсталлятора
 
-# Создание коммита с версией из config.json
-VERSION=$(jq -r .app_info.version config.json)
-git commit -m "chore(release): v$VERSION"
+Проверьте имя файла в `installer_output/`:
 
-# Отправка изменений на GitHub
+```text
+VPN-Server-Manager-Setup-vX.Y.Z.exe
+```
+
+---
+
+## 6. Коммит релизных изменений
+
+После обновления версии, `CHANGELOG.md` и сборки:
+
+```bash
+git add config.json config/config.json.template README.md env.example app/config.py app/__init__.py setup.py vpn-manager-installer.iss CHANGELOG.md
+git commit -m "chore(release): vX.Y.Z"
 git push origin main
 ```
 
-### 5.2. Создание тега автоматически
+Если в релиз входят ещё артефакты или документация, добавьте их явно.
+
+---
+
+## 7. Создание git-тега
+
+### macOS / Linux
 
 ```bash
-# Автоматическое создание тега из config.json
 VERSION=$(jq -r .app_info.version config.json)
 TAG=v$VERSION
-
-# Создание аннотированного тега
 git tag -a "$TAG" -m "Release $VERSION"
-
-# Отправка тега на GitHub
-git push origin "$TAG"
-
-# Проверка
-git tag --list "v4.0.*"
-```
-
-**Если jq не установлен:**
-```bash
-# macOS
-brew install jq
-
-# Или вручную укажите версию
-TAG=v4.0.4
-git tag -a "$TAG" -m "Release 4.0.4"
 git push origin "$TAG"
 ```
 
-## 6. Создание релиза на GitHub
+### Windows PowerShell
 
-### 6.1. Через веб-интерфейс GitHub
+```powershell
+$version = (Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
+$tag = "v$version"
+git tag -a $tag -m "Release $version"
+git push origin $tag
+```
 
-1. Перейдите на страницу репозитория на GitHub
-2. Нажмите на "Releases" в правой части страницы
-3. Нажмите "Draft a new release"
-4. Выберите созданный тег (v3.6.8)
-5. Заполните заголовок (например, "VPN Server Manager v3.6.8")
-6. Добавьте описание релиза (можно скопировать из CHANGELOG.md)
-7. Загрузите `.dmg` файл как артефакт релиза
-8. Нажмите "Publish release"
+---
 
-### 6.2. Через GitHub CLI (v4.0.3 - автоматически)
+## 8. Создание релиза на GitHub
 
-**Автоматический релиз с версией из config.json:**
+### Через GitHub CLI
+
+#### macOS / Linux
+
 ```bash
-# Получаем версию автоматически
 VERSION=$(jq -r .app_info.version config.json)
 TAG=v$VERSION
 
-# Создание релиза с загрузкой DMG-файла
-gh release create "$TAG" \
-  --title "VPN Server Manager v$VERSION" \
-  --notes "## Версия $VERSION
-
-### Добавлено
-- 🎯 Новая функциональность 1
-- 🚀 Новая функциональность 2
-
-### Улучшено
-- ⚡ Улучшение 1
-- 📊 Улучшение 2
-
-### Исправлено
-- 🐛 Исправление ошибки 1
-- 🔧 Исправление ошибки 2" \
-  dist/VPNServerManager-Clean_Installer.dmg
-
-# Или кратко (notes из CHANGELOG)
 gh release create "$TAG" \
   --title "VPN Server Manager v$VERSION" \
   --notes-file CHANGELOG.md \
   dist/VPNServerManager-Clean_Installer.dmg
 ```
 
-**One-liner (полный процесс):**
-```bash
-VERSION=$(jq -r .app_info.version config.json); TAG=v$VERSION; \
-make version && \
-git add -A && \
-git commit -m "chore(release): v$VERSION" && \
-git push && \
-git tag -a "$TAG" -m "Release $VERSION" && \
-git push origin "$TAG" && \
-gh release create "$TAG" \
-  --title "VPN Server Manager v$VERSION" \
-  --notes "Release v$VERSION" \
-  dist/VPNServerManager-Clean_Installer.dmg
+#### Windows PowerShell
+
+```powershell
+$version = (Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
+$tag = "v$version"
+
+gh release create $tag `
+  --title "VPN Server Manager v$version" `
+  --notes-file CHANGELOG.md `
+  "installer_output/VPN-Server-Manager-Setup-v$version.exe"
 ```
 
-### 6.3. Проверка релиза
+Если нужно опубликовать оба артефакта, укажите и `.exe`, и `.dmg`, когда они доступны.
 
-1. Перейдите на страницу "Releases" на GitHub
-2. Убедитесь, что новый релиз отображается и помечен как "Latest"
-3. Проверьте, что артефакты релиза доступны для скачивания
+### Через веб-интерфейс GitHub
 
-## 7. Решение проблем
-
-### 7.1. Ошибки сборки
-
-- **Проблема**: Ошибка "ImportError" при запуске приложения
-  - **Решение**: Добавьте отсутствующий модуль в список `hidden_imports` в `build_macos.py`
-
-- **Проблема**: Отсутствие иконки в собранном приложении
-  - **Решение**: Убедитесь, что файл `icon_clean.png` или `icon_clean.ico` существует в папке `static/images/`
-
-### 7.2. Ошибки с тегами Git
-
-- **Проблема**: "fatal: tag 'vX.X.X' already exists"
-  - **Решение**: Используйте другой номер версии или удалите существующий тег:
-    ```bash
-    git tag -d vX.X.X
-    git push origin :refs/tags/vX.X.X
-    ```
-
-### 7.3. Ошибки с релизами GitHub
-
-- **Проблема**: Релиз создан, но не отображается как "Latest"
-  - **Решение**: Убедитесь, что релиз не помечен как "Pre-release" и имеет более новую версию, чем предыдущий релиз
-
-- **Проблема**: Ошибка при загрузке артефактов
-  - **Решение**: Проверьте размер файла (GitHub имеет ограничения) или загрузите через веб-интерфейс
+1. Откройте страницу репозитория.
+2. Перейдите в `Releases`.
+3. Нажмите `Draft a new release`.
+4. Выберите тег `vX.Y.Z`.
+5. Заголовок: `VPN Server Manager vX.Y.Z`.
+6. В описание вставьте итог из `CHANGELOG.md`.
+7. Прикрепите релизные файлы.
+8. Опубликуйте релиз.
 
 ---
 
-## 8. Практический пример публикации (v4.0.3)
+## 9. SHA256 и публикация контрольных сумм
 
-Ниже приведены команды для публикации релиза 4.0.3 с **автоматическим определением версии** из config.json.
-
-### 8.1. Предварительные условия
+### macOS
 
 ```bash
-# Активируйте виртуальное окружение (если потребуется сборка)
-source venv/bin/activate
-
-# Убедитесь, что установлен и настроен GitHub CLI
-gh --version
-gh auth status
+shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg"
 ```
 
-### 8.2. Проверка и обновление версии
+### Windows PowerShell
 
-```bash
-# Проверить текущую версию
-make version
-# Вывод: VPN Server Manager v4.0.3
-
-# Обновить версию в config.json (если нужно)
-# Откройте config.json и измените app_info.version
-
-# Проверить снова
-make version
-# Вывод: VPN Server Manager v4.0.4 (новая версия)
+```powershell
+Get-FileHash "installer_output\VPN-Server-Manager-Setup-vX.Y.Z.exe" -Algorithm SHA256
 ```
 
-### 8.3. Сборка приложения (macOS)
-
-```bash
-# Способ 1: Через Makefile
-make dist
-
-# Способ 2: Напрямую
-python3 build_macos.py
-```
-
-Результаты:
-- .app: `dist/VPNServerManager-Clean.app`
-- .dmg: `dist/VPNServerManager-Clean_Installer.dmg`
-
-**Проверка версии в собранном приложении:**
-```bash
-# Запустить приложение и проверить в интерфейсе
-open dist/VPNServerManager-Clean.app
-
-# Или проверить Info.plist
-/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" \
-  dist/VPNServerManager-Clean.app/Contents/Info.plist
-```
-
-### 8.4. Публикация изменений в репозиторий (v4.0.3)
-
-```bash
-# Получаем версию автоматически
-VERSION=$(jq -r .app_info.version config.json)
-echo "Публикация версии: $VERSION"
-
-# Проверка статуса
-git status
-git remote -v
-
-# Коммит изменений
-git add config.json CHANGELOG.md
-git commit -m "chore(release): v$VERSION"
-
-# Публикация в main
-git push origin main
-```
-
-### 8.5. Создание и публикация тега (автоматически)
-
-```bash
-# Получаем версию и создаём тег
-VERSION=$(jq -r .app_info.version config.json)
-TAG=v$VERSION
-
-# Создание аннотированного тега
-git tag -a "$TAG" -m "Release $VERSION: централизованная версия из config.json, Multi-App Support, модульная архитектура"
-
-# Публикация тега
-git push origin "$TAG"
-
-# Проверка
-git tag --list "v4.0.*"
-```
-
-### 8.6. Создание релиза на GitHub (автоматически)
-
-```bash
-# Версия из config.json
-VERSION=$(jq -r .app_info.version config.json)
-TAG=v$VERSION
-
-# Создание релиза с загрузкой DMG
-gh release create "$TAG" \
-  --title "VPN Server Manager v$VERSION" \
-  --notes "## VPN Server Manager v$VERSION
-
-### 🎯 Ключевые изменения v4.0.3
-- **Централизованная версия**: Версия загружается из config.json автоматически
-- **Система выхода**: Endpoints /pin/exit_app, /pin/logout, /pin/check_auth
-- **Управление сессиями**: private_mode=True, PIN требуется при каждом запуске
-- **UI/UX улучшения**: Окно 880px, футер с URL и портом, исправлена видимость в светлой теме
-- **Локализация**: Добавлены переводы (EN, ZH), локализованные диалоги
-- **Multi-App Support**: Параллельный запуск без конфликтов портов
-- **WSGI сервер**: Динамическое выделение портов (порт 0)
-
-### 📦 Детали
-- Модульная архитектура (Application Factory, Service Layer, Blueprints)
-- DataManagerService для управления данными
-- Graceful Shutdown с освобождением ресурсов
-- Исправлена страница \"Управление подсказками\"
-- Обновлённая сборка macOS (.app и .dmg)
-
-### 🔧 Технические улучшения
-- Все компоненты читают версию из config.json
-- Механизм выхода: logout → session.clear() → exit_app → window.destroy() → os._exit(0)
-- Сессии только в cookies (отключен SESSION_TYPE='filesystem')
-- Улучшенная обработка ошибок
-- Расширенная документация" \
-  dist/VPNServerManager-Clean_Installer.dmg
-```
-
-### 8.7. Подсчёт SHA256 для DMG и обновление релиза
-
-```bash
-# Версия и хэш-сумма
-VERSION=$(jq -r .app_info.version config.json)
-TAG=v$VERSION
-HASH=$(shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg" | awk '{print $1}')
-
-echo "Версия: $VERSION"
-echo "SHA256: $HASH"
-```
-
-Пример результата для v4.0.3:
-
-```text
-Версия: 4.0.3
-SHA256: abc123def456...
-```
-
-Обновление заметок релиза с SHA256 и пометка как Latest:
-
-```bash
-VERSION=$(jq -r .app_info.version config.json)
-TAG=v$VERSION
-HASH=$(shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg" | awk '{print $1}')
-
-gh release edit "$TAG" \
-  --latest \
-  --notes "## VPN Server Manager v$VERSION
-
-### 🎯 Ключевые изменения v4.0.3
-- **Централизованная версия**: Автоматическая загрузка из config.json
-- **Система выхода**: Полностью рабочий механизм закрытия приложения
-- **Управление сессиями**: private_mode=True, PIN при каждом запуске
-- **UI/UX**: Окно 880px, футер с URL/портом, видимость в светлой теме
-- **Локализация**: Переводы EN/ZH, локализованные диалоги
-- **Multi-App Support**: Параллельный запуск без конфликтов
-- **WSGI + динамические порты**: Никогда не будет \"Address in use\"
-
-### 📦 Детали релиза
-- Модульная архитектура v4.0.0+
-- DataManagerService для бэкапов
-- Graceful Shutdown через window.destroy()
-- Исправлена страница \"Управление подсказками\"
-- Обновлённая документация
-
-### 🔐 Проверка целостности
-\`\`\`
-SHA256(DMG): $HASH
-\`\`\`"
-```
-
-### 8.8. Обновление README (опционально)
-
-Добавьте раздел со ссылками на последний релиз и прямую ссылку на DMG, а также SHA256-сумму. Пример:
-
-```markdown
-## ⬇️ Скачать
-
-- Последний релиз: [Latest Release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest)
-- Прямая ссылка (v3.6.8, macOS DMG): [VPNServerManager-Clean_Installer.dmg](https://github.com/kureinmaxim/vpn-server-manager/releases/download/v3.6.8/VPNServerManager-Clean_Installer.dmg)
-- SHA256(DMG): `b57abf517b112ed7956126c5fc3b5c48eeb457f5c48056fbe491ad0b976fb9ba`
-```
-
-Команды для коммита изменений README:
-
-```bash
-git add README.md
-git commit -m "docs: add download section with latest release link and DMG SHA256 (v3.6.8)"
-git push origin main
-```
-
-### 8.9. Верификация релиза
-
-```bash
-# Версия из config.json
-VERSION=$(jq -r .app_info.version config.json)
-TAG=v$VERSION
-
-# Просмотр в терминале
-gh release view "$TAG"
-
-# Или в браузере
-gh release view "$TAG" --web
-
-# Проверка списка релизов
-gh release list --limit 5
-```
-
-**Полный One-Liner для релиза v4.0.3:**
-```bash
-VERSION=$(jq -r .app_info.version config.json); TAG=v$VERSION; \
-make dist && \
-git add -A && git commit -m "chore(release): v$VERSION" && git push && \
-git tag -a "$TAG" -m "Release $VERSION" && git push origin "$TAG" && \
-HASH=$(shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg" | awk '{print $1}') && \
-gh release create "$TAG" --title "VPN Server Manager v$VERSION" \
-  --notes "Release v$VERSION\n\nSHA256: $HASH" \
-  dist/VPNServerManager-Clean_Installer.dmg && \
-gh release view "$TAG" --web
-```
-
-После выполнения этих шагов релиз будет доступен на странице релизов и помечен как Latest, а DMG-файл — с опубликованной контрольной суммой.
+Если контрольные суммы публикуются в релизе, добавьте их в описание GitHub Release или обновите файл в `installer_output/`, если это часть вашего workflow.
 
 ---
 
-## Дополнительные ресурсы
+## 10. Короткий release checklist
 
-- [Документация PyInstaller](https://pyinstaller.org/en/stable/)
-- [Документация GitHub CLI](https://cli.github.com/manual/)
-- [Semantic Versioning](https://semver.org/lang/ru/)
-- [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/)
+1. `tools/update_version.py status`
+2. `tools/update_version.py bump patch` или `sync X.Y.Z`
+3. Обновить `CHANGELOG.md`
+4. Снова выполнить `tools/update_version.py status`
+5. Собрать нужные артефакты
+6. Проверить версию в UI и в именах файлов
+7. Закоммитить изменения
+8. Создать тег `vX.Y.Z`
+9. Создать GitHub Release
+10. Проверить, что релиз отображается как ожидается
 
-Для получения дополнительной информации о сборке приложения, смотрите файл `docs/project_info/BUILD.md`.
+---
+
+## 11. Частые проблемы
+
+### Версия в UI и инсталляторе отличается
+
+Почти всегда это значит, что версия была изменена вручную, а не через `tools/update_version.py`.
+
+Решение:
+
+```powershell
+venv\Scripts\python.exe tools\update_version.py status
+venv\Scripts\python.exe tools\update_version.py sync
+```
+
+### Тег уже существует
+
+```bash
+git tag -d vX.Y.Z
+git push origin :refs/tags/vX.Y.Z
+```
+
+Делайте это только если уверены, что тег нужно пересоздать.
+
+### GitHub Release создан без артефактов
+
+Проверьте:
+- существуют ли файлы в `dist/` или `installer_output/`
+- совпадает ли версия в имени артефакта с версией тега
+- запускается ли команда `gh release create` из корня проекта
+
+---
+
+## 12. Полезные команды
+
+### Проверить текущую версию
+
+```bash
+python tools/update_version.py status
+```
+
+### Проверить версию напрямую из `config.json`
+
+```bash
+jq -r .app_info.version config.json
+```
+
+### Windows PowerShell
+
+```powershell
+(Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
+```

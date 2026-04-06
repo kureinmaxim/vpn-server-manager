@@ -15,9 +15,11 @@ def app():
     app = create_app('testing')
     
     # Настраиваем тестовые директории
+    app.config['APP_DATA_DIR'] = test_dir
     app.config['DATA_DIR'] = os.path.join(test_dir, 'data')
     app.config['UPLOAD_FOLDER'] = os.path.join(test_dir, 'uploads')
     app.config['LOG_FILE'] = os.path.join(test_dir, 'test.log')
+    app.config['DEFAULT_PIN'] = '1234'
     
     # Создаем необходимые директории
     os.makedirs(app.config['DATA_DIR'], exist_ok=True)
