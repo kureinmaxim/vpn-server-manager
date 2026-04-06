@@ -277,7 +277,7 @@ python -m babel.messages.frontend compile -d translations
 - [Руководство по версионированию](VERSION_MANAGEMENT.md)
 - [Руководство по релизам](docs/release_guide.md)
 - [Docker руководство](docs/DOCKER_GUIDE.md)
-- [Windows руководство](docs/WINDOWS_GUIDE.md)
+- [Windows proxy troubleshooting](docs/WINDOWS_PROXY_TROUBLESHOOTING.md)
 
 ## 🔒 Безопасность
 
