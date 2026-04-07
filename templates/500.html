@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center shadow-lg">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-octagon-fill"></i> {{ _('Внутренняя ошибка сервера') }}
+                    </h3>
+                </div>
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-bug display-1 text-muted"></i>
+                    </div>
+                    <h4 class="card-title mb-3">⚠️ {{ _('500 - Внутренняя ошибка сервера') }}</h4>
+                    <p class="card-text text-muted mb-4">
+                        {{ _('Произошла внутренняя ошибка сервера. Мы работаем над её устранением.') }}
+                    </p>
+                    
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-lightbulb"></i>
+                        <strong>{{ _('Что можно сделать:') }}</strong>
+                        <ul class="list-unstyled mt-2">
+                            <li>• {{ _('Обновите страницу через несколько минут') }}</li>
+                            <li>• {{ _('Проверьте подключение к интернету') }}</li>
+                            <li>• {{ _('Обратитесь к администратору, если проблема повторяется') }}</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-house"></i> {{ _('На главную') }}
+                        </a>
+                        <button type="button" class="btn btn-secondary btn-lg px-4" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise"></i> {{ _('Обновить') }}
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>
+                        <i class="bi bi-shield-exclamation"></i> 
+                        {{ _('Ошибка зафиксирована в логах системы.') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

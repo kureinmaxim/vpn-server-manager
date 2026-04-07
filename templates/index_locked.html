@@ -7,42 +7,47 @@
             <div class="card text-center shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
-                        <i class="bi bi-lock-fill"></i> Доступ ограничен
+                        <i class="bi bi-lock-fill"></i> {{ _('Доступ ограничен') }}
                     </h3>
                 </div>
                 <div class="card-body py-5">
                     <div class="mb-4">
                         <i class="bi bi-shield-lock display-1 text-muted"></i>
                     </div>
-                    <h4 class="card-title mb-3">🔐 Требуется PIN-код</h4>
+                    <h4 class="card-title mb-3">🔐 {{ _('Требуется PIN-код') }}</h4>
                     <p class="card-text text-muted mb-4">
-                        Для доступа к данным серверов необходимо ввести PIN-код.
+                        {{ _('Для доступа к данным серверов необходимо ввести PIN-код.') }}
                     </p>
                     
                     <div id="firstTimeHint" class="alert alert-info" role="alert" style="display: none;">
                         <i class="bi bi-lightbulb"></i>
-                        <strong>Совет:</strong> Если вы используете приложение впервые, 
-                        нажмите кнопку "Первый запуск" для создания PIN-кода.
+                        <strong>{{ _('Совет:') }}</strong> {{ _('Если вы используете приложение впервые, нажмите кнопку "Первый запуск" для создания PIN-кода.') }}
                     </div>
                     
                     <!-- Счетчик блокировки -->
-                    <div id="blockCounter" class="alert alert-warning" style="display: none;">
+                    <div id="blockCounter" class="alert alert-danger" style="display: none;">
                         <div class="d-flex align-items-center justify-content-center">
-                            <i class="bi bi-clock me-2"></i>
-                            <span id="blockTimer">🔒 Вход заблокирован на <strong id="countdown">30</strong> секунд</span>
+                            <i class="bi bi-lock-fill me-2"></i>
+                            <span id="blockTimer">🔒 {{ _('Вход заблокирован на') }} <strong id="countdown">30</strong> {{ _('секунд') }}</span>
+                        </div>
+                        <div class="progress mt-2">
+                            <div id="blockProgressBar" class="progress-bar bg-danger" role="progressbar" style="width: 100%"></div>
                         </div>
                     </div>
                     
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
-                        <button id="firstSetupButton" type="button" class="btn btn-primary btn-lg px-4" onclick="showFirstTimeSetup()" style="display: none;">
-                            <i class="bi bi-plus-circle"></i> Первый запуск
+                        <button type="button" class="btn btn-primary btn-lg px-4" onclick="showPinLoginModal()" id="pinLoginButton">
+                            <i class="bi bi-key"></i> {{ _('Ввести PIN') }}
+                        </button>
+                        <button id="firstSetupButton" type="button" class="btn btn-secondary btn-lg px-4" onclick="showFirstTimeSetup()" style="display: none;">
+                            <i class="bi bi-plus-circle"></i> {{ _('Первый запуск') }}
                         </button>
                     </div>
                 </div>
                 <div class="card-footer text-muted">
                     <small>
                         <i class="bi bi-shield-check"></i> 
-                        Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту.
+                        {{ _('Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту.') }}
                     </small>
                 </div>
             </div>
@@ -56,7 +61,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="pinLoginModalLabel">
-                    <i class="bi bi-key"></i> Вход по PIN-коду
+                    <i class="bi bi-key"></i> {{ _('Вход по PIN-коду') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -66,12 +71,12 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
                                 data-bs-target="#login-pane" type="button" role="tab" 
-                                aria-controls="login-pane" aria-selected="true">Вход</button>
+                                aria-controls="login-pane" aria-selected="true">{{ _('Вход') }}</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="change-pin-tab" data-bs-toggle="tab" 
                                 data-bs-target="#change-pin-pane" type="button" role="tab" 
-                                aria-controls="change-pin-pane" aria-selected="false">Сменить PIN</button>
+                                aria-controls="change-pin-pane" aria-selected="false">{{ _('Сменить PIN') }}</button>
                     </li>
                 </ul>
                 
@@ -80,11 +85,11 @@
                     <!-- Вкладка входа -->
                     <div class="tab-pane fade show active" id="login-pane" role="tabpanel" 
                          aria-labelledby="login-tab">
-                        <p class="text-muted mb-3 mt-3">Введите PIN-код для входа в систему</p>
+                        <p class="text-muted mb-3 mt-3">{{ _('Введите PIN-код для входа в систему') }}</p>
                         <div class="mb-3">
-                            <label for="pinInput" class="form-label">PIN-код</label>
+                            <label for="pinInput" class="form-label">{{ _('PIN-код') }}</label>
                             <input type="password" class="form-control" id="pinInput" 
-                                   placeholder="Введите PIN" maxlength="4" autocomplete="off">
+                                   placeholder="{{ _('Введите PIN') }}" maxlength="4" autocomplete="off">
                         </div>
                         <div id="pinLoginMessage" class="alert" style="display: none;"></div>
                     </div>
@@ -92,22 +97,22 @@
                     <!-- Вкладка смены PIN -->
                     <div class="tab-pane fade" id="change-pin-pane" role="tabpanel" 
                          aria-labelledby="change-pin-tab">
-                        <p class="text-muted mb-3 mt-3">Смените PIN-код для входа</p>
+                        <p class="text-muted mb-3 mt-3">{{ _('Смените PIN-код для входа') }}</p>
                         <form id="changePinForm">
                             <div class="mb-3">
-                                <label for="oldPin" class="form-label">Старый PIN</label>
+                                <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                 <input type="password" class="form-control" id="oldPin" name="old_pin" 
-                                       placeholder="Введите старый PIN" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Введите старый PIN') }}" maxlength="4" autocomplete="off" required>
                             </div>
                             <div class="mb-3">
-                                <label for="newPin1" class="form-label">Новый PIN</label>
+                                <label for="newPin1" class="form-label">{{ _('Новый PIN') }}</label>
                                 <input type="password" class="form-control" id="newPin1" name="new_pin1" 
-                                       placeholder="Введите новый PIN" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Введите новый PIN') }}" maxlength="4" autocomplete="off" required>
                             </div>
                             <div class="mb-3">
-                                <label for="newPin2" class="form-label">Подтвердите новый PIN</label>
+                                <label for="newPin2" class="form-label">{{ _('Подтвердите новый PIN') }}</label>
                                 <input type="password" class="form-control" id="newPin2" name="new_pin2" 
-                                       placeholder="Повторите новый PIN" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
                             </div>
                             <div id="changePinMessage" class="alert" style="display: none;"></div>
                         </form>
@@ -115,9 +120,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
                 <button type="button" class="btn btn-primary" id="modalSubmitBtn" 
-                        onclick="submitPinLogin()">Войти</button>
+                        onclick="submitPinLogin()">{{ _('Войти') }}</button>
             </div>
         </div>
     </div>
@@ -129,27 +134,31 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="firstTimeSetupModalLabel">
-                    <i class="bi bi-rocket"></i> Первый запуск
+                    <i class="bi bi-rocket"></i> {{ _('Первый запуск') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle"></i>
-                    <strong>Информация:</strong> Вы можете создать новый PIN-код или импортировать существующие данные.
+                    <strong>{{ _('Информация:') }}</strong> {{ _('Вы можете задать свой PIN-код, использовать PIN по умолчанию 1234 или импортировать существующие данные.') }}
                 </div>
-                <p>Выберите действие:</p>
+                <p>{{ _('Выберите действие:') }}</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-outline-primary" onclick="setupNewPin()">
-                        <i class="bi bi-plus-circle"></i> Создать новый PIN-код
+                        <i class="bi bi-plus-circle"></i> {{ _('Создать новый PIN-код') }}
+                    </button>
+                    <button type="button" class="btn btn-outline-success" onclick="useDefaultPin()">
+                        <i class="bi bi-key-fill"></i> {{ _('Использовать PIN 1234') }}
                     </button>
                     <button type="button" class="btn btn-outline-secondary" onclick="showArchiveUpload()">
-                        <i class="bi bi-upload"></i> Импортировать из архива
+                        <i class="bi bi-upload"></i> {{ _('Импортировать из архива') }}
                     </button>
                 </div>
+                <div id="firstSetupMessage" class="alert mt-3" style="display: none;"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
             </div>
         </div>
     </div>
@@ -161,28 +170,36 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="archiveUploadModalLabel">
-                    <i class="bi bi-archive"></i> Импорт из архива
+                    <i class="bi bi-archive"></i> {{ _('Импорт из архива') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle"></i>
-                    <strong>Информация:</strong> Загрузите ZIP архив, созданный функцией "Полный экспорт".
+                    <strong>{{ _('Информация:') }}</strong> {{ _('Загрузите ZIP архив, созданный функцией "Полный экспорт".') }}
                 </div>
                 <form id="archiveUploadForm">
                     <div class="mb-3">
-                        <label for="archiveFile" class="form-label">Выберите ZIP архив</label>
-                        <input type="file" class="form-control" id="archiveFile" name="archive_file" 
-                               accept=".zip" required>
+                        <label for="archiveFile" class="form-label">{{ _('Выберите ZIP архив') }}</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="archiveFile" name="archive_file" 
+                                   accept=".zip" required style="display: none;">
+                            <input type="text" class="form-control" id="archiveFileDisplay" 
+                                   placeholder="{{ _('Нажмите кнопку для выбора файла') }}" readonly>
+                            <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('archiveFile').click()">
+                                {{ _('Выбрать файл') }}
+                            </button>
+                        </div>
+                        <div class="form-text">{{ _('Файл не выбран') }}</div>
                     </div>
                     <div id="archiveMessage" class="alert" style="display: none;"></div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-info" onclick="checkArchiveForPin()">Проверить PIN</button>
-                <button type="button" class="btn btn-success" onclick="importArchiveData()">Импортировать данные</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
+                <button type="button" class="btn btn-info" onclick="checkArchiveForPin()">{{ _('Проверить PIN') }}</button>
+                <button type="button" class="btn btn-success" onclick="importArchiveData()">{{ _('Импортировать данные') }}</button>
             </div>
         </div>
     </div>
@@ -194,33 +211,33 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createPinModalLabel">
-                    <i class="bi bi-plus-circle"></i> Создание нового PIN-кода
+                    <i class="bi bi-plus-circle"></i> {{ _('Создание нового PIN-кода') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle"></i>
-                    <strong>Информация:</strong> Создайте новый PIN-код для защиты приложения.
+                    <strong>{{ _('Информация:') }}</strong> {{ _('Создайте новый PIN-код для защиты приложения.') }}
                 </div>
                 <form id="createPinForm">
                     <div class="mb-3">
-                        <label for="newPinInput" class="form-label">Новый PIN-код</label>
+                        <label for="newPinInput" class="form-label">{{ _('Новый PIN-код') }}</label>
                         <input type="password" class="form-control" id="newPinInput" name="new_pin" 
-                               placeholder="Введите новый PIN (минимум 4 символа)" maxlength="4" autocomplete="off" required>
-                        <div class="form-text">PIN должен содержать минимум 4 символа</div>
+                               placeholder="{{ _('Введите новый PIN (минимум 4 символа)') }}" maxlength="4" autocomplete="off" required>
+                        <div class="form-text">{{ _('PIN должен содержать минимум 4 символа') }}</div>
                     </div>
                     <div class="mb-3">
-                        <label for="confirmPinInput" class="form-label">Подтвердите PIN-код</label>
+                        <label for="confirmPinInput" class="form-label">{{ _('Подтвердите PIN-код') }}</label>
                         <input type="password" class="form-control" id="confirmPinInput" name="confirm_pin" 
-                               placeholder="Повторите новый PIN" maxlength="4" autocomplete="off" required>
+                               placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
                     </div>
                     <div id="createPinMessage" class="alert" style="display: none;"></div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" onclick="submitCreatePin()">Создать PIN</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
+                <button type="button" class="btn btn-primary" onclick="submitCreatePin()">{{ _('Создать PIN') }}</button>
             </div>
         </div>
     </div>
@@ -232,28 +249,28 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="pinShowModalLabel">
-                    <i class="bi bi-key"></i> PIN-код из архива
+                    <i class="bi bi-key"></i> {{ _('PIN-код из архива') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
                     <i class="bi bi-check-circle"></i>
-                    <strong>PIN-код найден!</strong> Запомните или запишите этот код.
+                    <strong>{{ _('PIN-код найден!') }}</strong> {{ _('Запомните или запишите этот код.') }}
                 </div>
                 <div class="text-center">
                     <h3 id="pinDisplay" class="text-primary mb-3"></h3>
-                    <p class="text-muted">Этот PIN-код потребуется для входа в приложение после импорта данных.</p>
+                    <p class="text-muted">{{ _('Этот PIN-код потребуется для входа в приложение после импорта данных.') }}</p>
                 </div>
                 <div class="alert alert-warning" role="alert">
                     <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Важно:</strong> PIN-код будет показан только один раз. Запишите его!
+                    <strong>{{ _('Важно:') }}</strong> {{ _('PIN-код будет показан только один раз. Запишите его!') }}
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" onclick="proceedWithImport()">Продолжить импорт</button>
-                <button type="button" class="btn btn-success" onclick="importArchiveDataFromPin()">Импортировать сейчас</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
+                <button type="button" class="btn btn-primary" onclick="proceedWithImport()">{{ _('Продолжить импорт') }}</button>
+                <button type="button" class="btn btn-success" onclick="importArchiveDataFromPin()">{{ _('Импортировать сейчас') }}</button>
             </div>
         </div>
     </div>
@@ -294,17 +311,26 @@
     function showBlockCounter(remainingSeconds) {
         const blockCounter = document.getElementById('blockCounter');
         const countdown = document.getElementById('countdown');
+        const progressBar = document.getElementById('blockProgressBar');
+        const pinLoginButton = document.getElementById('pinLoginButton');
         
         // Показываем счетчик
         blockCounter.style.display = 'block';
         
+        // Блокируем кнопку входа
+        if (pinLoginButton) {
+            pinLoginButton.disabled = true;
+            pinLoginButton.innerHTML = '<i class="bi bi-lock-fill"></i> ' + '{{ _("Вход заблокирован") }}';
+        }
+        
         // Запускаем таймер обратного отсчета
         let secondsLeft = remainingSeconds;
-        updateCountdown(secondsLeft);
+        const totalSeconds = remainingSeconds;
+        updateCountdown(secondsLeft, totalSeconds);
         
         const timer = setInterval(() => {
             secondsLeft--;
-            updateCountdown(secondsLeft);
+            updateCountdown(secondsLeft, totalSeconds);
             
             if (secondsLeft <= 0) {
                 clearInterval(timer);
@@ -314,23 +340,37 @@
             }
         }, 1000);
         
-        function updateCountdown(seconds) {
+        function updateCountdown(seconds, total) {
             const minutes = Math.floor(seconds / 60);
             const secs = seconds % 60;
             const timeStr = `${minutes}:${secs.toString().padStart(2, '0')}`;
             countdown.textContent = timeStr;
+            
+            // Обновляем прогресс-бар
+            const percentLeft = (seconds / total) * 100;
+            progressBar.style.width = percentLeft + '%';
         }
     }
     
     // Функция скрытия счетчика блокировки
     function hideBlockCounter() {
         const blockCounter = document.getElementById('blockCounter');
+        const pinLoginButton = document.getElementById('pinLoginButton');
+        
         blockCounter.style.display = 'none';
+        
+        // Разблокируем кнопку входа
+        if (pinLoginButton) {
+            pinLoginButton.disabled = false;
+            pinLoginButton.innerHTML = '<i class="bi bi-key"></i> ' + '{{ _("Ввести PIN") }}';
+        }
     }
     
     // Вызываем проверку блокировки сразу
     checkBlockStatus();
-    
+
+    let firstSetupAutoPrompted = false;
+
     // Проверка доступности "Первого запуска" (только если нет данных)
     function checkFirstSetupAllowed() {
         fetch('/pin/check_first_setup_allowed')
@@ -343,6 +383,12 @@
                     // Показываем кнопку и подсказку только если данных нет
                     button.style.display = 'inline-block';
                     hint.style.display = 'block';
+                    if (!firstSetupAutoPrompted) {
+                        firstSetupAutoPrompted = true;
+                        setTimeout(() => {
+                            showFirstTimeSetup();
+                        }, 400);
+                    }
                 } else {
                     // Скрываем кнопку если данные уже существуют (защита от несанкционированного доступа)
                     button.style.display = 'none';
@@ -356,7 +402,7 @@
                 document.getElementById('firstTimeHint').style.display = 'none';
             });
     }
-    
+
     // Проверяем доступность "Первого запуска" при загрузке страницы
     checkFirstSetupAllowed();
     
@@ -380,6 +426,7 @@
     
     // Функция показа модального окна первого запуска
     function showFirstTimeSetup() {
+        showFirstSetupMessage('', 'info', true);
         const modal = new bootstrap.Modal(document.getElementById('firstTimeSetupModal'));
         modal.show();
     }
@@ -413,49 +460,50 @@
         const submitButton = document.querySelector('#pinLoginModal .btn-primary');
         
         if (!pin) {
-            showPinLoginMessage('Введите PIN-код', 'danger');
+            showPinLoginMessage('{{ _("Введите PIN-код") }}', 'danger');
             return;
         }
         
         // Отключаем кнопку во время запроса
         submitButton.disabled = true;
-        submitButton.textContent = 'Проверка...';
+        submitButton.textContent = '{{ _("Проверка...") }}';
         
-        // Отправляем запрос на сервер
+        // Отправляем запрос на сервер (v4.0.0 - JSON format)
+        console.log('Sending PIN:', pin);
         fetch('/pin/login_ajax', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
             },
-            body: `pin=${encodeURIComponent(pin)}`
+            body: JSON.stringify({pin: pin})
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 showPinLoginMessage(data.message, 'success');
                 setTimeout(() => {
-                    // Закрываем модальный диалог и перезагружаем страницу
+                    // Закрываем модальный диалог и перенаправляем на главную страницу
                     const modal = bootstrap.Modal.getInstance(document.getElementById('pinLoginModal'));
                     modal.hide();
-                    window.location.reload();
+                    window.location.href = '/';
                 }, 1000);
             } else {
                 if (data.blocked) {
                     // Показываем блокировку с таймером
                     showPinLoginBlocked(data.remaining_seconds);
                 } else {
-                    showPinLoginMessage(data.message, 'danger');
+                        showPinLoginMessage(data.error || data.message, 'danger');
                 }
             }
         })
         .catch(error => {
             console.error('Ошибка входа по PIN:', error);
-            showPinLoginMessage('Ошибка соединения с сервером', 'danger');
+            showPinLoginMessage('{{ _("Ошибка соединения с сервером") }}', 'danger');
         })
         .finally(() => {
             // Восстанавливаем кнопку
             submitButton.disabled = false;
-            submitButton.textContent = 'Войти';
+            submitButton.textContent = '{{ _("Войти") }}';
         });
     }
     
@@ -501,7 +549,7 @@
             const minutes = Math.floor(seconds / 60);
             const secs = seconds % 60;
             const timeStr = `${minutes}:${secs.toString().padStart(2, '0')}`;
-            messageDiv.innerHTML = `🔒 Вход заблокирован на <strong>${timeStr}</strong> секунд`;
+            messageDiv.innerHTML = `🔒 {{ _("Вход заблокирован на") }} <strong>${timeStr}</strong> {{ _("секунд") }}`;
         }
     }
     
@@ -526,25 +574,25 @@
         const newPin2 = formData.get('new_pin2');
         
         if (!oldPin || !newPin1 || !newPin2) {
-            showChangePinMessage('Заполните все поля', 'danger');
+            showChangePinMessage('{{ _("Заполните все поля") }}', 'danger');
             return;
         }
         
         // Проверяем, что новые PIN совпадают
         if (newPin1 !== newPin2) {
-            showChangePinMessage('Новые PIN-коды не совпадают', 'danger');
+            showChangePinMessage('{{ _("Новые PIN-коды не совпадают") }}', 'danger');
             return;
         }
         
         // Проверяем минимальную длину
         if (newPin1.length < 4) {
-            showChangePinMessage('PIN должен содержать минимум 4 символа', 'danger');
+            showChangePinMessage('{{ _("PIN должен содержать минимум 4 символа") }}', 'danger');
             return;
         }
         
         // Отключаем кнопку во время запроса
         submitButton.disabled = true;
-        submitButton.textContent = 'Проверка...';
+        submitButton.textContent = '{{ _("Проверка...") }}';
         
         // Отправляем запрос
         fetch('/pin/change_ajax', {
@@ -554,7 +602,7 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showChangePinMessage('PIN успешно изменён!', 'success');
+                showChangePinMessage('{{ _("PIN успешно изменён!") }}', 'success');
                 // Очищаем форму
                 form.reset();
                 // Переключаемся на вкладку входа
@@ -562,17 +610,17 @@
                     document.getElementById('login-tab').click();
                 }, 1500);
             } else {
-                showChangePinMessage('Ошибка: ' + data.message, 'danger');
+                showChangePinMessage('{{ _("Ошибка:") }} ' + (data.message || data.error), 'danger');
             }
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            showChangePinMessage('Произошла ошибка при смене PIN', 'danger');
+            showChangePinMessage('{{ _("Произошла ошибка при смене PIN") }}', 'danger');
         })
         .finally(() => {
             // Восстанавливаем кнопку
             submitButton.disabled = false;
-            submitButton.textContent = 'Сменить PIN';
+            submitButton.textContent = '{{ _("Сменить PIN") }}';
         });
     }
     
@@ -596,6 +644,10 @@
             createPinModal.show();
         }, 500);
     }
+
+    function useDefaultPin() {
+        submitFirstTimeSetup('');
+    }
     
     // Функция показа модального окна загрузки архива
     function showArchiveUpload() {
@@ -616,7 +668,7 @@
         const messageDiv = document.getElementById('archiveUploadMessage');
         
         if (!fileInput.files[0]) {
-            showArchiveMessage('Выберите файл', 'danger');
+            showArchiveMessage('{{ _("Выберите файл") }}', 'danger');
             return;
         }
         
@@ -641,7 +693,7 @@
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            showArchiveMessage('Произошла ошибка при проверке архива', 'danger');
+            showArchiveMessage('{{ _("Произошла ошибка при проверке архива") }}', 'danger');
         });
     }
     
@@ -672,28 +724,38 @@
     function submitCreatePin() {
         const newPin = document.getElementById('newPinInput').value;
         const confirmPin = document.getElementById('confirmPinInput').value;
-        const messageDiv = document.getElementById('createPinMessage');
-        const submitButton = document.querySelector('#createPinModal .btn-primary');
         
         // Проверяем, что PIN введен
         if (!newPin || newPin.length < 4) {
-            showCreatePinMessage('PIN должен содержать минимум 4 символа', 'danger');
+            showCreatePinMessage('{{ _("PIN должен содержать минимум 4 символа") }}', 'danger');
             return;
         }
         
         // Проверяем, что PIN подтвержден
         if (newPin !== confirmPin) {
-            showCreatePinMessage('PIN-коды не совпадают', 'danger');
+            showCreatePinMessage('{{ _("PIN-коды не совпадают") }}', 'danger');
             return;
         }
-        
-        // Отключаем кнопку во время запроса
-        submitButton.disabled = true;
-        submitButton.textContent = 'Создание...';
-        
-        // Отправляем запрос
+
+        submitFirstTimeSetup(newPin);
+    }
+
+    function submitFirstTimeSetup(newPin) {
+        const createPinButton = document.querySelector('#createPinModal .btn-primary');
+        const defaultPinButton = document.querySelector('#firstTimeSetupModal .btn-outline-success');
+
+        if (createPinButton) {
+            createPinButton.disabled = true;
+            createPinButton.textContent = '{{ _("Создание...") }}';
+        }
+        if (defaultPinButton) {
+            defaultPinButton.disabled = true;
+        }
+
         const formData = new FormData();
-        formData.append('new_pin', newPin);
+        if (newPin) {
+            formData.append('new_pin', newPin);
+        }
         
         fetch('/pin/first_time_setup', {
             method: 'POST',
@@ -702,22 +764,33 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showCreatePinMessage('PIN успешно создан! Приложение будет перезагружено.', 'success');
+                const successMessage = data.used_default_pin
+                    ? '{{ _("Будет использован PIN 1234. Приложение будет перезагружено.") }}'
+                    : '{{ _("PIN успешно создан!") }} {{ _("Приложение будет перезагружено.") }}';
+                showCreatePinMessage(successMessage, 'success');
+                showFirstSetupMessage(successMessage, 'success');
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             } else {
-                showCreatePinMessage('Ошибка: ' + data.message, 'danger');
+                const errorMessage = '{{ _("Ошибка:") }} ' + (data.message || data.error || 'Unknown error');
+                showCreatePinMessage(errorMessage, 'danger');
+                showFirstSetupMessage(errorMessage, 'danger');
             }
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            showCreatePinMessage('Произошла ошибка при создании PIN', 'danger');
+            showCreatePinMessage('{{ _("Произошла ошибка при создании PIN") }}', 'danger');
+            showFirstSetupMessage('{{ _("Произошла ошибка при создании PIN") }}', 'danger');
         })
         .finally(() => {
-            // Восстанавливаем кнопку
-            submitButton.disabled = false;
-            submitButton.textContent = 'Создать PIN';
+            if (createPinButton) {
+                createPinButton.disabled = false;
+                createPinButton.textContent = '{{ _("Создать PIN") }}';
+            }
+            if (defaultPinButton) {
+                defaultPinButton.disabled = false;
+            }
         });
     }
     
@@ -725,6 +798,21 @@
     function showCreatePinMessage(message, type) {
         const messageDiv = document.getElementById('createPinMessage');
         messageDiv.className = `alert alert-${type}`;
+        messageDiv.textContent = message;
+        messageDiv.style.display = 'block';
+    }
+
+    function showFirstSetupMessage(message, type, hide = false) {
+        const messageDiv = document.getElementById('firstSetupMessage');
+        if (!messageDiv) {
+            return;
+        }
+        if (hide) {
+            messageDiv.style.display = 'none';
+            messageDiv.textContent = '';
+            return;
+        }
+        messageDiv.className = `alert alert-${type} mt-3`;
         messageDiv.textContent = message;
         messageDiv.style.display = 'block';
     }
@@ -753,7 +841,7 @@
         
         if (!fileInput.files[0]) {
             console.log('Файл не выбран');
-            showArchiveMessage('Выберите файл', 'danger');
+            showArchiveMessage('{{ _("Выберите файл") }}', 'danger');
             return;
         }
         
@@ -761,7 +849,7 @@
         
         // Отключаем кнопку во время запроса
         submitButton.disabled = true;
-        submitButton.textContent = 'Проверка...';
+        submitButton.textContent = '{{ _("Проверка...") }}';
         
         const formData = new FormData();
         formData.append('archive_file', fileInput.files[0]);
@@ -786,12 +874,12 @@
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            showArchiveMessage('Ошибка соединения с сервером', 'danger');
+            showArchiveMessage('{{ _("Ошибка соединения с сервером") }}', 'danger');
         })
         .finally(() => {
             // Восстанавливаем кнопку
             submitButton.disabled = false;
-            submitButton.textContent = 'Проверить PIN';
+            submitButton.textContent = '{{ _("Проверить PIN") }}';
         });
     }
     
@@ -827,7 +915,7 @@
         
         if (!fileInput.files[0]) {
             console.log('Файл не выбран');
-            showArchiveMessage('Выберите файл', 'danger');
+            showArchiveMessage('{{ _("Выберите файл") }}', 'danger');
             return;
         }
         
@@ -835,7 +923,7 @@
         
         // Отключаем кнопку во время запроса
         submitButton.disabled = true;
-        submitButton.textContent = 'Импорт...';
+        submitButton.textContent = '{{ _("Импорт...") }}';
         
         const formData = new FormData();
         formData.append('archive_file', fileInput.files[0]);
@@ -853,22 +941,22 @@
         .then(data => {
             console.log('Данные ответа:', data);
             if (data.success) {
-                showArchiveMessage('Данные успешно импортированы! Перенаправление...', 'success');
+                showArchiveMessage('{{ _("Данные успешно импортированы!") }} {{ _("Перенаправление...") }}', 'success');
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             } else {
-                showArchiveMessage('Ошибка: ' + data.message, 'danger');
+                showArchiveMessage('{{ _("Ошибка:") }} ' + data.message, 'danger');
             }
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            showArchiveMessage('Ошибка соединения с сервером', 'danger');
+            showArchiveMessage('{{ _("Ошибка соединения с сервером") }}', 'danger');
         })
         .finally(() => {
             // Восстанавливаем кнопку
             submitButton.disabled = false;
-            submitButton.textContent = 'Импортировать данные';
+            submitButton.textContent = '{{ _("Импортировать данные") }}';
         });
     }
     
@@ -877,7 +965,7 @@
         const fileInput = document.getElementById('archiveFile');
         
         if (!fileInput.files[0]) {
-            alert('Файл не выбран');
+            alert('{{ _("Файл не выбран") }}');
             return;
         }
         
@@ -888,7 +976,7 @@
         // Показываем сообщение о начале импорта
         const messageDiv = document.getElementById('archiveMessage');
         messageDiv.className = 'alert alert-info';
-        messageDiv.textContent = 'Импорт данных...';
+        messageDiv.textContent = '{{ _("Импорт данных...") }}';
         messageDiv.style.display = 'block';
         
         const formData = new FormData();
@@ -902,19 +990,19 @@
         .then(data => {
             if (data.success) {
                 messageDiv.className = 'alert alert-success';
-                messageDiv.textContent = 'Данные успешно импортированы! Перенаправление...';
+                messageDiv.textContent = '{{ _("Данные успешно импортированы!") }} {{ _("Перенаправление...") }}';
                 setTimeout(() => {
                     window.location.reload();
                 }, 2000);
             } else {
                 messageDiv.className = 'alert alert-danger';
-                messageDiv.textContent = 'Ошибка: ' + data.message;
+                messageDiv.textContent = '{{ _("Ошибка:") }} ' + data.message;
             }
         })
         .catch(error => {
             console.error('Ошибка:', error);
             messageDiv.className = 'alert alert-danger';
-            messageDiv.textContent = 'Ошибка соединения с сервером';
+            messageDiv.textContent = '{{ _("Ошибка соединения с сервером") }}';
         });
     }
     
@@ -925,11 +1013,11 @@
         document.addEventListener('click', function(e) {
             const submitButton = document.getElementById('modalSubmitBtn');
             if (e.target.id === 'change-pin-tab') {
-                submitButton.textContent = 'Сменить PIN';
+                submitButton.textContent = '{{ _("Сменить PIN") }}';
                 submitButton.onclick = submitChangePin;
                 submitButton.className = 'btn btn-warning';
             } else if (e.target.id === 'login-tab') {
-                submitButton.textContent = 'Войти';
+                submitButton.textContent = '{{ _("Войти") }}';
                 submitButton.onclick = submitPinLogin;
                 submitButton.className = 'btn btn-primary';
             }
@@ -953,7 +1041,32 @@
                 } else if (clickCount === 2) {
                     clearTimeout(clickTimer);
                     clickCount = 0;
-                    showPinLoginModal();
+                    
+                    // Проверяем, содержит ли текст "Куреин М. Н."
+                    if (developerName.textContent.includes('Куреин М. Н.')) {
+                        showPinLoginModal();
+                    }
+                }
+            });
+        }
+    });
+    
+    // Обработка выбора файла для кастомного input
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('archiveFile');
+        const fileDisplay = document.getElementById('archiveFileDisplay');
+        const fileText = document.querySelector('#archiveUploadForm .form-text');
+        
+        if (fileInput && fileDisplay) {
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileDisplay.value = this.files[0].name;
+                    fileText.textContent = '{{ _("Файл выбран") }}';
+                    fileText.className = 'form-text text-success';
+                } else {
+                    fileDisplay.value = '';
+                    fileText.textContent = '{{ _("Файл не выбран") }}';
+                    fileText.className = 'form-text text-muted';
                 }
             });
         }
