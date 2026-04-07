@@ -77,7 +77,7 @@ class SSHService:
     @staticmethod
     def _parse_cpu_used_pct(cpu_line: str) -> float:
         normalized = (cpu_line or '').replace(',', '.')
-        match = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*id\b', normalized)
+        match = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*%?\s*id\b', normalized)
         if not match:
             return 0.0
 
@@ -85,6 +85,18 @@ class SSHService:
         return round(max(0.0, min(100.0, 100.0 - idle_pct)), 1)
 
     def _get_cpu_used_pct(self, client, timeout: int = 30) -> float:
+        proc_stat_used = self._read_command_output(
+            client,
+            "sh -c 'read cpu u n s i io irq sirq st rest < /proc/stat; total1=$((u+n+s+i+io+irq+sirq+st)); idle1=$((i+io)); sleep 1; read cpu u n s i io irq sirq st rest < /proc/stat; total2=$((u+n+s+i+io+irq+sirq+st)); idle2=$((i+io)); dt=$((total2-total1)); di=$((idle2-idle1)); awk \"BEGIN { if ($dt > 0) printf \\\"%.1f\\\", (100*($dt-$di)/$dt); else print 0 }\"'",
+            timeout=max(timeout, 5)
+        )
+        try:
+            cpu_used = float((proc_stat_used or '0').replace(',', '.'))
+            if 0.0 <= cpu_used <= 100.0:
+                return round(cpu_used, 1)
+        except ValueError:
+            pass
+
         cpu_line = self._read_command_output(
             client,
             "LANG=C LC_ALL=C top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1",

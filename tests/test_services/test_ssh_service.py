@@ -310,11 +310,20 @@ class TestSSHService:
 
         assert service._parse_cpu_used_pct('%Cpu(s):  1,8 us,  0,8 sy,  0,0 ni, 97,4 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st') == 2.6
         assert service._parse_cpu_used_pct('%Cpu(s):  1.8 us,  0.8 sy,  0.0 ni, 97.4 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st') == 2.6
+        assert service._parse_cpu_used_pct('%Cpu(s):  1.8%us,  0.8%sy,  0.0%ni, 97.4%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st') == 2.6
+
+    def test_get_cpu_used_pct_prefers_proc_stat_delta(self):
+        """При наличии /proc/stat используем его как основной источник CPU."""
+        service = SSHService()
+        client = Mock()
+
+        with patch.object(service, '_read_command_output', side_effect=['2.7']):
+            assert service._get_cpu_used_pct(client) == 2.7
 
     def test_get_cpu_used_pct_falls_back_to_vmstat(self):
         """Если top не дал распарсить CPU, используется vmstat fallback."""
         service = SSHService()
         client = Mock()
 
-        with patch.object(service, '_read_command_output', side_effect=['', '', '97.0']):
+        with patch.object(service, '_read_command_output', side_effect=['oops', '', '', '97.0']):
             assert service._get_cpu_used_pct(client) == 3.0
