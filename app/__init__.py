@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 import logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, request
@@ -112,6 +113,24 @@ def register_error_handlers(app):
             from flask import render_template
             return render_template('500.html'), 500
 
+
+def _load_json_if_exists(path):
+    if not path or not os.path.exists(path):
+        return None
+
+    with open(path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def _get_release_config_candidates(base_path):
+    if not base_path:
+        return []
+
+    return [
+        os.path.join(base_path, 'config.json'),
+        os.path.join(base_path, 'config', 'config.json.template'),
+    ]
+
 def manage_user_config(app):
     """
     Управляет конфигурационным файлом пользователя (config.json) в APP_DATA_DIR.
@@ -128,21 +147,22 @@ def manage_user_config(app):
 
     if not os.path.exists(user_config_path):
         try:
-            # Копируем config.json из бандла (_MEIPASS) в папку данных пользователя
-            bundle_config_path = os.path.join(getattr(sys, '_MEIPASS', '.'), 'config.json')
-            if os.path.exists(bundle_config_path):
-                shutil.copy2(bundle_config_path, user_config_path)
-                app.logger.info(f"Copied config.json to {user_config_path}")
+            bundle_base_path = getattr(sys, '_MEIPASS', '.')
+            for bundle_config_path in _get_release_config_candidates(bundle_base_path):
+                if os.path.exists(bundle_config_path):
+                    shutil.copy2(bundle_config_path, user_config_path)
+                    app.logger.info(f"Copied config.json to {user_config_path}")
 
-                # Удаляем ключ active_data_file, чтобы заставить пользователя выбрать файл
-                with open(user_config_path, 'r+') as f:
-                    config = json.load(f)
-                    if 'active_data_file' in config:
-                        del config['active_data_file']
-                        f.seek(0)
-                        json.dump(config, f, indent=2, ensure_ascii=False)
-                        f.truncate()
-                        app.logger.info("Removed 'active_data_file' from user config on first run.")
+                    # Удаляем ключ active_data_file, чтобы заставить пользователя выбрать файл
+                    with open(user_config_path, 'r+', encoding='utf-8') as f:
+                        config = json.load(f)
+                        if 'active_data_file' in config:
+                            del config['active_data_file']
+                            f.seek(0)
+                            json.dump(config, f, indent=2, ensure_ascii=False)
+                            f.truncate()
+                            app.logger.info("Removed 'active_data_file' from user config on first run.")
+                    break
         except Exception as e:
             app.logger.error(f"Failed to manage user config on first run: {e}")
 
@@ -150,39 +170,42 @@ def manage_user_config(app):
 def load_app_info(app):
     """Загрузка информации о приложении и конфигурации из config.json"""
     try:
-        import json
-        
-        # В режиме разработки используем config.json из корня проекта
-        # В собранном приложении используем config.json из APP_DATA_DIR
         if getattr(sys, 'frozen', False):
-            # Режим PyInstaller: используем папку данных приложения
-            base_path = app.config.get('APP_DATA_DIR')
+            base_path = getattr(sys, '_MEIPASS', None)
         else:
-            # Обычный режим: корень проекта
             base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            
-        config_path = os.path.join(base_path, 'config.json') if base_path else None
 
-        if config_path and os.path.exists(config_path):
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-                app.config['app_info'] = config.get('app_info', {})
-                # Загружаем active_data_file если он есть
-                if 'active_data_file' in config:
-                    app.config['active_data_file'] = config['active_data_file']
-                    app.logger.info(f"Loaded active_data_file: {config['active_data_file']}")
-        else:
-            # Заглушка если config.json не найден
-            app.config['app_info'] = {
-                "version": "4.2.1",
-                "last_updated": "2026-04-06",
-                "developer": "Куреин М.Н."
-            }
+        release_config = None
+        for config_path in _get_release_config_candidates(base_path):
+            release_config = _load_json_if_exists(config_path)
+            if release_config is not None:
+                app.logger.info(f"Loaded release metadata from {config_path}")
+                break
+
+        runtime_config_path = os.path.join(app.config.get('APP_DATA_DIR', '.'), 'config.json')
+        runtime_config = _load_json_if_exists(runtime_config_path) or {}
+
+        app_info = (release_config or {}).get('app_info') or {
+            "version": app.config.get('APP_VERSION', '4.2.1'),
+            "release_date": "07.04.2026",
+            "last_updated": "2026-04-07",
+            "developer": "Куреин М.Н."
+        }
+        app.config['app_info'] = app_info
+
+        active_data_file = runtime_config.get('active_data_file')
+        if not active_data_file and release_config:
+            active_data_file = release_config.get('active_data_file')
+
+        if active_data_file:
+            app.config['active_data_file'] = active_data_file
+            app.logger.info(f"Loaded active_data_file: {active_data_file}")
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.2.1",
-            "last_updated": "2026-04-06",
+            "version": "4.2.2",
+            "release_date": "07.04.2026",
+            "last_updated": "2026-04-07",
             "developer": "Куреин М.Н."
         }
 
