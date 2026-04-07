@@ -1,12 +1,12 @@
 # VPN Server Manager - Windows Installer Builder (PowerShell)
-# Reads version from config.json
+# Reads version from config/config.json.template
 
 # Настройки
 $ErrorActionPreference = "Stop"
 $IsccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 
-# Читаем версию из основного config.json
-$ConfigPath = "config.json"
+# Читаем версию из release source of truth
+$ConfigPath = "config\config.json.template"
 if (Test-Path $ConfigPath) {
     $Config = Get-Content $ConfigPath | ConvertFrom-Json
     $AppVersion = $Config.app_info.version
@@ -66,7 +66,7 @@ $RequiredFiles = @(
     "LICENSE",
     "README.md",
     "static\favicon.ico",
-    "config.json",
+    "config\config.json.template",
     "env.example"
 )
 
@@ -225,6 +225,7 @@ try {
         Write-Host "========================================" -ForegroundColor Red
         Write-Host ""
         Write-Host "Expected file: $OutputFile" -ForegroundColor White
+        Write-Host "Version source: $ConfigPath" -ForegroundColor DarkGray
         Write-Host ""
         Write-Host "The build may have failed silently." -ForegroundColor Yellow
         Write-Host "Check the Inno Setup output above for errors." -ForegroundColor Yellow
