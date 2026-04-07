@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>VPNServerManager-Clean</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.vpnservermanager.clean.app</string>
+    <key>CFBundleName</key>
+    <string>VPN Server Manager Clean</string>
+    <key>CFBundleDisplayName</key>
+    <string>VPN Server Manager</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>{{VERSION}}</string>
+    <key>CFBundleVersion</key>
+    <string>{{VERSION}}</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.14</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>CFBundleIconFile</key>
+    <string>icon_clean</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>© 2025 VPN Server Manager. All rights reserved.</string>
+</dict>
+</plist>
+

@@ -1,0 +1,1798 @@
+from flask import Blueprint, request, jsonify, session, current_app
+from flask_babel import gettext as _
+from datetime import datetime
+import json
+import logging
+import os
+from ..services import registry
+from ..utils.decorators import require_auth, require_pin, validate_json, handle_errors
+from ..utils.validators import Validators
+from ..utils.rate_limiter import RateLimiter
+from ..exceptions import ValidationError, AuthenticationError, APIError
+from ..models.server import Server
+
+logger = logging.getLogger(__name__)
+
+# Создать лимитер (макс 10 запросов в минуту на сервер)
+rate_limiter = RateLimiter(max_requests=10, time_window=60)
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+
+# PIN endpoints (без /api префикса)
+pin_bp = Blueprint('pin', __name__, url_prefix='/pin')
+
+# Vendor endpoints (без префикса)
+vendor_bp = Blueprint('vendor', __name__)
+
+
+def _get_default_pin():
+    return current_app.config.get('DEFAULT_PIN', '1234')
+
+
+def _get_runtime_config_path():
+    app_data_dir = current_app.config.get('APP_DATA_DIR') or '.'
+    return os.path.join(app_data_dir, 'config.json')
+
+
+def _load_runtime_config():
+    config_path = _get_runtime_config_path()
+    template_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+        'config.json'
+    )
+
+    config = {}
+
+    if os.path.exists(template_path):
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        except Exception as e:
+            logger.warning(f"Could not load template config: {e}")
+
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                runtime_config = json.load(f)
+            config.update(runtime_config)
+        except Exception as e:
+            logger.warning(f"Could not load runtime config: {e}")
+
+    secret_pin = config.setdefault('secret_pin', {})
+    default_pin = _get_default_pin()
+    secret_pin.setdefault('default_pin', default_pin)
+    secret_pin.setdefault('current_pin', secret_pin.get('default_pin', default_pin))
+    secret_pin.setdefault('last_changed', '')
+    secret_pin.setdefault('setup_completed', False)
+
+    return config
+
+
+def _save_runtime_config(config):
+    config_path = _get_runtime_config_path()
+    os.makedirs(os.path.dirname(config_path), exist_ok=True)
+    with open(config_path, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2, ensure_ascii=False)
+
+
+def _get_current_pin():
+    return _load_runtime_config().get('secret_pin', {}).get('current_pin', _get_default_pin())
+
+
+def _save_current_pin(new_pin, setup_completed=True):
+    config = _load_runtime_config()
+    secret_pin = config.setdefault('secret_pin', {})
+    secret_pin['default_pin'] = _get_default_pin()
+    secret_pin['current_pin'] = new_pin
+    secret_pin['last_changed'] = datetime.now().strftime('%Y-%m-%d')
+    secret_pin['setup_completed'] = setup_completed
+    _save_runtime_config(config)
+
+
+def _has_existing_server_data():
+    data_dir = current_app.config.get('DATA_DIR') or os.path.join(current_app.config.get('APP_DATA_DIR', '.'), 'data')
+    servers_file = current_app.config.get('SERVERS_FILE', 'servers.json.enc')
+    servers_path = os.path.join(data_dir, servers_file)
+    return os.path.exists(servers_path) and os.path.getsize(servers_path) > 0
+
+
+def _is_first_setup_allowed():
+    if _has_existing_server_data():
+        return False
+
+    secret_pin = _load_runtime_config().get('secret_pin', {})
+    return not secret_pin.get('setup_completed', False)
+
+
+def _set_authenticated_session():
+    session['pin_authenticated'] = True
+    session['authenticated'] = True
+    session['pin_verified'] = True
+    session.permanent = False
+    session.pop('block_until', None)
+    session.pop('failed_attempts', None)
+
+@api_bp.route('/servers', methods=['GET'])
+@require_auth
+@require_pin
+def get_servers():
+    """Получение списка серверов"""
+    try:
+        # Здесь должна быть логика загрузки серверов из зашифрованного файла
+        servers = []  # Временно пустой список
+        
+        return jsonify({
+            'success': True,
+            'servers': [server.to_dict() if hasattr(server, 'to_dict') else server for server in servers]
+        })
+    except Exception as e:
+        logger.error(f"Error getting servers: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/servers', methods=['POST'])
+@require_auth
+@require_pin
+@validate_json
+@handle_errors
+def create_server():
+    """Создание нового сервера"""
+    data = request.get_json()
+    
+    # Валидация данных
+    errors = Validators.validate_server_data(data)
+    if errors:
+        raise ValidationError('; '.join(errors))
+    
+    try:
+        # Создание объекта сервера
+        server = Server(
+            id=data.get('id', ''),
+            name=data['name'],
+            hostname=data['hostname'],
+            username=data['username'],
+            password=data.get('password'),
+            key_file=data.get('key_file'),
+            port=int(data.get('port', 22)),
+            description=data.get('description')
+        )
+        
+        # Дополнительная валидация
+        validation_errors = server.validate()
+        if validation_errors:
+            raise ValidationError('; '.join(validation_errors))
+        
+        # Здесь должна быть логика сохранения сервера
+        # Временно просто возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Server created successfully'),
+            'server': server.to_dict()
+        }), 201
+        
+    except Exception as e:
+        logger.error(f"Error creating server: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/servers/<server_id>', methods=['GET'])
+@require_auth
+@require_pin
+def get_server(server_id):
+    """Получение сервера по ID"""
+    try:
+        # Здесь должна быть логика загрузки сервера по ID
+        server = None  # Временно None
+        
+        if not server:
+            return jsonify({
+                'success': False,
+                'error': _('Server not found')
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'server': server.to_dict() if hasattr(server, 'to_dict') else server
+        })
+    except Exception as e:
+        logger.error(f"Error getting server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/servers/<server_id>', methods=['PUT'])
+@require_auth
+@require_pin
+@validate_json
+@handle_errors
+def update_server(server_id):
+    """Обновление сервера"""
+    data = request.get_json()
+    
+    # Валидация данных
+    errors = Validators.validate_server_data(data)
+    if errors:
+        raise ValidationError('; '.join(errors))
+    
+    try:
+        # Здесь должна быть логика обновления сервера
+        # Временно просто возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Server updated successfully')
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/servers/<server_id>', methods=['DELETE'])
+@require_auth
+@require_pin
+def delete_server(server_id):
+    """Удаление сервера"""
+    try:
+        # Здесь должна быть логика удаления сервера
+        # Временно просто возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Server deleted successfully')
+        })
+        
+    except Exception as e:
+        logger.error(f"Error deleting server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/servers/<server_id>/test', methods=['POST'])
+@require_auth
+@require_pin
+def test_server_connection(server_id):
+    """Тестирование подключения к серверу"""
+    try:
+        # Здесь должна быть логика тестирования подключения
+        # Временно возвращаем успешный результат
+        
+        return jsonify({
+            'success': True,
+            'message': _('Connection test successful'),
+            'status': 'connected'
+        })
+        
+    except Exception as e:
+        logger.error(f"Connection test failed for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'status': 'error'
+        }), 500
+
+@api_bp.route('/servers/<server_id>/status', methods=['GET'])
+@require_auth
+@require_pin
+def get_server_status(server_id):
+    """Получение статуса сервера"""
+    try:
+        # Здесь должна быть логика получения статуса сервера
+        status = {
+            'connected': False,
+            'last_check': None,
+            'error': None,
+            'uptime': None,
+            'load': None
+        }
+        
+        return jsonify({
+            'success': True,
+            'status': status
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting server status {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/server/<server_id>/stats', methods=['GET'])
+@require_auth
+@require_pin
+def get_server_stats(server_id):
+    """Получение статистики сервера через SSH"""
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        # Получаем данные сервера
+        from flask import current_app
+        servers = data_manager.load_servers(current_app.config)
+        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        
+        if not server:
+            return jsonify({
+                'error': f'Server with id {server_id} not found'
+            }), 404
+        
+        # Получаем timeout из параметров запроса
+        timeout = int(request.args.get('timeout', 30))
+        
+        # Получаем SSH credentials из правильной структуры
+        ssh_creds = server.get('ssh_credentials', {})
+        ssh_user = ssh_creds.get('user', 'root')
+        ssh_port = ssh_creds.get('port', 22)  # Получаем SSH порт
+        
+        # Проверяем, есть ли уже расшифрованный пароль
+        ssh_password = ssh_creds.get('password_decrypted', '')
+        
+        # Если нет, пытаемся расшифровать
+        if not ssh_password and ssh_creds.get('password'):
+            try:
+                ssh_password = data_manager.decrypt_data(ssh_creds['password'])
+            except Exception as e:
+                logger.error(f"Failed to decrypt SSH password: {str(e)}")
+        
+        if not ssh_password:
+            return jsonify({
+                'error': 'SSH password not available. Please edit server and set SSH credentials.'
+            }), 400
+        
+        # Получаем статистику через SSH
+        stats = ssh_service.get_server_stats(
+            ip=server.get('ip_address', server.get('ip', '')),
+            user=ssh_user,
+            password=ssh_password,
+            port=ssh_port,  # Передаем SSH порт
+            timeout=timeout
+        )
+        
+        return jsonify({
+            'success': True,
+            'stats': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting server stats {server_id}: {str(e)}")
+        
+        # Определяем тип ошибки для более понятного сообщения
+        error_message = str(e)
+        if "SSH authentication failed" in error_message:
+            error_message = f"SSH authentication failed. Please check username and password for server {server_id}."
+        elif "not responding" in error_message or "SSH service is not running" in error_message:
+            error_message = f"Server {server_id} is not responding. Please check if the server is online and SSH service is running."
+        elif "Connection timeout" in error_message:
+            error_message = f"Connection timeout to server {server_id}. Server may be slow or unreachable."
+        elif "SSH connection failed" in error_message:
+            error_message = f"SSH connection failed to server {server_id}. Please check network connectivity and SSH settings."
+        
+        return jsonify({
+            'error': error_message
+        }), 500
+
+@api_bp.route('/snapshot/save', methods=['POST'])
+@require_auth
+@require_pin
+def snapshot_save():
+    """Accepts a PNG data URL and saves it to Downloads (export dir). Returns JSON with filename."""
+    try:
+        import base64
+        import datetime
+        import os
+        
+        logger.info("Snapshot save request received")
+        
+        data = request.get_json(silent=True) or {}
+        data_url = data.get('data_url', '')
+        
+        if not data_url:
+            logger.error("No data_url provided")
+            return jsonify({"success": False, "error": "No data_url provided"}), 400
+            
+        if not data_url.startswith('data:image/png;base64,'):
+            logger.error(f"Invalid data_url format: {data_url[:50]}")
+            return jsonify({"success": False, "error": "Invalid data_url format"}), 400
+        
+        b64 = data_url.split(',', 1)[1]
+        img_bytes = base64.b64decode(b64)
+        ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'server_status_{ts}.png'
+        
+        logger.info(f"Creating PNG file: {filename}, size: {len(img_bytes)} bytes")
+        
+        # Используем папку Downloads пользователя
+        downloads_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+        if os.path.exists(downloads_dir) and os.access(downloads_dir, os.W_OK):
+            export_dir = downloads_dir
+            logger.info(f"Using Downloads directory: {export_dir}")
+        else:
+            # Если Downloads недоступна, используем папку exports в проекте
+            export_dir = os.path.join(os.getcwd(), 'exports')
+            os.makedirs(export_dir, exist_ok=True)
+            logger.warning(f"Downloads not available, using exports: {export_dir}")
+        
+        path = os.path.join(export_dir, filename)
+        with open(path, 'wb') as f:
+            f.write(img_bytes)
+        
+        logger.info(f"PNG saved successfully: {path}")
+        return jsonify({"success": True, "filename": filename, "dir": export_dir})
+    except Exception as e:
+        logger.error(f"Error saving snapshot: {str(e)}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
+# Removed fake html2canvas vendor route - now using real library from static/js/html2canvas.min.js
+
+@api_bp.route('/ip-check', methods=['GET'])
+@require_auth
+@require_pin
+def check_ip():
+    """Проверка IP адреса"""
+    try:
+        api_service = registry.get('api')
+        if not api_service:
+            raise APIError('API service not available')
+        
+        ip = request.args.get('ip')
+        if ip:
+            result = api_service.check_ip_info(ip)
+        else:
+            # Получаем текущий IP
+            current_ip = api_service.get_current_ip()
+            result = api_service.check_ip_info(current_ip)
+        
+        return jsonify({
+            'success': True,
+            'data': result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking IP: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/dns-test', methods=['POST'])
+@require_auth
+@require_pin
+def test_dns():
+    """Тест DNS утечек"""
+    try:
+        api_service = registry.get('api')
+        if not api_service:
+            raise APIError('API service not available')
+        
+        result = api_service.test_dns_leak()
+        
+        return jsonify({
+            'success': True,
+            'data': result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error testing DNS: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/speed-test', methods=['POST'])
+@require_auth
+@require_pin
+def test_speed():
+    """Тест скорости соединения"""
+    try:
+        api_service = registry.get('api')
+        if not api_service:
+            raise APIError('API service not available')
+        
+        result = api_service.test_connection_speed()
+        
+        return jsonify({
+            'success': True,
+            'data': result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error testing speed: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Monitoring Endpoints
+def _get_server_ssh_credentials(server_id, data_manager):
+    """Helper: Получить SSH credentials с расшифровкой пароля"""
+    from flask import current_app
+    servers = data_manager.load_servers(current_app.config)
+    server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+    
+    if not server:
+        return None, None
+    
+    ssh_creds = server.get('ssh_credentials', {})
+    password = ssh_creds.get('password_decrypted', '')
+    
+    # Расшифровываем пароль, если нужно
+    if not password and ssh_creds.get('password'):
+        try:
+            password = data_manager.decrypt_data(ssh_creds['password'])
+        except Exception as e:
+            logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+            return None, None
+    
+    return server, {
+        'ip': server.get('ip_address'),
+        'user': ssh_creds.get('user', 'root'),
+        'password': password,
+        'port': ssh_creds.get('port', 22)
+    }
+
+@api_bp.route('/monitoring/<server_id>/network-stats', methods=['GET'])
+@require_auth
+@require_pin
+def get_network_stats(server_id):
+    """Получение статистики сетевого трафика"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        stats = ssh_service.get_network_stats(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting network stats for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/firewall-stats', methods=['GET'])
+@require_auth
+@require_pin
+def get_firewall_stats(server_id):
+    """Получение статистики брандмауэра"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        stats = ssh_service.get_firewall_stats(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting firewall stats for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/services-stats', methods=['GET'])
+@require_auth
+@require_pin
+def get_services_stats(server_id):
+    """Получение статистики системных сервисов"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        stats = ssh_service.get_services_stats(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting services stats for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/security-events', methods=['GET'])
+@require_auth
+@require_pin
+def get_security_events(server_id):
+    """Получение событий безопасности"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        stats = ssh_service.get_security_events(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': stats
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting security events for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/metrics-history', methods=['GET'])
+@require_auth
+@require_pin
+def get_metrics_history(server_id):
+    """Получение истории метрик (CPU/Memory)"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        history = ssh_service.get_metrics_history(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': history
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting metrics history for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/check-tools', methods=['GET'])
+@require_auth
+@require_pin
+def check_monitoring_tools(server_id):
+    """Проверка наличия необходимых утилит для мониторинга"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+        
+        tools_status = ssh_service.check_required_tools(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': tools_status
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking tools for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/<server_id>/check-installed', methods=['GET'])
+@require_auth
+@require_pin
+def check_monitoring_installed(server_id):
+    """Проверить, установлен ли мониторинг на сервере"""
+    # Rate limiting
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+    
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+        
+        from flask import current_app
+        servers = data_manager.load_servers(current_app.config)
+        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+        
+        if not server:
+            return jsonify({
+                'success': False,
+                'error': f'Server with id {server_id} not found'
+            }), 404
+        
+        # Расшифровываем пароль SSH
+        ssh_creds = server.get('ssh_credentials', {})
+        password = ssh_creds.get('password_decrypted', '')
+        if not password and ssh_creds.get('password'):
+            try:
+                password = data_manager.decrypt_data(ssh_creds['password'])
+            except Exception as e:
+                logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to decrypt server password',
+                    'installed': False
+                })
+        
+        # Проверяем наличие скрипта мониторинга на сервере
+        logger.info(f"Checking if monitoring is installed on server {server_id}")
+        
+        # Проверяем существование главного скрипта с коротким таймаутом (быстрая проверка)
+        check_cmd = "[ -f /usr/local/bin/monitoring/get-all-stats.sh ] && echo 'EXISTS' || echo 'NOT_FOUND'"
+        result = ssh_service.execute_remote_command(
+            ip=server.get('ip_address'),
+            user=ssh_creds.get('user', 'root'),
+            password=password,
+            command=check_cmd,
+            port=ssh_creds.get('port', 22),
+            timeout=8,              # Таймаут выполнения команды
+            connection_timeout=10   # Быстрый таймаут подключения для проверки (вместо 30)
+        )
+        
+        is_installed = 'EXISTS' in result.get('output', '')
+        
+        logger.info(f"Monitoring installed on server {server_id}: {is_installed}")
+        
+        return jsonify({
+            'success': True,
+            'installed': is_installed
+        })
+        
+    except Exception as e:
+        logger.error(f"Error checking installation for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'installed': False
+        })
+
+# Глобальная переменная для отслеживания отмены установки
+installation_cancelled = {}
+
+@api_bp.route('/monitoring/<server_id>/cancel-install', methods=['POST'])
+@require_auth
+@require_pin
+def cancel_installation(server_id):
+    """Отменить текущую установку"""
+    global installation_cancelled
+    installation_cancelled[server_id] = True
+    
+    return jsonify({
+        'success': True,
+        'message': 'Отмена установки...'
+    })
+
+@api_bp.route('/monitoring/<server_id>/install', methods=['GET'])  # EventSource использует GET!
+@require_auth
+@require_pin
+def install_monitoring(server_id):
+    """Установка системы мониторинга на удаленный сервер (с SSE прогрессом)"""
+    from flask import Response, stream_with_context
+    import time
+    import json
+    
+    global installation_cancelled
+    installation_cancelled[server_id] = False  # Сбрасываем флаг отмены
+    
+    def generate_progress():
+        """Generator для Server-Sent Events"""
+        try:
+            ssh_service = registry.get('ssh')
+            data_manager = registry.get('data_manager')
+            
+            if not ssh_service or not data_manager:
+                yield f"data: {json.dumps({'error': 'Required services not available', 'status': 'error'})}\n\n"
+                return
+            
+            from flask import current_app
+            servers = data_manager.load_servers(current_app.config)
+            server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+            
+            if not server:
+                yield f"data: {json.dumps({'error': f'Server with id {server_id} not found', 'status': 'error'})}\n\n"
+                return
+            
+            # Получаем credentials
+            ip = server.get('ip_address')
+            ssh_creds = server.get('ssh_credentials', {})
+            user = ssh_creds.get('user', 'root')
+            port = ssh_creds.get('port', 22)
+            
+            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
+            password = ssh_creds.get('password_decrypted', '')
+            
+            # Если нет расшифрованного, пытаемся расшифровать
+            if not password and ssh_creds.get('password'):
+                try:
+                    password = data_manager.decrypt_data(ssh_creds['password'])
+                except Exception as e:
+                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                    return
+            
+            if not password:
+                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+                return
+            
+            # Функция проверки отмены
+            def check_cancelled():
+                if installation_cancelled.get(server_id, False):
+                    return True
+                return False
+            
+            # Проверка: не установлен ли уже мониторинг
+            yield f"data: {json.dumps({'step': 0, 'total': 7, 'message': 'Проверка существующей установки...', 'status': 'running'})}\n\n"
+            import paramiko
+            check_client = None
+            try:
+                check_client = paramiko.SSHClient()
+                check_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                check_client.connect(hostname=ip, username=user, password=password, port=port, timeout=30, 
+                                   banner_timeout=60, auth_timeout=30, look_for_keys=False, allow_agent=False)
+                
+                # Проверяем наличие файла мониторинга
+                _, stdout, _ = check_client.exec_command('test -f /usr/local/bin/monitoring/get-all-stats.sh && echo "exists"', timeout=10)
+                result = stdout.read().decode('utf-8').strip()
+                check_client.close()
+                
+                if result == 'exists':
+                    logger.warning(f"Monitoring already installed on server {server_id}, aborting installation")
+                    yield f"data: {json.dumps({'error': 'Мониторинг уже установлен на этом сервере! Обновите страницу.', 'status': 'error'})}\n\n"
+                    return
+            except Exception as e:
+                if check_client:
+                    check_client.close()
+                # Игнорируем ошибку проверки, продолжаем установку
+                logger.debug(f"Pre-installation check failed (this is OK): {e}")
+            
+            # Шаг 1: Подключение
+            yield f"data: {json.dumps({'step': 1, 'total': 7, 'message': 'Подключение к серверу...', 'status': 'running'})}\n\n"
+            if check_cancelled():
+                yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
+                return
+            time.sleep(0.3)
+            
+            # Проверяем SSH подключение
+            client = None
+            try:
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.connect(hostname=ip, username=user, password=password, port=port, timeout=30)
+                
+                yield f"data: {json.dumps({'step': 1, 'total': 7, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
+                if check_cancelled():
+                    yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
+                    return
+                
+                # Шаг 2: Обновление пакетов
+                yield f"data: {json.dumps({'step': 2, 'total': 7, 'message': 'Обновление списка пакетов...', 'status': 'running'})}\n\n"
+                if check_cancelled():
+                    yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
+                    return
+                _, stdout, stderr = client.exec_command('sudo apt-get update -qq', timeout=60)
+                stdout.channel.recv_exit_status()  # Ждем завершения
+                yield f"data: {json.dumps({'step': 2, 'total': 7, 'message': '✅ Список пакетов обновлен', 'status': 'success'})}\n\n"
+                if check_cancelled():
+                    yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
+                    return
+                
+                # Шаг 3: Установка vnstat
+                yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': 'Установка vnstat...', 'status': 'running'})}\n\n"
+                _, stdout, stderr = client.exec_command('sudo apt-get install -y vnstat', timeout=120)
+                stdout.channel.recv_exit_status()
+                _, stdout, stderr = client.exec_command('sudo systemctl enable vnstat && sudo systemctl start vnstat', timeout=30)
+                stdout.channel.recv_exit_status()
+                yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '✅ vnstat установлен и запущен', 'status': 'success'})}\n\n"
+                
+                # Шаг 4: Установка jq
+                yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': 'Установка jq...', 'status': 'running'})}\n\n"
+                _, stdout, stderr = client.exec_command('sudo apt-get install -y jq', timeout=60)
+                stdout.channel.recv_exit_status()
+                yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': '✅ jq установлен', 'status': 'success'})}\n\n"
+                
+                # Шаг 5: Установка net-tools
+                yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': 'Установка net-tools...', 'status': 'running'})}\n\n"
+                _, stdout, stderr = client.exec_command('sudo apt-get install -y net-tools', timeout=60)
+                stdout.channel.recv_exit_status()
+                yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': '✅ net-tools установлен', 'status': 'success'})}\n\n"
+                
+                # Шаг 6: Установка и настройка UFW (опционально)
+                yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': 'Проверка UFW...', 'status': 'running'})}\n\n"
+                _, stdout, _ = client.exec_command('which ufw', timeout=10)
+                ufw_exists = bool(stdout.read().decode('utf-8').strip())
+                
+                if not ufw_exists:
+                    _, stdout, stderr = client.exec_command('sudo apt-get install -y ufw', timeout=60)
+                    stdout.channel.recv_exit_status()
+                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW установлен', 'status': 'success'})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW уже установлен', 'status': 'success'})}\n\n"
+                
+                # Шаг 7: Создание скриптов мониторинга
+                yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': 'Создание скриптов мониторинга...', 'status': 'running'})}\n\n"
+                
+                # Создаем директорию для скриптов
+                _, stdout, _ = client.exec_command('sudo mkdir -p /usr/local/bin/monitoring', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # 1. Главный скрипт get-all-stats.sh (для получения данных)
+                main_script = '''#!/bin/bash
+# VPN Server Manager - Main Monitoring Script
+echo "Monitoring data collected at $(date)"
+exit 0
+'''
+                import base64
+                main_b64 = base64.b64encode(main_script.encode()).decode()
+                _, stdout, _ = client.exec_command(f'echo {main_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/get-all-stats.sh > /dev/null', timeout=10)
+                stdout.channel.recv_exit_status()
+                _, stdout, _ = client.exec_command('sudo chmod +x /usr/local/bin/monitoring/get-all-stats.sh', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # 2. Скрипт сбора метрик update-metrics-history.sh
+                script_content = '''#!/bin/bash
+# VPN Server Manager - Metrics Collection Script
+HISTORY_FILE="/var/tmp/metrics_history.json"
+MAX_POINTS=288  # 24 часа истории (288 точек × 5 минут)
+
+# Получаем текущие метрики
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - $1}')
+MEM_USAGE=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100}')
+TIMESTAMP=$(date +%s)
+
+# Проверяем наличие jq
+if ! command -v jq &> /dev/null; then
+    echo "[]" > "$HISTORY_FILE"
+    exit 0
+fi
+
+# Читаем существующую историю или создаем новую
+if [ ! -f "$HISTORY_FILE" ]; then
+    echo "[]" > "$HISTORY_FILE"
+fi
+
+# Добавляем новую точку и ограничиваем до MAX_POINTS
+jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USAGE}] | .[-$MAX_POINTS:]" "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+'''
+                
+                # Записываем скрипт сбора метрик
+                script_b64 = base64.b64encode(script_content.encode()).decode()
+                _, stdout, _ = client.exec_command(f'echo {script_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/update-metrics-history.sh > /dev/null', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # Делаем исполняемым
+                _, stdout, _ = client.exec_command('sudo chmod +x /usr/local/bin/monitoring/update-metrics-history.sh', timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                # Создаем cron задачу с flock (безопасная версия - раз в 5 минут)
+                cron_cmd = '(crontab -l 2>/dev/null | grep -v "update-metrics-history.sh"; echo "*/5 * * * * flock -n /var/run/metrics-history.lock /usr/local/bin/monitoring/update-metrics-history.sh > /dev/null 2>&1") | crontab -'
+                _, stdout, _ = client.exec_command(cron_cmd, timeout=10)
+                stdout.channel.recv_exit_status()
+                
+                yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': '✅ Автоматический сбор метрик настроен', 'status': 'success'})}\n\n"
+                
+                # Шаг 8: Тестирование
+                yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': 'Проверка установленных утилит...', 'status': 'running'})}\n\n"
+                
+                # Проверяем все утилиты
+                tools_status = ssh_service.check_required_tools(ip=ip, user=user, password=password, port=port, timeout=30)
+                missing = tools_status.get('missing_count', 0)
+                
+                # Если все в порядке (all_ok=True или missing_count=0)
+                if tools_status.get('all_ok', False) or missing == 0:
+                    yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': '✅ Все утилиты успешно установлены!', 'status': 'success'})}\n\n"
+                    yield f"data: {json.dumps({'complete': True, 'status': 'success'})}\n\n"
+                else:
+                    # Только если действительно что-то отсутствует
+                    yield f"data: {json.dumps({'error': f'Не все утилиты установлены ({missing} отсутствует)', 'status': 'error'})}\n\n"
+                
+            except paramiko.AuthenticationException:
+                yield f"data: {json.dumps({'error': 'Ошибка аутентификации SSH. Проверьте имя пользователя и пароль.', 'status': 'error'})}\n\n"
+            except paramiko.SSHException as e:
+                yield f"data: {json.dumps({'error': f'Ошибка SSH: {str(e)}', 'status': 'error'})}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
+            finally:
+                if client:
+                    try:
+                        client.close()
+                    except:
+                        pass
+                # Очищаем флаг отмены после завершения
+                installation_cancelled[server_id] = False
+                        
+        except Exception as e:
+            logger.error(f"Error during monitoring installation: {str(e)}")
+            yield f"data: {json.dumps({'error': str(e), 'status': 'error'})}\n\n"
+            installation_cancelled[server_id] = False
+    
+    return Response(stream_with_context(generate_progress()), mimetype='text/event-stream')
+
+@api_bp.route('/monitoring/<server_id>/uninstall', methods=['GET'])  # EventSource использует GET!
+@require_auth
+@require_pin
+def uninstall_monitoring(server_id):
+    """Удаление системы мониторинга с удаленного сервера"""
+    from flask import Response, stream_with_context
+    import time
+    import json
+    
+    def generate_uninstall_progress():
+        """Generator для SSE при удалении"""
+        try:
+            ssh_service = registry.get('ssh')
+            data_manager = registry.get('data_manager')
+            
+            if not ssh_service or not data_manager:
+                yield f"data: {json.dumps({'error': 'Required services not available', 'status': 'error'})}\n\n"
+                return
+            
+            from flask import current_app
+            servers = data_manager.load_servers(current_app.config)
+            server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
+            
+            if not server:
+                yield f"data: {json.dumps({'error': f'Server with id {server_id} not found', 'status': 'error'})}\n\n"
+                return
+            
+            # Получаем credentials
+            ip = server.get('ip_address')
+            ssh_creds = server.get('ssh_credentials', {})
+            user = ssh_creds.get('user', 'root')
+            port = ssh_creds.get('port', 22)
+            
+            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
+            password = ssh_creds.get('password_decrypted', '')
+            
+            # Если нет расшифрованного, пытаемся расшифровать
+            if not password and ssh_creds.get('password'):
+                try:
+                    password = data_manager.decrypt_data(ssh_creds['password'])
+                except Exception as e:
+                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
+                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                    return
+            
+            if not password:
+                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+                return
+            
+            # Шаг 1: Подключение
+            yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': 'Подключение к серверу...', 'status': 'running'})}\n\n"
+            time.sleep(0.3)
+            
+            import paramiko
+            client = None
+            try:
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.connect(hostname=ip, username=user, password=password, port=port, timeout=30)
+                
+                yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
+                
+                # Шаг 2: Остановка vnstat (опционально, не удаляем сам пакет)
+                yield f"data: {json.dumps({'step': 2, 'total': 5, 'message': 'Проверка vnstat...', 'status': 'running'})}\n\n"
+                # Просто проверяем, не удаляем пакеты, так как они могут использоваться другими приложениями
+                yield f"data: {json.dumps({'step': 2, 'total': 5, 'message': '✅ Проверка завершена (пакеты оставлены)', 'status': 'success'})}\n\n"
+                
+                # Шаг 3: Удаление файла истории и скриптов
+                yield f"data: {json.dumps({'step': 3, 'total': 5, 'message': 'Удаление файлов мониторинга...', 'status': 'running'})}\n\n"
+                _, stdout, stderr = client.exec_command('sudo rm -f /var/tmp/metrics_history.json', timeout=10)
+                stdout.channel.recv_exit_status()
+                _, stdout, stderr = client.exec_command('sudo rm -rf /usr/local/bin/monitoring', timeout=10)
+                stdout.channel.recv_exit_status()
+                yield f"data: {json.dumps({'step': 3, 'total': 5, 'message': '✅ Файлы мониторинга удалены', 'status': 'success'})}\n\n"
+                
+                # Шаг 4: Удаление cron задачи
+                yield f"data: {json.dumps({'step': 4, 'total': 5, 'message': 'Удаление автоматических задач...', 'status': 'running'})}\n\n"
+                cron_remove_cmd = 'crontab -l 2>/dev/null | grep -v "update-metrics-history.sh" | crontab -'
+                _, stdout, stderr = client.exec_command(cron_remove_cmd, timeout=10)
+                stdout.channel.recv_exit_status()
+                yield f"data: {json.dumps({'step': 4, 'total': 5, 'message': '✅ Автоматические задачи удалены', 'status': 'success'})}\n\n"
+                
+                # Шаг 5: Завершение
+                yield f"data: {json.dumps({'step': 5, 'total': 5, 'message': 'Завершение...', 'status': 'running'})}\n\n"
+                yield f"data: {json.dumps({'step': 5, 'total': 5, 'message': '✅ Мониторинг деактивирован', 'status': 'success'})}\n\n"
+                
+                yield f"data: {json.dumps({'complete': True, 'status': 'success', 'message': '🎉 Мониторинг успешно удален!'})}\n\n"
+                
+            except paramiko.AuthenticationException:
+                yield f"data: {json.dumps({'error': 'Ошибка аутентификации SSH', 'status': 'error'})}\n\n"
+            except paramiko.SSHException as e:
+                yield f"data: {json.dumps({'error': f'Ошибка SSH: {str(e)}', 'status': 'error'})}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
+            finally:
+                if client:
+                    try:
+                        client.close()
+                    except:
+                        pass
+                        
+        except Exception as e:
+            logger.error(f"Error during monitoring uninstallation: {str(e)}")
+            yield f"data: {json.dumps({'error': str(e), 'status': 'error'})}\n\n"
+    
+    return Response(stream_with_context(generate_uninstall_progress()), mimetype='text/event-stream')
+
+@api_bp.route('/monitoring/stats/system', methods=['GET'])
+@require_auth
+@require_pin
+def monitoring_system_stats():
+    """Статистика работы системы мониторинга"""
+    from ..services.ssh_service import SSHService
+    
+    try:
+        # Количество открытых SSH соединений
+        active_connections = len(SSHService._connection_pool)
+        
+        # Список активных соединений
+        connections = []
+        for key, conn in SSHService._connection_pool.items():
+            try:
+                is_alive = conn.get_transport() and conn.get_transport().is_active()
+                connections.append({
+                    'key': key,
+                    'alive': is_alive
+                })
+            except:
+                connections.append({
+                    'key': key,
+                    'alive': False
+                })
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'active_ssh_connections': active_connections,
+                'connections': connections,
+                'connection_pool_enabled': True,
+                'rate_limiting_enabled': True,
+                'max_requests_per_minute': rate_limiter.max_requests,
+                'time_window': rate_limiter.time_window
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting monitoring system stats: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/monitoring/health', methods=['GET'])
+def health_check():
+    """Health check endpoint для мониторинга работоспособности"""
+    import time
+    from ..services.ssh_service import SSHService
+    
+    health = {
+        'status': 'healthy',
+        'timestamp': int(time.time()),
+        'checks': {}
+    }
+    
+    # Проверка SSH Connection Pool
+    try:
+        pool_size = len(SSHService._connection_pool)
+        active_count = 0
+        for key, conn in SSHService._connection_pool.items():
+            try:
+                if conn.get_transport() and conn.get_transport().is_active():
+                    active_count += 1
+            except:
+                pass
+        
+        health['checks']['ssh_pool'] = {
+            'status': 'ok',
+            'total_connections': pool_size,
+            'active_connections': active_count
+        }
+    except Exception as e:
+        health['checks']['ssh_pool'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+        health['status'] = 'degraded'
+    
+    # Проверка Rate Limiter
+    try:
+        health['checks']['rate_limiter'] = {
+            'status': 'ok',
+            'enabled': True,
+            'max_requests': rate_limiter.max_requests,
+            'time_window': rate_limiter.time_window
+        }
+    except Exception as e:
+        health['checks']['rate_limiter'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+        health['status'] = 'degraded'
+    
+    # Проверка services registry
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+        
+        health['checks']['services'] = {
+            'status': 'ok',
+            'ssh_service': ssh_service is not None,
+            'data_manager': data_manager is not None
+        }
+        
+        if not ssh_service or not data_manager:
+            health['status'] = 'degraded'
+    except Exception as e:
+        health['checks']['services'] = {
+            'status': 'error',
+            'error': str(e)
+        }
+        health['status'] = 'degraded'
+    
+    status_code = 200 if health['status'] == 'healthy' else 503
+    return jsonify(health), status_code
+
+@api_bp.route('/backup', methods=['POST'])
+@require_auth
+@require_pin
+def create_backup():
+    """Создание резервной копии"""
+    try:
+        # Здесь должна быть логика создания резервной копии
+        # Временно возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Backup created successfully'),
+            'backup_path': '/path/to/backup.json'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error creating backup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/restore', methods=['POST'])
+@require_auth
+@require_pin
+@validate_json
+def restore_backup():
+    """Восстановление из резервной копии"""
+    try:
+        data = request.get_json()
+        backup_data = data.get('backup_data')
+        
+        if not backup_data:
+            raise ValidationError('Backup data is required')
+        
+        # Здесь должна быть логика восстановления из резервной копии
+        # Временно возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Backup restored successfully')
+        })
+        
+    except Exception as e:
+        logger.error(f"Error restoring backup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/settings', methods=['GET'])
+@require_auth
+@require_pin
+def get_settings():
+    """Получение настроек приложения"""
+    try:
+        # Здесь должна быть логика загрузки настроек
+        settings = {
+            'default_pin': '1234',
+            'language': session.get('language', 'ru'),
+            'auto_backup': True,
+            'backup_interval': 24
+        }
+        
+        return jsonify({
+            'success': True,
+            'settings': settings
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting settings: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@api_bp.route('/settings', methods=['PUT'])
+@require_auth
+@require_pin
+@validate_json
+@handle_errors
+def update_settings():
+    """Обновление настроек приложения"""
+    try:
+        data = request.get_json()
+        
+        # Здесь должна быть логика обновления настроек
+        # Временно просто возвращаем успех
+        
+        return jsonify({
+            'success': True,
+            'message': _('Settings updated successfully')
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating settings: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# PIN endpoints
+@pin_bp.route('/check_block', methods=['GET'])
+def check_block():
+    """Проверка блокировки входа"""
+    try:
+        # Проверяем блокировку в сессии
+        block_until = session.get('block_until')
+        if block_until:
+            import time
+            if time.time() < block_until:
+                remaining = int(block_until - time.time())
+                return jsonify({
+                    'blocked': True,
+                    'remaining': remaining
+                })
+            else:
+                # Блокировка истекла
+                session.pop('block_until', None)
+        
+        return jsonify({
+            'blocked': False,
+            'remaining': 0
+        })
+    except Exception as e:
+        logger.error(f"Error checking block: {str(e)}")
+        return jsonify({
+            'blocked': False,
+            'remaining': 0
+        })
+
+@pin_bp.route('/check_first_setup_allowed', methods=['GET'])
+def check_first_setup_allowed():
+    """Проверка, разрешен ли первый запуск"""
+    try:
+        if _has_existing_server_data():
+            return jsonify({
+                'allowed': False,
+                'reason': 'Data already exists'
+            })
+
+        if not _is_first_setup_allowed():
+            return jsonify({
+                'allowed': False,
+                'reason': 'PIN already configured'
+            })
+
+        return jsonify({
+            'allowed': True,
+            'default_pin': _get_default_pin()
+        })
+    except Exception as e:
+        logger.error(f"Error checking first setup: {str(e)}")
+        return jsonify({
+            'allowed': False,
+            'error': str(e)
+        })
+
+
+@pin_bp.route('/first_time_setup', methods=['POST'])
+def first_time_setup():
+    """Первичная настройка PIN на чистой установке"""
+    try:
+        if not _is_first_setup_allowed():
+            return jsonify({
+                'success': False,
+                'message': _('First setup is not available')
+            }), 403
+
+        if request.is_json:
+            data = request.get_json() or {}
+            new_pin = data.get('new_pin', '').strip()
+        else:
+            new_pin = request.form.get('new_pin', '').strip()
+
+        selected_pin = new_pin or _get_default_pin()
+        if len(selected_pin) < 4:
+            return jsonify({
+                'success': False,
+                'message': _('PIN должен содержать минимум 4 символа')
+            }), 400
+
+        _save_current_pin(selected_pin, setup_completed=True)
+        _set_authenticated_session()
+
+        return jsonify({
+            'success': True,
+            'message': _('PIN configured successfully'),
+            'used_default_pin': not bool(new_pin)
+        })
+    except Exception as e:
+        logger.error(f"Error in first_time_setup: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@pin_bp.route('/login_ajax', methods=['POST', 'OPTIONS'])
+def login_ajax():
+    """AJAX авторизация по PIN"""
+    # Обработка OPTIONS запроса (CORS preflight)
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+    
+    try:
+        block_until = session.get('block_until')
+        if block_until:
+            import time
+            if time.time() < block_until:
+                remaining = int(block_until - time.time())
+                return jsonify({
+                    'success': False,
+                    'error': _('Too many failed attempts. Blocked for 30 seconds.'),
+                    'blocked': True,
+                    'remaining_seconds': remaining
+                }), 429
+
+        # Логируем для отладки
+        logger.info(f"Request method: {request.method}")
+        logger.info(f"Request content type: {request.content_type}")
+        logger.info(f"Request data: {request.get_data()}")
+        logger.info(f"Request JSON: {request.get_json(silent=True)}")
+        
+        # Поддерживаем как JSON, так и form-data
+        if request.is_json:
+            data = request.get_json()
+            pin = data.get('pin', '').strip() if data else ''
+        else:
+            # Обрабатываем form-data
+            try:
+                pin = request.form.get('pin', '').strip()
+            except Exception as e:
+                logger.error(f"Error getting form data: {e}")
+                pin = ''
+            
+        logger.info(f"Extracted PIN: '{pin}'")
+        
+        if not pin:
+            return jsonify({
+                'success': False,
+                'error': _('PIN is required')
+            }), 400
+        
+        current_pin = _get_current_pin()
+        
+        # Проверяем PIN
+        if pin == current_pin:
+            _set_authenticated_session()
+            logger.info(f"PIN authenticated successfully. Session: {dict(session)}")
+            return jsonify({
+                'success': True,
+                'message': _('Login successful')
+            })
+        else:
+            # Увеличиваем счетчик неудачных попыток
+            failed_attempts = session.get('failed_attempts', 0) + 1
+            session['failed_attempts'] = failed_attempts
+            
+            if failed_attempts >= 3:
+                # Блокируем на 30 секунд
+                import time
+                session['block_until'] = time.time() + 30
+                session['failed_attempts'] = 0
+                return jsonify({
+                    'success': False,
+                    'error': _('Too many failed attempts. Blocked for 30 seconds.'),
+                    'blocked': True,
+                    'remaining_seconds': 30
+                }), 429
+            
+            return jsonify({
+                'success': False,
+                'error': _('Invalid PIN'),
+                'attempts_left': 3 - failed_attempts
+            }), 401
+            
+    except Exception as e:
+        logger.error(f"Error in login_ajax: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pin_bp.route('/change_ajax', methods=['POST'])
+def change_ajax():
+    """AJAX смена PIN"""
+    try:
+        if request.is_json:
+            data = request.get_json() or {}
+            old_pin = data.get('old_pin', '').strip()
+            new_pin = data.get('new_pin', '').strip()
+        else:
+            old_pin = request.form.get('old_pin', '').strip()
+            new_pin = request.form.get('new_pin', '').strip() or request.form.get('new_pin1', '').strip()
+            confirm_pin = request.form.get('new_pin2', '').strip()
+            if confirm_pin and new_pin != confirm_pin:
+                return jsonify({
+                    'success': False,
+                    'message': _('Новые PIN-коды не совпадают')
+                }), 400
+        
+        if not old_pin or not new_pin:
+            return jsonify({
+                'success': False,
+                'error': _('Both old and new PIN are required')
+            }), 400
+
+        if len(new_pin) < 4:
+            return jsonify({
+                'success': False,
+                'message': _('PIN должен содержать минимум 4 символа')
+            }), 400
+
+        if old_pin == _get_current_pin():
+            _save_current_pin(new_pin, setup_completed=True)
+            return jsonify({
+                'success': True,
+                'message': _('PIN changed successfully')
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': _('Invalid old PIN')
+            }), 401
+            
+    except Exception as e:
+        logger.error(f"Error in change_ajax: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pin_bp.route('/logout', methods=['POST'])
+def logout():
+    """Выход из системы (сброс сессии)"""
+    try:
+        # Очищаем все данные сессии
+        session.clear()
+        logger.info("User logged out, session cleared")
+        return jsonify({
+            'success': True,
+            'message': _('Logged out successfully')
+        })
+    except Exception as e:
+        logger.error(f"Error in logout: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pin_bp.route('/check_auth', methods=['GET'])
+def check_auth():
+    """Проверка статуса аутентификации"""
+    try:
+        authenticated = session.get('pin_authenticated', False) or session.get('authenticated', False)
+        return jsonify({
+            'authenticated': authenticated
+        })
+    except Exception as e:
+        logger.error(f"Error checking auth: {str(e)}")
+        return jsonify({
+            'authenticated': False
+        })
+
+@pin_bp.route('/exit_app', methods=['POST'])
+def exit_app():
+    """Закрытие приложения (только для desktop mode)"""
+    try:
+        # Очищаем сессию
+        session.clear()
+        logger.info("Exit app request received, session cleared")
+        
+        # Пытаемся остановить приложение (работает только в desktop mode)
+        import sys
+        import os
+        
+        # Проверяем, запущено ли приложение в desktop режиме
+        if '--desktop' in sys.argv or os.environ.get('DESKTOP_MODE') == '1':
+            # Отправляем сигнал на остановку через threading
+            import threading
+            def stop_app():
+                import time
+                time.sleep(0.5)  # Даём время на отправку ответа
+                # Останавливаем pywebview
+                try:
+                    import webview
+                    # Получаем все окна и закрываем их
+                    for window in webview.windows:
+                        window.destroy()
+                except Exception as e:
+                    logger.error(f"Error destroying windows: {e}")
+                    # Если не получилось закрыть через webview, выходим из процесса
+                    os._exit(0)
+            
+            threading.Thread(target=stop_app, daemon=True).start()
+        
+        return jsonify({
+            'success': True,
+            'message': _('Application closing...')
+        })
+    except Exception as e:
+        logger.error(f"Error in exit_app: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

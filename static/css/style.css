@@ -115,70 +115,71 @@
     }
 }
 
-/* Улучшенные стили для выпадающих меню */
-.dropdown-menu {
+/* Стили для модального окна статуса сервера */
+#serverStatusModal .modal-body {
+    font-size: 0.9rem;
+}
+
+#serverStatusModal h5 {
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    padding-bottom: 0.5rem;
+}
+
+#serverStatusModal .table {
+    margin-bottom: 0;
+}
+
+#serverStatusModal .table th,
+#serverStatusModal .table td {
+    vertical-align: middle;
+}
+
+#serverStatusModal .progress {
+    background-color: var(--bs-border-color);
+}
+
+#serverStatusModal .list-group-flush .list-group-item {
+    background-color: transparent;
+}
+
+#serverStatusModal .card {
     border: 1px solid var(--bs-border-color);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
-    will-change: opacity, transform;
-    z-index: 1051; /* выше, чем offcanvas/другие элементы страницы */
 }
 
-.dropdown-item {
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+#serverStatusModal .card-body {
+    padding: 1rem;
 }
 
-.dropdown-item:hover {
-    background-color: var(--bs-primary);
-    color: white;
+#serverStatusModal .table-responsive {
+    font-size: 0.85rem;
 }
 
-.dropdown-item:focus {
-    background-color: var(--bs-primary);
-    color: white;
-    outline: none;
+#serverStatusModal .table thead th {
+    border-bottom: 2px solid var(--bs-border-color);
+    font-weight: 600;
 }
 
-/* Исправление для залипания кнопок */
-.dropdown-toggle:focus {
-    box-shadow: none;
+#serverStatusModal .table-borderless th,
+#serverStatusModal .table-borderless td {
+    border: 0;
 }
 
-.dropdown-toggle:focus-visible {
-    outline: 2px solid var(--bs-primary);
-    outline-offset: 2px;
+#serverStatusModal .table-borderless tbody tr {
+    border-bottom: 1px solid var(--bs-border-color);
 }
 
-/* Улучшение для навигационных элементов */
-.navbar-nav .dropdown-menu {
-    margin-top: 0; /* без зазора между кнопкой и меню для стабильного hover */
+#serverStatusModal .table-borderless tbody tr:last-child {
+    border-bottom: 0;
 }
 
-/* Анимация для выпадающих меню */
-.dropdown-menu.show {
-    animation: dropdownFadeIn 0.15s ease-out;
+/* Центрирование текста в таблицах */
+#proc-table td:not(:nth-child(2)), #proc-table th:not(:nth-child(2)),
+#docker-table td:not(:nth-child(1)):not(:nth-child(2)), #docker-table th:not(:nth-child(1)):not(:nth-child(2)),
+#inodes-table td:not(:first-child), #inodes-table th:not(:first-child) {
+    text-align: center;
 }
 
-@keyframes dropdownFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Увеличенная hit-area для иконок в навбаре */
-.navbar .nav-link {
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
-}
-
-/* Исправление субпиксельной размытости при изменённом корневом font-size */
-html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
+#proc-table, #docker-table, #inodes-table {
+    white-space: nowrap;
 }
