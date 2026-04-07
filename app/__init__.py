@@ -127,8 +127,8 @@ def _get_release_config_candidates(base_path):
         return []
 
     return [
-        os.path.join(base_path, 'config.json'),
         os.path.join(base_path, 'config', 'config.json.template'),
+        os.path.join(base_path, 'config.json'),
     ]
 
 def manage_user_config(app):
@@ -168,7 +168,7 @@ def manage_user_config(app):
 
 
 def load_app_info(app):
-    """Загрузка информации о приложении и конфигурации из config.json"""
+    """Загрузка release-метаданных приложения с приоритетом релизного шаблона."""
     try:
         if getattr(sys, 'frozen', False):
             base_path = getattr(sys, '_MEIPASS', None)
@@ -186,7 +186,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.2.1'),
+            "version": app.config.get('APP_VERSION', '4.2.2'),
             "release_date": "07.04.2026",
             "last_updated": "2026-04-07",
             "developer": "Куреин М.Н."
@@ -337,7 +337,7 @@ def create_app(config_name='development'):
         return {
             'app_info': app.config.get('app_info', {}),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
-            'server_info': {
+            'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {
                 'host': server_host,
                 'port': server_port,
                 'url': server_url
