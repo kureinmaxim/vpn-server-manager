@@ -17,7 +17,7 @@ REM Check if Python is installed
 python --version >nul 2>&1
 if errorlevel 1 (
     echo [ERROR] Python is not installed or not in PATH
-    echo Please install Python 3.8+ from https://www.python.org/
+    echo Please install Python 3.13+ from https://www.python.org/
     pause
     exit /b 1
 )
@@ -45,24 +45,32 @@ if exist venv\Scripts\activate.bat (
 echo.
 
 echo [2/4] Activating virtual environment...
-call venv\Scripts\activate.bat
-if errorlevel 1 (
-    echo [ERROR] Failed to activate virtual environment
+if not exist "venv\Scripts\python.exe" (
+    echo [ERROR] Virtual environment python not found
     echo [INFO] Try deleting the venv folder and run this script again
     pause
     exit /b 1
 )
-echo [OK] Virtual environment activated
+echo [OK] Virtual environment is ready
 echo.
 
 echo [3/5] Installing dependencies...
 echo This may take 3-5 minutes, please wait...
+echo If your internet is slow, pip retries and extended timeouts will be used.
 echo.
-pip install -r requirements.txt --progress-bar on
+set PIP_INSTALL_CMD=venv\Scripts\python.exe -m pip install -r requirements.txt --progress-bar on --timeout 120 --retries 10 --prefer-binary
+echo Running: %PIP_INSTALL_CMD%
+%PIP_INSTALL_CMD%
 if errorlevel 1 (
-    echo [ERROR] Failed to install dependencies
-    pause
-    exit /b 1
+    echo [WARNING] First attempt failed, retrying once...
+    echo.
+    %PIP_INSTALL_CMD%
+    if errorlevel 1 (
+        echo [ERROR] Failed to install dependencies
+        echo [INFO] If the error mentions timeout or proxy, see docs\WINDOWS_PROXY_TROUBLESHOOTING.md
+        pause
+        exit /b 1
+    )
 )
 echo.
 echo [OK] Dependencies installed
@@ -98,7 +106,7 @@ echo ========================================
 echo.
 echo To start the application:
 echo   - Desktop mode: start_windows.bat
-echo   - Or manually:  venv\Scripts\activate ^&^& python run.py --desktop
+echo   - Or manually:  venv\Scripts\python.exe run_desktop.py
 echo.
 pause
 
