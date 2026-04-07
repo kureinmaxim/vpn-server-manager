@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Панель управления VPS{% endblock %}</title>
+    <title>{% block title %}{{ _('Панель управления VPS') }}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <style>
+        html, body {
+            height: 100%;
+        }
         body {
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
         .content {
-            flex: 1;
+            flex: 1 0 auto;
+        }
+        .footer {
+            flex-shrink: 0;
         }
     </style>
     <script>
-        // Lazy-load html2canvas: try local vendor first, then fallback to CDN
+        // Лениво подгружаем html2canvas по требованию страниц
         function ensureHtml2CanvasLoaded(callback) {
-            if (window.html2canvas) { if (callback) callback(); return; }
+            if (window.html2canvas) { callback && callback(); return; }
+            // Сперва пробуем локальный vendor-роут (same-origin), затем CDN
             var el = document.createElement('script');
             var loaded = false;
             el.src = '/vendor/html2canvas.min.js';
@@ -39,8 +45,8 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="bi bi-hdd-stack"></i> VPS Manager
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                <i class="bi bi-hdd-stack"></i> {{ _('VPS Manager') }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -49,27 +55,27 @@
                 <ul class="navbar-nav ms-auto align-items-center">
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('settings_page') }}">Настройки</a>
+                        <a class="nav-link" href="{{ url_for('main.settings') }}">{{ _('Настройки') }}</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Справка
+                            {{ _('Справка') }}
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item nav-link-force" data-href="{{ url_for('help_page') }}" href="{{ url_for('help_page') }}">Справка по использованию</a></li>
-                            <li><a class="dropdown-item nav-link-force" data-href="{{ url_for('manage_hints_page') }}" href="{{ url_for('manage_hints_page') }}">Управление подсказками</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.help') }}">{{ _('Справка по использованию') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.manage_hints') }}">{{ _('Управление подсказками') }}</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cheatsheet_page') }}">Шпаргалка</a>
+                        <a class="nav-link" href="{{ url_for('main.cheatsheet') }}">{{ _('Шпаргалка') }}</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('about_page') }}">О программе</a>
+                        <a class="nav-link" href="{{ url_for('main.about') }}">{{ _('О программе') }}</a>
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout()" title="Выйти из системы">
+                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </li>
@@ -79,10 +85,20 @@
                             <i class="bi bi-search"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li class="dropdown-header">Масштаб интерфейса</li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('80')"><i class="bi bi-zoom-out me-2"></i>80%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('90')"><i class="bi bi-search me-2"></i>90%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('100')"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
+                            <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('60', event); return false;"><i class="bi bi-zoom-out me-2"></i>60%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('80', event); return false;"><i class="bi bi-search me-2"></i>80%</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setZoom('100', event); return false;"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='ru') }}">🇷🇺 Русский</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='en') }}">🇺🇸 English</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='zh') }}">🇨🇳 中文</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -90,8 +106,8 @@
                             <i class="bi bi-circle-half"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')"><i class="bi bi-sun-fill me-2"></i>Светлая</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')"><i class="bi bi-moon-stars-fill me-2"></i>Темная</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -103,21 +119,134 @@
         {% block content %}{% endblock %}
     </main>
     
-    <footer class="text-center text-muted small py-3 bg-dark">
+    <footer class="footer text-center small py-3 bg-dark text-light">
         <div class="container">
-            <p class="mb-0">VPS Manager v{{ app_info.version }} | Разработчик: {{ app_info.developer }}</p>
+            <p class="mb-0 text-white">
+                {{ _('VPS Manager') }} v{{ app_info.version }} | 
+                {{ _('Разработчик') }}: {% if session.get('pin_authenticated') %}{{ app_info.developer }}{% else %}Куреин М. Н.{% endif %}
+            </p>
+            {% if server_info %}
+            <p class="mb-0 mt-1 text-info" style="font-size: 0.85em;">
+                <i class="bi bi-server"></i> {{ server_info.url }} 
+                <span class="text-white-50">|</span> 
+                <i class="bi bi-hdd-network"></i> {{ _('Порт') }}: {{ server_info.port }}
+            </p>
+            {% endif %}
         </div>
     </footer>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script>
-        // Применить сохранённый масштаб при загрузке (через корневой font-size, без размытия)
+        // Применить сохранённый масштаб при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            const savedZoom = getCookie('ui_zoom') || '100';
-            applyRootZoom(savedZoom);
-            setupDropdownHoverIntent();
-            setupDropdownClickFallback();
+            const allowedZooms = ['60', '80', '100'];
+            const savedZoom = allowedZooms.includes(getCookie('ui_zoom')) ? getCookie('ui_zoom') : '80';
+            document.body.style.zoom = savedZoom + '%';
         });
+
+        const isDesktopApp = {{ 'true' if is_desktop_app else 'false' }};
+
+        // Исправление для pywebview: улучшенная инициализация без клонирования
+        let isInitialized = false;
+        
+        function initializeNavigation() {
+            if (isInitialized) return;
+            isInitialized = true;
+            
+            // Инициализируем dropdown только один раз
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            dropdownElementList.forEach(function (dropdownToggleEl) {
+                // Проверяем, не инициализирован ли уже
+                if (!bootstrap.Dropdown.getInstance(dropdownToggleEl)) {
+                    new bootstrap.Dropdown(dropdownToggleEl, {
+                        autoClose: true,
+                        boundary: 'window'
+                    });
+                }
+            });
+            
+            // Улучшенная обработка навигационных ссылок для pywebview
+            document.querySelectorAll('a.nav-link:not([onclick])').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Для обычных ссылок (не с onclick и не #) - просто переходим
+                    if (this.getAttribute('href') && 
+                        this.getAttribute('href') !== '#' && 
+                        !this.hasAttribute('data-bs-toggle')) {
+                        e.stopPropagation();
+                        // Небольшая задержка для корректной работы в pywebview
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 50);
+                    }
+                });
+            });
+            
+            // Обработка dropdown items для более надёжной работы
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    // Если это не onclick-ссылка, то переходим напрямую
+                    if (!this.hasAttribute('onclick') && 
+                        this.getAttribute('href') && 
+                        this.getAttribute('href') !== '#') {
+                        e.stopPropagation();
+                        setTimeout(() => {
+                            window.location.href = this.href;
+                        }, 50);
+                    }
+                });
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeNavigation);
+        
+        // Обработчик закрытия окна
+        // В desktop режиме (pywebview) полностью отключаем ВСЕ обработчики!
+        // Это единственный способ избежать надоедливых диалогов на Windows.
+        
+        // Флаг для отслеживания внутренних переходов
+        let isInternalNavigation = false;
+        
+        if (!isDesktopApp) {
+            // Отслеживаем клики по внутренним ссылкам
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a');
+                if (link && link.href) {
+                    // Проверяем, является ли ссылка внутренней (на тот же домен)
+                    try {
+                        const linkUrl = new URL(link.href);
+                        const currentUrl = new URL(window.location.href);
+                        if (linkUrl.origin === currentUrl.origin) {
+                            // Это внутренняя ссылка - не показываем предупреждение
+                            isInternalNavigation = true;
+                        }
+                    } catch (e) {
+                        // Если не удалось распарсить URL, считаем внутренней
+                        isInternalNavigation = true;
+                    }
+                }
+            });
+            
+            // Только для веб-браузера (не desktop)
+            window.addEventListener('beforeunload', function (e) {
+                // НЕ показываем предупреждение при переходах внутри приложения
+                if (isInternalNavigation) {
+                    isInternalNavigation = false; // Сбрасываем флаг
+                    return; // Не показываем предупреждение
+                }
+                
+                // Показываем подтверждение только при закрытии вкладки/браузера
+                {% if session.get('pin_authenticated') %}
+                    // Стандартное сообщение браузера
+                    e.preventDefault();
+                    e.returnValue = '{{ _("Вы уверены, что хотите закрыть приложение?") }}';
+                    return e.returnValue;
+                {% endif %}
+            });
+        }
+        
+        // ДЛЯ PYWEBVIEW НЕ УСТАНАВЛИВАЕМ НИКАКИХ ОБРАБОТЧИКОВ!
+        // Любые обработчики (даже возвращающие true) вызывают системные диалоги на Windows.
+        // Пусть окно закрывается нативно через системные механизмы.
 
         function getCookie(name) {
             const value = `; ${document.cookie}`;
@@ -125,13 +254,22 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-        function setTheme(theme) {
+        function setTheme(theme, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
             document.documentElement.setAttribute('data-bs-theme', theme);
             document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
+            return false;
         }
 
-        function setZoom(zoom) {
-            applyRootZoom(zoom);
+        function setZoom(zoom, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            document.body.style.zoom = zoom + '%';
             document.cookie = `ui_zoom=${zoom};path=/;max-age=31536000;SameSite=Lax`;
             // Показать уведомление о применении масштаба
             const alertDiv = document.createElement('div');
@@ -147,90 +285,7 @@
                     alertDiv.remove();
                 }
             }, 3000);
-        }
-
-        function applyRootZoom(zoom) {
-            // Масштабируем через корневой размер шрифта, чтобы избежать размытия и смещений хитбоксов
-            const value = String(zoom).replace('%','');
-            document.documentElement.style.fontSize = value + '%';
-        }
-
-        // Hover-intent для дропдаунов навбара (устраняет залипание и дребезг)
-        function setupDropdownHoverIntent() {
-            // Не применяем hover-логику на touch-устройствах
-            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            if (isTouch) return;
-
-            document.querySelectorAll('.navbar .dropdown').forEach(function(dropdownEl) {
-                const toggleEl = dropdownEl.querySelector('[data-bs-toggle="dropdown"]');
-                if (!toggleEl) return;
-                const bsDropdown = bootstrap.Dropdown.getOrCreateInstance(toggleEl);
-
-                let openTimer = null;
-                let closeTimer = null;
-
-                const openWithDelay = () => {
-                    clearTimeout(closeTimer);
-                    openTimer = setTimeout(() => {
-                        bsDropdown.show();
-                    }, 120);
-                };
-
-                const closeWithDelay = () => {
-                    clearTimeout(openTimer);
-                    closeTimer = setTimeout(() => {
-                        bsDropdown.hide();
-                    }, 180);
-                };
-
-                // Наводим на контейнер dropdown, чтобы исключить «зазор» между кнопкой и меню
-                dropdownEl.addEventListener('mouseenter', openWithDelay);
-                dropdownEl.addEventListener('mouseleave', closeWithDelay);
-                // При фокусе с клавиатуры — открываем мгновенно
-                toggleEl.addEventListener('focus', () => {
-                    clearTimeout(closeTimer);
-                    bsDropdown.show();
-                });
-                // При уходе фокуса — закрываем с небольшой задержкой
-                toggleEl.addEventListener('blur', () => {
-                    closeWithDelay();
-                });
-            });
-        }
-
-        // Надёжный клик-фоллбек: гарантирует открытие меню по клику, даже если события конфликтуют
-        function setupDropdownClickFallback() {
-            document.querySelectorAll('.navbar .dropdown-toggle').forEach(function(toggleEl) {
-                toggleEl.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const dd = bootstrap.Dropdown.getOrCreateInstance(this);
-                    dd.toggle();
-                });
-            });
-            // Принудительно осуществляем переход по ссылкам внутри dropdown
-            document.querySelectorAll('.navbar .dropdown-menu a.nav-link-force').forEach(function(link){
-                link.addEventListener('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const href = this.getAttribute('data-href') || this.getAttribute('href');
-                    // Закрываем все открытые меню, а затем переходим
-                    document.querySelectorAll('.navbar .dropdown-toggle.show').forEach(function(t){
-                        const dd = bootstrap.Dropdown.getInstance(t);
-                        if (dd) dd.hide();
-                    });
-                    window.location.assign(href);
-                });
-            });
-            // Закрывать открытые меню при клике вне навбара
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.navbar')) {
-                    document.querySelectorAll('.navbar .dropdown-toggle.show').forEach(function(t) {
-                        const dd = bootstrap.Dropdown.getInstance(t);
-                        if (dd) dd.hide();
-                    });
-                }
-            });
+            return false;
         }
 
         // Улучшенная функция проверки IP с обработкой ошибок
@@ -360,8 +415,12 @@
         }
         
         // Функция выхода из системы
-        function logout() {
-            if (confirm('Вы уверены, что хотите выйти из системы?')) {
+        function logout(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (confirm('{{ _('Вы уверены, что хотите выйти из системы?') }}')) {
                 fetch('/pin/logout', {
                     method: 'POST',
                     headers: {
@@ -370,13 +429,28 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        window.location.reload();
+                        // Для desktop app закрываем окно через специальный endpoint
+                        if (isDesktopApp) {
+                            // Сначала делаем запрос на закрытие приложения
+                            fetch('/pin/exit_app', { method: 'POST' })
+                                .then(() => {
+                                    console.log('Exit request sent, waiting for app to close...');
+                                })
+                                .catch(err => console.log('App closing...'));
+                        } else {
+                            // Для web перезагружаем страницу
+                            window.location.reload();
+                        }
                     }
                 })
                 .catch(error => {
-                    console.error('Ошибка выхода:', error);
-                    // В случае ошибки все равно перезагружаем страницу
-                    window.location.reload();
+                    console.error('{{ _('Ошибка выхода:') }}', error);
+                    // В случае ошибки тоже пытаемся закрыть
+                    if (isDesktopApp) {
+                        window.close();
+                    } else {
+                        window.location.reload();
+                    }
                 });
             }
         }
@@ -415,7 +489,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="bi bi-key"></i> Вход по PIN
+                                <i class="bi bi-key"></i> {{ _('Вход по PIN') }}
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -425,12 +499,12 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="login-tab" data-bs-toggle="tab" 
                                             data-bs-target="#login-pane" type="button" role="tab" 
-                                            aria-controls="login-pane" aria-selected="true">Вход</button>
+                                            aria-controls="login-pane" aria-selected="true">{{ _('Вход') }}</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="change-pin-tab" data-bs-toggle="tab" 
                                             data-bs-target="#change-pin-pane" type="button" role="tab" 
-                                            aria-controls="change-pin-pane" aria-selected="false">Сменить PIN</button>
+                                            aria-controls="change-pin-pane" aria-selected="false">{{ _('Сменить PIN') }}</button>
                                 </li>
                             </ul>
                             
@@ -439,11 +513,11 @@
                                 <!-- Вкладка входа -->
                                 <div class="tab-pane fade show active" id="login-pane" role="tabpanel" 
                                      aria-labelledby="login-tab">
-                                    <p class="text-muted mb-3 mt-3">Введите PIN-код для входа в систему</p>
+                                    <p class="text-muted mb-3 mt-3">{{ _('Введите PIN-код для входа в систему') }}</p>
                                     <div class="mb-3">
-                                        <label for="pinInput" class="form-label">PIN-код</label>
+                                        <label for="pinInput" class="form-label">{{ _('PIN-код') }}</label>
                                         <input type="password" class="form-control" id="pinInput" 
-                                               placeholder="Введите PIN" maxlength="4" autocomplete="off">
+                                               placeholder="{{ _('Введите PIN') }}" maxlength="4" autocomplete="off">
                                     </div>
                                     <div id="pinLoginMessage" class="alert" style="display: none;"></div>
                                 </div>
@@ -451,22 +525,22 @@
                                 <!-- Вкладка смены PIN -->
                                 <div class="tab-pane fade" id="change-pin-pane" role="tabpanel" 
                                      aria-labelledby="change-pin-tab">
-                                    <p class="text-muted mb-3 mt-3">Смените PIN-код для входа</p>
+                                    <p class="text-muted mb-3 mt-3">{{ _('Смените PIN-код для входа') }}</p>
                                     <form id="changePinForm">
                                         <div class="mb-3">
-                                            <label for="oldPin" class="form-label">Старый PIN</label>
+                                            <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                             <input type="password" class="form-control" id="oldPin" name="old_pin" 
-                                                   placeholder="Введите старый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Введите старый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="newPin1" class="form-label">Новый PIN</label>
+                                            <label for="newPin1" class="form-label">{{ _('Новый PIN') }}</label>
                                             <input type="password" class="form-control" id="newPin1" name="new_pin1" 
-                                                   placeholder="Введите новый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Введите новый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label for="newPin2" class="form-label">Подтвердите новый PIN</label>
+                                            <label for="newPin2" class="form-label">{{ _('Подтвердите новый PIN') }}</label>
                                             <input type="password" class="form-control" id="newPin2" name="new_pin2" 
-                                                   placeholder="Повторите новый PIN" maxlength="4" autocomplete="off" required>
+                                                   placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
                                         </div>
                                         <div id="changePinMessage" class="alert" style="display: none;"></div>
                                     </form>
@@ -474,9 +548,9 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
                             <button type="button" class="btn btn-primary" id="modalSubmitBtn" 
-                                    onclick="submitPinLogin()">Войти</button>
+                                    onclick="submitPinLogin()">{{ _('Войти') }}</button>
                         </div>
                     </div>
                 </div>
@@ -574,13 +648,13 @@
             submitButton.disabled = true;
             submitButton.textContent = 'Проверка...';
             
-            // Отправляем запрос на сервер
+            // Отправляем запрос на сервер (v4.0.0 - JSON format)
             fetch('/pin/login_ajax', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
-                body: `pin=${encodeURIComponent(pin)}`
+                body: JSON.stringify({pin: pin})
             })
             .then(response => response.json())
             .then(data => {
@@ -597,7 +671,7 @@
                         // Показываем блокировку с таймером
                         showPinLoginBlocked(data.remaining_seconds);
                     } else {
-                        showPinLoginMessage(data.message, 'danger');
+                        showPinLoginMessage(data.error || data.message || 'Неверный PIN-код', 'danger');
                     }
                 }
             })

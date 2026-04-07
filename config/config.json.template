@@ -1,0 +1,23 @@
+{
+  "SECRET_KEY_FILE": ".env",
+  "app_info": {
+    "version": "4.2.1",
+    "release_date": "06.04.2026",
+    "last_updated": "2026-04-06",
+    "developer": "Куреин М.Н.",
+    "description": "VPN Server Manager - Менеджер VPN серверов"
+  },
+  "service_urls": {
+    "ip_check_api": "https://ipinfo.io/{ip}/json",
+    "general_ip_test": "https://browserleaks.com/ip",
+    "general_dns_test": "https://dnsleaktest.com/",
+    "ip2location_demo": "https://www.ip2location.com/demo/{ip}"
+  },
+  "active_data_file": "data/servers.json.enc",
+  "secret_pin": {
+    "default_pin": "1234",
+    "current_pin": "1234",
+    "last_changed": "",
+    "_comment": "ВАЖНО: PIN 1234 - тестовый! Измените для production!"
+  }
+}
