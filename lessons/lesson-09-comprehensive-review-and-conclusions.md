@@ -126,7 +126,7 @@ mindmap
         AJAX Requests
         Event Handling
     Backend
-      Python 3.8+
+      Python 3.13+
         Modern Language Features
         Type Hints Support
         Async Capabilities

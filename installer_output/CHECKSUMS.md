@@ -1,200 +1,37 @@
-# 🔐 Контрольные суммы - VPN Server Manager v4.0.9
+# Контрольные суммы - VPN Server Manager v4.2.2
 
-## SHA-256 Checksums
+## Основной инсталлятор
 
-### Основной инсталлятор
+**Файл:** `VPN-Server-Manager-Setup-v4.2.2.exe`  
+**Размер:** `6,564,406 bytes`  
+**SHA-256:** `04CE419DF03257DB789D96DEE2B690B0DD4295CFA22076A9AD623F457621B524`
 
-**Файл:** `VPN-Server-Manager-Setup-v4.0.9.exe`  
-**Размер:** 6,650,135 bytes (6.34 MB)  
-**Дата сборки:** 15 октября 2025
-
-```
-SHA-256: B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90
-```
-
----
-
-## 🔍 Как проверить контрольную сумму?
-
-### Windows PowerShell (рекомендуется):
+## Проверка в PowerShell
 
 ```powershell
-Get-FileHash -Path "VPN-Server-Manager-Setup-v4.0.9.exe" -Algorithm SHA256
+Get-FileHash -Path "VPN-Server-Manager-Setup-v4.2.2.exe" -Algorithm SHA256
 ```
 
-**Ожидаемый вывод:**
-```
-Algorithm       Hash                                                                   Path
----------       ----                                                                   ----
-SHA256          B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90       VPN-Server-Manager-Setup-v4.0.9.exe
+Ожидаемый вывод:
+
+```text
+Algorithm : SHA256
+Hash      : 04CE419DF03257DB789D96DEE2B690B0DD4295CFA22076A9AD623F457621B524
 ```
 
-### Windows Command Prompt:
+## Проверка в CMD
 
 ```cmd
-certutil -hashfile VPN-Server-Manager-Setup-v4.0.9.exe SHA256
+certutil -hashfile "VPN-Server-Manager-Setup-v4.2.2.exe" SHA256
 ```
 
-**Ожидаемый вывод:**
-```
-SHA256 hash of VPN-Server-Manager-Setup-v4.0.9.exe:
-b373f3b92b58410dc263dbbea625fdd8190a77583c23deb8dee48f500c22cd90
-CertUtil: -hashfile command completed successfully.
-```
+## Если checksum не совпадает
 
-### Автоматическая проверка:
+- не устанавливайте файл;
+- скачайте артефакт заново;
+- сравните SHA-256 ещё раз.
 
-#### Windows CMD:
-```cmd
-verify_installer.bat
-```
+## Связанные документы
 
-#### PowerShell:
-```powershell
-.\verify_installer.ps1
-```
-
----
-
-## ⚠️ Важно!
-
-### Если хэш-сумма **СОВПАДАЕТ** ✅
-
-- Файл оригинальный и не поврежден
-- Безопасно устанавливать приложение
-- Продолжайте установку
-
-### Если хэш-сумма **НЕ СОВПАДАЕТ** ❌
-
-- **НЕ УСТАНАВЛИВАЙТЕ** приложение!
-- Файл может быть:
-  - Поврежден при загрузке
-  - Изменен третьими лицами
-  - Заражен вредоносным ПО
-- **Действия**:
-  1. Удалите скачанный файл
-  2. Очистите кэш браузера
-  3. Скачайте заново из официального источника
-  4. Проверьте хэш снова
-
----
-
-## 📥 Официальные источники загрузки
-
-### GitHub Releases (основной):
-```
-https://github.com/kureinmaxim/vpn-server-manager/releases/tag/v4.0.9
-```
-
-### Официальный сайт:
-```
-(если доступен)
-```
-
----
-
-## 🔒 Дополнительные проверки безопасности
-
-### 1. Проверка цифровой подписи (если доступна):
-
-```powershell
-Get-AuthenticodeSignature -FilePath "VPN-Server-Manager-Setup-v4.0.9.exe"
-```
-
-### 2. Проверка в VirusTotal (опционально):
-
-1. Откройте: https://www.virustotal.com
-2. Загрузите файл или вставьте его хэш
-3. Дождитесь результатов сканирования
-
-**Примечание:** Некоторые антивирусы могут давать ложные срабатывания на инсталляторы. Проверка хэш-суммы - более надежный метод.
-
----
-
-## 📊 Таблица контрольных сумм
-
-| Алгоритм | Хэш |
-|----------|-----|
-| **SHA-256** | `B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90` |
-
----
-
-## 📝 История версий и их хэши
-
-### v4.0.9 (текущая)
-```
-SHA-256: B373F3B92B58410DC263DBBEA625FDD8190A77583C23DEB8DEE48F500C22CD90
-Размер:  6,650,135 bytes
-Дата:    2025-10-15
-```
-
-### v4.0.8
-```
-SHA-256: (предыдущая версия)
-```
-
-### v4.0.7
-```
-SHA-256: (предыдущая версия)
-```
-
----
-
-## 🛡️ Гарантии безопасности
-
-### Что мы гарантируем:
-
-✅ Все релизы подписаны официальным ключом  
-✅ Контрольные суммы проверены перед публикацией  
-✅ Исходный код открыт и доступен на GitHub  
-✅ Регулярные проверки на уязвимости  
-
-### Что вы должны проверить:
-
-✅ Хэш-сумма совпадает с официальной  
-✅ Загрузка с официального источника  
-✅ HTTPS-соединение при загрузке  
-✅ Отсутствие предупреждений SmartScreen  
-
----
-
-## 🆘 Помощь
-
-### Если возникли вопросы по проверке:
-
-1. **Документация**: См. `HOW_TO_VERIFY.txt`
-2. **GitHub Issues**: https://github.com/kureinmaxim/vpn-server-manager/issues
-3. **Email**: support@example.com
-
----
-
-## 📄 Информация о сборке
-
-| Параметр | Значение |
-|----------|----------|
-| Версия | 4.0.9 |
-| Дата сборки | 2025-10-15 |
-| Компилятор | Inno Setup 6.5.3 |
-| Build Script | build_windows.ps1 |
-| Компрессия | LZMA2/Max + Solid |
-
----
-
-**Документ актуален на:** 15 октября 2025  
-**Версия документа:** 1.0  
-**Формат хэша:** SHA-256 (uppercase, без разделителей)
-
----
-
-## 🔗 Полезные ссылки
-
-- **GitHub Repository**: https://github.com/kureinmaxim/vpn-server-manager
-- **Issues**: https://github.com/kureinmaxim/vpn-server-manager/issues
-- **Releases**: https://github.com/kureinmaxim/vpn-server-manager/releases
-- **Documentation**: https://github.com/kureinmaxim/vpn-server-manager/tree/main/docs
-
----
-
-*Этот документ содержит официальные контрольные суммы для проверки целостности инсталлятора.*  
-*Храните его в надежном месте для будущих проверок.*
-
+- `README.md`
+- `../docs/CHECKSUM_GUIDE.md`
