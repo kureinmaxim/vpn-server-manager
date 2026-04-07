@@ -1,5 +1,5 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.1.1
+; Version 4.2.2
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
@@ -7,7 +7,7 @@
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
-#define PythonMinVersion "3.8"
+#define PythonMinVersion "3.13"
 
 [Setup]
 ; Основные настройки
@@ -171,7 +171,7 @@ begin
   if not CheckPythonInstalled then
   begin
     if MsgBox('Python не обнаружен на вашем компьютере.' + #13#10#13#10 +
-              'Для работы приложения требуется Python 3.8 или выше.' + #13#10#13#10 +
+              'Для работы приложения требуется Python 3.13 или выше.' + #13#10#13#10 +
               'Хотите продолжить установку? (Вам потребуется установить Python вручную)', 
               mbConfirmation, MB_YESNO) = IDNO then
     begin
