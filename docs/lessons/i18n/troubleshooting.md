@@ -10,12 +10,12 @@
 Flask-Babel требует **скомпилированные** файлы `.mo`, а не текстовые `.po`!
 
 **Решение:**
-```bash
-# Windows
-venv\Scripts\activate
+```text
+Windows PowerShell:
+.\venv\Scripts\Activate.ps1
 pybabel compile -d translations
 
-# macOS/Linux
+macOS/Linux:
 source venv/bin/activate
 pybabel compile -d translations
 ```
