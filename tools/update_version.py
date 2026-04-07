@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_CONFIG = ROOT / "config.json"
+LOCAL_CONFIG = ROOT / "config.json"
 TEMPLATE_CONFIG = ROOT / "config" / "config.json.template"
 README_FILE = ROOT / "README.md"
 INSTALLER_ISS = ROOT / "vpn-manager-installer.iss"
@@ -73,8 +73,23 @@ def today_iso_date():
     return datetime.now().strftime("%Y-%m-%d")
 
 
+def get_release_source_path():
+    if TEMPLATE_CONFIG.exists():
+        return TEMPLATE_CONFIG
+    return LOCAL_CONFIG
+
+
+def update_json_metadata(path, metadata, dry_run=False):
+    data = load_json(path)
+    app_info = data.setdefault("app_info", {})
+    app_info["version"] = metadata["version"]
+    app_info["release_date"] = metadata["release_date"]
+    app_info["last_updated"] = metadata["last_updated"]
+    save_json(path, data, dry_run=dry_run)
+
+
 def get_source_metadata():
-    data = load_json(SOURCE_CONFIG)
+    data = load_json(get_release_source_path())
     app_info = data.setdefault("app_info", {})
     return {
         "version": app_info.get("version", "0.0.0"),
@@ -84,15 +99,16 @@ def get_source_metadata():
 
 
 def set_source_metadata(metadata, dry_run=False):
-    data = load_json(SOURCE_CONFIG)
-    app_info = data.setdefault("app_info", {})
-    app_info["version"] = metadata["version"]
-    app_info["release_date"] = metadata["release_date"]
-    app_info["last_updated"] = metadata["last_updated"]
-    save_json(SOURCE_CONFIG, data, dry_run=dry_run)
+    release_source = get_release_source_path()
+    update_json_metadata(release_source, metadata, dry_run=dry_run)
+
+    if LOCAL_CONFIG.exists() and LOCAL_CONFIG != release_source:
+        update_json_metadata(LOCAL_CONFIG, metadata, dry_run=dry_run)
 
 
 def update_template_config(metadata, dry_run=False):
+    if not TEMPLATE_CONFIG.exists():
+        return
     data = load_json(TEMPLATE_CONFIG)
     app_info = data.setdefault("app_info", {})
     app_info["version"] = metadata["version"]
@@ -170,6 +186,12 @@ def update_app_init(metadata, dry_run=False):
     )
     content = replace_or_fail(
         content,
+        r'"release_date": "[^"]+"',
+        f'"release_date": "{metadata["release_date"]}"',
+        "app/__init__.py fallback release_date",
+    )
+    content = replace_or_fail(
+        content,
         r'"last_updated": "[^"]+"',
         f'"last_updated": "{metadata["last_updated"]}"',
         "app/__init__.py fallback last_updated",
@@ -211,16 +233,18 @@ def get_regex_value(path, pattern):
 
 
 def print_status():
+    release_source = get_release_source_path()
     source = get_source_metadata()
     versions = [
-        ("source", "config.json", source["version"]),
-        ("template", "config/config.json.template", get_json_version(TEMPLATE_CONFIG)),
-        ("readme", "README.md", get_regex_value(README_FILE, r"^# VPN Server Manager v([^\n]+)")),
-        ("installer", "vpn-manager-installer.iss", get_regex_value(INSTALLER_ISS, r'#define MyAppVersion "([^"]+)"')),
-        ("env", "env.example", get_regex_value(ENV_EXAMPLE, r"^APP_VERSION=(.+)$")),
-        ("app_config", "app/config.py", get_regex_value(APP_CONFIG, r"APP_VERSION = os\.getenv\('APP_VERSION', '([^']+)'\)")),
-        ("app_init", "app/__init__.py", get_regex_value(APP_INIT, r'"version": "([^"]+)"')),
-        ("setup", "setup.py", get_regex_value(SETUP_PY, r"return config\.get\('app_info', \{\}\)\.get\('version', '([^']+)'\)")),
+        ("source", str(release_source.relative_to(ROOT)), source["version"], True),
+        ("local", "config.json", get_json_version(LOCAL_CONFIG), False),
+        ("template", "config/config.json.template", get_json_version(TEMPLATE_CONFIG), True),
+        ("readme", "README.md", get_regex_value(README_FILE, r"^# VPN Server Manager v([^\n]+)"), True),
+        ("installer", "vpn-manager-installer.iss", get_regex_value(INSTALLER_ISS, r'#define MyAppVersion "([^"]+)"'), True),
+        ("env", "env.example", get_regex_value(ENV_EXAMPLE, r"^APP_VERSION=(.+)$"), True),
+        ("app_config", "app/config.py", get_regex_value(APP_CONFIG, r"APP_VERSION = os\.getenv\('APP_VERSION', '([^']+)'\)"), True),
+        ("app_init", "app/__init__.py", get_regex_value(APP_INIT, r'"version": "([^"]+)"'), True),
+        ("setup", "setup.py", get_regex_value(SETUP_PY, r"return config\.get\('app_info', \{\}\)\.get\('version', '([^']+)'\)"), True),
     ]
 
     print("[STATUS] VPN Server Manager version tracking")
@@ -231,10 +255,10 @@ def print_status():
     print("")
 
     mismatches = []
-    for label, path, value in versions:
-        marker = "OK" if value == source["version"] else "DIFF"
+    for label, path, value, tracked in versions:
+        marker = "INFO" if not tracked else ("OK" if value == source["version"] else "DIFF")
         print(f"{label:10} {marker:4} {value:10} {path}")
-        if value != source["version"]:
+        if tracked and value != source["version"]:
             mismatches.append(path)
 
     if mismatches:
@@ -251,7 +275,8 @@ def print_status():
 
 def sync_all(metadata, dry_run=False):
     set_source_metadata(metadata, dry_run=dry_run)
-    update_template_config(metadata, dry_run=dry_run)
+    if TEMPLATE_CONFIG.exists() and TEMPLATE_CONFIG != get_release_source_path():
+        update_template_config(metadata, dry_run=dry_run)
     update_readme(metadata, dry_run=dry_run)
     update_installer(metadata, dry_run=dry_run)
     update_env_example(metadata, dry_run=dry_run)
@@ -288,7 +313,7 @@ def build_parser():
 
     subparsers.add_parser("status", help="Show version tracking status")
 
-    sync_parser = subparsers.add_parser("sync", help="Sync all tracked files from config.json")
+    sync_parser = subparsers.add_parser("sync", help="Sync all tracked files from the release config")
     sync_parser.add_argument("version", nargs="?", help="Optional explicit version, e.g. 4.1.1")
     sync_parser.add_argument("--release-date", dest="release_date", help="DD.MM.YYYY")
     sync_parser.add_argument("--last-updated", dest="last_updated", help="YYYY-MM-DD")
