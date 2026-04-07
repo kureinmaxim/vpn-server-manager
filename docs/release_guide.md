@@ -1,24 +1,34 @@
 # Руководство по сборке и релизу VPN Server Manager
 
-Это актуальный релизный процесс для `VPN Server Manager` после перехода на централизованное управление версиями через `config.json` и `tools/update_version.py`.
+Это актуальный релизный процесс для `VPN Server Manager`.
 
 Связанные документы:
-- `VERSION_MANAGEMENT.md` — правила хранения и синхронизации версий
-- `BUILD.md` — общая инструкция по сборке
-- `CHANGELOG.md` — история изменений
+
+- `VERSION_MANAGEMENT.md`
+- `BUILD.md`
+- `CHANGELOG.md`
 
 ## 1. Перед релизом
 
 Убедитесь, что:
-- рабочее дерево чистое или вы понимаете все локальные изменения
-- установлен GitHub CLI, если релиз создаётся через `gh`
-- есть рабочее окружение Python с зависимостями проекта
-- сборка выполняется после синхронизации версии
 
-### Windows
+- рабочее дерево чистое или вы понимаете все локальные изменения;
+- установлен GitHub CLI, если релиз публикуется через `gh`;
+- зависимости проекта установлены;
+- версия синхронизируется через `tools/update_version.py`.
+
+### Windows PowerShell
+
+Если `venv` уже создан:
 
 ```powershell
-venv\Scripts\python.exe tools\update_version.py status
+.\venv\Scripts\python.exe tools\update_version.py status
+```
+
+Если `venv` ещё нет:
+
+```powershell
+python tools\update_version.py status
 ```
 
 ### macOS / Linux
@@ -27,42 +37,42 @@ venv\Scripts\python.exe tools\update_version.py status
 venv/bin/python3 tools/update_version.py status
 ```
 
-Если используется `.venv`, замените путь на `.venv`.
-
----
+Если используется `.venv`, замените путь соответственно.
 
 ## 2. Обновление версии
 
 Источник правды:
-- `config.json`
 
-Менять версию вручную в нескольких файлах больше не нужно. Для этого используется `tools/update_version.py`.
+- `config/config.json.template`
+
+Менять версию вручную в нескольких файлах не нужно.
 
 ### Поднять patch-версию
 
-```powershell
-venv\Scripts\python.exe tools\update_version.py bump patch
+```text
+python tools/update_version.py bump patch
 ```
 
 ### Поднять minor-версию
 
-```powershell
-venv\Scripts\python.exe tools\update_version.py bump minor
+```text
+python tools/update_version.py bump minor
 ```
 
 ### Поставить конкретную версию
 
-```powershell
-venv\Scripts\python.exe tools\update_version.py sync 4.1.2
+```text
+python tools/update_version.py sync 4.2.3
 ```
 
 ### Проверить итог
 
-```powershell
-venv\Scripts\python.exe tools\update_version.py status
+```text
+python tools/update_version.py status
 ```
 
 После этого автоматически синхронизируются:
+
 - `config/config.json.template`
 - `README.md`
 - `vpn-manager-installer.iss`
@@ -71,16 +81,14 @@ venv\Scripts\python.exe tools\update_version.py status
 - `app/__init__.py`
 - `setup.py`
 
----
-
 ## 3. Обновление CHANGELOG
 
-После bump/sync обновите `CHANGELOG.md`.
+После `bump` или `sync` обновите `CHANGELOG.md`.
 
 Рекомендуемый формат:
 
 ```markdown
-## [4.1.2] - 2026-04-06
+## [4.2.3] - 2026-04-07
 
 ### Added
 - ...
@@ -92,9 +100,7 @@ venv\Scripts\python.exe tools\update_version.py status
 - ...
 ```
 
-Если в проекте уже используется более подробный формат с эмодзи и подзаголовками, сохраняйте его стиль, но версия в заголовке должна совпадать с `config.json`.
-
----
+Если в проекте используется более подробный стиль, сохраняйте его, но версия в заголовке должна совпадать с релизной версией из `config/config.json.template`.
 
 ## 4. Сборка релизных артефактов
 
@@ -106,39 +112,41 @@ python3 build_macos.py
 ```
 
 Ожидаемые артефакты:
+
 - `dist/VPNServerManager-Clean.app`
 - `dist/VPNServerManager-Clean_Installer.dmg`
 
 ### Windows
 
+PowerShell:
+
 ```powershell
-venv\Scripts\python.exe tools\update_version.py status
 .\build_windows.ps1
 ```
 
-или
+или CMD:
 
-```powershell
+```cmd
 build_windows.bat
 ```
 
 Ожидаемый артефакт:
+
 - `installer_output/VPN-Server-Manager-Setup-vX.Y.Z.exe`
 
 Важно:
-- Windows-сборщики теперь читают версию из `config.json`
-- перед сборкой не нужно отдельно править `vpn-manager-installer.iss`
 
----
+- сборщики читают релизную версию из `config/config.json.template`;
+- перед сборкой не нужно вручную править `vpn-manager-installer.iss`.
 
 ## 5. Проверка собранного релиза
 
 Минимум проверьте:
-- приложение запускается
-- версия в UI совпадает с версией релиза
-- вход по PIN работает
-- основные страницы открываются
-- Windows `.exe` или macOS `.dmg` действительно собраны с нужной версией в имени файла
+
+- приложение запускается;
+- версия в UI совпадает с версией релиза;
+- вход по PIN работает;
+- имя `.exe` или `.dmg` совпадает с номером релиза.
 
 ### Быстрая проверка macOS `.app`
 
@@ -155,28 +163,24 @@ build_windows.bat
 VPN-Server-Manager-Setup-vX.Y.Z.exe
 ```
 
----
-
 ## 6. Коммит релизных изменений
 
 После обновления версии, `CHANGELOG.md` и сборки:
 
 ```bash
-git add config.json config/config.json.template README.md env.example app/config.py app/__init__.py setup.py vpn-manager-installer.iss CHANGELOG.md
+git add config/config.json.template README.md env.example app/config.py app/__init__.py setup.py vpn-manager-installer.iss CHANGELOG.md
 git commit -m "chore(release): vX.Y.Z"
 git push origin main
 ```
 
-Если в релиз входят ещё артефакты или документация, добавьте их явно.
-
----
+Если релиз затрагивает документацию или дополнительные артефакты, добавьте их явно.
 
 ## 7. Создание git-тега
 
 ### macOS / Linux
 
 ```bash
-VERSION=$(jq -r .app_info.version config.json)
+VERSION=$(jq -r .app_info.version config/config.json.template)
 TAG=v$VERSION
 git tag -a "$TAG" -m "Release $VERSION"
 git push origin "$TAG"
@@ -185,13 +189,11 @@ git push origin "$TAG"
 ### Windows PowerShell
 
 ```powershell
-$version = (Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
+$version = (Get-Content "config/config.json.template" -Raw | ConvertFrom-Json).app_info.version
 $tag = "v$version"
 git tag -a $tag -m "Release $version"
 git push origin $tag
 ```
-
----
 
 ## 8. Создание релиза на GitHub
 
@@ -200,7 +202,7 @@ git push origin $tag
 #### macOS / Linux
 
 ```bash
-VERSION=$(jq -r .app_info.version config.json)
+VERSION=$(jq -r .app_info.version config/config.json.template)
 TAG=v$VERSION
 
 gh release create "$TAG" \
@@ -212,7 +214,7 @@ gh release create "$TAG" \
 #### Windows PowerShell
 
 ```powershell
-$version = (Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
+$version = (Get-Content "config/config.json.template" -Raw | ConvertFrom-Json).app_info.version
 $tag = "v$version"
 
 gh release create $tag `
@@ -221,101 +223,23 @@ gh release create $tag `
   "installer_output/VPN-Server-Manager-Setup-v$version.exe"
 ```
 
-Если нужно опубликовать оба артефакта, укажите и `.exe`, и `.dmg`, когда они доступны.
-
-### Через веб-интерфейс GitHub
-
-1. Откройте страницу репозитория.
-2. Перейдите в `Releases`.
-3. Нажмите `Draft a new release`.
-4. Выберите тег `vX.Y.Z`.
-5. Заголовок: `VPN Server Manager vX.Y.Z`.
-6. В описание вставьте итог из `CHANGELOG.md`.
-7. Прикрепите релизные файлы.
-8. Опубликуйте релиз.
-
----
+Если нужно опубликовать оба артефакта, приложите и `.exe`, и `.dmg`.
 
 ## 9. SHA256 и публикация контрольных сумм
 
-### macOS
-
-```bash
-shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg"
-```
-
-### Windows PowerShell
+Пример для Windows PowerShell:
 
 ```powershell
 Get-FileHash "installer_output\VPN-Server-Manager-Setup-vX.Y.Z.exe" -Algorithm SHA256
 ```
 
-Если контрольные суммы публикуются в релизе, добавьте их в описание GitHub Release или обновите файл в `installer_output/`, если это часть вашего workflow.
+Подробности см. в `docs/CHECKSUM_GUIDE.md`.
 
----
+## 10. Итоговый чеклист
 
-## 10. Короткий release checklist
-
-1. `tools/update_version.py status`
-2. `tools/update_version.py bump patch` или `sync X.Y.Z`
-3. Обновить `CHANGELOG.md`
-4. Снова выполнить `tools/update_version.py status`
-5. Собрать нужные артефакты
-6. Проверить версию в UI и в именах файлов
-7. Закоммитить изменения
-8. Создать тег `vX.Y.Z`
-9. Создать GitHub Release
-10. Проверить, что релиз отображается как ожидается
-
----
-
-## 11. Частые проблемы
-
-### Версия в UI и инсталляторе отличается
-
-Почти всегда это значит, что версия была изменена вручную, а не через `tools/update_version.py`.
-
-Решение:
-
-```powershell
-venv\Scripts\python.exe tools\update_version.py status
-venv\Scripts\python.exe tools\update_version.py sync
-```
-
-### Тег уже существует
-
-```bash
-git tag -d vX.Y.Z
-git push origin :refs/tags/vX.Y.Z
-```
-
-Делайте это только если уверены, что тег нужно пересоздать.
-
-### GitHub Release создан без артефактов
-
-Проверьте:
-- существуют ли файлы в `dist/` или `installer_output/`
-- совпадает ли версия в имени артефакта с версией тега
-- запускается ли команда `gh release create` из корня проекта
-
----
-
-## 12. Полезные команды
-
-### Проверить текущую версию
-
-```bash
-python tools/update_version.py status
-```
-
-### Проверить версию напрямую из `config.json`
-
-```bash
-jq -r .app_info.version config.json
-```
-
-### Windows PowerShell
-
-```powershell
-(Get-Content "config.json" -Raw | ConvertFrom-Json).app_info.version
-```
+- `python tools/update_version.py status` показывает синхрон;
+- `CHANGELOG.md` обновлён;
+- сборка Windows и/или macOS завершилась успешно;
+- имя артефактов совпадает с релизной версией;
+- git tag создан и отправлен;
+- релиз опубликован на GitHub.

@@ -1,309 +1,177 @@
-# 🛠️ Руководство по сборке VPN Server Manager
+# Руководство по сборке VPN Server Manager
 
-## 📋 Требования
+## Требования
 
 - Python 3.13+
-- pip (менеджер пакетов Python)
+- pip
 - Git (опционально)
-- Inno Setup (для сборки Windows инсталлятора)
+- Inno Setup для Windows-инсталлятора
 
-## 🚀 Быстрый старт
+## Быстрый старт
 
-### Windows
+### Windows PowerShell
 
 ```powershell
-# 1. Создание виртуального окружения
 python -m venv venv
-
-# 2. Активация
 .\venv\Scripts\Activate.ps1
-
-# 3. Установка зависимостей
 python -m pip install -r requirements.txt
 
-# 4. Первоначальная настройка
 copy env.example .env
 python generate_key.py
 copy config\config.json.template config.json
 ```
 
+Если `venv` ещё не создан, некоторые команды можно запускать напрямую через системный `python`, но для разработки и сборки рекомендуется полноценное окружение.
+
 ### macOS / Linux
 
 ```bash
-# 1. Создание виртуального окружения
 python3 -m venv venv
-
-# 2. Активация
 source venv/bin/activate
+python -m pip install -r requirements.txt
 
-# 3. Установка зависимостей
-pip install -r requirements.txt
-
-# 4. Первоначальная настройка
 cp env.example .env
 python3 generate_key.py
 cp config/config.json.template config.json
 ```
 
-## ⚙️ Конфигурация
+## Конфигурация
 
-### Обязательные шаги перед первым запуском
+Обязательные локальные файлы:
 
-1. **Создайте `.env` файл**
-   ```bash
-   cp env.example .env
-   ```
+| Файл | Назначение | Статус |
+|------|------------|--------|
+| `.env` | `SECRET_KEY`, runtime-параметры | Не в Git |
+| `config.json` | локальные runtime-настройки, PIN, пути к данным | Не в Git |
+| `config/config.json.template` | источник правды для версии релиза | В Git |
 
-2. **Сгенерируйте секретный ключ**
-   ```bash
-   python generate_key.py
-   ```
+Важно:
 
-3. **Настройте конфигурацию**
-   ```bash
-   cp config/config.json.template config.json
-   # Откройте config.json и измените PIN-код!
-   ```
+- `config.json` не является источником версии репозитория;
+- версия релиза управляется через `tools/update_version.py`;
+- перед релизом сверяйтесь с `VERSION_MANAGEMENT.md`.
 
-### Важные файлы конфигурации
+## Запуск приложения
 
-| Файл | Содержит | Статус |
-|------|----------|--------|
-| `.env` | SECRET_KEY, DEFAULT_PIN | Не в Git |
-| `config.json` | PIN-код, пути к данным | Не в Git |
-| `data/*.enc` | Зашифрованные данные серверов | Не в Git |
+### Web
 
-## 🏃 Запуск приложения
-
-### Режим разработки
-
-**Windows:**
-```powershell
-# С активированным venv
+```text
 python run.py
-
-# Или напрямую
-.\venv\Scripts\python.exe run.py
 ```
 
-**macOS / Linux:**
-```bash
-# С активированным venv
-python3 run.py
+### Desktop
 
-# Или напрямую
-./venv/bin/python3 run.py
-```
-
-### Режим GUI (Desktop)
-
-```bash
-# Windows
+```text
 python run_desktop.py
-
-# macOS / Linux
-python3 run_desktop.py
 ```
 
-## 📦 Сборка инсталлятора
+### Debug
+
+```text
+python run.py --debug
+```
+
+## Сборка инсталляторов
 
 ### Windows
 
-**Способ 1: PowerShell скрипт**
+PowerShell:
+
 ```powershell
 .\build_windows.ps1
 ```
 
-**Способ 2: Batch файл**
+CMD:
+
 ```cmd
 build_windows.bat
 ```
 
-Требования:
-- Установленный Inno Setup
-- Все зависимости установлены в venv
-- Выполнена первоначальная настройка
+Результат:
+
+```text
+installer_output/VPN-Server-Manager-Setup-vX.Y.Z.exe
+```
 
 Если установка зависимостей в Windows падает с `ProxyError` или `No matching distribution found`, см. `docs/WINDOWS_PROXY_TROUBLESHOOTING.md`.
 
-Результат: `installer_output\VPN-Server-Manager-Setup-v{version}.exe`
-
 ### macOS
+
+Сборка выполняется через `build_macos.py`, который использует PyInstaller.
 
 ```bash
 python3 build_macos.py
 ```
 
-Требования:
-- py2app (`pip install py2app`)
-- Все зависимости установлены
+Ожидаемые артефакты:
 
-Результат: `.app` bundle в `dist/`
-
-## 🐳 Docker
-
-### Сборка образа
-
-```bash
-docker-compose build
+```text
+dist/VPNServerManager-Clean.app
+dist/VPNServerManager-Clean_Installer.dmg
 ```
 
-### Запуск
+## Переводы
 
-```bash
-docker-compose up -d
-```
+После изменения `.po` файлов обязательно компилируйте `.mo`:
 
-Приложение будет доступно на `http://localhost:5000`
+### Windows PowerShell
 
-## 🌍 Компиляция переводов
-
-Перед сборкой инсталлятора или запуском приложения необходимо скомпилировать файлы переводов (`.po` → `.mo`):
-
-### Компиляция всех переводов
-
-```bash
-# Windows (PowerShell)
+```powershell
 python -m babel.messages.frontend compile -d translations
+```
 
-# macOS / Linux
+### macOS / Linux
+
+```bash
 pybabel compile -d translations
 ```
 
-### Компиляция конкретного языка
+## Тестирование
 
-```bash
-# Английский
-pybabel compile -d translations -l en
-
-# Китайский
-pybabel compile -d translations -l zh
-```
-
-### Обновление переводов (после изменений в коде)
-
-```bash
-# 1. Извлечь новые строки из кода
-pybabel extract -F babel.cfg -o translations/messages.pot .
-
-# 2. Обновить существующие .po файлы
-pybabel update -i translations/messages.pot -d translations
-
-# 3. Перевести новые строки в .po файлах (вручную или автоматически)
-python tools/auto_translate_po.py
-
-# 4. Скомпилировать в .mo
-pybabel compile -d translations
-```
-
-### Структура файлов переводов
-
-```
-translations/
-├── en/
-│   └── LC_MESSAGES/
-│       ├── messages.po   # Исходный файл переводов (редактируется)
-│       └── messages.mo   # Скомпилированный файл (генерируется)
-└── zh/
-    └── LC_MESSAGES/
-        ├── messages.po
-        └── messages.mo
-```
-
-> ⚠️ **Важно:** Без `.mo` файлов переключение языков НЕ будет работать!
-
-## 🧪 Тестирование
-
-```bash
-# Установка тестовых зависимостей
-pip install pytest pytest-cov
-
-# Запуск тестов
+```text
 pytest
-
-# С покрытием
 pytest --cov=app tests/
 ```
 
-## ⚠️ Решение проблем
+Если зависимости тестов ещё не установлены:
 
-### Проблема: "pip is not recognized" (Windows)
+```text
+python -m pip install pytest pytest-cov
+```
 
-**Решение:**
+## Частые проблемы
+
+### PowerShell не запускает `venv\Scripts\python.exe`
+
+Используйте префикс `.\`:
+
 ```powershell
-# Используйте python -m pip вместо pip
-python -m pip install -r requirements.txt
+.\venv\Scripts\python.exe tools\update_version.py status
 ```
 
-### Проблема: ModuleNotFoundError
+Если `venv` отсутствует:
 
-**Решение:**
-```bash
-# Убедитесь, что venv активирован и зависимости установлены
-pip list
-pip install -r requirements.txt
+```powershell
+python tools\update_version.py status
 ```
 
-### Проблема: Ошибка импорта cryptography
+### Версия в UI и сборке не совпадает
 
-**Решение:**
-```bash
-# Переустановите cryptography
-pip uninstall cryptography
-pip install cryptography
+Проверьте:
+
+- `config/config.json.template`
+- `VERSION_MANAGEMENT.md`
+- `docs/release_guide.md`
+
+И затем запустите:
+
+```text
+python tools/update_version.py status
 ```
 
-### Проблема: Порт 5000 занят
+## Связанные документы
 
-**Решение:**
-```bash
-# Измените порт в run.py или используйте переменную окружения
-export FLASK_RUN_PORT=5001  # Linux/macOS
-$env:FLASK_RUN_PORT=5001    # Windows PowerShell
-```
-
-### Проблема: Переключение языков не работает
-
-**Причина:** Не скомпилированы `.mo` файлы переводов.
-
-**Решение:**
-```bash
-# Скомпилировать переводы
-python -m babel.messages.frontend compile -d translations
-```
-
-## 📚 Дополнительная информация
-
-- [Руководство по версионированию](VERSION_MANAGEMENT.md)
-- [Руководство по релизам](docs/release_guide.md)
-- [Docker руководство](docs/DOCKER_GUIDE.md)
-- [Windows proxy troubleshooting](docs/WINDOWS_PROXY_TROUBLESHOOTING.md)
-
-## 🔒 Безопасность
-
-### ⚠️ Файлы, которые НЕ ДОЛЖНЫ попадать в Git
-
-- `.env` - содержит SECRET_KEY
-- `config.json` - содержит PIN-код
-- `data/*.enc` - зашифрованные данные
-- `*.key`, `*.pem` - ключи и сертификаты
-
-### ✅ Проверка перед коммитом
-
-```bash
-# Проверить, что секреты не в индексе
-git ls-files | grep -E "\.env$|config\.json$|\.enc$"
-# Если команда что-то выводит - НЕ КОММИТЬТЕ!
-```
-
-## ✅ Чеклист перед запуском
-
-- [ ] Создано виртуальное окружение
-- [ ] Активировано виртуальное окружение
-- [ ] Установлены все зависимости
-- [ ] Создан `.env` файл
-- [ ] Сгенерирован уникальный `SECRET_KEY`
-- [ ] Создан `config.json` из шаблона
-- [ ] Изменён PIN-код с 1234 на свой
-- [ ] Приложение запускается без ошибок
-
+- `README.md`
+- `VERSION_MANAGEMENT.md`
+- `docs/release_guide.md`
+- `docs/WINDOWS_PROXY_TROUBLESHOOTING.md`
