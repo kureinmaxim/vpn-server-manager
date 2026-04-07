@@ -15,6 +15,28 @@ class SSHService:
     _connection_pool = {}
     _pool_lock = threading.Lock()
     _process_exclusions = {'ps', 'head', 'bash', 'sh', 'sudo', 'timeout'}
+    _known_port_labels = {
+        '22': 'SSH',
+        '80': 'HTTP',
+        '443': 'HTTPS / Xray / Hysteria2',
+        '465': 'MTProto / SMTPS',
+        '993': 'MTProto / IMAPS',
+        '8000': 'TelegramSimple API',
+        '8501': 'Dockhand',
+    }
+    _service_catalog = [
+        {'name': 'mtproto-proxy', 'display_name': 'MTProto Proxy', 'group': 'proxy', 'unit_candidates': ['mtproto-proxy']},
+        {'name': 'xray', 'display_name': 'Xray', 'group': 'proxy', 'unit_candidates': ['xray']},
+        {'name': 'sing-box', 'display_name': 'Sing-box', 'group': 'proxy', 'unit_candidates': ['sing-box', 'singbox']},
+        {'name': 'hysteria', 'display_name': 'Hysteria2', 'group': 'proxy', 'unit_candidates': ['hysteria-server', 'hysteria']},
+        {'name': 'nginx', 'display_name': 'Nginx', 'group': 'system', 'unit_candidates': ['nginx']},
+        {'name': 'apache2', 'display_name': 'Apache', 'group': 'system', 'unit_candidates': ['apache2']},
+        {'name': 'ssh', 'display_name': 'OpenSSH', 'group': 'system', 'unit_candidates': ['ssh', 'sshd']},
+        {'name': 'postgresql', 'display_name': 'PostgreSQL', 'group': 'system', 'unit_candidates': ['postgresql']},
+        {'name': 'mysql', 'display_name': 'MySQL', 'group': 'system', 'unit_candidates': ['mysql', 'mariadb']},
+        {'name': 'docker', 'display_name': 'Docker', 'group': 'system', 'unit_candidates': ['docker']},
+        {'name': 'redis-server', 'display_name': 'Redis', 'group': 'system', 'unit_candidates': ['redis-server']},
+    ]
     
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
@@ -73,6 +95,83 @@ class SSHService:
     def _read_command_output(self, client, command: str, timeout: int = 30) -> str:
         _, stdout, _ = client.exec_command(command, timeout=timeout)
         return stdout.read().decode('utf-8').strip()
+
+    @classmethod
+    def _label_port(cls, port: str) -> str:
+        label = cls._known_port_labels.get(str(port), '')
+        return f"{port} ({label})" if label else str(port)
+
+    @classmethod
+    def _label_ports(cls, ports: List[str]) -> List[str]:
+        return [cls._label_port(port) for port in ports]
+
+    def _probe_service(self, client, descriptor: Dict) -> Dict:
+        """Проверить наличие и статус systemd unit по набору candidate names."""
+        matched_name = None
+        for candidate in descriptor.get('unit_candidates', []):
+            output = self._read_command_output(
+                client,
+                f'systemctl list-unit-files --type=service 2>/dev/null | grep -E "^{candidate}\\.service\\s"',
+                timeout=10
+            )
+            if output:
+                matched_name = candidate
+                break
+
+        if not matched_name:
+            return {
+                'name': descriptor['name'],
+                'display_name': descriptor['display_name'],
+                'group': descriptor['group'],
+                'status': 'not_installed',
+                'enabled': 'not-found',
+                'uptime': '-',
+                'unit_name': None,
+            }
+
+        status = self._read_command_output(client, f'systemctl is-active {matched_name} 2>/dev/null', timeout=10) or 'unknown'
+        enabled = self._read_command_output(client, f'systemctl is-enabled {matched_name} 2>/dev/null', timeout=10) or 'unknown'
+        uptime_str = 'stopped'
+
+        if status == 'active':
+            try:
+                import time
+                timestamp_line = self._read_command_output(
+                    client,
+                    f'systemctl show {matched_name} --property=ActiveEnterTimestamp',
+                    timeout=10
+                )
+                if timestamp_line and '=' in timestamp_line:
+                    timestamp_str = timestamp_line.split('=', 1)[1].strip()
+                    if timestamp_str:
+                        start_time = self._read_command_output(
+                            client,
+                            f'date -d "{timestamp_str}" +%s',
+                            timeout=10
+                        )
+                        if start_time.isdigit():
+                            seconds = int(time.time()) - int(start_time)
+                            days = seconds // 86400
+                            hours = (seconds % 86400) // 3600
+                            mins = (seconds % 3600) // 60
+                            if days > 0:
+                                uptime_str = f"{days}d {hours}h"
+                            elif hours > 0:
+                                uptime_str = f"{hours}h {mins}m"
+                            else:
+                                uptime_str = f"{mins}m"
+            except Exception:
+                uptime_str = 'active'
+
+        return {
+            'name': descriptor['name'],
+            'display_name': descriptor['display_name'],
+            'group': descriptor['group'],
+            'status': status,
+            'enabled': enabled,
+            'uptime': uptime_str,
+            'unit_name': matched_name,
+        }
 
     @staticmethod
     def _parse_cpu_used_pct(cpu_line: str) -> float:
@@ -730,6 +829,7 @@ class SSHService:
 
             listening_ports = self._get_listening_ports(client)
             open_ports = ', '.join(listening_ports) if listening_ports else 'none'
+            labeled_open_ports = ', '.join(self._label_ports(listening_ports)) if listening_ports else 'none'
 
             backend = 'none'
             status = 'inactive'
@@ -795,6 +895,11 @@ class SSHService:
                 'status': status,
                 'backend': backend,
                 'open_ports': open_ports,
+                'open_ports_labeled': labeled_open_ports,
+                'open_ports_details': [
+                    {'port': p, 'label': self._known_port_labels.get(str(p), '')}
+                    for p in listening_ports
+                ],
                 'firewall_ports': firewall_ports,
                 'listening_ports_count': len(listening_ports),
                 'blocked_24h': blocked_24h,
@@ -811,6 +916,8 @@ class SSHService:
                 'status': 'unknown',
                 'backend': 'none',
                 'open_ports': 'N/A',
+                'open_ports_labeled': 'N/A',
+                'open_ports_details': [],
                 'firewall_ports': 'N/A',
                 'listening_ports_count': 0,
                 'blocked_24h': 0,
@@ -820,63 +927,12 @@ class SSHService:
     
     def get_services_stats(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> List[Dict]:
         """Получение статистики системных сервисов"""
-        import time
-        
         try:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password)
-            
-            # Список основных сервисов для мониторинга
-            services_to_check = ['nginx', 'apache2', 'ssh', 'sshd', 'postgresql', 'mysql', 'docker', 'redis-server']
             services = []
-            
-            for service in services_to_check:
-                # Проверяем существование сервиса
-                _, stdout, _ = client.exec_command(f'systemctl list-unit-files | grep "^{service}.service"')
-                if not stdout.read().decode('utf-8').strip():
-                    continue
-                
-                # Получаем статус
-                _, stdout, _ = client.exec_command(f'systemctl is-active {service} 2>/dev/null')
-                status = stdout.read().decode('utf-8').strip()
-                
-                # Получаем enabled статус
-                _, stdout, _ = client.exec_command(f'systemctl is-enabled {service} 2>/dev/null')
-                enabled = stdout.read().decode('utf-8').strip()
-                
-                # Получаем uptime
-                uptime_str = 'stopped'
-                if status == 'active':
-                    try:
-                        _, stdout, _ = client.exec_command(f'systemctl show {service} --property=ActiveEnterTimestamp')
-                        timestamp_line = stdout.read().decode('utf-8').strip()
-                        if timestamp_line and '=' in timestamp_line:
-                            timestamp_str = timestamp_line.split('=')[1].strip()
-                            if timestamp_str:
-                                # Парсим timestamp и вычисляем uptime
-                                _, stdout, _ = client.exec_command(f'date -d "{timestamp_str}" +%s')
-                                start_time = stdout.read().decode('utf-8').strip()
-                                if start_time.isdigit():
-                                    seconds = int(time.time()) - int(start_time)
-                                    days = seconds // 86400
-                                    hours = (seconds % 86400) // 3600
-                                    mins = (seconds % 3600) // 60
-                                    
-                                    if days > 0:
-                                        uptime_str = f"{days}d {hours}h"
-                                    elif hours > 0:
-                                        uptime_str = f"{hours}h {mins}m"
-                                    else:
-                                        uptime_str = f"{mins}m"
-                    except:
-                        uptime_str = 'active'
-                
-                services.append({
-                    'name': service,
-                    'status': status,
-                    'enabled': enabled,
-                    'uptime': uptime_str
-                })
+            for descriptor in self._service_catalog:
+                services.append(self._probe_service(client, descriptor))
             
             return services
             
