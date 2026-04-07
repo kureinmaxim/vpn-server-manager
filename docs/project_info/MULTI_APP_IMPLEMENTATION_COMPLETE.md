@@ -344,7 +344,7 @@ app.config['SESSION_COOKIE_NAME'] = 'vpn_manager_session_clean'  # 🎯 Уник
 ✅ Корректное завершение работы  
 ✅ **Запуск из Finder (macOS frozen .app)**  
 ✅ **Правильные пути для логов и данных**  
-✅ **Централизованная версия из config.json**  
+✅ **Централизованная версия из config/config.json.template**  
 
 **Статус:** 🎉 **PRODUCTION READY**
 
