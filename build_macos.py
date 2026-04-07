@@ -30,6 +30,13 @@ def cleanup_previous_builds():
         shutil.rmtree(BUILD_DIR, ignore_errors=True)
     print("✅ Очистка предыдущих сборок завершена")
 
+def get_build_metadata_sources():
+    """Возвращает доступные файлы конфигурации для сборки"""
+    return [
+        PROJECT_ROOT / "config.json",
+        PROJECT_ROOT / "config" / "config.json.template",
+    ]
+
 def convert_ico_to_icns():
     """Конвертация favicon.ico в icon.icns для macOS"""
     favicon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.ico"
@@ -119,15 +126,25 @@ def build_app():
     datas = [
         "templates:templates",          # HTML шаблоны
         "static:static",                # CSS, изображения
-        "config.json.example:.",        # Конфигурация (шаблон)
         "env.example:.",                # Пример конфигурации (шаблон)
         # NOTE: .env и config.json НЕ включаются в сборку по соображениям безопасности
         # Пользователь должен создать их самостоятельно после установки
         "data:data",                    # Данные
         "app:app",                      # Новое приложение
         "desktop:desktop",              # Desktop GUI
-        "requirements.txt:.",           # Зависимости
     ]
+
+    config_template = PROJECT_ROOT / "config" / "config.json.template"
+    if config_template.exists():
+        datas.append("config/config.json.template:config")
+    else:
+        print("⚠️ config/config.json.template не найден, шаблон конфигурации не будет включен в сборку")
+
+    requirements_path = PROJECT_ROOT / "requirements.txt"
+    if requirements_path.exists():
+        datas.append("requirements.txt:.")
+    else:
+        print("⚠️ requirements.txt не найден, файл не будет включен в сборку")
 
     # ВКЛЮЧАЕМ ПЕРЕВОДЫ (.po/.mo). Достаточно добавить всю папку translations
     if (PROJECT_ROOT / 'translations').exists():
@@ -264,7 +281,7 @@ def build_app():
         "--hidden-import=urllib.parse",
         
         # Другие важные модули
-        "--hidden-import=python-dotenv",
+        "--hidden-import=dotenv",
         "--hidden-import=threading",
         "--hidden-import=subprocess",
         "--hidden-import=signal",
@@ -701,16 +718,19 @@ def diagnose_app(app_path):
 def get_version_from_config():
     """Получение версии из config.json"""
     try:
-        config_path = PROJECT_ROOT / "config.json"
-        if config_path.exists():
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-                return config.get('app_info', {}).get('version', '4.0.7')
-        else:
-            print("⚠️ config.json не найден, используем версию по умолчанию")
-            return '4.0.7'
+        for config_path in get_build_metadata_sources():
+            if config_path.exists():
+                with open(config_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                    version = config.get('app_info', {}).get('version')
+                    if version:
+                        print(f"ℹ️ Версия сборки взята из {config_path.relative_to(PROJECT_ROOT)}")
+                        return version
+
+        print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
+        return '4.0.7'
     except Exception as e:
-        print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
+        print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
         return '4.0.7'
 
 def main():

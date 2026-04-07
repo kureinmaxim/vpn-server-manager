@@ -54,7 +54,7 @@ if is_frozen:
             # Создаем минимальный .env
             with open(dotenv_path, 'w') as f:
                 f.write(f"SECRET_KEY={secret_key}\n")
-                f.write("APP_VERSION=4.2.1\n")
+                f.write("APP_VERSION=4.2.2\n")
                 f.write("BABEL_DEFAULT_LOCALE=ru\n")
             print(f"✅ Created minimal .env at {dotenv_path}")
     
@@ -112,7 +112,7 @@ class Config:
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
     # Настройки приложения
-    APP_VERSION = os.getenv('APP_VERSION', '4.2.1')
+    APP_VERSION = os.getenv('APP_VERSION', '4.2.2')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     
