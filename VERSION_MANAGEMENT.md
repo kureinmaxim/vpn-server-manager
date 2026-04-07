@@ -96,17 +96,27 @@ python tools/update_version.py bump major
 
 ### Windows
 
+Если виртуальное окружение уже создано:
+
 ```powershell
-venv\Scripts\python.exe tools\update_version.py status
-venv\Scripts\python.exe tools\update_version.py sync
-venv\Scripts\python.exe tools\update_version.py sync 4.1.2
-venv\Scripts\python.exe tools\update_version.py bump patch
+.\venv\Scripts\python.exe tools\update_version.py status
+.\venv\Scripts\python.exe tools\update_version.py sync
+.\venv\Scripts\python.exe tools\update_version.py sync 4.1.2
+.\venv\Scripts\python.exe tools\update_version.py bump patch
 ```
 
 Если используется `.venv`:
 
 ```powershell
-.venv\Scripts\python.exe tools\update_version.py status
+.\.venv\Scripts\python.exe tools\update_version.py status
+```
+
+Если виртуального окружения в проекте ещё нет, можно запускать напрямую через установленный Python:
+
+```powershell
+python tools\update_version.py status
+python tools\update_version.py sync
+python tools\update_version.py bump patch
 ```
 
 ### macOS / Linux
@@ -120,8 +130,8 @@ venv/bin/python3 tools/update_version.py bump patch
 ### Совместимый старый скрипт
 
 ```powershell
-venv\Scripts\python.exe tools\bump_version.py --bump patch
-venv\Scripts\python.exe tools\bump_version.py --version 4.1.2
+.\venv\Scripts\python.exe tools\bump_version.py --bump patch
+.\venv\Scripts\python.exe tools\bump_version.py --version 4.1.2
 ```
 
 ---
@@ -131,19 +141,19 @@ venv\Scripts\python.exe tools\bump_version.py --version 4.1.2
 ### Проверить состояние перед релизом
 
 ```powershell
-venv\Scripts\python.exe tools\update_version.py status
+.\venv\Scripts\python.exe tools\update_version.py status
 ```
 
 ### Поднять patch-версию
 
 ```powershell
-venv\Scripts\python.exe tools\update_version.py bump patch
+.\venv\Scripts\python.exe tools\update_version.py bump patch
 ```
 
 ### Поставить точную версию вручную
 
 ```powershell
-venv\Scripts\python.exe tools\update_version.py sync 4.2.0
+.\venv\Scripts\python.exe tools\update_version.py sync 4.2.0
 ```
 
 ### После изменения версии
@@ -192,7 +202,34 @@ venv\Scripts\python.exe tools\update_version.py sync 4.2.0
 Запустите:
 
 ```powershell
-venv\Scripts\python.exe tools\update_version.py sync
+.\venv\Scripts\python.exe tools\update_version.py sync
+```
+
+### PowerShell пишет `The module 'venv' could not be loaded`
+
+В PowerShell путь к интерпретатору нужно запускать с `.\`:
+
+```powershell
+.\venv\Scripts\python.exe tools\update_version.py status
+```
+
+Если в проекте используется `.venv`, тогда:
+
+```powershell
+.\.venv\Scripts\python.exe tools\update_version.py status
+```
+
+Если ни `venv`, ни `.venv` нет, сначала создайте окружение и установите зависимости:
+
+```powershell
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Если нужен только просмотр статуса версии, а `venv` ещё не создан, можно использовать:
+
+```powershell
+python tools\update_version.py status
 ```
 
 ### В UI одна версия, а в инсталляторе другая

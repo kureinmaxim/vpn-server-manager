@@ -1,109 +1,101 @@
 # VPN Server Manager v4.2.2
 
-Приложение для управления VPN-серверами с шифрованием данных и поддержкой офлайн режима.
+Приложение для управления VPN-серверами с гибридной архитектурой `Flask + PyWebView`, шифрованием данных и поддержкой desktop/web режима.
 
 ![VPN Server Manager](static/VPSc.png)
 
-## 🚀 Возможности
+## Возможности
 
-- 🔐 **Шифрование данных** - Fernet (AES-128 + HMAC-SHA256)
-- 🖥️ **Desktop и Web режимы** - Flask + PyWebView
-- 🌐 **Офлайн работа** - не требует интернета
-- 🌍 **Многоязычность** - русский, английский, китайский
-- 📊 **Мониторинг серверов** - SSH подключение, статистика
-- 🔒 **PIN защита** - защита от несанкционированного доступа
-- 📦 **Экспорт/импорт** - резервное копирование данных
+- Шифрование данных через Fernet
+- Desktop и Web режимы
+- PIN-защита
+- Импорт и экспорт данных
+- SSH-мониторинг серверов
+- Многоязычный интерфейс
+- Офлайн-режим
 
-## 📋 Требования
+## Требования
 
-- Python 3.8+
+- Python 3.13+
 - pip
 
-## 🛠 Установка
+## Установка
 
-### Windows (автоматическая)
+### Windows
+
+Автоматический вариант:
 
 ```cmd
 setup_windows.bat
 start_windows.bat
 ```
 
-### Ручная установка
+Ручной вариант в PowerShell:
 
-```bash
-# 1. Клонировать репозиторий
+```powershell
 git clone https://github.com/kureinmaxim/vpn-server-manager.git
 cd vpn-server-manager
 
-# 2. Создать виртуальное окружение
 python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-
-# 3. Установить зависимости
+.\venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-OR
-pip install -r requirements.txt
 
-# 4. Сгенерировать ключ шифрования
+copy env.example .env
 python generate_key.py
-
-# 5. Создать конфигурацию
 copy config\config.json.template config.json
 
-# 6. Скомпилировать переводы
 python -m babel.messages.frontend compile -d translations
-```
-
-## ▶️ Запуск
-
-```bash
-# Web режим (браузер)
 python run.py
-
-# Desktop режим (отдельное окно)
-python run.py --desktop
-
-# Debug режим
-python run.py --debug
 ```
 
-## 🐳 Docker
+Если виртуальное окружение ещё не создано, служебные скрипты вроде `tools/update_version.py` можно запускать напрямую через системный `python`.
+
+### macOS / Linux
 
 ```bash
-docker-compose up
-```
+git clone https://github.com/kureinmaxim/vpn-server-manager.git
+cd vpn-server-manager
 
-## 🌍 Переводы
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements.txt
 
-Для работы переключения языков необходимо скомпилировать `.po` файлы:
+cp env.example .env
+python3 generate_key.py
+cp config/config.json.template config.json
 
-```bash
-# Компиляция переводов (.po → .mo)
 python -m babel.messages.frontend compile -d translations
+python3 run.py
 ```
 
-Поддерживаемые языки: русский (по умолчанию), английский, китайский.
+## Запуск
 
-## 📚 Документация
+```text
+Web:     python run.py
+Desktop: python run_desktop.py
+Debug:   python run.py --debug
+```
 
-Вся документация находится в папке `docs/`:
+## Версии и конфигурация
+
+- Источник правды для версии релиза: `config/config.json.template`
+- Локальный `config.json` нужен для runtime-настроек и не является источником версии репозитория
+- Для синхронизации версий используйте `tools/update_version.py`
+
+## Документация
 
 - [Индекс документации](docs/INDEX.md)
 - [Руководство по сборке](BUILD.md)
 - [Управление версиями](VERSION_MANAGEMENT.md)
+- [Релизный процесс](docs/release_guide.md)
 - [Windows proxy troubleshooting](docs/WINDOWS_PROXY_TROUBLESHOOTING.md)
-- [Docker Guide](docs/DOCKER_GUIDE.md)
 - [Мониторинг](docs/README_MONITORING.md)
+- [Docker Guide](docs/DOCKER_GUIDE.md)
 
-## 📝 Changelog
+## Changelog
 
-См. [CHANGELOG.md](CHANGELOG.md)
+См. `CHANGELOG.md`.
 
-## 📜 Лицензия
+## Лицензия
 
-MIT License - см. [LICENSE](LICENSE)
+MIT License. См. `LICENSE`.
