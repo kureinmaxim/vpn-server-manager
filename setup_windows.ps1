@@ -1,5 +1,5 @@
 # VPN Server Manager - Windows Setup (PowerShell)
-# Version 4.0.7
+# Version 4.2.2
 
 $ErrorActionPreference = "Stop"
 
@@ -23,7 +23,7 @@ try {
 } catch {
     Write-Host "[ERROR] Python is not installed or not in PATH" -ForegroundColor Red
     Write-Host ""
-    Write-Host "Please install Python 3.8+ from https://www.python.org/" -ForegroundColor White
+    Write-Host "Please install Python 3.13+ from https://www.python.org/" -ForegroundColor White
     Read-Host "Press Enter to exit"
     exit 1
 }
@@ -46,20 +46,42 @@ if (-not (Test-Path "venv")) {
 }
 Write-Host ""
 
-# [3/5] Activate and install dependencies
+# [3/5] Install dependencies
 Write-Host "[3/5] Installing dependencies..." -ForegroundColor Yellow
 Write-Host "This may take 3-5 minutes, please wait..." -ForegroundColor Cyan
+Write-Host "If your internet is slow, pip retries and extended timeouts will be used." -ForegroundColor Cyan
 Write-Host ""
 
 try {
-    & .\venv\Scripts\Activate.ps1
-    & pip install -r requirements.txt --progress-bar on
+    if (-not (Test-Path ".\venv\Scripts\python.exe")) {
+        throw "Virtual environment python not found"
+    }
+
+    $pipArgs = @(
+        "-m", "pip", "install",
+        "-r", "requirements.txt",
+        "--progress-bar", "on",
+        "--timeout", "120",
+        "--retries", "10",
+        "--prefer-binary"
+    )
+
+    & .\venv\Scripts\python.exe @pipArgs
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[WARNING] First attempt failed, retrying once..." -ForegroundColor Yellow
+        & .\venv\Scripts\python.exe @pipArgs
+        if ($LASTEXITCODE -ne 0) {
+            throw "pip install returned exit code $LASTEXITCODE"
+        }
+    }
+
     Write-Host ""
     Write-Host "[OK] Dependencies installed" -ForegroundColor Green
 } catch {
     Write-Host ""
     Write-Host "[ERROR] Failed to install dependencies" -ForegroundColor Red
     Write-Host "Error: $_" -ForegroundColor Red
+    Write-Host "If the error mentions timeout or proxy, see docs\WINDOWS_PROXY_TROUBLESHOOTING.md" -ForegroundColor Yellow
     Read-Host "Press Enter to exit"
     exit 1
 }
@@ -82,11 +104,11 @@ try {
 Write-Host "[5/5] Creating config file..." -ForegroundColor Yellow
 
 if (-not (Test-Path "config.json")) {
-    if (Test-Path "config.json.example") {
-        Copy-Item "config.json.example" "config.json"
-        Write-Host "[OK] Config file created from config.json.example" -ForegroundColor Green
+    if (Test-Path "config\config.json.template") {
+        Copy-Item "config\config.json.template" "config.json"
+        Write-Host "[OK] Config file created from template" -ForegroundColor Green
     } else {
-        Write-Host "[WARNING] config.json.example not found" -ForegroundColor Yellow
+        Write-Host "[WARNING] config\config.json.template not found" -ForegroundColor Yellow
     }
 } else {
     Write-Host "[INFO] Config file already exists" -ForegroundColor Cyan
@@ -99,7 +121,7 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "To start the application:" -ForegroundColor White
 Write-Host "  - Desktop mode: .\start_windows.bat" -ForegroundColor Cyan
-Write-Host "  - Or manually:  .\venv\Scripts\Activate.ps1; python run.py --desktop" -ForegroundColor Cyan
+Write-Host "  - Or manually:  .\venv\Scripts\python.exe run_desktop.py" -ForegroundColor Cyan
 Write-Host ""
 Read-Host "Press Enter to exit"
 
