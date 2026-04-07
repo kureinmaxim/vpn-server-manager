@@ -303,3 +303,18 @@ class TestSSHService:
         ufw_tool = result['tools']['ufw']
         assert ufw_tool['warning'] == '⚠️ UFW включен! Убедитесь что SSH-порт 22542 разрешен!'
         assert ufw_tool['fix_cmd'] == 'sudo ufw allow 22542/tcp && sudo ufw status numbered'
+
+    def test_parse_cpu_used_pct_handles_decimal_comma(self):
+        """Парсер CPU должен корректно работать с локалями, где дроби идут через запятую."""
+        service = SSHService()
+
+        assert service._parse_cpu_used_pct('%Cpu(s):  1,8 us,  0,8 sy,  0,0 ni, 97,4 id,  0,0 wa,  0,0 hi,  0,0 si,  0,0 st') == 2.6
+        assert service._parse_cpu_used_pct('%Cpu(s):  1.8 us,  0.8 sy,  0.0 ni, 97.4 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st') == 2.6
+
+    def test_get_cpu_used_pct_falls_back_to_vmstat(self):
+        """Если top не дал распарсить CPU, используется vmstat fallback."""
+        service = SSHService()
+        client = Mock()
+
+        with patch.object(service, '_read_command_output', side_effect=['', '', '97.0']):
+            assert service._get_cpu_used_pct(client) == 3.0

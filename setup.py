@@ -1,15 +1,25 @@
 from setuptools import setup, find_packages
 import os
 import json
+from pathlib import Path
 
-# Читаем версию из config.json
+# Читаем версию из release-конфига
 def get_version():
+    root = Path(__file__).resolve().parent
+    config_candidates = [
+        root / "config" / "config.json.template",
+        root / "config.json",
+    ]
+
     try:
-        with open("config.json", "r", encoding="utf-8") as fh:
-            config = json.load(fh)
-            return config.get('app_info', {}).get('version', '4.2.1')
-    except:
-        return '4.2.1'
+        for config_path in config_candidates:
+            if config_path.exists():
+                with open(config_path, "r", encoding="utf-8") as fh:
+                    config = json.load(fh)
+                    return config.get('app_info', {}).get('version', '4.2.2')
+    except Exception:
+        return '4.2.2'
+    return '4.2.2'
 
 # Читаем README файл
 def read_readme():

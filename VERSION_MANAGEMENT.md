@@ -12,7 +12,7 @@
 ## Источник правды
 
 Единственный источник правды для версии релиза:
-- `config.json`
+- `config/config.json.template`
 
 Ключевые поля:
 
@@ -73,9 +73,9 @@ python tools/update_version.py bump major
 
 ### Что делают команды
 
-- `status` — показывает текущую версию из `config.json` и проверяет рассинхрон по отслеживаемым файлам
-- `sync` — приводит производные файлы к версии из `config.json`
-- `sync X.Y.Z` — ставит конкретную версию в `config.json` и синхронизирует все производные файлы
+- `status` — показывает текущую версию из release-конфига и проверяет рассинхрон по отслеживаемым файлам
+- `sync` — приводит производные файлы к версии из `config/config.json.template`
+- `sync X.Y.Z` — ставит конкретную версию в `config/config.json.template` и синхронизирует все производные файлы
 - `bump patch|minor|major` — увеличивает семантическую версию и синхронизирует проект
 
 ### Дополнительные флаги
@@ -87,7 +87,7 @@ python tools/update_version.py bump major
 ```
 
 По умолчанию:
-- `sync` без новой версии сохраняет текущие даты из `config.json`
+- `sync` без новой версии сохраняет текущие даты из `config/config.json.template`
 - `sync X.Y.Z` и `bump ...` ставят сегодняшние даты, если они не переданы явно
 
 ---
@@ -159,7 +159,7 @@ venv\Scripts\python.exe tools\update_version.py sync 4.2.0
 ## Как это связано со сборкой
 
 Сборочные сценарии читают версию из:
-- `config.json`
+- `config/config.json.template`
 
 Это касается:
 - `build_windows.bat`
@@ -198,7 +198,7 @@ venv\Scripts\python.exe tools\update_version.py sync
 ### В UI одна версия, а в инсталляторе другая
 
 Проверьте:
-- `config.json`
+- `config/config.json.template`
 - `vpn-manager-installer.iss`
 - `README.md`
 - вывод `tools/update_version.py status`
@@ -215,7 +215,7 @@ venv\Scripts\python.exe tools\update_version.py sync
 
 Для этого проекта правило такое:
 - меняем версию через `tools/update_version.py`
-- храним источник правды в `config.json`
+- храним источник правды в `config/config.json.template`
 - не используем пользовательские runtime-конфиги как источник версии
 - перед релизом всегда проверяем `status`
 

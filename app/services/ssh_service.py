@@ -74,6 +74,47 @@ class SSHService:
         _, stdout, _ = client.exec_command(command, timeout=timeout)
         return stdout.read().decode('utf-8').strip()
 
+    @staticmethod
+    def _parse_cpu_used_pct(cpu_line: str) -> float:
+        normalized = (cpu_line or '').replace(',', '.')
+        match = re.search(r'([0-9]+(?:\.[0-9]+)?)\s*id\b', normalized)
+        if not match:
+            return 0.0
+
+        idle_pct = float(match.group(1))
+        return round(max(0.0, min(100.0, 100.0 - idle_pct)), 1)
+
+    def _get_cpu_used_pct(self, client, timeout: int = 30) -> float:
+        cpu_line = self._read_command_output(
+            client,
+            "LANG=C LC_ALL=C top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1",
+            timeout=timeout
+        )
+        cpu_used = self._parse_cpu_used_pct(cpu_line)
+        if cpu_used > 0:
+            return cpu_used
+
+        cpu_line = self._read_command_output(
+            client,
+            "top -bn1 | sed -n 's/^%\\?Cpu(s)\\?:\\s*//p' | head -n1",
+            timeout=timeout
+        )
+        cpu_used = self._parse_cpu_used_pct(cpu_line)
+        if cpu_used > 0:
+            return cpu_used
+
+        idle_raw = self._read_command_output(
+            client,
+            "LANG=C LC_ALL=C vmstat 1 2 | tail -1 | awk '{print $15}'",
+            timeout=timeout
+        )
+        try:
+            idle_pct = float((idle_raw or '0').replace(',', '.'))
+        except ValueError:
+            return 0.0
+
+        return round(max(0.0, min(100.0, 100.0 - idle_pct)), 1)
+
     def _get_listening_ports(self, client) -> List[str]:
         output = self._read_command_output(
             client,
@@ -352,16 +393,13 @@ class SSHService:
             try:
                 _, stdout, _ = client.exec_command('nproc')
                 cores = stdout.read().decode('utf-8').strip()
-                
-                _, stdout, _ = client.exec_command('top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'')
-                cpu_used = stdout.read().decode('utf-8').strip()
-                
+
                 _, stdout, _ = client.exec_command('uname -r')
                 kernel = stdout.read().decode('utf-8').strip()
                 
                 stats['cpu'] = {
                     'cores': int(cores) if cores else 0,
-                    'used_pct': float(cpu_used) if cpu_used else 0.0,
+                    'used_pct': self._get_cpu_used_pct(client, timeout=timeout),
                     'kernel': kernel
                 }
             except:
@@ -972,9 +1010,7 @@ class SSHService:
             max_points = 60
             
             # Получаем текущие метрики
-            _, stdout, _ = client.exec_command('top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk \'{print 100 - $1}\'')
-            cpu_usage = stdout.read().decode('utf-8').strip()
-            cpu_usage = float(cpu_usage) if cpu_usage else 0.0
+            cpu_usage = self._get_cpu_used_pct(client, timeout=timeout)
             
             _, stdout, _ = client.exec_command('free | grep Mem | awk \'{printf "%.1f", $3/$2 * 100}\'')
             mem_usage = stdout.read().decode('utf-8').strip()
