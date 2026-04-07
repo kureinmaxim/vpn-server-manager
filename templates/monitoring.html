@@ -1,0 +1,1361 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{{ super() }}
+<!-- Monitoring CSS with cache buster -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.3">
+{% endblock %}
+
+{% block content %}
+{% set ssh_port = server.get('ssh_credentials', {}).get('port', 22) %}
+<div class="container-fluid mt-3 monitoring-page">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1>
+                <i class="bi bi-bar-chart-line"></i> {{ _('Расширенный мониторинг') }}
+            </h1>
+            <p class="text-muted mb-0 small">
+                <strong>{{ server.name }}</strong> - {{ server.ip_address }}
+                {% if server.provider %}<span class="badge bg-secondary">{{ server.provider }}</span>{% endif %}
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> {{ _('Назад к списку') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Loading Indicator (показывается сразу, скрывается через JS) -->
+    <div id="initial-loading" class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">{{ _('Загрузка...') }}</span>
+        </div>
+        <h5 class="text-muted">{{ _('Проверка системы мониторинга...') }}</h5>
+        <p class="small text-muted">{{ _('Подключение к серверу...') }}</p>
+    </div>
+
+    <!-- Installation Panel (показывается если не установлено) -->
+    <div id="installation-panel" class="installation-panel" style="display: none;">
+        <div class="install-card">
+            <div class="install-header">
+                <h3>
+                    <i class="bi bi-box-seam"></i> {{ _('Установка системы мониторинга') }}
+                </h3>
+                <p>{{ _('Мониторинг еще не установлен на этом сервере') }}</p>
+            </div>
+            
+            <div class="install-body">
+                <div class="install-features">
+                    <h4>{{ _('Что будет установлено:') }}</h4>
+                    <ul>
+                        <li>✅ {{ _('vnstat - для статистики трафика') }}</li>
+                        <li>✅ {{ _('jq - для обработки JSON') }}</li>
+                        <li>✅ {{ _('net-tools - для сетевой статистики') }}</li>
+                        <li>⚠️ {{ _('ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)') }}</li>
+                    </ul>
+                    <p class="mt-2 text-muted small">
+                        <i class="bi bi-info-circle"></i> {{ _('Установка займет 1-2 минуты') }}
+                    </p>
+                </div>
+                
+                <button id="install-btn" class="btn btn-primary btn-lg">
+                    <i class="bi bi-download"></i> {{ _('Установить мониторинг') }}
+                </button>
+                
+                <!-- Progress section -->
+                <div id="install-progress" style="display: none;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                        <span class="progress-text" id="progress-text">0%</span>
+                    </div>
+                    
+                    <div class="install-logs" id="install-logs">
+                        <!-- Логи установки -->
+                    </div>
+                    
+                    <!-- Cancel button -->
+                    <button id="cancel-install-btn" class="btn btn-danger btn-block mt-3" style="display: none;">
+                        <i class="bi bi-x-circle"></i> {{ _('Отменить установку') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
+    <div id="stats-container" style="display: none;">
+        <div class="monitoring-overview card mb-4">
+            <div class="card-body">
+                <div class="overview-header">
+                    <div>
+                        <div class="overview-eyebrow">{{ _('Сводка по серверу') }}</div>
+                        <h2 class="overview-title">{{ server.name }}</h2>
+                        <p class="overview-subtitle mb-0">
+                            {{ server.ip_address }}
+                            {% if server.provider %}<span class="badge bg-secondary ms-2">{{ server.provider }}</span>{% endif %}
+                        </p>
+                    </div>
+                    <div class="overview-actions">
+                        <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-pencil-square"></i> {{ _('Настроить сервер') }}
+                        </a>
+                    </div>
+                </div>
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <span class="overview-label">{{ _('SSH порт') }}</span>
+                        <span class="overview-value">{{ ssh_port }}</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="overview-label">{{ _('Firewall backend') }}</span>
+                        <span class="overview-value" id="summary-fw-backend">-</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="overview-label">{{ _('Статус firewall') }}</span>
+                        <span class="overview-value" id="summary-fw-status">-</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="overview-label">{{ _('Listening ports') }}</span>
+                        <span class="overview-value" id="summary-port-count">0</span>
+                    </div>
+                    <div class="overview-item overview-item-wide">
+                        <span class="overview-label">{{ _('Сетевые интерфейсы') }}</span>
+                        <span class="overview-value" id="summary-interfaces">{{ _('Загрузка...') }}</span>
+                    </div>
+                    <div class="overview-item">
+                        <span class="overview-label">{{ _('Обновление системы') }}</span>
+                        <span class="overview-value" id="summary-last-update">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Connection Error Alert -->
+    <div id="connection-error-alert" class="alert alert-danger d-none mb-4" role="alert">
+        <div class="d-flex align-items-start">
+            <div class="me-3" style="font-size: 2rem;">⚠️</div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading mb-2">
+                    <i class="bi bi-exclamation-octagon"></i> {{ _('Ошибка подключения к серверу') }}
+                </h5>
+                <p class="mb-2" id="connection-error-message"></p>
+                <div id="connection-error-details" class="small text-muted mb-2"></div>
+                <div class="mt-3">
+                    <h6>{{ _('Что делать:') }}</h6>
+                    <ul id="connection-error-solutions" class="small mb-0"></ul>
+                </div>
+                <div class="mt-3">
+                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-pencil"></i> {{ _('Проверить настройки сервера') }}
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> {{ _('Повторить попытку') }}
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- Tools Check Alert -->
+    <div id="tools-alert" class="alert alert-warning d-none mb-4" role="alert">
+        <div class="d-flex align-items-start">
+            <div class="me-3" style="font-size: 2rem;"><i class="bi bi-tools"></i></div>
+            <div class="flex-grow-1">
+                <h5 class="alert-heading mb-2">
+                    <i class="bi bi-exclamation-triangle"></i> {{ _('Рекомендуется установить дополнительные утилиты') }}
+                </h5>
+                <p class="mb-2" id="tools-summary"></p>
+                
+                <div id="missing-tools-list" class="mb-3"></div>
+                
+                <div id="install-all-section" class="d-none">
+                    <h6>{{ _('Установить все одной командой:') }}</h6>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace" id="install-all-cmd" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyCommand('install-all-cmd')">
+                            <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div class="row g-4 monitoring-grid">
+        <div class="col-12 col-xxl-7">
+            <div class="network-traffic card monitoring-card h-100">
+                <div class="card-body">
+                    <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
+                    <div class="mb-2 monitoring-caption">
+                        <span id="monitored-interfaces">🔍 {{ _('Мониторинг всех сетевых интерфейсов') }}</span>
+                    </div>
+                    <div class="traffic-stats">
+                        <div class="stat">
+                            <span class="label">↓ {{ _('Загрузка:') }}</span>
+                            <span class="value" id="rx-speed">0 MB/s</span>
+                            <span class="peak">{{ _('Пик:') }} <span id="rx-peak">0</span> MB/s</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">↑ {{ _('Отдача:') }}</span>
+                            <span class="value" id="tx-speed">0 MB/s</span>
+                            <span class="peak">{{ _('Пик:') }} <span id="tx-peak">0</span> MB/s</span>
+                        </div>
+                    </div>
+                    <div class="daily-stats">
+                        <p>📈 {{ _('За 24 часа:') }} ↓ <span id="daily-rx">0 GB</span> ↑ <span id="daily-tx">0 GB</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xxl-5">
+            <div class="firewall-status card monitoring-card h-100">
+                <div class="card-body">
+                    <h3><i class="bi bi-shield-check"></i> {{ _('Статус брандмауэра') }}</h3>
+                    <div class="firewall-info">
+                        <div class="status-badge">
+                            <span id="fw-status">{{ _('Загрузка...') }}</span>
+                        </div>
+                        <div class="fw-details">
+                            <p><strong>{{ _('Backend:') }}</strong> <span id="fw-backend">-</span></p>
+                            <p><strong>{{ _('Listening ports:') }}</strong> <span id="open-ports">-</span></p>
+                            <p><strong>{{ _('Количество listening ports:') }}</strong> <span id="listening-ports-count">0</span></p>
+                            <p id="fw-rules-row" class="d-none"><strong>{{ _('Порты в правилах UFW:') }}</strong> <span id="fw-rules-ports">-</span></p>
+                            <p><strong>{{ _('Заблокировано за 24ч:') }}</strong> <span id="blocked-count">0</span> {{ _('попыток') }}</p>
+                            <p class="last-block">
+                                <strong>{{ _('Последний блок:') }}</strong>
+                                <span id="last-blocked-ip">-</span>
+                                ({{ _('порт:') }} <span id="last-blocked-port">-</span>)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-5">
+            <div class="active-services card monitoring-card h-100">
+                <div class="card-body">
+                    <h3><i class="bi bi-gear"></i> {{ _('Системные сервисы') }}</h3>
+                    <div id="services-list" class="services-grid">
+                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-7">
+            <div class="security-events card monitoring-card h-100">
+                <div class="card-body">
+                    <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
+                    <div class="events-grid">
+                        <div class="event-card" id="ssh-failures-card">
+                            <div class="event-icon">⚠️</div>
+                            <div class="event-content">
+                                <div class="event-value" id="ssh-failures">0</div>
+                                <div class="event-label">{{ _('Неудачные SSH попытки') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="event-card" id="security-updates-card">
+                            <div class="event-icon">🔄</div>
+                            <div class="event-content">
+                                <div class="event-value" id="security-updates">0</div>
+                                <div class="event-label">{{ _('Обновления безопасности') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="event-card" id="new-ports-card">
+                            <div class="event-icon">🔌</div>
+                            <div class="event-content">
+                                <div class="event-value" id="new-ports">0</div>
+                                <div class="event-label">{{ _('Новые открытые порты') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="event-card" id="fail2ban-card">
+                            <div class="event-icon">🔒</div>
+                            <div class="event-content">
+                                <div class="event-value" id="fail2ban-banned">0</div>
+                                <div class="event-label">{{ _('Fail2ban забанил IP') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="event-card" id="failed-services-card">
+                            <div class="event-icon">🛠️</div>
+                            <div class="event-content">
+                                <div class="event-value" id="failed-services">0</div>
+                                <div class="event-label">{{ _('Проблемные systemd unit\'ы') }}</div>
+                            </div>
+                        </div>
+
+                        <div class="event-card" id="journal-errors-card">
+                            <div class="event-icon">📕</div>
+                            <div class="event-content">
+                                <div class="event-value" id="journal-errors">0</div>
+                                <div class="event-label">{{ _('Ошибки journal') }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="top-threats" id="top-threats">
+                        <!-- Топ угроз будет добавлен динамически -->
+                    </div>
+
+                    <div class="last-update">
+                        {{ _('Последнее обновление системы:') }} <span id="days-since-update">-</span> {{ _('дней назад') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="mini-charts card monitoring-card mb-4">
+                <div class="card-body">
+                    <h3><i class="bi bi-graph-up-arrow"></i> {{ _('История производительности (60 мин)') }}</h3>
+                    <div class="charts-container">
+                        <div class="chart-card card">
+                            <div class="card-body">
+                                <h4>{{ _('Использование CPU') }}</h4>
+                                <div class="chart-wrapper">
+                                    <canvas id="cpu-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-card card">
+                            <div class="card-body">
+                                <h4>{{ _('Использование памяти') }}</h4>
+                                <div class="chart-wrapper">
+                                    <canvas id="memory-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Delete Monitoring Button -->
+        <div class="mt-4 text-end">
+            <button class="btn btn-outline-danger" id="uninstall-btn-main">
+                <i class="bi bi-trash"></i> {{ _('Удалить мониторинг') }}
+            </button>
+        </div>
+
+    </div> <!-- End #stats-container -->
+</div>
+
+<!-- Modal для подтверждения удаления -->
+<div class="modal fade" id="uninstallModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">⚠️ {{ _('Подтверждение удаления') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('Вы уверены, что хотите удалить систему мониторинга?') }}</p>
+                <p class="text-muted">{{ _('Это действие удалит:') }}</p>
+                <ul class="text-muted">
+                    <li>{{ _('Файлы истории метрик') }}</li>
+                    <li>{{ _('Настройки мониторинга') }}</li>
+                </ul>
+                <p class="text-danger"><strong>{{ _('Внимание:') }}</strong> {{ _('История метрик будет потеряна!') }}</p>
+                
+                <!-- Progress section для удаления -->
+                <div id="uninstall-progress" style="display: none;">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar progress-bar-danger" id="uninstall-progress-bar"></div>
+                        <span class="progress-text" id="uninstall-progress-text">0%</span>
+                    </div>
+                    <div class="install-logs" id="uninstall-logs"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-uninstall-btn">
+                    {{ _('Отмена') }}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirm-uninstall-btn">
+                    <i class="bi bi-trash"></i> {{ _('Да, удалить') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Panel removed - delete button now on main page -->
+
+<!-- Styles moved to static/css/monitoring.css -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Debug output - проверка загрузки
+console.log('✅ Monitoring script loaded');
+console.log('📍 Current URL:', window.location.href);
+console.log('🆔 Server ID:', '{{ server.id }}');
+console.log('📡 Server IP:', '{{ server.ip_address }}');
+
+const serverId = '{{ server.id }}';
+const sshPort = {{ ssh_port }};
+let rxPeak = 0;
+let txPeak = 0;
+let cpuChart, memoryChart;
+
+// Network Traffic Update
+async function updateNetworkStats() {
+    try {
+        console.log('📊 Fetching network stats...');
+        const response = await fetch(`/api/monitoring/${serverId}/network-stats`, {
+            signal: AbortSignal.timeout(25000) // Timeout 25 секунд
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📈 Network stats:', data);
+        
+        if (data.success) {
+            errorCount = 0; // Сброс при успехе
+            
+            const stats = data.data;
+            document.getElementById('rx-speed').textContent = `${stats.current.download} MB/s`;
+            document.getElementById('tx-speed').textContent = `${stats.current.upload} MB/s`;
+            
+            if (parseFloat(stats.current.download) > rxPeak) {
+                rxPeak = parseFloat(stats.current.download);
+                document.getElementById('rx-peak').textContent = rxPeak.toFixed(2);
+            }
+            if (parseFloat(stats.current.upload) > txPeak) {
+                txPeak = parseFloat(stats.current.upload);
+                document.getElementById('tx-peak').textContent = txPeak.toFixed(2);
+            }
+            
+            document.getElementById('daily-rx').textContent = stats.daily.download;
+            document.getElementById('daily-tx').textContent = stats.daily.upload;
+            
+            // Отображаем список мониторимых интерфейсов
+            if (stats.interfaces && stats.interfaces.length > 0) {
+                const interfacesList = stats.interfaces.join(', ');
+                document.getElementById('monitored-interfaces').innerHTML = 
+                    `🔍 Мониторинг: <strong>${interfacesList}</strong> (${stats.interfaces.length} интерфейс${stats.interfaces.length > 1 ? 'ов' : ''})`;
+                document.getElementById('summary-interfaces').textContent = interfacesList;
+            } else if (stats.interface) {
+                document.getElementById('monitored-interfaces').textContent = 
+                    `🔍 Мониторинг: ${stats.interface}`;
+                document.getElementById('summary-interfaces').textContent = stats.interface;
+            } else {
+                document.getElementById('summary-interfaces').textContent = '-';
+            }
+        } else {
+            handleError(data.error || 'Failed to load network stats', 'NetworkStats');
+        }
+    } catch (error) {
+        console.error('Error fetching network stats:', error);
+        handleError(error.message, 'NetworkStats');
+    }
+}
+
+// Firewall Status Update
+async function updateFirewallStatus() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/firewall-stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.data;
+            const statusElement = document.getElementById('fw-status');
+            const backendElement = document.getElementById('fw-backend');
+            const fwRulesRow = document.getElementById('fw-rules-row');
+            if (stats.status && stats.status.toLowerCase() === 'active') {
+                statusElement.textContent = '✅ Active';
+                statusElement.className = 'status-active';
+            } else {
+                statusElement.textContent = '❌ Inactive';
+                statusElement.className = 'status-inactive';
+            }
+            
+            backendElement.textContent = stats.backend || 'none';
+            document.getElementById('summary-fw-backend').textContent = stats.backend || 'none';
+            document.getElementById('summary-fw-status').textContent =
+                stats.status && stats.status.toLowerCase() === 'active' ? 'Active' : 'Inactive';
+            document.getElementById('open-ports').textContent = stats.open_ports || 'none';
+            document.getElementById('listening-ports-count').textContent = stats.listening_ports_count || 0;
+            document.getElementById('summary-port-count').textContent = stats.listening_ports_count || 0;
+            document.getElementById('blocked-count').textContent = stats.blocked_24h || 0;
+            document.getElementById('last-blocked-ip').textContent = stats.last_blocked?.ip || 'none';
+            document.getElementById('last-blocked-port').textContent = stats.last_blocked?.port || '-';
+
+            if ((stats.backend || '').toLowerCase() === 'ufw') {
+                document.getElementById('fw-rules-ports').textContent = stats.firewall_ports || 'none';
+                fwRulesRow.classList.remove('d-none');
+            } else {
+                document.getElementById('fw-rules-ports').textContent = '-';
+                fwRulesRow.classList.add('d-none');
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching firewall stats:', error);
+    }
+}
+
+// Services Status Update
+async function updateServicesStatus() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/services-stats`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const services = data.data;
+            const container = document.getElementById('services-list');
+            container.innerHTML = '';
+            
+            services.forEach(service => {
+                const serviceEl = document.createElement('div');
+                serviceEl.className = `service-item ${service.status}`;
+                
+                const statusIcon = service.status === 'active' ? '✅' : '❌';
+                const statusText = service.status === 'active' ? 'active' : 'inactive';
+                
+                serviceEl.innerHTML = `
+                    <div class="service-header">
+                        <span class="service-name">${service.name}</span>
+                        <span class="service-status">${statusIcon} ${statusText}</span>
+                    </div>
+                    <div class="service-uptime">${service.uptime || '-'}</div>
+                `;
+                
+                container.appendChild(serviceEl);
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching services stats:', error);
+    }
+}
+
+// Security Events Update
+async function updateSecurityEvents() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/security-events`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.data;
+            document.getElementById('ssh-failures').textContent = stats.ssh_failures_24h || 0;
+            document.getElementById('security-updates').textContent = stats.security_updates_available || 0;
+            document.getElementById('new-ports').textContent = stats.new_open_ports || 0;
+            document.getElementById('fail2ban-banned').textContent = stats.fail2ban_banned || 0;
+            document.getElementById('failed-services').textContent = stats.failed_services || 0;
+            document.getElementById('journal-errors').textContent = stats.error_events_24h || 0;
+            document.getElementById('days-since-update').textContent = stats.days_since_update || '-';
+            document.getElementById('summary-last-update').textContent =
+                (stats.days_since_update || stats.days_since_update === 0)
+                    ? `${stats.days_since_update} дн`
+                    : '-';
+            
+            const sshCard = document.getElementById('ssh-failures-card');
+            const updatesCard = document.getElementById('security-updates-card');
+            const newPortsCard = document.getElementById('new-ports-card');
+            const fail2banCard = document.getElementById('fail2ban-card');
+            const failedServicesCard = document.getElementById('failed-services-card');
+            const journalErrorsCard = document.getElementById('journal-errors-card');
+
+            sshCard.classList.toggle('warning', (stats.ssh_failures_24h || 0) > 50);
+            updatesCard.classList.toggle('warning', (stats.security_updates_available || 0) > 0);
+            newPortsCard.classList.toggle('warning', (stats.new_open_ports || 0) > 0);
+            fail2banCard.classList.toggle('warning', (stats.fail2ban_banned || 0) > 0);
+            failedServicesCard.classList.toggle('warning', (stats.failed_services || 0) > 0);
+            journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) > 0);
+            
+            const threatsContainer = document.getElementById('top-threats');
+            let threatHtml = '';
+
+            if (stats.top_failed_ips && stats.top_failed_ips.length > 0) {
+                threatHtml += '<h4>{{ _("Top атакующих IP:") }}</h4>';
+                stats.top_failed_ips.forEach(item => {
+                    threatHtml += `
+                        <div class="threat-item">
+                            <span class="threat-ip">${item.ip}</span>
+                            <span class="threat-count">${item.count} {{ _("попыток") }}</span>
+                        </div>
+                    `;
+                });
+            }
+
+            const summaryItems = [];
+            if ((stats.fail2ban_banned || 0) > 0) {
+                summaryItems.push(`{{ _("Сейчас забаненных IP через fail2ban:") }} <strong>${stats.fail2ban_banned}</strong>`);
+            }
+            if ((stats.failed_services || 0) > 0) {
+                summaryItems.push(`{{ _("Есть failed systemd unit'ы:") }} <strong>${stats.failed_services}</strong>`);
+            }
+            if ((stats.error_events_24h || 0) > 0) {
+                summaryItems.push(`{{ _("Ошибок в journal за 24ч:") }} <strong>${stats.error_events_24h}</strong>`);
+            }
+
+            if (summaryItems.length > 0) {
+                threatHtml += `
+                    <div class="mt-3 small text-muted">
+                        ${summaryItems.join('<br>')}
+                    </div>
+                `;
+            }
+
+            if (!threatHtml) {
+                threatHtml = '<div class="small text-muted">{{ _("Критичных событий не обнаружено") }}</div>';
+            }
+
+            threatsContainer.innerHTML = threatHtml;
+        }
+    } catch (error) {
+        console.error('Error fetching security events:', error);
+    }
+}
+
+// Charts
+function createCharts() {
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { color: '#6c757d' },
+                grid: { color: '#dee2e6' }
+            },
+            x: {
+                ticks: { color: '#6c757d' },
+                grid: { color: '#dee2e6' }
+            }
+        },
+        plugins: {
+            legend: { display: false }
+        }
+    };
+    
+    const cpuCtx = document.getElementById('cpu-chart').getContext('2d');
+    cpuChart = new Chart(cpuCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'CPU %',
+                data: [],
+                borderColor: '#0d6efd',
+                backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: chartOptions
+    });
+    
+    const memCtx = document.getElementById('memory-chart').getContext('2d');
+    memoryChart = new Chart(memCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Memory %',
+                data: [],
+                borderColor: '#6610f2',
+                backgroundColor: 'rgba(102, 16, 242, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: chartOptions
+    });
+}
+
+async function updateCharts() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/metrics-history`);
+        const data = await response.json();
+        
+        if (data.success) {
+            const history = data.data;
+            const labels = history.map((point, index) => {
+                if (index % 10 === 0) {
+                    const date = new Date(point.timestamp * 1000);
+                    return date.getHours() + ':' + String(date.getMinutes()).padStart(2, '0');
+                }
+                return '';
+            });
+            
+            cpuChart.data.labels = labels;
+            cpuChart.data.datasets[0].data = history.map(p => p.cpu);
+            cpuChart.update('none');
+            
+            memoryChart.data.labels = labels;
+            memoryChart.data.datasets[0].data = history.map(p => p.memory);
+            memoryChart.update('none');
+        }
+    } catch (error) {
+        console.error('Error updating charts:', error);
+    }
+}
+
+// Show connection error
+function showConnectionError(errorType, errorMessage) {
+    const alert = document.getElementById('connection-error-alert');
+    const messageEl = document.getElementById('connection-error-message');
+    const detailsEl = document.getElementById('connection-error-details');
+    const solutionsEl = document.getElementById('connection-error-solutions');
+    
+    let message = '';
+    let details = '';
+    let solutions = [];
+    
+    if (errorType === 'timeout') {
+        message = '{{ _("Не удается подключиться к серверу по SSH. Превышен timeout ожидания.") }}';
+        details = `{{ _("Сервер:") }} {{ server.name }} ({{ server.ip_address }})`;
+        solutions = [
+            '{{ _("Проверьте, что сервер включен и доступен") }}',
+            `{{ _("Убедитесь, что SSH порт открыт") }} (${sshPort})`,
+            '{{ _("Проверьте правильность IP адреса в настройках") }}',
+            `{{ _("Попробуйте подключиться вручную:") }} ssh user@{{ server.ip_address }} -p ${sshPort}`,
+            '{{ _("Проверьте firewall на вашем компьютере") }}'
+        ];
+    } else if (errorType === 'auth') {
+        message = '{{ _("Ошибка аутентификации SSH") }}';
+        details = '{{ _("Неверное имя пользователя или пароль") }}';
+        solutions = [
+            '{{ _("Проверьте имя пользователя SSH в настройках сервера") }}',
+            '{{ _("Проверьте пароль SSH в настройках сервера") }}',
+            '{{ _("Убедитесь, что парольный доступ разрешен на сервере") }}'
+        ];
+    } else {
+        message = '{{ _("Произошла ошибка при получении данных мониторинга") }}';
+        details = errorMessage || '{{ _("Неизвестная ошибка") }}';
+        solutions = [
+            '{{ _("Проверьте подключение к интернету") }}',
+            '{{ _("Проверьте настройки сервера в приложении") }}',
+            '{{ _("См. logs/app.log для подробной информации") }}'
+        ];
+    }
+    
+    messageEl.textContent = message;
+    detailsEl.textContent = details;
+    
+    solutionsEl.innerHTML = '';
+    solutions.forEach(solution => {
+        const li = document.createElement('li');
+        li.textContent = solution;
+        solutionsEl.appendChild(li);
+    });
+    
+    alert.classList.remove('d-none');
+}
+
+// Check Required Tools
+async function checkRequiredTools() {
+    try {
+        console.log('🔧 Checking required tools for server:', serverId);
+        const response = await fetch(`/api/monitoring/${serverId}/check-tools`);
+        console.log('📥 Check tools response status:', response.status);
+        const data = await response.json();
+        console.log('📊 Check tools data:', data);
+        
+        if (data.success && data.data) {
+            const toolsData = data.data;
+            
+            // Если все в порядке, скрываем алерт
+            if (toolsData.all_ok) {
+                document.getElementById('tools-alert').classList.add('d-none');
+                return;
+            }
+            
+            // Показываем алерт
+            document.getElementById('tools-alert').classList.remove('d-none');
+            
+            // Обновляем summary
+            const summary = `{{ _('Установлено:') }} ${toolsData.installed}/${toolsData.total}. ` +
+                          `{{ _('Недостающих утилит:') }} ${toolsData.missing_count}`;
+            document.getElementById('tools-summary').textContent = summary;
+            
+            // Формируем список недостающих утилит
+            const missingList = document.getElementById('missing-tools-list');
+            missingList.innerHTML = '';
+            
+            if (toolsData.missing && toolsData.missing.length > 0) {
+                toolsData.missing.forEach(tool => {
+                    const toolDiv = document.createElement('div');
+                    toolDiv.className = 'missing-tool-item mb-3 p-3 bg-light rounded';
+                    toolDiv.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>❌ ${tool.name}</strong>
+                            <span class="badge bg-${tool.category === 'optional' ? 'warning' : 'danger'}">${tool.category}</span>
+                        </div>
+                        <p class="mb-2 small text-muted">${tool.description}</p>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control font-monospace" value="${tool.install_cmd}" id="cmd-${tool.name}" readonly>
+                            <button class="btn btn-outline-primary" type="button" onclick="copyCommand('cmd-${tool.name}')">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    `;
+                    missingList.appendChild(toolDiv);
+                });
+            }
+            
+            // Показываем предупреждения для установленных, но не настроенных утилит
+            if (toolsData.warnings && toolsData.warnings.length > 0) {
+                toolsData.warnings.forEach(tool => {
+                    const toolDiv = document.createElement('div');
+                    toolDiv.className = 'missing-tool-item mb-3 p-3 bg-warning bg-opacity-10 rounded border border-warning';
+                    toolDiv.innerHTML = `
+                        <div class="d-flex align-items-center mb-2">
+                            <strong>⚠️ ${tool.name}</strong>
+                            <span class="ms-2 text-warning">${tool.warning}</span>
+                        </div>
+                        ${tool.fix_cmd ? `
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control font-monospace" value="${tool.fix_cmd}" id="fix-${tool.name}" readonly>
+                            <button class="btn btn-outline-warning" type="button" onclick="copyCommand('fix-${tool.name}')">
+                                <i class="bi bi-clipboard"></i> {{ _('Исправить') }}
+                            </button>
+                        </div>
+                        ` : ''}
+                    `;
+                    missingList.appendChild(toolDiv);
+                });
+            }
+            
+            // Показываем команду для установки всех утилит
+            if (toolsData.install_all_cmd) {
+                document.getElementById('install-all-section').classList.remove('d-none');
+                document.getElementById('install-all-cmd').value = toolsData.install_all_cmd;
+            } else {
+                document.getElementById('install-all-section').classList.add('d-none');
+            }
+        }
+    } catch (error) {
+        console.error('Error checking required tools:', error);
+        showConnectionError('timeout', error.message);
+    }
+}
+
+// Copy command to clipboard
+function copyCommand(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.select();
+        input.setSelectionRange(0, 99999); // For mobile devices
+        navigator.clipboard.writeText(input.value).then(() => {
+            // Visual feedback
+            const button = input.nextElementSibling;
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="bi bi-check-lg"></i> {{ _("Скопировано!") }}';
+            button.classList.add('btn-success');
+            button.classList.remove('btn-outline-primary', 'btn-outline-secondary', 'btn-outline-warning');
+            
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove('btn-success');
+                const classes = inputId.includes('fix-') ? 'btn-outline-warning' : 
+                               inputId.includes('install-all') ? 'btn-outline-secondary' : 'btn-outline-primary';
+                button.classList.add(classes);
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    }
+}
+
+// ========================================
+// ERROR HANDLING
+// ========================================
+
+let errorCount = 0;
+const MAX_ERRORS = 3;
+let intervals = []; // Для хранения всех setInterval
+
+function handleError(message, context = '') {
+    errorCount++;
+    console.warn(`⚠️ Error ${errorCount}/${MAX_ERRORS} [${context}]: ${message}`);
+    
+    if (errorCount >= MAX_ERRORS) {
+        console.error('❌ Too many errors! Stopping auto-refresh.');
+        
+        // Останавливаем все интервалы
+        stopAllIntervals();
+        
+        // Показываем уведомление пользователю
+        showErrorNotification('{{ _("Потеряно соединение с сервером. Автообновление остановлено. Обновите страницу.") }}');
+    }
+}
+
+function stopAllIntervals() {
+    console.log('🛑 Stopping all auto-refresh intervals...');
+    intervals.forEach(interval => clearInterval(interval));
+    intervals = [];
+}
+
+function showErrorNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'alert alert-danger alert-dismissible fade show';
+    notification.style.position = 'fixed';
+    notification.style.top = '80px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.maxWidth = '400px';
+    notification.innerHTML = `
+        <div class="d-flex align-items-start">
+            <div style="font-size: 2rem; margin-right: 15px;">⚠️</div>
+            <div>
+                <strong>{{ _("Ошибка подключения") }}</strong><br>
+                ${message}
+                <div class="mt-2">
+                    <button class="btn btn-sm btn-primary" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> {{ _("Обновить страницу") }}
+                    </button>
+                </div>
+            </div>
+            <button type="button" class="btn-close ms-2" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    document.body.appendChild(notification);
+}
+
+// ========================================
+// INSTALLATION LOGIC
+// ========================================
+
+let isInstalling = false;
+let isUninstalling = false;
+let currentEventSource = null;
+
+async function checkInstallation() {
+    console.log('🔧 Checking monitoring installation status...');
+    console.log('🔗 URL:', `/api/monitoring/${serverId}/check-installed`);
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/check-installed`);
+        console.log('📡 Response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('❌ Response not OK:', response.status, response.statusText);
+            return false;
+        }
+        
+        const data = await response.json();
+        console.log('📊 Installation check result:', data);
+        console.log('✅ Installed:', data.installed);
+        
+        if (!data.installed && data.error) {
+            console.error('❌ Check error:', data.error);
+        }
+        
+        return data.installed || false;
+    } catch (error) {
+        console.error('💥 Error checking installation:', error);
+        return false;
+    }
+}
+
+function showInstallationPanel() {
+    console.log('📦 Showing installation panel');
+    
+    // Скрываем индикатор загрузки
+    const loadingIndicator = document.getElementById('initial-loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+    
+    document.getElementById('installation-panel').style.display = 'block';
+    document.getElementById('stats-container').style.display = 'none';
+    
+    // Добавляем обработчик кнопки установки
+    document.getElementById('install-btn').addEventListener('click', function() {
+        startInstallation();
+    });
+}
+
+function showMonitoring() {
+    console.log('📊 Showing monitoring stats');
+    
+    // Скрываем индикатор загрузки
+    const loadingIndicator = document.getElementById('initial-loading');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'none';
+    }
+    
+    // Показываем кнопку настроек
+    const monitoringControls = document.getElementById('monitoring-controls');
+    if (monitoringControls) {
+        monitoringControls.style.display = 'block';
+    }
+    
+    document.getElementById('installation-panel').style.display = 'none';
+    document.getElementById('stats-container').style.display = 'block';
+    
+    // Инициализируем мониторинг
+    initMonitoring();
+    
+    // setupSettingsPanel() уже вызван в DOMContentLoaded
+}
+
+function setupSettingsPanel() {
+    console.log('⚙️ Setting up settings panel...');
+    
+    // Кнопка открытия настроек (если есть)
+    const showSettingsBtn = document.getElementById('show-settings-btn');
+    if (showSettingsBtn) {
+        const newShowBtn = showSettingsBtn.cloneNode(true);
+        showSettingsBtn.parentNode.replaceChild(newShowBtn, showSettingsBtn);
+        
+        newShowBtn.addEventListener('click', function() {
+            console.log('🔧 Opening settings panel');
+            document.getElementById('settings-panel').classList.add('active');
+        });
+    }
+    
+    // Кнопка закрытия настроек (если есть)
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    if (closeSettingsBtn) {
+        const newCloseBtn = closeSettingsBtn.cloneNode(true);
+        closeSettingsBtn.parentNode.replaceChild(newCloseBtn, closeSettingsBtn);
+        
+        newCloseBtn.addEventListener('click', function() {
+            console.log('❌ Closing settings panel');
+            document.getElementById('settings-panel').classList.remove('active');
+        });
+    }
+    
+    // Кнопка удаления в боковой панели (если есть)
+    const uninstallBtn = document.getElementById('uninstall-btn');
+    if (uninstallBtn) {
+        const newUninstallBtn = uninstallBtn.cloneNode(true);
+        uninstallBtn.parentNode.replaceChild(newUninstallBtn, uninstallBtn);
+        
+        newUninstallBtn.addEventListener('click', function() {
+            console.log('🗑️ Uninstall button (sidebar) clicked');
+            showUninstallModal();
+        });
+    }
+    
+    // Кнопка удаления на главной странице (новая)
+    const uninstallBtnMain = document.getElementById('uninstall-btn-main');
+    if (uninstallBtnMain) {
+        const newUninstallBtnMain = uninstallBtnMain.cloneNode(true);
+        uninstallBtnMain.parentNode.replaceChild(newUninstallBtnMain, uninstallBtnMain);
+        
+        newUninstallBtnMain.addEventListener('click', function() {
+            console.log('🗑️ Uninstall button (main) clicked');
+            showUninstallModal();
+        });
+    }
+    
+    console.log('✅ Settings panel configured');
+}
+
+async function startInstallation() {
+    if (isInstalling) {
+        console.warn('⚠️ Installation already in progress');
+        return;
+    }
+    
+    // Блокируем кнопку на время проверки
+    const installBtn = document.getElementById('install-btn');
+    const originalText = installBtn.innerHTML;
+    installBtn.disabled = true;
+    installBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>{{ _("Проверка...") }}';
+    
+    // Проверяем, не установлен ли уже мониторинг
+    console.log('🔍 Checking if monitoring is already installed...');
+    const alreadyInstalled = await checkInstallation();
+    if (alreadyInstalled) {
+        console.warn('⚠️ Monitoring is already installed on this server!');
+        
+        // Показываем красивое уведомление
+        const notification = document.createElement('div');
+        notification.className = 'alert alert-info alert-dismissible fade show';
+        notification.style.position = 'fixed';
+        notification.style.top = '80px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '9999';
+        notification.style.maxWidth = '400px';
+        notification.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div style="font-size: 2rem; margin-right: 15px;">✅</div>
+                <div>
+                    <strong>{{ _("Мониторинг уже установлен") }}</strong><br>
+                    <span class="small">{{ _("Система мониторинга уже активна на этом сервере. Сейчас загрузим данные...") }}</span>
+                </div>
+                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Через 2 секунды перезагружаем страницу
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
+        return;
+    }
+    
+    // Восстанавливаем текст кнопки и продолжаем установку
+    installBtn.innerHTML = originalText;
+    
+    isInstalling = true;
+    console.log('🚀 Starting installation...');
+    
+    // Показываем прогресс
+    installBtn.disabled = true;
+    document.getElementById('install-progress').style.display = 'block';
+    
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const logsContainer = document.getElementById('install-logs');
+    const cancelBtn = document.getElementById('cancel-install-btn');
+    
+    // Показываем кнопку отмены
+    cancelBtn.style.display = 'block';
+    cancelBtn.onclick = function() {
+        cancelInstallation();
+    };
+    
+    try {
+        // Создаем EventSource для получения прогресса через SSE
+        currentEventSource = new EventSource(`/api/monitoring/${serverId}/install`);
+        
+        currentEventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            console.log('📥 Installation progress:', data);
+            
+            // Отмена
+            if (data.cancelled) {
+                addLog(logsContainer, data.message, 'warning');
+                currentEventSource.close();
+                resetInstallation();
+                return;
+            }
+            
+            if (data.error) {
+                // Ошибка
+                addLog(logsContainer, `❌ Ошибка: ${data.error}`, 'error');
+                currentEventSource.close();
+                resetInstallation();
+                return;
+            }
+            
+            if (data.complete) {
+                // Установка завершена
+                currentEventSource.close();
+                addLog(logsContainer, '🎉 Установка завершена успешно!', 'success');
+                addLog(logsContainer, '🔄 Перезагрузка через 3 секунды...', 'info');
+                cancelBtn.style.display = 'none';
+                
+                // Перезагружаем страницу для чистого старта
+                setTimeout(function() {
+                    window.location.reload();
+                }, 3000);
+                return;
+            }
+            
+            // Обновляем прогресс
+            if (data.step && data.total) {
+                const percent = Math.round((data.step / data.total) * 100);
+                progressBar.style.width = `${percent}%`;
+                progressText.textContent = `${percent}%`;
+            }
+            
+            // Добавляем сообщение в лог
+            if (data.message) {
+                addLog(logsContainer, data.message, data.status);
+            }
+        };
+        
+        currentEventSource.onerror = function(error) {
+            console.error('EventSource error:', error);
+            currentEventSource.close();
+            addLog(logsContainer, '❌ Ошибка подключения к серверу', 'error');
+            resetInstallation();
+        };
+        
+    } catch (error) {
+        console.error('Installation error:', error);
+        addLog(logsContainer, `❌ Ошибка: ${error.message}`, 'error');
+        resetInstallation();
+    }
+}
+
+async function cancelInstallation() {
+    if (!confirm('Вы уверены, что хотите отменить установку?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/cancel-install`, {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            console.log('Cancellation requested');
+        }
+    } catch (error) {
+        console.error('Error cancelling installation:', error);
+    }
+}
+
+function resetInstallation() {
+    isInstalling = false;
+    document.getElementById('install-btn').disabled = false;
+    document.getElementById('cancel-install-btn').style.display = 'none';
+}
+
+function showUninstallModal() {
+    console.log('🗑️ Opening uninstall modal');
+    
+    const modalEl = document.getElementById('uninstallModal');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+    
+    // Сбрасываем состояние модального окна
+    const confirmBtn = document.getElementById('confirm-uninstall-btn');
+    const cancelBtn = document.getElementById('cancel-uninstall-btn');
+    
+    confirmBtn.style.display = 'block';
+    cancelBtn.style.display = 'block';
+    document.getElementById('uninstall-progress').style.display = 'none';
+    document.getElementById('uninstall-logs').innerHTML = '';
+    
+    // Удаляем старые обработчики и добавляем новые
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.onclick = function() {
+        console.log('✅ User confirmed uninstallation');
+        startUninstallation();
+    };
+    
+    console.log('✅ Uninstall modal configured');
+}
+
+async function startUninstallation() {
+    if (isUninstalling) {
+        console.warn('⚠️ Uninstallation already in progress');
+        return;
+    }
+    
+    console.log('🗑️ Starting uninstallation process...');
+    isUninstalling = true;
+    
+    // Скрываем кнопки, показываем прогресс
+    document.getElementById('confirm-uninstall-btn').style.display = 'none';
+    document.getElementById('cancel-uninstall-btn').style.display = 'none';
+    document.getElementById('uninstall-progress').style.display = 'block';
+    
+    const progressBar = document.getElementById('uninstall-progress-bar');
+    const progressText = document.getElementById('uninstall-progress-text');
+    const logsContainer = document.getElementById('uninstall-logs');
+    
+    console.log('📡 Connecting to uninstall endpoint...');
+    
+    try {
+        const eventSource = new EventSource(`/api/monitoring/${serverId}/uninstall`);
+        
+        eventSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (data.error) {
+                addLog(logsContainer, `❌ Ошибка: ${data.error}`, 'error');
+                eventSource.close();
+                isUninstalling = false;
+                return;
+            }
+            
+            if (data.complete) {
+                eventSource.close();
+                addLog(logsContainer, data.message || '🎉 Мониторинг удален!', 'success');
+                addLog(logsContainer, '🔄 Перезагрузка через 3 секунды...', 'info');
+                
+                // Перезагружаем страницу для чистого старта
+                setTimeout(function() {
+                    window.location.reload();
+                }, 3000);
+                return;
+            }
+            
+            if (data.step && data.total) {
+                const percent = Math.round((data.step / data.total) * 100);
+                progressBar.style.width = `${percent}%`;
+                progressText.textContent = `${percent}%`;
+            }
+            
+            if (data.message) {
+                addLog(logsContainer, data.message, data.status);
+            }
+        };
+        
+        eventSource.onerror = function(error) {
+            console.error('EventSource error:', error);
+            eventSource.close();
+            addLog(logsContainer, '❌ Ошибка подключения', 'error');
+            isUninstalling = false;
+        };
+        
+    } catch (error) {
+        console.error('Uninstallation error:', error);
+        addLog(logsContainer, `❌ Ошибка: ${error.message}`, 'error');
+        isUninstalling = false;
+    }
+}
+
+function addLog(container, message, status) {
+    const logEntry = document.createElement('div');
+    logEntry.className = `log-entry log-${status}`;
+    logEntry.textContent = message;
+    container.appendChild(logEntry);
+    container.scrollTop = container.scrollHeight;
+}
+
+function initMonitoring() {
+    console.log('🎯 Initializing monitoring displays...');
+    
+    createCharts();
+    
+    // Initial updates
+    console.log('⏱️ Starting initial data load...');
+    checkRequiredTools(); // Check tools first
+    updateNetworkStats();
+    updateFirewallStatus();
+    updateServicesStatus();
+    updateSecurityEvents();
+    updateCharts();
+    
+    // Set up intervals (увеличены для безопасности) и сохраняем их
+    console.log('⏰ Setting up auto-refresh intervals (safe mode: 30s) with error handling');
+    intervals.push(setInterval(updateNetworkStats, 30000));      // 30 seconds (было 5)
+    intervals.push(setInterval(updateFirewallStatus, 30000));    // 30 seconds (было 10)
+    intervals.push(setInterval(updateServicesStatus, 30000));    // 30 seconds (было 10)
+    intervals.push(setInterval(updateSecurityEvents, 60000));    // 60 seconds (было 30)
+    intervals.push(setInterval(updateCharts, 120000));           // 120 seconds (было 60)
+    console.log(`✅ Created ${intervals.length} monitoring intervals with auto-stop on errors`)
+    
+    console.log('✅ Monitoring fully initialized');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 Page loaded, checking installation...');
+    
+    // ВАЖНО: Настраиваем панель настроек ВСЕГДА (кнопки существуют в DOM)
+    setupSettingsPanel();
+    
+    // Проверяем, установлен ли мониторинг
+    const isInstalled = await checkInstallation();
+    
+    if (isInstalled) {
+        // Мониторинг установлен - показываем данные
+        showMonitoring();
+    } else {
+        // Мониторинг не установлен - показываем панель установки
+        showInstallationPanel();
+    }
+});
+</script>
+{% endblock %}
+
