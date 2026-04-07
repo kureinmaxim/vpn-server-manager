@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center shadow-lg">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill"></i> {{ _('Страница не найдена') }}
+                    </h3>
+                </div>
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-search display-1 text-muted"></i>
+                    </div>
+                    <h4 class="card-title mb-3">🔍 {{ _('404 - Страница не найдена') }}</h4>
+                    <p class="card-text text-muted mb-4">
+                        {{ _('Запрашиваемая страница не существует или была перемещена.') }}
+                    </p>
+                    
+                    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg px-4">
+                            <i class="bi bi-house"></i> {{ _('На главную') }}
+                        </a>
+                        <button type="button" class="btn btn-secondary btn-lg px-4" onclick="history.back()">
+                            <i class="bi bi-arrow-left"></i> {{ _('Назад') }}
+                        </button>
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <small>
+                        <i class="bi bi-info-circle"></i> 
+                        {{ _('Если вы считаете, что это ошибка, обратитесь к администратору.') }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

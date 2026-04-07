@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Скрипт для сборки VPN Server Manager с исправленными зависимостями.
-Включает поддержку офлайн режима и улучшенную обработку ошибок.
+Скрипт для сборки VPN Server Manager v4.0.7 с новой модульной архитектурой.
+Включает поддержку Application Factory, Service Layer и современные практики разработки.
+Версия автоматически загружается из config.json.
 """
 import os
 import sys
@@ -31,11 +32,11 @@ def cleanup_previous_builds():
 
 def convert_ico_to_icns():
     """Конвертация favicon.ico в icon.icns для macOS"""
-    favicon_path = PROJECT_ROOT / "static" / "favicon.ico"
-    icns_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+    favicon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.ico"
+    icns_path = PROJECT_ROOT / "static" / "images" / "icon_clean.icns"
     
     if not favicon_path.exists():
-        print("❌ favicon.ico не найден")
+        print("❌ icon_clean.ico не найден")
         return False
     
     # Создаем временную папку для конвертации
@@ -85,7 +86,7 @@ def convert_ico_to_icns():
             "iconutil", "-c", "icns", str(iconset_path), "-o", str(icns_path)
         ], check=True)
         
-        print(f"✅ favicon.ico конвертирован в {icns_path}")
+        print(f"✅ icon_clean.ico конвертирован в {icns_path}")
         return True
         
     except subprocess.CalledProcessError as e:
@@ -102,21 +103,35 @@ def convert_ico_to_icns():
 def build_app():
     """Создание .app файла с исправленными зависимостями"""
     
-    # Конвертируем favicon.ico в icon.icns
-    print("🔄 Конвертация иконки...")
-    if not convert_ico_to_icns():
-        print("⚠️ Не удалось конвертировать иконку, используем существующую")
+    # Получаем версию из config.json для PyInstaller
+    version = get_version_from_config()
+    print(f"📦 Версия для сборки: {version}")
+    
+    # Проверяем наличие иконки
+    print("🔄 Проверка иконки...")
+    icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
+    if icon_path.exists():
+        print("✅ Иконка найдена")
+    else:
+        print("⚠️ Иконка не найдена")
     
     # Определяем файлы для включения в сборку
     datas = [
         "templates:templates",          # HTML шаблоны
         "static:static",                # CSS, изображения
-        "config.json:.",                # Конфигурация
+        "config.json.example:.",        # Конфигурация (шаблон)
+        "env.example:.",                # Пример конфигурации (шаблон)
+        # NOTE: .env и config.json НЕ включаются в сборку по соображениям безопасности
+        # Пользователь должен создать их самостоятельно после установки
         "data:data",                    # Данные
-        "lessons:lessons",              # Учебные материалы
+        "app:app",                      # Новое приложение
+        "desktop:desktop",              # Desktop GUI
         "requirements.txt:.",           # Зависимости
-        "docs:docs",                    # Документация
     ]
+
+    # ВКЛЮЧАЕМ ПЕРЕВОДЫ (.po/.mo). Достаточно добавить всю папку translations
+    if (PROJECT_ROOT / 'translations').exists():
+        datas.append("translations:translations")
     
     # Добавляем дополнительные файлы если они есть
     additional_files = [
@@ -124,10 +139,8 @@ def build_app():
         "env.example",
         "yubikey_auth.py",
         "security_logger.py",
-        "tools/decrypt_tool.py",
-        "tools/generate_key.py",
-        "tools/generate_data_storage_pdf.py",
-        "tools/pin_auth.py"
+        "decrypt_tool.py",
+        "generate_key.py"
     ]
     
     for file in additional_files:
@@ -138,7 +151,10 @@ def build_app():
     datas_args = [f"--add-data={data}" for data in datas]
     
     # Проверяем наличие иконки
-    icon_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+    icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.icns"
+    if not icon_path.exists():
+        # Если нет .icns файла, используем .png
+        icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
     icon_arg = f"--icon={icon_path}" if icon_path.exists() else ""
     
     # КРИТИЧЕСКИ ВАЖНО: Скрытые импорты для Flask и офлайн режима
@@ -216,6 +232,11 @@ def build_app():
         "--hidden-import=webview.platforms.mshtml",
         "--hidden-import=webview.platforms.qt",
         
+        # macOS AppKit для GUI активации
+        "--hidden-import=AppKit",
+        "--hidden-import=Foundation",
+        "--hidden-import=objc",
+        
         # Криптография и безопасность
         "--hidden-import=cryptography",
         "--hidden-import=cryptography.fernet",
@@ -261,14 +282,6 @@ def build_app():
         "--hidden-import=os",
         "--hidden-import=sys",
         
-        # SSH и сетевые модули
-        "--hidden-import=paramiko",
-        "--hidden-import=bcrypt",
-        "--hidden-import=nacl",
-        "--hidden-import=cryptography",
-        "--hidden-import=cryptography.hazmat.backends.openssl.backend",
-
-        
         # Исключения для уменьшения размера
         "--exclude-module=PyQt6",
         "--exclude-module=PyQt5",
@@ -289,8 +302,8 @@ def build_app():
         "python3",
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
-        "--windowed",                   # GUI приложение
-        "--name=VPNServer",
+        "--windowed",                   # GUI приложение (обязательно для .app)
+        "--name=VPNServerManager-Clean",
         icon_arg,                       # Иконка (если есть)
         "--clean",
         "--noconfirm",
@@ -298,11 +311,11 @@ def build_app():
         "--workpath=build",
         "--noupx",
         "--strip",
-        "--osx-bundle-identifier=com.vpnserver.app",
-        "--debug=all",
+        "--osx-bundle-identifier=com.vpnservermanager.clean.app",
+        # "--debug=all",  # Отключаем debug для чистой сборки
         *datas_args,
         *hidden_imports,
-        "app.py"  # Основной файл приложения
+        "launch_gui.py"  # GUI Launcher с активацией foreground для macOS
     ]
     
     # Убираем пустые аргументы
@@ -318,11 +331,64 @@ def build_app():
         print(f"❌ ОШИБКА: PyInstaller завершился с кодом {result.returncode}")
         return False
     
+    # Используем кастомный Info.plist с правильной версией
+    app_path = DIST_DIR / "VPNServerManager-Clean.app"
+    if app_path.exists():
+        info_plist_path = app_path / "Contents" / "Info.plist"
+        info_template_path = Path(__file__).parent / "Info.plist.template"
+        
+        if info_template_path.exists():
+            print(f"🔧 Установка кастомного Info.plist с версией {version}...")
+            try:
+                # Читаем шаблон
+                with open(info_template_path, 'r') as f:
+                    plist_content = f.read()
+                
+                # Заменяем {{VERSION}} на реальную версию
+                plist_content = plist_content.replace('{{VERSION}}', version)
+                
+                # Записываем кастомный plist
+                with open(info_plist_path, 'w') as f:
+                    f.write(plist_content)
+                
+                print(f"✅ Info.plist установлен: версия {version}, NSPrincipalClass=NSApplication")
+            except Exception as e:
+                print(f"⚠️ Не удалось установить Info.plist: {e}")
+        else:
+            print(f"⚠️ Шаблон Info.plist.template не найден, используем версию PyInstaller")
+            try:
+                # Fallback: просто обновляем версию
+                with open(info_plist_path, 'r') as f:
+                    plist_content = f.read()
+                
+                plist_content = plist_content.replace('<string>0.0.0</string>', f'<string>{version}</string>')
+                
+                with open(info_plist_path, 'w') as f:
+                    f.write(plist_content)
+                
+                print(f"✅ Info.plist обновлен: версия {version}")
+            except Exception as e:
+                print(f"⚠️ Не удалось обновить Info.plist: {e}")
+        
+        # Копируем config.json в пользовательскую папку для обновления версии
+        try:
+            import os
+            user_config_dir = os.path.expanduser('~/Library/Application Support/VPNServerManager-Clean')
+            if os.path.exists(user_config_dir):
+                import shutil
+                project_config = PROJECT_ROOT / 'config.json'
+                user_config = os.path.join(user_config_dir, 'config.json')
+                if project_config.exists():
+                    shutil.copy2(project_config, user_config)
+                    print(f"✅ config.json обновлен в пользовательской папке (версия {version})")
+        except Exception as e:
+            print(f"⚠️ Не удалось обновить пользовательский config.json: {e}")
+    
     return True
 
 def create_app_bundle():
     """Создание .app бандла для macOS"""
-    app_name = "VPNServer"
+    app_name = "VPNServerManager-Clean"  # Изменено для избежания конфликтов
     
     # Проверяем, создалась ли папка с приложением
     app_dir = DIST_DIR / app_name
@@ -338,7 +404,7 @@ def create_app_bundle():
             # Проверяем и копируем иконку если её нет
             icon_path = app_path / "Contents" / "Resources" / "AppIcon.icns"
             if not icon_path.exists():
-                source_icon = PROJECT_ROOT / "static" / "images" / "icon.icns"
+                source_icon = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
                 if source_icon.exists():
                     shutil.copy2(source_icon, icon_path)
                     print(f"📁 Иконка скопирована: {source_icon}")
@@ -356,10 +422,19 @@ def create_app_bundle():
         # Копируем все файлы из папки приложения
         shutil.copytree(app_dir, app_macos / app_name, dirs_exist_ok=True)
         
+        # Создаем символическую ссылку на run.py для совместимости
+        run_py_link = app_macos / "run.py"
+        if not run_py_link.exists():
+            try:
+                os.symlink(app_name / "run.py", run_py_link)
+            except OSError:
+                # Если не удалось создать симлинк, копируем файл
+                shutil.copy2(app_dir / "run.py", run_py_link)
+        
         # Получаем версию из config.json
         version = get_version_from_config()
         
-        # Создаем Info.plist
+        # Создаем Info.plist с уникальным идентификатором
         info_plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -367,7 +442,7 @@ def create_app_bundle():
     <key>CFBundleExecutable</key>
     <string>{app_name}</string>
     <key>CFBundleIdentifier</key>
-    <string>com.vpnserver.app</string>
+    <string>com.vpnservermanager.clean.app</string>
     <key>CFBundleName</key>
     <string>{app_name}</string>
     <key>CFBundlePackageType</key>
@@ -389,7 +464,7 @@ def create_app_bundle():
             f.write(info_plist_content)
         
         # Копируем иконку если есть
-        icon_path = PROJECT_ROOT / "static" / "images" / "icon.icns"
+        icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
         if icon_path.exists():
             shutil.copy2(icon_path, app_resources / "AppIcon.icns")
             print(f"📁 Иконка скопирована: {icon_path}")
@@ -404,7 +479,7 @@ def create_app_bundle():
 
 def create_readme():
     """Создание файла README.txt с инструкциями"""
-    readme_content = """# VPN Server Manager
+    readme_content = """# VPN Server Manager Clean
 
 ## Важно: Первый запуск
 
@@ -419,7 +494,7 @@ def create_readme():
 ## Хранение данных
 
 Приложение автоматически сохраняет все данные в вашей пользовательской директории:
-~/Library/Application Support/VPNServer/
+~/Library/Application Support/VPNServerManager-Clean/
 
 В этой директории хранятся:
 - Файлы конфигурации
@@ -429,15 +504,20 @@ def create_readme():
 ## Резервное копирование
 
 Для создания резервной копии данных, сохраните директорию:
-~/Library/Application Support/VPNServer/
+~/Library/Application Support/VPNServerManager-Clean/
 
 ## Проблемы с запуском
 
 Если приложение не запускается, проверьте:
-1. Наличие файла .env с ключом шифрования
+1. Наличие файла env.example (шаблон для .env)
 2. Наличие прав доступа к директории данных
 
 Для технической поддержки обратитесь к разработчику.
+
+## Отличие от основного проекта
+
+Это версия "Clean" - упрощенная версия VPN Server Manager 
+с полной поддержкой интернационализации (английский, русский, китайский языки).
 """
     
     readme_path = DIST_DIR / "README.txt"
@@ -505,10 +585,10 @@ def diagnose_app(app_path):
     try:
         # Ищем исполняемый файл в разных возможных местах
         possible_executables = [
-            app_path / "Contents" / "MacOS" / "VPNServer" / "VPNServer",
-            app_path / "Contents" / "MacOS" / "VPNServer",
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean" / "VPNServerManager-Clean",
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean",
             app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServer.app" / "VPNServer"
+            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean.app" / "VPNServerManager-Clean"
         ]
         
         executable_path = None
@@ -556,13 +636,13 @@ def diagnose_app(app_path):
         print("⚠️ Иконка отсутствует")
     
     # Проверяем структуру приложения
-    app_dir = app_path / "Contents" / "MacOS" / "VPNServer"
+    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager-Clean"
     if not app_dir.exists():
         # Проверяем альтернативные пути
         alt_paths = [
             app_path / "Contents" / "MacOS",
             app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServer.app"
+            app_path / "Contents" / "MacOS" / "VPNServer-Clean.app"
         ]
         for alt_path in alt_paths:
             if alt_path.exists():
@@ -625,18 +705,18 @@ def get_version_from_config():
         if config_path.exists():
             with open(config_path, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-                return config.get('app_info', {}).get('version', '3.5.2')
+                return config.get('app_info', {}).get('version', '4.0.7')
         else:
             print("⚠️ config.json не найден, используем версию по умолчанию")
-            return '3.5.2'
+            return '4.0.7'
     except Exception as e:
         print(f"⚠️ Ошибка чтения config.json: {e}, используем версию по умолчанию")
-        return '3.5.2'
+        return '4.0.7'
 
 def main():
     """Основная функция сборки"""
     version = get_version_from_config()
-    print(f"🚀 Сборка VPN Server v{version}")
+    print(f"🚀 Сборка VPN Server Manager v{version}")
     print("=====================================")
     print(f"📁 Проект: {PROJECT_ROOT}")
     print(f"📦 Результат: {DIST_DIR}")
@@ -666,15 +746,20 @@ def main():
                 print("🎉 Инсталлятор создан успешно!")
                 print(f"📦 DMG файл: {dmg_path}")
                 print()
-                print("🔧 Особенности сборки:")
-                print("   ✅ Поддержка офлайн режима")
-                print("   ✅ Улучшенная обработка ошибок")
-                print("   ✅ Криптографические функции")
-                print("   ✅ PyWebView GUI")
-                print("   ✅ Flask веб-сервер")
-                print("   ✅ Шифрование данных")
-                print("   ✅ DMG инсталлятор")
-                print("   ✅ Иконка приложения")
+                print(f"🔧 Особенности сборки v{version}:")
+                print("   ✅ Централизованная версия из config.json")
+                print("   ✅ Multi-App Support (параллельный запуск)")
+                print("   ✅ Модульная архитектура")
+                print("   ✅ Application Factory Pattern")
+                print("   ✅ Service Layer (DataManagerService)")
+                print("   ✅ Blueprint Architecture")
+                print("   ✅ Dependency Injection")
+                print("   ✅ Custom Exceptions")
+                print("   ✅ Structured Logging")
+                print("   ✅ Comprehensive Testing")
+                print("   ✅ Docker Support")
+                print("   ✅ Security Enhancements")
+                print("   ✅ Modern Python Practices")
             else:
                 print("⚠️ Приложение создано, но DMG не создался")
                 print("Приложение доступно в папке dist/")

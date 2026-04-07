@@ -18,26 +18,29 @@
     {% if internet_available is defined %}
         <div class="d-flex justify-content-end mb-3">
             {% if internet_available %}
-                <span class="badge bg-success">
-                    <i class="bi bi-wifi"></i> Интернет доступен
+                <span class="badge bg-success" id="internet-status">
+                    <i class="bi bi-wifi"></i> {{ _('Интернет доступен') }}
                 </span>
             {% else %}
-                <span class="badge bg-warning text-dark">
-                    <i class="bi bi-wifi-off"></i> Нет интернета
+                <span class="badge bg-warning text-dark" id="internet-status">
+                    <i class="bi bi-wifi-off"></i> {{ _('Нет интернета') }}
                 </span>
             {% endif %}
+            <button class="btn btn-sm btn-outline-secondary ms-2" onclick="checkInternetStatus()" id="check-internet-btn" title="{{ _('Обновить статус интернета') }}">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
         </div>
     {% endif %}
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1>Список серверов</h1>
+            <h1>{{ _('Список серверов') }}</h1>
             <div class="btn-group" role="group">
-                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info">Тест IP</a>
-                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">Тест DNS</a>
+                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест IP') }}</a>
+                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест DNS') }}</a>
             </div>
         </div>
-        <a href="{{ url_for('add_server') }}" class="btn btn-primary">Добавить сервер</a>
+        <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
     </div>
 
     {% if not active_data_file and not servers %}
@@ -46,40 +49,40 @@
             <div class="mb-3">
                 <i class="bi bi-server display-1 text-muted"></i>
             </div>
-            <h5 class="card-title">Добро пожаловать в VPN Server Manager</h5>
+            <h5 class="card-title">{{ _('Добро пожаловать в VPN Server Manager') }}</h5>
             <p class="card-text">
                 {% if internet_available is defined and not internet_available %}
-                    <strong>Режим офлайн:</strong> Интернет недоступен, но вы можете работать с локальными данными.
+                    <strong>{{ _('Режим офлайн:') }}</strong> {{ _('Интернет недоступен, но вы можете работать с локальными данными.') }}
                 {% else %}
-                    Вы можете начать с добавления вашего первого сервера или импортировать существующие данные.
+                    {{ _('Вы можете начать с добавления вашего первого сервера или импортировать существующие данные.') }}
                 {% endif %}
             </p>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                 <a href="{{ url_for('add_server') }}" class="btn btn-primary btn-lg px-4 gap-3">
-                    <i class="bi bi-plus-circle"></i> Добавить первый сервер
+                 <a href="{{ url_for('main.add_server') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="bi bi-plus-circle"></i> {{ _('Добавить первый сервер') }}
                 </a>
-                <a href="{{ url_for('settings_page') }}" class="btn btn-outline-secondary btn-lg px-4">
-                    <i class="bi bi-upload"></i> Импортировать данные
+                <a href="{{ url_for('main.settings') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="bi bi-upload"></i> {{ _('Импортировать данные') }}
                 </a>
             </div>
         </div>
         <div class="card-footer text-muted">
             {% if internet_available is defined and not internet_available %}
-                <i class="bi bi-info-circle"></i> Работа в офлайн режиме
+                <i class="bi bi-info-circle"></i> {{ _('Работа в офлайн режиме') }}
             {% else %}
-                Все данные будут сохранены в зашифрованный файл.
+                {{ _('Все данные будут сохранены в зашифрованный файл.') }}
             {% endif %}
         </div>
     </div>
     {% elif servers %}
-    <div class="row" id="server-list">
+    <div class="row">
         {% for server in servers %}
-        <div class="col-md-6 col-lg-6 mb-4 server-card-container" data-id="{{ server.id }}" tabindex="0">
+        <div class="col-md-6 col-lg-6 mb-4">
             <div class="card h-100">
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
                     <h5 class="card-title mb-0 d-flex align-items-center">
                         {% if server.icon_filename %}
-                            <img src="{{ url_for('uploaded_file', filename=server.icon_filename) }}" 
+                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" 
                                  alt="icon" 
                                  class="me-2" 
                                  style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;"
@@ -100,16 +103,16 @@
                 <div class="card-body p-3">
                     <div class="row text-center border-bottom pb-3 mb-2">
                         <div class="col">
-                            <small class="text-muted">Стоимость</small>
+                            <small class="text-muted">{{ _('Стоимость') }}</small>
                             <div><strong>{{ "%.2f"|format(server.payment_info.amount) }} {{ server.payment_info.currency }}</strong></div>
-                            <small>{{ server.payment_info.get('payment_period', 'N/A') }}</small>
+                            <small>{{ server.payment_info.get('payment_period', _('N/A')) }}</small>
                         </div>
                         <div class="col">
-                            <small class="text-muted">След. платёж</small>
+                            <small class="text-muted">{{ _('След. платёж') }}</small>
                             <div><strong>{{ server.payment_info.formatted_date }}</strong></div>
                         </div>
                         <div class="col">
-                            <small class="text-muted">Статус</small>
+                            <small class="text-muted">{{ _('Статус') }}</small>
                             <div>
                                 {% set status_color = {
                                     'Active': 'success', 
@@ -125,50 +128,51 @@
 
                     <div class="row text-center small border-bottom pb-2 mb-2">
                         <div class="col">
-                            <span class="badge bg-{{ server.hosting_analysis.quality }}">{{ server.hosting_analysis.text }}</span>
+                            {% set analysis = server.get('hosting_analysis', {}) %}
+                            <span class="badge bg-{{ analysis.get('quality', 'secondary') }}">{{ analysis.get('text', 'N/A') }}</span>
                         </div>
                         <div class="col">
-                             {% if server.checks.get('dns_ok') %}
-                                <span class="badge bg-success">DNS OK</span>
+                             {% if server.get('checks', {}).get('dns_ok') %}
+                                <span class="badge bg-success">{{ _('DNS OK') }}</span>
                             {% else %}
-                                <span class="badge bg-warning text-dark">DNS ?</span>
+                                <span class="badge bg-warning text-dark">{{ _('DNS ?') }}</span>
                             {% endif %}
                         </div>
                         <div class="col">
-                             {% if server.checks.get('streaming_ok') %}
-                                <span class="badge bg-success">Стриминг OK</span>
+                             {% if server.get('checks', {}).get('streaming_ok') %}
+                                <span class="badge bg-success">{{ _('Стриминг OK') }}</span>
                             {% else %}
-                                <span class="badge bg-warning text-dark">Стриминг ?</span>
+                                <span class="badge bg-warning text-dark">{{ _('Стриминг ?') }}</span>
                             {% endif %}
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mb-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="Требуется интернет"{% endif %}>
-                            <i class="bi bi-search"></i> Проверить IP
+                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="{{ _('Требуется интернет') }}"{% endif %}>
+                            <i class="bi bi-search"></i> {{ _('Проверить IP') }}
                         </button>
-                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="Требуется интернет"{% endif %}>
-                            <i class="bi bi-building"></i> Владелец IP
+                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="{{ _('Требуется интернет') }}"{% endif %}>
+                            <i class="bi bi-building"></i> {{ _('Владелец IP') }}
                         </a>
-                        </div> <!-- Закрываем .d-grid gap-2 mb-2 -->
+                    </div>
 
                     <div class="accordion accordion-flush" id="accordion-{{ server.id }}">
                         <!-- Блок Кабинет хостера -->
                         {% if server.hoster_url or server.hoster_credentials.user_decrypted %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-hoster-{{ server.id }}">Кабинет хостера</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-hoster-{{ server.id }}">{{ _('Кабинет хостера') }}</button>
                             </h2>
                             <div id="collapse-hoster-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     
                                     {% if server.hoster_credentials.login_method != 'password' %}
-                                        <p class="text-center my-1 small">Вход через <strong>{{ server.hoster_credentials.login_method|capitalize }}</strong></p>
+                                        <p class="text-center my-1 small">{{ _('Вход через') }} <strong>{{ server.hoster_credentials.login_method|capitalize }}</strong></p>
                                     {% endif %}
 
                                     {% if server.hoster_credentials.user_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>{{ 'Email' if server.hoster_credentials.login_method != 'password' else 'Логин' }}:</small>
+                                        <small>{{ _('Email') if server.hoster_credentials.login_method != 'password' else _('Логин') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.hoster_credentials.user_decrypted }}</span>
                                             <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.user_decrypted }}')"><i class="bi bi-clipboard"></i></button>
@@ -178,18 +182,18 @@
 
                                     {% if server.hoster_credentials.login_method == 'password' and server.hoster_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.hoster_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.hoster_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
 
                                     {% if server.hoster_url %}
                                     <div class="d-grid mt-2">
-                                        <a href="{{ server.hoster_url }}" target="_blank" class="btn btn-sm btn-outline-primary">Перейти в кабинет</a>
+                                        <a href="{{ server.hoster_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в кабинет') }}</a>
                                     </div>
                                     {% endif %}
                                 </div>
@@ -200,53 +204,53 @@
                         <!-- Блок SSH -->
                         <div class="accordion-item">
                              <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ssh-{{ server.id }}">SSH-доступ</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ssh-{{ server.id }}">{{ _('SSH-доступ') }}</button>
                             </h2>
                             <div id="collapse-ssh-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     <div class="text-center mb-2">
-                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать SSH команду подключения">
-                                            <i class="bi bi-terminal"></i> Копировать команду
+                                        <button class="btn btn-sm btn-outline-success w-100" data-ssh-command="ssh {{ server.ssh_credentials.user }}@{{ server.ip_address }} -p {{ server.ssh_credentials.get('port', 22) }}" onclick="copyToClipboard(this, this.getAttribute('data-ssh-command'))" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать SSH команду подключения') }}">
+                                            <i class="bi bi-terminal"></i> {{ _('Копировать команду') }}
                                         </button>
                                     </div>
-                                    <h6 class="text-muted small">Пользователь</h6>
+                                    <h6 class="text-muted small">{{ _('Пользователь') }}</h6>
                                     {% if server.ssh_credentials.user %}
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Login:</small>
+                                        <small>{{ _('Login') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.ssh_credentials.user }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.user }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать логин') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.ssh_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     
                                     <hr class="my-2">
-                                    <h6 class="text-muted small">Root</h6>
+                                    <h6 class="text-muted small">{{ _('Root') }}</h6>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Вход по SSH:</small>
+                                        <small>{{ _('Вход по SSH') }}:</small>
                                         {% if server.ssh_credentials.get('root_login_allowed') %}
-                                            <span class="badge bg-success">Разрешен</span>
+                                            <span class="badge bg-success">{{ _('Разрешен') }}</span>
                                         {% else %}
-                                            <span class="badge bg-danger">Запрещен</span>
+                                            <span class="badge bg-danger">{{ _('Запрещен') }}</span>
                                         {% endif %}
                                     </div>
                                      {% if server.ssh_credentials.root_password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.ssh_credentials.root_password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.ssh_credentials.root_password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
@@ -258,44 +262,44 @@
                          {% if server.panel_url or server.panel_credentials.user_decrypted %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-panel-{{ server.id }}">Панель (3x-ui)</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-panel-{{ server.id }}">{{ _('Панель (3x-ui)') }}</button>
                             </h2>
                             <div id="collapse-panel-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
                                     {% if server.panel_credentials.user_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small>Логин:</small>
+                                        <small>{{ _('Логин') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm text-truncate">{{ server.panel_credentials.user_decrypted }}</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать логин"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.user_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать логин') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.panel_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <small>Пароль:</small>
+                                        <small>{{ _('Пароль') }}:</small>
                                         <div class="input-group input-group-sm w-auto">
                                             <span class="form-control form-control-sm password-field" data-password="{{ server.panel_credentials.password_decrypted }}">********</span>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="Показать/скрыть пароль"><i class="bi bi-eye"></i></button>
-                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="Копировать пароль"><i class="bi bi-clipboard"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword(this)" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Показать/скрыть пароль') }}"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, '{{ server.panel_credentials.password_decrypted }}')" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ _('Копировать пароль') }}"><i class="bi bi-clipboard"></i></button>
                                         </div>
                                     </div>
                                     {% endif %}
                                     {% if server.panel_url %}
                                      <div class="d-grid mt-2">
-                                        <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">Перейти в панель</a>
+                                        <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в панель') }}</a>
                                     </div>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
                         {% endif %}
-                        
+
                         <!-- Блок Дополнительная информация -->
                         {% if server.get('docker_info') %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-info-{{ server.id }}">Информация</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-info-{{ server.id }}">{{ _('Информация') }}</button>
                             </h2>
                             <div id="collapse-info-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
@@ -306,12 +310,12 @@
                             </div>
                         </div>
                         {% endif %}
-                        
+
                         <!-- Блок Установленное ПО -->
                         {% if server.get('software_info') %}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-software-{{ server.id }}">Установленное ПО</button>
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-software-{{ server.id }}">{{ _('Установленное ПО') }}</button>
                             </h2>
                             <div id="collapse-software-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
@@ -325,15 +329,18 @@
                     </div>
                 </div>
                 <div class="card-footer d-flex justify-content-between">
-                    <a href="{{ url_for('edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
-                        <i class="bi bi-pencil-square"></i> Редактировать
+                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
+                        <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
                     </a>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary btn-show-stats" type="button" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
-                            <i class="bi bi-activity"></i> Статус
+                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
+                            <i class="bi bi-activity"></i> {{ _('Статус') }}
                         </button>
-                        <form action="{{ url_for('delete_server', server_id=server.id) }}" method="post" onsubmit="return confirm('Вы уверены, что хотите удалить этот сервер?');">
-                            <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
+                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-bar-chart-line"></i> {{ _('Мониторинг') }}
+                        </a>
+                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
+                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
                         </form>
                     </div>
                 </div>
@@ -343,7 +350,7 @@
     </div>
     {% else %}
     <div class="alert alert-secondary text-center" role="alert">
-        Серверов пока нет. <a href="{{ url_for('add_server') }}" class="alert-link">Добавьте первый</a> или <a href="{{ url_for('settings_page') }}" class="alert-link">импортируйте данные</a>.
+        {{ _('Серверов пока нет.') }} <a href="{{ url_for('main.add_server') }}" class="alert-link">{{ _('Добавьте первый') }}</a> {{ _('или') }} <a href="{{ url_for('main.settings') }}" class="alert-link">{{ _('импортируйте данные') }}</a>.
     </div>
     {% endif %}
 </div>
@@ -353,7 +360,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="ipInfoModalLabel">Информация об IP</h5>
+        <h5 class="modal-title" id="ipInfoModalLabel">{{ _('Информация об IP') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -362,109 +369,192 @@
     </div>
   </div>
 </div>
+
+<!-- Модальное окно статуса сервера -->
+<div class="modal fade" id="serverStatusModal" tabindex="-1" aria-hidden="true" 
+     data-title-status="{{ _('Статус сервера') }}" 
+     data-title-status-with-colon="{{ _('Статус сервера:') }}"
+     data-docker-size-tooltip="{{ _('0B=изменяемый слой; virtual=размер образа') }}"
+     data-docker-size-short="{{ _('0B=измен., virtual=образ') }}"
+     data-inodes-header-mount="{{ _('Точка') }}"
+     data-inodes-header-total="{{ _('Всего') }}"
+     data-inodes-header-used="{{ _('Исп.') }}"
+     data-inodes-header-percent="%"
+     data-docker-yes="{{ _('есть') }}"
+     data-docker-no="{{ _('нет') }}"
+     data-docker-running="{{ _('running:') }}">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title d-flex align-items-center">
+            <i class="bi bi-activity me-2"></i> 
+            <span id="statusServerTitle">{{ _('Статус сервера') }}</span>
+            <span id="statusServerName" class="ms-2 fw-bold"></span>
+            <span id="statusServerIp" class="ms-1 text-muted"></span>
+        </h5>
+        <div class="ms-auto d-flex align-items-center">
+            <small id="uptime-header" class="text-muted me-2"></small>
+            <small id="lastUpdatedLabel" class="text-muted me-2"></small>
+            <div id="refreshSpin" class="spinner-border spinner-border-sm d-none" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="statsLoading" class="text-center my-3">
+          <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
+          <div class="mt-2">{{ _('Загрузка...') }}</div>
+        </div>
+        <div id="statsWarning" class="alert alert-warning d-none"></div>
+        <div id="statsContent" class="d-none">
+          <div class="row">
+            <!-- Top Row -->
+            <div class="col-lg-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <!-- CPU -->
+                  <h5>CPU</h5>
+                  <div class="progress mb-2" style="height: 5px;">
+                    <div id="cpu-used-thin-bar" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+                  </div>
+                  <div id="cpu-info" class="mb-3">
+                    <div class="d-flex justify-content-between small"><span>Cores:</span><strong id="cpu-cores"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Kernel:</span><strong id="cpu-kernel"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">OS:</span><strong id="os-name"></strong></div>
+                  </div>
+                  <hr>
+                  <!-- Memory -->
+                  <h5 class="mt-3">Memory</h5>
+                  <div class="progress mb-2" style="height: 20px;">
+                    <div id="mem-used-bar" class="progress-bar" role="progressbar" style="width: 0%;">0%</div>
+                  </div>
+                   <div id="mem-info-2" class="mt-2">
+                    <div class="d-flex justify-content-between small"><span>Used/Total:</span><strong id="mem-used"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Load:</span><strong id="load-avg"></strong></div>
+                    <div class="d-flex justify-content-between small"><span class="text-muted">Swap:</span><strong id="swap-used"></strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5>Storage</h5>
+                        <div id="disks-list"></div>
+                        <div id="inodes-table" class="mt-2 table-responsive"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body">
+                  <h5>Summary</h5>
+                  <div id="summary-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Full-width rows -->
+            <div class="col-12 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5>Processes (Top by CPU)</h5>
+                  <div id="proc-table" class="table-responsive"></div>
+                </div>
+              </div>
+            </div>
+             <div class="col-12 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="d-flex justify-content-between">
+                    <span>Networks</span>
+                    <small id="docker-version" class="text-muted"></small>
+                  </h5>
+                  <ul id="net-list" class="list-group list-group-flush"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 mb-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 title="Запущенные Docker контейнеры">Docker containers</h5>
+                  <div id="docker-table" class="table-responsive"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Закрыть') }}</button>
+        <button type="button" class="btn btn-primary" id="saveStatusImageBtn">{{ _('Сохранить как PNG') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/Sortable.min.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- Drag and Drop (SortableJS) ---
-        var el = document.getElementById('server-list');
-        if (el) {
-            var sortable = Sortable.create(el, {
-                animation: 150,
-                ghostClass: 'bg-light',
-                handle: '.card-header', // Drag handle
-                onEnd: function (evt) {
-                    saveNewOrder();
-                }
-            });
-        }
-
-        // --- Keyboard Navigation ---
-        const serverCards = document.querySelectorAll('.server-card-container');
-        serverCards.forEach(card => {
-            card.addEventListener('keydown', function(e) {
-                const currentCard = e.currentTarget;
-                const parent = currentCard.parentNode;
-                const allCards = Array.from(parent.children);
-                const currentIndex = allCards.indexOf(currentCard);
-                
-                let targetIndex = -1;
-
-                if (e.key === 'ArrowRight') {
-                    targetIndex = currentIndex + 1;
-                } else if (e.key === 'ArrowLeft') {
-                    targetIndex = currentIndex - 1;
-                } else if (e.key === 'ArrowDown') {
-                    // Assuming 2 columns on md/lg screens as per 'col-md-6'
-                    // This is a simple approximation. For robust grid Nav, more complex logic is needed.
-                    // But 'col-md-6' implies 2 columns.
-                   targetIndex = currentIndex + 2;
-                } else if (e.key === 'ArrowUp') {
-                   targetIndex = currentIndex - 2;
-                }
-
-                if (targetIndex >= 0 && targetIndex < allCards.length && (e.key.startsWith('Arrow'))) {
-                    e.preventDefault();
-                    
-                    // Swap logic
-                    const targetCard = allCards[targetIndex];
-                    
-                    // If moving right or down (forward in DOM)
-                    if (targetIndex > currentIndex) {
-                        parent.insertBefore(currentCard, targetCard.nextSibling);
-                    } else {
-                        // Moving left or up (backward in DOM)
-                        parent.insertBefore(currentCard, targetCard);
-                    }
-                    
-                    // Re-focus the moved card
-                    currentCard.focus();
-                    
-                    saveNewOrder();
-                }
-            });
-        });
-
-        function saveNewOrder() {
-            const allCards = document.querySelectorAll('.server-card-container');
-            const order = Array.from(allCards).map(c => parseInt(c.getAttribute('data-id')));
-            
-            fetch('/servers/reorder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ order: order })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Optional: show a small toast/check
-                    console.log('Order saved');
-                } else {
-                    console.error('Failed to save order:', data.message);
-                }
-            })
-            .catch(error => {
-               console.error('Error saving order:', error);
-            });
-        }
-    });
-
     // Инициализация tooltips при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+        
+        // Инициализируем tooltip для кнопки проверки интернета
+        new bootstrap.Tooltip(document.getElementById('check-internet-btn'));
     });
+
+    // Функция для проверки статуса интернета
+    function checkInternetStatus() {
+        const statusBadge = document.getElementById('internet-status');
+        const checkButton = document.getElementById('check-internet-btn');
+        
+        // Показываем индикатор загрузки
+        checkButton.disabled = true;
+        checkButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        
+        // Отправляем запрос на проверку интернета
+        fetch('/check_internet_status')
+            .then(response => response.json())
+            .then(data => {
+                // Обновляем индикатор статуса
+                if (data.available) {
+                    statusBadge.className = 'badge bg-success';
+                    statusBadge.innerHTML = '<i class="bi bi-wifi"></i> {{ _("Интернет доступен") }}';
+                } else {
+                    statusBadge.className = 'badge bg-warning text-dark';
+                    statusBadge.innerHTML = '<i class="bi bi-wifi-off"></i> {{ _("Нет интернета") }}';
+                }
+                
+                // Добавляем временную метку
+                const timestamp = document.createElement('small');
+                timestamp.className = 'ms-1 text-muted';
+                timestamp.textContent = `(${data.timestamp})`;
+                statusBadge.appendChild(timestamp);
+                
+                // Восстанавливаем кнопку
+                checkButton.disabled = false;
+                checkButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            })
+            .catch(error => {
+                console.error('Ошибка при проверке интернета:', error);
+                statusBadge.className = 'badge bg-danger';
+                statusBadge.innerHTML = '<i class="bi bi-exclamation-triangle"></i> {{ _("Ошибка проверки") }}';
+                
+                // Восстанавливаем кнопку
+                checkButton.disabled = false;
+                checkButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+            });
+    }
 
     function checkIpInfo(ipAddress) {
         const modal = new bootstrap.Modal(document.getElementById('ipInfoModal'));
         const content = document.getElementById('ipInfoContent');
-        content.textContent = 'Загрузка...';
+        content.textContent = '{{ _("Загрузка...") }}';
         modal.show();
 
         fetch(`/check_ip/${ipAddress}`)
@@ -473,7 +563,7 @@
                 content.textContent = JSON.stringify(data, null, 2);
             })
             .catch(error => {
-                content.textContent = 'Ошибка при загрузке данных: ' + error;
+                content.textContent = '{{ _("Ошибка при загрузке данных:") }} ' + error;
             });
     }
 
@@ -485,7 +575,7 @@
                 button.innerHTML = originalIcon;
             }, 1500);
         }).catch(err => {
-            console.error('Ошибка копирования: ', err);
+            console.error('{{ _("Ошибка копирования:") }} ', err);
         });
     }
 
@@ -504,370 +594,498 @@
             eyeIcon.classList.add('bi-eye');
         }
     }
+</script>
+<script>
+    // Логика модалки статуса сервера
+    var statusIntervalId = null;
+    var consecutiveErrors = 0;
+    var maxConsecutiveErrors = 3;
+    var currentServerId = null;
 
-    // Делегирование клика, чтобы избежать синтаксических конфликтов в шаблоне
     document.addEventListener('click', function(e){
-        var btn = e.target.closest && e.target.closest('.btn-show-stats');
-        if (!btn) return;
-        var sid = parseInt(btn.getAttribute('data-server-id'), 10);
-        if (!sid) return;
-        showServerStats(sid, btn.getAttribute('data-server-name') || '', btn.getAttribute('data-server-ip') || '');
+        var target = e.target;
+        if (target.classList && target.classList.contains('btn-show-stats')) {
+            var sid = target.getAttribute('data-server-id');
+            var sname = target.getAttribute('data-server-name');
+            var sip = target.getAttribute('data-server-ip');
+            setStatusHeaderInfo(sname, sip);
+            openStatsModal(sid);
+        } else if (target.closest && target.closest('.btn-show-stats')) {
+            var btn = target.closest('.btn-show-stats');
+            var sid2 = btn.getAttribute('data-server-id');
+            setStatusHeaderInfo(btn.getAttribute('data-server-name'), btn.getAttribute('data-server-ip'));
+            openStatsModal(sid2);
+        }
     });
 
-    function showServerStats(serverId, serverName, serverIp) {
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.innerHTML = `
-            <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title"><i class="bi bi-activity"></i> Статус сервера <span id="statusServerName" class="text-muted ms-1 ${serverName? '' : 'd-none'}"></span> <small id="statusServerIp" class="text-muted ms-1 ${serverIp? '' : 'd-none'}"></small></h5>
-                        <div class="ms-auto small text-muted">
-                            <span id="lastUpdatedLabel"></span>
-                            <span id="refreshSpin" class="spinner-border spinner-border-sm ms-2 d-none" role="status" aria-hidden="true"></span>
-                        </div>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body text-center text-muted">
-                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                        Загрузка…
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="button" class="btn btn-primary" id="saveStatusImageBtn">Сохранить как PNG</button>
-                    </div>
-                </div>
-            </div>`;
-        document.body.appendChild(modal);
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
+    function setStatusHeaderInfo(name, ip) {
+        var nameEl = document.getElementById('statusServerName');
+        var ipEl = document.getElementById('statusServerIp');
+        var titleEl = document.getElementById('statusServerTitle');
+        var uptimeEl = document.getElementById('uptime-header');
 
-        let refreshTimer = null;
-
-        // set header info
-        try {
-            var nameEl = modal.querySelector('#statusServerName');
-            var ipEl = modal.querySelector('#statusServerIp');
-            if (nameEl && serverName) nameEl.textContent = serverName;
-            if (ipEl && serverIp) ipEl.textContent = '(' + serverIp + ')';
-        } catch(_) {}
-
-        function ensureHtml2CanvasLoaded(cb){
-            if (window.html2canvas) { cb && cb(); return; }
-            var s = document.createElement('script');
-            s.src = '/vendor/html2canvas.min.js';
-            s.onload = function(){ cb && cb(); };
-            document.head.appendChild(s);
+        if (name && nameEl) { 
+            nameEl.textContent = name;
+        } else if (nameEl) {
+            nameEl.textContent = '';
+        }
+        
+        if (ip && ipEl) { 
+            ipEl.textContent = '(' + ip + ')';
+        } else if (ipEl) {
+            ipEl.textContent = '';
+        }
+        
+        // Показываем "Статус сервера", если нет имени
+        if (titleEl) {
+            var modalEl = document.getElementById('serverStatusModal');
+            var titleWithColon = modalEl.getAttribute('data-title-status-with-colon');
+            var titleSimple = modalEl.getAttribute('data-title-status');
+            titleEl.textContent = name ? titleWithColon : titleSimple;
         }
 
-        function captureStatusModal(){
-            var modalEl = modal;
-            if (!modalEl) return;
-            var content = modalEl.querySelector('.modal-content');
-            if (!content) return;
-            // Pause auto refresh and hide spinners to avoid animation artifacts
-            var prevTimer = refreshTimer;
-            try { if (refreshTimer) { clearInterval(refreshTimer); refreshTimer = null; } } catch(_) {}
-            var spin = modalEl.querySelector('#refreshSpin');
-            var prevSpinDisplay = spin ? spin.style.display : '';
-            if (spin) spin.style.display = 'none';
-            var dialog = modalEl.querySelector('.modal-dialog');
-            var bodyEl = modalEl.querySelector('.modal-body');
-            var hadScrollable = dialog && dialog.classList.contains('modal-dialog-scrollable');
-            var prevDialogOverflow = dialog ? dialog.style.overflow : '';
-            var prevBodyMaxH = bodyEl ? bodyEl.style.maxHeight : '';
-            var prevBodyOverflow = bodyEl ? bodyEl.style.overflow : '';
-            if (dialog && hadScrollable) { dialog.classList.remove('modal-dialog-scrollable'); }
-            if (dialog) { dialog.style.overflow = 'visible'; }
-            if (bodyEl) { bodyEl.style.maxHeight = 'none'; bodyEl.style.overflow = 'visible'; bodyEl.scrollTop = 0; }
-            setTimeout(function(){
-                var scale = Math.max(2, (window.devicePixelRatio||1));
-                var prevTransform = content.style.transform;
-                content.style.transform = 'scale(1)';
-                var fullHeight = content.scrollHeight;
-                window.html2canvas(content, { backgroundColor: null, scale: scale, height: fullHeight, windowHeight: fullHeight })
-                    .then(function(canvas){
-                        content.style.transform = prevTransform || '';
-                        if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
-                        if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
-                        if (spin) spin.style.display = prevSpinDisplay;
-                        // resume timer
-                        try { if (!refreshTimer && prevTimer) { refreshTimer = setInterval(fetchAndRender, 30000); } } catch(_) {}
-                        var dataUrl = canvas.toDataURL('image/png');
-                        fetch('/snapshot/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data_url: dataUrl }) })
-                            .then(function(r){ return r.json(); })
-                            .then(function(resp){
-                                if (resp && resp.success) {
-                                    alert('PNG сохранён: ' + resp.filename + '\nПапка: ' + resp.dir);
-                                } else {
-                                    var a=document.createElement('a');
-                                    a.download='server_status.png';
-                                    a.href=dataUrl;
-                                    a.target='_blank';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    setTimeout(function(){ try{ document.body.removeChild(a); }catch(_){} }, 100);
-                                    try { window.open(dataUrl, '_blank'); } catch(_) {}
-                                }
-                            })
-                            .catch(function(){
-                                var a=document.createElement('a');
-                                a.download='server_status.png';
-                                a.href=dataUrl;
-                                a.target='_blank';
-                                document.body.appendChild(a);
-                                a.click();
-                                setTimeout(function(){ try{ document.body.removeChild(a); }catch(_){} }, 100);
-                                try { window.open(dataUrl, '_blank'); } catch(_) {}
-                            });
-                    })
-                    .catch(function(err){
-                        if (dialog) { if (hadScrollable) dialog.classList.add('modal-dialog-scrollable'); dialog.style.overflow = prevDialogOverflow; }
-                        if (bodyEl) { bodyEl.style.maxHeight = prevBodyMaxH; bodyEl.style.overflow = prevBodyOverflow; }
-                        if (spin) spin.style.display = prevSpinDisplay;
-                        // resume timer on error as well
-                        try { if (!refreshTimer && prevTimer) { refreshTimer = setInterval(fetchAndRender, 30000); } } catch(_) {}
-                        console.error('html2canvas error', err);
-                        alert('Не удалось сохранить изображение');
-                    });
-            }, 50);
+        if (uptimeEl) {
+            uptimeEl.textContent = ''; // Очищаем предыдущее содержимое
         }
+    }
 
-        modal.addEventListener('click', function(e){
-            if (e.target && e.target.id === 'saveStatusImageBtn'){
-                ensureHtml2CanvasLoaded(captureStatusModal);
+    function openStatsModal(serverId) {
+        currentServerId = serverId;
+        consecutiveErrors = 0;
+        var modalEl = document.getElementById('serverStatusModal');
+        var modal = new bootstrap.Modal(modalEl);
+        // Reset UI
+        document.getElementById('statsLoading').classList.remove('d-none');
+        document.getElementById('statsContent').classList.add('d-none');
+        var warn = document.getElementById('statsWarning');
+        warn.classList.add('d-none');
+        warn.innerHTML = ''; // Очищаем содержимое
+        modal.show();
+        fetchAndRender();
+        // setup auto-refresh every 30s
+        if (statusIntervalId) { clearInterval(statusIntervalId); }
+        statusIntervalId = setInterval(fetchAndRender, 30000);
+
+        // stop timer on hide
+        function onHidden(){
+            if (statusIntervalId) { clearInterval(statusIntervalId); }
+            statusIntervalId = null;
+            currentServerId = null;
+            modalEl.removeEventListener('hidden.bs.modal', onHidden);
+        }
+        modalEl.addEventListener('hidden.bs.modal', onHidden);
+    }
+
+    function bytesToHuman(num) {
+        var units = ['B','KB','MB','GB','TB'];
+        var i = 0;
+        var n = Number(num) || 0;
+        while (n >= 1024 && i < units.length - 1) { n = n / 1024; i++; }
+        return (Math.round(n * 10) / 10) + ' ' + units[i];
+    }
+
+    function fetchAndRender() {
+        if (!currentServerId) return;
+        var spin = document.getElementById('refreshSpin');
+        if (spin) spin.classList.remove('d-none');
+        fetch('/api/server/' + currentServerId + '/stats?timeout=10')
+            .then(function(r){
+                // Проверяем статус ответа
+                if (r.status === 302 || r.status === 401) {
+                    throw new Error('{{ _("Сессия истекла. Пожалуйста, войдите заново.") }}');
+                }
+                if (!r.ok) {
+                    throw new Error('HTTP ' + r.status + ': ' + r.statusText);
+                }
+                return r.json();
+            })
+            .then(function(data){
+                if (!data || data.error) {
+                    consecutiveErrors += 1;
+                    showWarning(data && data.error ? data.error : '{{ _("Неизвестная ошибка") }}');
+                    if (consecutiveErrors >= maxConsecutiveErrors) {
+                        if (statusIntervalId) { clearInterval(statusIntervalId); }
+                        statusIntervalId = null;
+                    }
+                    return;
+                }
+                consecutiveErrors = 0;
+                renderStats(data.stats || {});
+                var label = document.getElementById('lastUpdatedLabel');
+                if (label) {
+                    var now = new Date();
+                    label.textContent = now.toLocaleTimeString();
+                }
+            })
+            .catch(function(err){
+                consecutiveErrors += 1;
+                var errorMsg = err.message || err.toString();
+                showWarning('{{ _("Ошибка") }}: ' + errorMsg);
+                if (consecutiveErrors >= maxConsecutiveErrors) {
+                    if (statusIntervalId) { clearInterval(statusIntervalId); }
+                    statusIntervalId = null;
+                }
+            })
+            .finally(function(){ if (spin) spin.classList.add('d-none'); });
+    }
+
+    function showWarning(text) {
+        var warn = document.getElementById('statsWarning');
+        warn.textContent = text;
+        warn.classList.remove('d-none');
+    }
+
+    function truncateMount(m, len) {
+        var a_len = len || 15;
+        if (!m) return '';
+        if (m.length <= a_len) return m;
+        return m.slice(0, a_len) + '…';
+    }
+
+    function renderStats(stats) {
+        document.getElementById('statsLoading').classList.add('d-none');
+        document.getElementById('statsContent').classList.remove('d-none');
+
+        // Header Uptime
+        document.getElementById('uptime-header').textContent = 'Uptime: ' + (stats.uptime || '');
+
+        // CPU
+        var usedPct = Number((stats.cpu && stats.cpu.used_pct) || 0);
+        var usedBar = document.getElementById('cpu-used-thin-bar');
+        usedBar.style.width = usedPct + '%';
+        // usedBar.textContent = usedPct.toFixed(1) + '%'; // Текст не нужен для тонкой полосы
+        usedBar.classList.remove('bg-success','bg-warning','bg-danger');
+        usedBar.classList.add(usedPct < 50 ? 'bg-success' : (usedPct < 80 ? 'bg-warning' : 'bg-danger'));
+        document.getElementById('cpu-cores').textContent = (stats.cpu && stats.cpu.cores) || 0;
+        document.getElementById('cpu-kernel').textContent = (stats.cpu && stats.cpu.kernel) || '';
+        document.getElementById('os-name').textContent = stats.os || '';
+
+        // Memory
+        var mem = stats.mem || {};
+        var memPct = Number(mem.used_pct || 0);
+        document.getElementById('mem-used').textContent = `${mem.used_mb || 0}MB (${memPct.toFixed(1)}%) / ${mem.total_mb || 0}MB`;
+        var memBar = document.getElementById('mem-used-bar');
+        memBar.style.width = memPct + '%';
+        memBar.textContent = memPct.toFixed(1) + '%';
+        memBar.classList.remove('bg-info','bg-warning','bg-danger');
+        memBar.classList.add(memPct < 70 ? 'bg-info' : (memPct < 90 ? 'bg-warning' : 'bg-danger'));
+        var swap = stats.swap || {};
+        document.getElementById('swap-used').textContent = (swap.used_mb || 0) + ' / ' + (swap.total_mb || 0) + ' MB (' + (swap.used_pct || 0) + '%)';
+        var load = stats.load || {};
+        document.getElementById('load-avg').textContent = (load['1m'] || '-') + ', ' + (load['5m'] || '-') + ', ' + (load['15m'] || '-');
+
+        // Summary
+        var summaryEl = document.getElementById('summary-list');
+        var docker = stats.docker || {};
+        var statusModal = document.getElementById('serverStatusModal');
+        var dockerYes = statusModal.getAttribute('data-docker-yes');
+        var dockerNo = statusModal.getAttribute('data-docker-no');
+        var dockerRunning = statusModal.getAttribute('data-docker-running');
+        var dockerStatus = docker.present ? (dockerYes + ', ' + dockerRunning + ' ' + (docker.running || 0)) : dockerNo;
+        var containerNames = (docker.names || []).join(', ');
+        summaryEl.innerHTML = `
+            <div class="d-flex justify-content-between small"><span>Uptime:</span><strong>${stats.uptime || ''}</strong></div>
+            <div class="d-flex justify-content-between small"><span>OS:</span><strong class="text-end">${stats.os || '-'}</strong></div>
+            <div class="d-flex justify-content-between small" title="${stats.cpu.kernel || ''}"><span class="text-muted">Kernel:</span><strong class="text-end text-truncate" style="max-width: 60%;">${stats.cpu.kernel || '-'}</strong></div>
+            <div class="d-flex justify-content-between small"><span>CPU Cores:</span><strong>${stats.cpu.cores || '-'}</strong></div>
+            <div class="d-flex justify-content-between small"><span>Docker:</span><strong>${dockerStatus}</strong></div>
+            <div class="d-flex justify-content-between small" title="${docker.version || ''}"><span>Version:</span><strong class="text-end text-truncate" style="max-width: 60%;">${docker.version || '-'}</strong></div>
+            ${containerNames ? `<div class="d-flex justify-content-between small" title="${containerNames}"><span>Containers:</span><strong class="text-end text-truncate" style="max-width: 60%;">${containerNames}</strong></div>` : ''}
+        `;
+        document.getElementById('docker-version').textContent = docker.version || '';
+
+
+        // Networks + RX/TX badges
+        var netList = document.getElementById('net-list');
+        netList.innerHTML = '';
+        var nets = stats.net || [];
+        var traffic = stats.traffic || [];
+        function findTraffic(iface) {
+            for (var i = 0; i < traffic.length; i++) {
+                if (traffic[i].iface === iface) return traffic[i];
             }
-        });
+            return { rx_bytes: 0, tx_bytes: 0 };
+        }
+        for (var i = 0; i < nets.length; i++) {
+            var n = nets[i];
+            var t = findTraffic(n.iface);
+            var li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center ps-0';
 
-        function bytesToHuman(num){
-            var units=['B','KB','MB','GB','TB'];
-            var i=0; var n=Number(num)||0;
-            while(n>=1024 && i<units.length-1){ n/=1024; i++; }
-            return (Math.round(n*10)/10)+' '+units[i];
+            var addrs = [];
+            if (n.addr4) addrs.push(n.addr4);
+            if (n.addr6) addrs.push(n.addr6);
+            var addrString = addrs.length > 0 ? addrs.join(' ') : '-';
+            
+            li.innerHTML = '<div><strong>' + n.iface + '</strong> - <span class="text-muted">' + addrString + '</span></div>' +
+                           '<div>' +
+                           '<span class="badge bg-primary me-1" title="RX — принято">RX: ' + bytesToHuman(t.rx_bytes) + '</span>' +
+                           '<span class="badge bg-info" title="TX — отправлено">TX: ' + bytesToHuman(t.tx_bytes) + '</span>' +
+                           '</div>';
+            netList.appendChild(li);
         }
 
-        function renderStats(s) {
-            const cpu = (s && s.cpu && s.cpu.used_pct != null) ? s.cpu.used_pct : 0;
-            const mt = (s && s.mem && s.mem.total_mb) || 0;
-            const mu = (s && s.mem && s.mem.used_mb) || 0;
-            const mm = mt ? Math.round(mu * 100 / mt) : 0;
-            const cpuClass = cpu < 50 ? 'bg-success' : (cpu < 80 ? 'bg-warning' : 'bg-danger');
-            const memClass = mm < 70 ? 'bg-info' : (mm < 90 ? 'bg-warning' : 'bg-danger');
-
-            const disks = (s && s.disks || []).map(d => `
-                <div class="mb-2">
-                    <div class="d-flex justify-content-between small">
-                        <span>${d.mount}</span><span>${d.pcent} (${d.used}/${d.size})</span>
-                    </div>
-                    <div class="progress" style="height: 8px;">
-                        <div class="progress-bar bg-info" role="progressbar" style="width:${(parseInt(d.pcent)||0)}%"></div>
-                    </div>
+        // Disks with progress bars
+        var disksEl = document.getElementById('disks-list');
+        disksEl.innerHTML = '';
+        var disks = stats.disks || [];
+        for (var j = 0; j < disks.length; j++) {
+            var d = disks[j];
+            var pcent = parseInt(d.used_pct || 0, 10);
+            var pbarClass = pcent < 70 ? 'bg-success' : (pcent < 90 ? 'bg-warning' : 'bg-danger');
+            var item = document.createElement('div');
+            item.className = 'mb-2';
+            item.innerHTML = `
+                <div class="d-flex w-100 justify-content-between small">
+                    <span class="text-truncate" style="max-width: 50%;" title="${d.mount}">${d.mount}</span>
+                    <small>${d.used} / ${d.size}</small>
                 </div>
-            `).join('');
-
-            const procs = (s && s.processes || []).map(p => `
-                <tr><td>${p.pid}</td><td class="text-truncate" style="max-width:220px">${p.cmd}</td><td>${p.cpu}</td><td>${p.mem}</td></tr>
-            `).join('');
-
-            // Сопоставление RX/TX к интерфейсам
-            const trafficMap = {};
-            (s && s.traffic || []).forEach(t => { trafficMap[t.iface] = t; });
-            const nets = (s && s.net || []).map(n => {
-                const t = trafficMap[n.iface] || {};
-                const rx = (typeof t.rx_bytes === 'number') ? bytesToHuman(t.rx_bytes) : '-';
-                const tx = (typeof t.tx_bytes === 'number') ? bytesToHuman(t.tx_bytes) : '-';
-                return `<li class="list-group-item d-flex justify-content-between align-items-center py-1">
-                            <span><code>${n.iface}</code> — ${n.addr || '-'}</span>
-                            <span>
-                                <span class="badge bg-info me-1">RX ${rx}</span>
-                                <span class="badge bg-info">TX ${tx}</span>
-                            </span>
-                        </li>`;
-            }).join('');
-
-            const cmdId = `installCmd_${serverId}_${Date.now()}`;
-            const missing = (s && s.missing_tools && s.missing_tools.length) ? s.missing_tools.join(', ') : '';
-            const toolsAlert = missing
-                ? `<div class="alert alert-warning">
-                        <div class="mb-1"><i class="bi bi-exclamation-triangle"></i> Для полной диагностики отсутствуют утилиты: <strong>${missing}</strong></div>
-                        ${(s && s.install_hint) ? `<div class="small mb-1">Установите командой:</div><div class="input-group input-group-sm"><pre id="${cmdId}" class="form-control" style="white-space: pre-wrap; margin:0;">${s.install_hint}</pre><button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard(this, document.getElementById('${cmdId}').textContent)"><i class="bi bi-clipboard"></i></button></div>` : ''}
-                   </div>`
-                : '';
-
-            const cpuCores = (s && s.cpu && s.cpu.cores != null) ? s.cpu.cores : '-';
-            const kernel = (s && s.cpu && s.cpu.kernel) ? s.cpu.kernel : '-';
-            const dockerPresent = (s && s.docker && s.docker.present) ? 'есть' : 'нет';
-            const dockerRunning = (s && s.docker && s.docker.running != null) ? s.docker.running : 0;
-            const dockerVersion = (s && s.docker && s.docker.version) ? s.docker.version : '';
-            const dockerNames = (s && s.docker && Array.isArray(s.docker.names)) ? s.docker.names : [];
-            const dockerContainers = (s && s.docker && Array.isArray(s.docker.containers)) ? s.docker.containers : [];
-
-            // Uptime: keep English format (like "6 months, 18 days")
-            let engUptime = (s && s.uptime) ? String(s.uptime) : '-';
-            engUptime = engUptime.replace(/^up\s+/i, '').trim();
-
-            modal.querySelector('.modal-body').innerHTML = `
-                ${toolsAlert}
-                <div class="small text-muted mb-2">Uptime: ${engUptime}</div>
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <div class="card card-body">
-                            <div class="d-flex justify-content-between align-items-center"><strong title="Процессор">CPU</strong><span class="small text-muted">${cpu}%</span></div>
-                            <div class="progress" style="height: 10px;"> 
-                                <div class="progress-bar ${'${cpuClass}'}" role="progressbar" style="width:${cpu}%"></div>
-                            </div>
-                            <div class="mt-2 small">Cores: <strong>${cpuCores}</strong>, Kernel: <code>${kernel}</code></div>
-                            <div class="mt-1 small">OS: <strong>${(s && s.os) ? s.os : ''}</strong></div>
-                            <div class="mt-3 d-flex justify-content-between align-items-center"><strong title="Оперативная память">Memory</strong><span class="small text-muted">${mm}% (${mu} / ${mt} MB)</span></div>
-                            <div class="progress" style="height: 10px;"> 
-                                <div class="progress-bar ${'${memClass}'}" role="progressbar" style="width:${mm}%"></div>
-                            </div>
-                            <div class="mt-3 small text-muted">
-                                <div title="Средняя системная нагрузка">Load: ${(s && s.load && s.load['1m']) || '-'} / ${(s && s.load && s.load['5m']) || '-'} / ${(s && s.load && s.load['15m']) || '-'}</div>
-                                <div title="Файл подкачки">Swap: ${((s && s.swap && s.swap.used_mb) || 0)} / ${((s && s.swap && s.swap.total_mb) || 0)} MB (${((s && s.swap && s.swap.used_pct) || 0)}%)</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4"> 
-                        <div class="card card-body"> 
-                            <strong class="mb-2" title="Файловые системы (df -h)">Storage</strong>
-                            ${disks || '<div class="text-muted small">Нет данных</div>'}
-                            ${(s && s.inodes && s.inodes.length) ? `
-                            <div class="mt-3">
-                                <strong title="Индексные дескрипторы (df -i)">Inodes</strong>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-dark align-middle">
-                                        <thead><tr><th>Точка</th><th>Всего</th><th>Исп.</th><th>%</th></tr></thead>
-                                        <tbody>${(s.inodes||[]).map(i=>{
-                                            const m = i.mount || '';
-                                            const short = m.length>15 ? (m.slice(0,15) + '…') : m;
-                                            return `<tr><td title="${m}">${short}</td><td>${i.inodes}</td><td>${i.iused}</td><td>${i.ipcent}</td></tr>`;
-                                        }).join('')}</tbody>
-                                    </table>
-                                </div>
-                            </div>` : ''}
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card card-body h-100">
-                            <strong class="mb-2" title="Сводка">Summary</strong>
-                            <div class="d-flex justify-content-between small">
-                                <span class="text-muted">Uptime:</span>
-                                <span class="text-end">${engUptime}</span>
-                            </div>
-                            <div class="d-flex justify-content-between small mt-1">
-                                <span class="text-muted">OS:</span>
-                                <span class="text-end">${(s && s.os) ? s.os : '-'}</span>
-                            </div>
-                            <div class="d-flex justify-content-between small mt-1" title="${kernel}">
-                                <span class="text-muted">Kernel:</span>
-                                <span class="text-end text-truncate" style="max-width: 60%;">${kernel}</span>
-                            </div>
-                            <div class="d-flex justify-content-between small mt-1">
-                                <span class="text-muted">CPU Cores:</span>
-                                <span class="text-end">${cpuCores}</span>
-                            </div>
-                            <div class="d-flex justify-content-between small mt-1">
-                                <span class="text-muted">Docker:</span>
-                                <span class="text-end">${dockerPresent}${dockerRunning?`, running: ${dockerRunning}`:''}</span>
-                            </div>
-                            <div class="d-flex justify-content-between small mt-1" title="${dockerVersion}">
-                                <span class="text-muted">Version:</span>
-                                <span class="text-end text-truncate" style="max-width: 60%;">${dockerVersion||'-'}</span>
-                            </div>
-                            ${dockerNames && dockerNames.length ? `<div class="d-flex justify-content-between small mt-1">
-                                <span class="text-muted">Containers:</span>
-                                <span class="text-end text-truncate" style="max-width: 60%;">${dockerNames.slice(0,2).join(', ')}${dockerNames.length>2?` +${dockerNames.length-2}`:''}</span>
-                            </div>` : ''}
-                        </div>
-                    </div>
-                    <div class="col-12"> 
-                        <div class="card card-body"> 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <strong title="Активные процессы">Processes (Top by CPU)</strong>
-                            </div>
-                            <div class="table-responsive mt-2"> 
-                                <table class="table table-sm table-dark align-middle"> 
-                                    <thead><tr><th>PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead>
-                                    <tbody>${procs}</tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12"> 
-                        <div class="card card-body"> 
-                            <div class="d-flex align-items-center">
-                                <strong title="Сетевые интерфейсы и трафик">Networks</strong>
-                            </div>
-                            <ul class="list-group list-group-flush mb-2">${nets}</ul>
-                            ${dockerContainers && dockerContainers.length ? `
-                            <div class="mt-2">
-                                <strong title="Запущенные Docker контейнеры">Docker containers</strong>
-                                <div class="table-responsive">
-                                    <table class="table table-sm table-dark align-middle">
-                                        <thead><tr><th>Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead>
-                                        <tbody>${dockerContainers.map(c=>`<tr>
-                                            <td>${c.name||''}</td>
-                                            <td class="text-truncate" style="max-width:160px" title="${c.image||''}">${c.image||''}</td>
-                                            <td>${c.status||''}</td>
-                                            <td class="text-truncate" style="max-width:180px" title="${c.ports||''}">${c.ports||''}</td>
-                                            <td>${c.size||''}</td>
-                                        </tr>`).join('')}</tbody>
-                                    </table>
-                                </div>
-                            </div>` : ''}
-                        </div>
-                    </div>
+                <div class="progress" style="height: 15px;">
+                    <div class="progress-bar ${pbarClass}" role="progressbar" style="width: ${pcent}%;" aria-valuenow="${pcent}" aria-valuemin="0" aria-valuemax="100">${pcent}%</div>
                 </div>
             `;
+            disksEl.appendChild(item);
         }
 
-        // Порог ошибок подряд до авто-остановки
-        let consecutiveErrors = 0;
-        const maxConsecutiveErrors = 3;
-        // Настраиваемый таймаут SSH (сек) и интервал обновления берутся статически здесь
-        const sshTimeoutSec = 10; // можно вынести в UI позже
+        // Inodes table
+        var inodesEl = document.getElementById('inodes-table');
+        inodesEl.innerHTML = '';
+        var inodes = stats.inodes || [];
+        var statusModal = document.getElementById('serverStatusModal');
+        var hdrMount = statusModal.getAttribute('data-inodes-header-mount');
+        var hdrTotal = statusModal.getAttribute('data-inodes-header-total');
+        var hdrUsed = statusModal.getAttribute('data-inodes-header-used');
+        var hdrPercent = statusModal.getAttribute('data-inodes-header-percent');
+        var inodesHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">' + hdrMount + '</th><th>' + hdrTotal + '</th><th>' + hdrUsed + '</th><th>' + hdrPercent + '</th></tr></thead><tbody>';
+        for (var k = 0; k < inodes.length; k++) {
+            var inode = inodes[k];
+            inodesHtml += '<tr><td class="ps-0">' + truncateMount(inode.mount, 20) + '</td><td>' + inode.inodes + '</td><td>' + inode.iused + '</td><td>' + inode.ipcent + '</td></tr>';
+        }
+        inodesHtml += '</tbody></table>';
+        inodesEl.innerHTML = inodesHtml;
 
-        function fetchAndRender() {
-            var spin = modal.querySelector('#refreshSpin');
-            if (spin) spin.classList.remove('d-none');
-            fetch(`/server/${serverId}/stats?timeout=${sshTimeoutSec}`)
-                .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
-                .then(({ ok, data }) => {
-                    if (!ok) throw new Error(data.error || 'Ошибка запроса');
-                    consecutiveErrors = 0;
-                    renderStats(data.stats || {});
-                    var label = modal.querySelector('#lastUpdatedLabel');
-                    if (label) {
-                        var now = new Date();
-                        label.textContent = now.toLocaleTimeString();
-                    }
-                })
-                .catch(err => {
-                    modal.querySelector('.modal-body').innerHTML = `<div class="alert alert-danger"><i class="bi bi-exclamation-triangle"></i> ${err.message}</div>`;
-                    consecutiveErrors += 1;
-                    if (consecutiveErrors >= maxConsecutiveErrors) {
-                        if (refreshTimer) clearInterval(refreshTimer);
-                        const stopNote = document.createElement('div');
-                        stopNote.className = 'alert alert-warning mt-2';
-                        stopNote.innerHTML = '<i class="bi bi-pause-circle"></i> Автообновление остановлено после нескольких ошибок.';
-                        const body = modal.querySelector('.modal-body');
-                        if (body) body.appendChild(stopNote);
-                    }
-                })
-                .finally(() => {
-                    var spin = modal.querySelector('#refreshSpin');
-                    if (spin) spin.classList.add('d-none');
+        // Processes table
+        var procWrap = document.getElementById('proc-table');
+        var procs = stats.processes || [];
+        if (procs.length === 0) {
+            procWrap.innerHTML = '<div class="text-muted">{{ _("Нет данных о процессах") }}</div>';
+        } else {
+            var procHtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">PID</th><th>CMD</th><th>%CPU</th><th>%MEM</th></tr></thead><tbody>';
+            for (var p = 0; p < procs.length; p++) {
+                var pr = procs[p];
+                procHtml += '<tr><td class="ps-0">' + pr.pid + '</td><td>' + pr.cmd + '</td><td>' + pr.cpu + '</td><td>' + pr.mem + '</td></tr>';
+            }
+            procHtml += '</tbody></table>';
+            procWrap.innerHTML = procHtml;
+        }
+
+        // Networks list
+        var netList = document.getElementById('net-list');
+        netList.innerHTML = '';
+        var nets = stats.net || [];
+        if (nets.length === 0) {
+            netList.innerHTML = '<li class="list-group-item text-muted">{{ _("Нет данных о сетевых интерфейсах") }}</li>';
+        } else {
+            for (var i = 0; i < nets.length; i++) {
+                var n = nets[i];
+                var li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center py-1';
+                li.innerHTML = '<span><strong>' + (n.interface || '') + '</strong> <small class="text-muted">(' + (n.family || '') + ')</small></span><span class="text-end text-truncate ms-2" style="max-width: 60%;">' + (n.address || '') + '</span>';
+                netList.appendChild(li);
+            }
+        }
+
+        // Docker table
+        var dockWrap = document.getElementById('docker-table');
+        var containers = (stats.docker && stats.docker.containers) || [];
+        if (containers.length === 0) {
+            dockWrap.innerHTML = '<div class="text-muted">No containers</div>';
+        } else {
+            var statusModal = document.getElementById('serverStatusModal');
+            var dockerSizeTooltip = statusModal.getAttribute('data-docker-size-tooltip');
+            var dockerSizeShort = statusModal.getAttribute('data-docker-size-short');
+            var dhtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
+            for (var c = 0; c < containers.length; c++) {
+                var ct = containers[c];
+                var portsCell = (ct.ports || '—');
+                var sizeCell = (ct.size || '');
+                var sizeExplain = '';
+                if (sizeCell && sizeCell.indexOf('virtual') !== -1) {
+                    sizeExplain = ' <small class="text-muted" title="' + dockerSizeTooltip + '">(' + dockerSizeShort + ')</small>';
+                }
+                dhtml += '<tr><td class="ps-0">' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
+            }
+            dhtml += '</tbody></table>';
+            dockWrap.innerHTML = dhtml;
+        }
+
+        // Missing tools warning
+        var warn = document.getElementById('statsWarning');
+        warn.innerHTML = ''; // Очищаем перед использованием
+        if (stats.missing_tools && stats.missing_tools.length > 0) {
+            var cmd = stats.install_hint || '';
+            var html = `
+                <div class="alert alert-warning d-flex flex-column align-items-center">
+                    <div class="mb-2">
+                        <i class="bi bi-exclamation-triangle-fill"></i> 
+                        {{ _('Для полной диагностики отсутствуют утилиты:') }} <strong>${stats.missing_tools.join(', ')}</strong>
+                    </div>
+                    ${cmd ? `
+                    <div class="text-center">{{ _('Установите командой:') }}</div>
+                    <div class="input-group mt-1" style="max-width: 600px;">
+                        <input type="text" class="form-control bg-dark text-light" value="${cmd}" readonly id="installCmdInput">
+                        <button class="btn btn-outline-secondary" type="button" id="copyInstallCmdBtn" title="{{ _('Копировать команду') }}">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+                    ` : ''}
+                </div>`;
+
+            warn.innerHTML = html;
+            warn.classList.remove('d-none');
+            
+            var copyBtn = document.getElementById('copyInstallCmdBtn');
+            if (copyBtn && cmd) {
+                copyBtn.addEventListener('click', function(){ 
+                    var input = document.getElementById('installCmdInput');
+                    input.select();
+                    document.execCommand('copy');
+
+                    var originalIcon = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+                    setTimeout(function() {
+                        copyBtn.innerHTML = originalIcon;
+                    }, 1500);
                 });
+            }
+        } else {
+            warn.classList.add('d-none');
+            warn.innerHTML = '';
         }
+    }
+</script>
+<script>
+    // Сохранение модалки статуса как PNG
+    document.addEventListener('DOMContentLoaded', function(){
+        var btn = document.getElementById('saveStatusImageBtn');
+        if (btn) {
+            btn.addEventListener('click', function(){
+                console.log('Save PNG button clicked');
+                if (window.html2canvas) {
+                    captureStatusModal();
+                } else {
+                    // Загружаем настоящую библиотеку html2canvas
+                    console.log('Loading real html2canvas library...');
+                    var s = document.createElement('script');
+                    s.src = '{{ url_for("static", filename="js/html2canvas.min.js") }}';
+                    s.type = 'text/javascript';
+                    s.async = false; // Загружаем синхронно
+                    s.onload = function() {
+                        console.log('✅ Real html2canvas loaded successfully');
+                        if (window.html2canvas) {
+                            captureStatusModal();
+                        } else {
+                            console.error('html2canvas not available after load');
+                            alert('Библиотека html2canvas не загрузилась корректно');
+                        }
+                    };
+                    s.onerror = function(e) {
+                        console.error('Failed to load html2canvas:', e);
+                        alert('Ошибка загрузки библиотеки html2canvas. Попробуйте обновить страницу.');
+                    };
+                    document.head.appendChild(s);
+                }
+            });
+        } else {
+            console.error('Save PNG button not found');
+        }
+    });
 
-        fetchAndRender();
-        refreshTimer = setInterval(fetchAndRender, 30000);
-
-        modal.addEventListener('hidden.bs.modal', () => {
-            if (refreshTimer) clearInterval(refreshTimer);
-            modal.remove();
-        });
+    function captureStatusModal(){
+        console.log('captureStatusModal called');
+        var modal = document.getElementById('serverStatusModal');
+        
+        if (!modal) {
+            console.error('Modal not found');
+            alert('{{ _("Модальное окно не найдено") }}');
+            return;
+        }
+        
+        // Захватываем весь modal-content (с заголовком и стилями)
+        var modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) {
+            console.error('Modal content not found');
+            alert('{{ _("Содержимое модального окна не найдено") }}');
+            return;
+        }
+        
+        console.log('Starting html2canvas capture of full modal...');
+        
+        // Небольшая задержка для перерасчёта лэйаута
+        setTimeout(function(){
+            var scale = Math.max(2, (window.devicePixelRatio || 1));
+            
+            // Сохраняем текущее состояние
+            var modalBody = modalContent.querySelector('.modal-body');
+            var prevBodyMaxH = modalBody ? modalBody.style.maxHeight : '';
+            var prevBodyOverflow = modalBody ? modalBody.style.overflow : '';
+            
+            // Разворачиваем для захвата
+            if (modalBody) {
+                modalBody.style.maxHeight = 'none';
+                modalBody.style.overflow = 'visible';
+            }
+            
+            // Используем настоящую библиотеку html2canvas с правильными параметрами
+            window.html2canvas(modalContent, {
+                backgroundColor: '#ffffff',
+                scale: scale,
+                logging: true,
+                useCORS: true,
+                allowTaint: true,
+                imageTimeout: 0,
+                removeContainer: true
+            })
+            .then(function(canvas){
+                console.log('Canvas created, size:', canvas.width, 'x', canvas.height);
+                
+                // Восстанавливаем стили
+                if (modalBody) {
+                    modalBody.style.maxHeight = prevBodyMaxH;
+                    modalBody.style.overflow = prevBodyOverflow;
+                }
+                
+                var dataUrl = canvas.toDataURL('image/png');
+                console.log('Data URL created, length:', dataUrl.length);
+                
+                fetch('/api/snapshot/save', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ data_url: dataUrl }) 
+                })
+                .then(function(r){ 
+                    console.log('Response status:', r.status);
+                    return r.json(); 
+                })
+                .then(function(resp){
+                    console.log('Response:', resp);
+                    if (resp && resp.success) {
+                        alert('✅ {{ _("PNG сохранён:") }} ' + resp.filename + '\\n📁 {{ _("Папка:") }} ' + resp.dir);
+                    } else {
+                        console.error('Save failed:', resp);
+                        alert('❌ {{ _("Не удалось сохранить на сервере:") }} ' + (resp.error || '{{ _("Неизвестная ошибка") }}'));
+                    }
+                })
+                .catch(function(err){
+                    console.error('Fetch error:', err);
+                    alert('❌ {{ _("Ошибка сохранения:") }} ' + err.message);
+                });
+            })
+            .catch(function(err){
+                console.error('html2canvas error:', err);
+                alert('{{ _("Ошибка создания скриншота:") }} ' + err.message);
+            });
+        }, 100);
     }
 </script>
 {% endblock %}
