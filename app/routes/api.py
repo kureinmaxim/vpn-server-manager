@@ -36,19 +36,22 @@ def _get_runtime_config_path():
 
 def _load_runtime_config():
     config_path = _get_runtime_config_path()
-    template_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        'config.json'
-    )
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+    template_candidates = [
+        os.path.join(project_root, 'config.json'),
+        os.path.join(project_root, 'config', 'config.json.template'),
+    ]
 
     config = {}
 
-    if os.path.exists(template_path):
-        try:
-            with open(template_path, 'r', encoding='utf-8') as f:
-                config = json.load(f)
-        except Exception as e:
-            logger.warning(f"Could not load template config: {e}")
+    for template_path in template_candidates:
+        if os.path.exists(template_path):
+            try:
+                with open(template_path, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                break
+            except Exception as e:
+                logger.warning(f"Could not load template config: {e}")
 
     if os.path.exists(config_path):
         try:
