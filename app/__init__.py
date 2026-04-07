@@ -203,7 +203,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.2.2",
+            "version": "4.2.3",
             "release_date": "07.04.2026",
             "last_updated": "2026-04-07",
             "developer": "Куреин М.Н."

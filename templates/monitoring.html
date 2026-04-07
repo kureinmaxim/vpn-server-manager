@@ -235,6 +235,16 @@
             </div>
         </div>
         <div class="col-12 col-xl-5">
+            <div class="active-services card monitoring-card h-100 mb-4">
+                <div class="card-body">
+                    <h3><i class="bi bi-router"></i> {{ _('VPN / Proxy сервисы') }}</h3>
+                    <div id="proxy-services-list" class="services-grid">
+                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-7">
             <div class="active-services card monitoring-card h-100">
                 <div class="card-body">
                     <h3><i class="bi bi-gear"></i> {{ _('Системные сервисы') }}</h3>
@@ -243,8 +253,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-xl-7">
             <div class="security-events card monitoring-card h-100">
                 <div class="card-body">
                     <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
@@ -480,7 +488,7 @@ async function updateFirewallStatus() {
             document.getElementById('summary-fw-backend').textContent = stats.backend || 'none';
             document.getElementById('summary-fw-status').textContent =
                 stats.status && stats.status.toLowerCase() === 'active' ? 'Active' : 'Inactive';
-            document.getElementById('open-ports').textContent = stats.open_ports || 'none';
+            document.getElementById('open-ports').textContent = stats.open_ports_labeled || stats.open_ports || 'none';
             document.getElementById('listening-ports-count').textContent = stats.listening_ports_count || 0;
             document.getElementById('summary-port-count').textContent = stats.listening_ports_count || 0;
             document.getElementById('blocked-count').textContent = stats.blocked_24h || 0;
@@ -509,25 +517,52 @@ async function updateServicesStatus() {
         if (data.success) {
             const services = data.data;
             const container = document.getElementById('services-list');
+            const proxyContainer = document.getElementById('proxy-services-list');
             container.innerHTML = '';
-            
-            services.forEach(service => {
+            proxyContainer.innerHTML = '';
+
+            const renderService = (service, target) => {
                 const serviceEl = document.createElement('div');
                 serviceEl.className = `service-item ${service.status}`;
-                
-                const statusIcon = service.status === 'active' ? '✅' : '❌';
-                const statusText = service.status === 'active' ? 'active' : 'inactive';
-                
+
+                let statusIcon = '❌';
+                let statusText = 'inactive';
+                if (service.status === 'active') {
+                    statusIcon = '✅';
+                    statusText = 'active';
+                } else if (service.status === 'not_installed') {
+                    statusIcon = '➖';
+                    statusText = 'not installed';
+                } else if (service.status === 'failed') {
+                    statusIcon = '⚠️';
+                    statusText = 'failed';
+                }
+
                 serviceEl.innerHTML = `
                     <div class="service-header">
-                        <span class="service-name">${service.name}</span>
+                        <span class="service-name">${service.display_name || service.name}</span>
                         <span class="service-status">${statusIcon} ${statusText}</span>
                     </div>
                     <div class="service-uptime">${service.uptime || '-'}</div>
                 `;
-                
-                container.appendChild(serviceEl);
-            });
+
+                target.appendChild(serviceEl);
+            };
+
+            const proxyServices = services.filter(service => service.group === 'proxy');
+            const systemServices = services.filter(service => service.group !== 'proxy');
+
+            if (proxyServices.length) {
+                proxyServices.forEach(service => renderService(service, proxyContainer));
+            } else {
+                proxyContainer.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
+            }
+
+            if (systemServices.length) {
+                systemServices.forEach(service => renderService(service, container));
+            } else {
+                container.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
+            }
         }
     } catch (error) {
         console.error('Error fetching services stats:', error);
