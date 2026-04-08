@@ -100,6 +100,21 @@ class TestMainRoutes:
             response = client.get(route)
             # Может быть 200 или 404 (если шаблон не найден)
             assert response.status_code in [200, 404]
+
+    def test_settings_shows_export_actions_when_data_file_attached(self, client, app):
+        """Страница настроек должна показывать экспорт при наличии active_data_file."""
+        app.config['active_data_file'] = '/tmp/test_servers.enc'
+
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+
+        response = client.get('/settings')
+
+        assert response.status_code == 200
+        assert 'Экспортировать данные'.encode('utf-8') in response.data
+        assert 'Экспортировать ключ'.encode('utf-8') in response.data
+        assert 'Полный экспорт'.encode('utf-8') in response.data
     
     def test_upload_icon_no_file(self, client):
         """Тест загрузки иконки без файла"""

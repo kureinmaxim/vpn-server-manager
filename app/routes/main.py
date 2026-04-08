@@ -262,7 +262,10 @@ def edit_server(server_id):
 @log_request
 def settings():
     """Страница настроек"""
-    return render_template('settings.html')
+    return render_template(
+        'settings.html',
+        active_data_file=current_app.config.get('active_data_file')
+    )
 
 # TODO: Implement these routes (moved from old app.py)
 @main_bp.route('/change_main_key', methods=['POST'])
