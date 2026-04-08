@@ -316,7 +316,7 @@ def build_app():
     
     # Команда PyInstaller
     pyinstaller_cmd = [
-        "python3",
+        sys.executable,
         "-m", "PyInstaller",
         "--onedir",                     # Создать папку с приложением
         "--windowed",                   # GUI приложение (обязательно для .app)
