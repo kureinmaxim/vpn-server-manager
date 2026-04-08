@@ -1,4 +1,4 @@
-# VPN Server Manager v4.2.3
+# VPN Server Manager v4.2.4
 
 Приложение для управления VPN-серверами с гибридной архитектурой `Flask + PyWebView`, шифрованием данных и поддержкой desktop/web режима.
 
