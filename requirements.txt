@@ -11,7 +11,7 @@ Babel==2.18.0
 pywebview>=4.0.0
 
 # Cryptography
-cryptography>=41.0.0
+cryptography>=47.0.0
 
 # SSH/SFTP
 paramiko>=3.0.0
