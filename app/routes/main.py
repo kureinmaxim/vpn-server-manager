@@ -150,7 +150,6 @@ def edit_server(server_id):
     """Страница редактирования сервера"""
     try:
         data_manager = registry.get('data_manager')
-        crypto_service = registry.get('crypto')
         
         if not data_manager:
             flash(_('Сервис данных не инициализирован.'), 'danger')
@@ -199,37 +198,37 @@ def edit_server(server_id):
                 
                 # Обновляем пароли SSH если указаны новые
                 new_ssh_password = request.form.get('ssh_password', '').strip()
-                if new_ssh_password and crypto_service:
-                    server['ssh_credentials']['password'] = crypto_service.encrypt(new_ssh_password)
+                if new_ssh_password:
+                    server['ssh_credentials']['password'] = data_manager.encrypt_data(new_ssh_password)
                     server['ssh_credentials']['password_decrypted'] = new_ssh_password
                 
                 new_root_password = request.form.get('ssh_root_password', '').strip()
-                if new_root_password and crypto_service:
-                    server['ssh_credentials']['root_password'] = crypto_service.encrypt(new_root_password)
+                if new_root_password:
+                    server['ssh_credentials']['root_password'] = data_manager.encrypt_data(new_root_password)
                     server['ssh_credentials']['root_password_decrypted'] = new_root_password
                 
                 # Обновляем данные панели управления
                 new_panel_user = request.form.get('panel_user', '').strip()
-                if new_panel_user and crypto_service:
-                    server['panel_credentials']['user'] = crypto_service.encrypt(new_panel_user)
+                if new_panel_user:
+                    server['panel_credentials']['user'] = data_manager.encrypt_data(new_panel_user)
                     server['panel_credentials']['user_decrypted'] = new_panel_user
                 
                 new_panel_password = request.form.get('panel_password', '').strip()
-                if new_panel_password and crypto_service:
-                    server['panel_credentials']['password'] = crypto_service.encrypt(new_panel_password)
+                if new_panel_password:
+                    server['panel_credentials']['password'] = data_manager.encrypt_data(new_panel_password)
                     server['panel_credentials']['password_decrypted'] = new_panel_password
                 
                 # Обновляем данные хостера
                 server['hoster_credentials']['login_method'] = request.form.get('hoster_login_method', 'password')
                 
                 new_hoster_user = request.form.get('hoster_user', '').strip()
-                if new_hoster_user and crypto_service:
-                    server['hoster_credentials']['user'] = crypto_service.encrypt(new_hoster_user)
+                if new_hoster_user:
+                    server['hoster_credentials']['user'] = data_manager.encrypt_data(new_hoster_user)
                     server['hoster_credentials']['user_decrypted'] = new_hoster_user
                 
                 new_hoster_password = request.form.get('hoster_password', '').strip()
-                if new_hoster_password and crypto_service:
-                    server['hoster_credentials']['password'] = crypto_service.encrypt(new_hoster_password)
+                if new_hoster_password:
+                    server['hoster_credentials']['password'] = data_manager.encrypt_data(new_hoster_password)
                     server['hoster_credentials']['password_decrypted'] = new_hoster_password
                 
                 # Обновляем проверки
