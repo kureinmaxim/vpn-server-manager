@@ -1,5 +1,10 @@
+import copy
+
 import pytest
 from flask import session
+
+from app.services import registry
+from app.services.crypto_service import CryptoService
 
 class TestMainRoutes:
     """Тесты для основных маршрутов"""
@@ -142,3 +147,101 @@ class TestMainRoutes:
         
         response = client.post('/restore_backup')
         assert response.status_code == 302
+
+    def test_edit_server_post_updates_passwords_with_data_manager_encryption(self, client):
+        """POST /edit_server должен сохранять новые пароли без ошибки CryptoService key."""
+        class StubDataManager:
+            def __init__(self):
+                self.servers = [{
+                    'id': '1',
+                    'name': 'Test server',
+                    'provider': 'Test provider',
+                    'ip_address': '127.0.0.1',
+                    'os': 'Debian',
+                    'status': 'Active',
+                    'notes': '',
+                    'docker_info': '',
+                    'software_info': '',
+                    'card_color': '#ffc107',
+                    'panel_url': '',
+                    'hoster_url': '',
+                    'specs': {'cpu': '', 'ram': '', 'disk': ''},
+                    'payment_info': {
+                        'amount': 0.0,
+                        'currency': 'USD',
+                        'next_due_date': '',
+                        'payment_period': 'Monthly',
+                    },
+                    'ssh_credentials': {
+                        'user': 'root',
+                        'port': 22,
+                        'root_login_allowed': False,
+                        'password': 'old-ssh',
+                        'password_decrypted': 'old-ssh',
+                        'root_password': 'old-root',
+                        'root_password_decrypted': 'old-root',
+                    },
+                    'panel_credentials': {
+                        'user': 'old-panel-user',
+                        'user_decrypted': 'old-panel-user',
+                        'password': 'old-panel-password',
+                        'password_decrypted': 'old-panel-password',
+                    },
+                    'hoster_credentials': {
+                        'login_method': 'password',
+                        'user': 'old-hoster-user',
+                        'user_decrypted': 'old-hoster-user',
+                        'password': 'old-hoster-password',
+                        'password_decrypted': 'old-hoster-password',
+                    },
+                    'checks': {'dns_ok': False, 'streaming_ok': False},
+                }]
+                self.saved_servers = None
+                self.saved_path = None
+
+            def load_servers(self, config):
+                return self.servers
+
+            def get_active_data_path(self, config):
+                return 'test-data.enc'
+
+            def save_servers(self, servers, file_path):
+                self.saved_servers = copy.deepcopy(servers)
+                self.saved_path = file_path
+
+            def encrypt_data(self, data):
+                return f'enc::{data}'
+
+        data_manager = StubDataManager()
+        registry.register('data_manager', data_manager)
+        registry.register('crypto', CryptoService())
+
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+
+        response = client.post(
+            '/edit_server/1',
+            data={
+                'ssh_password': 'new-ssh-password',
+                'ssh_root_password': 'new-root-password',
+                'panel_user': 'new-panel-user',
+                'panel_password': 'new-panel-password',
+                'hoster_user': 'new-hoster-user',
+                'hoster_password': 'new-hoster-password',
+            },
+            follow_redirects=False,
+        )
+
+        assert response.status_code == 302
+        assert response.location.endswith('/')
+        assert data_manager.saved_path == 'test-data.enc'
+        assert data_manager.saved_servers is not None
+
+        saved_server = data_manager.saved_servers[0]
+        assert saved_server['ssh_credentials']['password'] == 'enc::new-ssh-password'
+        assert saved_server['ssh_credentials']['root_password'] == 'enc::new-root-password'
+        assert saved_server['panel_credentials']['user'] == 'enc::new-panel-user'
+        assert saved_server['panel_credentials']['password'] == 'enc::new-panel-password'
+        assert saved_server['hoster_credentials']['user'] == 'enc::new-hoster-user'
+        assert saved_server['hoster_credentials']['password'] == 'enc::new-hoster-password'
