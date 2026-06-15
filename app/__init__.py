@@ -187,8 +187,8 @@ def load_app_info(app):
 
         app_info = (release_config or {}).get('app_info') or {
             "version": app.config.get('APP_VERSION', '4.2.2'),
-            "release_date": "30.04.2026",
-            "last_updated": "2026-04-30",
+            "release_date": "15.06.2026",
+            "last_updated": "2026-06-15",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -203,9 +203,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.2.5",
-            "release_date": "30.04.2026",
-            "last_updated": "2026-04-30",
+            "version": "4.2.6",
+            "release_date": "15.06.2026",
+            "last_updated": "2026-06-15",
             "developer": "Куреин М.Н."
         }
 
