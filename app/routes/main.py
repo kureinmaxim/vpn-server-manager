@@ -101,13 +101,125 @@ def logout():
     flash(_('Logged out successfully'), 'info')
     return redirect(url_for('main.index_locked'))
 
-@main_bp.route('/add_server')
+@main_bp.route('/add_server', methods=['GET', 'POST'])
 @require_auth
 @require_pin
 @log_request
 def add_server():
-    """Страница добавления сервера"""
-    return render_template('add_server.html')
+    """Страница добавления сервера (GET) и сохранение нового сервера (POST)."""
+    if request.method == 'GET':
+        return render_template('add_server.html')
+
+    # POST — создаём и сохраняем новый сервер
+    try:
+        data_manager = registry.get('data_manager')
+        if not data_manager:
+            flash(_('Сервис данных не инициализирован.'), 'danger')
+            return redirect(url_for('main.index'))
+
+        servers = data_manager.load_servers(current_app.config)
+
+        # Убеждаемся, что есть активный файл данных; при отсутствии — создаём по умолчанию
+        active_file = data_manager.get_active_data_path(current_app.config)
+        if not active_file:
+            try:
+                app_data_dir = current_app.config.get('APP_DATA_DIR', '.')
+                data_dir = os.path.join(app_data_dir, 'data')
+                os.makedirs(data_dir, exist_ok=True)
+                active_file = os.path.join(data_dir, 'servers.json.enc')
+                if not os.path.exists(active_file):
+                    data_manager.save_servers([], active_file)
+                current_app.config['active_data_file'] = active_file
+                flash(_('Создан новый файл для хранения серверов.'), 'info')
+            except Exception as create_error:
+                logger.error(f"Error creating default data file: {create_error}")
+                flash(_('Критическая ошибка: не удалось создать файл данных. %(error)s', error=str(create_error)), 'danger')
+                return redirect(url_for('main.index'))
+
+        new_id = max([int(s.get('id', 0)) for s in servers] + [0]) + 1
+
+        new_server = {
+            "id": new_id,
+            "provider": request.form.get('provider', ''),
+            "name": request.form.get('name', ''),
+            "ip_address": request.form.get('ip_address', ''),
+            "os": request.form.get('os', ''),
+            "status": request.form.get('status', 'Active'),
+            "card_color": request.form.get('card_color', '#ffc107'),
+            "icon_filename": None,
+            "geolocation": {},
+            "checks": {
+                "dns_ok": 'check_dns_ok' in request.form,
+                "streaming_ok": 'check_streaming_ok' in request.form,
+            },
+            "specs": {
+                "cpu": request.form.get('cpu', ''),
+                "ram": request.form.get('ram', ''),
+                "disk": request.form.get('disk', ''),
+            },
+            "payment_info": {
+                "amount": float(request.form.get('amount') or 0),
+                "currency": request.form.get('currency', 'USD'),
+                "next_due_date": request.form.get('next_due_date', ''),
+                "payment_period": request.form.get('payment_period', ''),
+                "receipts": [],
+            },
+            "ssh_credentials": {
+                "user": request.form.get('ssh_user', ''),
+                "password": data_manager.encrypt_data(request.form.get('ssh_password', '')),
+                "port": int(request.form.get('ssh_port') or 22),
+                "root_password": data_manager.encrypt_data(request.form.get('ssh_root_password', '')),
+                "root_login_allowed": 'root_login_allowed' in request.form,
+            },
+            "panel_url": request.form.get('panel_url', ''),
+            "panel_credentials": {
+                "user": data_manager.encrypt_data(request.form.get('panel_user', '')),
+                "password": data_manager.encrypt_data(request.form.get('panel_password', '')),
+            },
+            "hoster_url": request.form.get('hoster_url', ''),
+            "hoster_credentials": {
+                "login_method": request.form.get('hoster_login_method', 'password'),
+                "user": data_manager.encrypt_data(request.form.get('hoster_user', '')),
+                "password": data_manager.encrypt_data(request.form.get('hoster_password', '')),
+            },
+            "notes": request.form.get('notes', ''),
+            "docker_info": request.form.get('docker_info', ''),
+            "software_info": request.form.get('software_info', ''),
+        }
+
+        # Геолокация по IP (best-effort, не критично)
+        try:
+            import requests
+            ip_check_url = current_app.config.get('IP_CHECK_API', 'https://ipinfo.io/{ip}/json').format(ip=new_server['ip_address'])
+            response = requests.get(ip_check_url, timeout=5)
+            if response.status_code == 200:
+                new_server['geolocation'] = response.json()
+        except Exception:
+            pass
+
+        # Загрузка иконки сервера
+        upload_folder = current_app.config.get('UPLOAD_FOLDER')
+        if upload_folder and 'server_icon' in request.files:
+            icon_file = request.files['server_icon']
+            allowed_icon = {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico'}
+            if icon_file and icon_file.filename:
+                ext = os.path.splitext(secure_filename(icon_file.filename))[1].lower().lstrip('.')
+                if ext in allowed_icon:
+                    os.makedirs(upload_folder, exist_ok=True)
+                    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+                    unique_filename = f"icon_{new_id}_{timestamp}.{ext}"
+                    icon_file.save(os.path.join(upload_folder, unique_filename))
+                    new_server['icon_filename'] = unique_filename
+
+        servers.append(new_server)
+        data_manager.save_servers(servers, active_file)
+        flash(_('Сервер успешно добавлен.'), 'success')
+        return redirect(url_for('main.index'))
+
+    except Exception as e:
+        logger.error(f"Error adding server: {str(e)}")
+        flash(_('Ошибка при добавлении сервера: %(error)s', error=str(e)), 'danger')
+        return render_template('add_server.html')
 
 @main_bp.route('/delete_server/<int:server_id>', methods=['POST'])
 @require_auth
