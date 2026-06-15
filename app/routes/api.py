@@ -1020,7 +1020,26 @@ def install_monitoring(server_id):
                 if check_cancelled():
                     yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
                     return
-                
+
+                # Хелпер: выполнить команду и вернуть (код возврата, stdout, stderr).
+                # Раньше шаги печатали "✅" безусловно, не проверяя код возврата, поэтому
+                # тихий сбой apt/sudo маскировался, а правду показывала только финальная проверка.
+                def _run(cmd, cmd_timeout=60):
+                    _in, _out, _err = client.exec_command(cmd, timeout=cmd_timeout)
+                    code = _out.channel.recv_exit_status()
+                    out = _out.read().decode('utf-8', 'ignore').strip()
+                    err = _err.read().decode('utf-8', 'ignore').strip()
+                    return code, out, err
+
+                # Префлайт: есть ли рабочий sudo без пароля? Если SSH-пользователь не root и
+                # sudo требует пароль, ВСЕ `sudo apt-get` тихо падают -> "4 отсутствует".
+                sudo_code, _o, sudo_err = _run('sudo -n true 2>&1', 15)
+                if sudo_code != 0:
+                    detail = (sudo_err or _o or 'sudo требует пароль или недоступен').splitlines()
+                    detail = detail[0] if detail else 'sudo недоступен'
+                    yield f"data: {json.dumps({'error': f'Недостаточно прав: sudo не работает без пароля для пользователя {user}. Подключайтесь под root или настройте passwordless sudo. ({detail})', 'status': 'error'})}\n\n"
+                    return
+
                 # Шаг 2: Обновление пакетов
                 yield f"data: {json.dumps({'step': 2, 'total': 7, 'message': 'Обновление списка пакетов...', 'status': 'running'})}\n\n"
                 if check_cancelled():
@@ -1035,22 +1054,30 @@ def install_monitoring(server_id):
                 
                 # Шаг 3: Установка vnstat
                 yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': 'Установка vnstat...', 'status': 'running'})}\n\n"
-                _, stdout, stderr = client.exec_command('sudo apt-get install -y vnstat', timeout=120)
-                stdout.channel.recv_exit_status()
-                _, stdout, stderr = client.exec_command('sudo systemctl enable vnstat && sudo systemctl start vnstat', timeout=30)
-                stdout.channel.recv_exit_status()
+                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y vnstat', 120)
+                if code != 0:
+                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                    yield f"data: {json.dumps({'error': f'Не удалось установить vnstat: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                    return
+                _run('sudo systemctl enable vnstat && sudo systemctl start vnstat', 30)
                 yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '✅ vnstat установлен и запущен', 'status': 'success'})}\n\n"
-                
+
                 # Шаг 4: Установка jq
                 yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': 'Установка jq...', 'status': 'running'})}\n\n"
-                _, stdout, stderr = client.exec_command('sudo apt-get install -y jq', timeout=60)
-                stdout.channel.recv_exit_status()
+                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jq', 60)
+                if code != 0:
+                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                    yield f"data: {json.dumps({'error': f'Не удалось установить jq: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                    return
                 yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': '✅ jq установлен', 'status': 'success'})}\n\n"
-                
+
                 # Шаг 5: Установка net-tools
                 yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': 'Установка net-tools...', 'status': 'running'})}\n\n"
-                _, stdout, stderr = client.exec_command('sudo apt-get install -y net-tools', timeout=60)
-                stdout.channel.recv_exit_status()
+                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools', 60)
+                if code != 0:
+                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                    yield f"data: {json.dumps({'error': f'Не удалось установить net-tools: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                    return
                 yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': '✅ net-tools установлен', 'status': 'success'})}\n\n"
                 
                 # Шаг 6: Установка и настройка UFW (опционально)
