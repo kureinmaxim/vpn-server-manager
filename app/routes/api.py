@@ -1055,7 +1055,7 @@ def install_monitoring(server_id):
                 
                 # Шаг 6: Установка и настройка UFW (опционально)
                 yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': 'Проверка UFW...', 'status': 'running'})}\n\n"
-                _, stdout, _ = client.exec_command('which ufw', timeout=10)
+                _, stdout, _ = client.exec_command('export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v ufw 2>/dev/null', timeout=10)
                 ufw_exists = bool(stdout.read().decode('utf-8').strip())
                 
                 if not ufw_exists:
