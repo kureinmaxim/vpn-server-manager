@@ -1031,21 +1031,28 @@ def install_monitoring(server_id):
                     err = _err.read().decode('utf-8', 'ignore').strip()
                     return code, out, err
 
-                # Префлайт: есть ли рабочий sudo без пароля? Если SSH-пользователь не root и
-                # sudo требует пароль, ВСЕ `sudo apt-get` тихо падают -> "4 отсутствует".
-                sudo_code, _o, sudo_err = _run('sudo -n true 2>&1', 15)
-                if sudo_code != 0:
-                    detail = (sudo_err or _o or 'sudo требует пароль или недоступен').splitlines()
-                    detail = detail[0] if detail else 'sudo недоступен'
-                    yield f"data: {json.dumps({'error': f'Недостаточно прав: sudo не работает без пароля для пользователя {user}. Подключайтесь под root или настройте passwordless sudo. ({detail})', 'status': 'error'})}\n\n"
-                    return
+                # Определяем привилегии. Под root sudo не нужен (и часто вообще не установлен
+                # на минимальном Debian -> `sudo ...` падал бы с "command not found"). Для не-root
+                # требуется рабочий passwordless sudo, иначе все apt-команды тихо падают -> "4 отсутствует".
+                _pc, priv_out, _pe = _run('id -u', 15)
+                is_root = priv_out.strip() == '0'
+                if is_root:
+                    SUDO = ''
+                else:
+                    sudo_code, _o, sudo_err = _run('sudo -n true 2>&1', 15)
+                    if sudo_code != 0:
+                        detail = (sudo_err or _o or 'sudo требует пароль или недоступен').splitlines()
+                        detail = detail[0] if detail else 'sudo недоступен'
+                        yield f"data: {json.dumps({'error': f'Недостаточно прав: sudo не работает без пароля для пользователя {user}. Подключайтесь под root или настройте passwordless sudo. ({detail})', 'status': 'error'})}\n\n"
+                        return
+                    SUDO = 'sudo '
 
                 # Шаг 2: Обновление пакетов
                 yield f"data: {json.dumps({'step': 2, 'total': 7, 'message': 'Обновление списка пакетов...', 'status': 'running'})}\n\n"
                 if check_cancelled():
                     yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
                     return
-                _, stdout, stderr = client.exec_command('sudo apt-get update -qq', timeout=60)
+                _, stdout, stderr = client.exec_command(f'{SUDO}apt-get update -qq', timeout=60)
                 stdout.channel.recv_exit_status()  # Ждем завершения
                 yield f"data: {json.dumps({'step': 2, 'total': 7, 'message': '✅ Список пакетов обновлен', 'status': 'success'})}\n\n"
                 if check_cancelled():
@@ -1054,17 +1061,17 @@ def install_monitoring(server_id):
                 
                 # Шаг 3: Установка vnstat
                 yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': 'Установка vnstat...', 'status': 'running'})}\n\n"
-                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y vnstat', 120)
+                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y vnstat', 120)
                 if code != 0:
                     msg = (err or _o or 'неизвестная ошибка apt').splitlines()
                     yield f"data: {json.dumps({'error': f'Не удалось установить vnstat: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
                     return
-                _run('sudo systemctl enable vnstat && sudo systemctl start vnstat', 30)
+                _run(f'{SUDO}systemctl enable vnstat && {SUDO}systemctl start vnstat', 30)
                 yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '✅ vnstat установлен и запущен', 'status': 'success'})}\n\n"
 
                 # Шаг 4: Установка jq
                 yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': 'Установка jq...', 'status': 'running'})}\n\n"
-                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jq', 60)
+                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y jq', 60)
                 if code != 0:
                     msg = (err or _o or 'неизвестная ошибка apt').splitlines()
                     yield f"data: {json.dumps({'error': f'Не удалось установить jq: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
@@ -1073,7 +1080,7 @@ def install_monitoring(server_id):
 
                 # Шаг 5: Установка net-tools
                 yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': 'Установка net-tools...', 'status': 'running'})}\n\n"
-                code, _o, err = _run('sudo DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools', 60)
+                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools', 60)
                 if code != 0:
                     msg = (err or _o or 'неизвестная ошибка apt').splitlines()
                     yield f"data: {json.dumps({'error': f'Не удалось установить net-tools: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
@@ -1086,7 +1093,7 @@ def install_monitoring(server_id):
                 ufw_exists = bool(stdout.read().decode('utf-8').strip())
                 
                 if not ufw_exists:
-                    _, stdout, stderr = client.exec_command('sudo apt-get install -y ufw', timeout=60)
+                    _, stdout, stderr = client.exec_command(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y ufw', timeout=60)
                     stdout.channel.recv_exit_status()
                     yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW установлен', 'status': 'success'})}\n\n"
                 else:
@@ -1096,7 +1103,7 @@ def install_monitoring(server_id):
                 yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': 'Создание скриптов мониторинга...', 'status': 'running'})}\n\n"
                 
                 # Создаем директорию для скриптов
-                _, stdout, _ = client.exec_command('sudo mkdir -p /usr/local/bin/monitoring', timeout=10)
+                _, stdout, _ = client.exec_command(f'{SUDO}mkdir -p /usr/local/bin/monitoring', timeout=10)
                 stdout.channel.recv_exit_status()
                 
                 # 1. Главный скрипт get-all-stats.sh (для получения данных)
@@ -1107,9 +1114,9 @@ exit 0
 '''
                 import base64
                 main_b64 = base64.b64encode(main_script.encode()).decode()
-                _, stdout, _ = client.exec_command(f'echo {main_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/get-all-stats.sh > /dev/null', timeout=10)
+                _, stdout, _ = client.exec_command(f'echo {main_b64} | base64 -d | {SUDO}tee /usr/local/bin/monitoring/get-all-stats.sh > /dev/null', timeout=10)
                 stdout.channel.recv_exit_status()
-                _, stdout, _ = client.exec_command('sudo chmod +x /usr/local/bin/monitoring/get-all-stats.sh', timeout=10)
+                _, stdout, _ = client.exec_command(f'{SUDO}chmod +x /usr/local/bin/monitoring/get-all-stats.sh', timeout=10)
                 stdout.channel.recv_exit_status()
                 
                 # 2. Скрипт сбора метрик update-metrics-history.sh
@@ -1140,11 +1147,11 @@ jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USA
                 
                 # Записываем скрипт сбора метрик
                 script_b64 = base64.b64encode(script_content.encode()).decode()
-                _, stdout, _ = client.exec_command(f'echo {script_b64} | base64 -d | sudo tee /usr/local/bin/monitoring/update-metrics-history.sh > /dev/null', timeout=10)
+                _, stdout, _ = client.exec_command(f'echo {script_b64} | base64 -d | {SUDO}tee /usr/local/bin/monitoring/update-metrics-history.sh > /dev/null', timeout=10)
                 stdout.channel.recv_exit_status()
-                
+
                 # Делаем исполняемым
-                _, stdout, _ = client.exec_command('sudo chmod +x /usr/local/bin/monitoring/update-metrics-history.sh', timeout=10)
+                _, stdout, _ = client.exec_command(f'{SUDO}chmod +x /usr/local/bin/monitoring/update-metrics-history.sh', timeout=10)
                 stdout.channel.recv_exit_status()
                 
                 # Создаем cron задачу с flock (безопасная версия - раз в 5 минут)
@@ -1252,7 +1259,11 @@ def uninstall_monitoring(server_id):
                 client.connect(hostname=ip, username=user, password=password, port=port, timeout=30)
                 
                 yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
-                
+
+                # Под root sudo не нужен (и часто не установлен на минимальном Debian).
+                _ru = client.exec_command('id -u', timeout=15)[1].read().decode('utf-8', 'ignore').strip()
+                SUDO = '' if _ru == '0' else 'sudo '
+
                 # Шаг 2: Остановка vnstat (опционально, не удаляем сам пакет)
                 yield f"data: {json.dumps({'step': 2, 'total': 5, 'message': 'Проверка vnstat...', 'status': 'running'})}\n\n"
                 # Просто проверяем, не удаляем пакеты, так как они могут использоваться другими приложениями
@@ -1260,9 +1271,9 @@ def uninstall_monitoring(server_id):
                 
                 # Шаг 3: Удаление файла истории и скриптов
                 yield f"data: {json.dumps({'step': 3, 'total': 5, 'message': 'Удаление файлов мониторинга...', 'status': 'running'})}\n\n"
-                _, stdout, stderr = client.exec_command('sudo rm -f /var/tmp/metrics_history.json', timeout=10)
+                _, stdout, stderr = client.exec_command(f'{SUDO}rm -f /var/tmp/metrics_history.json', timeout=10)
                 stdout.channel.recv_exit_status()
-                _, stdout, stderr = client.exec_command('sudo rm -rf /usr/local/bin/monitoring', timeout=10)
+                _, stdout, stderr = client.exec_command(f'{SUDO}rm -rf /usr/local/bin/monitoring', timeout=10)
                 stdout.channel.recv_exit_status()
                 yield f"data: {json.dumps({'step': 3, 'total': 5, 'message': '✅ Файлы мониторинга удалены', 'status': 'success'})}\n\n"
                 
