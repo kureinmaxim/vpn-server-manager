@@ -560,7 +560,12 @@ class SSHService:
             
             # Disk Info
             try:
-                _, stdout, _ = client.exec_command('df -h | grep -E "^/dev/" | head -10')
+                # -P (POSIX) держит каждую запись на одной строке (без переноса длинных имён),
+                # -x исключает псевдо-ФС. Не требуем префикс /dev/ — на части VPS реальные
+                # ФС не начинаются с /dev/, из-за чего таблица Mount получалась пустой.
+                _, stdout, _ = client.exec_command(
+                    'df -hP -x tmpfs -x devtmpfs -x squashfs -x overlay 2>/dev/null | tail -n +2 | head -10'
+                )
                 disk_lines = stdout.read().decode('utf-8').strip().split('\n')
                 disks = []
                 for line in disk_lines:
@@ -736,7 +741,7 @@ class SSHService:
             
             # Получаем суточную статистику (если vnstat установлен)
             # Для vnstat используем основной интерфейс или сумму всех
-            _, stdout, _ = client.exec_command('which vnstat')
+            _, stdout, _ = client.exec_command('export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v vnstat 2>/dev/null')
             has_vnstat = bool(stdout.read().decode('utf-8').strip())
             
             daily_rx = "N/A"
@@ -1087,7 +1092,7 @@ class SSHService:
             timestamp = int(time.time())
             
             # Проверяем, установлен ли jq
-            _, stdout, _ = client.exec_command('which jq')
+            _, stdout, _ = client.exec_command('export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v jq 2>/dev/null')
             has_jq = bool(stdout.read().decode('utf-8').strip())
             
             # Читаем существующую историю
@@ -1176,10 +1181,21 @@ class SSHService:
                 }
             }
             
-            # Проверяем каждую утилиту
+            # Проверяем каждую утилиту.
+            # На Debian 12 (bookworm) команда `which` устарела и часто отсутствует,
+            # а PATH в неинтерактивной SSH-сессии не включает /usr/sbin (где живёт ufw).
+            # Поэтому используем POSIX-builtin `command -v` с явным PATH и фолбэком на прямой поиск файла.
+            sbin_path = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
             for tool_key, tool_info in tools.items():
-                _, stdout, _ = client.exec_command(f'which {tool_info["name"]}')
-                tool_path = stdout.read().decode('utf-8').strip()
+                name = tool_info["name"]
+                detect_cmd = (
+                    f'export PATH="{sbin_path}:$PATH"; '
+                    f'command -v {name} 2>/dev/null '
+                    f'|| ls /usr/sbin/{name} /sbin/{name} /usr/bin/{name} /bin/{name} 2>/dev/null | head -n1'
+                )
+                _, stdout, _ = client.exec_command(detect_cmd)
+                tool_path = stdout.read().decode('utf-8').strip().splitlines()
+                tool_path = tool_path[0].strip() if tool_path else ''
                 tools[tool_key]['installed'] = bool(tool_path)
                 if tool_path:
                     tools[tool_key]['path'] = tool_path
