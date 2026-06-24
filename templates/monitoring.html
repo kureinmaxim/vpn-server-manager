@@ -259,6 +259,14 @@
                     </div>
                 </div>
             </div>
+            <div class="webpanels card monitoring-card h-100 mt-4">
+                <div class="card-body">
+                    <h3><i class="bi bi-window-stack"></i> {{ _('Web-панели (SSH-туннель)') }}</h3>
+                    <div id="webpanels-list" class="services-grid">
+                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-12 col-xl-7">
             <div class="active-services card monitoring-card h-100">
@@ -641,6 +649,40 @@ async function updateReticulumStatus() {
         container.innerHTML = html;
     } catch (error) {
         console.error('Error fetching reticulum status:', error);
+    }
+}
+
+async function updateWebpanels() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/webpanels`);
+        const data = await response.json();
+        const container = document.getElementById('webpanels-list');
+        if (!container) return;
+
+        if (!data.success || !data.data || !data.data.panels || !data.data.panels.length) {
+            container.innerHTML = '<div class="text-muted">—</div>';
+            return;
+        }
+
+        let html = '';
+        data.data.panels.forEach(p => {
+            const icon = p.running ? '✅' : '⚪';
+            const txt = p.running ? 'running' : '{{ _("не запущена") }}';
+            html += `<div class="service-item ${p.running ? 'active' : ''}">
+                        <div class="service-header">
+                            <span class="service-name">${p.label} <small class="text-muted">:${p.local_port}</small></span>
+                            <span class="service-status">${icon} ${txt}</span>
+                        </div>
+                        <div class="service-uptime" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <code style="cursor:pointer;word-break:break-all" title="{{ _('Копировать команду туннеля') }}"
+                                  onclick="navigator.clipboard && navigator.clipboard.writeText('${p.tunnel_cmd}')">${p.tunnel_cmd}</code>
+                            <a href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} ↗</a>
+                        </div>
+                    </div>`;
+        });
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error fetching webpanels:', error);
     }
 }
 
@@ -1434,6 +1476,7 @@ function initMonitoring() {
     updateFirewallStatus();
     updateServicesStatus();
     updateReticulumStatus();
+    updateWebpanels();
     updateSecurityEvents();
     updateCharts();
     
@@ -1443,6 +1486,7 @@ function initMonitoring() {
     intervals.push(setInterval(updateFirewallStatus, 30000));    // 30 seconds (было 10)
     intervals.push(setInterval(updateServicesStatus, 30000));    // 30 seconds (было 10)
     intervals.push(setInterval(updateReticulumStatus, 30000));   // 30 seconds — Reticulum/HA
+    intervals.push(setInterval(updateWebpanels, 60000));         // 60 seconds — веб-панели
     intervals.push(setInterval(updateSecurityEvents, 60000));    // 60 seconds (было 30)
     intervals.push(setInterval(updateCharts, 120000));           // 120 seconds (было 60)
     console.log(`✅ Created ${intervals.length} monitoring intervals with auto-stop on errors`)
