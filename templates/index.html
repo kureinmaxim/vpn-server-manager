@@ -907,13 +907,14 @@
             var dhtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Name</th><th>Image</th><th>Status</th><th>Ports</th><th>Size</th></tr></thead><tbody>';
             for (var c = 0; c < containers.length; c++) {
                 var ct = containers[c];
+                var nameCell = ct.name + (ct.role ? ' <small class="text-info">(' + ct.role + ')</small>' : '');
                 var portsCell = (ct.ports || '—');
                 var sizeCell = (ct.size || '');
                 var sizeExplain = '';
                 if (sizeCell && sizeCell.indexOf('virtual') !== -1) {
                     sizeExplain = ' <small class="text-muted" title="' + dockerSizeTooltip + '">(' + dockerSizeShort + ')</small>';
                 }
-                dhtml += '<tr><td class="ps-0">' + ct.name + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
+                dhtml += '<tr><td class="ps-0">' + nameCell + '</td><td>' + ct.image + '</td><td>' + ct.status + '</td><td>' + portsCell + '</td><td>' + sizeCell + sizeExplain + '</td></tr>';
             }
             dhtml += '</tbody></table>';
             dockWrap.innerHTML = dhtml;

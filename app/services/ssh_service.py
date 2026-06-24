@@ -52,7 +52,16 @@ class SSHService:
         {'name': 'docker', 'display_name': 'Docker', 'group': 'system', 'unit_candidates': ['docker']},
         {'name': 'redis-server', 'display_name': 'Redis', 'group': 'system', 'unit_candidates': ['redis-server']},
     ]
-    
+    # Известные контейнеры стека TelegramOnly — для подсветки в списке Docker.
+    _known_containers = {
+        'headscale': 'Headscale (координатор)',
+        'headplane': 'Headplane (Web UI)',
+        'telegram-helper-lite': 'TelegramOnly бот',
+        'telegram-helper': 'TelegramOnly бот',
+        'dockhand': 'Dockhand',
+        'docker-socket-proxy': 'Docker socket proxy',
+    }
+
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
         self.sftp_client: Optional[paramiko.SFTPClient] = None
@@ -641,7 +650,8 @@ class SSHService:
                                 'id': parts[0],
                                 'name': parts[1],
                                 'status': parts[2],
-                                'image': parts[3]
+                                'image': parts[3],
+                                'role': self._known_containers.get(parts[1], ''),
                             })
                 
                 stats['docker'] = {
