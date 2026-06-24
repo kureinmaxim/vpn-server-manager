@@ -959,7 +959,57 @@ class SSHService:
         except Exception as e:
             logger.error(f"Error getting services stats from {ip}: {str(e)}")
             return [{'name': 'error', 'status': 'unknown', 'enabled': 'unknown', 'uptime': str(e)}]
-    
+
+    def get_reticulum_status(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Статус HA-стека TelegramOnly и Reticulum-моста.
+
+        Возвращает активность сервисов (ha-reticulum-bridge / ha-stub-grpc /
+        ha-stub-udp), слушает ли мост 50061, и bridge destination hash — он
+        печатается в лог при старте моста (последняя строка с 'destination').
+        """
+        try:
+            client = self.get_connection_pooled(ip, port, user, password)
+
+            def _active(unit: str) -> bool:
+                return self._read_command_output(
+                    client, f'systemctl is-active {unit} 2>/dev/null', timeout=10
+                ) == 'active'
+
+            installed = bool(self._read_command_output(
+                client,
+                'systemctl list-unit-files --type=service 2>/dev/null '
+                '| grep -E "^ha-reticulum-bridge\\.service\\s"',
+                timeout=10
+            ))
+
+            bridge_hash = ''
+            if installed:
+                line = self._read_command_output(
+                    client,
+                    'journalctl -u ha-reticulum-bridge --no-pager 2>/dev/null '
+                    '| grep -iE "destination|bridge hash" | tail -1',
+                    timeout=15
+                )
+                match = re.search(r'([0-9a-f]{32})', line or '')
+                if match:
+                    bridge_hash = match.group(1)
+
+            listening = bool(self._read_command_output(
+                client, "ss -tlnH 'sport = :50061' 2>/dev/null | head -1", timeout=10
+            ))
+
+            return {
+                'installed': installed,
+                'bridge_active': _active('ha-reticulum-bridge'),
+                'stub_grpc_active': _active('ha-stub-grpc'),
+                'stub_udp_active': _active('ha-stub-udp'),
+                'listening_50061': listening,
+                'bridge_hash': bridge_hash,
+            }
+        except Exception as e:
+            logger.error(f"Error getting reticulum status from {ip}: {str(e)}")
+            return {'installed': False, 'error': str(e)}
+
     def get_security_events(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
         """Получение событий безопасности"""
         import time
