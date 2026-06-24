@@ -75,6 +75,32 @@
                                 <p class="mb-0">{{ _('Все зашифрованные данные расшифровываются "на лету" только в момент их отображения на странице или при копировании в буфер обмена. В файле они всегда остаются зашифрованными.') }}</p>
                             </li>
                         </ul>
+
+                        <h5 class="mt-4">{{ _('Алгоритм шифрования Fernet') }}</h5>
+                        <p>
+                            {{ _('Для защиты ваших данных используется Fernet — это высокоуровневая система симметричного (с секретным ключом) шифрования из библиотеки cryptography.') }}
+                        </p>
+                        <p>{{ _('Ключевые особенности Fernet:') }}</p>
+                        <ul>
+                            <li><strong>{{ _('Гарантия подлинности:') }}</strong> {{ _('Fernet гарантирует, что зашифрованные данные не были изменены или подделаны. Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет быть расшифрован.') }}</li>
+                            <li><strong>{{ _('Надежные алгоритмы:') }}</strong> {{ _('"Под капотом" Fernet использует стандартные и проверенные временем криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с SHA256 для аутентификации (проверки подлинности).') }}</li>
+                        </ul>
+
+                        <h5 class="mt-4"><i class="bi bi-key-fill me-1"></i> {{ _('Что такое SECRET_KEY и где его взять?') }}</h5>
+                        <p>{{ _('<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных в приложении. Он абсолютно необходим для работы.')|safe }}</p>
+                        <ul>
+                            <li><strong>{{ _('Где находится:') }}</strong> {{ _('Ключ хранится в файле <code>.env</code> в корневой папке приложения.')|safe }}</li>
+                            <li><strong>{{ _('Как сгенерировать:') }}</strong> {{ _('Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого можно использовать Python:') }}
+                                <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
+                            </li>
+                            <li>{{ _('Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:')|safe }}
+                                <pre><code class="language-bash">SECRET_KEY={{ _('ваш_сгенерированный_ключ') }}</code></pre>
+                            </li>
+                            <li><strong>{{ _('ВАЖНО:') }}</strong> {{ _('Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.')|safe }}</li>
+                        </ul>
+                        <div class="alert alert-info">
+                            <strong>{{ _('Важно:') }}</strong> {{ _('Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в файле .env. Никогда и никому его не передавайте.') }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -196,17 +222,8 @@
                             <li><strong>{{ _('Открепить файл:') }}</strong> {{ _('Прекратить работу с текущим файлом. Список серверов станет пустым, как при первой установке. Сам файл при этом не удаляется.') }}</li>
                         </ul>
 
-                        <h5>{{ _('Алгоритм шифрования Fernet') }}</h5>
-                        <p>
-                            {{ _('Для защиты ваших данных используется Fernet — это высокоуровневая система симметричного (с секретным ключом) шифрования из библиотеки cryptography.') }}
-                        </p>
-                        <p>{{ _('Ключевые особенности Fernet:') }}</p>
-                        <ul>
-                            <li><strong>{{ _('Гарантия подлинности:') }}</strong> {{ _('Fernet гарантирует, что зашифрованные данные не были изменены или подделаны. Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет быть расшифрован.') }}</li>
-                            <li><strong>{{ _('Надежные алгоритмы:') }}</strong> {{ _('"Под капотом" Fernet использует стандартные и проверенные временем криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с SHA256 для аутентификации (проверки подлинности).') }}</li>
-                        </ul>
-                        <div class="alert alert-info">
-                            <strong>{{ _('Важно:') }}</strong> {{ _('Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в файле .env. Никогда и никому его не передавайте.') }}
+                        <div class="alert alert-secondary">
+                            <i class="bi bi-info-circle"></i> {{ _('Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше.') }}
                         </div>
                     </div>
                 </div>
@@ -286,29 +303,6 @@
             </div>
 
             <div class="accordion-item">
-                <h2 class="accordion-header" id="heading_secret_key">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_secret_key" aria-expanded="false" aria-controls="collapse_secret_key">
-                        <i class="bi bi-key-fill me-2"></i> {{ _('Что такое SECRET_KEY и где его взять?') }}
-                    </button>
-                </h2>
-                <div id="collapse_secret_key" class="accordion-collapse collapse" aria-labelledby="heading_secret_key" data-bs-parent="#helpAccordion">
-                    <div class="card-body">
-                        <p>{{ _('<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных в приложении. Он абсолютно необходим для работы.')|safe }}</p>
-                        <ul>
-                            <li><strong>{{ _('Где находится:') }}</strong> {{ _('Ключ хранится в файле <code>.env</code> в корневой папке приложения.')|safe }}</li>
-                            <li><strong>{{ _('Как сгенерировать:') }}</strong> {{ _('Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого можно использовать Python:') }}
-                                <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
-                            </li>
-                            <li>{{ _('Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:')|safe }}
-                                <pre><code class="language-bash">SECRET_KEY={{ _('ваш_сгенерированный_ключ') }}</code></pre>
-                            </li>
-                            <li><strong>{{ _('ВАЖНО:') }}</strong> {{ _('Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.')|safe }}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_transfer">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_transfer" aria-expanded="false" aria-controls="collapse_transfer">
                         <i class="bi bi-folder-symlink me-2"></i> {{ _('Структура и перенос приложения на другой компьютер?') }}
@@ -356,6 +350,14 @@
                             <li><code>/templates/</code>: {{ _('HTML-шаблоны страниц.') }}</li>
                             <li><code>/static/</code>: {{ _('Статические файлы (CSS, изображения, иконки <code>.png</code> и <code>.icns</code>).')|safe }}</li>
                         </ul>
+
+                        <h5 class="mt-4">{{ _('Алгоритм Работы Программы') }}</h5>
+                        <ol>
+                            <li><strong>{{ _('Запуск') }}</strong>: {{ _('`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно с помощью PyWebView.') }}</li>
+                            <li><strong>{{ _('Отображение') }}</strong>: {{ _('В окне загружается веб-страница. Flask расшифровывает данные из') }} <code>servers.json.enc</code> {{ _('и показывает их.') }}</li>
+                            <li><strong>{{ _('Взаимодействие') }}</strong>: {{ _('Все действия пользователя обрабатываются Flask, который изменяет данные и снова шифрует их.') }}</li>
+                            <li><strong>{{ _('Завершение') }}</strong>: {{ _('При закрытии окна PyWebView отправляет команду на выключение сервера Flask, который корректно завершает работу и освобождает порт.') }}</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -453,56 +455,6 @@
                     
                         <h5 class="mt-4">{{ _('Версия для разработки') }}</h5>
                         <p>{{ _('Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.') }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading_structure">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_structure" aria-expanded="false" aria-controls="collapse_structure">
-                        <i class="bi bi-diagram-3 me-2"></i> {{ _('Структура проекта и алгоритм работы') }}
-                    </button>
-                </h2>
-                <div id="collapse_structure" class="accordion-collapse collapse" aria-labelledby="heading_structure" data-bs-parent="#helpAccordion">
-                    <div class="card-body">
-                        <h5>{{ _('Дерево Проекта') }}</h5>
-<pre><code class="language-bash">
-VPNserverManage/
-│
-├── app.py
-├── build_macos.py
-├── requirements.txt
-├── config.json
-│
-├── data/
-│   ├── servers.json.enc
-│   └── hints.json
-│
-├── static/
-│   └── ...
-│
-├── templates/
-│   └── ...
-│
-└── venv/
-</code></pre>
-                        <h5>{{ _('Описание Файлов и Директорий') }}</h5>
-                        <ul>
-                            <li><strong><code>app.py</code></strong>: {{ _('Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию с PyWebView для создания окна.') }}</li>
-                            <li><strong><code>build_macos.py</code></strong>: {{ _('Скрипт для сборки приложения в') }} <code>.app</code> {{ _('для macOS с помощью PyInstaller.') }}</li>
-                            <li><strong><code>requirements.txt</code></strong>: {{ _('Список всех библиотек Python, необходимых для работы.') }}</li>
-                            <li><strong><code>config.json</code></strong>: {{ _('Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов.') }}</li>
-                            <li><strong><code>data/servers.json.enc</code></strong>: {{ _('Самый важный файл. Это') }} <strong>{{ _('зашифрованный') }}</strong> {{ _('JSON-файл, содержащий всю информацию о серверах.') }}</li>
-                            <li><strong><code>static/</code></strong> {{ _('и') }} <strong><code>templates/</code></strong>: {{ _('Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-интерфейса.') }}</li>
-                        </ul>
-
-                        <h5>{{ _('Алгоритм Работы Программы') }}</h5>
-                        <ol>
-                            <li><strong>{{ _('Запуск') }}</strong>: {{ _('`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно с помощью PyWebView.') }}</li>
-                            <li><strong>{{ _('Отображение') }}</strong>: {{ _('В окне загружается веб-страница. Flask расшифровывает данные из') }} <code>servers.json.enc</code> {{ _('и показывает их.') }}</li>
-                            <li><strong>{{ _('Взаимодействие') }}</strong>: {{ _('Все действия пользователя обрабатываются Flask, который изменяет данные и снова шифрует их.') }}</li>
-                            <li><strong>{{ _('Завершение') }}</strong>: {{ _('При закрытии окна PyWebView отправляет команду на выключение сервера Flask, который корректно завершает работу и освобождает порт.') }}</li>
-                        </ol>
                     </div>
                 </div>
             </div>
