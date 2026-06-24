@@ -34,6 +34,38 @@ def get_translations_path() -> str:
     # Фолбэк — относительный путь; Flask-Babel поддерживает одиночный путь
     return 'translations'
 
+def compile_translations(translations_dir: str) -> None:
+    """Компилирует .po → .mo, если .mo отсутствует или устарел.
+
+    Без .mo flask_babel отдаёт исходные (русские) строки, и переключение языков
+    «не работает». .mo лежат в .gitignore (артефакты сборки), поэтому в свежем
+    клоне их нет — компилируем при старте, чтобы не требовать ручного
+    `pybabel compile`. В упакованном (frozen) режиме каталог может быть только
+    для чтения — тогда тихо пропускаем (ошибки проглатываются).
+    """
+    try:
+        from babel.messages.pofile import read_po
+        from babel.messages.mofile import write_mo
+    except Exception:
+        return
+    if not os.path.isdir(translations_dir):
+        return
+    for lang in os.listdir(translations_dir):
+        lc_dir = os.path.join(translations_dir, lang, 'LC_MESSAGES')
+        po_path = os.path.join(lc_dir, 'messages.po')
+        mo_path = os.path.join(lc_dir, 'messages.mo')
+        if not os.path.isfile(po_path):
+            continue
+        try:
+            if os.path.isfile(mo_path) and os.path.getmtime(mo_path) >= os.path.getmtime(po_path):
+                continue  # .mo уже свежий
+            with open(po_path, 'rb') as f:
+                catalog = read_po(f)
+            with open(mo_path, 'wb') as f:
+                write_mo(f, catalog)
+        except Exception:
+            continue
+
 def get_locale():
     """Определяет язык для текущего запроса."""
     from flask import session
@@ -187,8 +219,8 @@ def load_app_info(app):
 
         app_info = (release_config or {}).get('app_info') or {
             "version": app.config.get('APP_VERSION', '4.2.2'),
-            "release_date": "15.06.2026",
-            "last_updated": "2026-06-15",
+            "release_date": "24.06.2026",
+            "last_updated": "2026-06-24",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -203,9 +235,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.2.9",
-            "release_date": "15.06.2026",
-            "last_updated": "2026-06-15",
+            "version": "4.3.0",
+            "release_date": "24.06.2026",
+            "last_updated": "2026-06-24",
             "developer": "Куреин М.Н."
         }
 
@@ -270,7 +302,9 @@ def create_app(config_name='development'):
     
     # Настройка переводов
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = get_translations_path()
-    
+    # Гарантируем наличие свежих .mo (иначе переключение языков не работает)
+    compile_translations(app.config['BABEL_TRANSLATION_DIRECTORIES'])
+
     # Инициализация расширений
     babel = Babel(app, locale_selector=get_locale)
     
