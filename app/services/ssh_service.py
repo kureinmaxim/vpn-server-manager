@@ -1020,6 +1020,40 @@ class SSHService:
             logger.error(f"Error getting reticulum status from {ip}: {str(e)}")
             return {'installed': False, 'error': str(e)}
 
+    def get_webpanels_status(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Веб-панели стека (Dockhand, Headplane) — слушают localhost на VPS.
+
+        Для каждой: запущена ли (порт слушается), готовая команда SSH-туннеля и
+        локальный URL (открывается после поднятия туннеля).
+        """
+        specs = [
+            {'name': 'dockhand', 'label': 'Dockhand', 'local_port': 8501},
+            {'name': 'headplane', 'label': 'Headplane', 'local_port': 3000},
+        ]
+        try:
+            client = self.get_connection_pooled(ip, port, user, password)
+
+            def _listening(p: int) -> bool:
+                return bool(self._read_command_output(
+                    client, f"ss -tlnH 'sport = :{p}' 2>/dev/null | head -1", timeout=10
+                ))
+
+            panels = []
+            for spec in specs:
+                lp = spec['local_port']
+                panels.append({
+                    'name': spec['name'],
+                    'label': spec['label'],
+                    'local_port': lp,
+                    'running': _listening(lp),
+                    'tunnel_cmd': f"ssh -L {lp}:127.0.0.1:{lp} -p {port} {user}@{ip}",
+                    'url': f"http://127.0.0.1:{lp}",
+                })
+            return {'panels': panels}
+        except Exception as e:
+            logger.error(f"Error getting webpanels status from {ip}: {str(e)}")
+            return {'panels': [], 'error': str(e)}
+
     def get_security_events(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
         """Получение событий безопасности"""
         import time
