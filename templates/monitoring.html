@@ -243,6 +243,14 @@
                     </div>
                 </div>
             </div>
+            <div class="telegramonly-stack card monitoring-card h-100 mb-4">
+                <div class="card-body">
+                    <h3><i class="bi bi-stack"></i> {{ _('TelegramOnly стек') }}</h3>
+                    <div id="telegramonly-services-list" class="services-grid">
+                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+                    </div>
+                </div>
+            </div>
             <div class="reticulum-status card monitoring-card h-100">
                 <div class="card-body">
                     <h3><i class="bi bi-broadcast"></i> {{ _('Reticulum / HA-стек') }}</h3>
@@ -526,8 +534,10 @@ async function updateServicesStatus() {
             const services = data.data;
             const container = document.getElementById('services-list');
             const proxyContainer = document.getElementById('proxy-services-list');
+            const teloContainer = document.getElementById('telegramonly-services-list');
             container.innerHTML = '';
             proxyContainer.innerHTML = '';
+            if (teloContainer) teloContainer.innerHTML = '';
 
             const renderService = (service, target) => {
                 const serviceEl = document.createElement('div');
@@ -558,12 +568,21 @@ async function updateServicesStatus() {
             };
 
             const proxyServices = services.filter(service => service.group === 'proxy');
-            const systemServices = services.filter(service => service.group !== 'proxy');
+            const teloServices = services.filter(service => service.group === 'telegramonly');
+            const systemServices = services.filter(service => service.group !== 'proxy' && service.group !== 'telegramonly');
 
             if (proxyServices.length) {
                 proxyServices.forEach(service => renderService(service, proxyContainer));
             } else {
                 proxyContainer.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
+            }
+
+            if (teloContainer) {
+                if (teloServices.length) {
+                    teloServices.forEach(service => renderService(service, teloContainer));
+                } else {
+                    teloContainer.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
+                }
             }
 
             if (systemServices.length) {
@@ -606,9 +625,7 @@ async function updateReticulumStatus() {
         };
 
         let html = '';
-        html += row('Reticulum bridge (:50061)', d.bridge_active && d.listening_50061);
-        html += row('HA stub gRPC', d.stub_grpc_active);
-        html += row('HA stub UDP', d.stub_udp_active);
+        html += row('Мост слушает (:50061)', d.bridge_active && d.listening_50061);
         if (d.bridge_hash) {
             html += `<div class="service-item active">
                         <div class="service-header">
@@ -618,6 +635,8 @@ async function updateReticulumStatus() {
                              title="{{ _('Копировать') }}"
                              onclick="navigator.clipboard && navigator.clipboard.writeText('${d.bridge_hash}')">${d.bridge_hash}</div>
                     </div>`;
+        } else {
+            html += '<div class="text-muted">{{ _("Мост запущен — hash появится в логе старта") }}</div>';
         }
         container.innerHTML = html;
     } catch (error) {
