@@ -243,6 +243,14 @@
                     </div>
                 </div>
             </div>
+            <div class="reticulum-status card monitoring-card h-100">
+                <div class="card-body">
+                    <h3><i class="bi bi-broadcast"></i> {{ _('Reticulum / HA-стек') }}</h3>
+                    <div id="reticulum-status" class="services-grid">
+                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-12 col-xl-7">
             <div class="active-services card monitoring-card h-100">
@@ -566,6 +574,54 @@ async function updateServicesStatus() {
         }
     } catch (error) {
         console.error('Error fetching services stats:', error);
+    }
+}
+
+async function updateReticulumStatus() {
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/reticulum-status`);
+        const data = await response.json();
+        const container = document.getElementById('reticulum-status');
+        if (!container) return;
+
+        if (!data.success || !data.data) {
+            container.innerHTML = '<div class="text-muted">—</div>';
+            return;
+        }
+        const d = data.data;
+        if (!d.installed) {
+            container.innerHTML = '<div class="text-muted">{{ _("HA-стек не установлен") }}</div>';
+            return;
+        }
+
+        const row = (label, ok) => {
+            const icon = ok ? '✅' : '❌';
+            const txt = ok ? 'active' : 'inactive';
+            return `<div class="service-item ${ok ? 'active' : 'inactive'}">
+                        <div class="service-header">
+                            <span class="service-name">${label}</span>
+                            <span class="service-status">${icon} ${txt}</span>
+                        </div>
+                    </div>`;
+        };
+
+        let html = '';
+        html += row('Reticulum bridge (:50061)', d.bridge_active && d.listening_50061);
+        html += row('HA stub gRPC', d.stub_grpc_active);
+        html += row('HA stub UDP', d.stub_udp_active);
+        if (d.bridge_hash) {
+            html += `<div class="service-item active">
+                        <div class="service-header">
+                            <span class="service-name">Bridge hash</span>
+                        </div>
+                        <div class="service-uptime" style="font-family:monospace;word-break:break-all;cursor:pointer"
+                             title="{{ _('Копировать') }}"
+                             onclick="navigator.clipboard && navigator.clipboard.writeText('${d.bridge_hash}')">${d.bridge_hash}</div>
+                    </div>`;
+        }
+        container.innerHTML = html;
+    } catch (error) {
+        console.error('Error fetching reticulum status:', error);
     }
 }
 
@@ -1358,6 +1414,7 @@ function initMonitoring() {
     updateNetworkStats();
     updateFirewallStatus();
     updateServicesStatus();
+    updateReticulumStatus();
     updateSecurityEvents();
     updateCharts();
     
@@ -1366,6 +1423,7 @@ function initMonitoring() {
     intervals.push(setInterval(updateNetworkStats, 30000));      // 30 seconds (было 5)
     intervals.push(setInterval(updateFirewallStatus, 30000));    // 30 seconds (было 10)
     intervals.push(setInterval(updateServicesStatus, 30000));    // 30 seconds (было 10)
+    intervals.push(setInterval(updateReticulumStatus, 30000));   // 30 seconds — Reticulum/HA
     intervals.push(setInterval(updateSecurityEvents, 60000));    // 60 seconds (было 30)
     intervals.push(setInterval(updateCharts, 120000));           // 120 seconds (было 60)
     console.log(`✅ Created ${intervals.length} monitoring intervals with auto-stop on errors`)
