@@ -21,14 +21,29 @@ class SSHService:
         '443': 'HTTPS / Xray / Hysteria2',
         '465': 'MTProto / SMTPS',
         '993': 'MTProto / IMAPS',
-        '8000': 'TelegramSimple API',
+        '3000': 'Headplane (Web UI)',
+        '8000': 'TelegramOnly API',
+        '8080': 'Headscale',
+        '8443': 'Nginx SNI / Headscale',
         '8501': 'Dockhand',
+        '50055': 'HA stub gRPC',
+        '50056': 'HA stub UDP',
+        '50061': 'HA Reticulum bridge',
     }
     _service_catalog = [
+        # --- VPN / proxy транспорты (секция «VPN / Proxy сервисы») ---
         {'name': 'mtproto-proxy', 'display_name': 'MTProto Proxy', 'group': 'proxy', 'unit_candidates': ['mtproto-proxy']},
-        {'name': 'xray', 'display_name': 'Xray', 'group': 'proxy', 'unit_candidates': ['xray']},
+        {'name': 'xray', 'display_name': 'Xray (VLESS-Reality)', 'group': 'proxy', 'unit_candidates': ['xray']},
         {'name': 'sing-box', 'display_name': 'Sing-box', 'group': 'proxy', 'unit_candidates': ['sing-box', 'singbox']},
         {'name': 'hysteria', 'display_name': 'Hysteria2', 'group': 'proxy', 'unit_candidates': ['hysteria-server', 'hysteria']},
+        {'name': 'naiveproxy', 'display_name': 'NaiveProxy (Caddy)', 'group': 'proxy', 'unit_candidates': ['caddy', 'naiveproxy', 'naive']},
+        {'name': 'tailscaled', 'display_name': 'Tailscale (mesh)', 'group': 'proxy', 'unit_candidates': ['tailscaled', 'tailscale']},
+        # --- TelegramOnly: бот + HA-стек/Reticulum (группа telegramonly → секция «Системные») ---
+        {'name': 'telegramonly', 'display_name': 'TelegramOnly бот/API', 'group': 'telegramonly', 'unit_candidates': ['telegramonly']},
+        {'name': 'ha-reticulum-bridge', 'display_name': 'HA Reticulum мост', 'group': 'telegramonly', 'unit_candidates': ['ha-reticulum-bridge']},
+        {'name': 'ha-stub-grpc', 'display_name': 'HA stub gRPC', 'group': 'telegramonly', 'unit_candidates': ['ha-stub-grpc']},
+        {'name': 'ha-stub-udp', 'display_name': 'HA stub UDP', 'group': 'telegramonly', 'unit_candidates': ['ha-stub-udp']},
+        # --- системные ---
         {'name': 'nginx', 'display_name': 'Nginx', 'group': 'system', 'unit_candidates': ['nginx']},
         {'name': 'apache2', 'display_name': 'Apache', 'group': 'system', 'unit_candidates': ['apache2']},
         {'name': 'ssh', 'display_name': 'OpenSSH', 'group': 'system', 'unit_candidates': ['ssh', 'sshd']},
