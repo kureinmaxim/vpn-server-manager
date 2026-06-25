@@ -6291,3 +6291,15 @@ msgstr "— it will work once the tunnel is up."
 
 msgid "Сервис не запущен на сервере — туннель и «Открыть» недоступны."
 msgstr "The service is not running on the server — tunnel and «Open» are unavailable."
+
+msgid "Что установить (выбери):"
+msgstr "What to install (choose):"
+
+msgid "jq - для обработки JSON (нужен для графиков)"
+msgstr "jq - for JSON processing (needed for charts)"
+
+msgid "ufw - только установка пакета (НЕ включается автоматически)"
+msgstr "ufw - install package only (NOT enabled automatically)"
+
+msgid "Скрипты мониторинга ставятся всегда. Установка займет 1-2 минуты"
+msgstr "Monitoring scripts are always installed. Installation takes 1-2 minutes"
