@@ -5804,8 +5804,6 @@ msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "Got unexpected extra argument ({args})"
 msgstr[1] "Got unexpected extra argument ({args})"
-msgstr[2] "Got unexpected extra arguments ({args})"
-msgstr[3] "Got unexpected extra arguments ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
@@ -5837,8 +5835,6 @@ msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "Takes {nargs} values but 1 was given."
 msgstr[1] "Takes {nargs} values but 1 was given."
-msgstr[2] "Takes {nargs} values but {len} were given."
-msgstr[3] "Takes {nargs} values but {len} were given."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
 msgid ""
@@ -5921,8 +5917,6 @@ msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "Did you mean {possibility}?"
 msgstr[1] "Did you mean {possibility}?"
-msgstr[2] "(Possible options: {possibilities})"
-msgstr[3] "(Possible options: {possibilities})"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:282
 msgid "unknown error"
@@ -5949,8 +5943,6 @@ msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "Option {name!r} requires an argument."
 msgstr[1] "Option {name!r} requires an argument."
-msgstr[2] "Option {name!r} requires {nargs} arguments."
-msgstr[3] "Option {name!r} requires {nargs} arguments."
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
@@ -5997,16 +5989,12 @@ msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value!r} is not {choice}."
 msgstr[1] "{value!r} is not {choice}."
-msgstr[2] "{value!r} is not one of {choices}."
-msgstr[3] "{value!r} is not one of {choices}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value!r} does not match the format {format}."
 msgstr[1] "{value!r} does not match the format {format}."
-msgstr[2] "{value!r} does not match the formats {formats}."
-msgstr[3] "{value!r} does not match the formats {formats}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
 msgid "{value!r} is not a valid {number_type}."
@@ -6065,8 +6053,6 @@ msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type} values are required, but {len_value} was given."
 msgstr[1] "{len_type} values are required, but {len_value} was given."
-msgstr[2] "{len_type} values are required, but {len_value} were given."
-msgstr[3] "{len_type} values are required, but {len_value} were given."
 
 #: venv/lib/python3.13/site-packages/isort/main.py:159
 msgid "show this help message and exit"
