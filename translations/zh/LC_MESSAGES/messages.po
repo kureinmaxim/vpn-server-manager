@@ -5553,9 +5553,6 @@ msgstr "选项"
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "有意外的额外参数（{args}）"
-msgstr[1] "得到意外的额外参数 ({args})"
-msgstr[2] "得到意外的额外参数 ({args})"
-msgstr[3] "得到意外的额外参数 ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
@@ -5585,9 +5582,6 @@ msgstr "价值必须是一个觉得的。"
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "取{nargs}值，但给出了1个。"
-msgstr[1] "接受 {nargs} 值，但给出了 {len}。"
-msgstr[2] "接受 {nargs} 值，但给出了 {len}。"
-msgstr[3] "接受 {nargs} 值，但给出了 {len}。"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
 msgid ""
@@ -5670,9 +5664,6 @@ msgstr "没有这样的选项：{name}"
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "您的意思是{可能性}吗？"
-msgstr[1] "（可能的选项：{可能性}）"
-msgstr[2] "（可能的选项：{可能性}）"
-msgstr[3] "（可能的选项：{可能性}）"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:282
 msgid "unknown error"
@@ -5698,9 +5689,6 @@ msgstr "选项{name！r}不采用值。"
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "选项{name！r}需要一个参数。"
-msgstr[1] "选项 {name!r} 需要 {nargs} 参数。"
-msgstr[2] "选项 {name!r} 需要 {nargs} 参数。"
-msgstr[3] "选项 {name!r} 需要 {nargs} 参数。"
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
@@ -5746,17 +5734,11 @@ msgstr ""
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value！r}不是{选择}。"
-msgstr[1] "{value!r} 不是 {choices} 之一。"
-msgstr[2] "{value!r} 不是 {choices} 之一。"
-msgstr[3] "{value!r} 不是 {choices} 之一。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value！r}与格式{格式}不匹配。"
-msgstr[1] "{value!r} 与格式 {formats} 不匹配。"
-msgstr[2] "{value!r} 与格式 {formats} 不匹配。"
-msgstr[3] "{value!r} 与格式 {formats} 不匹配。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
 msgid "{value!r} is not a valid {number_type}."
@@ -5814,9 +5796,6 @@ msgstr "{name} {fileName！r}无法执行。"
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type}需要{len_value}。"
-msgstr[1] "{len_type} 值是必需的，但已给出 {len_value}。"
-msgstr[2] "{len_type} 值是必需的，但已给出 {len_value}。"
-msgstr[3] "{len_type} 值是必需的，但已给出 {len_value}。"
 
 #: venv/lib/python3.13/site-packages/isort/main.py:159
 msgid "show this help message and exit"
@@ -5860,3 +5839,186 @@ msgstr "显示此消息并退出。"
 
 #~ msgid "Выберать зашифрованный файл данных из другой установки"
 #~ msgstr "选择来自其他安装的加密数据文件"
+
+msgid "(клик — копировать) и ссылку «Открыть» на"
+msgstr "（点击复制）以及「打开」链接到"
+
+msgid "Backend:"
+msgstr "后端："
+
+msgid "Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере. Карточка показывает, запущены ли они, даёт готовую команду"
+msgstr "Dockhand（:8501）和 Headplane（:3000）仅监听服务器的 localhost。卡片显示它们是否运行，并提供现成的命令"
+
+msgid "Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на самом сервере. Она доступна только на localhost VPS, поэтому открывайте её через SSH-туннель из карточки «Web-панели»."
+msgstr "Dockhand 是运行在服务器上的 TelegramOnly 栈轻量级 Streamlit 诊断面板。它仅在 VPS 的 localhost 上可用，请通过「Web 面板」卡片中的 SSH 隧道打开。"
+
+msgid "Fail2ban забанил IP"
+msgstr "Fail2ban 已封禁的 IP"
+
+msgid "Firewall backend"
+msgstr "防火墙后端"
+
+msgid "HA-стек не установлен"
+msgstr "未安装 HA 栈"
+
+msgid "Listening ports"
+msgstr "监听端口"
+
+msgid "Listening ports:"
+msgstr "监听端口："
+
+msgid "Reticulum / HA-стек"
+msgstr "Reticulum / HA 栈"
+
+msgid "Reticulum / HA:"
+msgstr "Reticulum / HA："
+
+msgid "SSH порт"
+msgstr "SSH 端口"
+
+msgid "TelegramOnly стек"
+msgstr "TelegramOnly 栈"
+
+msgid "TelegramOnly стек:"
+msgstr "TelegramOnly 栈："
+
+msgid "VPN / Proxy сервисы"
+msgstr "VPN / 代理服务"
+
+msgid "VPN / Proxy сервисы:"
+msgstr "VPN / 代理服务："
+
+msgid "Web-панели (SSH-туннель)"
+msgstr "Web 面板（SSH 隧道）"
+
+msgid "Web-панели (SSH-туннель):"
+msgstr "Web 面板（SSH 隧道）："
+
+msgid "nginx, docker, ssh, базы данных и т.п."
+msgstr "nginx、docker、ssh、数据库等。"
+
+msgid "Количество listening ports:"
+msgstr "监听端口数量："
+
+msgid "Копировать команду туннеля"
+msgstr "复制隧道命令"
+
+msgid "Критичных событий не обнаружено"
+msgstr "未发现严重事件"
+
+msgid "Мониторинг всех сетевых интерфейсов"
+msgstr "监控所有网络接口"
+
+msgid "Мост запущен — hash появится в логе старта"
+msgstr "网桥已启动 — hash 将出现在启动日志中"
+
+msgid "На карточке сервера есть две кнопки для наблюдения за состоянием VPS по SSH."
+msgstr "服务器卡片上有两个按钮，可通过 SSH 观察 VPS 状态。"
+
+msgid "Настроить сервер"
+msgstr "配置服务器"
+
+msgid "Не обнаружено"
+msgstr "未发现"
+
+msgid "Обновление системы"
+msgstr "系统更新"
+
+msgid "Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG» сохраняет снимок в картинку."
+msgstr "打开一个弹窗显示当前状态：CPU 负载、内存、磁盘、运行时间、进程排行、网络接口（含 tailscale0）以及 Docker 容器列表。TelegramOnly 栈的容器（headscale、headplane、机器人、dockhand）会标注其角色。「保存为 PNG」按钮可将快照保存为图片。"
+
+msgid "Открывает страницу с автообновляемыми графиками и карточками. Если на сервере ещё нет инструментов мониторинга, появится экран «Установка системы мониторинга»."
+msgstr "打开带有自动刷新图表和卡片的页面。如果服务器尚未安装监控工具，将显示「安装监控系统」界面。"
+
+msgid "Открыть"
+msgstr "打开"
+
+msgid "Ошибки journal"
+msgstr "journal 错误"
+
+msgid "Ошибок в journal за 24ч:"
+msgstr "24 小时内 journal 错误数："
+
+msgid "Подключение к серверу..."
+msgstr "正在连接服务器…"
+
+msgid "Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше."
+msgstr "关于加密、Fernet 算法和 SECRET_KEY 的更多信息，请见上方「安全与密码存储」一节。"
+
+msgid "Попробуйте подключиться вручную:"
+msgstr "请尝试手动连接："
+
+msgid "Порты в правилах UFW:"
+msgstr "UFW 规则中的端口："
+
+msgid "После установки доступны карточки:"
+msgstr "安装后可用的卡片："
+
+msgid "Расширенный мониторинг (живые данные)"
+msgstr "高级监控（实时数据）"
+
+msgid "Сводка по серверу"
+msgstr "服务器概览"
+
+msgid "Сейчас забаненных IP через fail2ban:"
+msgstr "当前通过 fail2ban 封禁的 IP："
+
+msgid "Сетевые интерфейсы"
+msgstr "网络接口"
+
+msgid "Системные сервисы:"
+msgstr "系统服务："
+
+msgid "События безопасности:"
+msgstr "安全事件："
+
+msgid "Статус (быстрый снимок)"
+msgstr "状态（快速快照）"
+
+msgid "Статус firewall"
+msgstr "防火墙状态"
+
+msgid "Статус сервера и Расширенный мониторинг"
+msgstr "服务器状态与高级监控"
+
+msgid "Убедитесь, что SSH порт открыт"
+msgstr "请确认 SSH 端口已开放"
+
+msgid "Установка мониторинга"
+msgstr "安装监控"
+
+msgid "бот/API и HA-стек (ha-reticulum-bridge, ha-stub-grpc, ha-stub-udp)."
+msgstr "机器人/API 和 HA 栈（ha-reticulum-bridge、ha-stub-grpc、ha-stub-udp）。"
+
+msgid "не запущена"
+msgstr "未运行"
+
+msgid "неудачные попытки входа по SSH и доступные обновления безопасности за 24 часа."
+msgstr "过去 24 小时内的 SSH 登录失败次数和可用的安全更新。"
+
+msgid "слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — копировать)."
+msgstr "网桥是否监听 50061 端口及其「bridge hash」（点击 hash 复制）。"
+
+msgid "состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Статус определяется по реально запущенному процессу на сервере, а не только по systemd."
+msgstr "传输状态 — VLESS（Xray）、Hysteria2、MTProto、NaiveProxy、Tailscale。状态依据服务器上实际运行的进程判断，而不仅是 systemd。"
+
+msgid "ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq (обработка JSON), net-tools (сетевая статистика). Пакет ufw только устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
+msgstr "在服务器上安装轻量工具：vnstat（流量统计）、jq（JSON 处理）、net-tools（网络统计）。ufw 仅安装但不会自动启用。需要 1–2 分钟。"
+
+msgid "— она заработает после поднятия туннеля."
+msgstr "— 在建立隧道后即可使用。"
+
+msgid "Сервис не запущен на сервере — туннель и «Открыть» недоступны."
+msgstr "该服务未在服务器上运行 — 隧道和「打开」不可用。"
+
+msgid "Что установить (выбери):"
+msgstr "选择要安装的项："
+
+msgid "jq - для обработки JSON (нужен для графиков)"
+msgstr "jq - 用于 JSON 处理（图表需要）"
+
+msgid "ufw - только установка пакета (НЕ включается автоматически)"
+msgstr "ufw - 仅安装软件包（不会自动启用）"
+
+msgid "Скрипты мониторинга ставятся всегда. Установка займет 1-2 минуты"
+msgstr "监控脚本始终会安装。安装需要 1-2 分钟"

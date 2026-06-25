@@ -5804,8 +5804,6 @@ msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "Got unexpected extra argument ({args})"
 msgstr[1] "Got unexpected extra argument ({args})"
-msgstr[2] "Got unexpected extra arguments ({args})"
-msgstr[3] "Got unexpected extra arguments ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
@@ -5837,8 +5835,6 @@ msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "Takes {nargs} values but 1 was given."
 msgstr[1] "Takes {nargs} values but 1 was given."
-msgstr[2] "Takes {nargs} values but {len} were given."
-msgstr[3] "Takes {nargs} values but {len} were given."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
 msgid ""
@@ -5921,8 +5917,6 @@ msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "Did you mean {possibility}?"
 msgstr[1] "Did you mean {possibility}?"
-msgstr[2] "(Possible options: {possibilities})"
-msgstr[3] "(Possible options: {possibilities})"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:282
 msgid "unknown error"
@@ -5949,8 +5943,6 @@ msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "Option {name!r} requires an argument."
 msgstr[1] "Option {name!r} requires an argument."
-msgstr[2] "Option {name!r} requires {nargs} arguments."
-msgstr[3] "Option {name!r} requires {nargs} arguments."
 
 #: venv/lib/python3.13/site-packages/click/shell_completion.py:325
 msgid "Shell completion is not supported for Bash versions older than 4.4."
@@ -5997,16 +5989,12 @@ msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value!r} is not {choice}."
 msgstr[1] "{value!r} is not {choice}."
-msgstr[2] "{value!r} is not one of {choices}."
-msgstr[3] "{value!r} is not one of {choices}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value!r} does not match the format {format}."
 msgstr[1] "{value!r} does not match the format {format}."
-msgstr[2] "{value!r} does not match the formats {formats}."
-msgstr[3] "{value!r} does not match the formats {formats}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
 msgid "{value!r} is not a valid {number_type}."
@@ -6065,8 +6053,6 @@ msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type} values are required, but {len_value} was given."
 msgstr[1] "{len_type} values are required, but {len_value} was given."
-msgstr[2] "{len_type} values are required, but {len_value} were given."
-msgstr[3] "{len_type} values are required, but {len_value} were given."
 
 #: venv/lib/python3.13/site-packages/isort/main.py:159
 msgid "show this help message and exit"
@@ -6119,3 +6105,187 @@ msgstr "Show this message and exit."
 
 #~ msgid "Выберать зашифрованный файл данных из другой установки"
 #~ msgstr "Select encrypted data file from another installation"
+
+
+msgid "(клик — копировать) и ссылку «Открыть» на"
+msgstr "(click to copy) and an «Open» link to"
+
+msgid "Backend:"
+msgstr "Backend:"
+
+msgid "Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере. Карточка показывает, запущены ли они, даёт готовую команду"
+msgstr "Dockhand (:8501) and Headplane (:3000) listen only on the server's localhost. The card shows whether they are running and provides a ready-made command"
+
+msgid "Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на самом сервере. Она доступна только на localhost VPS, поэтому открывайте её через SSH-туннель из карточки «Web-панели»."
+msgstr "Dockhand is a lightweight Streamlit diagnostics panel for the TelegramOnly stack running on the server itself. It is only available on the VPS localhost, so open it via an SSH tunnel from the «Web panels» card."
+
+msgid "Fail2ban забанил IP"
+msgstr "Fail2ban banned IPs"
+
+msgid "Firewall backend"
+msgstr "Firewall backend"
+
+msgid "HA-стек не установлен"
+msgstr "HA stack is not installed"
+
+msgid "Listening ports"
+msgstr "Listening ports"
+
+msgid "Listening ports:"
+msgstr "Listening ports:"
+
+msgid "Reticulum / HA-стек"
+msgstr "Reticulum / HA stack"
+
+msgid "Reticulum / HA:"
+msgstr "Reticulum / HA:"
+
+msgid "SSH порт"
+msgstr "SSH port"
+
+msgid "TelegramOnly стек"
+msgstr "TelegramOnly stack"
+
+msgid "TelegramOnly стек:"
+msgstr "TelegramOnly stack:"
+
+msgid "VPN / Proxy сервисы"
+msgstr "VPN / Proxy services"
+
+msgid "VPN / Proxy сервисы:"
+msgstr "VPN / Proxy services:"
+
+msgid "Web-панели (SSH-туннель)"
+msgstr "Web panels (SSH tunnel)"
+
+msgid "Web-панели (SSH-туннель):"
+msgstr "Web panels (SSH tunnel):"
+
+msgid "nginx, docker, ssh, базы данных и т.п."
+msgstr "nginx, docker, ssh, databases, etc."
+
+msgid "Количество listening ports:"
+msgstr "Number of listening ports:"
+
+msgid "Копировать команду туннеля"
+msgstr "Copy tunnel command"
+
+msgid "Критичных событий не обнаружено"
+msgstr "No critical events detected"
+
+msgid "Мониторинг всех сетевых интерфейсов"
+msgstr "Monitoring of all network interfaces"
+
+msgid "Мост запущен — hash появится в логе старта"
+msgstr "Bridge is running — the hash will appear in the startup log"
+
+msgid "На карточке сервера есть две кнопки для наблюдения за состоянием VPS по SSH."
+msgstr "Each server card has two buttons for monitoring the VPS state over SSH."
+
+msgid "Настроить сервер"
+msgstr "Configure server"
+
+msgid "Не обнаружено"
+msgstr "Not detected"
+
+msgid "Обновление системы"
+msgstr "System update"
+
+msgid "Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG» сохраняет снимок в картинку."
+msgstr "Opens a popup with the current state: CPU load, memory, disk, uptime, top processes, network interfaces (including tailscale0) and the list of Docker containers. TelegramOnly stack containers (headscale, headplane, bot, dockhand) are tagged with their role. The «Save as PNG» button saves the snapshot as an image."
+
+msgid "Открывает страницу с автообновляемыми графиками и карточками. Если на сервере ещё нет инструментов мониторинга, появится экран «Установка системы мониторинга»."
+msgstr "Opens a page with auto-refreshing charts and cards. If the server has no monitoring tools yet, the «Install monitoring system» screen appears."
+
+msgid "Открыть"
+msgstr "Open"
+
+msgid "Ошибки journal"
+msgstr "Journal errors"
+
+msgid "Ошибок в journal за 24ч:"
+msgstr "Journal errors in last 24h:"
+
+msgid "Подключение к серверу..."
+msgstr "Connecting to server..."
+
+msgid "Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше."
+msgstr "More about encryption, the Fernet algorithm and the SECRET_KEY is in the «Security and password storage» section above."
+
+msgid "Попробуйте подключиться вручную:"
+msgstr "Try connecting manually:"
+
+msgid "Порты в правилах UFW:"
+msgstr "Ports in UFW rules:"
+
+msgid "После установки доступны карточки:"
+msgstr "After installation the following cards are available:"
+
+msgid "Расширенный мониторинг (живые данные)"
+msgstr "Advanced monitoring (live data)"
+
+msgid "Сводка по серверу"
+msgstr "Server summary"
+
+msgid "Сейчас забаненных IP через fail2ban:"
+msgstr "Currently banned IPs via fail2ban:"
+
+msgid "Сетевые интерфейсы"
+msgstr "Network interfaces"
+
+msgid "Системные сервисы:"
+msgstr "System services:"
+
+msgid "События безопасности:"
+msgstr "Security events:"
+
+msgid "Статус (быстрый снимок)"
+msgstr "Status (quick snapshot)"
+
+msgid "Статус firewall"
+msgstr "Firewall status"
+
+msgid "Статус сервера и Расширенный мониторинг"
+msgstr "Server status and Advanced monitoring"
+
+msgid "Убедитесь, что SSH порт открыт"
+msgstr "Make sure the SSH port is open"
+
+msgid "Установка мониторинга"
+msgstr "Monitoring installation"
+
+msgid "бот/API и HA-стек (ha-reticulum-bridge, ha-stub-grpc, ha-stub-udp)."
+msgstr "bot/API and the HA stack (ha-reticulum-bridge, ha-stub-grpc, ha-stub-udp)."
+
+msgid "не запущена"
+msgstr "not running"
+
+msgid "неудачные попытки входа по SSH и доступные обновления безопасности за 24 часа."
+msgstr "failed SSH login attempts and available security updates over the last 24 hours."
+
+msgid "слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — копировать)."
+msgstr "whether the bridge listens on port 50061 and its «bridge hash» (click the hash to copy)."
+
+msgid "состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Статус определяется по реально запущенному процессу на сервере, а не только по systemd."
+msgstr "state of the transports — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Status is determined by the actually running process on the server, not just by systemd."
+
+msgid "ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq (обработка JSON), net-tools (сетевая статистика). Пакет ufw только устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
+msgstr "installs lightweight utilities on the server: vnstat (traffic stats), jq (JSON processing), net-tools (network stats). The ufw package is only installed, but NOT enabled automatically. Takes 1-2 minutes."
+
+msgid "— она заработает после поднятия туннеля."
+msgstr "— it will work once the tunnel is up."
+
+msgid "Сервис не запущен на сервере — туннель и «Открыть» недоступны."
+msgstr "The service is not running on the server — tunnel and «Open» are unavailable."
+
+msgid "Что установить (выбери):"
+msgstr "What to install (choose):"
+
+msgid "jq - для обработки JSON (нужен для графиков)"
+msgstr "jq - for JSON processing (needed for charts)"
+
+msgid "ufw - только установка пакета (НЕ включается автоматически)"
+msgstr "ufw - install package only (NOT enabled automatically)"
+
+msgid "Скрипты мониторинга ставятся всегда. Установка займет 1-2 минуты"
+msgstr "Monitoring scripts are always installed. Installation takes 1-2 minutes"
