@@ -663,7 +663,41 @@ class SSHService:
                 }
             except:
                 stats['docker'] = {'present': False, 'version': '', 'running': 0, 'names': [], 'containers': []}
-            
+
+            # --- Приложения, запущенные через systemd (НЕ в Docker) ---
+            # Бот TelegramOnly может работать не контейнером, а systemd-сервисом
+            # `telegramonly` (+ HA-стек/Reticulum). Показываем их статус, чтобы
+            # отсутствие docker-контейнера telegram-helper не выглядело как
+            # «бот не запущен». Один SSH-вызов; показываем только установленные.
+            try:
+                app_units = [d for d in self._service_catalog if d.get('group') == 'telegramonly']
+                by_unit = {d['unit_candidates'][0]: d for d in app_units}
+                unit_args = ' '.join(u + '.service' for u in by_unit)
+                probe_out = self._read_command_output(
+                    client,
+                    f'systemctl list-units --type=service --all --no-legend {unit_args} 2>/dev/null',
+                    timeout=15,
+                )
+                app_services = []
+                for probe_line in probe_out.splitlines():
+                    probe_line = probe_line.lstrip('●').strip()
+                    parts = probe_line.split()
+                    if len(parts) < 3 or parts[1] == 'not-found':
+                        continue
+                    unit = parts[0].replace('.service', '')
+                    desc = by_unit.get(unit)
+                    if not desc:
+                        continue
+                    app_services.append({
+                        'name': desc['name'],
+                        'display_name': desc['display_name'],
+                        'unit_name': unit,
+                        'status': parts[2],  # active / inactive / failed
+                    })
+                stats['app_services'] = app_services
+            except Exception:
+                stats['app_services'] = []
+
             logger.info(f"Successfully collected stats from {ip}")
             return stats
             

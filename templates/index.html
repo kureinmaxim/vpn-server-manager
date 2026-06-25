@@ -483,6 +483,14 @@
                 </div>
               </div>
             </div>
+            <div class="col-12 mb-3" id="app-services-block" style="display:none;">
+              <div class="card">
+                <div class="card-body">
+                  <h5 title="Сервисы приложения, запущенные через systemd (не в Docker)">Приложения (systemd)</h5>
+                  <div id="app-services-table" class="table-responsive"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -918,6 +926,30 @@
             }
             dhtml += '</tbody></table>';
             dockWrap.innerHTML = dhtml;
+        }
+
+        // App services (systemd) — бот TelegramOnly + HA-стек, когда работают не в Docker
+        var appBlock = document.getElementById('app-services-block');
+        var appWrap = document.getElementById('app-services-table');
+        var appServices = (stats.app_services) || [];
+        if (appServices.length === 0) {
+            if (appBlock) appBlock.style.display = 'none';
+            if (appWrap) appWrap.innerHTML = '';
+        } else if (appBlock && appWrap) {
+            appBlock.style.display = '';
+            var ahtml = '<table class="table table-sm table-borderless"><thead><tr><th class="ps-0">Сервис</th><th>Unit</th><th>Статус</th></tr></thead><tbody>';
+            for (var s = 0; s < appServices.length; s++) {
+                var sv = appServices[s];
+                var st = (sv.status || '').toLowerCase();
+                var cls = st === 'active' ? 'text-success' : (st === 'failed' ? 'text-danger' : 'text-warning');
+                var icon = st === 'active' ? '●' : (st === 'failed' ? '✕' : '○');
+                ahtml += '<tr><td class="ps-0">' + (sv.display_name || sv.name) +
+                         '</td><td><code class="small">' + (sv.unit_name || sv.name) + '.service</code></td>' +
+                         '<td class="' + cls + '">' + icon + ' ' + (sv.status || '') +
+                         ' <small class="text-muted">(systemd)</small></td></tr>';
+            }
+            ahtml += '</tbody></table>';
+            appWrap.innerHTML = ahtml;
         }
 
         // Missing tools warning
