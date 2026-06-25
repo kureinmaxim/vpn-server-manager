@@ -1273,17 +1273,19 @@ jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USA
                 # Шаг 8: Тестирование
                 yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': 'Проверка установленных утилит...', 'status': 'running'})}\n\n"
                 
-                # Проверяем все утилиты
+                # Проверяем только ВЫБРАННЫЕ утилиты (ufw мог быть снят в чеклисте —
+                # тогда его отсутствие не ошибка). Ключ net-tools в детекторе — netstat.
                 tools_status = ssh_service.check_required_tools(ip=ip, user=user, password=password, port=port, timeout=30)
-                missing = tools_status.get('missing_count', 0)
-                
-                # Если все в порядке (all_ok=True или missing_count=0)
-                if tools_status.get('all_ok', False) or missing == 0:
-                    yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': '✅ Все утилиты успешно установлены!', 'status': 'success'})}\n\n"
+                tools_map = tools_status.get('tools', {})
+                key_map = {'vnstat': 'vnstat', 'jq': 'jq', 'net-tools': 'netstat', 'ufw': 'ufw'}
+                missing_selected = [t for t in selected_tools
+                                    if not tools_map.get(key_map.get(t, t), {}).get('installed', False)]
+
+                if not missing_selected:
+                    yield f"data: {json.dumps({'step': 8, 'total': 8, 'message': '✅ Выбранные утилиты установлены!', 'status': 'success'})}\n\n"
                     yield f"data: {json.dumps({'complete': True, 'status': 'success'})}\n\n"
                 else:
-                    # Только если действительно что-то отсутствует
-                    yield f"data: {json.dumps({'error': f'Не все утилиты установлены ({missing} отсутствует)', 'status': 'error'})}\n\n"
+                    yield f"data: {json.dumps({'error': f'Не установлены выбранные утилиты: {chr(44).join(missing_selected)}', 'status': 'error'})}\n\n"
                 
             except paramiko.AuthenticationException:
                 yield f"data: {json.dumps({'error': 'Ошибка аутентификации SSH. Проверьте имя пользователя и пароль.', 'status': 'error'})}\n\n"
