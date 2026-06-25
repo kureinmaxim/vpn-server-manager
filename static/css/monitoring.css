@@ -1104,3 +1104,14 @@
     }
 }
 
+
+/* Иконки «События безопасности» — bootstrap-icons вместо эмодзи (WebView не
+   рендерит часть эмодзи как глифы). Крупнее базовых .bi, цвет — акцентный. */
+.event-icon .bi {
+    font-size: 1.3rem !important;
+    color: #8eb7ff;
+    line-height: 1;
+}
+.event-card.warning .event-icon .bi {
+    color: #ff6b6b;
+}
