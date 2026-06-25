@@ -668,16 +668,24 @@ async function updateWebpanels() {
         data.data.panels.forEach(p => {
             const icon = p.running ? '✅' : '⚪';
             const txt = p.running ? 'running' : '{{ _("не запущена") }}';
+            // Туннель и «Открыть» показываем ТОЛЬКО когда сервис реально слушает порт,
+            // иначе ссылка ведёт в никуда (Connection refused при пробросе).
+            let body;
+            if (p.running) {
+                body = `<div class="service-uptime" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+                            <code style="cursor:pointer;word-break:break-all" title="{{ _('Копировать команду туннеля') }}"
+                                  onclick="navigator.clipboard && navigator.clipboard.writeText('${p.tunnel_cmd}')">${p.tunnel_cmd}</code>
+                            <a href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} ↗</a>
+                        </div>`;
+            } else {
+                body = `<div class="service-uptime text-muted">{{ _('Сервис не запущен на сервере — туннель и «Открыть» недоступны.') }}</div>`;
+            }
             html += `<div class="service-item ${p.running ? 'active' : ''}">
                         <div class="service-header">
                             <span class="service-name">${p.label} <small class="text-muted">:${p.local_port}</small></span>
                             <span class="service-status">${icon} ${txt}</span>
                         </div>
-                        <div class="service-uptime" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                            <code style="cursor:pointer;word-break:break-all" title="{{ _('Копировать команду туннеля') }}"
-                                  onclick="navigator.clipboard && navigator.clipboard.writeText('${p.tunnel_cmd}')">${p.tunnel_cmd}</code>
-                            <a href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} ↗</a>
-                        </div>
+                        ${body}
                     </div>`;
         });
         container.innerHTML = html;
