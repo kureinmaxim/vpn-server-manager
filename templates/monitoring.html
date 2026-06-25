@@ -47,15 +47,27 @@
             
             <div class="install-body">
                 <div class="install-features">
-                    <h4>{{ _('Что будет установлено:') }}</h4>
-                    <ul>
-                        <li>✅ {{ _('vnstat - для статистики трафика') }}</li>
-                        <li>✅ {{ _('jq - для обработки JSON') }}</li>
-                        <li>✅ {{ _('net-tools - для сетевой статистики') }}</li>
-                        <li>⚠️ {{ _('ufw - только пакет (НЕ ВКЛЮЧАЕТСЯ!)') }}</li>
-                    </ul>
+                    <h4>{{ _('Что установить (выбери):') }}</h4>
+                    <div class="install-tool-list">
+                        <div class="form-check">
+                            <input class="form-check-input install-tool" type="checkbox" value="vnstat" id="tool-vnstat" checked>
+                            <label class="form-check-label" for="tool-vnstat">{{ _('vnstat - для статистики трафика') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input install-tool" type="checkbox" value="jq" id="tool-jq" checked>
+                            <label class="form-check-label" for="tool-jq">{{ _('jq - для обработки JSON (нужен для графиков)') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input install-tool" type="checkbox" value="net-tools" id="tool-net-tools" checked>
+                            <label class="form-check-label" for="tool-net-tools">{{ _('net-tools - для сетевой статистики') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input install-tool" type="checkbox" value="ufw" id="tool-ufw">
+                            <label class="form-check-label" for="tool-ufw">{{ _('ufw - только установка пакета (НЕ включается автоматически)') }}</label>
+                        </div>
+                    </div>
                     <p class="mt-2 text-muted small">
-                        <i class="bi bi-info-circle"></i> {{ _('Установка займет 1-2 минуты') }}
+                        <i class="bi bi-info-circle"></i> {{ _('Скрипты мониторинга ставятся всегда. Установка займет 1-2 минуты') }}
                     </p>
                 </div>
                 
@@ -1279,7 +1291,8 @@ async function startInstallation() {
     
     try {
         // Создаем EventSource для получения прогресса через SSE
-        currentEventSource = new EventSource(`/api/monitoring/${serverId}/install`);
+        const selectedTools = Array.from(document.querySelectorAll('.install-tool:checked')).map(c => c.value).join(',');
+        currentEventSource = new EventSource(`/api/monitoring/${serverId}/install?tools=${encodeURIComponent(selectedTools)}`);
         
         currentEventSource.onmessage = function(event) {
             const data = JSON.parse(event.data);
