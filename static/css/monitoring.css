@@ -388,20 +388,20 @@
 }
 
 .mini-charts .chart-card {
-    height: 320px !important;
-    max-height: 320px !important;
+    height: 250px !important;
+    max-height: 250px !important;
 }
 
 .mini-charts .chart-wrapper {
     position: relative;
-    height: 240px !important;
-    max-height: 240px !important;
+    height: 185px !important;
+    max-height: 185px !important;
 }
 
 .mini-charts canvas {
-    max-height: 240px !important;
+    max-height: 185px !important;
     width: 100% !important;
-    height: 240px !important;
+    height: 185px !important;
 }
 
 .chart-wrapper {
@@ -804,35 +804,35 @@
 }
 
 .monitoring-page h1 {
-    font-size: 2rem !important;
+    font-size: 1.35rem !important;
     font-weight: 700;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.3rem;
 }
 
 .monitoring-page h3 {
-    font-size: 1.15rem !important;
+    font-size: 1rem !important;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.6rem;
 }
 
 .monitoring-page h4 {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     font-weight: 700;
 }
 
 .monitoring-page .bi {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
 }
 
 .monitoring-page .card {
-    border-radius: 18px;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 14px 32px rgba(3, 10, 18, 0.24);
+    box-shadow: 0 4px 14px rgba(3, 10, 18, 0.18);
     background: linear-gradient(180deg, rgba(18, 30, 46, 0.96) 0%, rgba(16, 27, 40, 0.98) 100%);
 }
 
 .monitoring-page .card-body {
-    padding: 1.4rem;
+    padding: 0.85rem 1rem;
 }
 
 .monitoring-page .text-muted,
@@ -842,12 +842,21 @@
     color: #96a7bb !important;
 }
 
+/* Карточки по высоте контента, а не на всю строку (иначе короткие тянутся). */
+.monitoring-grid {
+    align-items: flex-start;   /* колонки по верху, без растягивания на равную высоту */
+}
+
 .monitoring-grid > [class*="col-"] {
-    display: flex;
+    display: block;
 }
 
 .monitoring-card {
     width: 100%;
+}
+
+.monitoring-page .card.h-100 {
+    height: auto !important;
 }
 
 .monitoring-caption {
@@ -879,7 +888,7 @@
 }
 
 .overview-title {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #f3f7fb;
     margin: 0;
@@ -897,19 +906,18 @@
 
 .overview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.6rem;
 }
 
 .overview-item {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.95rem 1rem;
-    border-radius: 14px;
+    gap: 0.2rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    min-height: 92px;
 }
 
 .overview-item-wide {
@@ -924,7 +932,7 @@
 }
 
 .overview-value {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #f3f7fb;
     word-break: break-word;
@@ -962,7 +970,7 @@
 
 .network-traffic .stat .value,
 .event-value {
-    font-size: 1.4rem;
+    font-size: 1.05rem;
     color: #f8fafc;
 }
 
@@ -1000,16 +1008,21 @@
 }
 
 .active-services .services-grid {
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.55rem;
+    margin-top: 0.6rem;
 }
 
 .service-item {
     background: linear-gradient(180deg, rgba(25, 39, 57, 0.92), rgba(17, 28, 42, 0.94));
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-left-width: 4px;
-    border-radius: 14px;
-    padding: 1rem;
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+}
+
+.service-header {
+    margin-bottom: 0.3rem;
 }
 
 .service-name {
@@ -1022,16 +1035,16 @@
 }
 
 .security-events .events-grid {
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 0.9rem;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.55rem;
 }
 
 .event-card {
-    min-height: 102px;
-    border-radius: 14px;
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
     background: linear-gradient(180deg, rgba(25, 39, 57, 0.92), rgba(17, 28, 42, 0.94));
     border: 1px solid rgba(255, 255, 255, 0.06);
-    align-items: flex-start;
+    align-items: center;
 }
 
 .event-icon {
@@ -1091,3 +1104,14 @@
     }
 }
 
+
+/* Иконки «События безопасности» — bootstrap-icons вместо эмодзи (WebView не
+   рендерит часть эмодзи как глифы). Крупнее базовых .bi, цвет — акцентный. */
+.event-icon .bi {
+    font-size: 1.3rem !important;
+    color: #8eb7ff;
+    line-height: 1;
+}
+.event-card.warning .event-icon .bi {
+    color: #ff6b6b;
+}

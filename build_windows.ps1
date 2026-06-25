@@ -118,6 +118,19 @@ if (-not $SecurityWarning) {
 }
 Write-Host ""
 
+# Компиляция переводов (.po -> .mo). .mo в .gitignore, без них инсталлятор уедет
+# без переводов и переключение языков работать не будет. Делаем до удаления venv.
+Write-Host "Compiling translations (.po -> .mo)..." -ForegroundColor Yellow
+try {
+    python -m babel.messages.frontend compile -d translations
+    if ($LASTEXITCODE -ne 0) { throw "babel compile exited with $LASTEXITCODE" }
+    Write-Host "[OK] Translations compiled" -ForegroundColor Green
+} catch {
+    Write-Host "[WARNING] Could not compile translations: $_" -ForegroundColor Yellow
+    Write-Host "          Install Babel (pip install babel) or app will fall back to source strings." -ForegroundColor Yellow
+}
+Write-Host ""
+
 # [4/5] Очистка перед сборкой
 Write-Host "[4/5] Cleaning up before build..." -ForegroundColor Yellow
 
