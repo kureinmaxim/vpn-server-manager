@@ -1022,7 +1022,13 @@ def install_monitoring(server_id):
     
     global installation_cancelled
     installation_cancelled[server_id] = False  # Сбрасываем флаг отмены
-    
+
+    # Какие apt-пакеты ставить (чекбоксы на экране установки). Скрипты мониторинга
+    # ставятся всегда; пакеты — по выбору. По умолчанию базовый набор (без ufw).
+    _tools_param = request.args.get('tools')
+    selected_tools = (set(t.strip() for t in _tools_param.split(',') if t.strip())
+                      if _tools_param is not None else {'vnstat', 'jq', 'net-tools'})
+
     def generate_progress():
         """Generator для Server-Sent Events"""
         try:
@@ -1151,45 +1157,56 @@ def install_monitoring(server_id):
                     yield f"data: {json.dumps({'cancelled': True, 'message': '⚠️ Установка отменена пользователем', 'status': 'cancelled'})}\n\n"
                     return
                 
-                # Шаг 3: Установка vnstat
-                yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': 'Установка vnstat...', 'status': 'running'})}\n\n"
-                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y vnstat', 120)
-                if code != 0:
-                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
-                    yield f"data: {json.dumps({'error': f'Не удалось установить vnstat: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
-                    return
-                _run(f'{SUDO}systemctl enable vnstat && {SUDO}systemctl start vnstat', 30)
-                yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '✅ vnstat установлен и запущен', 'status': 'success'})}\n\n"
-
-                # Шаг 4: Установка jq
-                yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': 'Установка jq...', 'status': 'running'})}\n\n"
-                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y jq', 60)
-                if code != 0:
-                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
-                    yield f"data: {json.dumps({'error': f'Не удалось установить jq: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
-                    return
-                yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': '✅ jq установлен', 'status': 'success'})}\n\n"
-
-                # Шаг 5: Установка net-tools
-                yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': 'Установка net-tools...', 'status': 'running'})}\n\n"
-                code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools', 60)
-                if code != 0:
-                    msg = (err or _o or 'неизвестная ошибка apt').splitlines()
-                    yield f"data: {json.dumps({'error': f'Не удалось установить net-tools: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
-                    return
-                yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': '✅ net-tools установлен', 'status': 'success'})}\n\n"
-                
-                # Шаг 6: Установка и настройка UFW (опционально)
-                yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': 'Проверка UFW...', 'status': 'running'})}\n\n"
-                _, stdout, _ = client.exec_command('export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v ufw 2>/dev/null', timeout=10)
-                ufw_exists = bool(stdout.read().decode('utf-8').strip())
-                
-                if not ufw_exists:
-                    _, stdout, stderr = client.exec_command(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y ufw', timeout=60)
-                    stdout.channel.recv_exit_status()
-                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW установлен', 'status': 'success'})}\n\n"
+                # Шаг 3: Установка vnstat (если выбран)
+                if 'vnstat' in selected_tools:
+                    yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': 'Установка vnstat...', 'status': 'running'})}\n\n"
+                    code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y vnstat', 120)
+                    if code != 0:
+                        msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                        yield f"data: {json.dumps({'error': f'Не удалось установить vnstat: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                        return
+                    _run(f'{SUDO}systemctl enable vnstat && {SUDO}systemctl start vnstat', 30)
+                    yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '✅ vnstat установлен и запущен', 'status': 'success'})}\n\n"
                 else:
-                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW уже установлен', 'status': 'success'})}\n\n"
+                    yield f"data: {json.dumps({'step': 3, 'total': 7, 'message': '⏭️ vnstat пропущен (не выбран)', 'status': 'success'})}\n\n"
+
+                # Шаг 4: Установка jq (если выбран)
+                if 'jq' in selected_tools:
+                    yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': 'Установка jq...', 'status': 'running'})}\n\n"
+                    code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y jq', 60)
+                    if code != 0:
+                        msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                        yield f"data: {json.dumps({'error': f'Не удалось установить jq: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                        return
+                    yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': '✅ jq установлен', 'status': 'success'})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'step': 4, 'total': 7, 'message': '⏭️ jq пропущен (не выбран) — графики истории могут не работать', 'status': 'success'})}\n\n"
+
+                # Шаг 5: Установка net-tools (если выбран)
+                if 'net-tools' in selected_tools:
+                    yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': 'Установка net-tools...', 'status': 'running'})}\n\n"
+                    code, _o, err = _run(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y net-tools', 60)
+                    if code != 0:
+                        msg = (err or _o or 'неизвестная ошибка apt').splitlines()
+                        yield f"data: {json.dumps({'error': f'Не удалось установить net-tools: {msg[0] if msg else code}', 'status': 'error'})}\n\n"
+                        return
+                    yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': '✅ net-tools установлен', 'status': 'success'})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'step': 5, 'total': 7, 'message': '⏭️ net-tools пропущен (не выбран)', 'status': 'success'})}\n\n"
+
+                # Шаг 6: Установка UFW (только если выбран; НЕ включаем автоматически)
+                if 'ufw' in selected_tools:
+                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': 'Проверка UFW...', 'status': 'running'})}\n\n"
+                    _, stdout, _ = client.exec_command('export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v ufw 2>/dev/null', timeout=10)
+                    ufw_exists = bool(stdout.read().decode('utf-8').strip())
+                    if not ufw_exists:
+                        _, stdout, stderr = client.exec_command(f'{SUDO}DEBIAN_FRONTEND=noninteractive apt-get install -y ufw', timeout=60)
+                        stdout.channel.recv_exit_status()
+                        yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW установлен (не включён)', 'status': 'success'})}\n\n"
+                    else:
+                        yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '✅ UFW уже установлен', 'status': 'success'})}\n\n"
+                else:
+                    yield f"data: {json.dumps({'step': 6, 'total': 7, 'message': '⏭️ UFW пропущен (не выбран)', 'status': 'success'})}\n\n"
                 
                 # Шаг 7: Создание скриптов мониторинга
                 yield f"data: {json.dumps({'step': 7, 'total': 8, 'message': 'Создание скриптов мониторинга...', 'status': 'running'})}\n\n"
