@@ -6288,3 +6288,6 @@ msgstr "installs lightweight utilities on the server: vnstat (traffic stats), jq
 
 msgid "— она заработает после поднятия туннеля."
 msgstr "— it will work once the tunnel is up."
+
+msgid "Сервис не запущен на сервере — туннель и «Открыть» недоступны."
+msgstr "The service is not running on the server — tunnel and «Open» are unavailable."
