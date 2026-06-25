@@ -21,14 +21,29 @@ class SSHService:
         '443': 'HTTPS / Xray / Hysteria2',
         '465': 'MTProto / SMTPS',
         '993': 'MTProto / IMAPS',
-        '8000': 'TelegramSimple API',
+        '3000': 'Headplane (Web UI)',
+        '8000': 'TelegramOnly API',
+        '8080': 'Headscale',
+        '8443': 'Nginx SNI / Headscale',
         '8501': 'Dockhand',
+        '50055': 'HA stub gRPC',
+        '50056': 'HA stub UDP',
+        '50061': 'HA Reticulum bridge',
     }
     _service_catalog = [
+        # --- VPN / proxy транспорты (секция «VPN / Proxy сервисы») ---
         {'name': 'mtproto-proxy', 'display_name': 'MTProto Proxy', 'group': 'proxy', 'unit_candidates': ['mtproto-proxy']},
-        {'name': 'xray', 'display_name': 'Xray', 'group': 'proxy', 'unit_candidates': ['xray']},
+        {'name': 'xray', 'display_name': 'Xray (VLESS-Reality)', 'group': 'proxy', 'unit_candidates': ['xray']},
         {'name': 'sing-box', 'display_name': 'Sing-box', 'group': 'proxy', 'unit_candidates': ['sing-box', 'singbox']},
         {'name': 'hysteria', 'display_name': 'Hysteria2', 'group': 'proxy', 'unit_candidates': ['hysteria-server', 'hysteria']},
+        {'name': 'naiveproxy', 'display_name': 'NaiveProxy (Caddy)', 'group': 'proxy', 'unit_candidates': ['caddy', 'naiveproxy', 'naive']},
+        {'name': 'tailscaled', 'display_name': 'Tailscale (mesh)', 'group': 'proxy', 'unit_candidates': ['tailscaled', 'tailscale']},
+        # --- TelegramOnly: бот + HA-стек/Reticulum (группа telegramonly → секция «Системные») ---
+        {'name': 'telegramonly', 'display_name': 'TelegramOnly бот/API', 'group': 'telegramonly', 'unit_candidates': ['telegramonly']},
+        {'name': 'ha-reticulum-bridge', 'display_name': 'HA Reticulum мост', 'group': 'telegramonly', 'unit_candidates': ['ha-reticulum-bridge']},
+        {'name': 'ha-stub-grpc', 'display_name': 'HA stub gRPC', 'group': 'telegramonly', 'unit_candidates': ['ha-stub-grpc']},
+        {'name': 'ha-stub-udp', 'display_name': 'HA stub UDP', 'group': 'telegramonly', 'unit_candidates': ['ha-stub-udp']},
+        # --- системные ---
         {'name': 'nginx', 'display_name': 'Nginx', 'group': 'system', 'unit_candidates': ['nginx']},
         {'name': 'apache2', 'display_name': 'Apache', 'group': 'system', 'unit_candidates': ['apache2']},
         {'name': 'ssh', 'display_name': 'OpenSSH', 'group': 'system', 'unit_candidates': ['ssh', 'sshd']},
@@ -37,7 +52,16 @@ class SSHService:
         {'name': 'docker', 'display_name': 'Docker', 'group': 'system', 'unit_candidates': ['docker']},
         {'name': 'redis-server', 'display_name': 'Redis', 'group': 'system', 'unit_candidates': ['redis-server']},
     ]
-    
+    # Известные контейнеры стека TelegramOnly — для подсветки в списке Docker.
+    _known_containers = {
+        'headscale': 'Headscale (координатор)',
+        'headplane': 'Headplane (Web UI)',
+        'telegram-helper-lite': 'TelegramOnly бот',
+        'telegram-helper': 'TelegramOnly бот',
+        'dockhand': 'Dockhand',
+        'docker-socket-proxy': 'Docker socket proxy',
+    }
+
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
         self.sftp_client: Optional[paramiko.SFTPClient] = None
@@ -626,7 +650,8 @@ class SSHService:
                                 'id': parts[0],
                                 'name': parts[1],
                                 'status': parts[2],
-                                'image': parts[3]
+                                'image': parts[3],
+                                'role': self._known_containers.get(parts[1], ''),
                             })
                 
                 stats['docker'] = {
@@ -944,7 +969,91 @@ class SSHService:
         except Exception as e:
             logger.error(f"Error getting services stats from {ip}: {str(e)}")
             return [{'name': 'error', 'status': 'unknown', 'enabled': 'unknown', 'uptime': str(e)}]
-    
+
+    def get_reticulum_status(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Статус HA-стека TelegramOnly и Reticulum-моста.
+
+        Возвращает активность сервисов (ha-reticulum-bridge / ha-stub-grpc /
+        ha-stub-udp), слушает ли мост 50061, и bridge destination hash — он
+        печатается в лог при старте моста (последняя строка с 'destination').
+        """
+        try:
+            client = self.get_connection_pooled(ip, port, user, password)
+
+            def _active(unit: str) -> bool:
+                return self._read_command_output(
+                    client, f'systemctl is-active {unit} 2>/dev/null', timeout=10
+                ) == 'active'
+
+            installed = bool(self._read_command_output(
+                client,
+                'systemctl list-unit-files --type=service 2>/dev/null '
+                '| grep -E "^ha-reticulum-bridge\\.service\\s"',
+                timeout=10
+            ))
+
+            bridge_hash = ''
+            if installed:
+                line = self._read_command_output(
+                    client,
+                    'journalctl -u ha-reticulum-bridge --no-pager 2>/dev/null '
+                    '| grep -iE "destination|bridge hash" | tail -1',
+                    timeout=15
+                )
+                match = re.search(r'([0-9a-f]{32})', line or '')
+                if match:
+                    bridge_hash = match.group(1)
+
+            listening = bool(self._read_command_output(
+                client, "ss -tlnH 'sport = :50061' 2>/dev/null | head -1", timeout=10
+            ))
+
+            return {
+                'installed': installed,
+                'bridge_active': _active('ha-reticulum-bridge'),
+                'stub_grpc_active': _active('ha-stub-grpc'),
+                'stub_udp_active': _active('ha-stub-udp'),
+                'listening_50061': listening,
+                'bridge_hash': bridge_hash,
+            }
+        except Exception as e:
+            logger.error(f"Error getting reticulum status from {ip}: {str(e)}")
+            return {'installed': False, 'error': str(e)}
+
+    def get_webpanels_status(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
+        """Веб-панели стека (Dockhand, Headplane) — слушают localhost на VPS.
+
+        Для каждой: запущена ли (порт слушается), готовая команда SSH-туннеля и
+        локальный URL (открывается после поднятия туннеля).
+        """
+        specs = [
+            {'name': 'dockhand', 'label': 'Dockhand', 'local_port': 8501},
+            {'name': 'headplane', 'label': 'Headplane', 'local_port': 3000},
+        ]
+        try:
+            client = self.get_connection_pooled(ip, port, user, password)
+
+            def _listening(p: int) -> bool:
+                return bool(self._read_command_output(
+                    client, f"ss -tlnH 'sport = :{p}' 2>/dev/null | head -1", timeout=10
+                ))
+
+            panels = []
+            for spec in specs:
+                lp = spec['local_port']
+                panels.append({
+                    'name': spec['name'],
+                    'label': spec['label'],
+                    'local_port': lp,
+                    'running': _listening(lp),
+                    'tunnel_cmd': f"ssh -L {lp}:127.0.0.1:{lp} -p {port} {user}@{ip}",
+                    'url': f"http://127.0.0.1:{lp}",
+                })
+            return {'panels': panels}
+        except Exception as e:
+            logger.error(f"Error getting webpanels status from {ip}: {str(e)}")
+            return {'panels': [], 'error': str(e)}
+
     def get_security_events(self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30) -> Dict:
         """Получение событий безопасности"""
         import time

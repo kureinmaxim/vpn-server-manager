@@ -75,6 +75,32 @@
                                 <p class="mb-0">{{ _('Все зашифрованные данные расшифровываются "на лету" только в момент их отображения на странице или при копировании в буфер обмена. В файле они всегда остаются зашифрованными.') }}</p>
                             </li>
                         </ul>
+
+                        <h5 class="mt-4">{{ _('Алгоритм шифрования Fernet') }}</h5>
+                        <p>
+                            {{ _('Для защиты ваших данных используется Fernet — это высокоуровневая система симметричного (с секретным ключом) шифрования из библиотеки cryptography.') }}
+                        </p>
+                        <p>{{ _('Ключевые особенности Fernet:') }}</p>
+                        <ul>
+                            <li><strong>{{ _('Гарантия подлинности:') }}</strong> {{ _('Fernet гарантирует, что зашифрованные данные не были изменены или подделаны. Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет быть расшифрован.') }}</li>
+                            <li><strong>{{ _('Надежные алгоритмы:') }}</strong> {{ _('"Под капотом" Fernet использует стандартные и проверенные временем криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с SHA256 для аутентификации (проверки подлинности).') }}</li>
+                        </ul>
+
+                        <h5 class="mt-4"><i class="bi bi-key-fill me-1"></i> {{ _('Что такое SECRET_KEY и где его взять?') }}</h5>
+                        <p>{{ _('<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных в приложении. Он абсолютно необходим для работы.')|safe }}</p>
+                        <ul>
+                            <li><strong>{{ _('Где находится:') }}</strong> {{ _('Ключ хранится в файле <code>.env</code> в корневой папке приложения.')|safe }}</li>
+                            <li><strong>{{ _('Как сгенерировать:') }}</strong> {{ _('Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого можно использовать Python:') }}
+                                <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
+                            </li>
+                            <li>{{ _('Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:')|safe }}
+                                <pre><code class="language-bash">SECRET_KEY={{ _('ваш_сгенерированный_ключ') }}</code></pre>
+                            </li>
+                            <li><strong>{{ _('ВАЖНО:') }}</strong> {{ _('Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.')|safe }}</li>
+                        </ul>
+                        <div class="alert alert-info">
+                            <strong>{{ _('Важно:') }}</strong> {{ _('Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в файле .env. Никогда и никому его не передавайте.') }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,6 +120,40 @@
                             <li><strong>{{ _('Проверка IP сервера:') }}</strong> {{ _('На каждой карточке есть кнопка') }} <i class="bi bi-search"></i> {{ _('"Проверить IP". При нажатии на неё открывается всплывающее окно с подробной информацией об IP-адресе сервера от сервиса') }} `ipinfo.io`, {{ _('включая данные об организации и хостинге.') }}</li>
                             <li><strong>{{ _('Определение владельца IP:') }}</strong> {{ _('Кнопка') }} <i class="bi bi-building"></i> {{ _('"Владелец IP" открывает сервис') }} [IP2Location](https://www.ip2location.com/demo/) {{ _('в новой вкладке для детального анализа владельца IP-адреса сервера, включая информацию об организации, провайдере и геолокации.') }}</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_monitoring">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_monitoring" aria-expanded="false" aria-controls="collapse_monitoring">
+                        <i class="bi bi-graph-up me-2"></i> {{ _('Статус сервера и Расширенный мониторинг') }}
+                    </button>
+                </h2>
+                <div id="collapse_monitoring" class="accordion-collapse collapse" aria-labelledby="heading_monitoring" data-bs-parent="#helpAccordion">
+                    <div class="accordion-body">
+                        <p>{{ _('На карточке сервера есть две кнопки для наблюдения за состоянием VPS по SSH.') }}</p>
+
+                        <h5><i class="bi bi-clipboard-data"></i> {{ _('Статус (быстрый снимок)') }}</h5>
+                        <p>{{ _('Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG» сохраняет снимок в картинку.') }}</p>
+
+                        <h5 class="mt-3"><i class="bi bi-graph-up"></i> {{ _('Расширенный мониторинг (живые данные)') }}</h5>
+                        <p>{{ _('Открывает страницу с автообновляемыми графиками и карточками. Если на сервере ещё нет инструментов мониторинга, появится экран «Установка системы мониторинга».') }}</p>
+                        <div class="alert alert-info">
+                            <strong>{{ _('Установка мониторинга') }}</strong> {{ _('ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq (обработка JSON), net-tools (сетевая статистика). Пакет ufw только устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты.') }}
+                        </div>
+                        <p>{{ _('После установки доступны карточки:') }}</p>
+                        <ul>
+                            <li><strong>{{ _('VPN / Proxy сервисы:') }}</strong> {{ _('состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Статус определяется по реально запущенному процессу на сервере, а не только по systemd.') }}</li>
+                            <li><strong>{{ _('TelegramOnly стек:') }}</strong> {{ _('бот/API и HA-стек (ha-reticulum-bridge, ha-stub-grpc, ha-stub-udp).') }}</li>
+                            <li><strong>{{ _('Reticulum / HA:') }}</strong> {{ _('слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — копировать).') }}</li>
+                            <li><strong>{{ _('Web-панели (SSH-туннель):') }}</strong> {{ _('Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере. Карточка показывает, запущены ли они, даёт готовую команду') }} <code>ssh -L …</code> {{ _('(клик — копировать) и ссылку «Открыть» на') }} <code>http://127.0.0.1:&lt;порт&gt;</code> {{ _('— она заработает после поднятия туннеля.') }}</li>
+                            <li><strong>{{ _('Системные сервисы:') }}</strong> {{ _('nginx, docker, ssh, базы данных и т.п.') }}</li>
+                            <li><strong>{{ _('События безопасности:') }}</strong> {{ _('неудачные попытки входа по SSH и доступные обновления безопасности за 24 часа.') }}</li>
+                        </ul>
+                        <div class="alert alert-secondary">
+                            <i class="bi bi-info-circle"></i> {{ _('Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на самом сервере. Она доступна только на localhost VPS, поэтому открывайте её через SSH-туннель из карточки «Web-панели».') }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -162,17 +222,8 @@
                             <li><strong>{{ _('Открепить файл:') }}</strong> {{ _('Прекратить работу с текущим файлом. Список серверов станет пустым, как при первой установке. Сам файл при этом не удаляется.') }}</li>
                         </ul>
 
-                        <h5>{{ _('Алгоритм шифрования Fernet') }}</h5>
-                        <p>
-                            {{ _('Для защиты ваших данных используется Fernet — это высокоуровневая система симметричного (с секретным ключом) шифрования из библиотеки cryptography.') }}
-                        </p>
-                        <p>{{ _('Ключевые особенности Fernet:') }}</p>
-                        <ul>
-                            <li><strong>{{ _('Гарантия подлинности:') }}</strong> {{ _('Fernet гарантирует, что зашифрованные данные не были изменены или подделаны. Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет быть расшифрован.') }}</li>
-                            <li><strong>{{ _('Надежные алгоритмы:') }}</strong> {{ _('"Под капотом" Fernet использует стандартные и проверенные временем криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с SHA256 для аутентификации (проверки подлинности).') }}</li>
-                        </ul>
-                        <div class="alert alert-info">
-                            <strong>{{ _('Важно:') }}</strong> {{ _('Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в файле .env. Никогда и никому его не передавайте.') }}
+                        <div class="alert alert-secondary">
+                            <i class="bi bi-info-circle"></i> {{ _('Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше.') }}
                         </div>
                     </div>
                 </div>
@@ -252,29 +303,6 @@
             </div>
 
             <div class="accordion-item">
-                <h2 class="accordion-header" id="heading_secret_key">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_secret_key" aria-expanded="false" aria-controls="collapse_secret_key">
-                        <i class="bi bi-key-fill me-2"></i> {{ _('Что такое SECRET_KEY и где его взять?') }}
-                    </button>
-                </h2>
-                <div id="collapse_secret_key" class="accordion-collapse collapse" aria-labelledby="heading_secret_key" data-bs-parent="#helpAccordion">
-                    <div class="card-body">
-                        <p>{{ _('<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных в приложении. Он абсолютно необходим для работы.')|safe }}</p>
-                        <ul>
-                            <li><strong>{{ _('Где находится:') }}</strong> {{ _('Ключ хранится в файле <code>.env</code> в корневой папке приложения.')|safe }}</li>
-                            <li><strong>{{ _('Как сгенерировать:') }}</strong> {{ _('Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого можно использовать Python:') }}
-                                <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
-                            </li>
-                            <li>{{ _('Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:')|safe }}
-                                <pre><code class="language-bash">SECRET_KEY={{ _('ваш_сгенерированный_ключ') }}</code></pre>
-                            </li>
-                            <li><strong>{{ _('ВАЖНО:') }}</strong> {{ _('Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.')|safe }}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_transfer">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_transfer" aria-expanded="false" aria-controls="collapse_transfer">
                         <i class="bi bi-folder-symlink me-2"></i> {{ _('Структура и перенос приложения на другой компьютер?') }}
@@ -322,6 +350,14 @@
                             <li><code>/templates/</code>: {{ _('HTML-шаблоны страниц.') }}</li>
                             <li><code>/static/</code>: {{ _('Статические файлы (CSS, изображения, иконки <code>.png</code> и <code>.icns</code>).')|safe }}</li>
                         </ul>
+
+                        <h5 class="mt-4">{{ _('Алгоритм Работы Программы') }}</h5>
+                        <ol>
+                            <li><strong>{{ _('Запуск') }}</strong>: {{ _('`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно с помощью PyWebView.') }}</li>
+                            <li><strong>{{ _('Отображение') }}</strong>: {{ _('В окне загружается веб-страница. Flask расшифровывает данные из') }} <code>servers.json.enc</code> {{ _('и показывает их.') }}</li>
+                            <li><strong>{{ _('Взаимодействие') }}</strong>: {{ _('Все действия пользователя обрабатываются Flask, который изменяет данные и снова шифрует их.') }}</li>
+                            <li><strong>{{ _('Завершение') }}</strong>: {{ _('При закрытии окна PyWebView отправляет команду на выключение сервера Flask, который корректно завершает работу и освобождает порт.') }}</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -419,199 +455,6 @@
                     
                         <h5 class="mt-4">{{ _('Версия для разработки') }}</h5>
                         <p>{{ _('Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.') }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading_icons">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_icons" aria-expanded="false" aria-controls="collapse_icons">
-                        <i class="bi bi-image me-2"></i> {{ _('Создание и настройка иконок приложения') }}
-                    </button>
-                </h2>
-                <div id="collapse_icons" class="accordion-collapse collapse" aria-labelledby="heading_icons" data-bs-parent="#helpAccordion">
-                    <div class="card-body">
-                        <p>{{ _('Приложение поддерживает кастомные иконки для каждой операционной системы. Это позволяет создать единый визуальный стиль на всех платформах.') }}</p>
-                        
-                        <h5>{{ _('Требования к исходной иконке') }}</h5>
-                        <div class="alert alert-info">
-                            <strong>{{ _('Рекомендуется:') }}</strong> {{ _('Используйте PNG файл размером') }} <strong>1024x1024 {{ _('пикселей') }}</strong> {{ _('с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, включая Retina-дисплеи.') }}
-                        </div>
-                        <ul>
-                            <li><strong>{{ _('Формат:') }}</strong> {{ _('PNG с альфа-каналом (прозрачность)') }}</li>
-                            <li><strong>{{ _('Размер:') }}</strong> 1024x1024 {{ _('пикселей (квадрат)') }}</li>
-                            <li><strong>{{ _('Цветовая модель:') }}</strong> {{ _('RGB') }}</li>
-                            <li><strong>{{ _('Расположение:') }}</strong> <code>static/images/icon.png</code></li>
-                        </ul>
-
-                        <h5>{{ _('Автоматическое создание иконок') }}</h5>
-                        <p>{{ _('При использовании скриптов сборки (') }}<code>build_macos.py</code> {{ _('или') }} <code>build_windows.py</code>{{ _(') иконки создаются автоматически из исходного PNG файла:') }}</p>
-                        <ul>
-                            <li><strong>macOS:</strong> {{ _('Создается файл') }} <code>static/images/icon.icns</code> {{ _('со всеми необходимыми размерами') }}</li>
-                            <li><strong>Windows:</strong> {{ _('Создается файл') }} <code>static/favicon.ico</code> {{ _('с множественными размерами') }}</li>
-                        </ul>
-
-                        <h5>{{ _('Ручное создание иконок') }}</h5>
-                        <p>{{ _('Если вы хотите создать иконки вручную или скрипты сборки не работают:') }}</p>
-                        
-                        <h6>{{ _('Для macOS (.icns)') }}</h6>
-                        <p>{{ _('Создайте временную папку и нарежьте иконку на нужные размеры:') }}</p>
-                        <pre><code class="language-bash"># {{ _('Создайте временную папку') }}
-mkdir -p static/images/tmp.iconset
-
-# {{ _('Создайте иконки разных размеров') }}
-sips -z 16 16 static/images/icon.png --out static/images/tmp.iconset/icon_16x16.png
-sips -z 32 32 static/images/icon.png --out static/images/tmp.iconset/icon_16x16@2x.png
-sips -z 32 32 static/images/icon.png --out static/images/tmp.iconset/icon_32x32.png
-sips -z 64 64 static/images/icon.png --out static/images/tmp.iconset/icon_32x32@2x.png
-sips -z 128 128 static/images/icon.png --out static/images/tmp.iconset/icon_128x128.png
-sips -z 256 256 static/images/icon.png --out static/images/tmp.iconset/icon_128x128@2x.png
-sips -z 256 256 static/images/icon.png --out static/images/tmp.iconset/icon_256x256.png
-sips -z 512 512 static/images/icon.png --out static/images/tmp.iconset/icon_256x256@2x.png
-sips -z 512 512 static/images/icon.png --out static/images/tmp.iconset/icon_512x512.png
-cp static/images/icon.png static/images/tmp.iconset/icon_512x512@2x.png
-
-# {{ _('Создайте .icns файл') }}
-iconutil -c icns static/images/tmp.iconset
-
-# {{ _('Переместите результат и очистите временные файлы') }}
-mv static/images/tmp.icns static/images/icon.icns
-rm -rf static/images/tmp.iconset</code></pre>
-
-                        <h6>{{ _('Для Windows (.ico)') }}</h6>
-                        <p>{{ _('Используйте Python с библиотекой Pillow для создания .ico файла:') }}</p>
-                        <pre><code class="language-bash"># {{ _('Установите Pillow, если не установлена') }}
-pip install Pillow
-
-# {{ _('Создайте .ico файл') }}
-python3 -c "
-from PIL import Image
-import os
-
-if os.path.exists('static/images/icon.png'):
-    img = Image.open('static/images/icon.png')
-    img.save('static/favicon.ico', format='ICO', sizes=[(16,16), (32,32), (48,48), (64,64), (128,128), (256,256)])
-    print('{{ _('Создан .ico файл:') }} static/favicon.ico')
-else:
-    print('{{ _('PNG файл не найден:') }} static/images/icon.png')
-"</code></pre>
-
-                        <h5>{{ _('Замена иконки в уже собранном приложении') }}</h5>
-                        <p>{{ _('Если вы хотите заменить иконку в уже готовом приложении без пересборки:') }}</p>
-                        
-                        <h6>{{ _('macOS') }}</h6>
-                        <ol>
-                            <li>{{ _('Найдите приложение в папке Applications') }}</li>
-                            <li>{{ _('Кликните правой кнопкой мыши → "Get Info" (Свойства)') }}</li>
-                            <li>{{ _('Перетащите новую иконку на маленькую иконку в левом верхнем углу окна') }}</li>
-                            <li>{{ _('Или замените файл') }} <code>YourApp.app/Contents/Resources/icon.icns</code> {{ _('напрямую') }}</li>
-                        </ol>
-
-                        <h6>{{ _('Windows') }}</h6>
-                        <ol>
-                            <li>{{ _('Найдите .exe файл приложения') }}</li>
-                            <li>{{ _('Кликните правой кнопкой мыши → "Properties" → "Change Icon"') }}</li>
-                            <li>{{ _('Или используйте специальные утилиты для замены иконок в .exe файлах (например, Resource Hacker)') }}</li>
-                        </ol>
-
-                        <h5>{{ _('Советы по оптимизации') }}</h5>
-                        <ul>
-                            <li><strong>{{ _('Простота:') }}</strong> {{ _('Иконки должны быть читаемы в малых размерах (16x16). Избегайте мелких деталей.') }}</li>
-                            <li><strong>{{ _('Контраст:') }}</strong> {{ _('Используйте высокий контраст между элементами иконки и фоном.') }}</li>
-                            <li><strong>{{ _('Тестирование:') }}</strong> {{ _('Проверьте как иконка выглядит на разных фонах (светлом/темном).') }}</li>
-                            <li><strong>{{ _('Формат:') }}</strong> {{ _('Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую совместимость.') }}</li>
-                        </ul>
-
-                        <div class="alert alert-warning">
-                            <strong>{{ _('Важно:') }}</strong> {{ _('После замены иконки может потребоваться перезагрузка системы или очистка кэша иконок, чтобы изменения стали видны в файловом менеджере.') }}
-                        </div>
-
-                        <h5>{{ _('Устранение проблем с иконками') }}</h5>
-                        <p>{{ _('Если иконки не отображаются или приложение собирается с дефектными иконками:') }}</p>
-                        
-                        <h6>{{ _('Проблема: Иконка не отображается в собранном приложении') }}</h6>
-                        <ul>
-                            <li><strong>{{ _('Проверьте размер файла:') }}</strong> {{ _('Убедитесь, что') }} <code>static/images/icon.icns</code> {{ _('имеет размер больше 1KB. Если файл всего несколько байт, он поврежден.')|safe }}</li>
-                            <li><strong>{{ _('Пересоздайте иконки:') }}</strong> {{ _('Удалите') }} <code>static/images/icon.icns</code> {{ _('и') }} <code>static/favicon.ico</code>, {{ _('затем запустите сборку снова.')|safe }}</li>
-                            <li><strong>{{ _('Проверьте путь в build_macos.py:')|safe }}</strong> {{ _('Убедитесь, что путь') }} <code>ICON_FILE</code> {{ _('правильно указывает на') }} <code>static/images/icon.icns</code>|safe }}</li>
-                        </ul>
-
-                        <h6>{{ _('Проблема: Ошибка при автоматическом создании иконок') }}</h6>
-                        <ul>
-                            <li><strong>{{ _('macOS:') }}</strong> {{ _('Убедитесь, что утилиты') }} <code>sips</code> {{ _('и') }} <code>iconutil</code> {{ _('доступны в системе') }}</li>
-                            <li><strong>{{ _('Windows:') }}</strong> {{ _('Установите библиотеку Pillow:') }} <code>pip install Pillow</code></li>
-                            <li><strong>{{ _('Права доступа:') }}</strong> {{ _('Убедитесь, что у приложения есть права на запись в папку') }} <code>static/images/</code></li>
-                        </ul>
-
-                        <h6>{{ _('Проблема: Иконка размыта или низкого качества') }}</h6>
-                        <ul>
-                            <li><strong>{{ _('Увеличьте разрешение исходника:') }}</strong> {{ _('Используйте PNG размером не менее 1024x1024 пикселей') }}</li>
-                            <li><strong>{{ _('Проверьте качество PNG:') }}</strong> {{ _('Убедитесь, что исходный файл не сжат с потерями') }}</li>
-                            <li><strong>{{ _('Пересоздайте иконки:') }}</strong> {{ _('Удалите старые иконки и пересоздайте их из нового PNG') }}</li>
-                        </ul>
-
-                        <h6>{{ _('Диагностика проблем') }}</h6>
-                        <p>{{ _('Для диагностики проблем с иконками выполните следующие команды:') }}</p>
-                        <pre><code class="language-bash"># {{ _('Проверьте размер и тип файлов иконок') }}
-ls -la static/images/icon.icns static/favicon.ico
-file static/images/icon.icns static/favicon.ico
-
-# {{ _('Проверьте исходный PNG') }}
-file static/images/icon.png</code></pre>
-
-                        <div class="alert alert-info">
-                            <strong>{{ _('Совет:') }}</strong> {{ _('Если проблемы с иконками повторяются, создайте резервную копию рабочей иконки после успешной сборки. Это поможет быстро восстановить функциональность в случае проблем.') }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading_structure">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_structure" aria-expanded="false" aria-controls="collapse_structure">
-                        <i class="bi bi-diagram-3 me-2"></i> {{ _('Структура проекта и алгоритм работы') }}
-                    </button>
-                </h2>
-                <div id="collapse_structure" class="accordion-collapse collapse" aria-labelledby="heading_structure" data-bs-parent="#helpAccordion">
-                    <div class="card-body">
-                        <h5>{{ _('Дерево Проекта') }}</h5>
-<pre><code class="language-bash">
-VPNserverManage/
-│
-├── app.py
-├── build_macos.py
-├── requirements.txt
-├── config.json
-│
-├── data/
-│   ├── servers.json.enc
-│   └── hints.json
-│
-├── static/
-│   └── ...
-│
-├── templates/
-│   └── ...
-│
-└── venv/
-</code></pre>
-                        <h5>{{ _('Описание Файлов и Директорий') }}</h5>
-                        <ul>
-                            <li><strong><code>app.py</code></strong>: {{ _('Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию с PyWebView для создания окна.') }}</li>
-                            <li><strong><code>build_macos.py</code></strong>: {{ _('Скрипт для сборки приложения в') }} <code>.app</code> {{ _('для macOS с помощью PyInstaller.') }}</li>
-                            <li><strong><code>requirements.txt</code></strong>: {{ _('Список всех библиотек Python, необходимых для работы.') }}</li>
-                            <li><strong><code>config.json</code></strong>: {{ _('Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов.') }}</li>
-                            <li><strong><code>data/servers.json.enc</code></strong>: {{ _('Самый важный файл. Это') }} <strong>{{ _('зашифрованный') }}</strong> {{ _('JSON-файл, содержащий всю информацию о серверах.') }}</li>
-                            <li><strong><code>static/</code></strong> {{ _('и') }} <strong><code>templates/</code></strong>: {{ _('Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-интерфейса.') }}</li>
-                        </ul>
-
-                        <h5>{{ _('Алгоритм Работы Программы') }}</h5>
-                        <ol>
-                            <li><strong>{{ _('Запуск') }}</strong>: {{ _('`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно с помощью PyWebView.') }}</li>
-                            <li><strong>{{ _('Отображение') }}</strong>: {{ _('В окне загружается веб-страница. Flask расшифровывает данные из') }} <code>servers.json.enc</code> {{ _('и показывает их.') }}</li>
-                            <li><strong>{{ _('Взаимодействие') }}</strong>: {{ _('Все действия пользователя обрабатываются Flask, который изменяет данные и снова шифрует их.') }}</li>
-                            <li><strong>{{ _('Завершение') }}</strong>: {{ _('При закрытии окна PyWebView отправляет команду на выключение сервера Flask, который корректно завершает работу и освобождает порт.') }}</li>
-                        </ol>
                     </div>
                 </div>
             </div>
