@@ -33,6 +33,8 @@ class SSHService:
         "50056": "HA stub UDP",
         "50061": "HA Reticulum bridge",
         "18090": "SHSK-M Remote CLI gRPC",
+        "7070": "i2pd web console",
+        "7656": "i2pd SAM (I2P)",
     }
     _service_catalog = [
         # --- VPN / proxy транспорты (секция «VPN / Proxy сервисы») ---
@@ -102,6 +104,12 @@ class SSHService:
             "display_name": "SHSK-M Remote CLI",
             "group": "telegramonly",
             "unit_candidates": ["shskm-remote-cli"],
+        },
+        {
+            "name": "i2pd",
+            "display_name": "i2pd (I2P для Reticulum)",
+            "group": "telegramonly",
+            "unit_candidates": ["i2pd"],
         },
         # --- системные ---
         {

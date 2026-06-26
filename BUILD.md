@@ -21,6 +21,23 @@
   - скрипты ждут компилятор по пути `C:\Program Files (x86)\Inno Setup 6\ISCC.exe`
     (поправьте `$IsccPath` / `ISCC_PATH` в `build_windows.ps1` / `.bat`, если иной)
 - macOS + Xcode CLT (`sips`, `iconutil`) — для сборки `.app`
+- виртуальное окружение `venv` с зависимостями из `requirements.txt` — для сборки
+  на macOS и для шагов ниже (системный `python3` их не содержит)
+
+## Подготовка окружения (macOS / Linux)
+
+Перед сборкой и шагами 1–2 поднимите `venv` и установите зависимости:
+
+```bash
+python3 -m venv venv          # один раз, если venv ещё нет
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+Дальше в этом документе `python` / `python3` подразумевают **активированный venv**.
+Без активации на macOS/Linux можно вызывать явно: `venv/bin/python3 …`.
+
+Windows (PowerShell): `.\venv\Scripts\Activate.ps1`
 
 ---
 
@@ -101,8 +118,17 @@ installer_output/checksum.txt
 
 ### macOS (приложение `.app` + `.dmg`)
 
+Из корня проекта, с активированным `venv` (см. «Подготовка окружения»):
+
 ```bash
+source venv/bin/activate
 python3 build_macos.py
+```
+
+Без активации:
+
+```bash
+venv/bin/python3 build_macos.py
 ```
 
 Использует PyInstaller; иконки `.icns` генерируются из `static/images/icon.png`.
@@ -153,6 +179,11 @@ python -m pip install pytest pytest-cov   # если зависимостей т
 ```
 
 ## Частые проблемы
+
+### `ModuleNotFoundError: No module named 'dotenv'` (macOS)
+Скрипт `build_macos.py` запущен системным `python3`, а не из `venv`. Активируйте
+окружение (`source venv/bin/activate`) или используйте `venv/bin/python3 build_macos.py`.
+При первой настройке: `pip install -r requirements.txt`.
 
 ### `Installer not found` после Inno Setup
 Версии в `config/config.json.template` и `vpn-manager-installer.iss` разошлись.
