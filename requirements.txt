@@ -29,7 +29,7 @@ pytest-flask>=1.2.0
 pytest-cov>=7.1.0
 
 # Code quality
-flake8>=6.0.0
+flake8>=7.3.0
 black>=23.0.0
 isort>=8.0.1
 
