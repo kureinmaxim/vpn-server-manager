@@ -21,7 +21,7 @@ requests>=2.31.0
 urllib3>=2.7.0
 
 # Environment variables
-python-dotenv>=1.0.0
+python-dotenv>=1.2.2
 
 # Development and testing
 pytest>=9.1.1
