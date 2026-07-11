@@ -14,7 +14,7 @@ pywebview>=4.0.0
 cryptography>=41.0.0
 
 # SSH/SFTP
-paramiko>=3.0.0
+paramiko>=5.0.0
 
 # HTTP requests
 requests>=2.31.0
