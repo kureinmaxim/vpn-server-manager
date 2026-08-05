@@ -245,3 +245,74 @@ class TestMainRoutes:
         assert saved_server['panel_credentials']['password'] == 'enc::new-panel-password'
         assert saved_server['hoster_credentials']['user'] == 'enc::new-hoster-user'
         assert saved_server['hoster_credentials']['password'] == 'enc::new-hoster-password'
+
+    def test_edit_server_sanitizes_pasted_password_artifacts(self, client):
+        """Вставка пароля с пробелами/ZWSP/переносами не должна портить SSH-секрет."""
+        class StubDataManager:
+            def __init__(self):
+                self.servers = [{
+                    'id': '1',
+                    'name': 'Test',
+                    'provider': '',
+                    'ip_address': '127.0.0.1',
+                    'os': '',
+                    'status': 'Active',
+                    'notes': '',
+                    'docker_info': '',
+                    'software_info': '',
+                    'card_color': '#ffc107',
+                    'panel_url': '',
+                    'hoster_url': '',
+                    'specs': {'cpu': '', 'ram': '', 'disk': ''},
+                    'payment_info': {
+                        'amount': 0.0, 'currency': 'USD',
+                        'next_due_date': '', 'payment_period': 'Monthly',
+                    },
+                    'ssh_credentials': {
+                        'user': 'root', 'port': 22, 'root_login_allowed': False,
+                        'password': 'old', 'password_decrypted': 'old',
+                        'root_password': '', 'root_password_decrypted': '',
+                    },
+                    'panel_credentials': {
+                        'user': '', 'user_decrypted': '',
+                        'password': '', 'password_decrypted': '',
+                    },
+                    'hoster_credentials': {
+                        'login_method': 'password',
+                        'user': '', 'user_decrypted': '',
+                        'password': '', 'password_decrypted': '',
+                    },
+                    'checks': {'dns_ok': False, 'streaming_ok': False},
+                }]
+                self.saved_servers = None
+
+            def load_servers(self, config):
+                return self.servers
+
+            def get_active_data_path(self, config):
+                return 'test-data.enc'
+
+            def save_servers(self, servers, file_path):
+                self.saved_servers = copy.deepcopy(servers)
+
+            def encrypt_data(self, data):
+                return f'enc::{data}'
+
+        data_manager = StubDataManager()
+        registry.register('data_manager', data_manager)
+        registry.register('crypto', CryptoService())
+
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+
+        dirty = "  p@ss'Word!\u200b\r\n "
+        response = client.post(
+            '/edit_server/1',
+            data={'ssh_password': dirty},
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+        saved = data_manager.saved_servers[0]
+        assert saved['ssh_credentials']['password'] == "enc::p@ss'Word!"
+        assert saved['ssh_credentials']['password_decrypted'] == "p@ss'Word!"
