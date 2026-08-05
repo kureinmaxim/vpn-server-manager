@@ -7,10 +7,13 @@ import os
 import sys
 import json
 import shutil
+import copy
 import datetime
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from cryptography.fernet import Fernet, InvalidToken
+
+from ..utils.credentials import sanitize_secret
 
 
 class DataManagerService:
@@ -294,25 +297,51 @@ class DataManagerService:
                     # SSH credentials
                     if 'ssh_credentials' in server:
                         ssh = server['ssh_credentials']
-                        ssh['password_decrypted'] = self.decrypt_data(ssh.get('password', ''))
-                        ssh['root_password_decrypted'] = self.decrypt_data(ssh.get('root_password', ''))
+                        ssh['password_decrypted'] = sanitize_secret(
+                            self.decrypt_data(ssh.get('password', ''))
+                        )
+                        ssh['root_password_decrypted'] = sanitize_secret(
+                            self.decrypt_data(ssh.get('root_password', ''))
+                        )
                     
                     # Panel credentials
                     if 'panel_credentials' in server:
                         panel = server['panel_credentials']
-                        panel['user_decrypted'] = self.decrypt_data(panel.get('user', ''))
-                        panel['password_decrypted'] = self.decrypt_data(panel.get('password', ''))
+                        panel['user_decrypted'] = sanitize_secret(
+                            self.decrypt_data(panel.get('user', ''))
+                        )
+                        panel['password_decrypted'] = sanitize_secret(
+                            self.decrypt_data(panel.get('password', ''))
+                        )
                     
                     # Hoster credentials
                     if 'hoster_credentials' in server:
                         hoster = server['hoster_credentials']
-                        hoster['user_decrypted'] = self.decrypt_data(hoster.get('user', ''))
-                        hoster['password_decrypted'] = self.decrypt_data(hoster.get('password', ''))
+                        hoster['user_decrypted'] = sanitize_secret(
+                            self.decrypt_data(hoster.get('user', ''))
+                        )
+                        hoster['password_decrypted'] = sanitize_secret(
+                            self.decrypt_data(hoster.get('password', ''))
+                        )
             
             return servers if isinstance(servers, list) else []
         except Exception as e:
             print(f"Ошибка загрузки серверов: {e}")
             return []
+
+    @staticmethod
+    def _strip_runtime_secrets(servers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Убирает plaintext *_decrypted поля перед записью в файл."""
+        cleaned = copy.deepcopy(servers)
+        for server in cleaned:
+            for section in ('ssh_credentials', 'panel_credentials', 'hoster_credentials'):
+                creds = server.get(section)
+                if not isinstance(creds, dict):
+                    continue
+                for key in list(creds.keys()):
+                    if key.endswith('_decrypted'):
+                        creds.pop(key, None)
+        return cleaned
     
     def save_servers(self, servers: List[Dict[str, Any]], file_path: str) -> None:
         """
@@ -323,10 +352,15 @@ class DataManagerService:
             file_path: Путь к файлу для сохранения
         """
         # Создаем директорию если нужно
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        parent = os.path.dirname(file_path)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+
+        # Не храним plaintext-поля внутри зашифрованного JSON
+        servers_to_store = self._strip_runtime_secrets(servers)
         
         # Шифруем данные
-        json_string = json.dumps(servers, ensure_ascii=False, indent=2)
+        json_string = json.dumps(servers_to_store, ensure_ascii=False, indent=2)
         encrypted_data = self.fernet.encrypt(json_string.encode('utf-8'))
         
         # Сохраняем

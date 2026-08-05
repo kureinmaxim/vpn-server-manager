@@ -136,6 +136,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/credentials.js') }}"></script>
     <script>
         // Применить сохранённый масштаб при загрузке
         document.addEventListener('DOMContentLoaded', function() {
@@ -379,41 +380,8 @@
                 });
         }
 
-        // Функция копирования в буфер обмена
-        function copyToClipboard(button, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="bi bi-check"></i>';
-                button.classList.add('btn-success');
-                button.classList.remove('btn-outline-secondary');
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.classList.remove('btn-success');
-                    button.classList.add('btn-outline-secondary');
-                }, 1000);
-            }).catch(err => {
-                console.error('Ошибка копирования:', err);
-                alert('Не удалось скопировать в буфер обмена');
-            });
-        }
+        // copyToClipboard / togglePassword — static/js/credentials.js
 
-        // Функция переключения видимости пароля
-        function togglePassword(button) {
-            const passwordField = button.previousElementSibling;
-            const isVisible = passwordField.type === 'text';
-            
-            if (isVisible) {
-                passwordField.type = 'password';
-                passwordField.textContent = '********';
-                button.innerHTML = '<i class="bi bi-eye"></i>';
-            } else {
-                passwordField.type = 'text';
-                passwordField.textContent = passwordField.dataset.password;
-                button.innerHTML = '<i class="bi bi-eye-slash"></i>';
-            }
-        }
-        
         // Функция выхода из системы
         function logout(event) {
             if (event) {
