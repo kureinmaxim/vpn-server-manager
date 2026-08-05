@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/credentials.html" import password_input, current_secret_row %}
 
 {% block title %}{{ _('Редактировать сервер') }}{% endblock %}
 
@@ -127,29 +128,38 @@
                 </div>
 
                 <h5 class="mt-4">{{ _('SSH-доступ') }}</h5>
+                <p class="text-muted small mb-3">
+                    {{ _('При вставке пароля лишние пробелы, переносы и невидимые символы удаляются автоматически. Пустое поле — не менять.') }}
+                </p>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>
-                        <input type="text" class="form-control" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}">
+                        <input type="text" class="form-control" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}" autocomplete="username">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="ssh_password" class="form-label">{{ _('Новый пароль SSH') }}</label>
-                        <input type="password" class="form-control" id="ssh_password" name="ssh_password" aria-describedby="sshPasswordHelp">
-                        <div id="sshPasswordHelp" class="form-text">{{ _('Оставьте пустым, чтобы не менять.') }}</div>
-                    </div>
-                     <div class="col-md-6 mb-3">
                         <label for="ssh_port" class="form-label">{{ _('Порт SSH') }}</label>
                         <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="{{ server.ssh_credentials.get('port', 22) }}">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="ssh_root_password" class="form-label">{{ _('Новый пароль root') }}</label>
-                        <input type="password" class="form-control" id="ssh_root_password" name="ssh_root_password" aria-describedby="rootPasswordHelp">
-                        <div id="rootPasswordHelp" class="form-text">{{ _('Оставьте пустым, чтобы не менять.') }}</div>
+                    <div class="col-md-6">
+                        {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль SSH')) }}
+                        {{ password_input(
+                            'ssh_password', 'ssh_password', _('Новый пароль SSH'),
+                            help_text=_('Оставьте пустым, чтобы не менять.'),
+                            is_set=server.ssh_credentials.password_decrypted,
+                            placeholder=_('Вставьте новый пароль')
+                        ) }}
                     </div>
-                    <div class="col-md-6 mb-3 d-flex align-items-end">
-                        <div class="form-check">
+                    <div class="col-md-6">
+                        {{ current_secret_row(server.ssh_credentials.root_password_decrypted, _('Текущий пароль root')) }}
+                        {{ password_input(
+                            'ssh_root_password', 'ssh_root_password', _('Новый пароль root'),
+                            help_text=_('Оставьте пустым, чтобы не менять.'),
+                            is_set=server.ssh_credentials.root_password_decrypted,
+                            placeholder=_('Вставьте новый пароль root')
+                        ) }}
+                        <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" {% if server.ssh_credentials.get('root_login_allowed') %}checked{% endif %}>
                             <label class="form-check-label" for="root_login_allowed">
                                 {{ _('Вход для root по SSH разрешен') }}
@@ -166,12 +176,16 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
-                        <input type="text" class="form-control" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}">
+                        <input type="text" class="form-control" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}" autocomplete="off">
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="panel_password" class="form-label">{{ _('Новый пароль панели') }}</label>
-                        <input type="password" class="form-control" id="panel_password" name="panel_password" aria-describedby="panelPasswordHelp">
-                        <div id="panelPasswordHelp" class="form-text">{{ _('Оставьте пустым, чтобы не менять.') }}</div>
+                    <div class="col-md-6">
+                        {{ current_secret_row(server.panel_credentials.password_decrypted, _('Текущий пароль панели')) }}
+                        {{ password_input(
+                            'panel_password', 'panel_password', _('Новый пароль панели'),
+                            help_text=_('Оставьте пустым, чтобы не менять.'),
+                            is_set=server.panel_credentials.password_decrypted,
+                            placeholder=_('Вставьте новый пароль панели')
+                        ) }}
                     </div>
                 </div>
 
@@ -194,12 +208,16 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="hoster_user" class="form-label" id="hoster_user_label">{{ _('Логин хостера') }}</label>
-                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com">
+                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com" autocomplete="off">
                     </div>
-                    <div class="col-md-6 mb-3" id="hoster_password_field">
-                        <label for="hoster_password" class="form-label">{{ _('Новый пароль хостера') }}</label>
-                        <input type="password" class="form-control" id="hoster_password" name="hoster_password" aria-describedby="hosterPasswordHelp">
-                        <div id="hosterPasswordHelp" class="form-text">{{ _('Оставьте пустым, чтобы не менять.') }}</div>
+                    <div class="col-md-6" id="hoster_password_field">
+                        {{ current_secret_row(server.hoster_credentials.password_decrypted, _('Текущий пароль хостера')) }}
+                        {{ password_input(
+                            'hoster_password', 'hoster_password', _('Новый пароль хостера'),
+                            help_text=_('Оставьте пустым, чтобы не менять.'),
+                            is_set=server.hoster_credentials.password_decrypted,
+                            placeholder=_('Вставьте новый пароль хостера')
+                        ) }}
                     </div>
                 </div>
 

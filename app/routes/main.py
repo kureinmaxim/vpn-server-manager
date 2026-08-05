@@ -10,6 +10,7 @@ import zipfile
 import signal
 from ..services import registry
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
+from ..utils.credentials import sanitize_secret
 from ..exceptions import ValidationError, AuthenticationError
 
 logger = logging.getLogger(__name__)
@@ -165,22 +166,24 @@ def add_server():
                 "receipts": [],
             },
             "ssh_credentials": {
-                "user": request.form.get('ssh_user', ''),
-                "password": data_manager.encrypt_data(request.form.get('ssh_password', '')),
+                "user": sanitize_secret(request.form.get('ssh_user', '')),
+                "password": data_manager.encrypt_data(sanitize_secret(request.form.get('ssh_password', ''))),
                 "port": int(request.form.get('ssh_port') or 22),
-                "root_password": data_manager.encrypt_data(request.form.get('ssh_root_password', '')),
+                "root_password": data_manager.encrypt_data(sanitize_secret(request.form.get('ssh_root_password', ''))),
                 "root_login_allowed": 'root_login_allowed' in request.form,
             },
             "panel_url": request.form.get('panel_url', ''),
             "panel_credentials": {
-                "user": data_manager.encrypt_data(request.form.get('panel_user', '')),
-                "password": data_manager.encrypt_data(request.form.get('panel_password', '')),
+                "user": data_manager.encrypt_data(
+                    sanitize_secret(request.form.get('panel_user') or request.form.get('panel_login', ''))
+                ),
+                "password": data_manager.encrypt_data(sanitize_secret(request.form.get('panel_password', ''))),
             },
             "hoster_url": request.form.get('hoster_url', ''),
             "hoster_credentials": {
                 "login_method": request.form.get('hoster_login_method', 'password'),
-                "user": data_manager.encrypt_data(request.form.get('hoster_user', '')),
-                "password": data_manager.encrypt_data(request.form.get('hoster_password', '')),
+                "user": data_manager.encrypt_data(sanitize_secret(request.form.get('hoster_user', ''))),
+                "password": data_manager.encrypt_data(sanitize_secret(request.form.get('hoster_password', ''))),
             },
             "notes": request.form.get('notes', ''),
             "docker_info": request.form.get('docker_info', ''),
@@ -304,28 +307,30 @@ def edit_server(server_id):
                 server['payment_info']['payment_period'] = request.form.get('payment_period', 'Monthly')
                 
                 # Обновляем SSH данные
-                server['ssh_credentials']['user'] = request.form.get('ssh_user', server['ssh_credentials'].get('user', ''))
+                server['ssh_credentials']['user'] = sanitize_secret(
+                    request.form.get('ssh_user', server['ssh_credentials'].get('user', ''))
+                )
                 server['ssh_credentials']['port'] = int(request.form.get('ssh_port', 22) or 22)
                 server['ssh_credentials']['root_login_allowed'] = bool(request.form.get('root_login_allowed'))
                 
-                # Обновляем пароли SSH если указаны новые
-                new_ssh_password = request.form.get('ssh_password', '').strip()
+                # Обновляем пароли SSH если указаны новые (sanitize: trim + невидимые символы)
+                new_ssh_password = sanitize_secret(request.form.get('ssh_password', ''))
                 if new_ssh_password:
                     server['ssh_credentials']['password'] = data_manager.encrypt_data(new_ssh_password)
                     server['ssh_credentials']['password_decrypted'] = new_ssh_password
                 
-                new_root_password = request.form.get('ssh_root_password', '').strip()
+                new_root_password = sanitize_secret(request.form.get('ssh_root_password', ''))
                 if new_root_password:
                     server['ssh_credentials']['root_password'] = data_manager.encrypt_data(new_root_password)
                     server['ssh_credentials']['root_password_decrypted'] = new_root_password
                 
                 # Обновляем данные панели управления
-                new_panel_user = request.form.get('panel_user', '').strip()
+                new_panel_user = sanitize_secret(request.form.get('panel_user', ''))
                 if new_panel_user:
                     server['panel_credentials']['user'] = data_manager.encrypt_data(new_panel_user)
                     server['panel_credentials']['user_decrypted'] = new_panel_user
                 
-                new_panel_password = request.form.get('panel_password', '').strip()
+                new_panel_password = sanitize_secret(request.form.get('panel_password', ''))
                 if new_panel_password:
                     server['panel_credentials']['password'] = data_manager.encrypt_data(new_panel_password)
                     server['panel_credentials']['password_decrypted'] = new_panel_password
@@ -333,12 +338,12 @@ def edit_server(server_id):
                 # Обновляем данные хостера
                 server['hoster_credentials']['login_method'] = request.form.get('hoster_login_method', 'password')
                 
-                new_hoster_user = request.form.get('hoster_user', '').strip()
+                new_hoster_user = sanitize_secret(request.form.get('hoster_user', ''))
                 if new_hoster_user:
                     server['hoster_credentials']['user'] = data_manager.encrypt_data(new_hoster_user)
                     server['hoster_credentials']['user_decrypted'] = new_hoster_user
                 
-                new_hoster_password = request.form.get('hoster_password', '').strip()
+                new_hoster_password = sanitize_secret(request.form.get('hoster_password', ''))
                 if new_hoster_password:
                     server['hoster_credentials']['password'] = data_manager.encrypt_data(new_hoster_password)
                     server['hoster_credentials']['password_decrypted'] = new_hoster_password
