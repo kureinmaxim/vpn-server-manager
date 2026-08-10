@@ -204,7 +204,7 @@
                                 <div class="accordion-body py-2">
                                     <div class="text-center mb-2">
                                         <button class="btn btn-sm btn-outline-success w-100"
-                                                data-copy-value={{ ("ssh " ~ server.ssh_credentials.user ~ "@" ~ server.ip_address ~ " -p " ~ server.ssh_credentials.get('port', 22))|tojson }}
+                                                data-copy-value="{{ 'ssh ' ~ server.ssh_credentials.user ~ '@' ~ server.ip_address ~ ' -p ' ~ server.ssh_credentials.get('port', 22) }}"
                                                 onclick="copyToClipboard(this)"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="{{ _('Копировать SSH команду подключения') }}">
