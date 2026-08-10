@@ -168,7 +168,10 @@ class DesktopApp:
         """Остановка desktop приложения"""
         try:
             if self.window:
-                webview.destroy_window(self.window)
+                # Не webview.destroy_window(window) — это API pywebview 2.x, его нет
+                # ни в 4.x, ни в 6.x. AttributeError глотался except-ом ниже, и окно
+                # молча оставалось открытым.
+                self.window.destroy()
             logger.info("Desktop app stopped")
         except Exception as e:
             logger.error(f"Error stopping desktop app: {str(e)}")
