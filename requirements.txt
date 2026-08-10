@@ -8,16 +8,16 @@ Flask-Babel==4.0.0
 Babel==2.18.0
 
 # Desktop GUI
-pywebview>=4.0.0
+pywebview>=6.2.1
 
 # Cryptography
-cryptography>=49.0.0
+cryptography>=50.0.0
 
 # SSH/SFTP
 paramiko>=5.0.0
 
 # HTTP requests
-requests>=2.31.0
+requests>=2.34.2
 urllib3>=2.7.0
 
 # Environment variables
@@ -30,11 +30,11 @@ pytest-cov>=7.1.0
 
 # Code quality
 flake8>=7.3.0
-black>=23.0.0
+black>=26.5.1
 isort>=8.0.1
 
 # Security
-bandit>=1.7.0
+bandit>=1.9.4
 
 # Build tools
 pyinstaller>=6.21.0 
