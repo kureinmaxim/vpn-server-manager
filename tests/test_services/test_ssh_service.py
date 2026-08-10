@@ -26,32 +26,38 @@ class TestSSHService:
         # Проверки
         assert service.client == mock_client
         mock_client.set_missing_host_key_policy.assert_called_once()
-        mock_client.connect.assert_called_once_with(
-            hostname='localhost',
-            username='testuser',
-            password='testpass',
-            key_filename=None,
-            port=22,
-            timeout=10
-        )
-    
+        mock_client.connect.assert_called_once()
+
+        # Проверяем значимые параметры, а не полную сигнатуру вызова: точные
+        # значения таймаутов — деталь реализации, их подкрутка не должна ронять тест.
+        kwargs = mock_client.connect.call_args.kwargs
+        assert kwargs['hostname'] == 'localhost'
+        assert kwargs['username'] == 'testuser'
+        assert kwargs['password'] == 'testpass'
+        assert kwargs['key_filename'] is None
+        assert kwargs['port'] == 22
+        assert kwargs['timeout'] > 0
+        # Подключение не должно втихую подхватывать ключи из ~/.ssh или ssh-agent
+        assert kwargs['look_for_keys'] is False
+        assert kwargs['allow_agent'] is False
+
     @patch('app.services.ssh_service.paramiko.SSHClient')
     def test_connect_with_key_file(self, mock_ssh_client):
         """Тест подключения с ключом"""
         mock_client = Mock()
         mock_ssh_client.return_value = mock_client
-        
+
         service = SSHService()
         service.connect('localhost', 'testuser', key_filename='/path/to/key')
-        
-        mock_client.connect.assert_called_once_with(
-            hostname='localhost',
-            username='testuser',
-            password=None,
-            key_filename='/path/to/key',
-            port=22,
-            timeout=10
-        )
+
+        mock_client.connect.assert_called_once()
+
+        kwargs = mock_client.connect.call_args.kwargs
+        assert kwargs['hostname'] == 'localhost'
+        assert kwargs['username'] == 'testuser'
+        assert kwargs['password'] is None
+        assert kwargs['key_filename'] == '/path/to/key'
+        assert kwargs['port'] == 22
     
     @patch('app.services.ssh_service.paramiko.SSHClient')
     def test_connect_authentication_error(self, mock_ssh_client):
@@ -85,15 +91,18 @@ class TestSSHService:
         """Тест отключения"""
         service = SSHService()
         
-        # Мокаем клиентов
-        service.sftp_client = Mock()
-        service.client = Mock()
-        
+        # Мокаем клиентов. Ссылки держим локально: disconnect() обнуляет атрибуты,
+        # поэтому проверять вызовы через service.* после него уже нельзя.
+        mock_sftp = Mock()
+        mock_client = Mock()
+        service.sftp_client = mock_sftp
+        service.client = mock_client
+
         service.disconnect()
-        
+
         # Проверяем, что клиенты закрыты
-        service.sftp_client.close.assert_called_once()
-        service.client.close.assert_called_once()
+        mock_sftp.close.assert_called_once()
+        mock_client.close.assert_called_once()
         assert service.sftp_client is None
         assert service.client is None
     
@@ -158,10 +167,12 @@ class TestSSHService:
         """Тест загрузки файла"""
         service = SSHService()
         
-        # Мокаем SFTP клиента
+        # Мокаем SFTP клиента. client тоже нужен: upload_file идёт через
+        # get_sftp_client(), а тот падает с SSHConnectionError без SSH-подключения.
         mock_sftp = Mock()
+        service.client = Mock()
         service.sftp_client = mock_sftp
-        
+
         service.upload_file('/local/path', '/remote/path')
         
         mock_sftp.put.assert_called_once_with('/local/path', '/remote/path')
@@ -172,8 +183,9 @@ class TestSSHService:
         
         # Мокаем SFTP клиента
         mock_sftp = Mock()
+        service.client = Mock()
         service.sftp_client = mock_sftp
-        
+
         service.download_file('/remote/path', '/local/path')
         
         mock_sftp.get.assert_called_once_with('/remote/path', '/local/path')
@@ -191,6 +203,7 @@ class TestSSHService:
         mock_file_attr.st_mtime = 1234567890
         
         mock_sftp.listdir_attr.return_value = [mock_file_attr]
+        service.client = Mock()
         service.sftp_client = mock_sftp
         
         result = service.list_directory('/remote/path')
@@ -279,16 +292,23 @@ class TestSSHService:
             stdout.read.return_value = output.encode('utf-8')
             return stdin, stdout, stderr
 
+        # Матчим по подстроке, а не по точной команде: код детекта утилит уже
+        # переезжал с `which` на `command -v` с явным PATH, и точное сравнение
+        # молча превращало тест в проверку ветки «утилита не установлена».
         def exec_side_effect(command):
-            mapping = {
-                'which vnstat': '/usr/bin/vnstat\n',
-                'which jq': '/usr/bin/jq\n',
-                'which ufw': '/usr/sbin/ufw\n',
-                'which netstat': '/usr/bin/netstat\n',
-                'systemctl is-active vnstat 2>/dev/null': 'active\n',
-                'sudo ufw status 2>/dev/null | grep "Status:" | awk \'{print $2}\'': 'active\n',
-            }
-            return make_result(mapping.get(command, ''))
+            if 'ufw status' in command:
+                return make_result('active\n')
+            if 'systemctl is-active vnstat' in command:
+                return make_result('active\n')
+            for name, path in (
+                ('vnstat', '/usr/bin/vnstat'),
+                ('jq', '/usr/bin/jq'),
+                ('ufw', '/usr/sbin/ufw'),
+                ('netstat', '/usr/bin/netstat'),
+            ):
+                if 'command -v %s ' % name in command:
+                    return make_result('%s\n' % path)
+            return make_result('')
 
         client.exec_command.side_effect = exec_side_effect
 
@@ -301,6 +321,10 @@ class TestSSHService:
             )
 
         ufw_tool = result['tools']['ufw']
+        # Страховка от тихой деградации: если детект утилиты снова разъедется с
+        # моком, тест должен падать здесь, а не проверять не ту ветку кода.
+        assert ufw_tool['installed'] is True
+        assert ufw_tool['enabled'] is True
         assert ufw_tool['warning'] == '⚠️ UFW включен! Убедитесь что SSH-порт 22542 разрешен!'
         assert ufw_tool['fix_cmd'] == 'sudo ufw allow 22542/tcp && sudo ufw status numbered'
 
