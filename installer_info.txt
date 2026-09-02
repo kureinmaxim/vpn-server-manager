@@ -1,0 +1,17 @@
+﻿VPN Server Manager
+
+A local desktop app for people who run VPN servers.
+Encrypted inventory, SSH monitoring, and PIN lock. No cloud account.
+
+Requirements
+- Python 3.13 or newer
+- This installer copies application files. After installation, run
+  setup_windows.bat on first install (creates a virtual environment
+  and installs Python packages).
+
+Your server data stays on this computer. Keep a backup of the
+encryption key from the .env file. If that key is lost, the vault
+cannot be recovered.
+
+License: MIT
+https://github.com/kureinmaxim/vpn-server-manager

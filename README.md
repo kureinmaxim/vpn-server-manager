@@ -1,4 +1,4 @@
-# VPN Server Manager v4.3.5
+# VPN Server Manager v4.3.6
 
 Language: **English** · [Русский](README_ru.md)
 

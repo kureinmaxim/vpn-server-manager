@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.3.6] - 2026-09-02
+
+### Fixed
+- Windows installer now ships `templates/macros/` (and other template subfolders). After PIN login, 4.3.5 crashed with `TemplateNotFound: macros/credentials.html`.
+- Installer welcome page uses plain text instead of raw `README.md` Markdown.
+
 ## [4.3.5] - 2026-09-02
 
 ### Changed
