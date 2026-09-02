@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.3.5
+; Version 4.3.6
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.3.5"
+#define MyAppVersion "4.3.6"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -22,7 +22,6 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
 LicenseFile=LICENSE
-InfoBeforeFile=README.md
 OutputDir=installer_output
 OutputBaseFilename=VPN-Server-Manager-Setup-v{#MyAppVersion}
 SetupIconFile=static\favicon.ico
@@ -35,8 +34,8 @@ DisableProgramGroupPage=yes
 UninstallDisplayIcon={app}\static\favicon.ico
 
 [Languages]
-Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
-Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"; InfoBeforeFile: "installer_info_ru.txt"
+Name: "english"; MessagesFile: "compiler:Default.isl"; InfoBeforeFile: "installer_info.txt"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
@@ -45,9 +44,9 @@ Name: "startupicon"; Description: "Запускать при входе в Windo
 [Files]
 ; Основные файлы приложения
 Source: "app\*"; DestDir: "{app}\app"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "desktop\*"; DestDir: "{app}\desktop"; Flags: ignoreversion recursesubdirs
+Source: "desktop\*"; DestDir: "{app}\desktop"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "static\*"; DestDir: "{app}\static"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion
+Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "tests\*"; DestDir: "{app}\tests"; Flags: ignoreversion recursesubdirs createallsubdirs
 
@@ -60,6 +59,7 @@ Source: "BUILD.md"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Python скрипты
 Source: "run.py"; DestDir: "{app}"; Flags: ignoreversion
+Source: "run_desktop.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "generate_key.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "launch_gui.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "decrypt_tool.py"; DestDir: "{app}"; Flags: ignoreversion
