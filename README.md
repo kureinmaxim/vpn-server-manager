@@ -1,36 +1,47 @@
 # VPN Server Manager v4.3.4
 
-Приложение для управления VPN-серверами с гибридной архитектурой `Flask + PyWebView`, шифрованием данных и поддержкой desktop/web режима.
+<p align="center">
+  <img src="static/VPSc.png" alt="VPN Server Manager" width="220">
+</p>
 
-![VPN Server Manager](static/VPSc.png)
+<p align="center">
+  <strong>A local desktop app for people who actually run VPN servers.</strong><br>
+  Encrypted inventory, SSH monitoring, PIN lock — no cloud account.
+</p>
 
-## Возможности
+<p align="center">
+  <a href="https://github.com/kureinmaxim/vpn-server-manager/releases"><img src="https://img.shields.io/github/v/release/kureinmaxim/vpn-server-manager?style=flat-square" alt="Latest release"></a>
+  <a href="https://github.com/kureinmaxim/vpn-server-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/kureinmaxim/vpn-server-manager/ci.yml?style=flat-square" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0F766E?style=flat-square" alt="MIT License"></a>
+  <a href="#quick-start"><img src="https://img.shields.io/badge/python-3.13+-3776AB?style=flat-square" alt="Python 3.13+"></a>
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-1F2937?style=flat-square" alt="Windows, macOS, Linux">
+</p>
 
-- Шифрование данных через Fernet
-- Desktop и Web режимы
-- PIN-защита
-- Импорт и экспорт данных
-- SSH-мониторинг серверов
-- Многоязычный интерфейс
-- Офлайн-режим
+VPN Server Manager keeps server logins, panel credentials, and hoster details in an encrypted local vault. It opens as a native desktop window (`Flask` + `PyWebView`) or in a browser. Monitoring talks to the machine over SSH — there is no always-on agent.
 
-## Требования
+## What you get
 
-- Python 3.13+
-- pip
+| | |
+|---|---|
+| **Encrypted vault** | Fernet encryption for server data. Import / export full backups. Lose the key, lose the data — by design. |
+| **Desktop or browser** | Native window on Windows, macOS, and Linux, or `python run.py` for web mode. |
+| **PIN lock** | Quick lock on the local app so a shared machine is not an open notebook. |
+| **SSH monitoring** | Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
+| **Works offline** | The inventory stays usable without internet. Network-only actions disable themselves cleanly. |
+| **Languages** | Russian, English, and Chinese. `.po` catalogs compile on first launch. |
 
-## Установка
+## Quick start
+
+**Requires Python 3.13+.**
 
 ### Windows
-
-Автоматический вариант:
 
 ```cmd
 setup_windows.bat
 start_windows.bat
 ```
 
-Ручной вариант в PowerShell:
+Or in PowerShell:
 
 ```powershell
 git clone https://github.com/kureinmaxim/vpn-server-manager.git
@@ -47,8 +58,6 @@ copy config\config.json.template config.json
 python -m babel.messages.frontend compile -d translations
 python run.py
 ```
-
-Если виртуальное окружение ещё не создано, служебные скрипты вроде `tools/update_version.py` можно запускать напрямую через системный `python`.
 
 ### macOS / Linux
 
@@ -68,7 +77,7 @@ python -m babel.messages.frontend compile -d translations
 python3 run.py
 ```
 
-## Запуск
+### Run
 
 ```text
 Web:     python run.py
@@ -76,26 +85,25 @@ Desktop: python run_desktop.py
 Debug:   python run.py --debug
 ```
 
-## Версии и конфигурация
+Installers (Windows setup `.exe`, macOS `.dmg`) are on the [Releases](https://github.com/kureinmaxim/vpn-server-manager/releases) page. Build steps: [BUILD.md](BUILD.md).
 
-- Источник правды для версии релиза: `config/config.json.template`
-- Локальный `config.json` нужен для runtime-настроек и не является источником версии репозитория
-- Для синхронизации версий используйте `tools/update_version.py`
+## Safety notes
 
-## Документация
+- Default PIN in the template is `1234`. Change it before real use.
+- Keep `.env` (`SECRET_KEY`) and encrypted exports off shared drives and out of git.
+- There is no password recovery. A full export is the backup.
 
-- [Индекс документации](docs/INDEX.md)
-- [Руководство по сборке](BUILD.md)
-- [Управление версиями](VERSION_MANAGEMENT.md)
-- [Релизный процесс](docs/release_guide.md)
-- [Windows proxy troubleshooting](docs/WINDOWS_PROXY_TROUBLESHOOTING.md)
-- [Мониторинг](docs/README_MONITORING.md)
-- [Docker Guide](docs/DOCKER_GUIDE.md)
+## Docs
 
-## Changelog
+- [Documentation index](docs/INDEX.md)
+- [Build guide](BUILD.md)
+- [Version management](VERSION_MANAGEMENT.md)
+- [Release process](docs/release_guide.md)
+- [Monitoring](docs/README_MONITORING.md)
+- [Changelog](CHANGELOG.md)
 
-См. `CHANGELOG.md`.
+Questions: [Discussions](https://github.com/kureinmaxim/vpn-server-manager/discussions). Bugs: [Issues](https://github.com/kureinmaxim/vpn-server-manager/issues).
 
-## Лицензия
+## License
 
-MIT License. См. `LICENSE`.
+[MIT](LICENSE)

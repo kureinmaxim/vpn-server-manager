@@ -1,81 +1,42 @@
-# Поддержка
+# Support
 
-## 🆘 Получение помощи
+## Docs
 
-### Документация
-- 📖 **[README.md](README.md)** - Основная документация проекта
-- 📋 **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Структура проекта
-- 🔐 **[SECRET_KEY.md](SECRET_KEY.md)** - Система шифрования
-- 🛠️ **[BUILD.md](BUILD.md)** - Инструкции по сборке
-- 📝 **[CHANGELOG.md](CHANGELOG.md)** - История изменений
+- [README](../README.md) — install, run, safety notes
+- [BUILD.md](../BUILD.md) — Windows installer and macOS `.app` / `.dmg`
+- [Monitoring](../docs/README_MONITORING.md)
+- [Changelog](../CHANGELOG.md)
 
-### Часто задаваемые вопросы
+## Common problems
 
-#### Приложение не запускается
-1. Убедитесь, что у вас установлен Python 3.13+
-2. Проверьте наличие файла `.env` с SECRET_KEY
-3. Используйте `python3 generate_key.py` для создания ключа
-4. Установите зависимости: `python -m pip install -r requirements.txt`
+### The app does not start
 
-#### Не могу импортировать данные
-1. Убедитесь, что ключ шифрования соответствует файлу данных
-2. Используйте "Проверить соответствие" в настройках
-3. Проверьте формат файла (.enc файл)
+1. Python 3.13+ is required.
+2. You need a `.env` file with `SECRET_KEY`. Create one with `python generate_key.py`.
+3. Install dependencies: `python -m pip install -r requirements.txt`.
 
-#### Потерял ключ шифрования
-1. Без ключа данные невозможно восстановить
-2. Всегда делайте резервные копии через "Полный экспорт"
-3. Храните ключи в безопасном месте
+### Import fails
 
-#### Проблемы с PIN-кодом
-1. По умолчанию PIN: 1234
-2. Двойной клик по имени разработчика для входа
-3. При блокировке подождите 30 секунд
+1. The encryption key must match the `.enc` file.
+2. Use “Check key match” in Settings.
+3. Confirm you are importing a `.enc` export from this app.
 
-### Создание Issue
+### Lost encryption key
 
-Перед созданием issue:
-1. ✅ Проверьте существующие issues
-2. ✅ Прочитайте документацию
-3. ✅ Попробуйте переустановить приложение
-4. ✅ Проверьте на чистой установке
+Data cannot be recovered without the key. Keep a full export and the key in a safe place.
 
-При создании issue укажите:
-- Версию приложения
-- Операционную систему
-- Шаги для воспроизведения
-- Ожидаемое и фактическое поведение
+### PIN issues
 
-### Обсуждения
+Default template PIN is `1234`. Double-click the developer name to unlock. After a lockout, wait 30 seconds.
 
-Для общих вопросов и обсуждений используйте:
-- [GitHub Discussions](https://github.com/your-repo/vpn-server-manager/discussions)
-- [GitHub Issues](https://github.com/your-repo/vpn-server-manager/issues)
+## Where to ask
 
-### Безопасность
+- Questions and ideas: [Discussions](https://github.com/kureinmaxim/vpn-server-manager/discussions)
+- Bugs and regressions: [Issues](https://github.com/kureinmaxim/vpn-server-manager/issues)
+- Security: see [SECURITY.md](../SECURITY.md) — do not file a public issue
 
-Для сообщений о уязвимостях безопасности:
-- НЕ создавайте публичный issue
-- Отправьте email на: [security@example.com](mailto:security@example.com)
-- См. [SECURITY.md](SECURITY.md) для подробностей
+When you open an issue, include app version, OS, steps to reproduce, and what you expected.
 
-### Вклад в проект
+## Contributing
 
-Хотите помочь проекту?
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Руководство по участию
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) - Кодекс поведения
-- [LICENSE](LICENSE) - Лицензия проекта
-
-### Социальные сети
-
-- 📧 Email: [support@example.com](mailto:support@example.com)
-- 🐦 Twitter: [@vpnservermanager](https://twitter.com/vpnservermanager)
-- 💬 Discord: [Сервер сообщества](https://discord.gg/example)
-
-### Спонсорство
-
-Поддержите развитие проекта:
-- ⭐ Поставьте звезду на GitHub
-- 💰 Станьте спонсором через GitHub Sponsors
-- 🐛 Сообщайте об ошибках
-- 💡 Предлагайте новые функции 
+Pull requests are welcome. Please keep changes focused, add tests when you touch behavior, and follow the PR template.
