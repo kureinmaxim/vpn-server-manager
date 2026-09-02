@@ -1,61 +1,61 @@
 @echo off
-REM Скрипт для удаления старых версий VPN Server Manager
-REM Сначала удалите вручную через "Программы и компоненты"
+REM Uninstall older VPN Server Manager builds
+REM Uninstall the listed entries in Windows first (Apps & features)
 
 echo ========================================
-echo Удаление старых версий VPN Server Manager
+echo Uninstall old VPN Server Manager versions
 echo ========================================
 echo.
-echo ВНИМАНИЕ: Этот скрипт удалит ВСЕ версии VPN Server Manager.
-echo Ваши данные (.env, config.json, data/) будут сохранены.
+echo WARNING: This removes ALL VPN Server Manager app installs.
+echo Your data (.env, config.json, data/) is kept.
 echo.
 pause
 
 echo.
-echo Открываю "Программы и компоненты"...
+echo Opening Apps ^& features...
 appwiz.cpl
 
 echo.
 echo ========================================
-echo Инструкция:
+echo Steps
 echo ========================================
 echo.
-echo 1. Найдите "VPN Server Manager 3.5.9"
-echo 2. Нажмите "Удалить"
-echo 3. При удалении выберите "Сохранить данные"
+echo 1. Find "VPN Server Manager 3.5.9"
+echo 2. Click Uninstall
+echo 3. Choose to keep data if asked
 echo.
-echo 4. Найдите "VPN Server Manager, версия 4.0.8"
-echo 5. Нажмите "Удалить" 
-echo 6. При удалении выберите "Сохранить данные"
+echo 4. Find "VPN Server Manager, version 4.0.8"
+echo 5. Click Uninstall
+echo 6. Choose to keep data if asked
 echo.
-echo 7. После удаления обеих версий нажмите любую клавишу
+echo 7. After both are gone, press any key here
 echo.
 pause
 
 echo.
-echo Проверяю оставшиеся файлы...
+echo Checking leftover folders...
 echo.
 
 if exist "C:\Program Files\VPN Server Manager" (
-    echo НАЙДЕНО: C:\Program Files\VPN Server Manager
-    echo Удаляю...
+    echo FOUND: C:\Program Files\VPN Server Manager
+    echo Removing...
     rd /s /q "C:\Program Files\VPN Server Manager"
 )
 
 if exist "C:\Users\%USERNAME%\AppData\Local\Programs\VPN Server Manager" (
-    echo НАЙДЕНО: C:\Users\%USERNAME%\AppData\Local\Programs\VPN Server Manager
-    echo Оставляем - там могут быть данные пользователя
+    echo FOUND: C:\Users\%USERNAME%\AppData\Local\Programs\VPN Server Manager
+    echo Leaving it — it may contain user data
 )
 
 echo.
-echo Удаляю старые ярлыки...
+echo Removing old shortcuts...
 del "%USERPROFILE%\Desktop\VPN Server Manager.lnk" 2>nul
+REM Russian Windows OneDrive desktop folder name
 del "%USERPROFILE%\OneDrive\Рабочий стол\VPN Server Manager.lnk" 2>nul
 
 echo.
 echo ========================================
-echo Готово! Теперь установите новую версию.
+echo Done. Install the new version next.
 echo ========================================
 echo.
 pause
-

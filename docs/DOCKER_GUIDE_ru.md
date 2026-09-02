@@ -1,6 +1,6 @@
-# 🐳 Руководство по запуску VPN Server Manager v4.0.5 с Docker
+# Руководство по запуску VPN Server Manager с Docker
 
-Это руководство описывает различные способы запуска VPN Server Manager v4.0.5 с использованием Docker и Docker Compose.
+Это руководство описывает запуск VPN Server Manager с Docker и Docker Compose.
 
 ## 📋 Содержание
 
@@ -320,7 +320,7 @@ docker build -t vpn-manager-clean:latest .
 
 ### Сборка с тегами версий
 ```bash
-docker build -t vpn-manager-clean:4.0.5 .
+docker build -t vpn-manager-clean:4.3.5 .
 docker build -t vpn-manager-clean:latest .
 ```
 
@@ -486,7 +486,7 @@ docker-compose up --scale vpn-manager=3
 SECRET_KEY=your-secret-key-here
 
 # Настройки приложения
-APP_VERSION=4.0.5
+APP_VERSION=4.3.5
 APP_NAME=VPNServerManager-Clean
 
 # Интернационализация
@@ -935,4 +935,4 @@ jobs:
 
 ---
 
-**Примечание**: Это руководство актуально для VPN Server Manager v4.0.5 с новой модульной архитектурой.
+**Примечание**: Это руководство для текущей модульной архитектуры VPN Server Manager. Версию релиза смотрите в `config/config.json.template`.

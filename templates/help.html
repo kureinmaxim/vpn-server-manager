@@ -94,7 +94,7 @@
                                 <pre><code class="language-python">python3 -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"</code></pre>
                             </li>
                             <li>{{ _('Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в таком виде:')|safe }}
-                                <pre><code class="language-bash">SECRET_KEY={{ _('ваш_сгенерированный_ключ') }}</code></pre>
+                                <pre><code class="language-bash">SECRET_KEY=your_generated_key</code></pre>
                             </li>
                             <li><strong>{{ _('ВАЖНО:') }}</strong> {{ _('Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ ко всем данным. Если вы переносите приложение, обязательно скопируйте файл <code>.env</code> вместе с остальными данными.')|safe }}</li>
                         </ul>

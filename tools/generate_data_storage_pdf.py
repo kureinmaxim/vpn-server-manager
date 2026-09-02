@@ -124,7 +124,7 @@ def create_data_storage_pdf():
     story.append(Paragraph("📂 В режиме разработки (текущий проект)", heading2_style))
     
     dev_structure = """
-/Users/olgazaharova/Project/ProjectPython/VPNserverManage/
+/path/to/vpn-server-manager/
 ├── data/                          # 📊 Локальные данные разработки
 │   ├── servers.json.enc          # 🔐 Основной файл с серверами (зашифрован)
 │   ├── hints.json                # 📝 Шпаргалка команд
@@ -346,7 +346,7 @@ if __name__ == "__main__":
     try:
         pdf_path = create_data_storage_pdf()
         print(f"📄 Документация по хранению данных создана:")
-        print(f"   MD: docs/DATA_STORAGE_GUIDE.md")
+        print(f"   MD: docs/DATA_STORAGE_GUIDE_ru.md")
         print(f"   PDF: {pdf_path}")
     except Exception as e:
         print(f"❌ Ошибка при создании PDF: {e}")
