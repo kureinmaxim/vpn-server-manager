@@ -1,42 +1,17 @@
-# GitHub Configuration
+# GitHub configuration
 
-Эта папка содержит конфигурационные файлы для GitHub.
+Files GitHub reads from this folder.
 
-## 📁 Файлы
+## Workflows
 
-### Workflows
-- **`workflows/ci.yml`** - Автоматическая проверка кода и сборка
+- `workflows/ci.yml` — install, smoke check, pytest
 
-### Templates
-- **`ISSUE_TEMPLATE.md`** - Шаблон для создания issues
-- **`PULL_REQUEST_TEMPLATE.md`** - Шаблон для создания pull requests
+## Templates
 
-### Configuration
-- **`FUNDING.yml`** - Настройка спонсорства проекта
-- **`dependabot.yml`** - Автоматическое обновление зависимостей
+- `ISSUE_TEMPLATE/` — bug and feature forms
+- `PULL_REQUEST_TEMPLATE.md` — PR checklist
 
-### Documentation
-- **`SUPPORT.md`** - Информация о поддержке проекта
+## Other
 
-## 🔧 Настройка
-
-### Замените placeholder значения:
-- `your-repo` → имя вашего репозитория
-- `your-username` → ваше имя пользователя GitHub
-- `security@example.com` → ваш email для безопасности
-- `support@example.com` → ваш email для поддержки
-
-### Включите функции:
-1. **Issues**: Включите в настройках репозитория
-2. **Discussions**: Включите в настройках репозитория
-3. **Sponsors**: Настройте в профиле GitHub
-4. **Dependabot**: Автоматически включится с файлом dependabot.yml
-
-## 📋 Чек-лист для публикации
-
-- [ ] Замените все placeholder значения
-- [ ] Проверьте ссылки в шаблонах
-- [ ] Настройте email адреса
-- [ ] Включите Discussions в настройках репозитория
-- [ ] Настройте GitHub Sponsors (опционально)
-- [ ] Проверьте работу CI/CD pipeline 
+- `FUNDING.yml` — GitHub Sponsors
+- `SUPPORT.md` — linked from the Community profile
