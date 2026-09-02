@@ -1,791 +1,199 @@
-# 📋 История изменений
+# Changelog
 
-Все значимые изменения в проекте VPN Server Manager документируются в этом файле.
+All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
-Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
-и проект следует [Semantic Versioning](https://semver.org/lang/ru/).
+## [4.3.5] - 2026-09-02
+
+### Changed
+- Public docs: Russian-only `docs/`, English GitHub files in the repo root, English cheatsheet command labels for all UI languages.
+- Version strings stay in sync through `tools/update_version.py` (`README_ru.md`, installer comment, `build_macos.py`, `docker-compose.yml`, bug-report placeholder).
 
 ## [4.3.4] - 2026-08-05
 
-### 🔧 Исправлено
-- **Пароли SSH/панели/хостера**: после вставки и копирования в терминал пароль
-  мог быть «неправильным» из‑за пробелов/переносов/невидимых символов и из‑за
-  вставки секрета в `onclick` (ломалось на кавычках и спецсимволах).
+### Fixed
+- SSH / panel / hoster passwords could be wrong after paste and copy (whitespace, line breaks, invisible characters, secrets in `onclick` breaking on quotes).
 
-### ✨ Улучшено
-- Единая санитизация секретов при сохранении и при загрузке.
-- Безопасное копирование через `data-*` + `|tojson` (`static/js/credentials.js`).
-- Формы add/edit: глаз / копировать, показ текущего пароля, бейдж «задан».
-- Исправлено сохранение логина панели на форме добавления (`panel_user`).
-- При записи в файл больше не сохраняются plaintext `*_decrypted`.
+### Improved
+- Secrets sanitized on save and load.
+- Safe copy via `data-*` + `|tojson` (`static/js/credentials.js`).
+- Add/edit forms: show/hide, copy, current password, “set” badge.
+- Panel login saved on the add-server form (`panel_user`).
+- Plaintext `*_decrypted` fields are no longer written to disk.
 
 ## [4.3.2] - 2026-06-25
 
-### ✨ Добавлено
-- **Мониторинг знает про стек TelegramOnly**: карточки «VPN / Proxy сервисы»
-  (VLESS/Hysteria2/MTProto/NaiveProxy/Tailscale), «TelegramOnly стек» (бот + HA),
-  «Reticulum / HA» (статус моста :50061 + bridge hash), «Web-панели (SSH-туннель)»
-  для Dockhand/Headplane (детект + готовая команда туннеля + ссылка «Открыть»).
-- **Подсветка контейнеров стека** в окне «Статус» (роли headscale/headplane/бот/dockhand).
-- **Чеклист установки мониторинга**: выбор пакетов (vnstat/jq/net-tools/ufw) —
-  ставятся только отмеченные, скрипты мониторинга всегда.
-- **Ротация ключа**: `scripts/rotate_secret_key.py` — перешифровка данных
-  старый→новый `SECRET_KEY` с бэкапом (`--dry-run`).
+### Added
+- Monitoring for the TelegramOnly stack (VLESS/Hysteria2/MTProto/NaiveProxy/Tailscale, bot + HA, Reticulum bridge, Dockhand/Headplane over SSH tunnel).
+- Container role highlighting in Status.
+- Monitoring install checklist (only selected packages).
+- `scripts/rotate_secret_key.py` for Fernet key rotation (`--dry-run`).
 
-### 🔧 Исправлено
-- **Переключение языков** не работало без скомпилированных `.mo` → автокомпиляция
-  `.po → .mo` при старте приложения.
-- **Финальная проверка установки** мониторинга учитывает только выбранные утилиты
-  (снятый в чеклисте `ufw` больше не считается «отсутствующим»).
-- Веб-панели: «Открыть»/команда туннеля показываются только когда сервис запущен.
-- CI: убран no-op `build` job (давал ложные письма о падении), оставлен `test`.
+### Fixed
+- Language switch compiles `.po` → `.mo` on startup.
+- Install final check only counts selected utilities.
+- Web-panel “Open” / tunnel only when the service is up.
+- CI: removed no-op `build` job; tests remain.
 
-### 💄 Оформление / i18n
-- Страница мониторинга компактнее и без вертикального растягивания; эмодзи в
-  «События безопасности» → bootstrap-иконки.
-- Каталог сервисов/портов синхронизирован со стеком TelegramOnly (без legacy).
-- Полные EN + ZH переводы новых строк; устранены предупреждения `num_plurals`.
+### UI / i18n
+- Tighter monitoring layout; security events use bootstrap icons.
+- Service/port catalog aligned with TelegramOnly.
+- EN + ZH strings for the new UI.
 
 ## [4.2.9] - 2026-06-15
 
-### 🔧 Исправлено
-
-#### Установка мониторинга под root (минимальный Debian)
-- **Главная причина «Не все утилиты установлены (4 отсутствует)»**: на минимальном Debian под `root` пакет `sudo` часто не установлен, поэтому все команды `sudo apt-get …` падали с «command not found», а старые шаги печатали «✅» не проверяя результат — пакеты по факту не ставились.
-- Теперь привилегии определяются по `id -u`: под `root` команды выполняются **без `sudo`**; для не-root по-прежнему используется `sudo` (с префлайт-проверкой passwordless).
-- Префикс `sudo` убран из всех команд установки (`apt-get`, `systemctl`, `mkdir`, `tee`, `chmod`) и удаления (`rm`) под root.
-- В связке с честной проверкой кода возврата (v4.2.8) установка теперь либо реально ставит пакеты, либо показывает настоящую ошибку.
+### Fixed
+- Monitoring install as **root** on minimal Debian: no `sudo` when `id -u` is 0; non-root still uses passwordless sudo. Fake “installed” ticks gone.
 
 ## [4.2.8] - 2026-06-15
 
-### 🔧 Исправлено
-
-#### Установка мониторинга — честные шаги вместо ложных «✅»
-- **Шаги установки печатали «✅ установлен» безусловно**, не проверяя код возврата `apt`/`sudo`. Из-за этого тихий сбой установки маскировался, а «Не все утилиты установлены (4 отсутствует)» появлялось только на финальной проверке без объяснения причины.
-- Добавлен хелпер `_run`, возвращающий `(код возврата, stdout, stderr)`.
-- **Префлайт `sudo`**: если SSH-пользователь не `root` и `sudo` требует пароль, теперь сразу выводится понятная ошибка (раньше все `sudo apt-get` падали молча).
-- Установка `vnstat`/`jq`/`net-tools` проверяет код возврата и при ошибке показывает реальный текст из `stderr` apt, а не фальшивый успех.
-- Установки выполняются с `DEBIAN_FRONTEND=noninteractive`.
+### Fixed
+- Install steps check apt/sudo exit codes (`_run` helper). Passwordless-sudo preflight. `DEBIAN_FRONTEND=noninteractive`.
 
 ## [4.2.7] - 2026-06-15
 
-### 🔧 Исправлено
-
-#### Аудит и мониторинг (Debian 12 / bookworm)
-- **Ложная ошибка «Не все утилиты установлены (4 отсутствует)»** после успешной установки:
-  - Определение наличия утилит делалось через `which`, которая на Debian 12 устарела/часто отсутствует, а `PATH` в неинтерактивной SSH-сессии не включает `/usr/sbin` (где живёт `ufw`)
-  - Переведено на POSIX-builtin `command -v` с явным `PATH` и фолбэком на прямой поиск файла (`/usr/sbin`, `/sbin`, `/usr/bin`, `/bin`)
-  - Те же правки для детекта `vnstat`, `jq` и `ufw` в статистике и при установке
-- **Пустая таблица Storage → Mount** в окне мониторинга:
-  - Парсинг `df` требовал префикс `^/dev/` и ломался на переносе длинных имён устройств
-  - Заменено на `df -hP` (POSIX, одна строка на запись) с исключением псевдо-ФС
+### Fixed
+- Tool detection via `command -v` and `/usr/sbin` (not `which`).
+- Storage mount table: `df -hP` so long device names wrap correctly.
 
 ## [4.2.6] - 2026-06-15
 
-### 🔧 Исправлено
-
-#### Добавление сервера (macOS)
-- **Устранена ошибка `405 Method Not Allowed` при добавлении нового сервера**:
-  - Маршрут `main.add_server` в blueprint-пакете `app/` принимал только `GET` и не обрабатывал отправку формы, из-за чего POST-запрос формы падал с «Method Not Allowed»
-  - Добавлен полноценный обработчик `POST`: создание нового сервера со всеми полями, шифрование SSH/панель/хостер-учёток через `DataManager`, генерация `id`, загрузка иконки, best-effort геолокация по IP и сохранение в активный файл данных
-  - При отсутствии активного файла данных он создаётся автоматически (`data/servers.json.enc`)
+### Fixed
+- macOS **405 Method Not Allowed** on add-server POST. Handler creates the server, encrypts credentials, optional icon/geo, and creates `data/servers.json.enc` if missing.
 
 ## [4.2.1] - 2026-04-06
 
-### ✨ Добавлено
+### Added
+- First-run PIN setup for packaged apps (custom PIN or default `1234`). Tests for PIN routes.
 
-#### Первый запуск и перенос данных
-- **Автоматическая первичная настройка PIN для упакованных приложений**:
-  - На чистой установке приложение само предлагает настроить PIN при первом запуске
-  - Пользователь может задать свой PIN или сразу использовать PIN по умолчанию `1234`
-  - Состояние первичной настройки теперь сохраняется в пользовательском `config.json`
-- **Тесты для PIN-маршрутов**:
-  - Добавлены проверки сценариев первого запуска, сохранения PIN и входа через runtime-конфиг
+### Fixed
+- Windows desktop “Leave site?” prompt: server-side desktop flag instead of `window.pywebview`.
+- PIN routes share one runtime `config.json`.
+- Windows installer no longer references removed `docs/WINDOWS_GUIDE.md`.
+- Monitoring UFW hints use the real SSH port, not hardcoded 22. Dashboard layout restored.
 
-### 🔧 Исправлено
-
-#### Desktop режим Windows
-- **Устранено ложное окно "Покинуть сайт?" в desktop-режиме на Windows**:
-  - Логика определения desktop-режима переведена на серверный флаг вместо ненадежной проверки `window.pywebview`
-  - `beforeunload` больше не должен срабатывать в упакованном desktop-приложении как в обычном браузере
-
-#### PIN и runtime-конфигурация
-- **PIN-логика переведена на единый источник в пользовательском конфиге**:
-  - `login_ajax`, `change_ajax` и `first_time_setup` используют один и тот же runtime `config.json`
-  - Исправлена работа первого запуска для Windows `.exe` и будущего пакета macOS
-  - Улучшена обработка блокировки после неудачных попыток входа
-
-#### Windows installer и документация
-- **Исправлены устаревшие ссылки после удаления старого Windows guide**:
-  - `build_windows.ps1`, `build_windows.bat` и `vpn-manager-installer.iss` больше не требуют удаленный `docs/WINDOWS_GUIDE.md`
-  - Инсталлятор теперь использует `README.md` как стартовую документацию
-  - Сборка Windows-инсталлятора снова проходит без ложного предупреждения о пропавшем файле
-
-#### Мониторинг
-- **Исправлены подсказки по UFW для нестандартных SSH-портов**:
-  - Предупреждения и команды в мониторинге теперь используют фактический SSH-порт сервера, например `22542`, а не захардкоженный `22`
-  - Сообщения о проблемах SSH-подключения также показывают реальный порт сервера
-- **Улучшена компоновка страницы мониторинга**:
-  - Возвращена более читаемая карточная структура dashboard-страницы
-  - Добавлена верхняя сводка по серверу с SSH-портом, backend firewall и кратким статусом
-  - Блоки трафика, firewall, сервисов, security и графиков переразложены в более логичную сетку
-
-### 🧭 Изменено
-
-#### Управление версиями
-- **Пересобрана система управления версиями проекта**:
-  - Источник правды для версии релиза теперь документирован через `config.json`
-  - `tools/update_version.py` переписан в полноценный инструмент для `status`, `sync` и `bump`
-  - `tools/bump_version.py` оставлен как совместимый wrapper
-  - Синхронизация версий теперь обновляет `README.md`, `config/config.json.template`, `vpn-manager-installer.iss`, `env.example`, `app/config.py`, `app/__init__.py`, `setup.py`
-- **Проект приведен к консистентной версии `4.2.1`**:
-  - Убрана рассинхронизация между `config.json`, инсталлятором и документацией
-
-### 📚 Документация
-- **Обновлены документы по версиям и релизам**:
-  - Переписан `VERSION_MANAGEMENT.md` под реальную структуру репозитория
-  - Обновлен `docs/release_guide.md` под новый релизный workflow
-  - Восстановлен `docs/VERSION_MANAGEMENT.md` как короткий redirect на актуальный документ
-  - Обновлены ссылки в `README.md` и `BUILD.md`
-- **Добавлена инструкция по Windows proxy troubleshooting**:
-  - Новый файл `docs/WINDOWS_PROXY_TROUBLESHOOTING.md` описывает ошибку `ProxyError('Cannot connect to proxy')`
-  - Добавлены шаги диагностики через `pip`, `Invoke-WebRequest` и Windows proxy settings
-  - Зафиксирован типовой случай с локальным proxy `127.0.0.1:12334`, который ломает установку зависимостей
+### Changed
+- Version tool: `tools/update_version.py` (`status` / `sync` / `bump`). Source of truth `config/config.json.template`.
 
 ## [4.0.10] - 2025-10-15
 
-### 🔧 Исправлено
-
-#### Мониторинг - Точный учет сетевого трафика
-- **🎯 КРИТИЧЕСКОЕ: Исправлен заниженный учет сетевого трафика**:
-  - **Проблема**: Мониторинг учитывал трафик только с одного интерфейса (обычно `eth0`), VPN-трафик через `tun0`, `wg0`, `tap0` не учитывался
-  - **Решение**: Теперь мониторинг автоматически находит и суммирует трафик со **всех активных сетевых интерфейсов**
-  - **Поддерживаемые интерфейсы**:
-    - Физические: `eth0`, `ens3`, `eno1`, `enp0s3`, `wlan0`, `wlp3s0`
-    - VPN: `tun0`, `tap0`, `wg0`, `ppp0`, `ipsec0`
-  - **Улучшения**:
-    - Автоматическое обнаружение всех активных интерфейсов
-    - Суммирование трафика со всех интерфейсов
-    - Отображение списка мониторимых интерфейсов в UI
-    - Улучшенная суточная статистика через `vnstat --json`
-  - **Результат**: Теперь показываются **реальные** значения трафика, включая VPN-соединения 📊
-  - Исправлено в `app/services/ssh_service.py` (метод `get_network_stats()`)
-  - Обновлен UI в `templates/monitoring.html`
-
-#### UX - Убраны надоедливые диалоги при навигации
-- **🎨 ИСПРАВЛЕНО: Диалоги "Уйти/Остаться" при переходах между вкладками**:
-  - **Проблема**: При переходе между страницами внутри приложения (например, с главной на настройки) появлялось системное предупреждение
-  - **Решение**: Добавлен умный обработчик, который различает:
-    - ✅ **Внутренние переходы** (между страницами приложения) → предупреждение **НЕ показывается**
-    - ⚠️ **Закрытие вкладки/браузера** → предупреждение **показывается** (защита от случайного закрытия)
-    - ⚠️ **Переход на внешний сайт** → предупреждение **показывается**
-  - **Как работает**: Система отслеживает клики по ссылкам и проверяет, является ли ссылка внутренней (тот же домен)
-  - **Результат**: Комфортная навигация без надоедливых предупреждений ✨
-  - Исправлено в `templates/layout.html` (обработчик `beforeunload`)
-
-### 📚 Документация
-- Добавлен `NETWORK_MONITORING_UPDATE.md` с кратким описанием изменений
-- Добавлен `docs/NETWORK_MONITORING_FIX.md` с подробной технической документацией
+### Fixed
+- Network stats sum **all** interfaces (eth/ens/wlan + tun/wg/tap), not only `eth0`.
+- In-app navigation no longer shows “Leave site?”; closing the tab still warns.
 
 ## [4.0.7] - 2025-10-14
 
-### 🔧 Исправлено
+### Fixed
+- Monitoring open delay (~40s): Flask `threaded=True` / werkzeug in desktop mode.
+- Faster SSH timeouts for install checks; loading spinner shown immediately.
+- SSH password decrypt via `data_manager.decrypt_data()` on all monitoring endpoints.
+- PNG status snapshot uses real html2canvas.
+- Uninstall buttons: duplicate handlers removed.
 
-#### Мониторинг - Критические исправления производительности
-- **🚀 КРИТИЧЕСКОЕ: Исправлена задержка 40 секунд при открытии мониторинга**:
-  - **Проблема**: Flask работал в однопоточном режиме, запросы ждали друг друга в очереди
-  - **Решение**: Добавлен многопоточный режим `threaded=True` в `run.py` и `desktop/window.py`
-  - **Web режим**: `app.run(..., threaded=True)` - теперь обрабатывает несколько запросов одновременно
-  - **Desktop режим**: `make_server(..., threaded=True)` с переходом на werkzeug вместо wsgiref
-  - **Результат**: Переход на страницу мониторинга теперь **мгновенный** ⚡
-  - Исправлено в `run.py` и `desktop/window.py`
-
-- **⚡ Ускорена проверка установки мониторинга**:
-  - Таймаут SSH подключения: 30 → **10 секунд**
-  - Таймаут выполнения команды: 15 → **8 секунд**
-  - Добавлен параметр `connection_timeout` в `SSHService.get_connection_pooled()`
-  - Проверка занимает 10-18 секунд вместо 40-45
-  - Исправлено в `app/services/ssh_service.py` и `app/routes/api.py`
-
-- **⏳ Исправлен индикатор загрузки**:
-  - Индикатор загрузки теперь **показывается сразу** при открытии страницы
-  - Переместили `<div id="initial-loading">` наружу из скрытого контейнера
-  - Текст: "Проверка системы мониторинга... Подключение к серверу..."
-  - Индикатор автоматически скрывается после проверки установки
-  - Исправлено в `templates/monitoring.html`
-
-- **🔒 ИСПРАВЛЕНО: Расшифровка SSH пароля**: 
-  - Мониторинг теперь использует правильный метод `data_manager.decrypt_data()` вместо `crypto_service.decrypt()`
-  - Тот же метод, что и в кнопке "Статус" - гарантирует совместимость
-  - Исправлено в `install_monitoring()`, `uninstall_monitoring()` и `check_monitoring_installed()`
-  
-- **🖼️ ИСПРАВЛЕНО: Сохранение PNG статуса сервера**:
-  - Статус сервера теперь **корректно сохраняется как красивое изображение** с CSS стилями
-  - Использована **настоящая библиотека html2canvas** вместо упрощенной fake-версии
-  - Библиотека перенесена в `static/js/html2canvas.min.js` и загружается динамически
-  - Параметры `html2canvas`: `useCORS: true`, `allowTaint: true`, `logging: true`
-  - Удален фейковый vendor endpoint `/vendor/html2canvas.min.js`
-  
-- **📊 ИСПРАВЛЕНО: Мониторинг не показывается после установки**:
-  - Улучшена проверка установки мониторинга - теперь проверяет наличие скрипта `get-all-stats.sh` на сервере
-  - Добавлен метод `SSHService.execute_remote_command()` для выполнения команд без предварительного подключения
-  - **Создана helper функция `_get_server_ssh_credentials()`** для централизованной расшифровки паролей
-  - Исправлена расшифровка пароля во **ВСЕХ мониторинг endpoints**:
-    - `check_monitoring_installed()`
-    - `get_network_stats()`
-    - `get_firewall_stats()`
-    - `get_services_stats()`
-    - `get_security_events()`
-    - `get_metrics_history()`
-    - `check_monitoring_tools()`
-  - После установки/удаления мониторинга страница **автоматически перезагружается**
-  
-- **🗑️ ИСПРАВЛЕНО: Кнопки удаления мониторинга не работают**:
-  - Исправлены дубликаты обработчиков событий - теперь используется клонирование элементов
-  - Добавлено логирование для отладки действий пользователя
-  - Модальные окна корректно открываются и закрываются
-
-### ✨ Улучшения
-
-#### Производительность
-- **🚀 Многопоточность Flask**: Теперь приложение может обрабатывать несколько запросов одновременно
-  - Web режим: никогда не будет блокирующих запросов
-  - Desktop режим: плавная навигация без зависаний
-  - Критично для работы с медленными/недоступными серверами
-- **⚡ Быстрые проверки**: Оптимизированные таймауты для быстрых операций
-  - Проверка установки мониторинга: 10-18 секунд (вместо 40-45)
-  - Другие операции используют стандартные таймауты 30 секунд
-
-#### Мониторинг
-- **📊 Увеличена история метрик**: MAX_POINTS = 288 (24 часа вместо 5 часов)
-- **🎨 Компактный интерфейс**: Уменьшены размеры шрифтов и отступы для более современного вида
-- **🛡️ Защита от повторной установки**: Двойная проверка (клиент + сервер) предотвращает повторную установку
-- **⚠️ UFW предупреждения**: Обновлена документация с критическими предупреждениями об UFW
-- **🌐 Обновлены переводы**: Извлечены и скомпилированы новые строки для английского и китайского языков
-
-#### Документация
-- **📚 Объединены файлы**: 
-  - `MONITORING_COMPLETE_CHECKLIST.md` (объединение SAFETY_CHECKLIST + monitoringfinal_checklist)
-  - `MONITORING_INSTALLATION_GUIDE.md` (объединение installer + uninstall + fixes)
-  - `PROJECT_DOCUMENTATION.md` (объединение README_NEW_STRUCTURE + PROJECT_STRUCTURE)
-  - `ArchitecturalRules.md` (удален дубликат ArchitecturalRules_v406.md)
-- **📝 Обновлена документация**: Все гайды по мониторингу с новой информацией
-- **📄 MONITORING_FIXES_SUMMARY.md**: Краткий отчет о всех исправлениях
-
----
+### Improved
+- Metrics history 288 points (24h). Compact monitoring UI. EN/ZH strings.
 
 ## [4.0.6] - 2025-10-13
 
-### 🔒 КРИТИЧЕСКОЕ обновление безопасности
-
-#### Исправлено
-- **Удалены конфиденциальные файлы из Git истории**:
-  - `.env` (содержал SECRET_KEY)
-  - `config.json` (содержал PIN-коды и пути)
-  - `data/*.enc` (зашифрованные данные серверов)
-- **Сгенерирован новый SECRET_KEY** (старый был скомпрометирован)
-- **build_macos.py**: Исправлено - больше не включает `.env` и `config.json` в DMG
-- **Git история очищена**: Использован `git filter-branch` для удаления секретов из 58 коммитов
-- **🔧 DMG импорт данных**: Исправлена инициализация DataManagerService в frozen режиме
-  - Теперь автоматически создаётся `.env` с уникальным SECRET_KEY при первом запуске
-  - Добавлена проверка на None для data_manager в import_external_data
-  - Добавлено детальное логирование регистрации сервисов
-
-#### Добавлено
-- **SECURITY.md**: Полное руководство по безопасности проекта (266 строк)
-- **SECURITY_AUDIT_REPORT.md**: Детальный отчет об аудите безопасности
-- **URGENT_ACTIONS.md**: Пошаговые инструкции по срочным действиям
-- **config.json.example**: Безопасный шаблон конфигурации (без реальных данных)
-- Обновлен `env.example` с комментариями о безопасности
-- Автоматическое создание `.env` в APP_DATA_DIR для frozen режима
-
-#### Изменено
-- **config.json** теперь локальный файл (добавлен в `.gitignore`)
-- **.env** больше не должен коммититься (подтверждено в `.gitignore`)
-- **Версия приложения**: 4.0.5 → 4.0.6
-- Обновлена вся документация (README.md, ArchitecturalRules.md и др.)
-
-### ⚠️ ВАЖНО для пользователей
-- Релиз v4.0.5 был удален с GitHub по соображениям безопасности
-- Если вы клонировали репозиторий до 13.10.2025, выполните `git pull --force`
-- **DMG приложение**: При первом запуске автоматически создаст `.env` с уникальным ключом
-- Для разработки: Пересоздайте `.env` файл: `python generate_key.py`
+### Security
+- Removed `.env`, `config.json`, and `data/*.enc` from git history; new `SECRET_KEY`.
+- macOS build no longer packs `.env` / `config.json` into the DMG.
+- Frozen app creates `.env` on first launch. See `SECURITY.md`.
+- v4.0.5 GitHub release was pulled. Recreate `.env` with `python generate_key.py` if you cloned before 2025-10-13.
 
 ## [4.0.5] - 2025-10-12
 
-### Исправлено
-- 🐛 **Функция "Сохранить как PNG"**: Полностью реализована функция сохранения статистики сервера в PNG
-  - Исправлен endpoint `/api/snapshot/save` (был недоступен из-за неправильного URL)
-  - Создан отдельный blueprint `vendor_bp` для статических ресурсов
-  - Реализована упрощенная но рабочая библиотека html2canvas
-  - Файлы сохраняются в папку Downloads пользователя
-  - Добавлены переводы для всех сообщений (русский, английский, китайский)
-- 🔐 **PIN аутентификация**: Исправлено отображение ошибки при неправильном PIN
-  - Красная полоска теперь показывает сообщение "Неверный PIN-код" / "Invalid PIN" / "PIN码错误"
-  - Исправлено использование `data.error` вместо `data.message` в JavaScript
-  - Добавлены переводы для ошибок аутентификации
-- 🌐 **SSH подключение**: Добавлена поддержка нестандартных SSH портов
-  - Endpoint `/api/server/<id>/stats` теперь использует порт из настроек сервера
-  - Улучшена обработка ошибок SSH с понятными сообщениями на всех языках
-- 📝 **Опечатки**: Исправлена опечатка "Выберать" → "Выберите" в форме импорта данных
-
-### Добавлено
-- 🌍 **Переводы**: Добавлены новые строки перевода для английского и китайского языков
-  - "PNG сохранён:" / "PNG saved:" / "PNG已保存："
-  - "Папка:" / "Folder:" / "文件夹："
-  - "Неверный PIN-код" / "Invalid PIN" / "PIN码错误"
-  - И другие сообщения об ошибках
+### Fixed
+- Save-as-PNG snapshot endpoint and html2canvas loading.
+- Invalid-PIN message (`data.error`).
+- SSH stats use the configured port. Import form typo.
 
 ## [4.0.4] - 2025-10-12
 
-### Добавлено
-- 🪟 **Поддержка Windows**: Автоматические скрипты для упрощения установки и запуска на Windows
-  - **setup_windows.bat**: Автоматическая установка (создание venv, установка зависимостей, генерация ключа)
-  - **start_windows.bat**: Быстрый запуск приложения в desktop режиме
-  - **Файлы**: `setup_windows.bat`, `start_windows.bat`
-- 📖 **Документация для Windows**: Создано подробное руководство [README_WINDOWS.md](README_WINDOWS.md)
-  - Пошаговые инструкции для CMD и PowerShell
-  - Решение типовых проблем Windows
-  - Советы по использованию и настройке
-  - Инструкции по созданию ярлыков и автозапуску
-- 🐳 **Улучшена Docker документация**: Обновлен [DOCKER_GUIDE.md](DOCKER_GUIDE.md)
-  - **Особенности Windows**: WSL2, PowerShell, CMD, пути к файлам, решение проблем
-  - **Особенности macOS**: Apple Silicon (M1/M2/M3), Intel, VirtioFS, производительность
-  - **Пояснение о портах**: Различие между динамическими портами в локальном режиме и фиксированными портами в Docker
-  - **Масштабирование**: Примеры запуска нескольких контейнеров с `-p 0:5000` для автоматического выбора портов
-  - **Практические примеры**: Сравнение локального запуска и Docker, multi-app setup
-- 🔄 **Git конфигурация**: Добавлен `.gitattributes` для корректной работы с line endings
-  - Автоматическое преобразование CRLF/LF для разных типов файлов
-  - Гарантирует работу .bat файлов на Windows и .sh на macOS/Linux
-  - **Файл**: `.gitattributes`
+### Added
+- `setup_windows.bat` / `start_windows.bat`. Docker guide notes for Windows/macOS. `.gitattributes` for line endings.
 
-### Исправлено
-- 🔧 **generate_key.py**: Исправлена критическая ошибка полной перезаписи .env файла
-  - Теперь сохраняет все 43 настройки из `env.example`
-  - Обновляет только строку `SECRET_KEY`
-  - Автоматически создает `.env` из `env.example` при первом запуске
-  - **Файл**: `generate_key.py`
-- 📝 **Документация**: Обновлены инструкции по установке в README.md
-  - Четкое разделение команд для macOS/Linux и Windows
-  - Исправлена последовательность шагов (generate_key.py перед запуском)
-  - Добавлена секция "Быстрая установка (Windows)"
-  - **Файл**: `README.md`
-
-### Изменено
-- 🎯 **Синхронизация версий**: Обновление версии до 4.0.4 во всех компонентах
-  - `config.json` → единый источник истины для версии
-  - `env.example` → APP_VERSION=4.0.4
-  - `generate_key.py`, `setup_windows.bat`, `start_windows.bat` → v4.0.4
-  - `README.md`, `README_WINDOWS.md`, `DOCKER_GUIDE.md` → v4.0.4
-  - `docker-compose.yml` → добавлена версия и улучшены комментарии
-  - **Файлы**: `config.json`, `env.example`, `generate_key.py`, `setup_windows.bat`, `start_windows.bat`, `README.md`, `README_WINDOWS.md`, `DOCKER_GUIDE.md`, `docker-compose.yml`
+### Fixed
+- `generate_key.py` no longer overwrites the whole `.env` (only `SECRET_KEY`).
 
 ## [4.0.3] - 2025-10-12
 
-### Добавлено
-- 🎯 **Централизованное управление версией**: Версия приложения теперь автоматически загружается из `config.json`
-  - **run.py**: Динамическое чтение версии при запуске
-  - **setup.py**: Функция `get_version()` читает из config.json
-  - **build_macos.py**: Функция `get_version_from_config()` обновлена на 4.0.3
-  - **app/__init__.py**: Fallback версия обновлена до 4.0.3
-  - **app/config.py**: APP_VERSION по умолчанию 4.0.3
-  - **Файлы**: `run.py`, `setup.py`, `build_macos.py`, `app/__init__.py`, `app/config.py`
-- 🚀 **Desktop launcher**: Новый `launch_gui.py` для корректного запуска из Finder
-  - Автоматическое перенаправление логов в `~/Library/Logs/VPNServerManager/`
-  - Поддержка frozen режима (PyInstaller)
-  - Детальное логирование для отладки
-- 🚪 **Система выхода из приложения**: Полная реализация корректного закрытия desktop приложения
-  - **Endpoint `/pin/exit_app`**: Закрытие приложения через API с очисткой сессий
-  - **Endpoint `/pin/logout`**: Выход из системы с очисткой всех данных сессии
-  - **Endpoint `/pin/check_auth`**: Проверка статуса аутентификации
-  - **JavaScript logout()**: Улучшенная функция выхода для pywebview
-  - **Graceful shutdown**: Корректная остановка pywebview windows через `window.destroy()`
-  - **Файлы**: `app/routes/api.py`, `templates/layout.html`
+### Added
+- Version read from config. Desktop launcher, `/pin/exit_app` / logout, `window.destroy()`.
 
-### Исправлено
-- 🐛 **Критические пути для frozen режима**: Исправлены пути для запакованного приложения
-  - **Логи**: `~/Library/Logs/VPNServerManager/app.log` (вместо `logs/` в read-only `/`)
-  - **Загрузки**: `~/Library/Application Support/VPNServerManager-Clean/uploads/`
-  - **Данные**: `~/Library/Application Support/VPNServerManager-Clean/data/`
-  - **Файлы**: `app/config.py`, `app/__init__.py`
-- 🎨 **Иконка приложения**: Конвертация PNG в ICNS с правильными размерами (16x16 до 1024x1024)
-- 🔧 **Info.plist**: Добавлен `NSPrincipalClass=NSApplication` для корректного запуска GUI
-- ✅ **Запуск из Finder**: Приложение теперь корректно запускается двойным кликом
-- 🔐 **Управление сессиями**: Исправлена проблема с постоянными сессиями
-  - **private_mode=True**: PyWebview не сохраняет сессии между запусками
-  - **session.permanent=False**: Сессии не персистентны
-  - **Отключен SESSION_TYPE='filesystem'**: Сессии только в cookies
-  - **PERMANENT_SESSION_LIFETIME**: Установлен на 1 час
-  - **Файлы**: `desktop/window.py`, `app/routes/api.py`, `app/__init__.py`
-- 🪟 **Увеличено окно при запуске**: Начальная высота увеличена на 10% (с 800px до 880px)
-  - **Файл**: `desktop/window.py`
-- 🎨 **Футер в светлой теме**: Исправлена видимость текста разработчика
-  - Изменены цвета с `text-muted` на `text-white` и `text-white-50`
-  - **Файл**: `templates/layout.html`
-- 🌐 **Переводы**: Добавлены недостающие переводы
-  - **"Порт"**: EN → "Port", ZH → "端口"
-  - **Диалог выхода**: Локализован через JavaScript `window.confirmClose()`
-  - **Диалог закрытия**: Локализован для desktop режима
-  - **Файлы**: `translations/en/LC_MESSAGES/messages.po`, `translations/zh/LC_MESSAGES/messages.po`, `templates/layout.html`
-- 🔧 **Управление подсказками**: Исправлена ошибка "Error 500" на странице "Управление подсказками"
-  - Добавлены маршруты `add_hint` и `delete_hint` в `main.py`
-  - Исправлены `url_for` в `manage_hints.html` с добавлением префикса `main.`
-  - **Файлы**: `app/routes/main.py`, `templates/manage_hints.html`
-- 🚪 **Закрытие приложения**: Исправлена проблема, когда приложение не закрывалось после выхода
-  - JavaScript функция `logout()` теперь вызывает `/pin/exit_app`
-  - Добавлена остановка pywebview через `webview.windows` и `window.destroy()`
-  - **Файлы**: `templates/layout.html`, `app/routes/api.py`
-- 🔐 **Диалог подтверждения закрытия**: Упрощена логика показа диалога
-  - Проверка аутентификации через `/pin/check_auth` endpoint
-  - Показ диалога только для аутентифицированных пользователей
-  - **Файлы**: `desktop/window.py`, `app/routes/api.py`
-- 📊 **Отображение информации о сервере**: Добавлено в футер
-  - URL и порт Flask-сервера теперь видны внизу страницы
-  - Контекст-процессор `inject_app_info` в `app/__init__.py`
-  - **Файлы**: `app/__init__.py`, `templates/layout.html`
-
-### Улучшено
-- 📚 **Документация**: Обновлена версия во всех документах (README, PROJECT_STRUCTURE, README_NEW_STRUCTURE)
-- 🔧 **Единый источник истины**: config.json теперь единственное место для управления версией приложения
-- 🪟 **Портативность**: Приложение работает как из Finder, так и из терминала
-- 📊 **Логирование**: Централизованное логирование с автоматическим созданием директорий
-- 🔒 **Безопасность сессий**: Улучшена изоляция сессий между запусками приложения
-- 🎨 **UX/UI**: Улучшена видимость элементов интерфейса в разных темах
-- 🌐 **i18n**: Полная локализация всех диалогов и сообщений
-
-### Технические детали
-- Все компоненты читают версию из `config.json` → `app_info.version`
-- Fallback версия: 4.0.3 (если config.json недоступен)
-- Упрощена поддержка: достаточно обновить версию в одном файле
-- Frozen detection: `getattr(sys, 'frozen', False)` для определения режима запуска
-- Правильные пути для macOS: `~/Library/Application Support/`, `~/Library/Logs/`
-- Механизм выхода: `logout` → `session.clear()` → `exit_app` → `window.destroy()` → `os._exit(0)`
-- Проверка аутентификации перед показом диалога закрытия через HTTP request
+### Fixed
+- Frozen-app paths under Application Support / Logs. Session isolation. Hints 500 error. Footer server URL.
 
 ## [4.0.2] - 2025-10-12
 
-### Добавлено
-- 🚀 **Multi-App Support**: Полная реализация параллельного запуска нескольких экземпляров
-  - **Динамические порты**: WSGI сервер с портом 0 (ОС автоматически выбирает свободный)
-  - **Уникальные cookie-сессии**: Изоляция сессий между экземплярами (`SESSION_COOKIE_NAME = 'vpn_manager_session_clean'`)
-  - **Глобальные переменные**: `SERVER_PORT` и `_WSGI_SERVER` для управления сервером
-  - **Динамический URL**: pywebview окно использует `f'http://127.0.0.1:{SERVER_PORT}'`
-  - **Эндпоинт /shutdown**: Корректное завершение сервера
-  - **Обработчик закрытия окна**: Graceful shutdown с освобождением портов
-  - **Файлы**: `app/__init__.py`, `desktop/window.py`, `app/routes/main.py`
-  - **Документация**: [MULTI_APP_IMPLEMENTATION_COMPLETE.md](MULTI_APP_IMPLEMENTATION_COMPLETE.md)
-
-### Улучшено
-- ⚡ **Desktop режим**: Переход с `app.run()` на WSGI сервер для лучшей производительности
-- 🔒 **Изоляция**: Полная изоляция данных и сессий при параллельной работе
-- 📊 **Тестирование**: Проверено на реальных портах (50473 динамически назначен ОС)
-
-### Технические детали
-- **WSGI**: `wsgiref.simple_server.make_server('127.0.0.1', 0, app)`
-- **Потоки**: Daemon thread для неблокирующего запуска
-- **Ожидание**: Умное ожидание инициализации сервера (до 5 секунд)
-- **Соответствие**: 100% реализация спецификации из `MULTI_APP_IMPLEMENTATION.md`
+### Added
+- Multi-instance: OS-assigned port 0, unique session cookie, `/shutdown`. See [MULTI_APP_IMPLEMENTATION.md](MULTI_APP_IMPLEMENTATION.md).
 
 ## [4.0.1] - 2025-10-11
 
-### Исправлено
-- 🔐 **PIN Authentication Fix**: Исправлена критическая ошибка входа по PIN-коду
-  - **Проблема**: JavaScript в `layout.html` отправлял данные в формате `application/x-www-form-urlencoded`
-  - **Решение**: Изменен формат отправки данных на `application/json`
-  - **Результат**: PIN-аутентификация теперь работает корректно во всех шаблонах
-  - **Файлы**: `templates/layout.html` - исправлен формат отправки с form-urlencoded на JSON
-  - **Документация**: [PIN_AUTHENTICATION_FIX.md](PIN_AUTHENTICATION_FIX.md)
-
-### Улучшено
-- 📚 **Документация**: Добавлены ссылки на технические отчеты в README.md и docs/project_info/README.md
-- ✅ **Логирование**: API endpoint `/pin/login_ajax` логирует типы запросов для диагностики
+### Fixed
+- PIN login JSON body (`application/json` instead of form-urlencoded).
 
 ## [4.0.0] - 2025-01-15
 
-### Добавлено
-- **Полная реструктуризация архитектуры**: Переход от монолитного приложения к модульной архитектуре
-- **Application Factory Pattern**: Современный способ создания Flask-приложения
-- **Service Layer**: Изоляция бизнес-логики в отдельные сервисы (SSH, Crypto, API)
-- **Blueprint Architecture**: Модульная организация маршрутов (main, api)
-- **Dependency Injection**: Реестр сервисов для управления зависимостями
-- **Custom Exceptions**: Централизованная обработка ошибок с кастомными исключениями
-- **Structured Logging**: Настроенное логирование с ротацией файлов
-- **Comprehensive Testing**: Unit и integration тесты с покрытием кода
-- **Docker Support**: Контейнеризация с Dockerfile и docker-compose.yml
-- **Development Tools**: Makefile, pytest.ini, инструменты качества кода
-- **Security Enhancements**: Валидация данных, декораторы безопасности, CSRF защита
-- **Modern Python**: Type hints, dataclasses, современные практики разработки
-
-### Изменено
-- **Структура проекта**: Полностью переработана в соответствии с архитектурными правилами
-- **Конфигурация**: Переход с JSON на переменные окружения (.env)
-- **Точка входа**: Новая точка входа `run.py` с поддержкой web/desktop режимов
-- **Зависимости**: Обновлены все зависимости с версионированием
-- **Документация**: Создана подробная документация новой архитектуры
-
-### Исправлено
-- **Архитектурные проблемы**: Устранены все нарушения принципов чистой архитектуры
-- **Модульность**: Разделение ответственности между компонентами
-- **Тестируемость**: Улучшена возможность тестирования компонентов
-- **Масштабируемость**: Готовность к дальнейшему развитию
-
-### Устарело
-- **Монолитная структура**: Старый `app.py` заменен модульной архитектурой
-- **JSON конфигурация**: Переход на переменные окружения
-
-### Безопасность
-- **Централизованная валидация**: Все входные данные проходят валидацию
-- **Безопасное хранение секретов**: Все секреты в переменных окружения
-- **CSRF защита**: Защита от межсайтовых атак
-- **Логирование безопасности**: Отслеживание подозрительной активности
+### Added
+- Modular Flask app (factory, blueprints, services, tests, Docker). Entry points `run.py` / `run_desktop.py`.
 
 ## [3.7.3] - 2025-10-03
 
-### Безопасность
-- **Критическое исправление:** Устранена уязвимость, позволявшая сбросить PIN-код через функцию "Первый запуск" при наличии существующих данных. Теперь эта опция доступна только на "чистой" установке.
+### Security
+- “First run” PIN reset only on a clean install (not when data already exists).
 
-### Изменено
-- **UI статуса сервера:** Полностью переработан дизайн модального окна "Статус" для более компактного и структурированного вида. Блоки CPU и Memory объединены, а вся информация организована в виде сетки.
-- **Сетевая информация:** Отображение IP-адресов (v4 и v6) в статусе сервера сделано более компактным (в одну строку).
-- **Таблицы:** Улучшено оформление таблиц `Processes`, `Docker`, `Inodes` — убраны лишние границы, текст в ячейках выровнен по центру для лучшей читаемости.
+### Changed
+- Status modal layout (CPU/Memory grid, IPv6, tables).
 
-### Добавлено
-- **Поддержка IPv6:** В окне "Статус" теперь собираются и отображаются IPv6-адреса для всех сетевых интерфейсов, включая link-local.
-
-### Исправлено
-- **Отображение дисков:** Устранено дублирование точек монтирования в статистике хранилища.
-- **Иконки серверов:** Добавлен резервный вариант отображения (иконка ОС) на случай, если пользовательская иконка не может быть загружена.
+### Fixed
+- Duplicate disk mounts; fallback OS icon.
 
 ## [3.7.2] - 2025-10-02
 
-### Добавлено
-- Отображение ОС (OS) рядом с Kernel — чтение `PRETTY_NAME` из `/etc/os-release`.
-- Сохранение всей панели «Статус» как PNG: серверный API `POST /snapshot/save` и разворачивание модалки на время снимка.
-- Локальный роут `/vendor/html2canvas.min.js` (кэширование библиотеки для офлайн/блокировок CDN).
+### Added
+- OS name from `/etc/os-release`. Save Status panel as PNG.
 
-### Изменено
-- Подсказки: добавлены в заголовках (Kernel/OS/Memory/Load/Uptime/Networks), убраны внутренние `title` у элементов в блоках Disks и Inodes.
-- Прогресс‑бары: цветовые пороги CPU/MEM, процент теперь отображается и на полосе Memory.
-- Docker/таблица: в колонке `Ports` отображается «—», если портов нет; в `Size` — краткое пояснение `(0B=измен., virtual=образ)` и tooltip.
-
-### Исправлено
-- Надёжный парсинг Docker: основной режим через `docker ps --format '{{json .}}'`, фолбэки (`ps -a --format`, `--filter`, `inspect`), синтетическая строка на крайний случай.
-- Inodes: фолбэк на POSIX `df -iP` при отсутствии `--output`.
+### Fixed
+- Docker JSON parsing fallbacks. Inodes via `df -iP`.
 
 ## [3.7.1] - 2025-10-02
 
-### Добавлено
-- Модалка «Статус» на карточке сервера с автообновлением (10с) и метриками: CPU, Memory/Swap, Load, Disks, Inodes, Network (RX/TX), Docker.
-- Бэкенд: `GET /server/<id>/stats` (Paramiko SSH, таймауты, фолбэки по утилитам и пакетным менеджерам), предупреждение и команда установки недостающих утилит.
-- В заголовке модалки — имя сервера и IP, индикатор «последнее обновление».
-- Первичная реализация «Сохранить как PNG».
-
-### Изменено
-- Улучшения UI/UX: бейджи RX/TX, аккуратные блоки, отсутствие modern JS (без `?.`/`??`) для WebView.
-
-### Исправлено
-- Пустые поля/ошибки парсинга в офлайн/ограниченных окружениях; устойчивость к отсутствующим утилитам на сервере.
+### Added
+- Status modal (CPU, memory, disks, network, Docker) with 10s refresh. `GET /server/<id>/stats`.
 
 ## [3.6.9] - 2025-09-28
 
-### Добавлено
-- **Кнопка "Владелец IP"**: Интеграция с IP2Location для анализа IP-адресов
-- **Обновленная шпаргалка**: Добавлены разделы NGINX, Docker, Systemd
-- **Содержание шпаргалки**: Навигация по разделам с якорными ссылками
-- **Секции информации**: Отображение полей "Информация" и "Установленное ПО" на карточках серверов
-- **Унифицированные кнопки**: Все кнопки копирования теперь с иконками
-
-### Изменено
-- Переименованы поля в формах добавления/редактирования серверов
-- Улучшена навигация по шпаргалке команд
-- Обновлена документация с описанием новых функций
+### Added
+- IP owner (IP2Location). Expanded hints (NGINX/Docker/systemd). Info/software fields on cards.
 
 ## [3.6.7] - 2025-08-14
 
-### Добавлено
-- Новая структура документации с разделением на основную и учебные материалы
-- Папка `docs/lessons/` для учебных материалов и туториалов
-- README файлы для улучшения навигации по документации
-
-### Изменено
-- Перемещены файлы документации из корня проекта в `docs/project_info/`
-- Перемещены туториалы GitHub в `docs/lessons/github_tutorials/`
-- Перемещена документация GitHub в `docs/lessons/github_docs/`
-- Перемещена документация по локализации в `docs/lessons/i18n/`
-- Перемещена документация по GitHub Actions в `docs/lessons/github-actions/`
-- Обновлен файл PROJECT_STRUCTURE.md с актуальной структурой проекта
-- Обновлены ссылки в README.md для отражения новой структуры
+### Changed
+- Docs split: product guides vs lessons (now `lessons/` in the repo root).
 
 ## [3.6.5] - 2025-08-08
 
-### Добавлено
-- Раздел документации по локализации: `docs/i18n/*` (Flask-Babel, Babel CLI, автоперевод, добавление языка, упаковка, траблшутинг)
-- Скрипт автоперевода `tools/auto_translate_po.py` (защита плейсхолдеров, plurals, сохранение прогресса)
-- Ссылки на i18n в `README.md` и `BUILD.md`
-
-### Изменено
-- Обновлены переводы EN/ZH; скомпилированы `.mo`
-- Улучшена упаковка PyInstaller: рекомендации по добавлению `translations` в сборку
-- Улучшены инструменты бэкапа: `backup_tools/rollback.sh` (флаг `-y/--yes`, fetch, безопасный pull)
-- Актуализирован `BACKUP_TOOLS.md` (неинтерактивный запуск, пометки)
-
-### Исправлено
-- Падение автоперевода при `None` от переводчика (коалесcинг и периодическое сохранение)
+### Added
+- i18n tooling (`tools/auto_translate_po.py`). EN/ZH catalogs.
 
 ## [3.5.3] - 2025-08-04
 
-### Добавлено
-- Подготовка проекта для публикации на GitHub
-- GitHub Actions CI/CD pipeline
-- Шаблоны для Issues и Pull Requests
-- Файлы SECURITY.md, CODE_OF_CONDUCT.md
-- Автоматическое обновление зависимостей (Dependabot)
-- Система спонсорства проекта
-- Документация поддержки (.github/SUPPORT.md)
+### Added
+- GitHub publication: CI, issue/PR templates, `SECURITY.md`. Developer name anonymized in docs; default PIN `1234`.
 
-### Изменено
-- Заменено имя разработчика на "Разработчик"
-- Установлен PIN по умолчанию: 1234
-- Очищена документация от личной информации
-- Обновлены даты в конфигурации
-- Удалены упоминания о папке lessons
-- Удалены упоминания о memory-bank
-- Обновлены ссылки в документации
+## [3.5.2] / [3.4.0] - 2025-08
 
-## [3.5.2] - 2025-08-04
+PIN lock, offline indicator, macOS icon conversion, key management, import/export, UI zoom.
 
-### Добавлено
-- PIN-система защиты приложения
-- Офлайн режим с индикатором состояния сети
-- Автоматическая конвертация иконок для macOS
-- Улучшенная обработка сетевых ошибок
-- Система управления ключами шифрования
-- Расширенная система экспорта/импорта данных
-- Масштабирование интерфейса (80%, 90%, 100%)
+## [3.3.x] – [3.0.0] - 2025-06–07
 
-### Исправлено
-- Проблемы с загрузкой стилей в офлайн режиме
-- Отображение иконки приложения в Dock и Finder
-- Обработка ошибок при отсутствии интернета
-- Валидация Fernet ключей любого формата
-
-### Изменено
-- Улучшенный JavaScript с анимациями
-- Обновленные стили для офлайн режима
-- Расширенная система исключений Git
-- Улучшенный интерфейс с цветными статусными блоками
-
-## [3.4.0] - 2025-08-03
-
-### Добавлено
-- PIN-система защиты приложения
-- Офлайн режим с индикатором состояния сети
-- Автоматическая конвертация иконок для macOS
-- Улучшенная обработка сетевых ошибок
-- Индикаторы состояния WiFi/WiFi-off
-- Анимации загрузки и модальные окна
-
-### Исправлено
-- Проблемы с загрузкой стилей в офлайн режиме
-- Отображение иконки приложения в Dock и Finder
-- Обработка ошибок при отсутствии интернета
-
-### Изменено
-- Улучшенный JavaScript с полной обработкой ошибок
-- Обновленные стили для офлайн режима
-- Анимации появления алертов
-
-## [3.3.3] - 2025-07-15
-
-### Добавлено
-- Система управления ключами шифрования
-- Смена ключей с автоматической перешифровкой
-- Проверка соответствия ключа и данных
-- Автоматическое резервное копирование при смене ключей
-
-### Исправлено
-- Проблемы с валидацией ключей шифрования
-- Ошибки при смене ключей
-
-## [3.3.0] - 2025-07-10
-
-### Добавлено
-- Расширенная система экспорта данных
-- Три варианта экспорта: данные, ключ, полный экспорт
-- Улучшенный импорт с объединением данных
-- Масштабирование интерфейса
-- Предотвращение дублей при импорте
-
-### Изменено
-- Улучшенный интерфейс с цветными статусными блоками
-- Трехкнопочный интерфейс экспорта
-- Двухколоночный дизайн для импорта
-- Адаптивная разметка
-
-## [3.2.0] - 2025-07-01
-
-### Добавлено
-- Система подсказок и шпаргалок
-- Управление подсказками через интерфейс
-- Экспорт/импорт подсказок
-- Улучшенная навигация
-
-### Исправлено
-- Проблемы с отображением подсказок
-- Ошибки в системе навигации
-
-## [3.1.0] - 2025-06-20
-
-### Добавлено
-- Система шифрования данных
-- Алгоритм Fernet для защиты паролей
-- Автоматическая генерация ключей
-- Безопасное хранение данных
-
-### Изменено
-- Все пароли теперь зашифрованы
-- Улучшена безопасность хранения данных
-
-## [3.0.0] - 2025-06-01
-
-### Добавлено
-- Полная переработка интерфейса
-- PyWebView для нативного GUI
-- Система тем (светлая/темная)
-- Улучшенная навигация
-- Современный дизайн
-
-### Изменено
-- Переход с консольного интерфейса на GUI
-- Обновленная архитектура приложения
+Encryption key rotation, export variants, hints, Fernet vault, PyWebView GUI.
 
 ## [2.0.0] - 2025-05-15
 
-### Добавлено
-- Веб-интерфейс на Flask
-- Система шаблонов Jinja2
-- Управление серверами через веб-интерфейс
-- Экспорт/импорт данных
-
-### Изменено
-- Переход с консольного интерфейса на веб
-- Новая архитектура приложения
+Flask web UI.
 
 ## [1.0.0] - 2025-05-01
 
-### Добавлено
-- Первая версия приложения
-- Консольный интерфейс
-- Базовая функциональность управления серверами
-- Простое хранение данных в JSON
-
----
-
-## Типы изменений
-
-- **Добавлено** - новые функции
-- **Изменено** - изменения в существующих функциях
-- **Устарело** - функции, которые скоро будут удалены
-- **Удалено** - удаленные функции
-- **Исправлено** - исправления багов
-- **Безопасность** - исправления уязвимостей 
+First console release, JSON storage.

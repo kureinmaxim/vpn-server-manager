@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate SECRET_KEY for VPN Server Manager v4.0.5
+Generate SECRET_KEY for VPN Server Manager.
 """
 
 from cryptography.fernet import Fernet

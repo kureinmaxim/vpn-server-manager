@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Скрипт для сборки VPN Server Manager v4.0.7 с новой модульной архитектурой.
+Скрипт для сборки VPN Server Manager (версия из config/config.json.template).
 Включает поддержку Application Factory, Service Layer и современные практики разработки.
 Версия автоматически загружается из config.json.
 """
@@ -728,10 +728,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '4.0.7'
+        return '4.3.5'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '4.0.7'
+        return '4.3.5'
 
 def main():
     """Основная функция сборки"""

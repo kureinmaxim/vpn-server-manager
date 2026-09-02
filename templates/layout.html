@@ -616,7 +616,7 @@
             submitButton.disabled = true;
             submitButton.textContent = 'Проверка...';
             
-            // Отправляем запрос на сервер (v4.0.0 - JSON format)
+            // JSON body
             fetch('/pin/login_ajax', {
                 method: 'POST',
                 headers: {

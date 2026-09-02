@@ -4,9 +4,9 @@
 
 Связанные документы:
 
-- `VERSION_MANAGEMENT.md`
-- `BUILD.md`
-- `CHANGELOG.md`
+- `../VERSION_MANAGEMENT_ru.md`
+- `../BUILD_ru.md`
+- `../CHANGELOG.md`
 
 ## 1. Перед релизом
 
@@ -62,7 +62,7 @@ python tools/update_version.py bump minor
 ### Поставить конкретную версию
 
 ```text
-python tools/update_version.py sync 4.2.3
+python tools/update_version.py sync X.Y.Z
 ```
 
 ### Проверить итог
@@ -88,7 +88,7 @@ python tools/update_version.py status
 Рекомендуемый формат:
 
 ```markdown
-## [4.2.3] - 2026-04-07
+## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
 - ...
@@ -233,7 +233,7 @@ gh release create $tag `
 Get-FileHash "installer_output\VPN-Server-Manager-Setup-vX.Y.Z.exe" -Algorithm SHA256
 ```
 
-Подробности см. в `docs/CHECKSUM_GUIDE.md`.
+Подробности см. в `docs/CHECKSUM_GUIDE_ru.md`.
 
 ## 10. Итоговый чеклист
 

@@ -63,5 +63,5 @@ shasum -a 256 "dist/VPNServerManager-Clean_Installer.dmg"
 
 Подробный релизный сценарий:
 
-- `release_guide.md`
-- `../BUILD.md`
+- `release_guide_ru.md`
+- `../BUILD_ru.md`

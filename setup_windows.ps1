@@ -1,5 +1,5 @@
 # VPN Server Manager - Windows Setup (PowerShell)
-# Version 4.2.2
+# Version is read from config/config.json.template
 
 $ErrorActionPreference = "Stop"
 

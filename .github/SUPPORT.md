@@ -4,7 +4,7 @@
 
 - [README](../README.md) — install, run, safety notes
 - [BUILD.md](../BUILD.md) — Windows installer and macOS `.app` / `.dmg`
-- [Monitoring](../docs/README_MONITORING.md)
+- [Monitoring](../docs/README_MONITORING_ru.md)
 - [Changelog](../CHANGELOG.md)
 
 ## Common problems
