@@ -1,104 +1,108 @@
-# 🔄 Реализация одновременной работы нескольких приложений
+# Running several instances at once
 
-## 🎯 Цель
+Language: **English** · [Русский](MULTI_APP_IMPLEMENTATION_ru.md)
 
-VPN Server Manager реализован с поддержкой **одновременного запуска нескольких экземпляров** без конфликтов портов и сессий. Это позволяет запускать несколько приложений управления серверами параллельно или использовать VPN Server Manager вместе с другими веб-приложениями.
+## Goal
+
+VPN Server Manager can run **more than one copy at the same time** without fighting over ports or sessions. You can open two managers side by side, or run it next to another local Flask app.
+
+Current launchers: `python run.py` (web) and `python run_desktop.py` (desktop). Older notes said `app.py` — that is no longer the entry point.
 
 ---
 
-## 🏗️ Архитектурные решения
+## Architecture
 
-### 1. Динамическое выделение портов
+### 1. Dynamic ports
 
-**Проблема:** Статический порт (например, 5050) может быть занят другим приложением.
+**Problem:** A hard-coded port (for example 5050) may already be in use.
 
-**Решение:** Использование порта `0` для автоматического выделения свободного порта ОС.
+**Solution:** Bind to port `0` so the OS picks a free TCP port.
 
 ```python
-# Порт 0 — ОС выдаст гарантированно свободный порт
+# Port 0 — the OS assigns a free TCP port
 _WSGI_SERVER = make_server('127.0.0.1', 0, app)
 SERVER_PORT = _WSGI_SERVER.server_port
-print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
+print(f"Flask listening on http://127.0.0.1:{SERVER_PORT}")
 ```
 
-**Преимущества:**
-- ✅ Никогда не конфликтует с другими приложениями
-- ✅ Автоматический выбор свободного порта
-- ✅ Работает на любой ОС
+**Benefits:**
+- Never clashes with other apps
+- Free port is chosen automatically
+- Works on Windows, macOS, and Linux
 
-### 2. Уникальные cookie-сессии
+### 2. Unique session cookies
 
-**Проблема:** Браузеры используют общие cookie для домена, что может привести к смешиванию сессий.
+**Problem:** Browsers share cookies per host, so two apps on `127.0.0.1` can mix sessions.
 
-**Решение:** Уникальное имя cookie для каждого приложения.
+**Solution:** Each app uses its own cookie name.
 
 ```python
 app.config['SESSION_COOKIE_NAME'] = 'vps_manager_session_vpn'
 ```
 
-**Преимущества:**
-- ✅ Изолированные сессии для каждого приложения
-- ✅ Нет конфликтов между экземплярами
-- ✅ Безопасное хранение данных сессии
+**Benefits:**
+- Isolated sessions per instance
+- No cookie clash between copies
+- Session data stays in the right app
 
-### 3. Изолированное хранение данных
+### 3. Isolated data directories
 
-**Проблема:** Несколько экземпляров могут перезаписывать данные друг друга.
+**Problem:** Several instances can overwrite each other’s files.
 
-**Решение:** Каждый экземпляр использует свою директорию данных.
+**Solution:** Each install uses its own data directory.
 
 ```python
 def get_app_data_dir():
     app_name = "VPNServerManager"
-    if is_frozen:  # Установленное приложение
+    if is_frozen:  # packaged app
         if sys.platform == 'darwin':  # macOS
             return os.path.join(
-                os.path.expanduser("~"), 
-                "Library", "Application Support", 
-                app_name
+                os.path.expanduser("~"),
+                "Library", "Application Support",
+                app_name,
             )
-    else:  # Режим разработки
-        return os.path.join(os.getcwd())
+    else:  # development
+        return os.getcwd()
 ```
 
-**Преимущества:**
-- ✅ Каждое приложение имеет свои данные
-- ✅ Нет потери информации при параллельной работе
-- ✅ Возможность синхронизации через импорт/экспорт
+Packaged Windows uses `%APPDATA%\VPNServerManager\`; Linux uses `~/.local/share/VPNServerManager/`. Sync between copies is import/export, not a shared file.
+
+**Benefits:**
+- Each copy keeps its own data
+- Parallel runs do not wipe each other
+- Optional sync via export/import
 
 ---
 
-## 🔧 Техническая реализация
+## How it starts
 
-### 1. Структура запуска
+### 1. Startup structure
 
 ```python
-# Глобальные переменные для управления сервером
 SERVER_PORT = None
 _WSGI_SERVER = None
 
 def _start_flask_server():
-    """Запуск Flask сервера в отдельном потоке"""
+    """Start Flask on a background thread."""
     global SERVER_PORT, _WSGI_SERVER
     try:
-        # Динамический порт
         _WSGI_SERVER = make_server('127.0.0.1', 0, app)
         SERVER_PORT = _WSGI_SERVER.server_port
-        print(f"🚀 Flask сервер запущен на http://127.0.0.1:{SERVER_PORT}")
+        print(f"Flask listening on http://127.0.0.1:{SERVER_PORT}")
         _WSGI_SERVER.serve_forever()
     except Exception as e:
-        print(f"❌ Ошибка запуска Flask сервера: {e}")
+        print(f"Flask failed to start: {e}")
 ```
 
-### 2. Потоковая архитектура
+### 2. Threading
+
+Flask runs on a daemon thread so the desktop window can open immediately:
 
 ```python
-# Запуск в отдельном потоке
 flask_thread = threading.Thread(target=_start_flask_server)
 flask_thread.daemon = True
 flask_thread.start()
 
-# Ожидание инициализации сервера
 import time
 for _ in range(100):
     if SERVER_PORT:
@@ -106,231 +110,223 @@ for _ in range(100):
     time.sleep(0.05)
 ```
 
-**Преимущества:**
-- ✅ Неблокирующий запуск
-- ✅ Быстрая инициализация GUI
-- ✅ Надежная работа с сетью
+**Benefits:**
+- Non-blocking start
+- Fast GUI init
+- Reliable bind on localhost
 
-### 3. Корректное завершение
+### 3. Clean shutdown
 
 ```python
 @app.route('/shutdown')
 def shutdown():
-    """Эндпоинт для корректного завершения сервера"""
+    """Ask the process to stop."""
     os.kill(os.getpid(), signal.SIGINT)
-    return 'Сервер выключается...'
+    return 'Server stopping...'
 
 def on_closing():
-    """Обработчик закрытия окна"""
-    print("Окно закрывается, отправка запроса на выключение...")
+    """Window close handler."""
     try:
         requests.get(f'http://127.0.0.1:{SERVER_PORT}/shutdown', timeout=1)
     except requests.exceptions.RequestException:
         pass
 ```
 
-**Преимущества:**
-- ✅ Корректное освобождение портов
-- ✅ Завершение всех потоков
-- ✅ Сохранение данных перед выходом
+**Benefits:**
+- Port is released
+- Worker threads stop
+- Prefer closing the window, not killing the process
 
 ---
 
-## 🌐 Сетевые особенности
+## Network
 
-### 1. Строго локальный хост
+### 1. Localhost only
 
 ```python
-# Всегда используем 127.0.0.1 (не 0.0.0.0)
+# Always 127.0.0.1 (not 0.0.0.0)
 _WSGI_SERVER = make_server('127.0.0.1', 0, app)
 ```
 
-**Причины:**
-- 🔒 **Безопасность**: Доступ только с локальной машины
-- 🚀 **Производительность**: Быстрее чем внешние интерфейсы
-- 🛡️ **Изоляция**: Нет доступа извне
+**Why:**
+- **Security:** only this machine can connect
+- **Speed:** loopback is faster than an external interface
+- **Isolation:** nothing from the LAN reaches the UI
 
-### 2. Динамические URL
+### 2. Dynamic window URL
 
 ```python
-# Создание окна с динамическим портом
 window = webview.create_window(
     'VPS Manager',
     f'http://127.0.0.1:{SERVER_PORT or 5050}',
     width=1280,
     height=800,
-    resizable=True
+    resizable=True,
 )
 ```
 
-**Преимущества:**
-- ✅ Автоматическая адаптация к выделенному порту
-- ✅ Fallback на порт по умолчанию
-- ✅ Гибкость конфигурации
+**Benefits:**
+- Window follows the assigned port
+- Fallback to 5050 if the port is not ready yet
+- Same pattern in web and desktop launchers
 
 ---
 
-## 📊 Сравнение подходов
+## Static vs dynamic ports
 
-| Аспект | Статический порт | Динамический порт |
-|--------|------------------|-------------------|
-| **Конфликты** | ❌ Высокий риск | ✅ Отсутствуют |
-| **Настройка** | ⚠️ Требует конфигурации | ✅ Автоматическая |
-| **Отладка** | ✅ Предсказуемый | ⚠️ Меняется |
-| **Масштабируемость** | ❌ Ограничена | ✅ Неограничена |
-| **Надежность** | ❌ Может не запуститься | ✅ Всегда работает |
+| | Static port | Dynamic port |
+|---|---|---|
+| Collisions | High risk | None |
+| Setup | Manual | Automatic |
+| Debugging | Predictable | Port changes each run |
+| Scale | Limited | As many copies as you need |
+| Reliability | May fail to bind | Always gets a free port |
 
 ---
 
-## 🔄 Процесс запуска нескольких приложений
+## Two copies at once
 
-### 1. Первое приложение
+From `/path/to/vpn-server-manager` (never a personal home path):
+
+### First instance
 
 ```bash
-# Запуск первого экземпляра
-cd /path/to/project1 && python3 app.py
-# Результат: http://127.0.0.1:52341
+cd /path/to/vpn-server-manager && python3 run.py
+# e.g. http://127.0.0.1:52341
 ```
 
-### 2. Второе приложение
+Desktop:
 
 ```bash
-# Запуск второго экземпляра (в другом терминале)
-cd /path/to/project2 && python3 app.py
-# Результат: http://127.0.0.1:52342
+cd /path/to/vpn-server-manager && python3 run_desktop.py
 ```
 
-### 3. Одновременная работа
+### Second instance
 
-- **Порт 52341**: Первое приложение с данными A
-- **Порт 52342**: Второе приложение с данными B
-- **Cookie**: `vps_manager_session_vpn` (изолированы)
-- **Данные**: Разные директории, нет конфликтов
+```bash
+# Another clone or another project, second terminal
+cd /path/to/other-copy && python3 run.py
+# e.g. http://127.0.0.1:52342
+```
+
+### What stays isolated
+
+- **Port 52341:** first app, data A
+- **Port 52342:** second app, data B
+- **Cookie:** `vps_manager_session_vpn` (per-app name)
+- **Data:** separate directories, no overwrite
 
 ---
 
-## 🛠️ Утилиты для управления
+## Checks and cleanup
 
-### 1. Проверка занятых портов
+### Occupied ports
 
 ```bash
-# Просмотр всех портов приложения
+# macOS / Linux
 lsof -i :52341
 lsof -i :52342
-
-# Проверка конкретного порта
 netstat -an | grep 52341
+
+# Windows
+netstat -ano | findstr :52341
 ```
 
-### 2. Мониторинг процессов
+### Processes
 
 ```bash
-# Поиск всех экземпляров приложения
-ps aux | grep "python.*app.py"
-
-# Детальная информация о процессах
+# macOS / Linux
+ps aux | grep "python.*run"
 ps -ef | grep "VPNServerManager"
 ```
 
-### 3. Очистка портов
+### Stuck port
 
 ```bash
-# Принудительное освобождение порта (если завис)
+# macOS / Linux
 kill -9 $(lsof -t -i:52341)
-
-# Очистка всех процессов приложения
 pkill -f "VPNServerManager"
 ```
 
 ---
 
-## 🔧 Конфигурация для разработки
+## Development extras
 
-### 1. Переменные окружения
+### Environment
 
 ```bash
-# Установка уникального имени для разработки
 export APP_NAME="VPNServerManager_Dev"
 export SESSION_COOKIE_NAME="vps_manager_dev_session"
 ```
 
-### 2. Настройка IDE
+### IDE launch config
+
+VS Code / Cursor `launch.json` (example — still prefer port `0` for packaged apps):
 
 ```json
-// VS Code launch.json
 {
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VPN Server Manager (Port 1)",
+            "name": "VPN Server Manager (web)",
             "type": "python",
             "request": "launch",
-            "program": "app.py",
-            "env": {
-                "SERVER_PORT": "5050"
-            }
+            "program": "run.py"
         },
         {
-            "name": "VPN Server Manager (Port 2)",
+            "name": "VPN Server Manager (desktop)",
             "type": "python",
             "request": "launch",
-            "program": "app.py",
-            "env": {
-                "SERVER_PORT": "5051"
-            }
+            "program": "run_desktop.py"
         }
     ]
 }
 ```
 
----
-
-## 🚨 Устранение неполадок
-
-### Проблема: "Порт уже занят"
-
-**Симптомы:**
-- Ошибка `Address already in use`
-- Приложение не запускается
-
-**Решение:**
-1. Проверить занятые порты: `lsof -i :PORT`
-2. Завершить процесс: `kill -9 PID`
-3. Перезапустить приложение
-
-### Проблема: "Смешивание данных"
-
-**Симптомы:**
-- Данные одного приложения появляются в другом
-- Потеря информации
-
-**Решение:**
-1. Проверить cookie-сессии
-2. Убедиться в изоляции директорий данных
-3. Перезапустить приложения
-
-### Проблема: "Медленный запуск"
-
-**Симптомы:**
-- Долгое ожидание инициализации
-- Таймауты при запуске
-
-**Решение:**
-1. Увеличить время ожидания порта
-2. Проверить системные ресурсы
-3. Оптимизировать загрузку данных
+Fixed ports in `env` (`SERVER_PORT=5050`) are only for local debugging when you want a predictable URL. Production and packaged builds should keep OS-assigned port `0`.
 
 ---
 
-## 📈 Производительность
+## Troubleshooting
 
-### 1. Оптимизация памяти
+### Address already in use
+
+**Symptoms:** `Address already in use`; the app does not start.
+
+**Fix:**
+1. Check the port: `lsof -i :PORT` or `netstat -ano | findstr :PORT`
+2. Stop the old PID
+3. Start again
+
+This only happens if something still binds a **fixed** port. Dynamic port `0` should not hit this.
+
+### Data mixed between windows
+
+**Symptoms:** one window shows the other copy’s servers; data looks lost.
+
+**Fix:**
+1. Check cookie names
+2. Confirm each copy uses its own data directory
+3. Restart both instances
+
+### Slow start
+
+**Symptoms:** long wait before the UI; startup timeouts.
+
+**Fix:**
+1. Wait until `SERVER_PORT` is set (the ~5s poll, 100 × 50ms)
+2. Check disk / antivirus load on the venv
+3. Avoid starting from a slow network share
+
+---
+
+## Performance notes
+
+### Session and temp files
 
 ```python
-# Ограничение размера сессии
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
-# Очистка временных файлов
 def cleanup_temp_files():
     temp_dir = os.path.join(app_data_dir, "temp")
     for file in os.listdir(temp_dir):
@@ -338,91 +334,72 @@ def cleanup_temp_files():
             os.remove(os.path.join(temp_dir, file))
 ```
 
-### 2. Мониторинг ресурсов
+### Optional resource log
 
 ```python
-# Логирование использования ресурсов
 import psutil
 
 def log_resource_usage():
     process = psutil.Process()
     memory_mb = process.memory_info().rss / 1024 / 1024
     cpu_percent = process.cpu_percent()
-    print(f"📊 Ресурсы: {memory_mb:.1f}MB RAM, {cpu_percent:.1f}% CPU")
+    print(f"Resources: {memory_mb:.1f}MB RAM, {cpu_percent:.1f}% CPU")
 ```
 
 ---
 
-## 🎯 Лучшие практики
+## Practices
 
-### 1. Для разработчиков
+### Developers
 
-- ✅ **Всегда используйте динамические порты** в продакшене
-- ✅ **Тестируйте параллельный запуск** перед релизом
-- ✅ **Логируйте выделенные порты** для отладки
-- ✅ **Очищайте ресурсы** при завершении
+- Use dynamic ports in packaged / production builds
+- Test two copies side by side before a release
+- Log the assigned port
+- Shut down through `/shutdown` so the port is freed
 
-### 2. Для пользователей
+### Users
 
-- ✅ **Закрывайте приложения корректно** (через GUI)
-- ✅ **Не запускайте слишком много экземпляров** одновременно
-- ✅ **Делайте резервные копии** перед параллельной работой
-- ✅ **Мониторьте использование ресурсов**
+- Close via the window so shutdown runs
+- Do not run dozens of copies
+- Full export before experiments
+- Watch RAM if several desktop windows are open
 
-### 3. Для системных администраторов
+### Admins
 
-- ✅ **Настройте мониторинг портов** в корпоративной среде
-- ✅ **Ограничьте количество процессов** при необходимости
-- ✅ **Настройте автоматическую очистку** зависших процессов
-- ✅ **Ведите логи запуска** для аудита
+- Monitor listening ports if needed
+- Limit processes in a locked-down environment
+- Clean up hung PIDs
+- Keep start/stop logs for audit
 
 ---
 
-## 🔮 Будущие улучшения
+## Ideas not implemented
 
-### 1. Автоматическое обнаружение конфликтов
+These snippets are sketches only. Use export/import instead of live sync.
 
 ```python
 def check_port_conflicts():
-    """Автоматическая проверка конфликтов портов"""
-    # Реализация проверки занятых портов
+    """Scan for port clashes before bind."""
     pass
-```
 
-### 2. Централизованное управление
-
-```python
 def register_app_instance():
-    """Регистрация экземпляра в центральном реестре"""
-    # Реализация реестра приложений
+    """Register this copy in a central instance list."""
     pass
-```
 
-### 3. Синхронизация данных
-
-```python
 def sync_data_between_instances():
-    """Синхронизация данных между экземплярами"""
-    # Реализация синхронизации
+    """Live sync between copies — not implemented."""
     pass
 ```
 
 ---
 
-## 🎉 Заключение
+## Summary
 
-VPN Server Manager реализует **надежную архитектуру для параллельной работы** нескольких экземпляров приложения:
+VPN Server Manager is built so several copies can run in parallel:
 
-### ✅ **Достигнутые цели:**
-- 🔄 **Параллельный запуск** без конфликтов
-- 🔒 **Изоляция данных** и сессий
-- 🚀 **Автоматическое выделение** портов
-- 🛡️ **Безопасность** и стабильность
+- Parallel start without port clashes
+- Isolated data and sessions
+- OS-assigned ports
+- Localhost-only bind
 
-### 🎯 **Ключевые принципы:**
-- **Динамические порты** вместо статических
-- **Уникальные cookie** для изоляции
-- **Потоковая архитектура** для производительности
-- **Корректное завершение** для освобождения ресурсов
-
-Эта реализация обеспечивает **масштабируемость** и **надежность** при работе с несколькими экземплярами приложения! 🚀
+**Principles:** dynamic ports instead of a fixed one; unique cookies; Flask on a background thread; clean shutdown to release resources.

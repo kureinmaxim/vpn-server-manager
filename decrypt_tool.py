@@ -3,8 +3,6 @@ import json
 from cryptography.fernet import Fernet, InvalidToken
 from dotenv import load_dotenv
 
-# --- Улучшенная версия скрипта для v4.0.0 ---
-
 def decrypt_data(fernet_instance, encrypted_data):
     """
     Вспомогательная функция для расшифровки отдельных полей.
@@ -102,7 +100,6 @@ def decrypt_servers_file():
             print(f"    - Пароль: {decrypt_data(fernet, hoster.get('password'))}")
 
     print(f"\n{'='*10} Процесс завершен {'='*10}")
-    print("Примечание: В v4.0.0 используется новая модульная архитектура.")
     print("Для запуска приложения используйте: python run.py")
 
 

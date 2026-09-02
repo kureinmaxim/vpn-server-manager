@@ -11,7 +11,7 @@ VPN Server Manager использует **зашифрованное хране�
 ### 📂 В режиме разработки (текущий проект)
 
 ```
-/Users/olgazaharova/Project/ProjectPython/VPNserverManage/
+/path/to/vpn-server-manager/
 ├── data/                          # 📊 Локальные данные разработки
 │   ├── servers.json.enc          # 🔐 Основной файл с серверами (зашифрован)
 │   ├── hints.json                # 📝 Шпаргалка команд
