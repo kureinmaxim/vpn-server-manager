@@ -1,4 +1,4 @@
-# 🔧 Руководство по работе с Git и GitHub для VPN Server Manager v4.0.0
+# Руководство по работе с Git и GitHub для VPN Server Manager
 
 Это руководство описывает работу с Git локально, использование .gitignore, и публикацию проекта на GitHub с использованием GitHub CLI (gh) и без него.
 
@@ -50,7 +50,7 @@ git config user.email
 
 ### Структура .gitignore для проекта
 
-Наш `.gitignore` файл уже настроен для VPN Server Manager v4.0.0:
+Наш `.gitignore` файл уже настроен для VPN Server Manager:
 
 ```gitignore
 # Python
@@ -149,7 +149,7 @@ git add -A                   # Все изменения включая удал
 
 # Коммит
 git commit -m "feat: add new modular architecture"
-git commit -am "fix: update version to 4.0.0"  # Добавить и закоммитить
+git commit -am "fix: update version to X.Y.Z"  # Добавить и закоммитить
 
 # Просмотр истории
 git log --oneline
@@ -239,10 +239,10 @@ gh auth status
 ### Создание репозитория
 ```bash
 # Создание публичного репозитория
-gh repo create vpn-server-manager --public --description "VPN Server Manager v4.0.0 with modular architecture"
+gh repo create vpn-server-manager --public --description "VPN Server Manager vX.Y.Z with modular architecture"
 
 # Создание приватного репозитория
-gh repo create vpn-server-manager --private --description "VPN Server Manager v4.0.0 with modular architecture"
+gh repo create vpn-server-manager --private --description "VPN Server Manager vX.Y.Z with modular architecture"
 
 # Создание с README
 gh repo create vpn-server-manager --public --add-readme
@@ -308,7 +308,7 @@ gh issue close 123
 2. Нажмите "New repository"
 3. Заполните:
    - Repository name: `vpn-server-manager`
-   - Description: `VPN Server Manager v4.0.0 with modular architecture`
+   - Description: `VPN Server Manager vX.Y.Z with modular architecture`
    - Visibility: Public/Private
    - Initialize with README: No (у нас уже есть файлы)
 
@@ -321,7 +321,7 @@ git init
 git add .
 
 # Первый коммит
-git commit -m "feat: initial commit with v4.0.0 modular architecture"
+git commit -m "feat: initial commit with vX.Y.Z modular architecture"
 
 # Добавление удаленного репозитория
 git remote add origin https://github.com/username/vpn-server-manager.git
@@ -353,21 +353,21 @@ git push -u origin feature/new-feature
 ### С gh CLI
 ```bash
 # Создание релиза
-gh release create v4.0.0 \
-  --title "VPN Server Manager v4.0.0" \
+gh release create vX.Y.Z \
+  --title "VPN Server Manager vX.Y.Z" \
   --notes "Major release with modular architecture" \
   --latest
 
 # Создание релиза с файлами
-gh release create v4.0.0 \
-  --title "VPN Server Manager v4.0.0" \
+gh release create vX.Y.Z \
+  --title "VPN Server Manager vX.Y.Z" \
   --notes "Major release with modular architecture" \
   dist/VPNServerManager-Clean_Installer.dmg \
   --latest
 
 # Создание draft релиза
-gh release create v4.0.0 \
-  --title "VPN Server Manager v4.0.0" \
+gh release create vX.Y.Z \
+  --title "VPN Server Manager vX.Y.Z" \
   --notes "Major release with modular architecture" \
   --draft
 
@@ -375,15 +375,15 @@ gh release create v4.0.0 \
 gh release list
 
 # Просмотр релиза
-gh release view v4.0.0
+gh release view vX.Y.Z
 ```
 
 ### Без gh CLI (через веб-интерфейс)
 1. Перейдите в раздел "Releases" на GitHub
 2. Нажмите "Create a new release"
 3. Заполните:
-   - Tag version: `v4.0.0`
-   - Release title: `VPN Server Manager v4.0.0`
+   - Tag version: `vX.Y.Z`
+   - Release title: `VPN Server Manager vX.Y.Z`
    - Description: Описание изменений
 4. Прикрепите файлы (DMG, архив)
 5. Нажмите "Publish release"
@@ -391,11 +391,11 @@ gh release view v4.0.0
 ### Автоматическое создание релизов
 ```bash
 # Создание тега
-git tag -a v4.0.0 -m "Release version 4.0.0"
-git push origin v4.0.0
+git tag -a vX.Y.Z -m "Release version X.Y.Z"
+git push origin vX.Y.Z
 
 # Создание аннотированного тега
-git tag -a v4.0.0 -m "Release version 4.0.0" commit-hash
+git tag -a vX.Y.Z -m "Release version X.Y.Z" commit-hash
 ```
 
 ## 🌿 Работа с ветками
@@ -640,26 +640,26 @@ gh pr create --title "Daily improvements" --body "Description"
 # Создание release ветки
 git checkout main
 git pull origin main
-git checkout -b release/v4.0.0
+git checkout -b release/vX.Y.Z
 
 # Обновление версии
 # ... обновляем версию в файлах ...
 
 git add .
-git commit -m "chore: bump version to 4.0.0"
-git push -u origin release/v4.0.0
+git commit -m "chore: bump version to X.Y.Z"
+git push -u origin release/vX.Y.Z
 
 # Создание PR
-gh pr create --title "Release v4.0.0" --body "Release notes"
+gh pr create --title "Release vX.Y.Z" --body "Release notes"
 
 # После мержа
 git checkout main
 git pull origin main
-git tag -a v4.0.0 -m "Release version 4.0.0"
-git push origin v4.0.0
+git tag -a vX.Y.Z -m "Release version X.Y.Z"
+git push origin vX.Y.Z
 
 # Создание релиза
-gh release create v4.0.0 --title "VPN Server Manager v4.0.0" --latest
+gh release create vX.Y.Z --title "VPN Server Manager vX.Y.Z" --latest
 ```
 
 ## 🔗 Полезные ссылки
@@ -681,4 +681,4 @@ gh release create v4.0.0 --title "VPN Server Manager v4.0.0" --latest
 
 ---
 
-**Примечание**: Это руководство актуально для VPN Server Manager v4.0.0 с новой модульной архитектурой.
+**Примечание**: Это руководство для текущей версии VPN Server Manager. Номер релиза смотрите в `config/config.json.template`.

@@ -1,4 +1,6 @@
-# VPN Server Manager v4.3.4
+# VPN Server Manager v4.3.5
+
+Language: **English** · [Русский](README_ru.md)
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="220">
@@ -95,12 +97,15 @@ Installers (Windows setup `.exe`, macOS `.dmg`) are on the [Releases](https://gi
 
 ## Docs
 
-- [Documentation index](docs/INDEX.md)
-- [Build guide](BUILD.md)
-- [Version management](VERSION_MANAGEMENT.md)
-- [Release process](docs/release_guide.md)
-- [Monitoring](docs/README_MONITORING.md)
+- [Documentation index](docs/INDEX_ru.md) (Russian)
+- [Build guide](BUILD.md) · [RU](BUILD_ru.md)
+- [Terminal help](TERMINAL_HELP.md) · [RU](TERMINAL_HELP_ru.md)
+- [Version management](VERSION_MANAGEMENT.md) · [RU](VERSION_MANAGEMENT_ru.md)
+- [Release process](docs/release_guide_ru.md) (Russian)
+- [Monitoring](docs/README_MONITORING_ru.md) (Russian)
+- [Docker](docs/DOCKER_GUIDE_ru.md) (Russian)
 - [Changelog](CHANGELOG.md)
+- [Lessons](lessons/README.md) (Russian: app + Git)
 
 Questions: [Discussions](https://github.com/kureinmaxim/vpn-server-manager/discussions). Bugs: [Issues](https://github.com/kureinmaxim/vpn-server-manager/issues).
 

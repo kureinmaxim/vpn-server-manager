@@ -1,333 +1,200 @@
-# Инструкция по запуску приложения в терминале
+# Terminal commands
 
-Этот файл содержит основные команды для работы с проектом через терминал на macOS.
+Language: **English** · [Русский](TERMINAL_HELP_ru.md)
 
-## Основные команды
+Commands for running VPN Server Manager from a terminal. Replace `/path/to/vpn-server-manager` with your clone directory. Never commit a personal home path.
 
-### 1. Переход в директорию проекта
+Requires **Python 3.13+**.
 
-Прежде всего, вам нужно перейти в папку с проектом. Скопируйте и вставьте эту команду в терминал:
+## 1. Go to the project
 
 ```bash
-cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage
+cd /path/to/vpn-server-manager
 ```
 
-### 2. Активация виртуального окружения
+After `git clone https://github.com/kureinmaxim/vpn-server-manager.git` that directory is usually `./vpn-server-manager`.
 
-Для корректной работы приложения необходимо активировать виртуальное окружение.
+## 2. Virtual environment
+
+**macOS / Linux**
 
 ```bash
+python3 -m venv venv
 source venv/bin/activate
 ```
-После активации вы увидите `(venv)` в начале строки терминала.
 
-### 3. Запуск приложения
+**Windows (PowerShell)**
 
-После активации окружения, используйте эту команду для запуска приложения:
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+You should see `(venv)` in the prompt.
+
+## 3. First-time setup
 
 ```bash
-python3 app.py
+python -m pip install -r requirements.txt
+cp env.example .env          # Windows: copy env.example .env
+python generate_key.py
+cp config/config.json.template config.json   # Windows: copy config\config.json.template config.json
+python -m babel.messages.frontend compile -d translations
+```
+
+## 4. Run
+
+```text
+Web:     python run.py
+Desktop: python run_desktop.py
+Debug:   python run.py --debug
+```
+
+One-liner (macOS / Linux):
+
+```bash
+cd /path/to/vpn-server-manager && source venv/bin/activate && python3 run.py
+```
+
+One-liner (Windows PowerShell):
+
+```powershell
+cd \path\to\vpn-server-manager; .\venv\Scripts\Activate.ps1; python run.py
 ```
 
 ---
 
-## Единая команда для запуска
-
-Вы можете объединить все шаги в одну команду для быстрого запуска:
+## Dependencies
 
 ```bash
-cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/activate && python3 app.py
+pip install package_name
+pip install -r requirements.txt
 ```
+
+Prefer editing `requirements.txt` by hand over `pip freeze` so pin ranges stay intact.
 
 ---
 
-## Управление зависимостями
+## Data and encryption
 
-### Установка новых пакетов
-
-Если нужно установить дополнительные пакеты Python:
+Create a key if `.env` is missing:
 
 ```bash
-source venv/bin/activate && pip install название_пакета
+python generate_key.py
 ```
 
-### Обновление списка зависимостей
-
-После установки новых пакетов обновите requirements.txt:
+Show the key (keep this private):
 
 ```bash
-source venv/bin/activate && pip freeze > requirements.txt
-```
-
-### Установка всех зависимостей из requirements.txt
-
-При первой настройке или после клонирования проекта:
-
-```bash
-source venv/bin/activate && pip install -r requirements.txt
-```
-
----
-
-## Работа с данными
-
-### Создание ключа шифрования
-
-Если файл `.env` отсутствует, создайте новый ключ шифрования:
-
-```bash
-python3 -c "from cryptography.fernet import Fernet; print('SECRET_KEY=' + Fernet.generate_key().decode())" > .env
-```
-
-### Просмотр текущего ключа
-
-Чтобы увидеть ваш текущий ключ шифрования:
-
-```bash
+# macOS / Linux
 cat .env
+
+# Windows PowerShell
+Get-Content .env
 ```
 
-### Проверка данных
-
-Для расшифровки и просмотра данных используйте встроенную утилиту:
+Decrypt / inspect data (if the tool is present):
 
 ```bash
-source venv/bin/activate && python3 tools/decrypt_tool.py
+python tools/decrypt_tool.py
 ```
 
 ---
 
-## Полезные команды для разработки
+## Build
 
-### Просмотр структуры проекта
-
-```bash
-tree -I 'venv|__pycache__|*.pyc|.git' -a
+```powershell
+# Windows installer
+.\build_windows.ps1
 ```
 
-Если `tree` не установлена:
-
 ```bash
-find . -type f -not -path "./venv/*" -not -path "./.git/*" -not -name "*.pyc" | head -20
+# macOS .app + .dmg
+source venv/bin/activate
+python3 build_macos.py
 ```
 
-### Поиск файлов
-
-Найти все `.html` файлы:
-
-```bash
-find . -name "*.html" -not -path "./venv/*"
-```
-
-Найти все файлы с данными:
-
-```bash
-find . -name "*.enc" -o -name "*.json" -not -path "./venv/*"
-```
-
-### Проверка синтаксиса Python
-
-```bash
-source venv/bin/activate && python3 -m py_compile app.py
-```
+Full steps: [BUILD.md](BUILD.md) · [BUILD_ru.md](BUILD_ru.md)
 
 ---
 
-## Сборка приложения
-
-### Сборка для macOS
-
-```bash
-source venv/bin/activate && python3 build_macos.py
-```
-
-### Установка PyInstaller (если не установлен)
-
-```bash
-source venv/bin/activate && pip install pyinstaller
-```
-
----
-
-## Работа с Git
-
-### Статус изменений
+## Git (short)
 
 ```bash
 git status
-```
-
-### Просмотр изменений
-
-```bash
 git diff
-```
-
-### Фиксация изменений
-
-```bash
 git add .
-git commit -m "Описание изменений"
+git commit -m "Describe the change"
+git log --oneline
 ```
 
-### Просмотр истории
-
-```bash
-git log --oneline | head -10
-```
+Do not `git add` `.env`, `config.json`, or `data/`.
 
 ---
 
-## Диагностика и отладка
+## Diagnostics
 
-### Проверка портов
-
-Проверить, свободен ли порт 5050:
+Default web port is **5050**:
 
 ```bash
+# macOS / Linux
 lsof -i :5050
-```
-
-### Завершение процессов на порту
-
-Если порт занят:
-
-```bash
 lsof -ti:5050 | xargs kill -9
 ```
 
-### Просмотр логов
-
-Если приложение запущено с выводом в файл:
-
-```bash
-tail -f app.log
-```
-
-### Проверка места на диске
-
-```bash
-df -h
-du -sh *
+```powershell
+# Windows
+netstat -ano | findstr :5050
 ```
 
 ---
 
-## Полезные алиасы
+## Optional aliases
 
-Добавьте эти строки в `~/.zshrc` для быстрого доступа:
+Put **your** clone path in the alias — not a username from this repo.
 
-```bash
-# VPN Server Manager
-alias vpn-cd='cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage'
-alias vpn-run='cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/activate && python3 app.py'
-alias vpn-build='cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && source venv/bin/activate && python3 build_macos.py'
-alias vpn-key='cd /Users/olgazaharova/Project/ProjectPython/VPNserverManage && cat .env'
-```
-
-После добавления выполните:
+**zsh** (`~/.zshrc`):
 
 ```bash
-source ~/.zshrc
+REPO="$HOME/vpn-server-manager"
+alias vpn-cd="cd \"$REPO\""
+alias vpn-run="cd \"$REPO\" && source venv/bin/activate && python3 run.py"
+alias vpn-desk="cd \"$REPO\" && source venv/bin/activate && python3 run_desktop.py"
 ```
 
-Теперь вы можете использовать короткие команды:
-- `vpn-cd` - перейти в папку проекта
-- `vpn-run` - запустить приложение
-- `vpn-build` - собрать приложение
-- `vpn-key` - показать ключ шифрования
+**PowerShell** (`$PROFILE`):
 
----
-
-## Дополнительные команды
-
-### Остановка приложения
-
-Для остановки приложения, запущенного в терминале, просто нажмите комбинацию клавиш:
-
-```
-Ctrl + C
-```
-
-### Очистка терминала
-
-```bash
-clear
-```
-
-### Информация о системе
-
-```bash
-system_profiler SPSoftwareDataType | grep "System Version"
-python3 --version
-pip --version
+```powershell
+$VpnRepo = Join-Path $HOME "vpn-server-manager"
+function vpn-cd { Set-Location $VpnRepo }
+function vpn-run { Set-Location $VpnRepo; .\venv\Scripts\Activate.ps1; python run.py }
 ```
 
 ---
 
-## Новые функции
-
-### Изменение масштаба интерфейса
-
-Приложение теперь поддерживает изменение масштаба интерфейса (80%, 90%, 100%) через значок лупы в верхней панели.
-
-### Импорт из другой установки
-
-Новая функция позволяет импортировать данные из других установок с использованием внешнего ключа шифрования. Доступна в разделе "Настройки".
-
-### Офлайн режим (v3.4.0)
-
-Приложение теперь корректно работает без интернета:
-- **Индикатор состояния сети**: WiFi/WiFi-off иконки
-- **Отключение недоступных функций**: Кнопки "Проверить IP" отключаются в офлайн режиме
-- **Graceful обработка ошибок**: Детальные сообщения об ошибках сети
-
-### Исправление иконки приложения (v3.4.0)
-
-- **Автоматическая конвертация**: favicon.ico → icon.icns
-- **Правильное отображение**: Иконка корректно отображается в Dock и Finder
-- **Использование оригинальной иконки**: Применяется favicon.ico из проекта
-
-### Исправление стилей в офлайн режиме (v3.4.0)
-
-- **Локальные файлы Bootstrap**: CSS и JS файлы теперь локальные
-- **Полная поддержка офлайн**: Стили загружаются без интернета
-- **Корректное отображение**: Интерфейс выглядит одинаково в онлайн и офлайн режимах
-
-### Улучшенный .gitignore
-
-Проект теперь исключает больше временных и системных файлов из системы контроля версий.
-
----
-
-## Решение проблем
-
-### Проблема с правами доступа
+## Troubleshooting
 
 ```bash
-chmod +x venv/bin/activate
-```
-
-### Переустановка виртуального окружения
-
-```bash
-rm -rf venv
+# Recreate venv
+rm -rf venv                 # Windows: rmdir /s /q venv
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Проблемы с PyWebView на macOS
+PyWebView on macOS:
 
 ```bash
-source venv/bin/activate && pip install --upgrade pywebview
+pip install --upgrade pywebview
 ```
 
-Для получения дополнительной помощи обратитесь к документации проекта или справке в приложении.
+Proxy errors while installing packages: [WINDOWS_PROXY_TROUBLESHOOTING_ru.md](docs/WINDOWS_PROXY_TROUBLESHOOTING_ru.md)
 
-### Дополнительная документация
+---
 
-- **[PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** - Подробная структура проекта
-- **[CHANGELOG_v3.4.0.md](CHANGELOG_v3.4.0.md)** - История изменений версии 3.4.0
-- **[SECRET_KEY.md](SECRET_KEY.md)** - Система шифрования
-- **[BUILD.md](BUILD.md)** - Инструкции по сборке 
+## More docs
+
+- [README.md](README.md)
+- [BUILD.md](BUILD.md)
+- [SECRET_KEY_ru.md](docs/SECRET_KEY_ru.md)
+- [INDEX_ru.md](docs/INDEX_ru.md)

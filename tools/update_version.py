@@ -13,11 +13,15 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCAL_CONFIG = ROOT / "config.json"
 TEMPLATE_CONFIG = ROOT / "config" / "config.json.template"
 README_FILE = ROOT / "README.md"
+README_RU_FILE = ROOT / "README_ru.md"
 INSTALLER_ISS = ROOT / "vpn-manager-installer.iss"
 ENV_EXAMPLE = ROOT / "env.example"
 APP_CONFIG = ROOT / "app" / "config.py"
 APP_INIT = ROOT / "app" / "__init__.py"
 SETUP_PY = ROOT / "setup.py"
+BUILD_MACOS = ROOT / "build_macos.py"
+DOCKER_COMPOSE = ROOT / "docker-compose.yml"
+BUG_TEMPLATE = ROOT / ".github" / "ISSUE_TEMPLATE" / "bug.yml"
 
 
 def read_text(path):
@@ -125,19 +129,28 @@ def replace_or_fail(text, pattern, replacement, description, flags=0):
 
 
 def update_readme(metadata, dry_run=False):
-    content = read_text(README_FILE)
-    content = replace_or_fail(
-        content,
-        r"^# VPN Server Manager v[^\n]+",
-        f"# VPN Server Manager v{metadata['version']}",
-        "README version header",
-        flags=re.MULTILINE,
-    )
-    write_text(README_FILE, content, dry_run=dry_run)
+    for path in (README_FILE, README_RU_FILE):
+        if not path.exists():
+            continue
+        content = read_text(path)
+        content = replace_or_fail(
+            content,
+            r"^# VPN Server Manager v[^\n]+",
+            f"# VPN Server Manager v{metadata['version']}",
+            f"{path.name} version header",
+            flags=re.MULTILINE,
+        )
+        write_text(path, content, dry_run=dry_run)
 
 
 def update_installer(metadata, dry_run=False):
     content = read_text(INSTALLER_ISS)
+    content = replace_or_fail(
+        content,
+        r"; Version [^\n]+",
+        f"; Version {metadata['version']}",
+        "installer version comment",
+    )
     content = replace_or_fail(
         content,
         r'#define MyAppVersion "[^"]+"',
@@ -180,6 +193,12 @@ def update_app_init(metadata, dry_run=False):
     content = read_text(APP_INIT)
     content = replace_or_fail(
         content,
+        r"app\.config\.get\('APP_VERSION', '[^']+'\)",
+        f"app.config.get('APP_VERSION', '{metadata['version']}')",
+        "app/__init__.py APP_VERSION fallback",
+    )
+    content = replace_or_fail(
+        content,
         r'"version": "[^"]+"',
         f'"version": "{metadata["version"]}"',
         "app/__init__.py fallback version",
@@ -216,6 +235,50 @@ def update_setup_py(metadata, dry_run=False):
     write_text(SETUP_PY, content, dry_run=dry_run)
 
 
+def update_build_macos(metadata, dry_run=False):
+    if not BUILD_MACOS.exists():
+        return
+    content = read_text(BUILD_MACOS)
+    content = replace_or_fail(
+        content,
+        r"return '[0-9]+\.[0-9]+\.[0-9]+'",
+        f"return '{metadata['version']}'",
+        "build_macos.py fallback version",
+    )
+    write_text(BUILD_MACOS, content, dry_run=dry_run)
+
+
+def update_docker_compose(metadata, dry_run=False):
+    if not DOCKER_COMPOSE.exists():
+        return
+    content = read_text(DOCKER_COMPOSE)
+    content = replace_or_fail(
+        content,
+        r"# VPN Server Manager v[^\n]+",
+        f"# VPN Server Manager v{metadata['version']}",
+        "docker-compose header version",
+    )
+    content = re.sub(
+        r"APP_VERSION=[0-9]+\.[0-9]+\.[0-9]+",
+        f"APP_VERSION={metadata['version']}",
+        content,
+    )
+    write_text(DOCKER_COMPOSE, content, dry_run=dry_run)
+
+
+def update_bug_template(metadata, dry_run=False):
+    if not BUG_TEMPLATE.exists():
+        return
+    content = read_text(BUG_TEMPLATE)
+    content = replace_or_fail(
+        content,
+        r'placeholder: "[0-9]+\.[0-9]+\.[0-9]+"',
+        f'placeholder: "{metadata["version"]}"',
+        "bug report version placeholder",
+    )
+    write_text(BUG_TEMPLATE, content, dry_run=dry_run)
+
+
 def get_json_version(path):
     if not path.exists():
         return "MISSING"
@@ -240,11 +303,14 @@ def print_status():
         ("local", "config.json", get_json_version(LOCAL_CONFIG), False),
         ("template", "config/config.json.template", get_json_version(TEMPLATE_CONFIG), True),
         ("readme", "README.md", get_regex_value(README_FILE, r"^# VPN Server Manager v([^\n]+)"), True),
+        ("readme_ru", "README_ru.md", get_regex_value(README_RU_FILE, r"^# VPN Server Manager v([^\n]+)"), True),
         ("installer", "vpn-manager-installer.iss", get_regex_value(INSTALLER_ISS, r'#define MyAppVersion "([^"]+)"'), True),
         ("env", "env.example", get_regex_value(ENV_EXAMPLE, r"^APP_VERSION=(.+)$"), True),
         ("app_config", "app/config.py", get_regex_value(APP_CONFIG, r"APP_VERSION = os\.getenv\('APP_VERSION', '([^']+)'\)"), True),
         ("app_init", "app/__init__.py", get_regex_value(APP_INIT, r'"version": "([^"]+)"'), True),
         ("setup", "setup.py", get_regex_value(SETUP_PY, r"return config\.get\('app_info', \{\}\)\.get\('version', '([^']+)'\)"), True),
+        ("macos", "build_macos.py", get_regex_value(BUILD_MACOS, r"return '([0-9]+\.[0-9]+\.[0-9]+)'"), True),
+        ("compose", "docker-compose.yml", get_regex_value(DOCKER_COMPOSE, r"APP_VERSION=([0-9]+\.[0-9]+\.[0-9]+)"), True),
     ]
 
     print("[STATUS] VPN Server Manager version tracking")
@@ -283,6 +349,9 @@ def sync_all(metadata, dry_run=False):
     update_app_config(metadata, dry_run=dry_run)
     update_app_init(metadata, dry_run=dry_run)
     update_setup_py(metadata, dry_run=dry_run)
+    update_build_macos(metadata, dry_run=dry_run)
+    update_docker_compose(metadata, dry_run=dry_run)
+    update_bug_template(metadata, dry_run=dry_run)
 
 
 def build_metadata(args):

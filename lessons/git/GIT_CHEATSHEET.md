@@ -1,4 +1,4 @@
-# 🚀 Git Cheatsheet для VPN Server Manager v4.0.0
+# Git Cheatsheet для VPN Server Manager
 
 Быстрая шпаргалка по основным Git командам для работы с проектом.
 
@@ -113,11 +113,11 @@ gh pr merge 123 --merge
 ### Релизы
 ```bash
 # Создание релиза
-gh release create v4.0.0 --title "Release v4.0.0" --latest
+gh release create vX.Y.Z --title "Release vX.Y.Z" --latest
 
 # С файлами
-gh release create v4.0.0 \
-  --title "Release v4.0.0" \
+gh release create vX.Y.Z \
+  --title "Release vX.Y.Z" \
   dist/VPNServerManager-Clean_Installer.dmg \
   --latest
 
@@ -176,7 +176,7 @@ cp env.example .env
 ### 2. Первый коммит
 ```bash
 git add .
-git commit -m "feat: initial commit v4.0.0"
+git commit -m "feat: initial commit vX.Y.Z"
 ```
 
 ### 3. Публикация на GitHub
@@ -195,14 +195,14 @@ git push -u origin main
 
 ### С тегом
 ```bash
-git tag -a v4.0.0 -m "Release version 4.0.0"
-git push origin v4.0.0
+git tag -a vX.Y.Z -m "Release version X.Y.Z"
+git push origin vX.Y.Z
 ```
 
 ### С gh CLI
 ```bash
-gh release create v4.0.0 \
-  --title "VPN Server Manager v4.0.0" \
+gh release create vX.Y.Z \
+  --title "VPN Server Manager vX.Y.Z" \
   --notes "Major release with modular architecture" \
   dist/VPNServerManager-Clean_Installer.dmg \
   --latest
