@@ -148,6 +148,7 @@ def add_server():
             "status": request.form.get('status', 'Active'),
             "card_color": request.form.get('card_color', '#ffc107'),
             "icon_filename": None,
+            "archived": False,
             "geolocation": {},
             "checks": {
                 "dns_ok": 'check_dns_ok' in request.form,
@@ -292,6 +293,7 @@ def edit_server(server_id):
                 server['docker_info'] = request.form.get('docker_info', server.get('docker_info', ''))
                 server['software_info'] = request.form.get('software_info', server.get('software_info', ''))
                 server['card_color'] = request.form.get('card_color', server.get('card_color', '#ffc107'))
+                server['archived'] = bool(request.form.get('archived'))
                 server['panel_url'] = request.form.get('panel_url', server.get('panel_url', ''))
                 server['hoster_url'] = request.form.get('hoster_url', server.get('hoster_url', ''))
                 

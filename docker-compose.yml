@@ -1,6 +1,6 @@
 version: '3.8'
 
-# VPN Server Manager v4.4.0
+# VPN Server Manager v4.4.1
 # Docker Compose конфигурация для запуска приложения
 
 services:
@@ -13,7 +13,7 @@ services:
       - FLASK_ENV=production
       - SECRET_KEY=your-production-secret-key-here
       # Раскомментируйте для кастомизации:
-      # - APP_VERSION=4.4.0
+      # - APP_VERSION=4.4.1
       # - BABEL_DEFAULT_LOCALE=ru
       # - LOG_LEVEL=INFO
       # - DEFAULT_PIN=1234
@@ -46,7 +46,7 @@ services:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
       - SECRET_KEY=dev-secret-key
-      - APP_VERSION=4.4.0
+      - APP_VERSION=4.4.1
     volumes:
       # Hot reload - монтирование исходного кода
       - .:/app

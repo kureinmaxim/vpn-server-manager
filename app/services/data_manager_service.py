@@ -137,6 +137,7 @@ class DataManagerService:
             'os_icon': server.get('os_icon', 'bi-server'),
             'docker_info': server.get('docker_info', ''),
             'software_info': server.get('software_info', ''),
+            'archived': bool(server.get('archived', False)),
         }
         
         # Вложенные объекты с дефолтными значениями

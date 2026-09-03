@@ -135,6 +135,64 @@ def get_servers():
             'error': str(e)
         }), 500
 
+
+def _persist_servers(servers) -> bool:
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return False
+    active_file = data_manager.get_active_data_path(current_app.config)
+    if not active_file:
+        return False
+    data_manager.save_servers(servers, active_file)
+    return True
+
+
+@api_bp.route('/servers/reorder', methods=['POST'])
+@require_auth
+@require_pin
+def reorder_server_list():
+    """Save the drag-and-drop order of server cards."""
+    from ..utils.board import reorder_servers
+
+    data = request.get_json(silent=True) or {}
+    order = data.get('order')
+    if not isinstance(order, list):
+        return jsonify({'success': False, 'error': 'order must be a list'}), 400
+
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return jsonify({'success': False, 'error': 'Data service unavailable'}), 500
+
+    servers = data_manager.load_servers(current_app.config)
+    reordered = reorder_servers(servers, order)
+    if not _persist_servers(reordered):
+        return jsonify({'success': False, 'error': 'No active data file'}), 500
+    return jsonify({'success': True})
+
+
+@api_bp.route('/servers/<server_id>/archived', methods=['POST'])
+@require_auth
+@require_pin
+def set_server_archived(server_id):
+    """Dim or restore a card without deleting the server."""
+    from ..utils.board import apply_archived
+
+    data = request.get_json(silent=True) or {}
+    archived = bool(data.get('archived'))
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return jsonify({'success': False, 'error': 'Data service unavailable'}), 500
+
+    servers = data_manager.load_servers(current_app.config)
+    server = next((item for item in servers if str(item.get('id')) == str(server_id)), None)
+    if not server:
+        return jsonify({'success': False, 'error': 'Server not found'}), 404
+    apply_archived(server, archived)
+    if not _persist_servers(servers):
+        return jsonify({'success': False, 'error': 'No active data file'}), 500
+    return jsonify({'success': True, 'archived': server['archived']})
+
+
 @api_bp.route('/servers', methods=['POST'])
 @require_auth
 @require_pin
