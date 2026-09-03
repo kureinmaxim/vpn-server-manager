@@ -1655,7 +1655,7 @@ def get_settings():
         # Здесь должна быть логика загрузки настроек
         settings = {
             'default_pin': '1234',
-            'language': session.get('language', 'ru'),
+            'language': session.get('language', 'en'),
             'auto_backup': True,
             'backup_interval': 24
         }

@@ -68,28 +68,26 @@ def compile_translations(translations_dir: str) -> None:
 
 def get_locale():
     """Определяет язык для текущего запроса."""
-    from flask import session
-    
-    # Сначала проверяем параметр в URL
-    if request.args.get('lang'):
-        lang = request.args.get('lang')
+    from flask import session, current_app
+
+    supported = list(current_app.config.get('BABEL_SUPPORTED_LOCALES') or ['ru', 'en', 'zh'])
+    default = current_app.config.get('BABEL_DEFAULT_LOCALE') or 'en'
+    if default not in supported:
+        default = 'en'
+
+    lang = request.args.get('lang')
+    if lang in supported:
         session['language'] = lang
         session.permanent = True
         return lang
-    
-    # Затем проверяем сохраненный язык в сессии
-    if 'language' in session:
-        return session.get('language')
-    
-    # Если язык не установлен, автоопределяем по браузеру
-    detected_lang = request.accept_languages.best_match(['ru', 'en', 'zh'])
-    if detected_lang:
-        session['language'] = detected_lang
-    else:
-        session['language'] = 'ru'  # По умолчанию русский
-    
+
+    stored = session.get('language')
+    if stored in supported:
+        return stored
+
+    session['language'] = default
     session.permanent = True
-    return session['language']
+    return default
 
 def setup_logging(app):
     """Настройка логирования"""
@@ -218,7 +216,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.4.1'),
+            "version": app.config.get('APP_VERSION', '4.4.2'),
             "release_date": "03.09.2026",
             "last_updated": "2026-09-03",
             "developer": "Куреин М.Н."
@@ -235,7 +233,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.4.1",
+            "version": "4.4.2",
             "release_date": "03.09.2026",
             "last_updated": "2026-09-03",
             "developer": "Куреин М.Н."
@@ -371,10 +369,12 @@ def create_app(config_name='development'):
         server_url = f"http://{request.host}"
         
         from flask_babel import gettext as _
+        from flask_babel import get_locale as babel_get_locale
 
         return {
             'app_info': app.config.get('app_info', {}),
             'developer_name': _('Куреин М.Н.'),
+            'current_locale': str(babel_get_locale()),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {
                 'host': server_host,
