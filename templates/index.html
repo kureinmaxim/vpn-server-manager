@@ -537,7 +537,7 @@
     };
 </script>
 <script src="{{ url_for('static', filename='js/Sortable.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/server_board.js') }}"></script>
+<script src="{{ url_for('static', filename='js/server_board.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script>
     // Инициализация tooltips при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
