@@ -137,3 +137,19 @@ def test_file_picker_uses_app_language_not_os_widget(app):
     assert 'No file selected' in html
     assert 'js-file-picker-input' in html
     assert 'Выбор файла' not in html
+
+
+def test_icon_picker_shows_preview_and_screen_snip(app):
+    from flask_babel import force_locale
+
+    with force_locale('en'):
+        html = app.jinja_env.from_string(
+            MACROS + "{{ cred.icon_picker(current_url='/uploads/icon.png', compact=True) }}"
+        ).render()
+    assert 'data-icon-picker' in html
+    assert 'icon-picker-preview' in html
+    assert '/uploads/icon.png' in html
+    assert 'js-icon-snip' in html
+    assert 'From screen' in html
+    assert 'name="server_icon_data"' in html
+    assert 'name="remove_icon"' in html
