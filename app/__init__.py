@@ -218,9 +218,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.3.8'),
-            "release_date": "02.09.2026",
-            "last_updated": "2026-09-02",
+            "version": app.config.get('APP_VERSION', '4.4.0'),
+            "release_date": "03.09.2026",
+            "last_updated": "2026-09-03",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -235,9 +235,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.3.8",
-            "release_date": "02.09.2026",
-            "last_updated": "2026-09-02",
+            "version": "4.4.0",
+            "release_date": "03.09.2026",
+            "last_updated": "2026-09-03",
             "developer": "Куреин М.Н."
         }
 
@@ -370,8 +370,11 @@ def create_app(config_name='development'):
         server_port = request.host.split(':')[1] if ':' in request.host else '5000'
         server_url = f"http://{request.host}"
         
+        from flask_babel import gettext as _
+
         return {
             'app_info': app.config.get('app_info', {}),
+            'developer_name': _('Куреин М.Н.'),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {
                 'host': server_host,

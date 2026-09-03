@@ -103,3 +103,37 @@ def test_password_input_compact_hides_help_text(app):
     assert 'input-group-sm' in html
     assert 'form-text' not in html
     assert 'title="Hint"' in html
+
+
+def test_set_badge_and_edit_labels_are_english(app):
+    from flask_babel import force_locale, gettext as _
+
+    with force_locale('en'):
+        html = app.jinja_env.from_string(
+            MACROS + "{{ cred.password_input('p', 'p', 'L', is_set=True) }}"
+        ).render()
+        assert 'Set' in html
+        assert 'задан' not in html.lower()
+        assert _('Текущий пароль хостера') == 'Current hoster password'
+        assert _('Вставьте новый пароль панели') == 'Paste the new panel password'
+        assert _('Куреин М.Н.') == 'Kurein M.N.'
+
+
+def test_developer_name_latin_for_zh(app):
+    from flask_babel import force_locale, gettext as _
+
+    with force_locale('zh'):
+        assert _('Куреин М.Н.') == 'Kurein M.N.'
+
+
+def test_file_picker_uses_app_language_not_os_widget(app):
+    from flask_babel import force_locale
+
+    with force_locale('en'):
+        html = app.jinja_env.from_string(
+            MACROS + "{{ cred.file_picker('server_icon', 'server_icon', compact=True) }}"
+        ).render()
+    assert 'Select File' in html
+    assert 'No file selected' in html
+    assert 'js-file-picker-input' in html
+    assert 'Выбор файла' not in html

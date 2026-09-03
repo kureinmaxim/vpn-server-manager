@@ -123,7 +123,7 @@
         <div class="container">
             <p class="mb-0 text-white">
                 {{ _('VPS Manager') }} v{{ app_info.version }} | 
-                {{ _('Разработчик') }}: {% if session.get('pin_authenticated') %}{{ app_info.developer }}{% else %}Куреин М. Н.{% endif %}
+                {{ _('Разработчик') }}: {{ developer_name }}
             </p>
             {% if server_info %}
             <p class="mb-0 mt-1 text-info" style="font-size: 0.85em;">
