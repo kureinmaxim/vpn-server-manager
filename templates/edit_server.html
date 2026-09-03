@@ -4,275 +4,262 @@
 {% block title %}{{ _('Редактировать сервер') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>{{ _('Редактировать:') }} {{ server.name }}</h1>
-    <hr>
-    <div class="row">
-        <div class="col-md-8">
-            <form action="{{ url_for('main.edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
-                <h5 class="mt-4">{{ _('Основная информация') }}</h5>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="name" class="form-label">{{ _('Название сервера') }}</label>
-                        <input type="text" class="form-control" id="name" name="name" value="{{ server.name }}" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="provider" class="form-label">{{ _('Хостинг-провайдер') }}</label>
-                        <input type="text" class="form-control" id="provider" name="provider" value="{{ server.provider }}">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
-                    <input type="text" class="form-control" id="ip_address" name="ip_address" value="{{ server.ip_address }}" required>
-                </div>
-                <div class="mb-3">
-                    <label for="os" class="form-label">{{ _('Операционная система') }}</label>
-                    <input type="text" class="form-control" id="os" name="os" value="{{ server.os }}" placeholder="{{ _('Например, Ubuntu 22.04') }}">
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="status" class="form-label">{{ _('Статус') }}</label>
-                        <select class="form-select" id="status" name="status">
-                            <option value="Active" {% if server.status == 'Active' %}selected{% endif %}>{{ _('Активен') }}</option>
-                            <option value="Inactive" {% if server.status == 'Inactive' %}selected{% endif %}>{{ _('Неактивен') }}</option>
-                            <option value="Suspended" {% if server.status == 'Suspended' %}selected{% endif %}>{{ _('Приостановлен') }}</option>
-                            <option value="Удален" {% if server.status == 'Удален' %}selected{% endif %}>{{ _('Удален') }}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Результаты проверок') }}</h5>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok" {% if server.checks.get('dns_ok') %}checked{% endif %}>
-                            <label class="form-check-label" for="check_dns_ok">
-                                {{ _('DNS-тест пройден (нет утечек)') }}
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="check_streaming_ok" name="check_streaming_ok" {% if server.checks.get('streaming_ok') %}checked{% endif %}>
-                            <label class="form-check-label" for="check_streaming_ok">
-                                {{ _('Стриминг-тест пройден') }}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Оформление карточки') }}</h5>
-                <div class="row align-items-center">
-                    <div class="col-md-6 mb-3">
-                        <label for="card_color" class="form-label">{{ _('Цвет карточки') }}</label>
-                        <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="{{ server.get('card_color', '#ffc107') }}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="server_icon" class="form-label">{{ _('Иконка сервера (заменит текущую)') }}</label>
-                        <input class="form-control" type="file" id="server_icon" name="server_icon">
-                        {% if server.icon_filename %}
-                        <div class="mt-2">
-                            <small>{{ _('Текущая:') }}</small>
-                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail" style="width: 40px; height: 40px; object-fit: contain; margin-left: 10px;">
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Характеристики сервера') }}</h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="cpu" class="form-label">CPU</label>
-                        <input type="text" class="form-control" id="cpu" name="cpu" value="{{ server.specs.cpu }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="ram" class="form-label">RAM</label>
-                        <input type="text" class="form-control" id="ram" name="ram" value="{{ server.specs.ram }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="disk" class="form-label">{{ _('Диск') }}</label>
-                        <input type="text" class="form-control" id="disk" name="disk" value="{{ server.specs.disk }}">
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Платёжная информация') }}</h5>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="amount" class="form-label">{{ _('Сумма платежа') }}</label>
-                        <input type="number" step="0.01" class="form-control" id="amount" name="amount" value="{{ server.payment_info.amount }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="currency" class="form-label">{{ _('Валюта') }}</label>
-                        <input type="text" class="form-control" id="currency" name="currency" value="{{ server.payment_info.currency }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="next_due_date" class="form-label">{{ _('Дата след. платежа') }}</label>
-                        <input type="date" class="form-control" id="next_due_date" name="next_due_date" value="{{ server.payment_info.next_due_date }}">
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="payment_period" class="form-label">{{ _('Период оплаты') }}</label>
-                        <select class="form-select" id="payment_period" name="payment_period">
-                            <option value="" {% if not server.payment_info.get('payment_period') %}selected{% endif %}>{{ _('Не указан') }}</option>
-                            <option value="Monthly" {% if server.payment_info.get('payment_period') == 'Monthly' %}selected{% endif %}>{{ _('Месяц') }}</option>
-                            <option value="3 Months" {% if server.payment_info.get('payment_period') == '3 Months' %}selected{% endif %}>{{ _('3 месяца') }}</option>
-                            <option value="Yearly" {% if server.payment_info.get('payment_period') == 'Yearly' %}selected{% endif %}>{{ _('Год') }}</option>
-                            <option value="Perpetual" {% if server.payment_info.get('payment_period') == 'Perpetual' %}selected{% endif %}>{{ _('Бессрочно') }}</option>
-                        </select>
-                    </div>
-                     <div class="col-12 mt-2">
-                        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#receiptsModal">
-                            <i class="bi bi-receipt"></i> {{ _('Управление чеками') }} ({{ server.payment_info.get('receipts', [])|length }})
-                        </button>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('SSH-доступ') }}</h5>
-                <p class="text-muted small mb-3">
-                    {{ _('При вставке пароля лишние пробелы, переносы и невидимые символы удаляются автоматически. Пустое поле — не менять.') }}
-                </p>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>
-                        <input type="text" class="form-control" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}" autocomplete="username">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="ssh_port" class="form-label">{{ _('Порт SSH') }}</label>
-                        <input type="number" class="form-control" id="ssh_port" name="ssh_port" value="{{ server.ssh_credentials.get('port', 22) }}">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль SSH')) }}
-                        {{ password_input(
-                            'ssh_password', 'ssh_password', _('Новый пароль SSH'),
-                            help_text=_('Оставьте пустым, чтобы не менять.'),
-                            is_set=server.ssh_credentials.password_decrypted,
-                            placeholder=_('Вставьте новый пароль')
-                        ) }}
-                    </div>
-                    <div class="col-md-6">
-                        {{ current_secret_row(server.ssh_credentials.root_password_decrypted, _('Текущий пароль root')) }}
-                        {{ password_input(
-                            'ssh_root_password', 'ssh_root_password', _('Новый пароль root'),
-                            help_text=_('Оставьте пустым, чтобы не менять.'),
-                            is_set=server.ssh_credentials.root_password_decrypted,
-                            placeholder=_('Вставьте новый пароль root')
-                        ) }}
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" {% if server.ssh_credentials.get('root_login_allowed') %}checked{% endif %}>
-                            <label class="form-check-label" for="root_login_allowed">
-                                {{ _('Вход для root по SSH разрешен') }}
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Панель управления (3x-ui и др.)') }}</h5>
-                <div class="mb-3">
-                    <label for="panel_url" class="form-label">{{ _('URL панели') }}</label>
-                    <input type="text" class="form-control" id="panel_url" name="panel_url" value="{{ server.get('panel_url', '') }}">
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
-                        <input type="text" class="form-control" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}" autocomplete="off">
-                    </div>
-                    <div class="col-md-6">
-                        {{ current_secret_row(server.panel_credentials.password_decrypted, _('Текущий пароль панели')) }}
-                        {{ password_input(
-                            'panel_password', 'panel_password', _('Новый пароль панели'),
-                            help_text=_('Оставьте пустым, чтобы не менять.'),
-                            is_set=server.panel_credentials.password_decrypted,
-                            placeholder=_('Вставьте новый пароль панели')
-                        ) }}
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Кабинет хостера') }}</h5>
-                 <div class="mb-3">
-                    <label for="hoster_url" class="form-label">{{ _('URL кабинета') }}</label>
-                    <input type="text" class="form-control" id="hoster_url" name="hoster_url" value="{{ server.get('hoster_url', '') }}">
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="hoster_login_method" class="form-label">{{ _('Способ входа') }}</label>
-                        <select class="form-select" id="hoster_login_method" name="hoster_login_method">
-                            <option value="password" {% if server.hoster_credentials.login_method == 'password' %}selected{% endif %}>{{ _('По логину/паролю') }}</option>
-                            <option value="google" {% if server.hoster_credentials.login_method == 'google' %}selected{% endif %}>{{ _('Через Google') }}</option>
-                            <option value="apple" {% if server.hoster_credentials.login_method == 'apple' %}selected{% endif %}>{{ _('Через Apple') }}</option>
-                            <option value="other" {% if server.hoster_credentials.login_method == 'other' %}selected{% endif %}>{{ _('Другой') }}</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="hoster_user" class="form-label" id="hoster_user_label">{{ _('Логин хостера') }}</label>
-                        <input type="text" class="form-control" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com" autocomplete="off">
-                    </div>
-                    <div class="col-md-6" id="hoster_password_field">
-                        {{ current_secret_row(server.hoster_credentials.password_decrypted, _('Текущий пароль хостера')) }}
-                        {{ password_input(
-                            'hoster_password', 'hoster_password', _('Новый пароль хостера'),
-                            help_text=_('Оставьте пустым, чтобы не менять.'),
-                            is_set=server.hoster_credentials.password_decrypted,
-                            placeholder=_('Вставьте новый пароль хостера')
-                        ) }}
-                    </div>
-                </div>
-
-                <h5 class="mt-4">{{ _('Быстрая загрузка чека') }}</h5>
-                 <div class="mb-3">
-                   <label for="receipt" class="form-label">{{ _('Файл нового чека') }}</label>
-                    <input class="form-control" type="file" id="receipt" name="receipt">
-                   <div class="form-text">{{ _('Используйте для быстрой загрузки одного чека. Для просмотра всех чеков используйте кнопку "Управление чеками".') }}</div>
-               </div>
-               <div class="mb-3">
-                   <label for="receipt_description" class="form-label">{{ _('Описание чека') }}</label>
-                   <input type="text" class="form-control" id="receipt_description" name="receipt_description" placeholder="{{ _('Например, Оплата за январь 2024') }}">
-                </div>
-
-                <h5 class="mt-4">{{ _('Дополнительная информация') }}</h5>
-                <div class="mb-3">
-                    <label for="notes" class="form-label">{{ _('Заметки') }}</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ server.notes }}</textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="docker_info" class="form-label">{{ _('Информация') }}</label>
-                    <textarea class="form-control" id="docker_info" name="docker_info" rows="3">{{ server.get('docker_info', '') }}</textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="software_info" class="form-label">{{ _('Установленное ПО') }}</label>
-                    <textarea class="form-control" id="software_info" name="software_info" rows="3">{{ server.get('software_info', '') }}</textarea>
-                </div>
-                
-                <button type="submit" class="btn btn-primary mt-3">{{ _('Сохранить изменения') }}</button>
-                <a href="{{ url_for('main.index') }}" class="btn btn-secondary mt-3">{{ _('Отмена') }}</a>
-            </form>
-        </div>
-        <div class="col-md-4">
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="mb-0">{{ _('Подсказки по командам') }}</h5>
-                </div>
-                <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
-                    {% if hints %}
-                        {% for group, commands in hints.items() %}
-                            <h6 class="mt-3">{{ group }}</h6>
-                            {% for hint in commands %}
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">{{ hint.command }}</code></pre>
-                                <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
-                            </div>
-                            {% endfor %}
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted">{{ _('Подсказок нет. Вы можете') }} <a href="{{ url_for('main.manage_hints') }}">{{ _('добавить их') }}</a>.</p>
-                    {% endif %}
-                </div>
+<div class="container-fluid px-4 pb-3 server-form">
+    <form action="{{ url_for('main.edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
+        <div class="server-form-bar">
+            <h1 class="h5 mb-0 text-truncate">{{ _('Редактировать:') }} {{ server.name }}</h1>
+            <div class="d-flex gap-2 flex-shrink-0">
+                <a href="{{ url_for('main.index') }}" class="btn btn-sm btn-outline-secondary">{{ _('Отмена') }}</a>
+                <button type="submit" class="btn btn-sm btn-primary">{{ _('Сохранить изменения') }}</button>
             </div>
         </div>
-    </div>
+
+        <div class="row g-3">
+            <div class="col-xl-6">
+                <section class="server-form-section">
+                    <h5>{{ _('Основная информация') }}</h5>
+                    <div class="row g-2">
+                        <div class="col-sm-6">
+                            <label for="name" class="form-label">{{ _('Название сервера') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="name" name="name" value="{{ server.name }}" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="provider" class="form-label">{{ _('Хостинг-провайдер') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="provider" name="provider" value="{{ server.provider }}">
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="ip_address" name="ip_address" value="{{ server.ip_address }}" required>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="os" class="form-label">{{ _('ОС') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="os" name="os" value="{{ server.os }}" placeholder="{{ _('Например, Ubuntu 22.04') }}">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="status" class="form-label">{{ _('Статус') }}</label>
+                            <select class="form-select form-select-sm" id="status" name="status">
+                                <option value="Active" {% if server.status == 'Active' %}selected{% endif %}>{{ _('Активен') }}</option>
+                                <option value="Inactive" {% if server.status == 'Inactive' %}selected{% endif %}>{{ _('Неактивен') }}</option>
+                                <option value="Suspended" {% if server.status == 'Suspended' %}selected{% endif %}>{{ _('Приостановлен') }}</option>
+                                <option value="Удален" {% if server.status == 'Удален' %}selected{% endif %}>{{ _('Удален') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <label for="card_color" class="form-label">{{ _('Цвет') }}</label>
+                            <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="{{ server.get('card_color', '#ffc107') }}">
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="server_icon" class="form-label">{{ _('Иконка') }}</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input class="form-control form-control-sm" type="file" id="server_icon" name="server_icon">
+                                {% if server.icon_filename %}
+                                <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail flex-shrink-0" style="width: 32px; height: 32px; object-fit: contain;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="cpu" class="form-label">CPU</label>
+                            <input type="text" class="form-control form-control-sm" id="cpu" name="cpu" value="{{ server.specs.cpu }}">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="ram" class="form-label">RAM</label>
+                            <input type="text" class="form-control form-control-sm" id="ram" name="ram" value="{{ server.specs.ram }}">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="disk" class="form-label">{{ _('Диск') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="disk" name="disk" value="{{ server.specs.disk }}">
+                        </div>
+                        <div class="col-12 d-flex flex-wrap gap-3 pt-1">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok" {% if server.checks.get('dns_ok') %}checked{% endif %}>
+                                <label class="form-check-label" for="check_dns_ok">{{ _('DNS без утечек') }}</label>
+                            </div>
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="check_streaming_ok" name="check_streaming_ok" {% if server.checks.get('streaming_ok') %}checked{% endif %}>
+                                <label class="form-check-label" for="check_streaming_ok">{{ _('Стриминг-тест') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="server-form-section">
+                    <h5>{{ _('Платёжная информация') }}</h5>
+                    <div class="row g-2">
+                        <div class="col-6 col-md-3">
+                            <label for="amount" class="form-label">{{ _('Сумма') }}</label>
+                            <input type="number" step="0.01" class="form-control form-control-sm" id="amount" name="amount" value="{{ server.payment_info.amount }}">
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label for="currency" class="form-label">{{ _('Валюта') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="currency" name="currency" value="{{ server.payment_info.currency }}">
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <label for="next_due_date" class="form-label">{{ _('Дата след. платежа') }}</label>
+                            <input type="date" class="form-control form-control-sm" id="next_due_date" name="next_due_date" value="{{ server.payment_info.next_due_date }}">
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <label for="payment_period" class="form-label">{{ _('Период') }}</label>
+                            <select class="form-select form-select-sm" id="payment_period" name="payment_period">
+                                <option value="" {% if not server.payment_info.get('payment_period') %}selected{% endif %}>{{ _('Не указан') }}</option>
+                                <option value="Monthly" {% if server.payment_info.get('payment_period') == 'Monthly' %}selected{% endif %}>{{ _('Месяц') }}</option>
+                                <option value="3 Months" {% if server.payment_info.get('payment_period') == '3 Months' %}selected{% endif %}>{{ _('3 месяца') }}</option>
+                                <option value="Yearly" {% if server.payment_info.get('payment_period') == 'Yearly' %}selected{% endif %}>{{ _('Год') }}</option>
+                                <option value="Perpetual" {% if server.payment_info.get('payment_period') == 'Perpetual' %}selected{% endif %}>{{ _('Бессрочно') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#receiptsModal">
+                                <i class="bi bi-receipt"></i> {{ _('Управление чеками') }} ({{ server.payment_info.get('receipts', [])|length }})
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-xl-6">
+                <section class="server-form-section">
+                    <h5>{{ _('SSH-доступ') }}</h5>
+                    <p class="small text-muted mb-2">{{ _('Пустое поле пароля — не менять. Вставка очищается от пробелов.') }}</p>
+                    <div class="row g-2">
+                        <div class="col-sm-8">
+                            <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}" autocomplete="username">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="ssh_port" class="form-label">{{ _('Порт') }}</label>
+                            <input type="number" class="form-control form-control-sm" id="ssh_port" name="ssh_port" value="{{ server.ssh_credentials.get('port', 22) }}">
+                        </div>
+                        <div class="col-sm-6">
+                            {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль входа по SSH')) }}
+                            {{ password_input(
+                                'ssh_password', 'ssh_password', _('Новый пароль входа по SSH'),
+                                help_text=_('Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять.'),
+                                is_set=server.ssh_credentials.password_decrypted,
+                                placeholder=_('Вставьте пароль входа по SSH'),
+                                compact=True
+                            ) }}
+                        </div>
+                        <div class="col-sm-6" id="ssh-root-password-col">
+                            {{ current_secret_row(server.ssh_credentials.root_password_decrypted, _('Текущий пароль root (справка)')) }}
+                            {{ password_input(
+                                'ssh_root_password', 'ssh_root_password', _('Новый пароль root (справка)'),
+                                help_text=_('Письмо хостера или su. Для статуса не используется. Оставьте пустым, чтобы не менять.'),
+                                is_set=server.ssh_credentials.root_password_decrypted,
+                                placeholder=_('Необязательно, если отличается от входа'),
+                                compact=True
+                            ) }}
+                            <p id="ssh-root-redundant-hint" class="form-text d-none mb-1">
+                                {{ _('Пользователь уже root — для входа достаточно пароля слева.') }}
+                            </p>
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" {% if server.ssh_credentials.get('root_login_allowed') %}checked{% endif %}>
+                                <label class="form-check-label" for="root_login_allowed">
+                                    {{ _('На сервере разрешён вход root по SSH') }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="server-form-section">
+                    <h5>{{ _('Панель управления (3x-ui и др.)') }}</h5>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <label for="panel_url" class="form-label">{{ _('URL панели') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="panel_url" name="panel_url" value="{{ server.get('panel_url', '') }}">
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}" autocomplete="off">
+                        </div>
+                        <div class="col-sm-6">
+                            {{ current_secret_row(server.panel_credentials.password_decrypted, _('Текущий пароль панели')) }}
+                            {{ password_input(
+                                'panel_password', 'panel_password', _('Новый пароль панели'),
+                                help_text=_('Оставьте пустым, чтобы не менять.'),
+                                is_set=server.panel_credentials.password_decrypted,
+                                placeholder=_('Вставьте новый пароль панели'),
+                                compact=True
+                            ) }}
+                        </div>
+                    </div>
+                </section>
+
+                <section class="server-form-section">
+                    <h5>{{ _('Кабинет хостера') }}</h5>
+                    <div class="row g-2">
+                        <div class="col-sm-8">
+                            <label for="hoster_url" class="form-label">{{ _('URL кабинета') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="hoster_url" name="hoster_url" value="{{ server.get('hoster_url', '') }}">
+                        </div>
+                        <div class="col-sm-4">
+                            <label for="hoster_login_method" class="form-label">{{ _('Способ входа') }}</label>
+                            <select class="form-select form-select-sm" id="hoster_login_method" name="hoster_login_method">
+                                <option value="password" {% if server.hoster_credentials.login_method == 'password' %}selected{% endif %}>{{ _('По логину/паролю') }}</option>
+                                <option value="google" {% if server.hoster_credentials.login_method == 'google' %}selected{% endif %}>{{ _('Через Google') }}</option>
+                                <option value="apple" {% if server.hoster_credentials.login_method == 'apple' %}selected{% endif %}>{{ _('Через Apple') }}</option>
+                                <option value="other" {% if server.hoster_credentials.login_method == 'other' %}selected{% endif %}>{{ _('Другой') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="hoster_user" class="form-label" id="hoster_user_label">{{ _('Логин хостера') }}</label>
+                            <input type="text" class="form-control form-control-sm" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com" autocomplete="off">
+                        </div>
+                        <div class="col-sm-6" id="hoster_password_field">
+                            {{ current_secret_row(server.hoster_credentials.password_decrypted, _('Текущий пароль хостера')) }}
+                            {{ password_input(
+                                'hoster_password', 'hoster_password', _('Новый пароль хостера'),
+                                help_text=_('Оставьте пустым, чтобы не менять.'),
+                                is_set=server.hoster_credentials.password_decrypted,
+                                placeholder=_('Вставьте новый пароль хостера'),
+                                compact=True
+                            ) }}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <details class="server-form-extra mt-1">
+            <summary>{{ _('Дополнительно') }}</summary>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label for="notes" class="form-label">{{ _('Заметки') }}</label>
+                    <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2">{{ server.notes }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label for="docker_info" class="form-label">{{ _('Информация') }}</label>
+                    <textarea class="form-control form-control-sm" id="docker_info" name="docker_info" rows="2">{{ server.get('docker_info', '') }}</textarea>
+                </div>
+                <div class="col-md-4">
+                    <label for="software_info" class="form-label">{{ _('Установленное ПО') }}</label>
+                    <textarea class="form-control form-control-sm" id="software_info" name="software_info" rows="2">{{ server.get('software_info', '') }}</textarea>
+                </div>
+                <div class="col-md-6">
+                    <label for="receipt" class="form-label">{{ _('Файл нового чека') }}</label>
+                    <input class="form-control form-control-sm" type="file" id="receipt" name="receipt">
+                </div>
+                <div class="col-md-6">
+                    <label for="receipt_description" class="form-label">{{ _('Описание чека') }}</label>
+                    <input type="text" class="form-control form-control-sm" id="receipt_description" name="receipt_description" placeholder="{{ _('Например, Оплата за январь 2024') }}">
+                </div>
+                {% if hints %}
+                <div class="col-12">
+                    <div class="small text-muted mb-1">{{ _('Подсказки по командам') }}</div>
+                    {% for group, commands in hints.items() %}
+                        <div class="fw-semibold small mt-2">{{ group }}</div>
+                        {% for hint in commands %}
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <pre class="mb-0 me-2 flex-grow-1"><code class="language-bash" style="font-size: 0.8em;">{{ hint.command }}</code></pre>
+                            <button type="button" class="btn btn-sm btn-outline-secondary copy-btn flex-shrink-0" onclick="copyHint(this)"><i class="bi bi-clipboard"></i></button>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </details>
+    </form>
 </div>
 
 <!-- Modal for Receipts -->

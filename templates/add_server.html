@@ -116,19 +116,24 @@
                 <div class="row">
                     <div class="col-md-6">
                         {{ password_input(
-                            'ssh_password', 'ssh_password', _('Пароль SSH'),
-                            placeholder=_('Вставьте пароль SSH')
+                            'ssh_password', 'ssh_password', _('Пароль входа по SSH'),
+                            help_text=_('Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его.'),
+                            placeholder=_('Вставьте пароль входа по SSH')
                         ) }}
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6" id="ssh-root-password-col">
                         {{ password_input(
-                            'ssh_root_password', 'ssh_root_password', _('Пароль root'),
-                            placeholder=_('Вставьте пароль root')
+                            'ssh_root_password', 'ssh_root_password', _('Пароль учётной записи root'),
+                            help_text=_('Справка (письмо хостера, команда su). Для статуса не используется.'),
+                            placeholder=_('Необязательно, если отличается от входа')
                         ) }}
+                        <p id="ssh-root-redundant-hint" class="form-text d-none">
+                            {{ _('Пользователь уже root — для входа достаточно пароля слева.') }}
+                        </p>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="root_login_allowed" name="root_login_allowed" checked>
                             <label class="form-check-label" for="root_login_allowed">
-                                {{ _('Вход для root по SSH разрешен') }}
+                                {{ _('На сервере разрешён вход root по SSH') }}
                             </label>
                         </div>
                     </div>
