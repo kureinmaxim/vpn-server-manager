@@ -20,6 +20,9 @@ paramiko>=5.0.0
 requests>=2.34.2
 urllib3>=2.7.0
 
+# Images (server icons and screen snip)
+Pillow>=11.0.0
+
 # Environment variables
 python-dotenv>=1.2.2
 

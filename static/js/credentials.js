@@ -255,10 +255,85 @@
             input.dataset.boundFilePicker = '1';
             input.addEventListener('change', function () {
                 var label = document.querySelector('[data-file-picker-name="' + input.id + '"]');
-                if (!label) return;
-                var empty = input.getAttribute('data-empty-label') || '';
-                label.textContent = (input.files && input.files[0]) ? input.files[0].name : empty;
+                if (label) {
+                    var empty = input.getAttribute('data-empty-label') || '';
+                    label.textContent = (input.files && input.files[0]) ? input.files[0].name : empty;
+                }
             });
+        });
+    }
+
+    function setIconPreview(picker, dataUrl) {
+        var img = picker.querySelector('.icon-picker-preview');
+        var fallback = picker.querySelector('.icon-picker-fallback');
+        var data = picker.querySelector('.js-icon-data');
+        var remove = picker.querySelector('.js-icon-remove');
+        if (data) data.value = dataUrl || '';
+        if (remove) remove.value = '';
+        if (img) {
+            if (dataUrl) {
+                img.src = dataUrl;
+                img.classList.remove('d-none');
+            } else {
+                img.removeAttribute('src');
+                img.classList.add('d-none');
+            }
+        }
+        if (fallback) fallback.classList.toggle('d-none', !!dataUrl);
+    }
+
+    function bindIconPickers(root) {
+        if (!root) return;
+        root.querySelectorAll('[data-icon-picker]').forEach(function (picker) {
+            if (picker.dataset.boundIconPicker === '1') return;
+            picker.dataset.boundIconPicker = '1';
+            var fileInput = picker.querySelector('.js-file-picker-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', function () {
+                    var file = fileInput.files && fileInput.files[0];
+                    if (!file || !window.FileReader) return;
+                    var reader = new FileReader();
+                    reader.onload = function () {
+                        setIconPreview(picker, reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            var snip = picker.querySelector('.js-icon-snip');
+            if (snip) {
+                snip.addEventListener('click', function () {
+                    snip.disabled = true;
+                    fetch('/api/icon-snip', {
+                        method: 'POST',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(function (response) {
+                        return response.json();
+                    }).then(function (payload) {
+                        if (!payload || !payload.success || !payload.data) return;
+                        if (fileInput) fileInput.value = '';
+                        var label = picker.querySelector('.js-file-picker-name');
+                        if (label) label.textContent = fileInput ? (fileInput.getAttribute('data-empty-label') || '') : '';
+                        setIconPreview(picker, payload.data);
+                    }).catch(function (err) {
+                        console.error('icon snip failed', err);
+                    }).finally(function () {
+                        snip.disabled = false;
+                    });
+                });
+            }
+            var clearBtn = picker.querySelector('.js-icon-clear');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function () {
+                    if (fileInput) {
+                        fileInput.value = '';
+                        var label = picker.querySelector('.js-file-picker-name');
+                        if (label) label.textContent = fileInput.getAttribute('data-empty-label') || '';
+                    }
+                    setIconPreview(picker, '');
+                    var remove = picker.querySelector('.js-icon-remove');
+                    if (remove) remove.value = '1';
+                });
+            }
         });
     }
 
@@ -267,6 +342,7 @@
         bindSecretInputMasks(document);
         bindSshRootHint(document);
         bindFilePickers(document);
+        bindIconPickers(document);
     });
 
     global.sanitizeSecret = sanitizeSecret;
@@ -278,4 +354,5 @@
     global.bindSecretInputMasks = bindSecretInputMasks;
     global.bindSshRootHint = bindSshRootHint;
     global.bindFilePickers = bindFilePickers;
+    global.bindIconPickers = bindIconPickers;
 })(window);

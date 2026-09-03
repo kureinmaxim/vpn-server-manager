@@ -10,7 +10,7 @@ body:
     id: version
     attributes:
       label: App version
-      placeholder: "4.4.3"
+      placeholder: "4.4.4"
     validations:
       required: true
   - type: dropdown

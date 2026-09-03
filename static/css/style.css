@@ -368,3 +368,22 @@ body:has(.server-form) .navbar.mb-4 {
 .server-board-ghost {
     opacity: 0.4;
 }
+
+.icon-picker-preview {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    background: var(--bs-tertiary-bg, #2b3035);
+}
+
+.icon-picker-fallback {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--bs-border-color);
+    border-radius: 0.25rem;
+    color: var(--bs-secondary-color);
+    font-size: 1.5rem;
+}
