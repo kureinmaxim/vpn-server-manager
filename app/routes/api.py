@@ -193,6 +193,23 @@ def set_server_archived(server_id):
     return jsonify({'success': True, 'archived': server['archived']})
 
 
+@api_bp.route('/icon-snip', methods=['POST'])
+@require_auth
+@require_pin
+def icon_snip():
+    """Capture a desktop rectangle for the server icon (desktop app)."""
+    import base64
+    from desktop.snip import capture_region
+
+    png = capture_region()
+    if not png:
+        return jsonify({'success': False, 'cancelled': True})
+    return jsonify({
+        'success': True,
+        'data': 'data:image/png;base64,' + base64.b64encode(png).decode('ascii'),
+    })
+
+
 @api_bp.route('/servers', methods=['POST'])
 @require_auth
 @require_pin

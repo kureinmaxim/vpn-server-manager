@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.4] - 2026-09-03
+
+### Fixed
+- Add/Edit icon picker shows a live preview, has a **From screen** capture button, and actually saves the icon on Edit.
+
 ## [4.4.3] - 2026-09-03
 
 ### Fixed
