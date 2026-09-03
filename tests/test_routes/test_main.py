@@ -380,3 +380,11 @@ class TestMainRoutes:
         assert 'server-card-full' in html
         assert 'is-archived' in html
         assert 'accordion-' in html
+        assert 'js/server_board.js' in html
+
+
+def test_board_script_uses_second_click_not_text_selection():
+    from pathlib import Path
+    js = Path(__file__).resolve().parents[2].joinpath('static', 'js', 'server_board.js').read_text(encoding='utf-8')
+    assert 'event.detail !== 2' in js
+    assert 'String(selection)' not in js

@@ -2,7 +2,7 @@
     'use strict';
 
     var LABELS = window.SERVER_BOARD_I18N || {};
-    var INTERACTIVE = 'a, button, input, textarea, select, form, label, .accordion-button';
+    var INTERACTIVE = 'a, button, input, textarea, select, label, .server-card-handle';
 
     function postJson(url, body) {
         return fetch(url, {
@@ -41,6 +41,23 @@
         item.classList.toggle('col-xl-6', expanded);
     }
 
+    function activateCard(card) {
+        var item = card.closest('.server-board-item');
+        if (!item) return;
+        if (card.classList.contains('is-archived')) {
+            var id = item.getAttribute('data-server-id');
+            postJson('/api/servers/' + encodeURIComponent(id) + '/archived', { archived: false })
+                .then(function (data) {
+                    if (data && data.success) applyArchived(card, false);
+                })
+                .catch(function (err) {
+                    console.error('unarchive on dblclick failed', err);
+                });
+            return;
+        }
+        setExpanded(item, !card.classList.contains('is-expanded'));
+    }
+
     function bindArchiveToggles() {
         document.querySelectorAll('.js-archive-toggle').forEach(function (button) {
             if (button.dataset.boundArchive === '1') return;
@@ -62,30 +79,24 @@
         });
     }
 
-    function bindCardDblClick() {
-        document.querySelectorAll('.server-preview-card').forEach(function (card) {
-            if (card.dataset.boundDbl === '1') return;
-            card.dataset.boundDbl = '1';
-            card.addEventListener('dblclick', function (event) {
-                if (event.target.closest(INTERACTIVE)) return;
-                var selection = window.getSelection && window.getSelection();
-                if (selection && String(selection).length > 0) return;
-                var item = card.closest('.server-board-item');
-                if (!item) return;
-                event.preventDefault();
-                if (card.classList.contains('is-archived')) {
-                    var id = item.getAttribute('data-server-id');
-                    postJson('/api/servers/' + encodeURIComponent(id) + '/archived', { archived: false })
-                        .then(function (data) {
-                            if (data && data.success) applyArchived(card, false);
-                        })
-                        .catch(function (err) {
-                            console.error('unarchive on dblclick failed', err);
-                        });
-                    return;
-                }
-                setExpanded(item, !card.classList.contains('is-expanded'));
-            });
+    function bindCardActivate() {
+        var board = document.getElementById('server-board');
+        if (!board || board.dataset.boundActivate === '1') return;
+        board.dataset.boundActivate = '1';
+        // click.detail === 2 is the second click of a double-click. Native
+        // dblclick is unreliable in pywebview/WebView2, and the default
+        // dblclick-to-select-word must not cancel the action.
+        board.addEventListener('click', function (event) {
+            if (event.detail !== 2) return;
+            if (event.target.closest(INTERACTIVE)) return;
+            var card = event.target.closest('.server-preview-card');
+            if (!card) return;
+            event.preventDefault();
+            if (window.getSelection) {
+                var selection = window.getSelection();
+                if (selection && selection.removeAllRanges) selection.removeAllRanges();
+            }
+            activateCard(card);
         });
     }
 
@@ -109,9 +120,15 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function init() {
         bindArchiveToggles();
-        bindCardDblClick();
+        bindCardActivate();
         bindSortable();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();

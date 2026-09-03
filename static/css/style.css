@@ -300,6 +300,11 @@ body:has(.server-form) .navbar.mb-4 {
     min-width: 0;
 }
 
+.server-preview-card:not(.is-expanded) {
+    user-select: none;
+    cursor: pointer;
+}
+
 .server-preview-head {
     display: flex;
     align-items: center;
