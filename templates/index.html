@@ -76,251 +76,73 @@
         </div>
     </div>
     {% elif servers %}
-    <div class="row">
+    <p class="small text-muted mb-2">{{ _('Перетащите за ручку, чтобы поменять местами. Архив — серая карточка, данные не удаляются.') }}</p>
+    <div class="row g-2" id="server-board">
         {% for server in servers %}
-        <div class="col-md-6 col-lg-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
-                    <h5 class="card-title mb-0 d-flex align-items-center">
+        <div class="col-sm-6 col-lg-4 col-xl-3 server-board-item" data-server-id="{{ server.id }}">
+            <div class="card server-preview-card h-100{% if server.get('archived') %} is-archived{% endif %}">
+                <div class="card-header force-dark-text py-2 px-2" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
+                    <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-sm p-0 border-0 bg-transparent server-card-handle" title="{{ _('Перетащить') }}" aria-label="{{ _('Перетащить') }}">
+                            <i class="bi bi-grip-vertical"></i>
+                        </button>
                         {% if server.icon_filename %}
-                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" 
-                                 alt="icon" 
-                                 class="me-2" 
-                                 style="width: 40px; height: 40px; object-fit: contain; border-radius: 4px;"
+                            <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}"
+                                 alt=""
+                                 class="server-preview-icon"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-                            <i class="bi {{ server.os_icon }} me-2" style="display: none; font-size: 32px;"></i>
+                            <i class="bi {{ server.os_icon }} server-preview-os" style="display: none;"></i>
                         {% else %}
-                            <i class="bi {{ server.os_icon }} me-2" style="font-size: 32px;"></i>
+                            <i class="bi {{ server.os_icon }} server-preview-os"></i>
                         {% endif %}
-                        {{ server.name }}
-                    </h5>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
-                        {% if server.geolocation.city %}
-                        <small><i class="bi bi-geo-alt-fill"></i> {{ server.geolocation.city }}, {{ server.geolocation.country }}</small>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row text-center border-bottom pb-3 mb-2">
-                        <div class="col">
-                            <small class="text-muted">{{ _('Стоимость') }}</small>
-                            <div><strong>{{ "%.2f"|format(server.payment_info.amount) }} {{ server.payment_info.currency }}</strong></div>
-                            <small>{{ server.payment_info.get('payment_period', _('N/A')) }}</small>
+                        <div class="min-w-0 flex-grow-1">
+                            <div class="fw-semibold text-truncate lh-sm">{{ server.name }}</div>
+                            <div class="small text-truncate lh-sm">{{ server.ip_address }}{% if server.provider %} · {{ server.provider }}{% endif %}</div>
                         </div>
-                        <div class="col">
-                            <small class="text-muted">{{ _('След. платёж') }}</small>
-                            <div><strong>{{ server.payment_info.formatted_date }}</strong></div>
-                        </div>
-                        <div class="col">
-                            <small class="text-muted">{{ _('Статус') }}</small>
-                            <div>
-                                {% set status_color = {
-                                    'Active': 'success', 
-                                    'Inactive': 'secondary', 
-                                    'Suspended': 'danger', 
-                                    'Приостановлен': 'warning', 
-                                    'Удален': 'danger'
-                                }.get(server.status, 'secondary') %}
-                                <span class="badge bg-{{ status_color }}">{{ server.status }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row text-center small border-bottom pb-2 mb-2">
-                        <div class="col">
-                            {% set analysis = server.get('hosting_analysis', {}) %}
-                            <span class="badge bg-{{ analysis.get('quality', 'secondary') }}">{{ analysis.get('text', 'N/A') }}</span>
-                        </div>
-                        <div class="col">
-                             {% if server.get('checks', {}).get('dns_ok') %}
-                                <span class="badge bg-success">{{ _('DNS OK') }}</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">{{ _('DNS ?') }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="col">
-                             {% if server.get('checks', {}).get('streaming_ok') %}
-                                <span class="badge bg-success">{{ _('Стриминг OK') }}</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">{{ _('Стриминг ?') }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2 mb-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="{{ _('Требуется интернет') }}"{% endif %}>
-                            <i class="bi bi-search"></i> {{ _('Проверить IP') }}
+                        <button type="button"
+                                class="btn btn-sm p-0 border-0 bg-transparent js-archive-toggle"
+                                data-server-id="{{ server.id }}"
+                                data-archived="{{ '1' if server.get('archived') else '0' }}"
+                                title="{{ _('Архив') if server.get('archived') else _('В архив') }}">
+                            <i class="bi {{ 'bi-archive-fill' if server.get('archived') else 'bi-archive' }}"></i>
                         </button>
-                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="{{ _('Требуется интернет') }}"{% endif %}>
-                            <i class="bi bi-building"></i> {{ _('Владелец IP') }}
-                        </a>
                     </div>
-
-                    <div class="accordion accordion-flush" id="accordion-{{ server.id }}">
-                        <!-- Блок Кабинет хостера -->
-                        {% if server.hoster_url or server.hoster_credentials.user_decrypted %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-hoster-{{ server.id }}">{{ _('Кабинет хостера') }}</button>
-                            </h2>
-                            <div id="collapse-hoster-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
-                                <div class="accordion-body py-2">
-                                    
-                                    {% if server.hoster_credentials.login_method != 'password' %}
-                                        <p class="text-center my-1 small">{{ _('Вход через') }} <strong>{{ server.hoster_credentials.login_method|capitalize }}</strong></p>
-                                    {% endif %}
-
-                                    {% if server.hoster_credentials.user_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Email') if server.hoster_credentials.login_method != 'password' else _('Логин') }}:</small>
-                                        {{ text_copy_display(server.hoster_credentials.user_decrypted, _('Копировать логин')) }}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if server.hoster_credentials.login_method == 'password' and server.hoster_credentials.password_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Пароль') }}:</small>
-                                        {{ password_display(server.hoster_credentials.password_decrypted) }}
-                                    </div>
-                                    {% endif %}
-
-                                    {% if server.hoster_url %}
-                                    <div class="d-grid mt-2">
-                                        <a href="{{ server.hoster_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в кабинет') }}</a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                <div class="card-body py-2 px-2">
+                    <div class="d-flex justify-content-between gap-2 small mb-1">
+                        <span class="text-truncate">{{ "%.0f"|format(server.payment_info.amount or 0) }} {{ server.payment_info.currency }}</span>
+                        <span class="text-truncate text-muted">{{ server.payment_info.formatted_date }}</span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1">
+                        {% set status_color = {
+                            'Active': 'success',
+                            'Inactive': 'secondary',
+                            'Suspended': 'danger',
+                            'Приостановлен': 'warning',
+                            'Удален': 'danger'
+                        }.get(server.status, 'secondary') %}
+                        <span class="badge bg-{{ status_color }}">{{ server.status }}</span>
+                        {% if server.get('checks', {}).get('dns_ok') %}
+                        <span class="badge bg-success">DNS</span>
                         {% endif %}
-
-                        <!-- Блок SSH -->
-                        <div class="accordion-item">
-                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-ssh-{{ server.id }}">{{ _('SSH-доступ') }}</button>
-                            </h2>
-                            <div id="collapse-ssh-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
-                                <div class="accordion-body py-2">
-                                    <div class="text-center mb-2">
-                                        <button class="btn btn-sm btn-outline-success w-100"
-                                                data-copy-value="{{ 'ssh ' ~ server.ssh_credentials.user ~ '@' ~ server.ip_address ~ ' -p ' ~ server.ssh_credentials.get('port', 22) }}"
-                                                onclick="copyToClipboard(this)"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="{{ _('Копировать SSH команду подключения') }}">
-                                            <i class="bi bi-terminal"></i> {{ _('Копировать команду') }}
-                                        </button>
-                                    </div>
-                                    <h6 class="text-muted small">{{ _('Пользователь') }}</h6>
-                                    {% if server.ssh_credentials.user %}
-                                    <div class="d-flex justify-content-between align-items-center gap-2">
-                                        <small>{{ _('Login') }}:</small>
-                                        {{ text_copy_display(server.ssh_credentials.user, _('Копировать логин')) }}
-                                    </div>
-                                    {% endif %}
-                                    {% if server.ssh_credentials.password_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Пароль входа') }}:</small>
-                                        {{ password_display(server.ssh_credentials.password_decrypted) }}
-                                    </div>
-                                    {% endif %}
-                                    
-                                    <hr class="my-2">
-                                    <h6 class="text-muted small">{{ _('Root (справка)') }}</h6>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small>{{ _('Вход по SSH') }}:</small>
-                                        {% if server.ssh_credentials.get('root_login_allowed') %}
-                                            <span class="badge bg-success">{{ _('Разрешен') }}</span>
-                                        {% else %}
-                                            <span class="badge bg-danger">{{ _('Запрещен') }}</span>
-                                        {% endif %}
-                                    </div>
-                                     {% if server.ssh_credentials.root_password_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Пароль') }}:</small>
-                                        {{ password_display(server.ssh_credentials.root_password_decrypted) }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Блок Панель управления -->
-                         {% if server.panel_url or server.panel_credentials.user_decrypted %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-panel-{{ server.id }}">{{ _('Панель (3x-ui)') }}</button>
-                            </h2>
-                            <div id="collapse-panel-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
-                                <div class="accordion-body py-2">
-                                    {% if server.panel_credentials.user_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center gap-2">
-                                        <small>{{ _('Логин') }}:</small>
-                                        {{ text_copy_display(server.panel_credentials.user_decrypted, _('Копировать логин')) }}
-                                    </div>
-                                    {% endif %}
-                                    {% if server.panel_credentials.password_decrypted %}
-                                    <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Пароль') }}:</small>
-                                        {{ password_display(server.panel_credentials.password_decrypted) }}
-                                    </div>
-                                    {% endif %}
-                                    {% if server.panel_url %}
-                                     <div class="d-grid mt-2">
-                                        <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в панель') }}</a>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Блок Дополнительная информация -->
-                        {% if server.get('docker_info') %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-info-{{ server.id }}">{{ _('Информация') }}</button>
-                            </h2>
-                            <div id="collapse-info-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
-                                <div class="accordion-body py-2">
-                                    <div class="small text-muted">
-                                        {{ server.docker_info|replace('\n', '<br>')|safe }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Блок Установленное ПО -->
-                        {% if server.get('software_info') %}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-software-{{ server.id }}">{{ _('Установленное ПО') }}</button>
-                            </h2>
-                            <div id="collapse-software-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
-                                <div class="accordion-body py-2">
-                                    <div class="small text-muted">
-                                        {{ server.software_info|replace('\n', '<br>')|safe }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% if server.get('checks', {}).get('streaming_ok') %}
+                        <span class="badge bg-success">{{ _('Стрим') }}</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
-                        <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
+                <div class="card-footer py-1 px-2 d-flex justify-content-between gap-1">
+                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary" title="{{ _('Редактировать') }}">
+                        <i class="bi bi-pencil-square"></i>
                     </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
-                            <i class="bi bi-activity"></i> {{ _('Статус') }}
+                    <div class="d-flex gap-1">
+                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}" title="{{ _('Статус') }}">
+                            <i class="bi bi-activity"></i>
                         </button>
-                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-bar-chart-line"></i> {{ _('Мониторинг') }}
+                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success" title="{{ _('Мониторинг') }}">
+                            <i class="bi bi-bar-chart-line"></i>
                         </a>
-                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
-                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
+                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" class="d-inline" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ _('Удалить') }}"><i class="bi bi-trash"></i></button>
                         </form>
                     </div>
                 </div>
@@ -484,6 +306,14 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    window.SERVER_BOARD_I18N = {
+        archive: {{ _('В архив') | tojson }},
+        unarchive: {{ _('Архив') | tojson }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/Sortable.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/server_board.js') }}"></script>
 <script>
     // Инициализация tooltips при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
