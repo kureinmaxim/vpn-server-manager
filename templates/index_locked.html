@@ -1042,10 +1042,7 @@
                     clearTimeout(clickTimer);
                     clickCount = 0;
                     
-                    // Проверяем, содержит ли текст "Куреин М. Н."
-                    if (developerName.textContent.includes('Куреин М. Н.')) {
-                        showPinLoginModal();
-                    }
+                    showPinLoginModal();
                 }
             });
         }

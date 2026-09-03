@@ -6361,3 +6361,39 @@ msgstr "More"
 
 msgid "Пустое поле пароля — не менять. Вставка очищается от пробелов."
 msgstr "Leave a password field empty to keep it. Pasted secrets are trimmed."
+
+msgid "Задан"
+msgstr "Set"
+
+msgid "задан"
+msgstr "Set"
+
+msgid "Текущий"
+msgstr "Current"
+
+msgid "Показать/скрыть"
+msgstr "Show/hide"
+
+msgid "Копировать из поля"
+msgstr "Copy from field"
+
+msgid "Текущий пароль панели"
+msgstr "Current panel password"
+
+msgid "Вставьте новый пароль панели"
+msgstr "Paste the new panel password"
+
+msgid "Текущий пароль хостера"
+msgstr "Current hoster password"
+
+msgid "Вставьте новый пароль хостера"
+msgstr "Paste the new hoster password"
+
+msgid "Вставьте пароль панели"
+msgstr "Paste the panel password"
+
+msgid "Вставьте пароль хостера"
+msgstr "Paste the hoster password"
+
+msgid "Куреин М.Н."
+msgstr "Kurein M.N."
