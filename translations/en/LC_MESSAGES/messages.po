@@ -6415,3 +6415,12 @@ msgstr "Archived card (grey on the list)"
 
 msgid "Стрим"
 msgstr "Stream"
+
+msgid "С экрана"
+msgstr "From screen"
+
+msgid "Убрать иконку"
+msgstr "Remove icon"
+
+msgid "После выбора файла или выделения экрана сразу видно превью."
+msgstr "After you pick a file or select a screen region, the preview appears immediately."

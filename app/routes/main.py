@@ -11,6 +11,7 @@ import signal
 from ..services import registry
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
 from ..utils.credentials import sanitize_secret
+from ..utils.icons import apply_icon_from_form
 from ..exceptions import ValidationError, AuthenticationError
 
 logger = logging.getLogger(__name__)
@@ -203,17 +204,10 @@ def add_server():
 
         # Загрузка иконки сервера
         upload_folder = current_app.config.get('UPLOAD_FOLDER')
-        if upload_folder and 'server_icon' in request.files:
-            icon_file = request.files['server_icon']
-            allowed_icon = {'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'ico'}
-            if icon_file and icon_file.filename:
-                ext = os.path.splitext(secure_filename(icon_file.filename))[1].lower().lstrip('.')
-                if ext in allowed_icon:
-                    os.makedirs(upload_folder, exist_ok=True)
-                    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-                    unique_filename = f"icon_{new_id}_{timestamp}.{ext}"
-                    icon_file.save(os.path.join(upload_folder, unique_filename))
-                    new_server['icon_filename'] = unique_filename
+        if upload_folder:
+            new_server['icon_filename'] = apply_icon_from_form(
+                request.form, request.files, upload_folder, new_id, None
+            ) or ''
 
         servers.append(new_server)
         data_manager.save_servers(servers, active_file)
@@ -353,6 +347,17 @@ def edit_server(server_id):
                 # Обновляем проверки
                 server['checks']['dns_ok'] = bool(request.form.get('check_dns_ok'))
                 server['checks']['streaming_ok'] = bool(request.form.get('check_streaming_ok'))
+
+                upload_folder = current_app.config.get('UPLOAD_FOLDER')
+                if upload_folder:
+                    icon_name = apply_icon_from_form(
+                        request.form,
+                        request.files,
+                        upload_folder,
+                        server.get('id'),
+                        server.get('icon_filename'),
+                    )
+                    server['icon_filename'] = icon_name or ''
                 
                 # Сохраняем обновленный список серверов
                 active_file = data_manager.get_active_data_path(current_app.config)

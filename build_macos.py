@@ -728,10 +728,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '4.4.3'
+        return '4.4.4'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '4.4.3'
+        return '4.4.4'
 
 def main():
     """Основная функция сборки"""

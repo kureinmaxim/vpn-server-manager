@@ -136,7 +136,7 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/credentials.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/credentials.js') }}?v={{ app_info.get('version', '') }}"></script>
     <script>
         // Применить сохранённый масштаб при загрузке
         document.addEventListener('DOMContentLoaded', function() {

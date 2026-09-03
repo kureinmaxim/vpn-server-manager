@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "macros/credentials.html" import password_input, file_picker %}
+{% from "macros/credentials.html" import password_input, file_picker, icon_picker %}
 
 {% block title %}{{ _('Добавить сервер') }}{% endblock %}
 
@@ -53,8 +53,8 @@
                         <input type="color" class="form-control form-control-color" id="card_color" name="card_color" value="#ffc107">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label for="server_icon" class="form-label">{{ _('Иконка сервера') }}</label>
-                        {{ file_picker('server_icon', 'server_icon', accept='image/png,image/jpeg,image/gif,image/webp,image/x-icon,image/bmp,.png,.jpg,.jpeg,.gif,.webp,.ico,.bmp') }}
+                        <label class="form-label">{{ _('Иконка сервера') }}</label>
+                        {{ icon_picker() }}
                     </div>
                 </div>
 
