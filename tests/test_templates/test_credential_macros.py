@@ -4,6 +4,7 @@
 парсит JSON в HTML-атрибутах, поэтому |tojson там ломает спецсимволы.
 """
 
+import base64
 import re
 
 import pytest
@@ -11,9 +12,10 @@ from html import unescape
 
 MACROS = "{% import 'macros/credentials.html' as cred %}"
 
-# Пароли с символами, которые ломались при |tojson в атрибуте.
+# Пароли с символами, которые ломались при |tojson в атрибуте и при URL-decode `%:`.
 TRICKY_SECRETS = [
     r"nb7\Fyhqa#%z55&g}&3%:",
+    "aguJ#%z&g}&%:",
     r"a&b<c>d",
     r"back\\slash",
     "quote\"inside",
@@ -30,13 +32,18 @@ def _attr(html, name):
     return unescape(match.group(1))
 
 
+def _secret_from_display(html):
+    assert 'data-enc="b64"' in html
+    return base64.b64decode(_attr(html, "data-password")).decode("utf-8")
+
+
 @pytest.mark.parametrize("secret", TRICKY_SECRETS)
 def test_password_display_preserves_secret(app, secret):
     html = app.jinja_env.from_string(
         MACROS + "{{ cred.password_display(value) }}"
     ).render(value=secret)
 
-    assert _attr(html, "data-password") == secret
+    assert _secret_from_display(html) == secret
 
 
 @pytest.mark.parametrize("secret", TRICKY_SECRETS)
@@ -49,13 +56,13 @@ def test_text_copy_display_preserves_value(app, secret):
 
 
 def test_password_display_escapes_html(app):
-    """Значение экранируется, а не вставляется сырым — иначе XSS."""
+    """Секрет в атрибуте — base64, не сырой HTML."""
     html = app.jinja_env.from_string(
         MACROS + "{{ cred.password_display(value) }}"
     ).render(value='"><script>alert(1)</script>')
 
     assert "<script>" not in html
-    assert _attr(html, "data-password") == '"><script>alert(1)</script>'
+    assert _secret_from_display(html) == '"><script>alert(1)</script>'
 
 
 def test_password_display_attribute_is_quoted(app):
@@ -64,7 +71,7 @@ def test_password_display_attribute_is_quoted(app):
         MACROS + "{{ cred.password_display(value) }}"
     ).render(value="two words")
 
-    assert 'data-password="two words"' in html
+    assert _secret_from_display(html) == "two words"
 
 
 def test_current_secret_row_preserves_secret(app):
@@ -73,4 +80,26 @@ def test_current_secret_row_preserves_secret(app):
         MACROS + "{{ cred.current_secret_row(value) }}"
     ).render(value=secret)
 
-    assert _attr(html, "data-password") == secret
+    assert _secret_from_display(html) == secret
+
+
+def test_password_input_starts_as_text_without_monospace(app):
+    """Пустое поле — type=text без monospace, иначе WebView рисует точки поверх placeholder."""
+    html = app.jinja_env.from_string(
+        MACROS + "{{ cred.password_input('ssh_password', 'ssh_password', 'Пароль', placeholder='Paste') }}"
+    ).render()
+
+    assert 'type="text"' in html
+    assert "font-monospace" not in html
+    assert "secret-input" in html
+    assert 'autocomplete="new-password"' in html
+
+
+def test_password_input_compact_hides_help_text(app):
+    html = app.jinja_env.from_string(
+        MACROS + "{{ cred.password_input('p', 'p', 'L', help_text='Hint', compact=True) }}"
+    ).render()
+
+    assert 'input-group-sm' in html
+    assert 'form-text' not in html
+    assert 'title="Hint"' in html

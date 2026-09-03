@@ -220,13 +220,13 @@
                                     {% endif %}
                                     {% if server.ssh_credentials.password_decrypted %}
                                     <div class="d-flex justify-content-between align-items-center mt-2 gap-2">
-                                        <small>{{ _('Пароль') }}:</small>
+                                        <small>{{ _('Пароль входа') }}:</small>
                                         {{ password_display(server.ssh_credentials.password_decrypted) }}
                                     </div>
                                     {% endif %}
                                     
                                     <hr class="my-2">
-                                    <h6 class="text-muted small">{{ _('Root') }}</h6>
+                                    <h6 class="text-muted small">{{ _('Root (справка)') }}</h6>
                                     <div class="d-flex justify-content-between align-items-center">
                                         <small>{{ _('Вход по SSH') }}:</small>
                                         {% if server.ssh_credentials.get('root_login_allowed') %}

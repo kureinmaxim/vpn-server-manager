@@ -13,6 +13,8 @@ class TestSanitizeSecret:
     def test_preserves_internal_spaces_and_special_chars(self):
         assert sanitize_secret(' p@ss word! ') == 'p@ss word!'
         assert sanitize_secret("ab'c\"d\\e") == "ab'c\"d\\e"
+        assert sanitize_secret('aguJ#%z&g}&%:') == 'aguJ#%z&g}&%:'
+        assert sanitize_secret(r'nb7\Fyhqa#%z55&g}&3%:') == r'nb7\Fyhqa#%z55&g}&3%:'
 
     def test_empty_and_none(self):
         assert sanitize_secret(None) == ''

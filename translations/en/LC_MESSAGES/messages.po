@@ -6289,3 +6289,75 @@ msgstr "ufw - install package only (NOT enabled automatically)"
 
 msgid "Скрипты мониторинга ставятся всегда. Установка займет 1-2 минуты"
 msgstr "Monitoring scripts are always installed. Installation takes 1-2 minutes"
+
+msgid "Пароль входа по SSH"
+msgstr "SSH login password"
+
+msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его."
+msgstr "The app logs in as the user above with this password. Status and monitoring use only this one."
+
+msgid "Пароль учётной записи root"
+msgstr "Root account password"
+
+msgid "Справка (письмо хостера, команда su). Для статуса не используется."
+msgstr "Reference only (hoster email, su). Not used for Status."
+
+msgid "Пользователь уже root — для входа достаточно пароля слева."
+msgstr "The user is already root — the password on the left is enough to log in."
+
+msgid "На сервере разрешён вход root по SSH"
+msgstr "This server allows root SSH login"
+
+msgid "Вставьте пароль входа по SSH"
+msgstr "Paste the SSH login password"
+
+msgid "Необязательно, если отличается от входа"
+msgstr "Optional if it differs from the login password"
+
+msgid "Текущий пароль входа по SSH"
+msgstr "Current SSH login password"
+
+msgid "Новый пароль входа по SSH"
+msgstr "New SSH login password"
+
+msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять."
+msgstr "The app logs in as the user above with this password. Status and monitoring use only this one. Leave empty to keep the current password."
+
+msgid "Текущий пароль root (справка)"
+msgstr "Current root password (reference)"
+
+msgid "Новый пароль root (справка)"
+msgstr "New root password (reference)"
+
+msgid "Письмо хостера или su. Для статуса не используется. Оставьте пустым, чтобы не менять."
+msgstr "Hoster email or su. Not used for Status. Leave empty to keep the current password."
+
+msgid "Пароль входа"
+msgstr "Login password"
+
+msgid "Root (справка)"
+msgstr "Root (reference)"
+
+msgid "ОС"
+msgstr "OS"
+
+msgid "Цвет"
+msgstr "Color"
+
+msgid "Иконка"
+msgstr "Icon"
+
+msgid "DNS без утечек"
+msgstr "DNS leak-free"
+
+msgid "Стриминг-тест"
+msgstr "Streaming test"
+
+msgid "Период"
+msgstr "Period"
+
+msgid "Дополнительно"
+msgstr "More"
+
+msgid "Пустое поле пароля — не менять. Вставка очищается от пробелов."
+msgstr "Leave a password field empty to keep it. Pasted secrets are trimmed."

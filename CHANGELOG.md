@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.3.8] - 2026-09-03
+
+### Improved
+- Edit/add server: SSH login password vs root-account password labels say which one Status uses.
+- Password fields no longer draw mask dots on top of the placeholder (WebView/Chromium).
+- Edit server form is a compact two-column layout with sticky Save, so it fits on one screen.
+
+### Fixed
+- Passwords with `%` / `&` (for example `...}&%:`) were shown or copied wrong after a reload because the WebView treated `%` in HTML attributes as URL-encoding. Secrets are now stored base64 in the page.
+
 ## [4.3.6] - 2026-09-02
 
 ### Fixed
