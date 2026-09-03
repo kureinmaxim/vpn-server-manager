@@ -218,7 +218,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.3.6'),
+            "version": app.config.get('APP_VERSION', '4.3.8'),
             "release_date": "02.09.2026",
             "last_updated": "2026-09-02",
             "developer": "Куреин М.Н."
@@ -235,7 +235,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.3.6",
+            "version": "4.3.8",
             "release_date": "02.09.2026",
             "last_updated": "2026-09-02",
             "developer": "Куреин М.Н."
@@ -292,7 +292,9 @@ def create_app(config_name='development'):
     app = Flask(__name__, 
                 template_folder=os.path.join(project_root, 'templates'),
                 static_folder=os.path.join(project_root, 'static'))
-    
+    from .utils.credentials import encode_secret_attr
+    app.jinja_env.filters['secret_attr'] = encode_secret_attr
+
     # Загрузка конфигурации
     app.config.from_object(config_by_name[config_name])
     app.config['IS_DESKTOP_APP'] = '--desktop' in sys.argv or os.environ.get('DESKTOP_MODE') == '1'

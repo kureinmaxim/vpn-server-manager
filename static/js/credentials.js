@@ -32,7 +32,7 @@
         if (group) {
             var secretField = group.querySelector('[data-password]');
             if (secretField) {
-                return sanitizeSecret(secretField.getAttribute('data-password'));
+                return sanitizeSecret(readSecretFromEl(secretField));
             }
             var copyField = group.querySelector('[data-copy-value]');
             if (copyField) {
@@ -96,6 +96,27 @@
         }
     }
 
+    function b64ToUtf8(b64) {
+        var bin = atob(b64);
+        var bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) {
+            bytes[i] = bin.charCodeAt(i);
+        }
+        return new TextDecoder('utf-8').decode(bytes);
+    }
+
+    function readSecretFromEl(el) {
+        var raw = el.getAttribute('data-password') || '';
+        if (el.getAttribute('data-enc') === 'b64') {
+            try {
+                return b64ToUtf8(raw);
+            } catch (err) {
+                return raw;
+            }
+        }
+        return raw;
+    }
+
     function togglePassword(button) {
         if (!button) return;
         var group = button.closest('.input-group');
@@ -104,7 +125,7 @@
             : button.previousElementSibling;
         if (!span) return;
 
-        var password = sanitizeSecret(span.getAttribute('data-password'));
+        var password = sanitizeSecret(readSecretFromEl(span));
         var eyeIcon = button.querySelector('i');
         var hidden = span.getAttribute('data-hidden') !== '0';
 
@@ -125,18 +146,65 @@
         }
     }
 
+    function applySecretInputType(input) {
+        if (!input) return;
+        var revealed = input.dataset.revealed === '1';
+        var hasValue = Boolean(input.value);
+        input.classList.toggle('has-secret-value', hasValue);
+        if (revealed) {
+            input.type = 'text';
+            return;
+        }
+        // Empty field stays type=text so the placeholder is not disc-masked
+        // (WebView/Chromium draws password dots on top of placeholder letters).
+        input.type = hasValue ? 'password' : 'text';
+    }
+
     function togglePasswordInput(button) {
         if (!button) return;
         var group = button.closest('.input-group');
         var input = group && group.querySelector('input.secret-input, input[type="password"], input[type="text"]');
         if (!input) return;
         var eyeIcon = button.querySelector('i');
-        var show = input.type === 'password';
-        input.type = show ? 'text' : 'password';
+        var revealing = input.dataset.revealed !== '1';
+        input.dataset.revealed = revealing ? '1' : '0';
+        applySecretInputType(input);
         if (eyeIcon) {
-            eyeIcon.classList.toggle('bi-eye', !show);
-            eyeIcon.classList.toggle('bi-eye-slash', show);
+            eyeIcon.classList.toggle('bi-eye', !revealing);
+            eyeIcon.classList.toggle('bi-eye-slash', revealing);
         }
+    }
+
+    function bindSecretInputMasks(root) {
+        var scope = root || document;
+        scope.querySelectorAll('input.secret-input').forEach(function (input) {
+            applySecretInputType(input);
+            if (input.dataset.maskBound === '1') return;
+            input.dataset.maskBound = '1';
+            input.addEventListener('input', function () {
+                applySecretInputType(input);
+            });
+        });
+    }
+
+    function bindSshRootHint(root) {
+        var scope = root || document;
+        var user = scope.getElementById ? scope.getElementById('ssh_user') : document.getElementById('ssh_user');
+        var col = scope.getElementById ? scope.getElementById('ssh-root-password-col') : document.getElementById('ssh-root-password-col');
+        var hint = scope.getElementById ? scope.getElementById('ssh-root-redundant-hint') : document.getElementById('ssh-root-redundant-hint');
+        if (!user || !col) return;
+        function sync() {
+            var isRoot = (user.value || '').trim().toLowerCase() === 'root';
+            col.classList.toggle('opacity-50', isRoot);
+            if (hint) hint.classList.toggle('d-none', !isRoot);
+        }
+        if (user.dataset.rootHintBound === '1') {
+            sync();
+            return;
+        }
+        user.dataset.rootHintBound = '1';
+        user.addEventListener('input', sync);
+        sync();
     }
 
     function copyPasswordInput(button) {
@@ -175,6 +243,8 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         bindPasteSanitize(document);
+        bindSecretInputMasks(document);
+        bindSshRootHint(document);
     });
 
     global.sanitizeSecret = sanitizeSecret;
@@ -183,4 +253,6 @@
     global.togglePasswordInput = togglePasswordInput;
     global.copyPasswordInput = copyPasswordInput;
     global.bindPasteSanitize = bindPasteSanitize;
+    global.bindSecretInputMasks = bindSecretInputMasks;
+    global.bindSshRootHint = bindSshRootHint;
 })(window);
