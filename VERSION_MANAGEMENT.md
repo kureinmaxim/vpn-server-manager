@@ -13,7 +13,7 @@ The only release-version source of truth is `config/config.json.template`:
 ```json
 {
   "app_info": {
-    "version": "4.4.2",
+    "version": "4.4.3",
     "release_date": "03.09.2026",
     "last_updated": "2026-09-03"
   }
