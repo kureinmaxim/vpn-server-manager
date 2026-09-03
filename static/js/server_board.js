@@ -2,6 +2,7 @@
     'use strict';
 
     var LABELS = window.SERVER_BOARD_I18N || {};
+    var INTERACTIVE = 'a, button, input, textarea, select, form, label, .accordion-button';
 
     function postJson(url, body) {
         return fetch(url, {
@@ -12,6 +13,32 @@
             if (!response.ok) throw new Error('HTTP ' + response.status);
             return response.json();
         });
+    }
+
+    function applyArchived(card, archived) {
+        if (!card) return;
+        card.classList.toggle('is-archived', archived);
+        var button = card.querySelector('.js-archive-toggle');
+        if (!button) return;
+        button.setAttribute('data-archived', archived ? '1' : '0');
+        button.title = archived ? (LABELS.unarchive || '') : (LABELS.archive || '');
+        var icon = button.querySelector('i');
+        if (icon) {
+            icon.className = archived ? 'bi bi-archive-fill' : 'bi bi-archive';
+        }
+    }
+
+    function setExpanded(item, expanded) {
+        var card = item.querySelector('.server-preview-card');
+        if (!card) return;
+        card.classList.toggle('is-expanded', expanded);
+        item.classList.toggle('is-expanded', expanded);
+        item.classList.toggle('col-sm-6', !expanded);
+        item.classList.toggle('col-sm-12', expanded);
+        item.classList.toggle('col-lg-4', !expanded);
+        item.classList.toggle('col-xl-3', !expanded);
+        item.classList.toggle('col-lg-6', expanded);
+        item.classList.toggle('col-xl-6', expanded);
     }
 
     function bindArchiveToggles() {
@@ -26,18 +53,38 @@
                 postJson('/api/servers/' + encodeURIComponent(id) + '/archived', { archived: next })
                     .then(function (data) {
                         if (!data || !data.success) return;
-                        var card = button.closest('.server-preview-card');
-                        if (card) card.classList.toggle('is-archived', data.archived);
-                        button.setAttribute('data-archived', data.archived ? '1' : '0');
-                        button.title = data.archived ? (LABELS.unarchive || '') : (LABELS.archive || '');
-                        var icon = button.querySelector('i');
-                        if (icon) {
-                            icon.className = data.archived ? 'bi bi-archive-fill' : 'bi bi-archive';
-                        }
+                        applyArchived(button.closest('.server-preview-card'), data.archived);
                     })
                     .catch(function (err) {
                         console.error('archive toggle failed', err);
                     });
+            });
+        });
+    }
+
+    function bindCardDblClick() {
+        document.querySelectorAll('.server-preview-card').forEach(function (card) {
+            if (card.dataset.boundDbl === '1') return;
+            card.dataset.boundDbl = '1';
+            card.addEventListener('dblclick', function (event) {
+                if (event.target.closest(INTERACTIVE)) return;
+                var selection = window.getSelection && window.getSelection();
+                if (selection && String(selection).length > 0) return;
+                var item = card.closest('.server-board-item');
+                if (!item) return;
+                event.preventDefault();
+                if (card.classList.contains('is-archived')) {
+                    var id = item.getAttribute('data-server-id');
+                    postJson('/api/servers/' + encodeURIComponent(id) + '/archived', { archived: false })
+                        .then(function (data) {
+                            if (data && data.success) applyArchived(card, false);
+                        })
+                        .catch(function (err) {
+                            console.error('unarchive on dblclick failed', err);
+                        });
+                    return;
+                }
+                setExpanded(item, !card.classList.contains('is-expanded'));
             });
         });
     }
@@ -64,6 +111,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         bindArchiveToggles();
+        bindCardDblClick();
         bindSortable();
     });
 })();

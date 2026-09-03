@@ -54,8 +54,8 @@ if is_frozen:
             # Создаем минимальный .env
             with open(dotenv_path, 'w') as f:
                 f.write(f"SECRET_KEY={secret_key}\n")
-                f.write("APP_VERSION=4.4.1\n")
-                f.write("BABEL_DEFAULT_LOCALE=ru\n")
+                f.write("APP_VERSION=4.4.2\n")
+                f.write("BABEL_DEFAULT_LOCALE=en\n")
             print(f"✅ Created minimal .env at {dotenv_path}")
     
     load_dotenv(dotenv_path=dotenv_path)
@@ -107,12 +107,12 @@ def get_app_data_dir():
 class Config:
     """Базовая конфигурация"""
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-    BABEL_DEFAULT_LOCALE = os.getenv('BABEL_DEFAULT_LOCALE', 'ru')
+    BABEL_DEFAULT_LOCALE = os.getenv('BABEL_DEFAULT_LOCALE', 'en')
     BABEL_TRANSLATION_DIRECTORIES = 'translations'
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
     # Настройки приложения
-    APP_VERSION = os.getenv('APP_VERSION', '4.4.1')
+    APP_VERSION = os.getenv('APP_VERSION', '4.4.2')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     
@@ -169,6 +169,7 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     DEBUG = True
+    BABEL_DEFAULT_LOCALE = 'en'
     # Используем временные файлы для тестов
     DATA_DIR = 'test_data'
     SERVERS_FILE = 'test_servers.json.enc'

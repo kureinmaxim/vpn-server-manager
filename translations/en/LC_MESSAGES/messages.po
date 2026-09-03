@@ -6398,8 +6398,8 @@ msgstr "Paste the hoster password"
 msgid "Куреин М.Н."
 msgstr "Kurein M.N."
 
-msgid "Перетащите за ручку, чтобы поменять местами. Архив — серая карточка, данные не удаляются."
-msgstr "Drag by the handle to reorder. Archive greys the card out; nothing is deleted."
+msgid "Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — полная карточка."
+msgstr "Drag by the handle. Double-click an archived card to restore it, then double-click again for the full card."
 
 msgid "Перетащить"
 msgstr "Drag"

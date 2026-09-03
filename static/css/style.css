@@ -291,6 +291,30 @@ body:has(.server-form) .navbar.mb-4 {
     margin-bottom: 0.35rem !important;
 }
 
+.server-board-item {
+    min-width: 0;
+}
+
+.server-preview-card {
+    overflow: hidden;
+    min-width: 0;
+}
+
+.server-preview-head {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    width: 100%;
+    flex-wrap: nowrap;
+}
+
+.server-preview-title {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
 .server-preview-icon {
     width: 28px;
     height: 28px;
@@ -322,6 +346,18 @@ body:has(.server-form) .navbar.mb-4 {
 
 .server-preview-card.is-archived .card-header {
     background-color: #8a8f96 !important;
+}
+
+.server-preview-card:not(.is-expanded) .server-card-full {
+    display: none;
+}
+
+.server-preview-card.is-expanded .server-card-compact {
+    display: none;
+}
+
+.server-preview-card.is-expanded {
+    overflow: visible;
 }
 
 .server-board-ghost {

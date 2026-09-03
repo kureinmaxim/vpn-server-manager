@@ -113,6 +113,7 @@ class TestMainRoutes:
         with client.session_transaction() as sess:
             sess['authenticated'] = True
             sess['pin_verified'] = True
+            sess['language'] = 'ru'
 
         response = client.get('/settings')
 
@@ -316,3 +317,66 @@ class TestMainRoutes:
         saved = data_manager.saved_servers[0]
         assert saved['ssh_credentials']['password'] == "enc::p@ss'Word!"
         assert saved['ssh_credentials']['password_decrypted'] == "p@ss'Word!"
+
+    def test_index_renders_compact_and_full_card(self, client):
+        class StubDataManager:
+            def load_servers(self, config):
+                return [{
+                    'id': '1',
+                    'name': 'Alpha',
+                    'provider': 'TestHost',
+                    'ip_address': '10.0.0.1',
+                    'os': 'Debian',
+                    'os_icon': 'bi-server',
+                    'icon_filename': '',
+                    'status': 'Active',
+                    'archived': True,
+                    'notes': '',
+                    'docker_info': '',
+                    'software_info': '',
+                    'card_color': '#ffc107',
+                    'panel_url': '',
+                    'hoster_url': '',
+                    'specs': {'cpu': '', 'ram': '', 'disk': ''},
+                    'payment_info': {
+                        'amount': 5.0,
+                        'currency': 'USD',
+                        'next_due_date': '',
+                        'payment_period': 'Monthly',
+                        'formatted_date': 'N/A',
+                    },
+                    'ssh_credentials': {
+                        'user': 'root',
+                        'port': 22,
+                        'root_login_allowed': False,
+                        'password': '',
+                        'password_decrypted': 'secret',
+                        'root_password': '',
+                        'root_password_decrypted': '',
+                    },
+                    'panel_credentials': {
+                        'user': '', 'user_decrypted': '',
+                        'password': '', 'password_decrypted': '',
+                    },
+                    'hoster_credentials': {
+                        'login_method': 'password',
+                        'user': '', 'user_decrypted': '',
+                        'password': '', 'password_decrypted': '',
+                    },
+                    'geolocation': {'city': '', 'country': ''},
+                    'checks': {'dns_ok': False, 'streaming_ok': False},
+                }]
+
+        registry.register('data_manager', StubDataManager())
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_authenticated'] = True
+            sess['pin_verified'] = True
+
+        response = client.get('/')
+        assert response.status_code == 200
+        html = response.get_data(as_text=True)
+        assert 'server-card-compact' in html
+        assert 'server-card-full' in html
+        assert 'is-archived' in html
+        assert 'accordion-' in html
