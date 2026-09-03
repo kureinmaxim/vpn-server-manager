@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.2] - 2026-09-03
+
+### Improved
+- Double-click an archived card to restore it; double-click again to open the previous full card (credentials, accordions).
+- Fresh install defaults the UI to English (the language menu still switches to Russian or Chinese).
+
 ## [4.4.1] - 2026-09-03
 
 ### Improved
