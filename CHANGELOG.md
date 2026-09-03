@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.0] - 2026-09-03
+
+### Fixed
+- English and Chinese Edit/Add forms no longer fall back to Russian for new password labels, the Set badge, or the native file-picker caption (Windows WebView always used the OS language).
+- Footer and About show **Kurein M.N.** in English and Chinese, **Куреин М.Н.** in Russian.
+- Root-password column on Edit is no longer faded when the SSH user is `root`; the hint under the field is enough.
+
 ## [4.3.8] - 2026-09-03
 
 ### Improved
