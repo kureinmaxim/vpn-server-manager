@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/credentials.html" import file_picker %}
 
 {% block title %}{{ _('Управление данными') }}{% endblock %}
 
@@ -59,7 +60,7 @@
                     <form action="{{ url_for('main.verify_key_data') }}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="verifyFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
-                            <input type="file" class="form-control" name="verify_file" id="verifyFile" accept=".enc" required>
+                            {{ file_picker('verifyFile', 'verify_file', accept='.enc', required=True) }}
                         </div>
                         <div class="mb-3">
                             <label for="verifyKey" class="form-label">{{ _('Ключ для проверки') }}</label>
@@ -144,7 +145,7 @@
             <form action="{{ url_for('main.import_data') }}" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="dataFile" class="form-label">{{ _('Выбор файла данных') }}</label>
-                    <input type="file" class="form-control" name="data_file" id="dataFile" accept=".enc" required>
+                    {{ file_picker('dataFile', 'data_file', accept='.enc', required=True) }}
                     <div class="form-text">{{ _('Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.') }}</div>
                 </div>
                 <div class="d-grid">
@@ -174,7 +175,7 @@
                         <h6 class="text-primary">{{ _('servers.json.enc файл') }}</h6>
                 <div class="mb-3">
                             <label for="envFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
-                            <input type="file" class="form-control" name="external_file" id="envFile" accept=".enc" required style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+                            {{ file_picker('envFile', 'external_file', accept='.enc', required=True) }}
                     <div class="form-text">{{ _('Выберите зашифрованный файл данных из другой установки') }}</div>
                 </div>
                     </div>

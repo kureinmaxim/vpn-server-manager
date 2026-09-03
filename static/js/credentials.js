@@ -195,7 +195,6 @@
         if (!user || !col) return;
         function sync() {
             var isRoot = (user.value || '').trim().toLowerCase() === 'root';
-            col.classList.toggle('opacity-50', isRoot);
             if (hint) hint.classList.toggle('d-none', !isRoot);
         }
         if (user.dataset.rootHintBound === '1') {
@@ -241,10 +240,33 @@
         });
     }
 
+    function bindFilePickers(root) {
+        if (!root) return;
+        root.querySelectorAll('.js-file-picker-btn').forEach(function (button) {
+            if (button.dataset.boundFilePicker === '1') return;
+            button.dataset.boundFilePicker = '1';
+            button.addEventListener('click', function () {
+                var input = document.getElementById(button.getAttribute('data-file-picker'));
+                if (input) input.click();
+            });
+        });
+        root.querySelectorAll('.js-file-picker-input').forEach(function (input) {
+            if (input.dataset.boundFilePicker === '1') return;
+            input.dataset.boundFilePicker = '1';
+            input.addEventListener('change', function () {
+                var label = document.querySelector('[data-file-picker-name="' + input.id + '"]');
+                if (!label) return;
+                var empty = input.getAttribute('data-empty-label') || '';
+                label.textContent = (input.files && input.files[0]) ? input.files[0].name : empty;
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         bindPasteSanitize(document);
         bindSecretInputMasks(document);
         bindSshRootHint(document);
+        bindFilePickers(document);
     });
 
     global.sanitizeSecret = sanitizeSecret;
@@ -255,4 +277,5 @@
     global.bindPasteSanitize = bindPasteSanitize;
     global.bindSecretInputMasks = bindSecretInputMasks;
     global.bindSshRootHint = bindSshRootHint;
+    global.bindFilePickers = bindFilePickers;
 })(window);

@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "macros/credentials.html" import password_input, current_secret_row %}
+{% from "macros/credentials.html" import password_input, current_secret_row, file_picker %}
 
 {% block title %}{{ _('Редактировать сервер') }}{% endblock %}
 
@@ -51,7 +51,7 @@
                         <div class="col-sm-6">
                             <label for="server_icon" class="form-label">{{ _('Иконка') }}</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input class="form-control form-control-sm" type="file" id="server_icon" name="server_icon">
+                                {{ file_picker('server_icon', 'server_icon', compact=True, accept='image/png,image/jpeg,image/gif,image/webp,image/x-icon,image/bmp,.png,.jpg,.jpeg,.gif,.webp,.ico,.bmp') }}
                                 {% if server.icon_filename %}
                                 <img src="{{ url_for('main.uploaded_file', filename=server.icon_filename) }}" alt="icon" class="img-thumbnail flex-shrink-0" style="width: 32px; height: 32px; object-fit: contain;">
                                 {% endif %}
@@ -237,7 +237,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="receipt" class="form-label">{{ _('Файл нового чека') }}</label>
-                    <input class="form-control form-control-sm" type="file" id="receipt" name="receipt">
+                    {{ file_picker('receipt', 'receipt', compact=True) }}
                 </div>
                 <div class="col-md-6">
                     <label for="receipt_description" class="form-label">{{ _('Описание чека') }}</label>
@@ -283,7 +283,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="receipt_file" class="form-label">{{ _('Файл чека') }}</label>
-                        <input type="file" class="form-control" id="receipt_file" name="receipt_file" required>
+                        {{ file_picker('receipt_file', 'receipt_file', required=True) }}
                     </div>
                     <button type="submit" class="btn btn-success">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>

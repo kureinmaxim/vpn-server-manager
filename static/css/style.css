@@ -232,6 +232,10 @@ input.secret-input.has-secret-value {
     text-overflow: ellipsis;
 }
 
+.file-picker {
+    min-width: 0;
+}
+
 .server-form-bar {
     position: sticky;
     top: 0;

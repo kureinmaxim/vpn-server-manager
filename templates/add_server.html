@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% from "macros/credentials.html" import password_input %}
+{% from "macros/credentials.html" import password_input, file_picker %}
 
 {% block title %}{{ _('Добавить сервер') }}{% endblock %}
 
@@ -54,7 +54,7 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="server_icon" class="form-label">{{ _('Иконка сервера') }}</label>
-                        <input class="form-control" type="file" id="server_icon" name="server_icon">
+                        {{ file_picker('server_icon', 'server_icon', accept='image/png,image/jpeg,image/gif,image/webp,image/x-icon,image/bmp,.png,.jpg,.jpeg,.gif,.webp,.ico,.bmp') }}
                     </div>
                 </div>
 
@@ -209,7 +209,7 @@
                 <h5 class="mt-4">{{ _('Загрузка файлов') }}</h5>
                 <div class="mb-3">
                     <label for="receipt" class="form-label">{{ _('Загрузить чек об оплате') }}</label>
-                    <input class="form-control" type="file" id="receipt" name="receipt">
+                    {{ file_picker('receipt', 'receipt') }}
                 </div>
 
 
