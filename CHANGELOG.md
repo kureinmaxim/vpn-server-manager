@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.1] - 2026-09-03
+
+### Improved
+- Server list uses compact preview cards; drag the handle to reorder.
+- Archive a card (list icon or Edit checkbox) to grey it out without deleting it.
+
 ## [4.4.0] - 2026-09-03
 
 ### Fixed
