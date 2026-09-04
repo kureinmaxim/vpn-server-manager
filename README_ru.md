@@ -6,6 +6,10 @@
 
 ![VPN Server Manager](static/VPSc.png)
 
+<p align="center">
+  <img src="docs/images/03-server-board.png" alt="Доска серверов — компактные карточки" width="900">
+</p>
+
 ## Возможности
 
 - Шифрование данных через Fernet
@@ -15,6 +19,12 @@
 - SSH-мониторинг серверов
 - Многоязычный интерфейс
 - Офлайн-режим
+
+<p align="center">
+  <img src="docs/images/01-pin-lock.png" alt="Экран PIN-блокировки" width="430">
+  &nbsp;
+  <img src="docs/images/02-pin-modal.png" alt="Диалог входа по PIN" width="430">
+</p>
 
 ## Требования
 
@@ -69,6 +79,18 @@ cp config/config.json.template config.json
 python -m babel.messages.frontend compile -d translations
 python3 run.py
 ```
+
+<p align="center">
+  <img src="docs/images/04-add-server.png" alt="Добавление сервера" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/05-settings.png" alt="Настройки — ключ, импорт и экспорт" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/06-about.png" alt="О программе" width="720">
+</p>
 
 ## Запуск
 
