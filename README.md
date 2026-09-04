@@ -21,6 +21,10 @@ Language: **English** · [Русский](README_ru.md)
 
 VPN Server Manager keeps server logins, panel credentials, and hoster details in an encrypted local vault. It opens as a native desktop window (`Flask` + `PyWebView`) or in a browser. Monitoring talks to the machine over SSH — there is no always-on agent.
 
+<p align="center">
+  <img src="docs/images/03-server-board.png" alt="Server board — compact cards, drag to reorder, archive" width="900">
+</p>
+
 ## What you get
 
 | | |
@@ -31,6 +35,12 @@ VPN Server Manager keeps server logins, panel credentials, and hoster details in
 | **SSH monitoring** | Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
 | **Works offline** | The inventory stays usable without internet. Network-only actions disable themselves cleanly. |
 | **Languages** | Russian, English, and Chinese. `.po` catalogs compile on first launch. |
+
+<p align="center">
+  <img src="docs/images/01-pin-lock.png" alt="PIN lock screen" width="430">
+  &nbsp;
+  <img src="docs/images/02-pin-modal.png" alt="PIN login dialog" width="430">
+</p>
 
 ## Quick start
 
@@ -88,6 +98,18 @@ Debug:   python run.py --debug
 ```
 
 Installers (Windows setup `.exe`, macOS `.dmg`) are on the [Releases](https://github.com/kureinmaxim/vpn-server-manager/releases) page. Build steps: [BUILD.md](BUILD.md).
+
+<p align="center">
+  <img src="docs/images/04-add-server.png" alt="Add server — inventory fields, icon picker, SSH and panel credentials" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/05-settings.png" alt="Settings — encryption key, import and export" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/06-about.png" alt="About — version and developer" width="720">
+</p>
 
 ## Safety notes
 
