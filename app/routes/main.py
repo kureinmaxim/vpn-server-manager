@@ -309,40 +309,33 @@ def edit_server(server_id):
                 server['ssh_credentials']['port'] = int(request.form.get('ssh_port', 22) or 22)
                 server['ssh_credentials']['root_login_allowed'] = bool(request.form.get('root_login_allowed'))
                 
-                # Обновляем пароли SSH если указаны новые (sanitize: trim + невидимые символы)
-                new_ssh_password = sanitize_secret(request.form.get('ssh_password', ''))
-                if new_ssh_password:
-                    server['ssh_credentials']['password'] = data_manager.encrypt_data(new_ssh_password)
-                    server['ssh_credentials']['password_decrypted'] = new_ssh_password
-                
-                new_root_password = sanitize_secret(request.form.get('ssh_root_password', ''))
-                if new_root_password:
-                    server['ssh_credentials']['root_password'] = data_manager.encrypt_data(new_root_password)
-                    server['ssh_credentials']['root_password_decrypted'] = new_root_password
-                
-                # Обновляем данные панели управления
-                new_panel_user = sanitize_secret(request.form.get('panel_user', ''))
-                if new_panel_user:
-                    server['panel_credentials']['user'] = data_manager.encrypt_data(new_panel_user)
-                    server['panel_credentials']['user_decrypted'] = new_panel_user
-                
-                new_panel_password = sanitize_secret(request.form.get('panel_password', ''))
-                if new_panel_password:
-                    server['panel_credentials']['password'] = data_manager.encrypt_data(new_panel_password)
-                    server['panel_credentials']['password_decrypted'] = new_panel_password
-                
-                # Обновляем данные хостера
+                def store_secret(section, key, raw_value, clear_name):
+                    """Новое значение заменяет секрет. Пустое поле его не трогает, пока не нажата корзина."""
+                    cleaned = sanitize_secret(raw_value)
+                    if cleaned:
+                        section[key] = data_manager.encrypt_data(cleaned)
+                        section[key + '_decrypted'] = cleaned
+                    elif request.form.get(clear_name) == '1':
+                        section[key] = ''
+                        section[key + '_decrypted'] = ''
+
+                def store_login(section, form_key):
+                    """Логин панели/хостера: пустое поле стирает сохранённое значение."""
+                    if form_key not in request.form:
+                        return
+                    cleaned = sanitize_secret(request.form.get(form_key, ''))
+                    section['user'] = data_manager.encrypt_data(cleaned) if cleaned else ''
+                    section['user_decrypted'] = cleaned
+
+                store_secret(server['ssh_credentials'], 'password', request.form.get('ssh_password', ''), 'clear_ssh_password')
+                store_secret(server['ssh_credentials'], 'root_password', request.form.get('ssh_root_password', ''), 'clear_root_password')
+
+                store_login(server['panel_credentials'], 'panel_user')
+                store_secret(server['panel_credentials'], 'password', request.form.get('panel_password', ''), 'clear_panel_password')
+
                 server['hoster_credentials']['login_method'] = request.form.get('hoster_login_method', 'password')
-                
-                new_hoster_user = sanitize_secret(request.form.get('hoster_user', ''))
-                if new_hoster_user:
-                    server['hoster_credentials']['user'] = data_manager.encrypt_data(new_hoster_user)
-                    server['hoster_credentials']['user_decrypted'] = new_hoster_user
-                
-                new_hoster_password = sanitize_secret(request.form.get('hoster_password', ''))
-                if new_hoster_password:
-                    server['hoster_credentials']['password'] = data_manager.encrypt_data(new_hoster_password)
-                    server['hoster_credentials']['password_decrypted'] = new_hoster_password
+                store_login(server['hoster_credentials'], 'hoster_user')
+                store_secret(server['hoster_credentials'], 'password', request.form.get('hoster_password', ''), 'clear_hoster_password')
                 
                 # Обновляем проверки
                 server['checks']['dns_ok'] = bool(request.form.get('check_dns_ok'))

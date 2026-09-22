@@ -123,18 +123,21 @@
             <div class="col-xl-6">
                 <section class="server-form-section">
                     <h5>{{ _('SSH-доступ') }}</h5>
-                    <p class="small text-muted mb-2">{{ _('Пустое поле пароля — не менять. Вставка очищается от пробелов.') }}</p>
+                    <p class="small text-muted mb-2">{{ _('Пустое поле нового пароля — не менять. Чтобы стереть сохранённый пароль, нажмите корзину. Если на сервере только root — кнопка «Только root».') }}</p>
                     <div class="row g-2">
                         <div class="col-sm-8">
                             <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>
-                            <input type="text" class="form-control form-control-sm" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}" autocomplete="username">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" id="ssh_user" name="ssh_user" value="{{ server.ssh_credentials.user }}" autocomplete="username">
+                                <button type="button" class="btn btn-outline-secondary" onclick="useSshRootOnly()" title="{{ _('Логин станет root. Справочный пароль root, если он есть, перенесётся в пароль входа и будет удалён.') }}">{{ _('Только root') }}</button>
+                            </div>
                         </div>
                         <div class="col-sm-4">
                             <label for="ssh_port" class="form-label">{{ _('Порт') }}</label>
                             <input type="number" class="form-control form-control-sm" id="ssh_port" name="ssh_port" value="{{ server.ssh_credentials.get('port', 22) }}">
                         </div>
-                        <div class="col-sm-6">
-                            {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль входа по SSH')) }}
+                        <div class="col-12">
+                            {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль входа по SSH'), 'clear_ssh_password') }}
                             {{ password_input(
                                 'ssh_password', 'ssh_password', _('Новый пароль входа по SSH'),
                                 help_text=_('Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять.'),
@@ -143,8 +146,8 @@
                                 compact=True
                             ) }}
                         </div>
-                        <div class="col-sm-6" id="ssh-root-password-col">
-                            {{ current_secret_row(server.ssh_credentials.root_password_decrypted, _('Текущий пароль root (справка)')) }}
+                        <div class="col-12" id="ssh-root-password-col">
+                            {{ current_secret_row(server.ssh_credentials.root_password_decrypted, _('Текущий пароль root (справка)'), 'clear_root_password') }}
                             {{ password_input(
                                 'ssh_root_password', 'ssh_root_password', _('Новый пароль root (справка)'),
                                 help_text=_('Письмо хостера или su. Для статуса не используется. Оставьте пустым, чтобы не менять.'),
@@ -166,18 +169,29 @@
                 </section>
 
                 <section class="server-form-section">
-                    <h5>{{ _('Панель управления (3x-ui и др.)') }}</h5>
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                        <h5 class="mb-0 flex-grow-1">{{ _('Панель управления (3x-ui и др.)') }}</h5>
+                        <button type="button" class="btn btn-sm btn-outline-danger flex-shrink-0" onclick="clearFormSection(this)" data-confirm="{{ _('Очистить URL, логин и пароль панели? Изменения запишутся после «Сохранить».') }}">
+                            <i class="bi bi-trash"></i> {{ _('Очистить') }}
+                        </button>
+                    </div>
                     <div class="row g-2">
                         <div class="col-12">
                             <label for="panel_url" class="form-label">{{ _('URL панели') }}</label>
-                            <input type="text" class="form-control form-control-sm" id="panel_url" name="panel_url" value="{{ server.get('panel_url', '') }}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" id="panel_url" name="panel_url" value="{{ server.get('panel_url', '') }}">
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearTextField('panel_url')" title="{{ _('Очистить') }}"><i class="bi bi-x-lg"></i></button>
+                            </div>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-12 col-md-6">
                             <label for="panel_user" class="form-label">{{ _('Логин панели') }}</label>
-                            <input type="text" class="form-control form-control-sm" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}" autocomplete="off">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" id="panel_user" name="panel_user" value="{{ server.panel_credentials.user_decrypted }}" autocomplete="off">
+                                <button type="button" class="btn btn-outline-danger" onclick="clearTextField('panel_user')" title="{{ _('Очистить логин. Пустое поле сохранится.') }}"><i class="bi bi-trash"></i></button>
+                            </div>
                         </div>
-                        <div class="col-sm-6">
-                            {{ current_secret_row(server.panel_credentials.password_decrypted, _('Текущий пароль панели')) }}
+                        <div class="col-12 col-md-6">
+                            {{ current_secret_row(server.panel_credentials.password_decrypted, _('Текущий пароль панели'), 'clear_panel_password') }}
                             {{ password_input(
                                 'panel_password', 'panel_password', _('Новый пароль панели'),
                                 help_text=_('Оставьте пустым, чтобы не менять.'),
@@ -190,11 +204,19 @@
                 </section>
 
                 <section class="server-form-section">
-                    <h5>{{ _('Кабинет хостера') }}</h5>
+                    <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                        <h5 class="mb-0 flex-grow-1">{{ _('Кабинет хостера') }}</h5>
+                        <button type="button" class="btn btn-sm btn-outline-danger flex-shrink-0" onclick="clearFormSection(this)" data-confirm="{{ _('Очистить URL, логин и пароль кабинета? Изменения запишутся после «Сохранить».') }}">
+                            <i class="bi bi-trash"></i> {{ _('Очистить') }}
+                        </button>
+                    </div>
                     <div class="row g-2">
                         <div class="col-sm-8">
                             <label for="hoster_url" class="form-label">{{ _('URL кабинета') }}</label>
-                            <input type="text" class="form-control form-control-sm" id="hoster_url" name="hoster_url" value="{{ server.get('hoster_url', '') }}">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" id="hoster_url" name="hoster_url" value="{{ server.get('hoster_url', '') }}">
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearTextField('hoster_url')" title="{{ _('Очистить') }}"><i class="bi bi-x-lg"></i></button>
+                            </div>
                         </div>
                         <div class="col-sm-4">
                             <label for="hoster_login_method" class="form-label">{{ _('Способ входа') }}</label>
@@ -205,12 +227,15 @@
                                 <option value="other" {% if server.hoster_credentials.login_method == 'other' %}selected{% endif %}>{{ _('Другой') }}</option>
                             </select>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-12 col-md-6">
                             <label for="hoster_user" class="form-label" id="hoster_user_label">{{ _('Логин хостера') }}</label>
-                            <input type="text" class="form-control form-control-sm" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com" autocomplete="off">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" id="hoster_user" name="hoster_user" value="{{ server.hoster_credentials.user_decrypted }}" placeholder="user@example.com" autocomplete="off">
+                                <button type="button" class="btn btn-outline-danger" onclick="clearTextField('hoster_user')" title="{{ _('Очистить логин. Пустое поле сохранится.') }}"><i class="bi bi-trash"></i></button>
+                            </div>
                         </div>
-                        <div class="col-sm-6" id="hoster_password_field">
-                            {{ current_secret_row(server.hoster_credentials.password_decrypted, _('Текущий пароль хостера')) }}
+                        <div class="col-12 col-md-6" id="hoster_password_field">
+                            {{ current_secret_row(server.hoster_credentials.password_decrypted, _('Текущий пароль хостера'), 'clear_hoster_password') }}
                             {{ password_input(
                                 'hoster_password', 'hoster_password', _('Новый пароль хостера'),
                                 help_text=_('Оставьте пустым, чтобы не менять.'),
