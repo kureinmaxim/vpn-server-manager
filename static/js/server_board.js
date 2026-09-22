@@ -28,17 +28,21 @@
         }
     }
 
+    var COMPACT_COLS = ['col-sm-6', 'col-lg-4', 'col-xl-3'];
+    var EXPANDED_COLS = ['col-sm-12', 'col-lg-6', 'col-xl-6', 'col-12'];
+
     function setExpanded(item, expanded) {
         var card = item.querySelector('.server-preview-card');
         if (!card) return;
         card.classList.toggle('is-expanded', expanded);
         item.classList.toggle('is-expanded', expanded);
-        item.classList.toggle('col-sm-6', !expanded);
-        item.classList.toggle('col-sm-12', expanded);
-        item.classList.toggle('col-lg-4', !expanded);
-        item.classList.toggle('col-xl-3', !expanded);
-        item.classList.toggle('col-lg-6', expanded);
-        item.classList.toggle('col-xl-6', expanded);
+        COMPACT_COLS.concat(EXPANDED_COLS).forEach(function (name) {
+            item.classList.remove(name);
+        });
+        (expanded ? ['col-12'] : COMPACT_COLS).forEach(function (name) {
+            item.classList.add(name);
+        });
+        card.classList.toggle('h-100', !expanded);
     }
 
     function activateCard(card) {
@@ -55,7 +59,16 @@
                 });
             return;
         }
-        setExpanded(item, !card.classList.contains('is-expanded'));
+        var expand = !card.classList.contains('is-expanded');
+        if (expand) {
+            document.querySelectorAll('.server-board-item.is-expanded').forEach(function (other) {
+                if (other !== item) setExpanded(other, false);
+            });
+        }
+        setExpanded(item, expand);
+        if (expand && item.scrollIntoView) {
+            item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
     }
 
     function bindArchiveToggles() {

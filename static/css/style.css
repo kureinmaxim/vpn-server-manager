@@ -212,6 +212,33 @@ input.secret-input.has-secret-value {
 .server-form .form-label {
     margin-bottom: 0.15rem;
     font-size: 0.8rem;
+    overflow-wrap: anywhere;
+}
+
+.server-form [class*="col-"] {
+    min-width: 0;
+}
+
+.current-secret {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.current-secret .input-group {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
+}
+
+.current-secret .password-field {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.current-secret.is-cleared .password-field {
+    opacity: 0.4;
+    text-decoration: line-through;
 }
 
 .server-form .form-control,
@@ -258,12 +285,25 @@ input.secret-input.has-secret-value {
     margin-bottom: 0.75rem;
 }
 
-.server-form-section > h5 {
+.server-form-section > h5,
+.server-form-section > .d-flex > h5 {
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: var(--bs-secondary-color, #8aa0b5);
+    margin: 0 0 0.6rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.server-form-section > .d-flex > h5 {
+    margin-bottom: 0;
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.server-form-section > .d-flex {
     margin: 0 0 0.6rem;
     padding-bottom: 0.35rem;
     border-bottom: 1px solid var(--bs-border-color);
@@ -363,6 +403,28 @@ body:has(.server-form) .navbar.mb-4 {
 
 .server-preview-card.is-expanded {
     overflow: visible;
+}
+
+.server-board-item.is-expanded {
+    scroll-margin-top: 0.75rem;
+}
+
+.server-preview-card.is-expanded .server-card-full-body {
+    display: grid;
+    grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+    gap: 0.75rem 1.25rem;
+    align-items: start;
+}
+
+.server-preview-card.is-expanded .server-card-summary .border-bottom:last-child,
+.server-preview-card.is-expanded .server-card-summary .d-grid {
+    margin-bottom: 0 !important;
+}
+
+@media (max-width: 991.98px) {
+    .server-preview-card.is-expanded .server-card-full-body {
+        grid-template-columns: 1fr;
+    }
 }
 
 .server-board-ghost {
