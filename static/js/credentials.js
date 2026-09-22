@@ -210,6 +210,65 @@
         copyToClipboard(button);
     }
 
+    function markSecretCleared(button) {
+        var box = button && button.closest('.current-secret');
+        if (!box) return;
+        var hidden = box.querySelector('.js-clear-secret');
+        var note = box.querySelector('.js-clear-note');
+        var pending = !hidden || hidden.value !== '1';
+        if (hidden) hidden.value = pending ? '1' : '';
+        box.classList.toggle('is-cleared', pending);
+        button.classList.toggle('btn-danger', pending);
+        button.classList.toggle('btn-outline-danger', !pending);
+        if (note) note.classList.toggle('d-none', !pending);
+    }
+
+    function clearTextField(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.value = '';
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function clearFormSection(button) {
+        var section = button && button.closest('section');
+        if (!section) return;
+        var message = button.getAttribute('data-confirm') || '';
+        if (message && !window.confirm(message)) return;
+        section.querySelectorAll('input[type="text"], input[type="url"], textarea').forEach(function (el) {
+            if (el.classList.contains('secret-input')) return;
+            el.value = '';
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        section.querySelectorAll('.js-clear-secret-btn').forEach(function (btn) {
+            var box = btn.closest('.current-secret');
+            if (box && !box.classList.contains('is-cleared')) markSecretCleared(btn);
+        });
+    }
+
+    function useSshRootOnly() {
+        var user = document.getElementById('ssh_user');
+        if (user) {
+            user.value = 'root';
+            user.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        var allow = document.getElementById('root_login_allowed');
+        if (allow) allow.checked = true;
+        var rootCol = document.getElementById('ssh-root-password-col');
+        var login = document.getElementById('ssh_password');
+        var secretEl = rootCol && rootCol.querySelector('.password-field');
+        if (secretEl && login && rootCol && !rootCol.querySelector('.current-secret.is-cleared')) {
+            var secret = readSecretFromEl(secretEl);
+            if (secret) {
+                login.value = secret;
+                login.dataset.revealed = '0';
+                applySecretInputType(login);
+                var btn = rootCol.querySelector('.js-clear-secret-btn');
+                if (btn) markSecretCleared(btn);
+            }
+        }
+    }
+
     function bindPasteSanitize(root) {
         var scope = root || document;
         scope.querySelectorAll('input.secret-input, input[data-sanitize-paste]').forEach(function (input) {
@@ -350,6 +409,10 @@
     global.togglePassword = togglePassword;
     global.togglePasswordInput = togglePasswordInput;
     global.copyPasswordInput = copyPasswordInput;
+    global.markSecretCleared = markSecretCleared;
+    global.clearTextField = clearTextField;
+    global.clearFormSection = clearFormSection;
+    global.useSshRootOnly = useSshRootOnly;
     global.bindPasteSanitize = bindPasteSanitize;
     global.bindSecretInputMasks = bindSecretInputMasks;
     global.bindSshRootHint = bindSshRootHint;
