@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.5] - 2026-09-22
+
+### Improved
+- Edit form can clear a stored password, a panel or hoster login, or the whole panel and hoster block. **Root only** sets the SSH user to `root` and moves the reference root password into the login password.
+- Double-click opens one server card full width: summary on the left, SSH and the other sections on the right. The other cards stay in a compact grid.
+- The SSH copy button names the login (`ssh user@host`) and which password belongs to that command. A second button copies `ssh root@…` when the login user is not root and root SSH is allowed.
+
 ## [4.4.4] - 2026-09-03
 
 ### Fixed
