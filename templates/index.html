@@ -256,15 +256,33 @@
                             </h2>
                             <div id="collapse-ssh-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
                                 <div class="accordion-body py-2">
-                                    <div class="text-center mb-2">
+                                    {% set ssh_user = server.ssh_credentials.user or '' %}
+                                    {% set ssh_port = server.ssh_credentials.get('port', 22) %}
+                                    {% set ssh_login_cmd = 'ssh ' ~ ssh_user ~ '@' ~ server.ip_address ~ ' -p ' ~ ssh_port %}
+                                    {% set login_is_root = ssh_user|lower == 'root' %}
+                                    <div class="mb-2">
                                         <button class="btn btn-sm btn-outline-success w-100"
-                                                data-copy-value="{{ 'ssh ' ~ server.ssh_credentials.user ~ '@' ~ server.ip_address ~ ' -p ' ~ server.ssh_credentials.get('port', 22) }}"
+                                                data-copy-value="{{ ssh_login_cmd }}"
                                                 onclick="copyToClipboard(this)"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="{{ _('Копировать SSH команду подключения') }}">
-                                            <i class="bi bi-terminal"></i> {{ _('Копировать команду') }}
+                                                title="{{ _('Команда входа как %(user)s. Пароль — «Пароль входа».', user=ssh_user) }}">
+                                            <i class="bi bi-terminal"></i> {{ _('Команда для %(user)s', user=ssh_user) }}
                                         </button>
+                                        <div class="small font-monospace text-break mt-1">{{ ssh_login_cmd }}</div>
+                                        <div class="form-text">{{ _('Пароль к этой команде — «Пароль входа» ниже.') }}</div>
                                     </div>
+                                    {% if server.ssh_credentials.get('root_login_allowed') and not login_is_root %}
+                                    {% set ssh_root_cmd = 'ssh root@' ~ server.ip_address ~ ' -p ' ~ ssh_port %}
+                                    <div class="mb-2">
+                                        <button class="btn btn-sm btn-outline-secondary w-100"
+                                                data-copy-value="{{ ssh_root_cmd }}"
+                                                onclick="copyToClipboard(this)"
+                                                title="{{ _('Команда входа как root. Пароль — справочный пароль root.') }}">
+                                            <i class="bi bi-terminal"></i> {{ _('Команда для root') }}
+                                        </button>
+                                        <div class="small font-monospace text-break mt-1">{{ ssh_root_cmd }}</div>
+                                        <div class="form-text">{{ _('Пароль к этой команде — справочный пароль root.') }}</div>
+                                    </div>
+                                    {% endif %}
                                     <h6 class="text-muted small">{{ _('Пользователь') }}</h6>
                                     {% if server.ssh_credentials.user %}
                                     <div class="d-flex justify-content-between align-items-center gap-2">
