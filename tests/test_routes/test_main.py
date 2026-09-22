@@ -318,6 +318,94 @@ class TestMainRoutes:
         assert saved['ssh_credentials']['password'] == "enc::p@ss'Word!"
         assert saved['ssh_credentials']['password_decrypted'] == "p@ss'Word!"
 
+    def test_edit_server_clears_panel_login_and_password(self, client):
+        """Пустой логин и корзина пароля стирают данные панели, SSH-пароль без флага не трогают."""
+        class StubDataManager:
+            def __init__(self):
+                self.servers = [{
+                    'id': '1',
+                    'name': 'Test',
+                    'provider': 'Host',
+                    'ip_address': '127.0.0.1',
+                    'os': '',
+                    'status': 'Active',
+                    'notes': '',
+                    'docker_info': '',
+                    'software_info': '',
+                    'card_color': '#ffc107',
+                    'panel_url': 'https://panel.example',
+                    'hoster_url': 'https://host.example',
+                    'specs': {'cpu': '', 'ram': '', 'disk': ''},
+                    'payment_info': {
+                        'amount': 0.0, 'currency': 'USD',
+                        'next_due_date': '', 'payment_period': 'Monthly',
+                    },
+                    'ssh_credentials': {
+                        'user': 'mxm', 'port': 22, 'root_login_allowed': True,
+                        'password': 'enc-old-ssh', 'password_decrypted': 'old-ssh',
+                        'root_password': 'enc-old-root', 'root_password_decrypted': 'old-root',
+                    },
+                    'panel_credentials': {
+                        'user': 'enc-panel-user', 'user_decrypted': 'admin',
+                        'password': 'enc-panel-pass', 'password_decrypted': 'secret',
+                    },
+                    'hoster_credentials': {
+                        'login_method': 'google',
+                        'user': 'enc-host-user', 'user_decrypted': 'a@b.c',
+                        'password': 'enc-host-pass', 'password_decrypted': 'host-secret',
+                    },
+                    'checks': {'dns_ok': False, 'streaming_ok': False},
+                }]
+                self.saved_servers = None
+
+            def load_servers(self, config):
+                return self.servers
+
+            def get_active_data_path(self, config):
+                return 'test-data.enc'
+
+            def save_servers(self, servers, file_path):
+                self.saved_servers = copy.deepcopy(servers)
+
+            def encrypt_data(self, data):
+                return f'enc::{data}' if data else ''
+
+        data_manager = StubDataManager()
+        registry.register('data_manager', data_manager)
+        registry.register('crypto', CryptoService())
+
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+
+        response = client.post(
+            '/edit_server/1',
+            data={
+                'panel_url': '',
+                'panel_user': '',
+                'clear_panel_password': '1',
+                'hoster_url': '',
+                'hoster_user': '',
+                'hoster_login_method': 'google',
+                'clear_hoster_password': '1',
+                'clear_root_password': '1',
+                'ssh_user': 'root',
+            },
+            follow_redirects=False,
+        )
+        assert response.status_code == 302
+        saved = data_manager.saved_servers[0]
+        assert saved['panel_url'] == ''
+        assert saved['panel_credentials']['user'] == ''
+        assert saved['panel_credentials']['password'] == ''
+        assert saved['hoster_url'] == ''
+        assert saved['hoster_credentials']['user'] == ''
+        assert saved['hoster_credentials']['password'] == ''
+        assert saved['hoster_credentials']['login_method'] == 'google'
+        assert saved['ssh_credentials']['user'] == 'root'
+        assert saved['ssh_credentials']['password'] == 'enc-old-ssh'
+        assert saved['ssh_credentials']['root_password'] == ''
+
     def test_index_renders_compact_and_full_card(self, client):
         class StubDataManager:
             def load_servers(self, config):
