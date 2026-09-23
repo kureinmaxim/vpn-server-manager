@@ -3,7 +3,7 @@
 {% block head %}
 {{ super() }}
 <!-- Monitoring CSS with cache buster -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.3">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.4">
 {% endblock %}
 
 {% block content %}
@@ -194,6 +194,41 @@
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    </div>
+
+    <div class="btop-board" aria-label="{{ _('Нагрузка сервера') }}">
+        <section class="btop-box">
+            <header>
+                <span>CPU</span>
+                <strong id="btop-cpu-val">—</strong>
+            </header>
+            <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
+            <div class="btop-spark" id="btop-cpu-spark"></div>
+        </section>
+        <section class="btop-box">
+            <header>
+                <span>MEM</span>
+                <strong id="btop-mem-val">—</strong>
+            </header>
+            <div class="btop-bar"><i id="btop-mem-fill"></i></div>
+            <div class="btop-spark" id="btop-mem-spark"></div>
+        </section>
+        <section class="btop-box">
+            <header>
+                <span>NET</span>
+                <strong id="btop-net-val">MB/s</strong>
+            </header>
+            <div class="btop-net-row">
+                <span>↓</span>
+                <div class="btop-bar"><i id="btop-rx-fill"></i></div>
+                <em id="btop-rx-val">0.00</em>
+            </div>
+            <div class="btop-net-row">
+                <span>↑</span>
+                <div class="btop-bar"><i id="btop-tx-fill"></i></div>
+                <em id="btop-tx-val">0.00</em>
+            </div>
+        </section>
     </div>
 
     <div class="row g-4 monitoring-grid">
@@ -475,6 +510,7 @@ async function updateNetworkStats() {
                 txPeak = parseFloat(stats.current.upload);
                 document.getElementById('tx-peak').textContent = txPeak.toFixed(2);
             }
+            paintNetMeters(parseFloat(stats.current.download) || 0, parseFloat(stats.current.upload) || 0);
             
             document.getElementById('daily-rx').textContent = stats.daily.download;
             document.getElementById('daily-tx').textContent = stats.daily.upload;
@@ -864,10 +900,70 @@ async function updateCharts() {
             memoryChart.data.labels = labels;
             memoryChart.data.datasets[0].data = history.map(p => p.memory);
             memoryChart.update('none');
+            paintLoadMeters(history);
         }
     } catch (error) {
         console.error('Error updating charts:', error);
     }
+}
+
+function meterColor(pct) {
+    if (pct < 50) return '#3dd68c';
+    if (pct < 75) return '#e6b325';
+    return '#f07178';
+}
+
+function paintMeter(fillId, valId, pct) {
+    const fill = document.getElementById(fillId);
+    const val = document.getElementById(valId);
+    const n = Number(pct);
+    if (!fill || !val || !Number.isFinite(n)) return;
+    const clamped = Math.max(0, Math.min(100, n));
+    fill.style.width = clamped + '%';
+    fill.style.background = meterColor(clamped);
+    val.textContent = clamped.toFixed(1) + '%';
+    val.style.color = meterColor(clamped);
+}
+
+function paintSpark(id, values) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const pts = (values || []).slice(-36).map(v => Number(v) || 0);
+    el.replaceChildren();
+    const max = Math.max(1, ...pts);
+    pts.forEach(n => {
+        const bar = document.createElement('span');
+        bar.style.height = Math.max(8, (n / max) * 100) + '%';
+        bar.style.background = meterColor(n);
+        el.appendChild(bar);
+    });
+}
+
+function paintLoadMeters(history) {
+    if (!history || !history.length) return;
+    const last = history[history.length - 1];
+    paintMeter('btop-cpu-fill', 'btop-cpu-val', last.cpu);
+    paintMeter('btop-mem-fill', 'btop-mem-val', last.memory);
+    paintSpark('btop-cpu-spark', history.map(p => p.cpu));
+    paintSpark('btop-mem-spark', history.map(p => p.memory));
+}
+
+function paintNetMeters(down, up) {
+    const scale = Math.max(rxPeak, txPeak, down, up, 0.01);
+    const rx = document.getElementById('btop-rx-fill');
+    const tx = document.getElementById('btop-tx-fill');
+    const rxVal = document.getElementById('btop-rx-val');
+    const txVal = document.getElementById('btop-tx-val');
+    if (rx) {
+        rx.style.width = Math.min(100, (down / scale) * 100) + '%';
+        rx.style.background = '#7aa2f7';
+    }
+    if (tx) {
+        tx.style.width = Math.min(100, (up / scale) * 100) + '%';
+        tx.style.background = '#9ece6a';
+    }
+    if (rxVal) rxVal.textContent = down.toFixed(2);
+    if (txVal) txVal.textContent = up.toFixed(2);
 }
 
 // Show connection error

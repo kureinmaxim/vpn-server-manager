@@ -43,73 +43,106 @@ class SSHService:
             "display_name": "MTProto Proxy",
             "group": "proxy",
             "unit_candidates": ["mtproto-proxy"],
+            "hint": "scripts/install_mtproto.sh",
         },
         {
             "name": "xray",
             "display_name": "Xray (VLESS-Reality)",
             "group": "proxy",
             "unit_candidates": ["xray"],
+            "hint": "установка Xray, затем /xray_apply в боте",
         },
         {
             "name": "sing-box",
             "display_name": "Sing-box",
             "group": "proxy",
             "unit_candidates": ["sing-box", "singbox"],
+            "hint": "обычно клиент; на VPS unit sing-box не обязателен",
         },
         {
             "name": "hysteria",
             "display_name": "Hysteria2",
             "group": "proxy",
             "unit_candidates": ["hysteria-server", "hysteria"],
+            "hint": "scripts/install_hysteria2.sh",
         },
         {
             "name": "naiveproxy",
             "display_name": "NaiveProxy (Caddy)",
             "group": "proxy",
-            "unit_candidates": ["caddy", "naiveproxy", "naive"],
+            "unit_candidates": ["caddy-naive", "naiveproxy", "naive"],
+            "hint": "scripts/install_naiveproxy.sh",
+        },
+        {
+            "name": "mita",
+            "display_name": "Mieru (mita)",
+            "group": "proxy",
+            "unit_candidates": ["mita"],
+            "hint": "scripts/install_mieru.sh",
         },
         {
             "name": "tailscaled",
             "display_name": "Tailscale (mesh)",
             "group": "proxy",
             "unit_candidates": ["tailscaled", "tailscale"],
+            "hint": "curl -fsSL https://tailscale.com/install.sh | sh",
         },
-        # --- TelegramOnly: бот + HA-стек/Reticulum (группа telegramonly → секция «Системные») ---
+        # --- TelegramOnly: бот + HA-стек/Reticulum (группа telegramonly) ---
         {
             "name": "telegramonly",
             "display_name": "TelegramOnly бот/API",
             "group": "telegramonly",
             "unit_candidates": ["telegramonly"],
+            "hint": "scripts/install_telegramonly_vps.sh",
         },
         {
             "name": "ha-reticulum-bridge",
             "display_name": "HA Reticulum мост",
             "group": "telegramonly",
             "unit_candidates": ["ha-reticulum-bridge"],
+            "hint": "scripts/install_ha_stack.sh",
         },
         {
             "name": "ha-stub-grpc",
             "display_name": "HA stub gRPC",
             "group": "telegramonly",
             "unit_candidates": ["ha-stub-grpc"],
+            "hint": "scripts/install_ha_stack.sh",
         },
         {
             "name": "ha-stub-udp",
             "display_name": "HA stub UDP",
             "group": "telegramonly",
             "unit_candidates": ["ha-stub-udp"],
+            "hint": "scripts/install_ha_stack.sh",
+        },
+        {
+            "name": "ha-adapter-grpc",
+            "display_name": "HA adapter gRPC",
+            "group": "telegramonly",
+            "unit_candidates": ["ha-adapter-grpc"],
+            "hint": "scripts/install_ha_adapter.sh",
+        },
+        {
+            "name": "ha-rns-watchdog",
+            "display_name": "HA RNS watchdog",
+            "group": "telegramonly",
+            "unit_candidates": ["ha-rns-watchdog"],
+            "hint": "ставится вместе с scripts/install_ha_stack.sh",
         },
         {
             "name": "shskm-remote-cli",
             "display_name": "SHSK-M Remote CLI",
             "group": "telegramonly",
             "unit_candidates": ["shskm-remote-cli"],
+            "hint": "опционально, unit shskm-remote-cli",
         },
         {
             "name": "i2pd",
             "display_name": "i2pd (I2P для Reticulum)",
             "group": "telegramonly",
             "unit_candidates": ["i2pd"],
+            "hint": "scripts/install_i2p_bridge.sh",
         },
         # --- системные ---
         {
@@ -164,6 +197,25 @@ class SSHService:
         "dockhand": "Dockhand",
         "docker-socket-proxy": "Docker socket proxy",
     }
+    # Контейнеры, которые автоустановка TelegramOnly может поднять отдельно.
+    # Если контейнера нет — в статусе это подсказка, а не пустая строка.
+    _expected_containers = [
+        {
+            "name": "headscale",
+            "display_name": "Headscale (координатор)",
+            "hint": "docker compose, Web UI — scripts/install_headplane.sh",
+        },
+        {
+            "name": "headplane",
+            "display_name": "Headplane (Web UI)",
+            "hint": "scripts/install_headplane.sh",
+        },
+        {
+            "name": "dockhand",
+            "display_name": "Dockhand",
+            "hint": "опционально, контейнер dockhand",
+        },
+    ]
 
     def __init__(self):
         self.client: Optional[paramiko.SSHClient] = None
@@ -311,7 +363,88 @@ class SSHService:
             "enabled": enabled,
             "uptime": uptime_str,
             "unit_name": matched_name,
+            "hint": descriptor.get("hint", ""),
         }
+
+    def _collect_stack_status(self, client, docker_names: List[str]) -> List[Dict]:
+        """Весь стек TelegramOnly: транспорты, бот, HA и ожидаемые контейнеры.
+
+        Неустановленные unit'ы тоже возвращаются — статус их не прячет.
+        """
+        descriptors = [
+            d
+            for d in self._service_catalog
+            if d.get("group") in ("proxy", "telegramonly")
+        ]
+        candidate_owner = {}
+        units = []
+        for descriptor in descriptors:
+            for candidate in descriptor.get("unit_candidates", []):
+                if candidate not in candidate_owner:
+                    candidate_owner[candidate] = descriptor["name"]
+                    units.append(candidate)
+
+        states = {}
+        if units:
+            unit_args = " ".join(unit + ".service" for unit in units)
+            probe_out = self._read_command_output(
+                client,
+                "systemctl show -p Id -p LoadState -p ActiveState -- " + unit_args,
+                timeout=20,
+            )
+            block = {}
+            for line in (probe_out or "").splitlines():
+                if not line.strip():
+                    if block.get("Id"):
+                        states[block["Id"].replace(".service", "")] = block
+                    block = {}
+                    continue
+                if "=" in line:
+                    key, value = line.split("=", 1)
+                    block[key] = value.strip()
+            if block.get("Id"):
+                states[block["Id"].replace(".service", "")] = block
+
+        app_services = []
+        for descriptor in descriptors:
+            matched = None
+            for candidate in descriptor.get("unit_candidates", []):
+                state = states.get(candidate, {})
+                if state.get("LoadState") and state.get("LoadState") != "not-found":
+                    matched = (candidate, state)
+                    break
+            if matched:
+                unit, state = matched
+                status = state.get("ActiveState") or "unknown"
+            else:
+                unit = descriptor["unit_candidates"][0]
+                status = "not_installed"
+            app_services.append(
+                {
+                    "name": descriptor["name"],
+                    "display_name": descriptor["display_name"],
+                    "group": descriptor["group"],
+                    "unit_name": unit,
+                    "status": status,
+                    "hint": "" if status == "active" else descriptor.get("hint", ""),
+                }
+            )
+
+        running = set(docker_names or [])
+        for expected in self._expected_containers:
+            if expected["name"] in running:
+                continue
+            app_services.append(
+                {
+                    "name": expected["name"],
+                    "display_name": expected["display_name"],
+                    "group": "docker",
+                    "unit_name": expected["name"],
+                    "status": "not_installed",
+                    "hint": expected.get("hint", ""),
+                }
+            )
+        return app_services
 
     @staticmethod
     def _parse_cpu_used_pct(cpu_line: str) -> float:
@@ -824,42 +957,14 @@ class SSHService:
                     "containers": [],
                 }
 
-            # --- Приложения, запущенные через systemd (НЕ в Docker) ---
-            # Бот TelegramOnly может работать не контейнером, а systemd-сервисом
-            # `telegramonly` (+ HA-стек/Reticulum). Показываем их статус, чтобы
-            # отсутствие docker-контейнера telegram-helper не выглядело как
-            # «бот не запущен». Один SSH-вызов; показываем только установленные.
+            # Полный стек TelegramOnly: транспорты, бот, HA и ожидаемые
+            # контейнеры. Неустановленное тоже попадает в список — с подсказкой.
             try:
-                app_units = [
-                    d for d in self._service_catalog if d.get("group") == "telegramonly"
-                ]
-                by_unit = {d["unit_candidates"][0]: d for d in app_units}
-                unit_args = " ".join(u + ".service" for u in by_unit)
-                probe_out = self._read_command_output(
-                    client,
-                    f"systemctl list-units --type=service --all --no-legend {unit_args} 2>/dev/null",
-                    timeout=15,
+                stats["app_services"] = self._collect_stack_status(
+                    client, stats.get("docker", {}).get("names", [])
                 )
-                app_services = []
-                for probe_line in probe_out.splitlines():
-                    probe_line = probe_line.lstrip("●").strip()
-                    parts = probe_line.split()
-                    if len(parts) < 3 or parts[1] == "not-found":
-                        continue
-                    unit = parts[0].replace(".service", "")
-                    desc = by_unit.get(unit)
-                    if not desc:
-                        continue
-                    app_services.append(
-                        {
-                            "name": desc["name"],
-                            "display_name": desc["display_name"],
-                            "unit_name": unit,
-                            "status": parts[2],  # active / inactive / failed
-                        }
-                    )
-                stats["app_services"] = app_services
             except Exception:
+                logger.exception("Failed to collect TelegramOnly stack status")
                 stats["app_services"] = []
 
             logger.info(f"Successfully collected stats from {ip}")
