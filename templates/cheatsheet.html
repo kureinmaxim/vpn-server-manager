@@ -17,6 +17,7 @@
                 <div class="col-md-6">
                     <h6 class="text-muted mb-3">{{ _('Основные разделы') }}</h6>
                     <ul class="list-unstyled">
+                        <li><a href="#htop-btop" class="text-decoration-none">📈 {{ _('Интерактивный обзор (htop / btop)') }}</a></li>
                         <li><a href="#quick-summary" class="text-decoration-none">📊 {{ _('Быстрая сводка') }}</a></li>
                         <li><a href="#installed-software" class="text-decoration-none">📦 {{ _('Установленное ПО') }}</a></li>
                         <li><a href="#key-utilities" class="text-decoration-none">🔧 {{ _('Ключевые утилиты') }}</a></li>
@@ -39,6 +40,45 @@
         </div>
     </div>
     
+    <div class="card mb-4" id="htop-btop">
+        <div class="card-header">
+            <h5 class="mb-0">{{ _('Интерактивный обзор (htop / btop)') }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <p class="mb-0">{{ _('htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q.') }}</p>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>{{ _('Запустить htop') }}</strong> ({{ _('легче, хватает на 1 ГБ RAM') }})</p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">htop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>{{ _('Запустить btop') }}</strong> ({{ _('нагляднее, но тяжелее') }})</p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">btop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>{{ _('Установить htop') }}</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt-get update && sudo apt-get install -y htop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <p class="mb-1"><strong>{{ _('Установить btop') }}</strong></p>
+                <div class="position-relative">
+                    <pre><code class="language-bash">sudo apt-get update && sudo apt-get install -y btop</code></pre>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn" style="position: absolute; top: 0.5rem; right: 0.5rem;"><i class="bi bi-clipboard"></i></button>
+                </div>
+            </li>
+        </ul>
+    </div>
+
     <div class="card mb-4" id="quick-summary">
         <div class="card-header">
             <h5 class="mb-0">{{ _('Быстрая сводка') }}</h5>
