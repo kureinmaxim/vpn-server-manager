@@ -6398,8 +6398,8 @@ msgstr "Paste the hoster password"
 msgid "Куреин М.Н."
 msgstr "Kurein M.N."
 
-msgid "Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — полная карточка."
-msgstr "Drag by the handle. Double-click an archived card to restore it, then double-click again for the full card."
+msgid "Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — карточка на всю ширину. Повторный двойной клик сворачивает."
+msgstr "Drag by the handle. Double-click: restore from archive, again for a full-width card. Another double-click collapses it."
 
 msgid "Перетащить"
 msgstr "Drag"
@@ -6424,3 +6424,27 @@ msgstr "Remove icon"
 
 msgid "После выбора файла или выделения экрана сразу видно превью."
 msgstr "After you pick a file or select a screen region, the preview appears immediately."
+
+msgid "Интерактивный обзор (htop / btop)"
+msgstr "Interactive overview (htop / btop)"
+
+msgid "htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q."
+msgstr "htop and btop show CPU, memory, load, and processes on one screen — faster than a pile of one-off commands. On a small VPS prefer htop: it is lighter. Press q to quit."
+
+msgid "Запустить htop"
+msgstr "Run htop"
+
+msgid "легче, хватает на 1 ГБ RAM"
+msgstr "lighter, fine on 1 GB RAM"
+
+msgid "Запустить btop"
+msgstr "Run btop"
+
+msgid "нагляднее, но тяжелее"
+msgstr "clearer, but heavier"
+
+msgid "Установить htop"
+msgstr "Install htop"
+
+msgid "Установить btop"
+msgstr "Install btop"
