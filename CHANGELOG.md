@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.9] - 2026-09-23
+
+### Improved
+- Monitoring cards stay as tall as their content, and the attack IP list is no longer repeated under the counters.
+- htop and btop install commands stay visible under the load meters, each with its own copy button.
+
 ## [4.4.8] - 2026-09-23
 
 ### Improved

@@ -960,19 +960,40 @@
 
 /* Карточки по высоте контента, а не на всю строку (иначе короткие тянутся). */
 .monitoring-grid {
-    align-items: flex-start;   /* колонки по верху, без растягивания на равную высоту */
+    align-items: flex-start !important;
 }
 
 .monitoring-grid > [class*="col-"] {
-    display: block;
-}
-
-.monitoring-card {
-    width: 100%;
-}
-
-.monitoring-page .card.h-100 {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start !important;
     height: auto !important;
+}
+
+.monitoring-card,
+.monitoring-page .card,
+.monitoring-page .card.h-100,
+.monitoring-page .card-body {
+    height: auto !important;
+    min-height: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+.services-grid {
+    display: flex !important;
+    flex-direction: column;
+    align-content: flex-start;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+}
+
+.service-item {
+    flex: 0 0 auto;
+    padding: 0.4rem 0.65rem;
+}
+
+.service-header {
+    margin-bottom: 0;
 }
 
 .monitoring-caption {
@@ -1182,10 +1203,43 @@
     font-size: 0.9rem;
 }
 
+.load-tools {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(230, 179, 37, 0.12);
+    border: 1px solid rgba(230, 179, 37, 0.55);
+}
+
+.load-tools-title {
+    color: #f2d48a;
+    font-weight: 650;
+    margin-bottom: 0.55rem;
+}
+
+.load-tool-row {
+    display: grid;
+    grid-template-columns: 3.2rem minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.4rem;
+}
+
+.load-tool-row span {
+    color: #fff;
+    font-weight: 700;
+}
+
 .load-diagnosis .form-control {
     background: #0d1117;
     color: #e6edf3;
     border-color: #30363d;
+}
+
+@media (max-width: 640px) {
+    .load-tool-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 .security-brief {

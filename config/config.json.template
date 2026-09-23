@@ -1,7 +1,7 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "4.4.8",
+    "version": "4.4.9",
     "release_date": "23.09.2026",
     "last_updated": "2026-09-23",
     "developer": "Куреин М.Н.",
