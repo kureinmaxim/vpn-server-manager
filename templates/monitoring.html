@@ -3,7 +3,7 @@
 {% block head %}
 {{ super() }}
 <!-- Monitoring CSS with cache buster -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.4">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.6">
 {% endblock %}
 
 {% block content %}
@@ -97,6 +97,30 @@
 
     <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
     <div id="stats-container" style="display: none;">
+        <div id="priority-strip" class="priority-strip d-none">
+            <section id="priority-load" class="priority-card d-none">
+                <h3><i class="bi bi-speedometer2"></i> {{ _('Перегрузка') }}</h3>
+                <p id="priority-load-text" class="mb-0"></p>
+            </section>
+            <section id="priority-security" class="priority-card d-none">
+                <h3><i class="bi bi-shield-exclamation"></i> {{ _('Атаки и сбои') }}</h3>
+                <p id="priority-security-text" class="mb-2"></p>
+                <button type="button" class="btn btn-outline-warning btn-sm" id="security-brief-btn">
+                    <i class="bi bi-chat-left-text"></i> {{ _('Разобрать ситуацию') }}
+                </button>
+                <div id="security-brief" class="security-brief d-none">
+                    <h4>{{ _('Разбор') }}</h4>
+                    <pre id="security-brief-summary" class="security-brief-text"></pre>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <h4 class="mb-0">{{ _('Промпт для LLM') }}</h4>
+                        <button type="button" class="btn btn-outline-light btn-sm" id="copy-security-prompt">
+                            <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                        </button>
+                    </div>
+                    <textarea id="security-brief-prompt" class="security-brief-text mt-2" readonly rows="12"></textarea>
+                </div>
+            </section>
+        </div>
         <div class="monitoring-overview card mb-4">
             <div class="card-body">
                 <div class="overview-header">
@@ -381,8 +405,8 @@
                         <!-- Топ угроз будет добавлен динамически -->
                     </div>
 
-                    <div class="last-update">
-                        {{ _('Последнее обновление системы:') }} <span id="days-since-update">-</span> {{ _('дней назад') }}
+                    <div class="last-update" id="system-update-line">
+                        {{ _('Последнее обновление пакетов: нет данных') }}
                     </div>
                 </div>
             </div>
@@ -756,11 +780,31 @@ async function updateSecurityEvents() {
             document.getElementById('fail2ban-banned').textContent = stats.fail2ban_banned || 0;
             document.getElementById('failed-services').textContent = stats.failed_services || 0;
             document.getElementById('journal-errors').textContent = stats.error_events_24h || 0;
-            document.getElementById('days-since-update').textContent = stats.days_since_update || '-';
-            document.getElementById('summary-last-update').textContent =
-                (stats.days_since_update || stats.days_since_update === 0)
-                    ? `${stats.days_since_update} дн`
-                    : '-';
+            var updateLine = document.getElementById('system-update-line');
+            var updateSummary = document.getElementById('summary-last-update');
+            if (stats.apt_update_known && (stats.days_since_update || stats.days_since_update === 0)) {
+                if (updateLine) {
+                    updateLine.textContent = '{{ _("Последнее обновление пакетов:") }} ' + stats.days_since_update + ' {{ _("дней назад") }}';
+                }
+                if (updateSummary) updateSummary.textContent = stats.days_since_update + ' дн';
+            } else {
+                if (updateLine) updateLine.textContent = '{{ _("Последнее обновление пакетов: нет данных") }}';
+                if (updateSummary) updateSummary.textContent = '-';
+            }
+
+            var hasIncident = (stats.ssh_failures_24h || 0) > 0
+                || (stats.failed_services || 0) > 0
+                || (stats.error_events_24h || 0) > 0
+                || (stats.top_failed_ips && stats.top_failed_ips.length > 0);
+            var securityCard = document.getElementById('priority-security');
+            var securityText = document.getElementById('priority-security-text');
+            if (securityCard) securityCard.classList.toggle('d-none', !hasIncident);
+            if (securityText && hasIncident) {
+                securityText.textContent = 'SSH: ' + (stats.ssh_failures_24h || 0)
+                    + ', journal: ' + (stats.error_events_24h || 0)
+                    + ', failed unit: ' + (stats.failed_services || 0) + '.';
+            }
+            syncPriorityStrip();
             
             const sshCard = document.getElementById('ssh-failures-card');
             const updatesCard = document.getElementById('security-updates-card');
@@ -820,6 +864,41 @@ async function updateSecurityEvents() {
         console.error('Error fetching security events:', error);
     }
 }
+
+document.getElementById('security-brief-btn').addEventListener('click', async function () {
+    var button = this;
+    var panel = document.getElementById('security-brief');
+    var summaryEl = document.getElementById('security-brief-summary');
+    var promptEl = document.getElementById('security-brief-prompt');
+    button.disabled = true;
+    button.textContent = '{{ _("Собираю разбор...") }}';
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/security-brief`);
+        const data = await response.json();
+        if (!data.success) {
+            summaryEl.textContent = data.error || '{{ _("Не удалось собрать разбор") }}';
+            promptEl.value = '';
+        } else {
+            summaryEl.textContent = data.data.summary || '';
+            promptEl.value = data.data.prompt || '';
+        }
+        panel.classList.remove('d-none');
+    } catch (error) {
+        summaryEl.textContent = '{{ _("Не удалось собрать разбор") }}';
+        promptEl.value = '';
+        panel.classList.remove('d-none');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-chat-left-text"></i> {{ _("Разобрать ситуацию") }}';
+    }
+});
+
+document.getElementById('copy-security-prompt').addEventListener('click', function () {
+    var promptEl = document.getElementById('security-brief-prompt');
+    if (!promptEl.value) return;
+    navigator.clipboard.writeText(promptEl.value);
+    this.innerHTML = '<i class="bi bi-check"></i> {{ _("Скопировано") }}';
+});
 
 // Charts
 function createCharts() {
@@ -939,6 +1018,31 @@ function paintSpark(id, values) {
     });
 }
 
+function syncPriorityStrip() {
+    const strip = document.getElementById('priority-strip');
+    const load = document.getElementById('priority-load');
+    const security = document.getElementById('priority-security');
+    if (!strip || !load || !security) return;
+    const visible = !load.classList.contains('d-none') || !security.classList.contains('d-none');
+    strip.classList.toggle('d-none', !visible);
+}
+
+function paintPriorityLoad(cpu, memory) {
+    const card = document.getElementById('priority-load');
+    const text = document.getElementById('priority-load-text');
+    if (!card || !text) return;
+    const hotCpu = Number(cpu) >= 75;
+    const hotMem = Number(memory) >= 75;
+    card.classList.toggle('d-none', !(hotCpu || hotMem));
+    if (hotCpu || hotMem) {
+        const parts = [];
+        if (hotCpu) parts.push('CPU ' + Number(cpu).toFixed(1) + '%');
+        if (hotMem) parts.push('память ' + Number(memory).toFixed(1) + '%');
+        text.textContent = parts.join(', ') + '. Это уже красная зона на шкале ниже.';
+    }
+    syncPriorityStrip();
+}
+
 function paintLoadMeters(history) {
     if (!history || !history.length) return;
     const last = history[history.length - 1];
@@ -946,6 +1050,7 @@ function paintLoadMeters(history) {
     paintMeter('btop-mem-fill', 'btop-mem-val', last.memory);
     paintSpark('btop-cpu-spark', history.map(p => p.cpu));
     paintSpark('btop-mem-spark', history.map(p => p.memory));
+    paintPriorityLoad(last.cpu, last.memory);
 }
 
 function paintNetMeters(down, up) {
