@@ -982,10 +982,15 @@ def get_metrics_history(server_id):
             port=creds['port'],
             timeout=30
         )
-        
+        diagnosis = {}
+        if isinstance(history, dict):
+            diagnosis = history.get('diagnosis') or {}
+            history = history.get('points') or []
+
         return jsonify({
             'success': True,
-            'data': history
+            'data': history,
+            'diagnosis': diagnosis
         })
         
     except Exception as e:
@@ -1356,8 +1361,18 @@ exit 0
 HISTORY_FILE="/var/tmp/metrics_history.json"
 MAX_POINTS=288  # 24 часа истории (288 точек × 5 минут)
 
-# Получаем текущие метрики
-CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\\([0-9.]*\\)%* id.*/\\1/" | awk '{print 100 - $1}')
+# Один замер top -bn1 врёт: это среднее с загрузки, не текущая секунда.
+read cpu u n s i io irq sirq st rest < /proc/stat
+total1=$((u+n+s+i+io+irq+sirq+st)); idle1=$((i+io))
+sleep 1
+read cpu u n s i io irq sirq st rest < /proc/stat
+total2=$((u+n+s+i+io+irq+sirq+st)); idle2=$((i+io))
+dt=$((total2-total1)); di=$((idle2-idle1))
+if [ "$dt" -gt 0 ]; then
+  CPU_USAGE=$(awk -v dt="$dt" -v di="$di" 'BEGIN { printf "%.1f", (100*(dt-di)/dt) }')
+else
+  CPU_USAGE=0
+fi
 MEM_USAGE=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100}')
 TIMESTAMP=$(date +%s)
 

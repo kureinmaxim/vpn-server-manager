@@ -420,3 +420,18 @@ class TestSSHService:
         assert "PasswordAuthentication" in brief["summary"]
         assert "Не предлагай атаки" in brief["prompt"]
         assert "super-secret-value" not in brief["prompt"]
+
+    def test_load_diagnosis_asks_for_htop_when_both_tools_missing(self):
+        service = SSHService()
+        sample = "LOAD 0.02 0.08 0.10\nPROC sshd 1.2\n"
+        with patch.object(service, "_read_command_output", return_value=sample):
+            diagnosis = service._read_load_diagnosis(Mock(), 87.1)
+        assert diagnosis["need_tools"] is True
+        assert diagnosis["load"] == ["0.02", "0.08", "0.10"]
+        assert diagnosis["top"][0]["cmd"] == "sshd"
+
+        sample_with_tool = sample + "TOOL btop\n"
+        with patch.object(service, "_read_command_output", return_value=sample_with_tool):
+            diagnosis = service._read_load_diagnosis(Mock(), 12.0)
+        assert diagnosis["need_tools"] is False
+        assert diagnosis["btop"] is True
