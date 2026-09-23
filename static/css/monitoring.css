@@ -1,4 +1,29 @@
-/* VPN Server Manager - Monitoring Styles v2.4 */
+/* VPN Server Manager - Monitoring Styles v2.6 */
+
+.priority-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.priority-card {
+    background: linear-gradient(180deg, rgba(65, 24, 30, 0.92), rgba(32, 16, 20, 0.94));
+    border: 1px solid rgba(255, 107, 107, 0.55);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    color: #f8e8e8;
+}
+
+.priority-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.35rem;
+}
+
+.priority-card p {
+    color: #f0d0d0;
+    font-size: 0.92rem;
+}
 
 .btop-board {
     display: grid;
@@ -1140,6 +1165,37 @@
 .event-card.warning {
     border: 1px solid rgba(255, 107, 107, 0.45);
     background: linear-gradient(180deg, rgba(65, 24, 30, 0.78), rgba(45, 19, 26, 0.88));
+}
+
+.security-brief {
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(24, 37, 54, 0.92), rgba(16, 28, 41, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #dce7f4;
+}
+
+.security-brief h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.4rem;
+}
+
+.security-brief-text {
+    width: 100%;
+    max-height: 22rem;
+    overflow: auto;
+    white-space: pre-wrap;
+    color: #e8eef6;
+    background: rgba(8, 14, 22, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 0.82rem;
+}
+
+#security-brief-btn {
+    margin-top: 0.75rem;
 }
 
 .top-threats,
