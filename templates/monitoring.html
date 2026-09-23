@@ -3,7 +3,7 @@
 {% block head %}
 {{ super() }}
 <!-- Monitoring CSS with cache buster -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.8">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=3.0">
 {% endblock %}
 
 {% block content %}
@@ -256,20 +256,24 @@
     </div>
     <div id="load-diagnosis" class="load-diagnosis">
         <p id="load-diagnosis-text" class="mb-2">{{ _('Считаю загрузку по /proc/stat и load average…') }}</p>
-        <div id="load-tools" class="d-none">
-            <div class="small mb-1">{{ _('Для списка процессов поставьте htop или btop:') }}</div>
-            <div class="input-group input-group-sm">
-                <input type="text" class="form-control font-monospace" id="load-tools-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop btop">
-                <button class="btn btn-outline-light" type="button" onclick="copyCommand('load-tools-cmd')">
-                    <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
-                </button>
+        <div id="load-tools" class="load-tools">
+            <div class="load-tools-title">{{ _('Команды htop и btop') }}</div>
+            <div class="load-tool-row">
+                <span>htop</span>
+                <input type="text" class="form-control font-monospace" id="load-htop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop">
+                <button class="btn btn-warning" type="button" onclick="copyCommand('load-htop-cmd')">{{ _('Копировать') }}</button>
+            </div>
+            <div class="load-tool-row">
+                <span>btop</span>
+                <input type="text" class="form-control font-monospace" id="load-btop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y btop">
+                <button class="btn btn-warning" type="button" onclick="copyCommand('load-btop-cmd')">{{ _('Копировать') }}</button>
             </div>
         </div>
     </div>
 
     <div class="row g-4 monitoring-grid">
         <div class="col-12 col-xxl-7">
-            <div class="network-traffic card monitoring-card h-100">
+            <div class="network-traffic card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
                     <div class="mb-2 monitoring-caption">
@@ -294,7 +298,7 @@
             </div>
         </div>
         <div class="col-12 col-xxl-5">
-            <div class="firewall-status card monitoring-card h-100">
+            <div class="firewall-status card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-shield-check"></i> {{ _('Статус брандмауэра') }}</h3>
                     <div class="firewall-info">
@@ -318,7 +322,7 @@
             </div>
         </div>
         <div class="col-12 col-xl-5">
-            <div class="active-services card monitoring-card h-100 mb-4">
+            <div class="active-services card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-router"></i> {{ _('VPN / Proxy сервисы') }}</h3>
                     <div id="proxy-services-list" class="services-grid">
@@ -326,7 +330,7 @@
                     </div>
                 </div>
             </div>
-            <div class="telegramonly-stack card monitoring-card h-100 mb-4">
+            <div class="telegramonly-stack card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-stack"></i> {{ _('TelegramOnly стек') }}</h3>
                     <div id="telegramonly-services-list" class="services-grid">
@@ -334,7 +338,7 @@
                     </div>
                 </div>
             </div>
-            <div class="reticulum-status card monitoring-card h-100">
+            <div class="reticulum-status card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-broadcast"></i> {{ _('Reticulum / HA-стек') }}</h3>
                     <div id="reticulum-status" class="services-grid">
@@ -342,7 +346,7 @@
                     </div>
                 </div>
             </div>
-            <div class="webpanels card monitoring-card h-100 mt-4">
+            <div class="webpanels card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-window-stack"></i> {{ _('Web-панели (SSH-туннель)') }}</h3>
                     <div id="webpanels-list" class="services-grid">
@@ -352,7 +356,7 @@
             </div>
         </div>
         <div class="col-12 col-xl-7">
-            <div class="active-services card monitoring-card h-100">
+            <div class="active-services card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-gear"></i> {{ _('Системные сервисы') }}</h3>
                     <div id="services-list" class="services-grid">
@@ -360,7 +364,7 @@
                     </div>
                 </div>
             </div>
-            <div class="security-events card monitoring-card h-100">
+            <div class="security-events card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
                     <div class="events-grid">
@@ -411,10 +415,6 @@
                                 <div class="event-label">{{ _('Ошибки journal') }}</div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="top-threats" id="top-threats">
-                        <!-- Топ угроз будет добавлен динамически -->
                     </div>
 
                     <div class="last-update" id="system-update-line">
@@ -648,12 +648,13 @@ async function updateServicesStatus() {
                     statusText = 'failed';
                 }
 
+                var uptime = (service.status === 'not_installed') ? '' : (service.uptime && service.uptime !== '-' ? service.uptime : '');
                 serviceEl.innerHTML = `
                     <div class="service-header">
                         <span class="service-name">${service.display_name || service.name}</span>
                         <span class="service-status">${statusIcon} ${statusText}</span>
                     </div>
-                    <div class="service-uptime">${service.uptime || '-'}</div>
+                    ${uptime ? '<div class="service-uptime">' + uptime + '</div>' : ''}
                 `;
 
                 target.appendChild(serviceEl);
@@ -762,7 +763,7 @@ async function updateWebpanels() {
                             <a href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} ↗</a>
                         </div>`;
             } else {
-                body = `<div class="service-uptime text-muted">{{ _('Сервис не запущен на сервере — туннель и «Открыть» недоступны.') }}</div>`;
+                body = '';
             }
             html += `<div class="service-item ${p.running ? 'active' : ''}">
                         <div class="service-header">
@@ -832,45 +833,6 @@ async function updateSecurityEvents() {
             failedServicesCard.classList.toggle('warning', (stats.failed_services || 0) > 0);
             journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) > 0);
             
-            const threatsContainer = document.getElementById('top-threats');
-            let threatHtml = '';
-
-            if (stats.top_failed_ips && stats.top_failed_ips.length > 0) {
-                threatHtml += '<h4>{{ _("Top атакующих IP:") }}</h4>';
-                stats.top_failed_ips.forEach(item => {
-                    threatHtml += `
-                        <div class="threat-item">
-                            <span class="threat-ip">${item.ip}</span>
-                            <span class="threat-count">${item.count} {{ _("попыток") }}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            const summaryItems = [];
-            if ((stats.fail2ban_banned || 0) > 0) {
-                summaryItems.push(`{{ _("Сейчас забаненных IP через fail2ban:") }} <strong>${stats.fail2ban_banned}</strong>`);
-            }
-            if ((stats.failed_services || 0) > 0) {
-                summaryItems.push(`{{ _("Есть failed systemd unit'ы:") }} <strong>${stats.failed_services}</strong>`);
-            }
-            if ((stats.error_events_24h || 0) > 0) {
-                summaryItems.push(`{{ _("Ошибок в journal за 24ч:") }} <strong>${stats.error_events_24h}</strong>`);
-            }
-
-            if (summaryItems.length > 0) {
-                threatHtml += `
-                    <div class="mt-3 small text-muted">
-                        ${summaryItems.join('<br>')}
-                    </div>
-                `;
-            }
-
-            if (!threatHtml) {
-                threatHtml = '<div class="small text-muted">{{ _("Критичных событий не обнаружено") }}</div>';
-            }
-
-            threatsContainer.innerHTML = threatHtml;
         }
     } catch (error) {
         console.error('Error fetching security events:', error);
@@ -1055,7 +1017,16 @@ function paintLoadDiagnosis(diagnosis) {
     }
     if (procs) line += ' Сейчас в топе: ' + procs + '.';
     text.textContent = line;
-    if (tools) tools.classList.toggle('d-none', !(diagnosis.need_tools));
+    if (tools) {
+        var bothInstalled = diagnosis.htop && diagnosis.btop;
+        tools.classList.toggle('is-installed', !!bothInstalled);
+        var title = tools.querySelector('.load-tools-title');
+        if (title) {
+            title.textContent = bothInstalled
+                ? '{{ _("htop и btop уже стоят. Команды установки:") }}'
+                : '{{ _("Команды htop и btop") }}';
+        }
+    }
 }
 
 function paintPriorityLoad(cpu, memory) {
