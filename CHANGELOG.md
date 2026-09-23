@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.7] - 2026-09-23
+
+### Improved
+- Monitoring puts overload and attacks at the top of the page. When either is present, **Review the situation** builds a secret-free summary and a prompt that can be copied into an LLM.
+
 ## [4.4.6] - 2026-09-23
 
 ### Improved

@@ -382,3 +382,41 @@ class TestSSHService:
         assert "install_mieru" in by_name["mita"]["hint"]
         assert by_name["headscale"]["status"] == "not_installed"
         assert by_name["headplane"]["group"] == "docker"
+
+    def test_security_brief_hides_secrets_and_states_the_attack(self):
+        """Разбор называет перебор SSH и не тащит секреты в промпт."""
+        service = SSHService()
+        samples = service._summarize_journal_errors(
+            "Sep 23 12:00:01 host sshd[10]: Failed password for root from 165.227.238.235\n"
+            "Sep 23 12:00:02 host app[11]: token=super-secret-value failed\n"
+        )
+        assert samples
+        assert all("super-secret-value" not in item["message"] for item in samples)
+
+        brief = service.build_security_brief(
+            {
+                "ssh_failures_24h": 6892,
+                "top_failed_ips": [{"ip": "165.227.238.235", "count": 6892}],
+                "failed_units": ["nginx.service"],
+                "journal_samples": samples,
+                "error_events_24h": 119,
+                "fail2ban_banned": 0,
+                "fail2ban_installed": False,
+                "apt_update_known": False,
+                "days_since_update": None,
+                "security_updates_available": 0,
+                "sshd": {
+                    "password_authentication": "yes",
+                    "permit_root_login": "yes",
+                    "port": "22",
+                },
+            },
+            server_name="srv",
+            server_ip="167.148.88.215",
+        )
+        assert brief["has_incident"] is True
+        assert "165.227.238.235" in brief["summary"]
+        assert "nginx.service" in brief["summary"]
+        assert "PasswordAuthentication" in brief["summary"]
+        assert "Не предлагай атаки" in brief["prompt"]
+        assert "super-secret-value" not in brief["prompt"]

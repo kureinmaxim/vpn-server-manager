@@ -1479,8 +1479,10 @@ class SSHService:
                 "stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null"
             )
             last_update_timestamp = stdout.read().decode("utf-8").strip()
-            days_since_update = 0
+            apt_update_known = False
+            days_since_update = None
             if last_update_timestamp.isdigit():
+                apt_update_known = True
                 days_since_update = (
                     int(time.time()) - int(last_update_timestamp)
                 ) // 86400
@@ -1540,6 +1542,7 @@ class SSHService:
                 "top_failed_ips": top_failed_ips,
                 "security_updates_available": security_updates,
                 "days_since_update": days_since_update,
+                "apt_update_known": apt_update_known,
                 "new_open_ports": new_open_ports,
                 "fail2ban_banned": fail2ban_banned,
                 "failed_services": failed_services,
@@ -1553,7 +1556,8 @@ class SSHService:
                 "ssh_failures_24h": 0,
                 "top_failed_ips": [],
                 "security_updates_available": 0,
-                "days_since_update": 0,
+                "days_since_update": None,
+                "apt_update_known": False,
                 "new_open_ports": 0,
                 "fail2ban_banned": 0,
                 "failed_services": 0,
@@ -1561,6 +1565,252 @@ class SSHService:
                 "timestamp": int(time.time()),
                 "error": str(e),
             }
+
+    _secret_in_log = re.compile(
+        r"(?i)(password|passwd|token|secret|api[_-]?key|authorization|bearer)\s*[=:]\s*\S+"
+    )
+
+    @classmethod
+    def _redact_log_line(cls, line: str) -> str:
+        if "PRIVATE KEY" in line or "BEGIN OPENSSH" in line:
+            return "[скрыто: ключевой материал]"
+        cleaned = cls._secret_in_log.sub(lambda match: match.group(1) + "=[скрыто]", line)
+        return re.sub(r"\s+", " ", cleaned).strip()[:180]
+
+    @classmethod
+    def _summarize_journal_errors(cls, text: str, limit: int = 8) -> List[Dict]:
+        """Свернуть повторяющиеся ошибки журнала, без IP и секретов."""
+        counts = {}
+        order = []
+        for raw in (text or "").splitlines():
+            line = cls._redact_log_line(raw)
+            if not line or line.startswith("--"):
+                continue
+            message = re.sub(r"^\w{3}\s+\d+\s+\S+\s+\S+\s+", "", line)
+            message = re.sub(r"\[\d+\]", "", message)
+            message = re.sub(r"\b\d{1,3}(?:\.\d{1,3}){3}\b", "IP", message)
+            message = re.sub(r"\s+", " ", message).strip()
+            if not message:
+                continue
+            unit_match = re.search(r"([\w.@+-]+\.(?:service|scope))", message)
+            unit = unit_match.group(1) if unit_match else ""
+            key = (unit, message[:140])
+            if key not in counts:
+                counts[key] = 0
+                order.append(key)
+            counts[key] += 1
+        ranked = sorted(order, key=lambda item: counts[item], reverse=True)[:limit]
+        return [
+            {"unit": unit or "journal", "message": message, "count": counts[(unit, message)]}
+            for unit, message in ranked
+        ]
+
+    def get_security_brief(
+        self,
+        ip: str,
+        user: str,
+        password: str,
+        port: int = 22,
+        timeout: int = 30,
+        server_name: str = "",
+    ) -> Dict:
+        """Разбор ситуации и промпт для LLM. Секреты из журнала вырезаются."""
+        facts = self.get_security_events(ip, user, password, port, timeout)
+        try:
+            client = self.get_connection_pooled(ip, port, user, password)
+            failed_raw = self._read_command_output(
+                client,
+                "systemctl --failed --no-legend --plain --no-pager 2>/dev/null | awk '{print $1}' | head -15",
+                timeout=10,
+            )
+            facts["failed_units"] = [
+                name
+                for name in failed_raw.split()
+                if re.match(r"^[\w@.+-]+\.(service|socket|mount|timer)$", name)
+            ]
+            journal_raw = self._read_command_output(
+                client,
+                'sudo journalctl --since "24 hours ago" -p err..alert --no-pager -o short -n 250 2>/dev/null',
+                timeout=20,
+            )
+            facts["journal_samples"] = self._summarize_journal_errors(journal_raw)
+            sshd_raw = self._read_command_output(
+                client,
+                "sudo sshd -T 2>/dev/null | grep -E '^(passwordauthentication|permitrootlogin|port) '",
+                timeout=10,
+            )
+            sshd = {
+                "password_authentication": "unknown",
+                "permit_root_login": "unknown",
+                "port": "unknown",
+            }
+            for line in sshd_raw.splitlines():
+                key, _, value = line.partition(" ")
+                if key == "passwordauthentication":
+                    sshd["password_authentication"] = value.strip() or "unknown"
+                elif key == "permitrootlogin":
+                    sshd["permit_root_login"] = value.strip() or "unknown"
+                elif key == "port":
+                    sshd["port"] = value.strip() or "unknown"
+            facts["sshd"] = sshd
+            fail2ban_bin = self._read_command_output(
+                client,
+                "command -v fail2ban-client >/dev/null 2>&1 && echo yes || echo no",
+                timeout=10,
+            )
+            facts["fail2ban_installed"] = fail2ban_bin.strip() == "yes"
+        except Exception:
+            logger.exception("Security brief extras failed for %s", ip)
+            facts.setdefault("failed_units", [])
+            facts.setdefault("journal_samples", [])
+            facts.setdefault("sshd", {})
+            facts.setdefault("fail2ban_installed", None)
+        return self.build_security_brief(facts, server_name=server_name, server_ip=ip)
+
+    @staticmethod
+    def build_security_brief(
+        facts: Dict, server_name: str = "", server_ip: str = ""
+    ) -> Dict:
+        """Текст разбора и промпт. Только защита этого хоста, без шагов атаки."""
+        ssh_failures = int(facts.get("ssh_failures_24h") or 0)
+        top_ips = facts.get("top_failed_ips") or []
+        failed_units = facts.get("failed_units") or []
+        journal_samples = facts.get("journal_samples") or []
+        error_events = int(facts.get("error_events_24h") or 0)
+        banned = int(facts.get("fail2ban_banned") or 0)
+        updates = int(facts.get("security_updates_available") or 0)
+        apt_known = bool(facts.get("apt_update_known"))
+        days = facts.get("days_since_update")
+        sshd = facts.get("sshd") or {}
+        fail2ban_installed = facts.get("fail2ban_installed")
+        host = server_name or server_ip or "VPS"
+        if server_name and server_ip:
+            host = f"{server_name} ({server_ip})"
+
+        ip_lines = [
+            f"- {item.get('ip')}: {item.get('count')} неудачных попыток входа"
+            for item in top_ips
+            if item.get("ip")
+        ] or ["- источников с Failed password не выделено"]
+        unit_lines = [f"- {name}" for name in failed_units] or ["- имён failed-unit нет"]
+        journal_lines = [
+            f"- {item.get('count')}× {item.get('unit')}: {item.get('message')}"
+            for item in journal_samples
+        ] or ["- повторяющихся текстов ошибок нет"]
+
+        if apt_known and days is not None:
+            apt_line = f"штамп apt обновлялся {days} дн. назад"
+        else:
+            apt_line = "штампа успешного apt update нет, срок обновления неизвестен"
+
+        password_auth = sshd.get("password_authentication", "unknown")
+        root_login = sshd.get("permit_root_login", "unknown")
+        ssh_port = sshd.get("port", "unknown")
+
+        actions = []
+        if ssh_failures > 0:
+            actions.append(
+                "Неудачные пароли SSH — это перебор с интернета, не доказанный вход. "
+                "Смотреть нужно отказ, а не эти адреса как цель."
+            )
+        if ssh_failures >= 50 and banned == 0:
+            if fail2ban_installed is True:
+                actions.append(
+                    "Fail2ban установлен, но сейчас никого не банит. Проверить jail sshd: он должен быть включён."
+                )
+            elif fail2ban_installed is False:
+                actions.append(
+                    "Fail2ban не найден. Для такого числа попыток его стоит поставить на jail sshd, а не банить адреса вручную."
+                )
+        if password_auth == "yes":
+            actions.append(
+                "sshd принимает пароль. После входа по ключу выключить PasswordAuthentication."
+            )
+        if root_login == "yes":
+            actions.append(
+                "Root по паролю разрешён. Оставить вход root только по ключу или запретить его."
+            )
+        if failed_units:
+            actions.append(
+                "Один failed unit — отдельный сбой службы. Имя ниже; смотреть systemctl status и журнал этой службы, не перезапускать всё подряд."
+            )
+        if error_events > 20 and journal_samples:
+            actions.append(
+                "Большое число ошибок журнала часто одно и то же сообщение, повторённое много раз. Сначала смотреть список повторов ниже."
+            )
+        if updates > 0:
+            actions.append(
+                f"Доступно обновлений с пометкой security: {updates}. Их стоит поставить отдельно от разбора атак."
+            )
+        if not apt_known:
+            actions.append(
+                "Дата обновления пакетов неизвестна: нет /var/lib/apt/periodic/update-success-stamp."
+            )
+        if not actions:
+            actions.append("За последние сутки явных атак и failed-служб в этих счётчиках нет.")
+
+        summary = "\n".join(
+            [
+                f"Хост: {host}",
+                f"Неудачные SSH за 24 ч: {ssh_failures}",
+                "Источники:",
+                *ip_lines,
+                f"Fail2ban, сейчас в бане: {banned}"
+                + (
+                    " (клиент fail2ban не найден)"
+                    if fail2ban_installed is False
+                    else ""
+                ),
+                f"SSH: порт {ssh_port}, пароль {password_auth}, root {root_login}",
+                f"Failed unit'ы: {len(failed_units) or facts.get('failed_services') or 0}",
+                *unit_lines,
+                f"Ошибок journal за 24 ч: {error_events}",
+                "Повторы:",
+                *journal_lines,
+                f"Пакеты: {apt_line}. Обновлений security в списке apt: {updates}.",
+                "",
+                "Что делать:",
+                *[f"{index}. {text}" for index, text in enumerate(actions, start=1)],
+            ]
+        )
+
+        prompt = "\n".join(
+            [
+                "Проанализируй защищённость моего собственного VPS по фактам ниже.",
+                "Нужен разбор обороны этого хоста: что уже происходит, что проверить и в каком порядке чинить.",
+                "Не предлагай атаки, эксплойты, подбор паролей и действия против чужих IP.",
+                "Не проси и не выдумывай секреты, ключи и содержимое .env.",
+                "",
+                "Факты за последние 24 часа:",
+                summary,
+                "",
+                "Ответ дай по пунктам:",
+                "1. Что это за ситуация обычным языком.",
+                "2. Что срочно на этом сервере.",
+                "3. Что можно отложить.",
+                "4. Какие команды только для чтения имеют смысл, чтобы подтвердить вывод.",
+            ]
+        )
+        has_incident = bool(
+            ssh_failures or top_ips or failed_units or error_events or updates
+        )
+        return {
+            "summary": summary,
+            "prompt": prompt,
+            "has_incident": has_incident,
+            "facts": {
+                "ssh_failures_24h": ssh_failures,
+                "top_failed_ips": top_ips,
+                "failed_units": failed_units,
+                "error_events_24h": error_events,
+                "fail2ban_banned": banned,
+                "fail2ban_installed": fail2ban_installed,
+                "sshd": sshd,
+                "apt_update_known": apt_known,
+                "days_since_update": days,
+                "security_updates_available": updates,
+            },
+        }
 
     def get_metrics_history(
         self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
