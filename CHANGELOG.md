@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.8] - 2026-09-23
+
+### Improved
+- The LLM prompt on Monitoring is a full-width block, and CPU is shown once on the meter. The line under the meters uses a one-second `/proc/stat` sample plus load average, and offers a copyable command to install `htop` or `btop` when neither is present.
+
 ## [4.4.7] - 2026-09-23
 
 ### Improved

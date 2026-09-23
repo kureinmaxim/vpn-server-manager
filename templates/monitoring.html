@@ -3,7 +3,7 @@
 {% block head %}
 {{ super() }}
 <!-- Monitoring CSS with cache buster -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.6">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=2.8">
 {% endblock %}
 
 {% block content %}
@@ -98,27 +98,27 @@
     <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
     <div id="stats-container" style="display: none;">
         <div id="priority-strip" class="priority-strip d-none">
-            <section id="priority-load" class="priority-card d-none">
-                <h3><i class="bi bi-speedometer2"></i> {{ _('Перегрузка') }}</h3>
-                <p id="priority-load-text" class="mb-0"></p>
-            </section>
             <section id="priority-security" class="priority-card d-none">
                 <h3><i class="bi bi-shield-exclamation"></i> {{ _('Атаки и сбои') }}</h3>
                 <p id="priority-security-text" class="mb-2"></p>
                 <button type="button" class="btn btn-outline-warning btn-sm" id="security-brief-btn">
                     <i class="bi bi-chat-left-text"></i> {{ _('Разобрать ситуацию') }}
                 </button>
-                <div id="security-brief" class="security-brief d-none">
-                    <h4>{{ _('Разбор') }}</h4>
-                    <pre id="security-brief-summary" class="security-brief-text"></pre>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <h4 class="mb-0">{{ _('Промпт для LLM') }}</h4>
-                        <button type="button" class="btn btn-outline-light btn-sm" id="copy-security-prompt">
-                            <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
-                        </button>
-                    </div>
-                    <textarea id="security-brief-prompt" class="security-brief-text mt-2" readonly rows="12"></textarea>
+            </section>
+        </div>
+        <div id="security-brief" class="security-brief d-none">
+            <section class="security-brief-block">
+                <h4>{{ _('Разбор') }}</h4>
+                <pre id="security-brief-summary" class="security-brief-text"></pre>
+            </section>
+            <section class="security-brief-block">
+                <div class="security-brief-head">
+                    <h4>{{ _('Промпт для LLM') }}</h4>
+                    <button type="button" class="btn btn-outline-light btn-sm" id="copy-security-prompt">
+                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                    </button>
                 </div>
+                <pre id="security-brief-prompt" class="security-brief-text"></pre>
             </section>
         </div>
         <div class="monitoring-overview card mb-4">
@@ -221,7 +221,7 @@
     </div>
 
     <div class="btop-board" aria-label="{{ _('Нагрузка сервера') }}">
-        <section class="btop-box">
+        <section class="btop-box" id="btop-cpu-box">
             <header>
                 <span>CPU</span>
                 <strong id="btop-cpu-val">—</strong>
@@ -229,7 +229,7 @@
             <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
             <div class="btop-spark" id="btop-cpu-spark"></div>
         </section>
-        <section class="btop-box">
+        <section class="btop-box" id="btop-mem-box">
             <header>
                 <span>MEM</span>
                 <strong id="btop-mem-val">—</strong>
@@ -253,6 +253,18 @@
                 <em id="btop-tx-val">0.00</em>
             </div>
         </section>
+    </div>
+    <div id="load-diagnosis" class="load-diagnosis">
+        <p id="load-diagnosis-text" class="mb-2">{{ _('Считаю загрузку по /proc/stat и load average…') }}</p>
+        <div id="load-tools" class="d-none">
+            <div class="small mb-1">{{ _('Для списка процессов поставьте htop или btop:') }}</div>
+            <div class="input-group input-group-sm">
+                <input type="text" class="form-control font-monospace" id="load-tools-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop btop">
+                <button class="btn btn-outline-light" type="button" onclick="copyCommand('load-tools-cmd')">
+                    <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
+                </button>
+            </div>
+        </div>
     </div>
 
     <div class="row g-4 monitoring-grid">
@@ -877,15 +889,15 @@ document.getElementById('security-brief-btn').addEventListener('click', async fu
         const data = await response.json();
         if (!data.success) {
             summaryEl.textContent = data.error || '{{ _("Не удалось собрать разбор") }}';
-            promptEl.value = '';
+            promptEl.textContent = '';
         } else {
             summaryEl.textContent = data.data.summary || '';
-            promptEl.value = data.data.prompt || '';
+            promptEl.textContent = data.data.prompt || '';
         }
         panel.classList.remove('d-none');
     } catch (error) {
         summaryEl.textContent = '{{ _("Не удалось собрать разбор") }}';
-        promptEl.value = '';
+        promptEl.textContent = '';
         panel.classList.remove('d-none');
     } finally {
         button.disabled = false;
@@ -895,8 +907,8 @@ document.getElementById('security-brief-btn').addEventListener('click', async fu
 
 document.getElementById('copy-security-prompt').addEventListener('click', function () {
     var promptEl = document.getElementById('security-brief-prompt');
-    if (!promptEl.value) return;
-    navigator.clipboard.writeText(promptEl.value);
+    if (!promptEl.textContent) return;
+    navigator.clipboard.writeText(promptEl.textContent);
     this.innerHTML = '<i class="bi bi-check"></i> {{ _("Скопировано") }}';
 });
 
@@ -963,7 +975,8 @@ async function updateCharts() {
         const data = await response.json();
         
         if (data.success) {
-            const history = data.data;
+            const history = Array.isArray(data.data) ? data.data : (data.data.points || []);
+            paintLoadDiagnosis(data.diagnosis || {});
             const labels = history.map((point, index) => {
                 if (index % 10 === 0) {
                     const date = new Date(point.timestamp * 1000);
@@ -1020,27 +1033,36 @@ function paintSpark(id, values) {
 
 function syncPriorityStrip() {
     const strip = document.getElementById('priority-strip');
-    const load = document.getElementById('priority-load');
     const security = document.getElementById('priority-security');
-    if (!strip || !load || !security) return;
-    const visible = !load.classList.contains('d-none') || !security.classList.contains('d-none');
-    strip.classList.toggle('d-none', !visible);
+    if (!strip || !security) return;
+    strip.classList.toggle('d-none', security.classList.contains('d-none'));
+}
+
+function paintLoadDiagnosis(diagnosis) {
+    const text = document.getElementById('load-diagnosis-text');
+    const tools = document.getElementById('load-tools');
+    if (!text) return;
+    const cpu = Number(diagnosis.cpu);
+    const load = diagnosis.load || [];
+    const loadText = load.length ? load.join(' ') : '—';
+    const procs = (diagnosis.top || []).map(function (item) {
+        return item.cmd + ' ' + item.cpu + '%';
+    }).join(', ');
+    let line = 'CPU ' + (Number.isFinite(cpu) ? cpu.toFixed(1) + '%' : '—')
+        + ' за 1 с по /proc/stat. Load average: ' + loadText + '.';
+    if (Number.isFinite(cpu) && cpu >= 75 && load.length && Number(load[0]) < 0.7) {
+        line += ' Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная перегрузка.';
+    }
+    if (procs) line += ' Сейчас в топе: ' + procs + '.';
+    text.textContent = line;
+    if (tools) tools.classList.toggle('d-none', !(diagnosis.need_tools));
 }
 
 function paintPriorityLoad(cpu, memory) {
-    const card = document.getElementById('priority-load');
-    const text = document.getElementById('priority-load-text');
-    if (!card || !text) return;
-    const hotCpu = Number(cpu) >= 75;
-    const hotMem = Number(memory) >= 75;
-    card.classList.toggle('d-none', !(hotCpu || hotMem));
-    if (hotCpu || hotMem) {
-        const parts = [];
-        if (hotCpu) parts.push('CPU ' + Number(cpu).toFixed(1) + '%');
-        if (hotMem) parts.push('память ' + Number(memory).toFixed(1) + '%');
-        text.textContent = parts.join(', ') + '. Это уже красная зона на шкале ниже.';
-    }
-    syncPriorityStrip();
+    const cpuBox = document.getElementById('btop-cpu-box');
+    const memBox = document.getElementById('btop-mem-box');
+    if (cpuBox) cpuBox.classList.toggle('is-hot', Number(cpu) >= 75);
+    if (memBox) memBox.classList.toggle('is-hot', Number(memory) >= 75);
 }
 
 function paintLoadMeters(history) {

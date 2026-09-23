@@ -41,6 +41,11 @@
     min-width: 0;
 }
 
+.btop-box.is-hot {
+    border-color: rgba(240, 113, 120, 0.85);
+    box-shadow: inset 0 0 0 1px rgba(240, 113, 120, 0.35);
+}
+
 .btop-box header {
     display: flex;
     justify-content: space-between;
@@ -1167,31 +1172,69 @@
     background: linear-gradient(180deg, rgba(65, 24, 30, 0.78), rgba(45, 19, 26, 0.88));
 }
 
+.load-diagnosis {
+    margin: -0.25rem 0 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 8px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    font-size: 0.9rem;
+}
+
+.load-diagnosis .form-control {
+    background: #0d1117;
+    color: #e6edf3;
+    border-color: #30363d;
+}
+
 .security-brief {
-    margin-top: 1rem;
-    padding: 0.9rem 1rem;
-    border-radius: 10px;
-    background: linear-gradient(180deg, rgba(24, 37, 54, 0.92), rgba(16, 28, 41, 0.94));
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: grid;
+    gap: 0.75rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    background: transparent;
+    border: 0;
     color: #dce7f4;
 }
 
-.security-brief h4 {
+.security-brief-block {
+    padding: 0.95rem 1rem 1rem;
+    border-radius: 10px;
+    background: #161b22;
+    border: 1px solid #30363d;
+}
+
+.security-brief-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.55rem;
+}
+
+.security-brief h4,
+.security-brief-head h4 {
     font-size: 0.95rem;
-    margin-bottom: 0.4rem;
+    margin: 0 0 0.55rem;
+}
+
+.security-brief-head h4 {
+    margin: 0;
 }
 
 .security-brief-text {
     width: 100%;
-    max-height: 22rem;
-    overflow: auto;
+    margin-bottom: 0;
+    overflow: visible;
     white-space: pre-wrap;
     color: #e8eef6;
     background: rgba(8, 14, 22, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     padding: 0.75rem;
-    font-size: 0.82rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
 }
 
 #security-brief-btn {

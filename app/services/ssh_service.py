@@ -1878,21 +1878,58 @@ class SSHService:
                 history_str = json.dumps(history)
                 client.exec_command(f"echo '{history_str}' > {history_file}")
 
-            return history
+            return {
+                "points": history,
+                "diagnosis": self._read_load_diagnosis(client, cpu_usage),
+            }
 
         except Exception as e:
             logger.error(f"Error getting metrics history from {ip}: {str(e)}")
-            # Возвращаем хотя бы текущие данные
             import time
 
-            return [
-                {
-                    "timestamp": int(time.time()),
-                    "cpu": 0.0,
-                    "memory": 0.0,
-                    "error": str(e),
-                }
-            ]
+            return {
+                "points": [
+                    {
+                        "timestamp": int(time.time()),
+                        "cpu": 0.0,
+                        "memory": 0.0,
+                        "error": str(e),
+                    }
+                ],
+                "diagnosis": {},
+            }
+
+    def _read_load_diagnosis(self, client, cpu_usage: float) -> Dict:
+        """Load average и топ процессов. Процент CPU без очереди — не перегрузка."""
+        raw = self._read_command_output(
+            client,
+            "echo LOAD $(cut -d' ' -f1-3 /proc/loadavg); "
+            "command -v htop >/dev/null && echo TOOL htop; "
+            "command -v btop >/dev/null && echo TOOL btop; "
+            "ps -eo comm,%cpu --sort=-%cpu | awk 'NR>1 && NR<=4 {printf \"PROC %s %s\\n\", $1, $2}'",
+            timeout=10,
+        )
+        load = []
+        tools = set()
+        top = []
+        for line in (raw or "").splitlines():
+            parts = line.split()
+            if not parts:
+                continue
+            if parts[0] == "LOAD":
+                load = parts[1:4]
+            elif parts[0] == "TOOL" and len(parts) > 1:
+                tools.add(parts[1])
+            elif parts[0] == "PROC" and len(parts) >= 3:
+                top.append({"cmd": parts[1], "cpu": parts[2]})
+        return {
+            "cpu": cpu_usage,
+            "load": load,
+            "top": top,
+            "htop": "htop" in tools,
+            "btop": "btop" in tools,
+            "need_tools": "htop" not in tools and "btop" not in tools,
+        }
 
     def check_required_tools(
         self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
