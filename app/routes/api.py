@@ -901,6 +901,53 @@ def get_security_events(server_id):
             'error': str(e)
         }), 500
 
+@api_bp.route('/monitoring/<server_id>/security-brief', methods=['GET'])
+@require_auth
+@require_pin
+def get_security_brief(server_id):
+    """Разбор атак и сбоев плюс промпт для LLM. Секреты в текст не попадают."""
+    if not rate_limiter.is_allowed(f"server_{server_id}"):
+        return jsonify({
+            'success': False,
+            'error': 'Rate limit exceeded. Please wait a moment.'
+        }), 429
+
+    try:
+        ssh_service = registry.get('ssh')
+        data_manager = registry.get('data_manager')
+
+        if not ssh_service or not data_manager:
+            raise APIError('Required services not available')
+
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+
+        if not server or not creds:
+            return jsonify({
+                'success': False,
+                'error': f'Server {server_id} not found or credentials invalid'
+            }), 404
+
+        brief = ssh_service.get_security_brief(
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
+            timeout=40,
+            server_name=server.get('name', ''),
+        )
+
+        return jsonify({
+            'success': True,
+            'data': brief
+        })
+
+    except Exception as e:
+        logger.error(f"Error building security brief for server {server_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @api_bp.route('/monitoring/<server_id>/metrics-history', methods=['GET'])
 @require_auth
 @require_pin
