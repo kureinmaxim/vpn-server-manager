@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.6] - 2026-09-23
+
+### Improved
+- Monitoring shows CPU, memory, and network as compact meters next to the existing charts.
+- Server Status lists the whole TelegramOnly stack, including transports, the bot, the HA services, and expected containers. Missing pieces stay visible with the install script that adds them.
+
 ## [4.4.5] - 2026-09-22
 
 ### Improved

@@ -351,3 +351,34 @@ class TestSSHService:
 
         with patch.object(service, '_read_command_output', side_effect=['oops', '', '', '97.0']):
             assert service._get_cpu_used_pct(client) == 3.0
+
+    def test_collect_stack_status_keeps_missing_units(self):
+        """Статус показывает и запущенное, и то, чего на сервере нет."""
+        service = SSHService()
+        client = Mock()
+        probe = "\n".join([
+            "Id=telegramonly.service",
+            "LoadState=loaded",
+            "ActiveState=active",
+            "",
+            "Id=mita.service",
+            "LoadState=not-found",
+            "ActiveState=inactive",
+            "",
+        ])
+
+        def fake_read(_client, command, timeout=30):
+            if command.startswith("systemctl show"):
+                return probe
+            return ""
+
+        with patch.object(service, "_read_command_output", side_effect=fake_read):
+            rows = service._collect_stack_status(client, docker_names=[])
+
+        by_name = {row["name"]: row for row in rows}
+        assert by_name["telegramonly"]["status"] == "active"
+        assert by_name["telegramonly"]["hint"] == ""
+        assert by_name["mita"]["status"] == "not_installed"
+        assert "install_mieru" in by_name["mita"]["hint"]
+        assert by_name["headscale"]["status"] == "not_installed"
+        assert by_name["headplane"]["group"] == "docker"
