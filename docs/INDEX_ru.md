@@ -1,13 +1,13 @@
 # Индекс документации VPN Server Manager
 
-Документы в `docs/` на русском. В корне репозитория — английские гайды и их русские пары (`README.md` / `README_ru.md` и т.д.).
+Документы в `docs/` на русском. Обзор и версии — в английских файлах в корне репозитория.
 
 ## С чего начать
 
-- [../README_ru.md](../README_ru.md) — обзор, установка, запуск
+- [../README.md](../README.md) — обзор, установка, запуск
 - [../BUILD_ru.md](../BUILD_ru.md) — сборка
 - [../TERMINAL_HELP_ru.md](../TERMINAL_HELP_ru.md) — команды терминала
-- [../VERSION_MANAGEMENT_ru.md](../VERSION_MANAGEMENT_ru.md) — версии
+- [../VERSION_MANAGEMENT.md](../VERSION_MANAGEMENT.md) — версии
 - [release_guide_ru.md](release_guide_ru.md) — релизный процесс
 - [README_MONITORING_ru.md](README_MONITORING_ru.md) — мониторинг
 - [../CHANGELOG.md](../CHANGELOG.md) — история изменений

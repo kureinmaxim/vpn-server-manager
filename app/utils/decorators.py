@@ -15,7 +15,7 @@ def is_api_request():
     if request.is_json:
         return True
     # API пути
-    if request.path.startswith('/api/') or request.path.startswith('/server/'):
+    if request.path.startswith('/api/') or request.path.startswith('/server/') or request.path.startswith('/check_ip/'):
         return True
     # Accept заголовок указывает на JSON
     if 'application/json' in request.headers.get('Accept', ''):

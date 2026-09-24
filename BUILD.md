@@ -37,7 +37,7 @@ Windows (PowerShell): `.\venv\Scripts\Activate.ps1`
 
 ## Step 1. Bump the version (use the tool)
 
-Never edit version strings by hand. `tools/update_version.py` updates `config/config.json.template`, `vpn-manager-installer.iss` (`MyAppVersion`), `README.md`, `README_ru.md`, `env.example`, `app/config.py`, `app/__init__.py`, `setup.py`, `build_macos.py`, `docker-compose.yml`, and the bug-report template. Then add a `[X.Y.Z]` heading in `CHANGELOG.md`.
+Never edit version strings by hand. `tools/update_version.py` updates `config/config.json.template`, `vpn-manager-installer.iss` (`MyAppVersion`), `README.md`, `env.example`, `app/config.py`, `app/__init__.py`, `setup.py`, `build_macos.py`, `docker-compose.yml`, and the bug-report template. Then add a `[X.Y.Z]` heading in `CHANGELOG.md`.
 
 ```bash
 python tools/update_version.py status
@@ -147,7 +147,7 @@ pytest --cov=app tests/
 
 ## Related
 
-- [README.md](README.md) · [README_ru.md](README_ru.md)
-- [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md) · [VERSION_MANAGEMENT_ru.md](VERSION_MANAGEMENT_ru.md)
+- [README.md](README.md)
+- [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md)
 - [release_guide_ru.md](docs/release_guide_ru.md)
 - [TERMINAL_HELP.md](TERMINAL_HELP.md)

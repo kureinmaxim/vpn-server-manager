@@ -48,7 +48,7 @@ Windows (PowerShell): `.\venv\Scripts\Activate.ps1`
 Версия хранится в нескольких файлах и **должна быть синхронизирована**. Никогда
 не правьте версию вручную — используйте `tools/update_version.py`, он обновляет
 сразу всё: `config/config.json.template`, **`vpn-manager-installer.iss`**
-(`MyAppVersion`), `README.md`, `README_ru.md`, `env.example`, `app/config.py`,
+(`MyAppVersion`), `README.md`, `env.example`, `app/config.py`,
 `app/__init__.py`, `setup.py`, `build_macos.py`, `docker-compose.yml`.
 После этого добавьте заголовок в `CHANGELOG.md`.
 

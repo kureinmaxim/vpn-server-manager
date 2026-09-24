@@ -4,7 +4,7 @@
 
 Связанные документы:
 
-- `../VERSION_MANAGEMENT_ru.md`
+- `../VERSION_MANAGEMENT.md`
 - `../BUILD_ru.md`
 - `../CHANGELOG.md`
 

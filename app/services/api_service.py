@@ -47,8 +47,11 @@ class APIService:
     
     def get(self, endpoint: str = '', params: Optional[Dict] = None, 
             headers: Optional[Dict] = None) -> Dict[str, Any]:
-        """GET запрос"""
-        url = f"{self.base_url}/{endpoint.lstrip('/')}" if endpoint else self.base_url
+        """GET запрос. Полный http(s) URL не склеивается с base_url."""
+        if endpoint.startswith('http://') or endpoint.startswith('https://'):
+            url = endpoint
+        else:
+            url = f"{self.base_url}/{endpoint.lstrip('/')}" if endpoint else self.base_url
         
         try:
             logger.info(f"Making GET request to: {url}")
