@@ -1,7 +1,5 @@
 # Version management
 
-Language: **English** · [Русский](VERSION_MANAGEMENT_ru.md)
-
 How VPN Server Manager stores the app version, how to change it safely, and which files stay in sync.
 
 Related: [BUILD.md](BUILD.md) · [release_guide_ru.md](docs/release_guide_ru.md) · [CHANGELOG.md](CHANGELOG.md)
@@ -27,7 +25,7 @@ Do **not** take the version from `%APPDATA%`, `~/Library/Application Support`, a
 `tools/update_version.py` updates:
 
 - `config/config.json.template`
-- `README.md` / `README_ru.md`
+- `README.md`
 - `vpn-manager-installer.iss`
 - `env.example`
 - `app/config.py`
@@ -45,23 +43,27 @@ python tools/update_version.py sync X.Y.Z
 python tools/update_version.py bump patch|minor|major
 ```
 
-Flags: `--release-date DD.MM.YYYY`, `--last-updated YYYY-MM-YYYY`, `--dry-run`.
+Flags: `--release-date DD.MM.YYYY`, `--last-updated YYYY-MM-DD`, `--dry-run`.
+
+The script uses only the Python standard library. A project virtual environment is not required.
 
 ## Examples
 
-Windows (venv already created):
+Windows, from the project root:
 
 ```powershell
-.\venv\Scripts\python.exe tools\update_version.py status
-.\venv\Scripts\python.exe tools\update_version.py bump patch
-.\venv\Scripts\python.exe tools\update_version.py sync X.Y.Z
+python tools\update_version.py status
+python tools\update_version.py bump patch
+python tools\update_version.py sync X.Y.Z
 ```
+
+Use `.\venv\Scripts\python.exe` or `.\.venv\Scripts\python.exe` only when that folder exists. This repository does not ship a `venv`, so that path fails with `The term '.\venv\Scripts\python.exe' is not recognized`.
 
 macOS / Linux:
 
 ```bash
-venv/bin/python3 tools/update_version.py status
-venv/bin/python3 tools/update_version.py bump patch
+python3 tools/update_version.py status
+python3 tools/update_version.py bump patch
 ```
 
 After a version change: update `CHANGELOG.md`, run `status`, then build.
@@ -72,7 +74,9 @@ Build scripts read the version from `config/config.json.template` (`build_window
 
 **`status` reports drift** — run `sync`.
 
-**PowerShell: The module 'venv' could not be loaded** — use `.\venv\Scripts\python.exe`.
+**PowerShell: `.\venv\Scripts\python.exe` is not recognized** — there is no `venv` folder. Run `python tools\update_version.py status` instead.
+
+**PowerShell: The module 'venv' could not be loaded** — the command was started without `.\`. Prefer `python tools\update_version.py`.
 
 **UI version ≠ installer version** — check `config/config.json.template`, `vpn-manager-installer.iss`, `README.md`, and `status`. Someone edited one file by hand.
 

@@ -37,8 +37,8 @@
         <div>
             <h1>{{ _('Список серверов') }}</h1>
             <div class="btn-group" role="group">
-                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест IP') }}</a>
-                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info">{{ _('Тест DNS') }}</a>
+                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
+                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
             </div>
         </div>
         <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
@@ -165,8 +165,9 @@
                     </h5>
                     <div class="d-flex justify-content-between align-items-center">
                         <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
-                        {% if server.geolocation.city %}
-                        <small><i class="bi bi-geo-alt-fill"></i> {{ server.geolocation.city }}, {{ server.geolocation.country }}</small>
+                        {% set geo = server.geolocation or {} %}
+                        {% if geo.city and (not geo.ip or geo.ip == server.ip_address) %}
+                        <small><i class="bi bi-geo-alt-fill"></i> {{ geo.city }}, {{ geo.country }}</small>
                         {% endif %}
                     </div>
                 </div>
@@ -210,10 +211,10 @@
                         </div>
                     </div>
                     <div class="d-grid gap-2 mb-2">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" {% if internet_available is defined and not internet_available %}disabled title="{{ _('Требуется интернет') }}"{% endif %}>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="checkIpInfo('{{ server.ip_address }}')" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Город и провайдер IP сервера: ipinfo.io') }}{% if internet_available is defined and not internet_available %} {{ _('Требуется интернет') }}{% endif %}" {% if internet_available is defined and not internet_available %}disabled{% endif %}>
                             <i class="bi bi-search"></i> {{ _('Проверить IP') }}
                         </button>
-                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;" title="{{ _('Требуется интернет') }}"{% endif %}>
+                        <a href="{{ service_urls.get('ip2location_demo', 'https://www.ip2location.com/demo/{ip}').format(ip=server.ip_address) }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Владелец IP сервера: ip2location.com') }}{% if internet_available is defined and not internet_available %} {{ _('Требуется интернет') }}{% endif %}" {% if internet_available is defined and not internet_available %}onclick="return false;" style="pointer-events: none; opacity: 0.6;"{% endif %}>
                             <i class="bi bi-building"></i> {{ _('Владелец IP') }}
                         </a>
                     </div>
@@ -563,7 +564,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+            return new bootstrap.Tooltip(tooltipTriggerEl, { container: 'body', trigger: 'hover', delay: { show: 400, hide: 80 } });
         });
         
         // Инициализируем tooltip для кнопки проверки интернета
@@ -619,13 +620,30 @@
         content.textContent = '{{ _("Загрузка...") }}';
         modal.show();
 
-        fetch(`/check_ip/${ipAddress}`)
-            .then(response => response.json())
+        fetch(`/check_ip/${encodeURIComponent(ipAddress)}`, {
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(async response => {
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('{{ _("Сервер вернул не JSON") }}');
+                }
+                if (!response.ok) {
+                    throw new Error(data.error || data.message || ('HTTP ' + response.status));
+                }
+                return data;
+            })
             .then(data => {
                 content.textContent = JSON.stringify(data, null, 2);
             })
             .catch(error => {
-                content.textContent = '{{ _("Ошибка при загрузке данных:") }} ' + error;
+                content.textContent = '{{ _("Ошибка при загрузке данных:") }} ' + (error.message || error);
             });
     }
 
