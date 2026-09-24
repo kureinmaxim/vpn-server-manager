@@ -6448,3 +6448,30 @@ msgstr "Install htop"
 
 msgid "Установить btop"
 msgstr "Install btop"
+
+msgid "Ваш IP: browserleaks.com"
+msgstr "Your IP: browserleaks.com"
+
+msgid "Утечка DNS: dnsleaktest.com"
+msgstr "DNS leak: dnsleaktest.com"
+
+msgid "Город и провайдер IP сервера: ipinfo.io"
+msgstr "City and provider of this server IP: ipinfo.io"
+
+msgid "Владелец IP сервера: ip2location.com"
+msgstr "Owner of this server IP: ip2location.com"
+
+msgid "Файл данных импортирован. Серверов: %(count)s"
+msgstr "Data file imported. Servers: %(count)s"
+
+msgid "Некорректный IP-адрес"
+msgstr "Invalid IP address"
+
+msgid "Сервис проверки IP недоступен"
+msgstr "IP check service is unavailable"
+
+msgid "Не удалось получить данные об IP"
+msgstr "Could not load IP details"
+
+msgid "Сервер вернул не JSON"
+msgstr "Server did not return JSON"
