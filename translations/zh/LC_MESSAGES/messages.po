@@ -6181,3 +6181,30 @@ msgstr "安装 htop"
 
 msgid "Установить btop"
 msgstr "安装 btop"
+
+msgid "Ваш IP: browserleaks.com"
+msgstr "您的 IP：browserleaks.com"
+
+msgid "Утечка DNS: dnsleaktest.com"
+msgstr "DNS 泄露：dnsleaktest.com"
+
+msgid "Город и провайдер IP сервера: ipinfo.io"
+msgstr "此服务器 IP 的城市和运营商：ipinfo.io"
+
+msgid "Владелец IP сервера: ip2location.com"
+msgstr "此服务器 IP 的所有者：ip2location.com"
+
+msgid "Файл данных импортирован. Серверов: %(count)s"
+msgstr "数据文件已导入。服务器：%(count)s"
+
+msgid "Некорректный IP-адрес"
+msgstr "IP 地址无效"
+
+msgid "Сервис проверки IP недоступен"
+msgstr "IP 检查服务不可用"
+
+msgid "Не удалось получить данные об IP"
+msgstr "无法获取 IP 信息"
+
+msgid "Сервер вернул не JSON"
+msgstr "服务器返回的不是 JSON"

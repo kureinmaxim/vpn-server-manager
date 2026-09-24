@@ -13,7 +13,6 @@ ROOT = Path(__file__).resolve().parents[1]
 LOCAL_CONFIG = ROOT / "config.json"
 TEMPLATE_CONFIG = ROOT / "config" / "config.json.template"
 README_FILE = ROOT / "README.md"
-README_RU_FILE = ROOT / "README_ru.md"
 INSTALLER_ISS = ROOT / "vpn-manager-installer.iss"
 ENV_EXAMPLE = ROOT / "env.example"
 APP_CONFIG = ROOT / "app" / "config.py"
@@ -129,7 +128,7 @@ def replace_or_fail(text, pattern, replacement, description, flags=0):
 
 
 def update_readme(metadata, dry_run=False):
-    for path in (README_FILE, README_RU_FILE):
+    for path in (README_FILE,):
         if not path.exists():
             continue
         content = read_text(path)
@@ -303,7 +302,6 @@ def print_status():
         ("local", "config.json", get_json_version(LOCAL_CONFIG), False),
         ("template", "config/config.json.template", get_json_version(TEMPLATE_CONFIG), True),
         ("readme", "README.md", get_regex_value(README_FILE, r"^# VPN Server Manager v([^\n]+)"), True),
-        ("readme_ru", "README_ru.md", get_regex_value(README_RU_FILE, r"^# VPN Server Manager v([^\n]+)"), True),
         ("installer", "vpn-manager-installer.iss", get_regex_value(INSTALLER_ISS, r'#define MyAppVersion "([^"]+)"'), True),
         ("env", "env.example", get_regex_value(ENV_EXAMPLE, r"^APP_VERSION=(.+)$"), True),
         ("app_config", "app/config.py", get_regex_value(APP_CONFIG, r"APP_VERSION = os\.getenv\('APP_VERSION', '([^']+)'\)"), True),

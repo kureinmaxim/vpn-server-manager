@@ -471,6 +471,47 @@ class TestMainRoutes:
         assert 'js/server_board.js' in html
 
 
+def test_stale_geolocation_is_replaced_when_ip_changes():
+    from app.routes.main import _apply_fresh_geolocation, _geolocation_matches_ip
+    import app.routes.main as main_routes
+
+    server = {
+        'ip_address': '203.0.113.10',
+        'geolocation': {'city': 'Sydney', 'country': 'AU', 'ip': '167.148.88.215'},
+    }
+    assert _geolocation_matches_ip(server) is False
+
+    original = main_routes._lookup_geolocation
+    main_routes._lookup_geolocation = lambda ip: {'city': 'Frankfurt', 'country': 'DE', 'ip': ip}
+    try:
+        assert _apply_fresh_geolocation(server) is True
+        assert server['geolocation']['city'] == 'Frankfurt'
+        assert _geolocation_matches_ip(server) is True
+    finally:
+        main_routes._lookup_geolocation = original
+
+
+def test_check_ip_returns_json(client):
+    """Кнопка «Проверить IP» ждёт JSON с /check_ip/<ip>, а не HTML 404."""
+    class StubApi:
+        def check_ip_info(self, ip):
+            return {'ip': ip, 'city': 'Sydney', 'org': 'UltraHost'}
+
+    registry.register('api', StubApi())
+    with client.session_transaction() as sess:
+        sess['authenticated'] = True
+        sess['pin_verified'] = True
+
+    response = client.get('/check_ip/167.148.88.215', headers={'Accept': 'application/json'})
+    assert response.status_code == 200
+    assert response.is_json
+    assert response.get_json()['city'] == 'Sydney'
+
+    missing = client.get('/check_ip/not-an-ip')
+    assert missing.status_code == 400
+    assert missing.is_json
+
+
 def test_board_script_uses_second_click_not_text_selection():
     from pathlib import Path
     js = Path(__file__).resolve().parents[2].joinpath('static', 'js', 'server_board.js').read_text(encoding='utf-8')

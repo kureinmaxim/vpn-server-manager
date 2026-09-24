@@ -12,11 +12,54 @@ from ..services import registry
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
 from ..utils.credentials import sanitize_secret
 from ..utils.icons import apply_icon_from_form
-from ..exceptions import ValidationError, AuthenticationError
+from ..exceptions import ValidationError, AuthenticationError, APIError
+from ..utils.validators import Validators
 
 logger = logging.getLogger(__name__)
 
 main_bp = Blueprint('main', __name__)
+
+def _lookup_geolocation(ip_address):
+    """Город и страна по IP через ipinfo.io. None, если адреса нет или сервис недоступен."""
+    ip_address = (ip_address or '').strip()
+    if not Validators.validate_ip_address(ip_address):
+        return None
+    try:
+        import requests
+        url = current_app.config.get('IP_CHECK_API', 'https://ipinfo.io/{ip}/json').format(ip=ip_address)
+        response = requests.get(url, timeout=5)
+        if response.status_code != 200:
+            return None
+        data = response.json()
+        if not isinstance(data, dict) or not data.get('city'):
+            return None
+        data['ip'] = data.get('ip') or ip_address
+        return data
+    except Exception as exc:
+        logger.info(f"Geolocation lookup failed for {ip_address}: {exc}")
+        return None
+
+
+def _geolocation_matches_ip(server):
+    geo = server.get('geolocation') or {}
+    ip = (server.get('ip_address') or '').strip()
+    return bool(geo.get('city')) and (geo.get('ip') or '') == ip
+
+
+def _apply_fresh_geolocation(server):
+    """Подставляет актуальный город. Стирает город, если он относится к другому IP."""
+    fresh = _lookup_geolocation(server.get('ip_address'))
+    if fresh:
+        server['geolocation'] = fresh
+        return True
+    geo = server.get('geolocation') or {}
+    stored_ip = (geo.get('ip') or '').strip()
+    current_ip = (server.get('ip_address') or '').strip()
+    if geo.get('city') and stored_ip and stored_ip != current_ip:
+        server['geolocation'] = {'city': '', 'country': '', 'region': '', 'ip': current_ip}
+        return True
+    return False
+
 
 def get_secret_pin():
     """Получает текущий PIN из config.json"""
@@ -35,7 +78,7 @@ def index():
     """Главная страница"""
     # Проверяем PIN авторизацию
     logger.info(f"Index route accessed. Session: {dict(session)}")
-    if not session.get('pin_authenticated'):
+    if not (session.get('pin_authenticated') or (session.get('authenticated') and session.get('pin_verified'))):
         logger.warning("Not authenticated, redirecting to locked page")
         return redirect(url_for('main.index_locked'))
     
@@ -48,7 +91,7 @@ def index():
         else:
             servers = []
             logger.warning("DataManager not available, using empty server list")
-        
+
         # Загружаем service_urls из конфигурации
         service_urls = {
             'general_ip_test': current_app.config.get('GENERAL_IP_TEST', 'https://browserleaks.com/ip'),
@@ -94,6 +137,25 @@ def verify_pin():
     else:
         flash(_('Invalid PIN'), 'error')
         return redirect(url_for('main.index_locked'))
+
+@main_bp.route('/check_ip/<ip_address>')
+@require_auth
+@require_pin
+def check_ip(ip_address):
+    """Данные ipinfo.io для кнопки «Проверить IP» на карточке сервера."""
+    if not Validators.validate_ip_address(ip_address):
+        return jsonify({'error': _('Некорректный IP-адрес')}), 400
+
+    api_service = registry.get('api')
+    if not api_service:
+        return jsonify({'error': _('Сервис проверки IP недоступен')}), 503
+
+    try:
+        return jsonify(api_service.check_ip_info(ip_address))
+    except APIError as e:
+        logger.error(f"IP check failed for {ip_address}: {e.message}")
+        return jsonify({'error': _('Не удалось получить данные об IP')}), 502
+
 
 @main_bp.route('/logout')
 @log_request
@@ -192,15 +254,7 @@ def add_server():
             "software_info": request.form.get('software_info', ''),
         }
 
-        # Геолокация по IP (best-effort, не критично)
-        try:
-            import requests
-            ip_check_url = current_app.config.get('IP_CHECK_API', 'https://ipinfo.io/{ip}/json').format(ip=new_server['ip_address'])
-            response = requests.get(ip_check_url, timeout=5)
-            if response.status_code == 200:
-                new_server['geolocation'] = response.json()
-        except Exception:
-            pass
+        _apply_fresh_geolocation(new_server)
 
         # Загрузка иконки сервера
         upload_folder = current_app.config.get('UPLOAD_FOLDER')
@@ -281,6 +335,7 @@ def edit_server(server_id):
                 server['name'] = request.form.get('name', server.get('name'))
                 server['provider'] = request.form.get('provider', server.get('provider'))
                 server['ip_address'] = request.form.get('ip_address', server.get('ip_address'))
+                _apply_fresh_geolocation(server)
                 server['os'] = request.form.get('os', server.get('os'))
                 server['status'] = request.form.get('status', server.get('status'))
                 server['notes'] = request.form.get('notes', server.get('notes', ''))
@@ -621,7 +676,7 @@ def import_data():
                     raise ValueError("Invalid data structure")
                 
                 server_count = len(servers)
-                flash(f'✅ Файл данных успешно импортирован! Найдено серверов: {server_count}', 'success')
+                flash(_('Файл данных импортирован. Серверов: %(count)s', count=server_count), 'success')
                 logger.info(f"Successfully imported {server_count} servers from {filename}")
             except Exception as e:
                 # Удаляем файл, если он не может быть расшифрован
@@ -637,8 +692,6 @@ def import_data():
             if not data_manager.update_user_config({'active_data_file': file_path}):
                 flash(_('Не удалось сохранить путь к новому файлу данных. Изменение будет временным.'), 'warning')
             
-            # Перенаправляем на главную страницу, чтобы пользователь увидел импортированные серверы
-            flash('💡 Обновите страницу (F5), если серверы не отображаются сразу.', 'info')
             return redirect(url_for('main.index'))
         else:
             flash(_('Неверный тип файла. Пожалуйста, выберите файл .enc'), 'danger')
@@ -652,6 +705,7 @@ def import_data():
 @require_pin
 def import_external_data():
     """Импорт внешних данных с другим ключом шифрования"""
+    imported_ok = False
     import tempfile
     from cryptography.fernet import Fernet, InvalidToken
     
@@ -780,6 +834,7 @@ def import_external_data():
             with open(config_path, 'w', encoding='utf-8') as f:
                 json.dump(config_data, f, ensure_ascii=False, indent=2)
             
+            imported_ok = True
             # Информируем пользователя о результате
             if added_count > 0:
                 message = f'Успешно импортировано {added_count} новых серверов!'
@@ -805,6 +860,8 @@ def import_external_data():
         logger.error(f"Error processing external import: {str(e)}")
         flash(f'Ошибка при обработке файла: {str(e)}', 'danger')
     
+    if imported_ok:
+        return redirect(url_for('main.index'))
     return redirect(url_for('main.settings'))
 
 @main_bp.route('/export_data')

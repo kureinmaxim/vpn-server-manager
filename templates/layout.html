@@ -143,6 +143,15 @@
             const allowedZooms = ['60', '80', '100'];
             const savedZoom = allowedZooms.includes(getCookie('ui_zoom')) ? getCookie('ui_zoom') : '80';
             document.body.style.zoom = savedZoom + '%';
+            document.querySelectorAll('.alert-success, .alert-info').forEach(function(alertEl) {
+                setTimeout(function() {
+                    if (window.bootstrap && bootstrap.Alert) {
+                        bootstrap.Alert.getOrCreateInstance(alertEl).close();
+                    } else if (alertEl.parentNode) {
+                        alertEl.remove();
+                    }
+                }, 3500);
+            });
         });
 
         const isDesktopApp = {{ 'true' if is_desktop_app else 'false' }};
@@ -167,7 +176,7 @@
             });
             
             // Улучшенная обработка навигационных ссылок для pywebview
-            document.querySelectorAll('a.nav-link:not([onclick])').forEach(link => {
+            document.querySelectorAll('a.navbar-brand, a.nav-link:not([onclick])').forEach(link => {
                 link.addEventListener('click', function(e) {
                     // Для обычных ссылок (не с onclick и не #) - просто переходим
                     if (this.getAttribute('href') && 
