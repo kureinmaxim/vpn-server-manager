@@ -163,11 +163,11 @@
                         {% endif %}
                         {{ server.name }}
                     </h5>
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center js-server-subtitle" data-ip="{{ server.ip_address }}">
                         <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
                         {% set geo = server.geolocation or {} %}
                         {% if geo.city and (not geo.ip or geo.ip == server.ip_address) %}
-                        <small><i class="bi bi-geo-alt-fill"></i> {{ geo.city }}, {{ geo.country }}</small>
+                        <small class="js-server-geo"><i class="bi bi-geo-alt-fill"></i> {{ geo.city }}, {{ geo.country }}</small>
                         {% endif %}
                     </div>
                 </div>
@@ -614,6 +614,25 @@
             });
     }
 
+    function showGeolocationOnCards(ipAddress, data) {
+        if (!data || !data.city) {
+            return;
+        }
+        const label = data.country ? data.city + ', ' + data.country : data.city;
+        document.querySelectorAll('.js-server-subtitle').forEach(function(row) {
+            if (row.getAttribute('data-ip') !== ipAddress || row.querySelector('.js-server-geo')) {
+                return;
+            }
+            const geo = document.createElement('small');
+            geo.className = 'js-server-geo';
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-geo-alt-fill';
+            geo.appendChild(icon);
+            geo.appendChild(document.createTextNode(' ' + label));
+            row.appendChild(geo);
+        });
+    }
+
     function checkIpInfo(ipAddress) {
         const modal = new bootstrap.Modal(document.getElementById('ipInfoModal'));
         const content = document.getElementById('ipInfoContent');
@@ -641,6 +660,7 @@
             })
             .then(data => {
                 content.textContent = JSON.stringify(data, null, 2);
+                showGeolocationOnCards(ipAddress, data);
             })
             .catch(error => {
                 content.textContent = '{{ _("Ошибка при загрузке данных:") }} ' + (error.message || error);

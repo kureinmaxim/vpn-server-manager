@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.11] - 2026-09-24
+
+### Added
+- **Check IP** stores the city on the server card when that card has no geolocation yet, and shows it in the header immediately. A city that already matches the current IP is left unchanged.
+
 ## [4.4.9] - 2026-09-23
 
 ### Improved

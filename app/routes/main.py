@@ -46,6 +46,45 @@ def _geolocation_matches_ip(server):
     return bool(geo.get('city')) and (geo.get('ip') or '') == ip
 
 
+def _geolocation_record(ip_address, payload):
+    return {
+        'city': payload.get('city', ''),
+        'country': payload.get('country', ''),
+        'region': payload.get('region', ''),
+        'ip': payload.get('ip') or ip_address,
+    }
+
+
+def _persist_geolocation_if_empty(ip_address, payload):
+    """Пишет город на карточки с этим IP, только если справа сейчас нечего показать."""
+    if not isinstance(payload, dict) or not payload.get('city'):
+        return False
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return False
+    try:
+        servers = data_manager.load_servers(current_app.config)
+        active_file = data_manager.get_active_data_path(current_app.config)
+        if not servers or not active_file:
+            return False
+        ip_address = (ip_address or '').strip()
+        record = _geolocation_record(ip_address, payload)
+        changed = False
+        for server in servers:
+            if (server.get('ip_address') or '').strip() != ip_address:
+                continue
+            if _geolocation_matches_ip(server):
+                continue
+            server['geolocation'] = record
+            changed = True
+        if changed:
+            data_manager.save_servers(servers, active_file)
+        return changed
+    except Exception as exc:
+        logger.info(f"Could not store geolocation for {ip_address}: {exc}")
+        return False
+
+
 def _apply_fresh_geolocation(server):
     """Подставляет актуальный город. Стирает город, если он относится к другому IP."""
     fresh = _lookup_geolocation(server.get('ip_address'))
@@ -151,7 +190,9 @@ def check_ip(ip_address):
         return jsonify({'error': _('Сервис проверки IP недоступен')}), 503
 
     try:
-        return jsonify(api_service.check_ip_info(ip_address))
+        payload = api_service.check_ip_info(ip_address)
+        _persist_geolocation_if_empty(ip_address, payload)
+        return jsonify(payload)
     except APIError as e:
         logger.error(f"IP check failed for {ip_address}: {e.message}")
         return jsonify({'error': _('Не удалось получить данные об IP')}), 502
