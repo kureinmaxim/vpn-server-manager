@@ -512,6 +512,55 @@ def test_check_ip_returns_json(client):
     assert missing.is_json
 
 
+def test_check_ip_stores_city_when_card_geolocation_is_empty(client):
+    class StubApi:
+        def check_ip_info(self, ip):
+            return {'ip': ip, 'city': 'New York City', 'country': 'US', 'region': 'New York'}
+
+    class StubData:
+        def __init__(self):
+            self.servers = [{
+                'id': 1,
+                'ip_address': '167.148.88.215',
+                'geolocation': {'city': '', 'country': '', 'region': '', 'ip': ''},
+            }, {
+                'id': 2,
+                'ip_address': '203.0.113.10',
+                'geolocation': {'city': 'Berlin', 'country': 'DE', 'region': 'Berlin', 'ip': '203.0.113.10'},
+            }]
+            self.saved = None
+
+        def load_servers(self, config):
+            return self.servers
+
+        def get_active_data_path(self, config):
+            return '/tmp/servers.enc'
+
+        def save_servers(self, servers, path):
+            self.saved = (copy.deepcopy(servers), path)
+
+    data = StubData()
+    registry.register('api', StubApi())
+    registry.register('data_manager', data)
+    with client.session_transaction() as sess:
+        sess['authenticated'] = True
+        sess['pin_verified'] = True
+
+    response = client.get('/check_ip/167.148.88.215', headers={'Accept': 'application/json'})
+    assert response.status_code == 200
+    assert response.get_json()['city'] == 'New York City'
+    assert data.saved is not None
+    stored = data.saved[0]
+    assert stored[0]['geolocation']['city'] == 'New York City'
+    assert stored[0]['geolocation']['ip'] == '167.148.88.215'
+    assert stored[1]['geolocation']['city'] == 'Berlin'
+
+    data.saved = None
+    again = client.get('/check_ip/167.148.88.215', headers={'Accept': 'application/json'})
+    assert again.status_code == 200
+    assert data.saved is None
+
+
 def test_board_script_uses_second_click_not_text_selection():
     from pathlib import Path
     js = Path(__file__).resolve().parents[2].joinpath('static', 'js', 'server_board.js').read_text(encoding='utf-8')
