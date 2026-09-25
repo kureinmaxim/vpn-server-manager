@@ -1,0 +1,53 @@
+/* Shared actions keep compact and expanded server cards consistent. */
+.server-preview-card { overflow: visible; }
+.server-preview-card .card-header { border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0; }
+.server-board-item:has(.server-actions-menu.show) { position: relative; z-index: 10; }
+.server-actions.card-footer {
+    display: flex; align-items: center; gap: 4px; padding: 9px 10px;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
+}
+.server-actions .server-action {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    min-height: 36px; padding: 6px 9px; border: 1px solid transparent;
+    border-radius: 7px; color: var(--bs-body-color); font-size: 13px;
+    font-weight: 500; line-height: 1.2; white-space: nowrap;
+}
+.server-actions .server-action-icon { width: 36px; flex: 0 0 36px; padding: 6px; }
+.server-actions .server-action-status { color: var(--bs-info); background: rgba(var(--bs-info-rgb), .09); }
+.server-actions .server-action:hover { background: rgba(var(--bs-secondary-rgb), .18); color: var(--bs-body-color); }
+.server-actions .server-action:focus-visible { outline: 2px solid var(--bs-info); outline-offset: 2px; box-shadow: none; }
+.server-actions-more { margin-left: auto; flex-shrink: 0; }
+.server-actions-menu { min-width: 210px; padding: 6px; border-radius: 10px; box-shadow: 0 12px 28px rgba(0,0,0,.22); }
+.server-actions-menu .dropdown-item { display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 8px 12px; border-radius: 5px; font-size: 14px; }
+.server-actions-menu .dropdown-divider { margin: 5px 6px; }
+@media (max-width: 359px) {
+    .server-actions.card-footer { gap: 2px; padding: 8px 6px; }
+    .server-actions .server-action { padding: 6px; gap: 4px; font-size: 12px; }
+}
+
+.server-actions.card-footer { flex-wrap: wrap; }
+.server-actions .server-action-menu-toggle {
+    border-color: var(--bs-secondary-color); background: rgba(var(--bs-secondary-rgb), .2);
+    font-weight: 600; color: var(--bs-body-color);
+}
+.server-actions .server-action-menu-toggle[aria-expanded="true"] {
+    border-color: var(--bs-info); background: rgba(var(--bs-info-rgb), .15);
+}
+
+/* Grid tracks constrain translated labels inside the card at every width. */
+.server-actions.card-footer { display: grid; grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1.35fr) auto; gap: 4px; }
+.server-actions .server-action { min-width: 0; padding: 6px; }
+.server-actions .server-action-icon { width: 32px; }
+.server-actions .server-action > span { overflow: hidden; text-overflow: ellipsis; }
+.server-actions .server-action-menu-toggle > span { overflow: visible; }
+.server-actions-more { margin-left: 0; }
+.server-actions-menu { max-width: calc(100vw - 32px); }
+.server-actions-menu .dropdown-item { white-space: normal; }
+
+/* Compact cards use named icon buttons; expanded cards retain visible labels. */
+.server-card-compact .server-actions.card-footer { display: flex; flex-wrap: nowrap; gap: 6px; }
+.server-card-compact .server-actions > .server-action { width: 36px; flex: 0 0 36px; }
+.server-card-compact .server-action-label { display: none; }
+.server-card-compact .server-actions-more { margin-left: auto; }
+.server-card-compact .server-action > .bi { font-size: 17px; }

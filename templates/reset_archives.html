@@ -1,15 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
 <div class="container py-4" id="archive-page" data-list="{{ url_for('reset.archive_list', server_id=server.id) }}" data-delete="{{ url_for('reset.archive_delete', server_id=server.id) }}" data-csrf="{{ session.csrf_token }}">
-<a href="{{ url_for('reset.reset_page', server_id=server.id) }}">← Очистка TelegramOnly</a>
-<h1 class="h3 mt-3">Архивы очистки · {{ server.name }}</h1>
+<a href="{{ url_for('reset.reset_page', server_id=server.id) }}">← {{ _('Очистка TelegramOnly') }}</a>
+<h1 class="h3 mt-3">{{ _('Архивы очистки') }} · {{ server.name }}</h1>
 <p>{{ server.ip_address }}</p>
-<div class="alert alert-warning">Удаление архива необратимо: сохранённые настройки и данные восстановить из него уже не получится. Удаляйте архив после успешной повторной установки.</div>
-<p>Показаны только архивы завершённых операций из /var/backups/telegramonly-reset. Архивы незавершённых операций защищены.</p>
-<button id="archive-refresh" type="button" class="btn btn-primary">Показать архивы и размеры</button>
+<div class="alert alert-warning">{{ _('Удаление архива необратимо: сохранённые настройки и данные восстановить из него уже не получится. Удаляйте архив после успешной повторной установки.') }}</div>
+<p>{{ _('Показаны только архивы завершённых операций из /var/backups/telegramonly-reset. Архивы незавершённых операций защищены.') }}</p>
+<button id="archive-refresh" type="button" class="btn btn-primary">{{ _('Показать архивы и размеры') }}</button>
 <p id="archive-status" class="mt-3" role="status" aria-live="polite"></p>
 <div id="archive-list"></div>
-<label for="archive-host" class="form-label">Для удаления введите имя VPS: <strong id="archive-hostname"></strong></label>
+<label for="archive-host" class="form-label">{{ _('Для удаления введите имя VPS:') }} <strong id="archive-hostname"></strong></label>
 <input id="archive-host" class="form-control" autocomplete="off">
 </div>
 <script>
@@ -23,7 +23,7 @@
     async function post(url, body) {
         const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': page.dataset.csrf}, body: JSON.stringify(body)});
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Операция не выполнена');
+        if (!response.ok) throw new Error(data.error || {{ _("Операция не выполнена")|tojson }});
         return data;
     }
     function sync() {
@@ -33,7 +33,7 @@
     host.addEventListener('input', sync);
     refresh.addEventListener('click', async () => {
         busy = true; list.replaceChildren(); host.value = ''; sync();
-        status.textContent = 'Читаю список архивов…';
+        status.textContent = {{ _("Читаю список архивов…")|tojson }};
         try {
             const data = await post(page.dataset.list, {});
             hostname = data.hostname;
@@ -41,22 +41,22 @@
             data.archives.forEach(archive => {
                 const row = document.createElement('div'); row.className = 'border rounded p-3 mb-2';
                 const label = document.createElement('span');
-                label.textContent = archive.name + ' — ' + (archive.bytes / 1048576).toFixed(1) + ' МиБ ';
-                const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-danger btn-sm'; button.textContent = 'Удалить архив';
+                label.textContent = archive.name + ' — ' + (archive.bytes / 1048576).toFixed(1) + {{ _(" МиБ ")|tojson }};
+                const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-danger btn-sm'; button.textContent = {{ _("Удалить архив")|tojson }};
                 button.addEventListener('click', async () => {
                     if (busy || host.value !== hostname) return;
-                    if (!window.confirm('Безвозвратно удалить архив ' + archive.name + ' на VPS ' + hostname + '?')) return;
-                    busy = true; sync(); status.textContent = 'Удаляю выбранный архив…';
+                    if (!window.confirm({{ _("Безвозвратно удалить архив ")|tojson }} + archive.name + {{ _(" на VPS ")|tojson }} + hostname + '?')) return;
+                    busy = true; sync(); status.textContent = {{ _("Удаляю выбранный архив…")|tojson }};
                     try {
                         await post(page.dataset.delete, {ticket: archive.ticket, confirmation: host.value});
-                        row.remove(); status.textContent = 'Архив удалён.';
+                        row.remove(); status.textContent = {{ _("Архив удалён.")|tojson }};
                     } catch (error) {
-                        list.replaceChildren(); status.textContent = error.message + ' Обновите список архивов.';
+                        list.replaceChildren(); status.textContent = error.message + {{ _(" Обновите список архивов.")|tojson }};
                     } finally { busy = false; sync(); }
                 });
                 row.append(label, button); list.append(row);
             });
-            status.textContent = data.archives.length ? 'Список действителен 10 минут.' : 'Завершённых архивов для удаления нет.';
+            status.textContent = data.archives.length ? {{ _("Список действителен 10 минут.")|tojson }} : {{ _("Завершённых архивов для удаления нет.")|tojson }};
         } catch (error) { status.textContent = error.message; }
         finally { busy = false; sync(); }
     });

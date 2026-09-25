@@ -7,6 +7,7 @@ import threading
 import time
 
 import paramiko
+from flask_babel import gettext as translate
 from flask import Blueprint, current_app, jsonify, render_template, request, session, abort
 
 from ..services import registry
@@ -82,15 +83,15 @@ def reset_plan(server_id):
     body = request.get_json(silent=True) or {}
     components = body.get("components")
     if not isinstance(components, list) or not components or any(not isinstance(c, str) or c not in COMPONENTS for c in components):
-        return jsonify(error="Выберите компоненты из списка"), 400
+        return jsonify(error=translate("Выберите компоненты из списка")), 400
     _, creds = target(server_id)
     components = sorted(set(components))
     try:
         plan = remote(creds, ["--components", ",".join(components)])
     except Exception:
-        return jsonify(error="Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено."), 502
+        return jsonify(error=translate("Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено.")), 502
     if "plan_hash" not in plan:
-        return jsonify(error=plan.get("error", "Аудит не выполнен")), 409
+        return jsonify(error=plan.get("error", translate("Аудит не выполнен"))), 409
     ticket = secrets.token_urlsafe(32)
     owner = session.setdefault("reset_session", secrets.token_urlsafe(32))
     with _guard:
@@ -111,20 +112,20 @@ def reset_apply(server_id):
     body = request.get_json(silent=True) or {}
     ticket = body.get("ticket")
     if not isinstance(ticket, str):
-        return jsonify(error="Сначала получите план очистки"), 400
+        return jsonify(error=translate("Сначала получите план очистки")), 400
     _, creds = target(server_id)
     with _guard:
         item = _pending.get(ticket)
         if (not item or item["server"] != server_id or item["identity"] != identity(creds)
                 or not hmac.compare_digest(item["owner"], session.get("reset_session", ""))
                 or time.monotonic() - item["time"] > TTL):
-            return jsonify(error="План устарел или относится к другому серверу/сеансу"), 409
+            return jsonify(error=translate("План устарел или относится к другому серверу/сеансу")), 409
         plan = item["plan"]
         if plan.get("blockers") or body.get("confirmation") != plan["hostname"]:
-            return jsonify(error="Устраните блокировки и введите точное имя сервера"), 400
+            return jsonify(error=translate("Устраните блокировки и введите точное имя сервера")), 400
         lock = _locks.setdefault(identity(creds)[:2], threading.Lock())
         if not lock.acquire(blocking=False):
-            return jsonify(error="Очистка этого сервера уже выполняется"), 409
+            return jsonify(error=translate("Очистка этого сервера уже выполняется")), 409
         # Consume before SSH: an uncertain response must not cause a destructive retry.
         _pending.pop(ticket)
     try:
@@ -132,7 +133,7 @@ def reset_apply(server_id):
                                 "--plan-hash", plan["plan_hash"], "--confirm", plan["hostname"]])
         return jsonify(result), (200 if result.get("success") else 409)
     except Exception:
-        return jsonify(error="Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH."), 502
+        return jsonify(error=translate("Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH.")), 502
     finally:
         lock.release()
 
@@ -160,9 +161,9 @@ def archive_list(server_id):
     try:
         result = remote(creds, [], source=ARCHIVE_SOURCE)
         if 'archives' not in result:
-            return jsonify(error='Не удалось прочитать архивы. Проверьте SSH и права доступа.'), 502
+            return jsonify(error=translate('Не удалось прочитать архивы. Проверьте SSH и права доступа.')), 502
     except Exception:
-        return jsonify(error='Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.'), 502
+        return jsonify(error=translate('Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.')), 502
     owner = session.setdefault('reset_session', secrets.token_urlsafe(32))
     with _guard:
         now = time.monotonic()
@@ -186,23 +187,56 @@ def archive_delete(server_id):
     body = request.get_json(silent=True) or {}
     token = body.get('ticket') if isinstance(body, dict) else None
     if not isinstance(token, str):
-        return jsonify(error='Сначала загрузите список архивов'), 400
+        return jsonify(error=translate('Сначала загрузите список архивов')), 400
     _, creds = target(server_id)
     with _guard:
         item = _archive_tickets.get(token)
         if (not item or item['server'] != server_id or item['identity'] != identity(creds)
                 or item['owner'] != session.get('reset_session') or time.monotonic() - item['time'] > TTL):
-            return jsonify(error='Обновите список архивов'), 409
+            return jsonify(error=translate('Обновите список архивов')), 409
         if body.get('confirmation') != item['hostname']:
-            return jsonify(error='Введите точное имя VPS'), 400
+            return jsonify(error=translate('Введите точное имя VPS')), 400
         lock = _locks.setdefault(identity(creds)[:2], threading.Lock())
         if not lock.acquire(blocking=False):
-            return jsonify(error='Другая операция уже выполняется'), 409
+            return jsonify(error=translate('Другая операция уже выполняется')), 409
         _archive_tickets.pop(token)
     try:
         result = remote(creds, [item['name'], item['hash'], item['hostname']], source=ARCHIVE_SOURCE)
+        if result.get('error'):
+            result['error'] = translate(result['error'])
         return jsonify(result), (200 if result.get('success') else 409)
     except Exception:
-        return jsonify(error='Ответ потерян. Обновите список перед дальнейшими действиями.'), 502
+        return jsonify(error=translate('Ответ потерян. Обновите список перед дальнейшими действиями.')), 502
     finally:
         lock.release()
+
+
+@reset_bp.route('/servers/<server_id>/disk-usage')
+@require_auth
+@require_pin
+def disk_page(server_id):
+    from ..services.disk_usage_payload import DISPLAY_COMMANDS
+    server, _ = target(server_id)
+    session.setdefault('csrf_token', secrets.token_urlsafe(32))
+    return render_template('disk_usage.html', server=server, commands=DISPLAY_COMMANDS)
+
+
+@reset_bp.route('/api/servers/<server_id>/disk-usage', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def disk_run(server_id):
+    from ..services.disk_usage_payload import DISK_SOURCE
+    _, creds = target(server_id)
+    try:
+        # Only this fixed read-only payload is sent; request data cannot change commands.
+        result = remote(creds, [], source=DISK_SOURCE)
+        if 'results' not in result:
+            return jsonify(error=translate('Не удалось получить данные о диске.')), 502
+        for row in result['results']:
+            row['title'] = translate(row['title'])
+            if row.get('note'):
+                row['note'] = translate(row['note'])
+        return jsonify(result)
+    except Exception:
+        return jsonify(error=translate('Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n.')), 502
