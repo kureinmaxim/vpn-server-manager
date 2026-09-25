@@ -3837,6 +3837,10 @@ msgstr "无网络"
 msgid "Список серверов"
 msgstr "服务器列表"
 
+#: templates/disk_usage.html:4 templates/reset.html:7
+msgid "Серверы"
+msgstr "服务器"
+
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:39
 #: templates/index.html:39
 msgid "Тест IP"

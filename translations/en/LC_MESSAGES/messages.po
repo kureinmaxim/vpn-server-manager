@@ -4059,6 +4059,10 @@ msgstr "No internet"
 msgid "Список серверов"
 msgstr "Server List"
 
+#: templates/disk_usage.html:4 templates/reset.html:7
+msgid "Серверы"
+msgstr "Servers"
+
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:39
 #: templates/index.html:39
 msgid "Тест IP"
