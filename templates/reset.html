@@ -17,6 +17,7 @@
         <i class="bi bi-activity"></i> {{ _('Status') }}
     </a>
     <a class="btn btn-outline-success btn-sm mb-3" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
+    <a class="btn btn-sm btn-outline-danger" href="{{ url_for('reset.archive_page', server_id=server.id) }}"><i class="bi bi-archive"></i> {{ _('Удалить архив') }}</a>
     <fieldset id="components" class="mb-3">
         <legend class="h6">{{ _('Компоненты для очистки') }}</legend>
         {% for component in components %}
