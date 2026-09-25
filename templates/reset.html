@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 {% block content %}
 <div class="container py-4" style="max-width: 1000px">
     <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
@@ -78,3 +78,4 @@
 })();
 </script>
 {% endblock %}
+
