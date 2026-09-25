@@ -36,7 +36,7 @@ def identity(creds):
     return (creds["ip"], int(creds["port"]), creds["user"])
 
 
-def remote(creds, args):
+def remote(creds, args, *, source=SCRIPT_SOURCE):
     # WARNING: The general SSH pool accepts unknown host keys. Destructive reset
     # must use verified OpenSSH known_hosts and RejectPolicy instead.
     client = paramiko.SSHClient()
@@ -48,7 +48,7 @@ def remote(creds, args):
                        auth_timeout=20, banner_timeout=20)
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
         stdin, stdout, stderr = client.exec_command(shlex.join(command), timeout=1800)
-        stdin.write(SCRIPT_SOURCE)
+        stdin.write(source)
         stdin.flush()
         stdin.channel.shutdown_write()
         raw = stdout.read(2 * 1024 * 1024)
@@ -133,5 +133,76 @@ def reset_apply(server_id):
         return jsonify(result), (200 if result.get("success") else 409)
     except Exception:
         return jsonify(error="Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH."), 502
+    finally:
+        lock.release()
+
+
+_archive_tickets = {}
+
+
+@reset_bp.route('/servers/<server_id>/reset/archives')
+@require_auth
+@require_pin
+def archive_page(server_id):
+    server, _ = target(server_id)
+    session.setdefault('csrf_token', secrets.token_urlsafe(32))
+    session.setdefault('reset_session', secrets.token_urlsafe(32))
+    return render_template('reset_archives.html', server=server)
+
+
+@reset_bp.route('/api/servers/<server_id>/reset/archives', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def archive_list(server_id):
+    from ..services.archive_payload import ARCHIVE_SOURCE
+    _, creds = target(server_id)
+    try:
+        result = remote(creds, [], source=ARCHIVE_SOURCE)
+        if 'archives' not in result:
+            return jsonify(error='Не удалось прочитать архивы. Проверьте SSH и права доступа.'), 502
+    except Exception:
+        return jsonify(error='Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.'), 502
+    owner = session.setdefault('reset_session', secrets.token_urlsafe(32))
+    with _guard:
+        now = time.monotonic()
+        for key, item in list(_archive_tickets.items()):
+            if now - item['time'] > TTL or (item['owner'] == owner and item['server'] == server_id):
+                _archive_tickets.pop(key, None)
+        for archive in result['archives']:
+            token = secrets.token_urlsafe(32)
+            _archive_tickets[token] = dict(owner=owner, server=server_id, identity=identity(creds),
+                time=now, name=archive['name'], hash=archive.pop('hash'), hostname=result['hostname'])
+            archive['ticket'] = token
+    return jsonify(result)
+
+
+@reset_bp.route('/api/servers/<server_id>/reset/archives/delete', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def archive_delete(server_id):
+    from ..services.archive_payload import ARCHIVE_SOURCE
+    body = request.get_json(silent=True) or {}
+    token = body.get('ticket') if isinstance(body, dict) else None
+    if not isinstance(token, str):
+        return jsonify(error='Сначала загрузите список архивов'), 400
+    _, creds = target(server_id)
+    with _guard:
+        item = _archive_tickets.get(token)
+        if (not item or item['server'] != server_id or item['identity'] != identity(creds)
+                or item['owner'] != session.get('reset_session') or time.monotonic() - item['time'] > TTL):
+            return jsonify(error='Обновите список архивов'), 409
+        if body.get('confirmation') != item['hostname']:
+            return jsonify(error='Введите точное имя VPS'), 400
+        lock = _locks.setdefault(identity(creds)[:2], threading.Lock())
+        if not lock.acquire(blocking=False):
+            return jsonify(error='Другая операция уже выполняется'), 409
+        _archive_tickets.pop(token)
+    try:
+        result = remote(creds, [item['name'], item['hash'], item['hostname']], source=ARCHIVE_SOURCE)
+        return jsonify(result), (200 if result.get('success') else 409)
+    except Exception:
+        return jsonify(error='Ответ потерян. Обновите список перед дальнейшими действиями.'), 502
     finally:
         lock.release()
