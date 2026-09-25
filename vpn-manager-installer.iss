@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.4.11
+; Version 4.4.12
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.4.11"
+#define MyAppVersion "4.4.12"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -113,10 +113,10 @@ Filename: "python"; Parameters: "--version"; StatusMsg: "Проверка нал
 Filename: "{app}\setup_windows.bat"; Description: "Установить зависимости и настроить приложение (рекомендуется)"; StatusMsg: "Настройка виртуального окружения и установка зависимостей (это займет 3-5 минут)..."; Flags: postinstall waituntilterminated; Check: CheckPythonInstalled
 
 ; Запуск приложения после установки
-Filename: "{app}\start_windows.bat"; Description: "Запустить {#MyAppName}"; Flags: postinstall skipifsilent nowait; Check: CheckSetupCompleted
+Filename: "{app}\start_windows.bat"; Description: "Запустить {#MyAppName}"; Flags: postinstall skipifsilent nowait unchecked; Check: CheckSetupCompleted
 
 ; Открыть README
-Filename: "{app}\README.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent
+Filename: "{app}\README.md"; Description: "Открыть руководство пользователя"; Flags: postinstall shellexec skipifsilent unchecked
 
 [UninstallDelete]
 ; Удаление созданных файлов и папок при деинсталляции

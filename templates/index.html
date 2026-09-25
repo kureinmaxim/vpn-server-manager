@@ -694,6 +694,21 @@
         }
     });
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const serverId = new URLSearchParams(window.location.search).get('status_server');
+        if (!serverId) return;
+
+        const button = Array.from(document.querySelectorAll('.btn-show-stats'))
+            .find(function (item) {
+                return item.dataset.serverId === serverId;
+            });
+
+        if (button) {
+            button.click();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+
     function setStatusHeaderInfo(name, ip) {
         var nameEl = document.getElementById('statusServerName');
         var ipEl = document.getElementById('statusServerIp');
