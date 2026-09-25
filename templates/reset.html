@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="container py-4" style="max-width: 1000px">
+<div class="container py-4" style="max-width: 1000px"
+     data-reset-plan-url="{{ url_for('reset.reset_plan', server_id=server.id) }}"
+     data-reset-apply-url="{{ url_for('reset.reset_apply', server_id=server.id) }}"
+     data-reset-csrf="{{ session.csrf_token }}">
     <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
     <h1 class="h3 mt-3">{{ _('Очистка TelegramOnly') }}</h1>
     <p class="lead">{{ server.name }} · {{ server.ip_address }}</p>
@@ -9,6 +12,10 @@
         {{ _('Это подготовка к повторной установке, а не переустановка ОС. Docker, firewall и системные пакеты остаются.') }}
     </div>
     <p>{{ _('Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: очистка выбранного прокси прервёт соединения через него.') }}</p>
+    <a class="btn btn-outline-info btn-sm mb-3"
+       href="{{ url_for('main.index') }}">
+        <i class="bi bi-activity"></i> {{ _('Status') }}
+    </a>
     <a class="btn btn-outline-success btn-sm mb-3" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
     <fieldset id="components" class="mb-3">
         <legend class="h6">{{ _('Компоненты для очистки') }}</legend>
@@ -30,9 +37,10 @@
 </div>
 <script>
 (() => {
-    const planUrl = {{ url_for('reset.reset_plan', server_id=server.id)|tojson }};
-    const applyUrl = {{ url_for('reset.reset_apply', server_id=server.id)|tojson }};
-    const csrf = {{ session.csrf_token|tojson }};
+    const root = document.querySelector('[data-reset-plan-url]');
+    const planUrl = root.dataset.resetPlanUrl;
+    const applyUrl = root.dataset.resetApplyUrl;
+    const csrf = root.dataset.resetCsrf;
     const status = document.getElementById('reset-status');
     const output = document.getElementById('reset-plan');
     const inspect = document.getElementById('inspect-reset');
