@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.14] - 2026-09-25
+
+### Added
+- Server-card action to reset the TelegramOnly stack, with dedicated reset, archive, and disk-usage pages.
+- Status link on the reset page; Status opens for the selected server after install and leaves only setup checked.
+
+### Improved
+- Compact server-card layout and a **Delete archive** control for finished cleanup archives.
+- English and Chinese UI: the back link **Servers** is translated (`Серверы` / `服务器`).
+
 ## [4.4.11] - 2026-09-24
 
 ### Added
