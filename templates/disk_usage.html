@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container py-4" style="max-width: 960px" id="disk-check" data-url="{{ url_for('reset.disk_run', server_id=server.id) }}" data-csrf="{{ session.csrf_token }}">
+    <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
+    <h1 class="h3 mt-3">{{ _('Место на диске') }}</h1>
+    <p class="text-muted">{{ server.name }} · {{ server.ip_address }}</p>
+    <p>{{ _('Проверка покажет размеры каталогов, архивов очистки, кэша пакетов и системного журнала. Файлы не изменяются.') }}</p>
+    <label for="disk-commands" class="form-label">{{ _('Команды для Tabby') }}</label>
+    <textarea id="disk-commands" class="form-control font-monospace" rows="5" readonly spellcheck="false">{{ commands }}</textarea>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <button type="button" class="btn btn-outline-secondary" id="disk-copy">{{ _('Копировать команды') }}</button>
+        <button type="button" class="btn btn-primary" id="disk-run">{{ _('Выполнить на этом VPS') }}</button>
+    </div>
+    <p class="small text-muted mt-2">{{ _('При запуске здесь используется SSH из карточки сервера. Для root команды выполняются без sudo.') }}</p>
+    <p id="disk-status" role="status" aria-live="polite" class="mt-3"></p>
+    <div id="disk-results"></div>
+</div>
+<script>
+(() => {
+    const root = document.getElementById('disk-check');
+    const commands = document.getElementById('disk-commands');
+    const status = document.getElementById('disk-status');
+    const run = document.getElementById('disk-run');
+    const output = document.getElementById('disk-results');
+    document.getElementById('disk-copy').addEventListener('click', async () => {
+        try {
+            if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(commands.value);
+            else { commands.focus(); commands.select(); if (!document.execCommand('copy')) throw new Error(); }
+            status.textContent = {{ _("Команды скопированы. Вставьте их в терминал Tabby на нужном VPS.")|tojson }};
+        } catch (_) { commands.focus(); commands.select(); status.textContent = {{ _("Нажмите Ctrl+C, чтобы скопировать выделенные команды.")|tojson }}; }
+    });
+    run.addEventListener('click', async () => {
+        run.disabled = true; output.replaceChildren(); status.textContent = {{ _("Проверяю диск. Это может занять несколько минут…")|tojson }};
+        try {
+            const response = await fetch(root.dataset.url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': root.dataset.csrf}, body: '{}'});
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || {{ _("Проверка не выполнена")|tojson }});
+            data.results.forEach(result => {
+                const section = document.createElement('section'); section.className = 'mb-4';
+                const title = document.createElement('h2'); title.className = 'h6'; title.textContent = result.title;
+                const pre = document.createElement('pre'); pre.className = 'border rounded p-3'; pre.textContent = result.output || {{ _("Нет данных")|tojson }};
+                section.append(title, pre);
+                if (result.note) { const note = document.createElement('p'); note.className = 'text-warning'; note.textContent = result.note; section.append(note); }
+                output.append(section);
+            });
+            status.textContent = data.results.every(item => item.success) ? {{ _("Проверка завершена.")|tojson }} : {{ _("Проверка завершена с замечаниями — см. результаты ниже.")|tojson }};
+        } catch (error) { status.textContent = error.message; }
+        finally { run.disabled = false; }
+    });
+})();
+</script>
+{% endblock %}

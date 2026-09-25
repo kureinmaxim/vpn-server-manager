@@ -12,12 +12,14 @@
         {{ _('Это подготовка к повторной установке, а не переустановка ОС. Docker, firewall и системные пакеты остаются.') }}
     </div>
     <p>{{ _('Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: очистка выбранного прокси прервёт соединения через него.') }}</p>
-    <a class="btn btn-outline-info btn-sm mb-3"
+    <div class="d-flex flex-wrap align-items-stretch gap-2 mb-3">
+    <a class="btn d-inline-flex align-items-center gap-1 btn-outline-info btn-sm"
        href="{{ url_for('main.index', status_server=server.id) }}">
         <i class="bi bi-activity"></i> {{ _('Status') }}
     </a>
-    <a class="btn btn-outline-success btn-sm mb-3" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
-    <a class="btn btn-sm btn-outline-danger" href="{{ url_for('reset.archive_page', server_id=server.id) }}"><i class="bi bi-archive"></i> {{ _('Удалить архив') }}</a>
+    <a class="btn d-inline-flex align-items-center gap-1 btn-outline-success btn-sm" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
+    <a class="btn d-inline-flex align-items-center gap-1 btn-sm btn-outline-danger" href="{{ url_for('reset.archive_page', server_id=server.id) }}"><i class="bi bi-archive"></i> {{ _('Удалить архив') }}</a>
+    </div>
     <fieldset id="components" class="mb-3">
         <legend class="h6">{{ _('Компоненты для очистки') }}</legend>
         {% for component in components %}
@@ -56,31 +58,31 @@
     async function post(url, body) {
         const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf}, body: JSON.stringify(body)});
         const data = await response.json();
-        if (!response.ok) throw new Error((data.error || 'Операция не выполнена') + (data.backup ? '\nАрхив: ' + data.backup : ''));
+        if (!response.ok) throw new Error((data.error || {{ _("Операция не выполнена")|tojson }}) + (data.backup ? {{ _("\nАрхив: ")|tojson }} + data.backup : ''));
         return data;
     }
     inspect.addEventListener('click', async () => {
         invalidate(); busy = true; inspect.disabled = true; fields.disabled = true;
-        status.textContent = 'Проверяю сервер. Изменения не выполняются…';
+        status.textContent = {{ _("Проверяю сервер. Изменения не выполняются…")|tojson }};
         try {
             const data = await post(planUrl, {components: [...fields.querySelectorAll('input:checked')].map(el => el.value)});
             plan = data.plan; ticket = data.ticket; input.value = '';
-            output.textContent = ['Hostname: ' + plan.hostname, 'Службы: ' + plan.units.map(x => x.name).join(', '),
-                'Контейнеры: ' + plan.containers.map(x => x.name).join(', '), 'Тома с резервным копированием: ' + plan.volumes.map(x => x.name).join(', '),
-                'Перенести в архив:\n' + plan.paths.map(x => x.path).join('\n'),
-                'Сохранить:\n' + plan.preserved.join('\n'), 'Блокировки:\n' + (plan.blockers.join('\n') || 'нет')].join('\n\n');
+            output.textContent = ['Hostname: ' + plan.hostname, {{ _("Службы: ")|tojson }} + plan.units.map(x => x.name).join(', '),
+                {{ _("Контейнеры: ")|tojson }} + plan.containers.map(x => x.name).join(', '), {{ _("Тома с резервным копированием: ")|tojson }} + plan.volumes.map(x => x.name).join(', '),
+                {{ _("Перенести в архив:\n")|tojson }} + plan.paths.map(x => x.path).join('\n'),
+                {{ _("Сохранить:\n")|tojson }} + plan.preserved.join('\n'), {{ _("Блокировки:\n")|tojson }} + (plan.blockers.join('\n') || {{ _("нет")|tojson }})].join('\n\n');
             output.hidden = false; confirm.hidden = plan.blockers.length > 0;
-            status.textContent = 'План действителен 10 минут. Проверьте каждый компонент перед подтверждением.';
+            status.textContent = {{ _("План действителен 10 минут. Проверьте каждый компонент перед подтверждением.")|tojson }};
         } catch (error) { status.textContent = error.message; }
         finally { busy = false; inspect.disabled = false; fields.disabled = false; }
     });
     apply.addEventListener('click', async () => {
         if (!ticket || !plan || input.value !== plan.hostname || busy) return;
         busy = true; apply.disabled = true; inspect.disabled = true; fields.disabled = true;
-        status.textContent = 'Выполняю подтверждённую очистку. Не закрывайте окно и не запускайте её повторно…';
+        status.textContent = {{ _("Выполняю подтверждённую очистку. Не закрывайте окно и не запускайте её повторно…")|tojson }};
         try {
             const data = await post(applyUrl, {ticket, confirmation: input.value});
-            status.textContent = 'Очистка завершена. Архив: ' + data.backup + '. Теперь проверьте Status и Monitoring.';
+            status.textContent = {{ _("Очистка завершена. Архив: ")|tojson }} + data.backup + {{ _(". Теперь проверьте Status и Monitoring.")|tojson }};
         } catch (error) { status.textContent = error.message; }
         finally { invalidate(); busy = false; inspect.disabled = false; fields.disabled = false; }
     });

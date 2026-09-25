@@ -10,13 +10,13 @@ msgstr ""
 "POT-Creation-Date: 2025-10-14 20:32+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: en <LL@li.org>\n"
 "Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: app/routes/api.py:81
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:81
@@ -218,8 +218,8 @@ msgstr "Data file successfully detached."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:476
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:542
 msgid ""
-"Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ "
-"шифрования."
+"Сервис управления данными не инициализирован. Проверьте конфигурацию и "
+"ключ шифрования."
 msgstr ""
 "The data management service has not been initialized. Check the "
 "configuration and encryption key."
@@ -228,16 +228,17 @@ msgstr ""
 #: backup_tools/legacy_backup_20251012_151015/app.py:1732
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:511
 msgid ""
-"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан с "
-"другим ключом."
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
+" с другим ключом."
 msgstr ""
-"Error: File cannot be decrypted or is corrupted. It may have been created "
-"with a different key."
+"Error: File cannot be decrypted or is corrupted. It may have been created"
+" with a different key."
 
 #: app/routes/main.py:519
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:519
 msgid ""
-"Не удалось сохранить путь к новому файлу данных. Изменение будет временным."
+"Не удалось сохранить путь к новому файлу данных. Изменение будет "
+"временным."
 msgstr "Failed to save path to new data file. The change will be temporary."
 
 #: app/routes/main.py:525 app/routes/main.py:553
@@ -271,10 +272,8 @@ msgstr "All servers from the imported file already exist in your list."
 #: app/routes/main.py:674
 #: backup_tools/legacy_backup_20251012_151015/app.py:1928
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:674
-msgid ""
-"Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
-msgstr ""
-"Error: Invalid encryption key. Check the correctness of the entered key."
+msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+msgstr "Error: Invalid encryption key. Check the correctness of the entered key."
 
 #: app/routes/main.py:676
 #: backup_tools/legacy_backup_20251012_151015/app.py:1930
@@ -375,8 +374,8 @@ msgstr "Authentication successful"
 
 #: backup_tools/legacy_backup_20251012_151015/app.py:1053
 msgid ""
-"Не удалось загрузить данные серверов. Проверьте подключение к интернету и "
-"целостность файла данных."
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
+" целостность файла данных."
 msgstr ""
 "Failed to load server data. Check your internet connection and data file "
 "integrity."
@@ -399,8 +398,8 @@ msgid ""
 "✅ Ключ успешно изменен! Создан новый файл данных: %(new_filename)s. "
 "Резервная копия сохранена как: %(backup_filename)s"
 msgstr ""
-"✅ Key successfully changed! New data file created: %(new_filename)s. Backup "
-"saved as: %(backup_filename)s"
+"✅ Key successfully changed! New data file created: %(new_filename)s. "
+"Backup saved as: %(backup_filename)s"
 
 #: backup_tools/legacy_backup_20251012_151015/app.py:2133
 msgid "❌ Некорректный формат ключа Fernet."
@@ -459,8 +458,7 @@ msgstr "500 - Internal server error"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:19
 #: templates/500.html:19
 msgid "Произошла внутренняя ошибка сервера. Мы работаем над её устранением."
-msgstr ""
-"An internal server error has occurred. We are working to eliminate it."
+msgstr "An internal server error has occurred. We are working to eliminate it."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:24
 #: templates/500.html:24
@@ -524,8 +522,8 @@ msgstr "Developer:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/about.html:16
 #: templates/about.html:16
 msgid ""
-"Программа для удобного и безопасного хранения информации о VPS/VDS серверах "
-"от различных провайдеров."
+"Программа для удобного и безопасного хранения информации о VPS/VDS "
+"серверах от различных провайдеров."
 msgstr ""
 "Program for convenient and secure storage of information about VPS/VDS "
 "servers from various providers."
@@ -1575,8 +1573,8 @@ msgid ""
 "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
 "используйте кнопку \"Управление чеками\"."
 msgstr ""
-"Use for quick loading of one check. To view all the checks, use the \"Chek "
-"Management\" button."
+"Use for quick loading of one check. To view all the checks, use the "
+"\"Chek Management\" button."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:213
 #: templates/edit_server.html:213
@@ -1724,8 +1722,8 @@ msgstr "Adding a New Server"
 #: templates/help.html:19
 msgid ""
 "Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
-"необходимые поля. Пароли будут автоматически зашифрованы перед сохранением. "
-"Вы также можете прикрепить файл (например, чек об оплате)."
+"необходимые поля. Пароли будут автоматически зашифрованы перед "
+"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
 msgstr ""
 "Click the \"Add Server\" button on the main page. Fill in all required "
 "fields. Passwords will be automatically encrypted before saving. You can "
@@ -1742,8 +1740,8 @@ msgid ""
 "Пароли намеренно не отображаются в открытом виде для безопасности. Чтобы "
 "увидеть сохраненный пароль, используйте иконку глаза."
 msgstr ""
-"Passwords are intentionally not displayed in plain text for security. To see"
-" the saved password, use the eye icon."
+"Passwords are intentionally not displayed in plain text for security. To "
+"see the saved password, use the eye icon."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:34
 #: templates/help.html:34
@@ -1803,8 +1801,8 @@ msgid ""
 "можете оставить поле пароля пустым, чтобы не изменять его."
 msgstr ""
 "Use the \"Edit\" and \"Delete\" buttons on each server card. Deletion "
-"requires confirmation. When editing, you can leave the password field empty "
-"to avoid changing it."
+"requires confirmation. When editing, you can leave the password field "
+"empty to avoid changing it."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:58
 #: templates/help.html:58
@@ -1828,9 +1826,9 @@ msgstr "SSH, Panel, Host (Passwords) - High Level"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в файле"
-msgstr ""
-"All passwords (for SSH, control panel and host cabinet) are stored in file"
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
+"файле"
+msgstr "All passwords (for SSH, control panel and host cabinet) are stored in file"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
@@ -1845,8 +1843,8 @@ msgstr "encrypted form"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"с использованием надежного алгоритма. Для шифрования используется секретный "
-"ключ из файла"
+"с использованием надежного алгоритма. Для шифрования используется "
+"секретный ключ из файла"
 msgstr "using a reliable algorithm. For encryption, a secret key from file"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
@@ -1872,8 +1870,8 @@ msgstr "plain text"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:71
 #: templates/help.html:71
 msgid ""
-"Они не шифруются, но на главной странице их пути маскируются для защиты от "
-"случайных взглядов."
+"Они не шифруются, но на главной странице их пути маскируются для защиты "
+"от случайных взглядов."
 msgstr ""
 "They are not encrypted, but on the main page their paths are masked to "
 "protect from casual glances."
@@ -1890,8 +1888,8 @@ msgid ""
 "отображения на странице или при копировании в буфер обмена. В файле они "
 "всегда остаются зашифрованными."
 msgstr ""
-"All encrypted data is decrypted \"on the fly\" only when displayed on the "
-"page or copied to clipboard. In the file, they always remain encrypted."
+"All encrypted data is decrypted \"on the fly\" only when displayed on the"
+" page or copied to clipboard. In the file, they always remain encrypted."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:85
 #: templates/help.html:85
@@ -1903,8 +1901,7 @@ msgstr "Diagnostics and IP Checking"
 msgid ""
 "Приложение включает в себя инструменты для быстрой диагностики сети и "
 "серверов."
-msgstr ""
-"The application includes tools for quick network and server diagnostics."
+msgstr "The application includes tools for quick network and server diagnostics."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
 #: templates/help.html:92
@@ -1914,11 +1911,11 @@ msgstr "IP and DNS Test:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
 #: templates/help.html:92
 msgid ""
-"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", которые"
-" ведут на внешние сервисы"
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
+"которые ведут на внешние сервисы"
 msgstr ""
-"At the top of the main page are \"IP Test\" and \"DNS Test\" buttons that "
-"lead to external services"
+"At the top of the main page are \"IP Test\" and \"DNS Test\" buttons that"
+" lead to external services"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:535
@@ -1943,12 +1940,12 @@ msgstr "Automatic Geolocation:"
 #: templates/help.html:93
 msgid ""
 "При добавлении или редактировании сервера приложение автоматически "
-"определяет его геолокацию (страну и город) по IP-адресу и отображает её в "
-"шапке карточки."
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
+" шапке карточки."
 msgstr ""
-"When adding or editing a server, the application automatically determines "
-"its geolocation (country and city) by IP address and displays it in the card"
-" header."
+"When adding or editing a server, the application automatically determines"
+" its geolocation (country and city) by IP address and displays it in the "
+"card header."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:94
 #: templates/help.html:94
@@ -1966,8 +1963,8 @@ msgid ""
 "\"Проверить IP\". При нажатии на неё открывается всплывающее окно с "
 "подробной информацией об IP-адресе сервера от сервиса"
 msgstr ""
-"\"Check IP\". When clicked, a popup window opens with detailed information "
-"about the server's IP address from service"
+"\"Check IP\". When clicked, a popup window opens with detailed "
+"information about the server's IP address from service"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:94
 #: templates/help.html:94
@@ -1992,11 +1989,12 @@ msgstr "\"IP Owner\" opens the service"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid ""
-"в новой вкладке для детального анализа владельца IP-адреса сервера, включая "
-"информацию об организации, провайдере и геолокации."
+"в новой вкладке для детального анализа владельца IP-адреса сервера, "
+"включая информацию об организации, провайдере и геолокации."
 msgstr ""
-"in a new tab for a detailed analysis of the owner of the server IP address, "
-"including information about the organization, provider and geolocation."
+"in a new tab for a detailed analysis of the owner of the server IP "
+"address, including information about the organization, provider and "
+"geolocation."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:104
 #: templates/help.html:104
@@ -2011,9 +2009,10 @@ msgid ""
 "стриминговыми сервисами, имеющими геолокационные ограничения (например, "
 "9Now, Hulu, BBC iPlayer)."
 msgstr ""
-"On each server card, there is a row with three indicators that help quickly "
-"assess whether the IP address is suitable for use with streaming services "
-"that have geolocation restrictions (e.g., 9Now, Hulu, BBC iPlayer)."
+"On each server card, there is a row with three indicators that help "
+"quickly assess whether the IP address is suitable for use with streaming "
+"services that have geolocation restrictions (e.g., 9Now, Hulu, BBC "
+"iPlayer)."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:111
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:114
@@ -2033,8 +2032,8 @@ msgid ""
 "Это результат автоматической проверки. Приложение анализирует, кому "
 "принадлежит IP-адрес."
 msgstr ""
-"This is the result of an automatic check. The application analyzes who owns "
-"the IP address."
+"This is the result of an automatic check. The application analyzes who "
+"owns the IP address."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:114
 #: templates/help.html:114
@@ -2049,8 +2048,8 @@ msgid ""
 "Внимание. IP-адрес выдан дата-центром или VPN-провайдером. Вероятность "
 "блокировки на стриминговых платформах очень высока."
 msgstr ""
-"Attention. The IP address is issued by a data center or VPN provider. The "
-"probability of being blocked on streaming platforms is very high."
+"Attention. The IP address is issued by a data center or VPN provider. The"
+" probability of being blocked on streaming platforms is very high."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:119
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:122
@@ -2069,15 +2068,15 @@ msgstr "DNS OK"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:120
 #: templates/help.html:120
 msgid ""
-"Это результат ручной проверки, которую вы должны провести самостоятельно. "
-"Многие стриминговые сервисы определяют ваше реальное местоположение через "
-"DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), сервис "
-"поймет, что вы используете VPN."
+"Это результат ручной проверки, которую вы должны провести самостоятельно."
+" Многие стриминговые сервисы определяют ваше реальное местоположение "
+"через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
+"сервис поймет, что вы используете VPN."
 msgstr ""
-"This is the result of a manual check that you must perform yourself. Many "
-"streaming services determine your real location through DNS requests. If "
-"they \"leak\" (go past your VPN server), the service will understand that "
-"you are using a VPN."
+"This is the result of a manual check that you must perform yourself. Many"
+" streaming services determine your real location through DNS requests. If"
+" they \"leak\" (go past your VPN server), the service will understand "
+"that you are using a VPN."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:122
 #: templates/help.html:122
@@ -2129,8 +2128,8 @@ msgid ""
 "Вы подтвердили, что сервис работает, установив галочку \"Стриминг-тест "
 "пройден\"."
 msgstr ""
-"You have confirmed that the service is working by checking the \"Streaming "
-"test passed\" box."
+"You have confirmed that the service is working by checking the "
+"\"Streaming test passed\" box."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:142
 #: templates/help.html:142
@@ -2140,8 +2139,8 @@ msgstr "Data Management and Encryption"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:147
 #: templates/help.html:147
 msgid ""
-"Вся информация о ваших серверах хранится в одном зашифрованном файле, что "
-"обеспечивает как безопасность, так и портативность данных."
+"Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
+" обеспечивает как безопасность, так и портативность данных."
 msgstr ""
 "All information about your servers is stored in a single encrypted file, "
 "which ensures both security and data portability."
@@ -2155,26 +2154,26 @@ msgstr "How does it work?"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:151
 #: templates/help.html:151
 msgid ""
-"Все данные о серверах, которые вы вводите, собираются вместе и преобразуются"
-" в единый текстовый блок (в формате JSON). Затем этот блок полностью "
-"шифруется и сохраняется в файл с расширением .enc."
+"Все данные о серверах, которые вы вводите, собираются вместе и "
+"преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
+"полностью шифруется и сохраняется в файл с расширением .enc."
 msgstr ""
 "All server data you enter is collected and converted into a single text "
-"block (in JSON format). This block is then fully encrypted and saved to a "
-"file with the .enc extension."
+"block (in JSON format). This block is then fully encrypted and saved to a"
+" file with the .enc extension."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:154
 #: templates/help.html:154
 msgid ""
-"Можно представить это как подробный чертеж (ваши данные), который разрезали "
-"на тысячи мельчайших кусочков и сложили в коробку (файл .enc). Без точной "
-"инструкции по сборке (ключа шифрования SECRET_KEY) никто не сможет "
-"восстановить исходный чертеж."
+"Можно представить это как подробный чертеж (ваши данные), который "
+"разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
+"Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
+"сможет восстановить исходный чертеж."
 msgstr ""
 "You can imagine it as a detailed blueprint (your data) that has been cut "
-"into thousands of tiny pieces and placed in a box (.enc file). Without the "
-"exact assembly instructions (the SECRET_KEY encryption key), no one can "
-"restore the original blueprint."
+"into thousands of tiny pieces and placed in a box (.enc file). Without "
+"the exact assembly instructions (the SECRET_KEY encryption key), no one "
+"can restore the original blueprint."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:157
 #: templates/help.html:157
@@ -2208,11 +2207,11 @@ msgstr "Import and attach:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:161
 #: templates/help.html:161
 msgid ""
-"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, и "
-"все ваши серверы появятся в списке."
+"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
+"и все ваши серверы появятся в списке."
 msgstr ""
-"Upload a previously exported file. The application will start working with "
-"it, and all your servers will appear in the list."
+"Upload a previously exported file. The application will start working "
+"with it, and all your servers will appear in the list."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
 #: templates/help.html:162
@@ -2222,11 +2221,11 @@ msgstr "Detach file:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
 #: templates/help.html:162
 msgid ""
-"Прекратить работу с текущим файлом. Список серверов станет пустым, как при "
-"первой установке. Сам файл при этом не удаляется."
+"Прекратить работу с текущим файлом. Список серверов станет пустым, как "
+"при первой установке. Сам файл при этом не удаляется."
 msgstr ""
-"Stop working with the current file. The server list will become empty, as in"
-" the first installation. The file itself is not deleted."
+"Stop working with the current file. The server list will become empty, as"
+" in the first installation. The file itself is not deleted."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:165
 #: templates/help.html:165
@@ -2236,11 +2235,12 @@ msgstr "Fernet encryption algorithm"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:167
 #: templates/help.html:167
 msgid ""
-"Для защиты ваших данных используется Fernet — это высокоуровневая система "
-"симметричного (с секретным ключом) шифрования из библиотеки cryptography."
+"Для защиты ваших данных используется Fernet — это высокоуровневая система"
+" симметричного (с секретным ключом) шифрования из библиотеки "
+"cryptography."
 msgstr ""
-"Fernet is used to protect your data - it is a high-level symmetric (secret "
-"key) encryption system from the cryptography library."
+"Fernet is used to protect your data - it is a high-level symmetric "
+"(secret key) encryption system from the cryptography library."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:169
 #: templates/help.html:169
@@ -2255,13 +2255,13 @@ msgstr "Authenticity guarantee:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:171
 #: templates/help.html:171
 msgid ""
-"Fernet гарантирует, что зашифрованные данные не были изменены или подделаны."
-" Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет"
-" быть расшифрован."
+"Fernet гарантирует, что зашифрованные данные не были изменены или "
+"подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
+" он не сможет быть расшифрован."
 msgstr ""
-"Fernet guarantees that encrypted data has not been altered or tampered with."
-" If someone tries to change even one character in the .enc file, it cannot "
-"be decrypted."
+"Fernet guarantees that encrypted data has not been altered or tampered "
+"with. If someone tries to change even one character in the .enc file, it "
+"cannot be decrypted."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:172
 #: templates/help.html:172
@@ -2272,8 +2272,8 @@ msgstr "Reliable algorithms:"
 #: templates/help.html:172
 msgid ""
 "\"Под капотом\" Fernet использует стандартные и проверенные временем "
-"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с "
-"SHA256 для аутентификации (проверки подлинности)."
+"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
+" SHA256 для аутентификации (проверки подлинности)."
 msgstr ""
 "\"Under the hood\" Fernet uses standard and time-tested cryptographic "
 "algorithms: AES-128 in CBC mode for encryption and HMAC with SHA256 for "
@@ -2294,11 +2294,11 @@ msgstr "Important:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:175
 #: templates/help.html:175
 msgid ""
-"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в "
-"файле .env. Никогда и никому его не передавайте."
+"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
+" файле .env. Никогда и никому его не передавайте."
 msgstr ""
-"The entire security of the system depends on the secrecy of your SECRET_KEY "
-"in the .env file. Never share it with anyone."
+"The entire security of the system depends on the secrecy of your "
+"SECRET_KEY in the .env file. Never share it with anyone."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:184
 #: templates/help.html:184
@@ -2308,8 +2308,8 @@ msgstr "Import from Another Installation"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:189
 #: templates/help.html:189
 msgid ""
-"Эта функция позволяет перенести данные о серверах из другой установки VPN "
-"Server Manager, даже если у неё другой ключ шифрования."
+"Эта функция позволяет перенести данные о серверах из другой установки VPN"
+" Server Manager, даже если у неё другой ключ шифрования."
 msgstr ""
 "This feature allows you to transfer server data from another VPN Server "
 "Manager installation, even if it has a different encryption key."
@@ -2322,11 +2322,11 @@ msgstr "When is this needed?"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:193
 #: templates/help.html:193
 msgid ""
-"Вы настроили приложение на другом компьютере и хотите перенести данные на "
-"новый"
+"Вы настроили приложение на другом компьютере и хотите перенести данные на"
+" новый"
 msgstr ""
-"You have set up the application on another computer and want to transfer the"
-" data to a new one"
+"You have set up the application on another computer and want to transfer "
+"the data to a new one"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:194
 #: templates/help.html:194
@@ -2394,11 +2394,11 @@ msgstr "Transfer:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:207
 #: templates/help.html:207
 msgid ""
-"Скопируйте оба элемента на новый компьютер любым удобным способом (флешка, "
-"облако, email)"
+"Скопируйте оба элемента на новый компьютер любым удобным способом "
+"(флешка, облако, email)"
 msgstr ""
-"Copy both items to the new computer in any convenient way (USB flash drive, "
-"cloud, email)"
+"Copy both items to the new computer in any convenient way (USB flash "
+"drive, cloud, email)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:208
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:655
@@ -2507,8 +2507,7 @@ msgstr "What happens during import?"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:229
 #: templates/help.html:229
-msgid ""
-"Приложение расшифровывает внешний файл с помощью предоставленного ключа"
+msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
 msgstr "The application decrypts the external file using the provided key"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:230
@@ -2557,8 +2556,8 @@ msgid ""
 "Внешний ключ не сохраняется в системе - он используется только для "
 "одноразового импорта"
 msgstr ""
-"The external key is not saved in the system - it is used only for a one-time"
-" import"
+"The external key is not saved in the system - it is used only for a one-"
+"time import"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:242
 #: templates/help.html:242
@@ -2577,11 +2576,11 @@ msgstr "Tip:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
 #: templates/help.html:248
 msgid ""
-"Для регулярного обмена данными между установками рекомендуется использовать "
-"одинаковый"
+"Для регулярного обмена данными между установками рекомендуется "
+"использовать одинаковый"
 msgstr ""
-"For regular data exchange between installations, it is recommended to use "
-"the same"
+"For regular data exchange between installations, it is recommended to use"
+" the same"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
 #: templates/help.html:248
@@ -2601,11 +2600,11 @@ msgstr "What is SECRET_KEY and where to get it?"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:262
 #: templates/help.html:262
 msgid ""
-"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных "
-"в приложении. Он абсолютно необходим для работы."
+"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех "
+"данных в приложении. Он абсолютно необходим для работы."
 msgstr ""
-"<code>SECRET_KEY</code> is your master password for encrypting all data in "
-"the application. It is absolutely essential for operation."
+"<code>SECRET_KEY</code> is your master password for encrypting all data "
+"in the application. It is absolutely essential for operation."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:264
 #: templates/help.html:264
@@ -2616,8 +2615,8 @@ msgstr "Where it is located:"
 #: templates/help.html:264
 msgid "Ключ хранится в файле <code>.env</code> в корневой папке приложения."
 msgstr ""
-"The key is stored in the <code>.env</code> file in the root folder of the "
-"application."
+"The key is stored in the <code>.env</code> file in the root folder of the"
+" application."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:265
 #: templates/help.html:265
@@ -2627,20 +2626,20 @@ msgstr "How to generate:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:265
 #: templates/help.html:265
 msgid ""
-"Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого"
-" можно использовать Python:"
+"Если вы запускаете приложение в первый раз, вам нужно создать его. Для "
+"этого можно использовать Python:"
 msgstr ""
-"If you are running the application for the first time, you need to create "
-"it. To do this, you can use Python:"
+"If you are running the application for the first time, you need to create"
+" it. To do this, you can use Python:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:268
 #: templates/help.html:268
 msgid ""
-"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в "
-"таком виде:"
+"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code>"
+" в таком виде:"
 msgstr ""
-"Copy the resulting long code and paste it into the <code>.env</code> file in"
-" this form:"
+"Copy the resulting long code and paste it into the <code>.env</code> file"
+" in this form:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:269
 #: templates/help.html:269
@@ -2655,13 +2654,13 @@ msgstr "IMPORTANT:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:271
 #: templates/help.html:271
 msgid ""
-"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ "
-"ко всем данным. Если вы переносите приложение, обязательно скопируйте файл "
-"<code>.env</code> вместе с остальными данными."
+"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете "
+"доступ ко всем данным. Если вы переносите приложение, обязательно "
+"скопируйте файл <code>.env</code> вместе с остальными данными."
 msgstr ""
-"Never share this key with anyone! If you lose it, you will lose access to "
-"all your data. If you are transferring the application, be sure to copy the "
-"<code>.env</code> file along with the rest of the data."
+"Never share this key with anyone! If you lose it, you will lose access to"
+" all your data. If you are transferring the application, be sure to copy "
+"the <code>.env</code> file along with the rest of the data."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:280
 #: templates/help.html:280
@@ -2680,13 +2679,14 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:288
 #: templates/help.html:288
 msgid ""
-"Эта инструкция предназначена для текущей \"портативной\" версии приложения. "
-"В будущем, для версий, установленных через инсталлятор (Windows, macOS), "
-"будет предусмотрен специальный механизм экспорта и импорта."
+"Эта инструкция предназначена для текущей \"портативной\" версии "
+"приложения. В будущем, для версий, установленных через инсталлятор "
+"(Windows, macOS), будет предусмотрен специальный механизм экспорта и "
+"импорта."
 msgstr ""
-"This instruction is for the current \"portable\" version of the application."
-" In the future, for versions installed via an installer (Windows, macOS), a "
-"special export and import mechanism will be provided."
+"This instruction is for the current \"portable\" version of the "
+"application. In the future, for versions installed via an installer "
+"(Windows, macOS), a special export and import mechanism will be provided."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:291
 #: templates/help.html:291
@@ -2699,8 +2699,8 @@ msgid ""
 "Для полного переноса вам нужно скопировать <strong>3 ключевых "
 "элемента</strong> из папки проекта:"
 msgstr ""
-"For a full transfer, you need to copy <strong>3 key elements</strong> from "
-"the project folder:"
+"For a full transfer, you need to copy <strong>3 key elements</strong> "
+"from the project folder:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:294
 #: templates/help.html:294
@@ -2710,11 +2710,13 @@ msgstr "File <code>.env</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:294
 #: templates/help.html:294
 msgid ""
-"— самый важный файл! В нем содержится ваш уникальный <code>SECRET_KEY</code>"
-" для расшифровки данных. <strong>Без него все данные будут утеряны.</strong>"
+"— самый важный файл! В нем содержится ваш уникальный "
+"<code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все "
+"данные будут утеряны.</strong>"
 msgstr ""
-"— the most important file! It contains your unique <code>SECRET_KEY</code> "
-"for decrypting data. <strong>Without it, all data will be lost.</strong>"
+"— the most important file! It contains your unique "
+"<code>SECRET_KEY</code> for decrypting data. <strong>Without it, all data"
+" will be lost.</strong>"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:295
 #: templates/help.html:295
@@ -2738,10 +2740,11 @@ msgstr "Folder <code>/uploads/</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:296
 #: templates/help.html:296
 msgid ""
-"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об оплате."
+"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об "
+"оплате."
 msgstr ""
-"— this is where all the files you have uploaded are stored: server icons and"
-" payment receipts."
+"— this is where all the files you have uploaded are stored: server icons "
+"and payment receipts."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:299
 #: templates/help.html:299
@@ -2755,9 +2758,9 @@ msgid ""
 "<code>VPNserverManage.zip</code>). Это самый надежный способ ничего не "
 "забыть."
 msgstr ""
-"On the old computer, create an archive of the entire application folder (for"
-" example, <code>VPNserverManage.zip</code>). This is the most reliable way "
-"to not forget anything."
+"On the old computer, create an archive of the entire application folder "
+"(for example, <code>VPNserverManage.zip</code>). This is the most "
+"reliable way to not forget anything."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:302
 #: templates/help.html:302
@@ -2786,11 +2789,11 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:309
 #: templates/help.html:309
 msgid ""
-"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на"
-" месте."
+"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть"
+" на месте."
 msgstr ""
-"Launch the application. All your data, including receipts and icons, should "
-"be in place."
+"Launch the application. All your data, including receipts and icons, "
+"should be in place."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:312
 #: templates/help.html:312
@@ -2850,7 +2853,8 @@ msgid ""
 "Статические файлы (CSS, изображения, иконки <code>.png</code> и "
 "<code>.icns</code>)."
 msgstr ""
-"Static files (CSS, images, icons <code>.png</code> and <code>.icns</code>)."
+"Static files (CSS, images, icons <code>.png</code> and "
+"<code>.icns</code>)."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:332
 #: templates/help.html:332
@@ -2860,24 +2864,24 @@ msgstr "How to see all passwords at once (decryption)?"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:338
 #: templates/help.html:338
 msgid ""
-"Хотя приложение позволяет просматривать пароли по одному через интерфейс, "
-"может возникнуть ситуация, когда вам нужно получить доступ ко всем данным "
-"сразу в читаемом виде. Например, для резервного копирования в текстовый файл"
-" или для переноса в другую систему."
+"Хотя приложение позволяет просматривать пароли по одному через интерфейс,"
+" может возникнуть ситуация, когда вам нужно получить доступ ко всем "
+"данным сразу в читаемом виде. Например, для резервного копирования в "
+"текстовый файл или для переноса в другую систему."
 msgstr ""
-"Although the application allows you to view passwords one at a time through "
-"the interface, there may be a situation where you need to access all the "
-"data at once in a readable form. For example, for backing up to a text file "
-"or for transferring to another system."
+"Although the application allows you to view passwords one at a time "
+"through the interface, there may be a situation where you need to access "
+"all the data at once in a readable form. For example, for backing up to a"
+" text file or for transferring to another system."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:341
 #: templates/help.html:341
 msgid ""
-"Для этой цели в корневой папке проекта существует специальный инструмент — "
-"<code>decrypt_tool.py</code>."
-msgstr ""
-"For this purpose, there is a special tool in the root folder of the project "
+"Для этой цели в корневой папке проекта существует специальный инструмент "
 "— <code>decrypt_tool.py</code>."
+msgstr ""
+"For this purpose, there is a special tool in the root folder of the "
+"project — <code>decrypt_tool.py</code>."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:344
 #: templates/help.html:344
@@ -2891,14 +2895,14 @@ msgid ""
 "<code>.env</code> для полной расшифровки файла с данными "
 "<code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную "
 "структуру и расшифровывает все учетные данные: <strong>SSH, панель "
-"управления и кабинет хостера</strong>, после чего выводит все в терминал в "
-"структурированном виде."
+"управления и кабинет хостера</strong>, после чего выводит все в терминал "
+"в структурированном виде."
 msgstr ""
 "This script uses your <code>SECRET_KEY</code> from the <code>.env</code> "
-"file to fully decrypt the data file <code>data/servers.json.enc</code>. It "
-"correctly handles the nested structure and decrypts all credentials: "
-"<strong>SSH, control panel, and hoster's account</strong>, after which it "
-"outputs everything to the terminal in a structured form."
+"file to fully decrypt the data file <code>data/servers.json.enc</code>. "
+"It correctly handles the nested structure and decrypts all credentials: "
+"<strong>SSH, control panel, and hoster's account</strong>, after which it"
+" outputs everything to the terminal in a structured form."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:349
 #: templates/help.html:349
@@ -2911,14 +2915,14 @@ msgid ""
 "Вам нужно выполнить одну команду в терминале, находясь в корневой папке "
 "проекта:"
 msgstr ""
-"You need to execute one command in the terminal, being in the root folder of"
-" the project:"
+"You need to execute one command in the terminal, being in the root folder"
+" of the project:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:354
 #: templates/help.html:354
 msgid ""
-"Эта команда сначала активирует необходимое виртуальное окружение, а затем "
-"запускает скрипт для расшифровки."
+"Эта команда сначала активирует необходимое виртуальное окружение, а затем"
+" запускает скрипт для расшифровки."
 msgstr ""
 "This command first activates the necessary virtual environment, and then "
 "launches the decryption script."
@@ -2933,12 +2937,12 @@ msgstr "Attention:"
 #: templates/help.html:357
 msgid ""
 "Выводимые данные (включая все пароли) будут видны в вашем терминале. "
-"Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет "
-"увидеть ваш экран."
+"Убедитесь, что вы делаете это в безопасной обстановке, где никто не "
+"сможет увидеть ваш экран."
 msgstr ""
-"The output data (including all passwords) will be visible in your terminal. "
-"Make sure you are doing this in a safe environment where no one can see your"
-" screen."
+"The output data (including all passwords) will be visible in your "
+"terminal. Make sure you are doing this in a safe environment where no one"
+" can see your screen."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:366
 #: templates/help.html:366
@@ -2949,10 +2953,11 @@ msgstr "Features of working on macOS"
 #: templates/help.html:371
 msgid ""
 "В установленной версии приложения для macOS данные хранятся в "
-"пользовательской директории для соответствия стандартам безопасности Apple."
+"пользовательской директории для соответствия стандартам безопасности "
+"Apple."
 msgstr ""
-"In the installed version of the application for macOS, data is stored in the"
-" user's directory to comply with Apple's security standards."
+"In the installed version of the application for macOS, data is stored in "
+"the user's directory to comply with Apple's security standards."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:373
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:394
@@ -2973,15 +2978,15 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:376
 #: templates/help.html:376
 msgid ""
-"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» "
-"(Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт "
-"«Library». В открывшейся папке далее перейдите в «Application Support», а "
-"затем в «VPNServerManager»."
+"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню "
+"«Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите "
+"появившийся пункт «Library». В открывшейся папке далее перейдите в "
+"«Application Support», а затем в «VPNServerManager»."
 msgstr ""
-"To quickly get to this folder: open Finder, click on the \"Go\" menu, hold "
-"down the <code>Option (⌥)</code> key and select the \"Library\" item that "
-"appears. In the folder that opens, then go to \"Application Support\", and "
-"then to \"VPNServerManager\"."
+"To quickly get to this folder: open Finder, click on the \"Go\" menu, "
+"hold down the <code>Option (⌥)</code> key and select the \"Library\" item"
+" that appears. In the folder that opens, then go to \"Application "
+"Support\", and then to \"VPNServerManager\"."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:378
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:399
@@ -2995,11 +3000,11 @@ msgstr "Development version"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:421
 #: templates/help.html:379 templates/help.html:400 templates/help.html:421
 msgid ""
-"Если вы запускаете приложение из исходного кода, все данные хранятся прямо в"
-" папке проекта для удобства отладки."
+"Если вы запускаете приложение из исходного кода, все данные хранятся "
+"прямо в папке проекта для удобства отладки."
 msgstr ""
-"If you run the application from the source code, all data is stored directly"
-" in the project folder for ease of debugging."
+"If you run the application from the source code, all data is stored "
+"directly in the project folder for ease of debugging."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:387
 #: templates/help.html:387
@@ -3055,11 +3060,10 @@ msgstr "Features of working on Linux"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
 #: templates/help.html:413
-msgid ""
-"В установленной версии приложения для Linux данные хранятся в директории"
+msgid "В установленной версии приложения для Linux данные хранятся в директории"
 msgstr ""
-"In the installed version of the application for Linux, data is stored in the"
-" directory"
+"In the installed version of the application for Linux, data is stored in "
+"the directory"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
 #: templates/help.html:413
@@ -3081,8 +3085,8 @@ msgid ""
 "является скрытой. Чтобы увидеть её в файловом менеджере, включите "
 "отображение скрытых файлов (обычно по нажатию"
 msgstr ""
-"is hidden. To see it in the file manager, enable the display of hidden files"
-" (usually by pressing"
+"is hidden. To see it in the file manager, enable the display of hidden "
+"files (usually by pressing"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:418
 #: templates/help.html:418
@@ -3097,11 +3101,11 @@ msgstr "Creating and configuring application icons"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:434
 #: templates/help.html:434
 msgid ""
-"Приложение поддерживает кастомные иконки для каждой операционной системы. "
-"Это позволяет создать единый визуальный стиль на всех платформах."
+"Приложение поддерживает кастомные иконки для каждой операционной системы."
+" Это позволяет создать единый визуальный стиль на всех платформах."
 msgstr ""
-"The application supports custom icons for each operating system. This allows"
-" you to create a single visual style on all platforms."
+"The application supports custom icons for each operating system. This "
+"allows you to create a single visual style on all platforms."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:436
 #: templates/help.html:436
@@ -3126,8 +3130,8 @@ msgstr "pixels"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:438
 #: templates/help.html:438
 msgid ""
-"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, "
-"включая Retina-дисплеи."
+"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
+" включая Retina-дисплеи."
 msgstr ""
 "with a transparent background. This will ensure the best quality on all "
 "devices, including Retina displays."
@@ -3213,8 +3217,7 @@ msgstr "Manual icon creation"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:455
 #: templates/help.html:455
 msgid "Если вы хотите создать иконки вручную или скрипты сборки не работают:"
-msgstr ""
-"If you want to create icons manually or the build scripts do not work:"
+msgstr "If you want to create icons manually or the build scripts do not work:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:457
 #: templates/help.html:457
@@ -3283,11 +3286,10 @@ msgstr "Replacing the icon in an already built application"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:500
 #: templates/help.html:500
-msgid ""
-"Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
+msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
 msgstr ""
-"If you want to replace the icon in an already finished application without "
-"rebuilding:"
+"If you want to replace the icon in an already finished application "
+"without rebuilding:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:502
 #: templates/help.html:502
@@ -3307,8 +3309,7 @@ msgstr "Right-click → \"Get Info\""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:506
 #: templates/help.html:506
 msgid "Перетащите новую иконку на маленькую иконку в левом верхнем углу окна"
-msgstr ""
-"Drag the new icon to the small icon in the upper left corner of the window"
+msgstr "Drag the new icon to the small icon in the upper left corner of the window"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:507
 #: templates/help.html:507
@@ -3384,11 +3385,11 @@ msgstr "Check how the icon looks on different backgrounds (light/dark)."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:522
 #: templates/help.html:522
 msgid ""
-"Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую "
-"совместимость."
+"Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
+"лучшую совместимость."
 msgstr ""
-"Always use PNG with transparency as the source - this will ensure the best "
-"compatibility."
+"Always use PNG with transparency as the source - this will ensure the "
+"best compatibility."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:526
 #: templates/help.html:526
@@ -3396,8 +3397,8 @@ msgid ""
 "После замены иконки может потребоваться перезагрузка системы или очистка "
 "кэша иконок, чтобы изменения стали видны в файловом менеджере."
 msgstr ""
-"After replacing the icon, you may need to restart the system or clear the "
-"icon cache for the changes to become visible in the file manager."
+"After replacing the icon, you may need to restart the system or clear the"
+" icon cache for the changes to become visible in the file manager."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:529
 #: templates/help.html:529
@@ -3407,10 +3408,11 @@ msgstr "Troubleshooting icons"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:530
 #: templates/help.html:530
 msgid ""
-"Если иконки не отображаются или приложение собирается с дефектными иконками:"
+"Если иконки не отображаются или приложение собирается с дефектными "
+"иконками:"
 msgstr ""
-"If the icons are not displayed or the application is built with defective "
-"icons:"
+"If the icons are not displayed or the application is built with defective"
+" icons:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:532
 #: templates/help.html:532
@@ -3562,9 +3564,9 @@ msgid ""
 "иконки после успешной сборки. Это поможет быстро восстановить "
 "функциональность в случае проблем."
 msgstr ""
-"If problems with icons persist, create a backup of the working icon after a "
-"successful build. This will help to quickly restore functionality in case of"
-" problems."
+"If problems with icons persist, create a backup of the working icon after"
+" a successful build. This will help to quickly restore functionality in "
+"case of problems."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:572
 #: templates/help.html:572
@@ -3584,11 +3586,11 @@ msgstr "Description of Files and Directories"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:600
 #: templates/help.html:600
 msgid ""
-"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию"
-" с PyWebView для создания окна."
+"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
+"интеграцию с PyWebView для создания окна."
 msgstr ""
-"The heart of the application. Contains a Flask web server, encryption logic "
-"and integration with PyWebView to create a window."
+"The heart of the application. Contains a Flask web server, encryption "
+"logic and integration with PyWebView to create a window."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:601
 #: templates/help.html:601
@@ -3607,8 +3609,7 @@ msgstr "A list of all the Python libraries needed to run."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:603
 #: templates/help.html:603
-msgid ""
-"Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
+msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
 msgstr ""
 "Settings file, stores information about the version and URLs of external "
 "services."
@@ -3631,11 +3632,11 @@ msgstr "A JSON file containing all information about the servers."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:605
 #: templates/help.html:605
 msgid ""
-"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-"
-"интерфейса."
+"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
+"веб-интерфейса."
 msgstr ""
-"Folders with static resources (CSS, images) and HTML templates for the web "
-"interface."
+"Folders with static resources (CSS, images) and HTML templates for the "
+"web interface."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:608
 #: templates/help.html:608
@@ -3650,8 +3651,8 @@ msgstr "Launch"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:610
 #: templates/help.html:610
 msgid ""
-"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно"
-" с помощью PyWebView."
+"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
+"окно с помощью PyWebView."
 msgstr ""
 "`app.py` starts a Flask web server in a background thread and creates a "
 "native window using PyWebView."
@@ -3679,11 +3680,11 @@ msgstr "Interaction"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:612
 #: templates/help.html:612
 msgid ""
-"Все действия пользователя обрабатываются Flask, который изменяет данные и "
-"снова шифрует их."
+"Все действия пользователя обрабатываются Flask, который изменяет данные и"
+" снова шифрует их."
 msgstr ""
-"All user actions are processed by Flask, which changes the data and encrypts"
-" it again."
+"All user actions are processed by Flask, which changes the data and "
+"encrypts it again."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
 #: templates/help.html:613
@@ -3693,11 +3694,11 @@ msgstr "Completion"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
 #: templates/help.html:613
 msgid ""
-"При закрытии окна PyWebView отправляет команду на выключение сервера Flask, "
-"который корректно завершает работу и освобождает порт."
+"При закрытии окна PyWebView отправляет команду на выключение сервера "
+"Flask, который корректно завершает работу и освобождает порт."
 msgstr ""
-"When the window is closed, PyWebView sends a command to shut down the Flask "
-"server, which correctly terminates and releases the port."
+"When the window is closed, PyWebView sends a command to shut down the "
+"Flask server, which correctly terminates and releases the port."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:622
 #: templates/help.html:622
@@ -3724,8 +3725,8 @@ msgstr "First Launch"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:630
 #: templates/help.html:630
 msgid ""
-"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У вас "
-"есть два варианта:"
+"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У "
+"вас есть два варианта:"
 msgstr ""
 "When you first launch the application, you will see the \"Access "
 "Restricted\" screen. You have two options:"
@@ -3738,11 +3739,11 @@ msgstr "Create a new PIN:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:632
 #: templates/help.html:632
 msgid ""
-"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый PIN"
-" и сбросит все данные."
+"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый "
+"PIN и сбросит все данные."
 msgstr ""
-"Click \"First Launch\" → \"Create a new PIN code\". This will create a new "
-"PIN and reset all data."
+"Click \"First Launch\" → \"Create a new PIN code\". This will create a "
+"new PIN and reset all data."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:633
 #: templates/help.html:633
@@ -3755,8 +3756,8 @@ msgid ""
 "Нажмите \"Первый запуск\" → \"Импортировать архив\". Это позволит "
 "восстановить данные из ранее созданного архива."
 msgstr ""
-"Click \"First Launch\" → \"Import archive\". This will allow you to restore "
-"data from a previously created archive."
+"Click \"First Launch\" → \"Import archive\". This will allow you to "
+"restore data from a previously created archive."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:636
 #: templates/help.html:636
@@ -3780,7 +3781,8 @@ msgstr "Double-click on the developer's name:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:639
 #: templates/help.html:639
 msgid ""
-"Внизу страницы найдите имя разработчика в футере и дважды кликните по нему."
+"Внизу страницы найдите имя разработчика в футере и дважды кликните по "
+"нему."
 msgstr ""
 "At the bottom of the page, find the developer's name in the footer and "
 "double-click on it."
@@ -3888,8 +3890,7 @@ msgstr "PIN display:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:656
 #: templates/help.html:656
 msgid "При импорте PIN отображается в отдельном окне для записи"
-msgstr ""
-"During import, the PIN is displayed in a separate window for recording"
+msgstr "During import, the PIN is displayed in a separate window for recording"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:659
 #: templates/help.html:659
@@ -3934,20 +3935,22 @@ msgstr "Logging out"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:670
 #: templates/help.html:670
 msgid ""
-"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели навигации. "
-"После выхода потребуется повторный ввод PIN-кода для доступа к данным."
+"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели "
+"навигации. После выхода потребуется повторный ввод PIN-кода для доступа к"
+" данным."
 msgstr ""
 "To log out, click the \"Logout\" button in the top navigation bar. After "
-"logging out, you will need to enter the PIN code again to access the data."
+"logging out, you will need to enter the PIN code again to access the "
+"data."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:676
 #: templates/help.html:676
 msgid ""
-"Запишите PIN-код в надежном месте - без него вы не сможете получить доступ к"
-" данным"
+"Запишите PIN-код в надежном месте - без него вы не сможете получить "
+"доступ к данным"
 msgstr ""
-"Write down the PIN code in a safe place - without it, you will not be able "
-"to access your data"
+"Write down the PIN code in a safe place - without it, you will not be "
+"able to access your data"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:677
 #: templates/help.html:677
@@ -3957,11 +3960,11 @@ msgstr "When creating a new PIN, all existing data will be deleted"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:678
 #: templates/help.html:678
 msgid ""
-"PIN-код не восстанавливается - если вы его забудете, потребуется создавать "
-"новый"
+"PIN-код не восстанавливается - если вы его забудете, потребуется "
+"создавать новый"
 msgstr ""
-"The PIN code cannot be recovered - if you forget it, you will need to create"
-" a new one"
+"The PIN code cannot be recovered - if you forget it, you will need to "
+"create a new one"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:684
 #: templates/help.html:684
@@ -3969,8 +3972,8 @@ msgid ""
 "Для максимальной безопасности используйте PIN-код длиной 6-8 символов, "
 "содержащий цифры и буквы."
 msgstr ""
-"For maximum security, use a PIN code that is 6-8 characters long, containing"
-" both numbers and letters."
+"For maximum security, use a PIN code that is 6-8 characters long, "
+"containing both numbers and letters."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:693
 #: templates/help.html:693
@@ -3994,18 +3997,17 @@ msgstr ") you see an error "
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:699
 #: templates/help.html:699
-msgid ""
-", это означает, что в вашем окружении отсутствует необходимая библиотека."
+msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
 msgstr ", it means that a required library is missing in your environment."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:700
 #: templates/help.html:700
 msgid ""
-"Это происходит, когда в проект добавляется новая функциональность (например,"
-" как недавно был добавлен `pywebview`)."
+"Это происходит, когда в проект добавляется новая функциональность "
+"(например, как недавно был добавлен `pywebview`)."
 msgstr ""
-"This happens when new functionality is added to the project (for example, "
-"like `pywebview` was recently added)."
+"This happens when new functionality is added to the project (for example,"
+" like `pywebview` was recently added)."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:701
 #: templates/help.html:701
@@ -4018,8 +4020,8 @@ msgid ""
 "Чтобы установить или обновить все зависимости, выполните в терминале "
 "следующую команду, находясь в папке проекта:"
 msgstr ""
-"To install or update all dependencies, execute the following command in the "
-"terminal while in the project folder:"
+"To install or update all dependencies, execute the following command in "
+"the terminal while in the project folder:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:704
 #: templates/help.html:704
@@ -4029,7 +4031,8 @@ msgstr "This command will read the file"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:704
 #: templates/help.html:704
 msgid ""
-"и установит точные версии всех библиотек, необходимых для корректной работы."
+"и установит точные версии всех библиотек, необходимых для корректной "
+"работы."
 msgstr ""
 "and install the exact versions of all libraries required for correct "
 "operation."
@@ -4332,7 +4335,7 @@ msgstr "yes"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:384
 #: templates/index.html:384
 msgid "нет"
-msgstr "no"
+msgstr "none"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:385
 #: templates/index.html:385
@@ -4461,11 +4464,11 @@ msgstr "To access server data, you need to enter a PIN code."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:24
 #: templates/index_locked.html:24
 msgid ""
-"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" для"
-" создания PIN-кода."
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
+"для создания PIN-кода."
 msgstr ""
-"If you are using the application for the first time, click the \"First Run\""
-" button to create a PIN code."
+"If you are using the application for the first time, click the \"First "
+"Run\" button to create a PIN code."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:31
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:539
@@ -4488,7 +4491,8 @@ msgstr "Enter PIN"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:50
 #: templates/index_locked.html:50
 msgid ""
-"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту."
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
+"защиту."
 msgstr ""
 "All data is protected by encryption. PIN code provides additional "
 "protection."
@@ -4700,8 +4704,7 @@ msgstr "Remember or write down this code."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:259
 #: templates/index_locked.html:259
 msgid "Этот PIN-код потребуется для входа в приложение после импорта данных."
-msgstr ""
-"This PIN code will be required to enter the application after data import."
+msgstr "This PIN code will be required to enter the application after data import."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:263
 #: templates/index_locked.html:263
@@ -5320,8 +5323,8 @@ msgid ""
 "Потеряно соединение с сервером. Автообновление остановлено. Обновите "
 "страницу."
 msgstr ""
-"The connection to the server has been lost. Auto-update has stopped. Refresh"
-" the page."
+"The connection to the server has been lost. Auto-update has stopped. "
+"Refresh the page."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:771
 #: templates/monitoring.html:771
@@ -5340,11 +5343,10 @@ msgstr "Monitoring is already installed"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:925
 #: templates/monitoring.html:925
-msgid ""
-"Система мониторинга уже активна на этом сервере. Сейчас загрузим данные..."
+msgid "Система мониторинга уже активна на этом сервере. Сейчас загрузим данные..."
 msgstr ""
-"The monitoring system is already active on this server. Now let's load the "
-"data..."
+"The monitoring system is already active on this server. Now let's load "
+"the data..."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:3
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:7
@@ -5365,11 +5367,11 @@ msgstr "Change Main Key"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:32
 #: templates/settings.html:32
 msgid ""
-"При смене ключа будет создан новый зашифрованный файл данных. Старый файл "
-"сохранится как резервная копия."
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
+" сохранится как резервная копия."
 msgstr ""
-"When changing the key, a new encrypted data file will be created. The old "
-"file will be saved as a backup."
+"When changing the key, a new encrypted data file will be created. The old"
+" file will be saved as a backup."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:36
 #: templates/settings.html:36
@@ -5409,10 +5411,11 @@ msgstr "Key-Data Match Check"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:57
 #: templates/settings.html:57
 msgid ""
-"Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение."
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
+"приложение."
 msgstr ""
-"Quickly check if the key matches the data file without importing into the "
-"app."
+"Quickly check if the key matches the data file without importing into the"
+" app."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:61
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:176
@@ -5482,8 +5485,7 @@ msgstr "The file will be saved in the VPN Server Manager application folder."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:121
 #: templates/settings.html:121
-msgid ""
-"Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
 msgstr ""
 "Are you sure you want to detach the data file? The server list will be "
 "empty."
@@ -5501,11 +5503,11 @@ msgstr "No data file attached."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:132
 #: templates/settings.html:132
 msgid ""
-"Приложение в данный момент не работает с каким-либо файлом данных. Вы можете"
-" импортировать существующий файл, чтобы восстановить свои записи."
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
+"можете импортировать существующий файл, чтобы восстановить свои записи."
 msgstr ""
-"The application is not currently working with any data file. You can import "
-"an existing file to restore your records."
+"The application is not currently working with any data file. You can "
+"import an existing file to restore your records."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:140
 #: templates/settings.html:140
@@ -5515,12 +5517,12 @@ msgstr "Import Data File"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:143
 #: templates/settings.html:143
 msgid ""
-"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить "
-"его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
+" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
 "заменен."
 msgstr ""
-"Upload an encrypted data file (<code>.enc</code>) to attach and work with "
-"it. The current attached file (if any) will be replaced."
+"Upload an encrypted data file (<code>.enc</code>) to attach and work with"
+" it. The current attached file (if any) will be replaced."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:146
 #: templates/settings.html:146
@@ -5554,8 +5556,8 @@ msgstr "Requirements:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:167
 #: templates/settings.html:167
 msgid ""
-"файл <code>.env</code> и <code>servers.json.enc</code> из другой установки "
-"приложения."
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
+"установки приложения."
 msgstr ""
 "<code>.env</code> file and <code>servers.json.enc</code> from another "
 "installation of the app."
@@ -5586,8 +5588,8 @@ msgid ""
 "Вставьте сюда ключ шифрования из файла .env другой установки (например: "
 "k-IgKHDDBZxqwr5oaBNkQzCjD71i2N3VctHIfOA663w=)"
 msgstr ""
-"Insert the encryption key from the .env file of another installation (for "
-"example: K-IGKHDDBZXQWR5OABNKZCJD71I2N3VCTHIFOA663W =)"
+"Insert the encryption key from the .env file of another installation (for"
+" example: K-IGKHDDBZXQWR5OABNKZCJD71I2N3VCTHIFOA663W =)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:189
 #: templates/settings.html:189
@@ -5649,8 +5651,8 @@ msgid ""
 "Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл "
 "данных и сохранит резервную копию старого."
 msgstr ""
-"Are you sure you want to change the encryption key? This will create a new "
-"data file and save the backup of the old."
+"Are you sure you want to change the encryption key? This will create a "
+"new data file and save the backup of the old."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:254
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:257
@@ -5754,8 +5756,8 @@ msgid ""
 "Если PIN-код был заблокирован из-за неверных попыток входа, вы можете "
 "сбросить блокировку здесь."
 msgstr ""
-"If your PIN has been blocked due to invalid login attempts, you can reset "
-"the block here."
+"If your PIN has been blocked due to invalid login attempts, you can reset"
+" the block here."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:436
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:477
@@ -5783,15 +5785,18 @@ msgid ""
 msgstr "Are you sure you want to delete this server?"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+#, python-brace-format
 msgid "{editor}: Editing failed"
 msgstr "{editor}: Editing failed"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+#, python-brace-format
 msgid "{editor}: Editing failed: {e}"
 msgstr "{editor}: Editing failed: {e}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1084
 #: venv/lib/python3.13/site-packages/click/core.py:1121
+#, python-brace-format
 msgid "{text} {deprecated_message}"
 msgstr "{text} {deprecated_message}"
 
@@ -5800,15 +5805,16 @@ msgid "Options"
 msgstr "Options"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1204
+#, python-brace-format
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "Got unexpected extra argument ({args})"
 msgstr[1] "Got unexpected extra argument ({args})"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
+#, python-brace-format
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
-msgstr ""
-"DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1405
 msgid "Aborted!"
@@ -5823,6 +5829,7 @@ msgid "Missing command."
 msgstr "Missing command."
 
 #: venv/lib/python3.13/site-packages/click/core.py:1888
+#, python-brace-format
 msgid "No such command {name!r}."
 msgstr "No such command {name!r}."
 
@@ -5831,22 +5838,28 @@ msgid "Value must be an iterable."
 msgstr "Value must be an iterable."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2326
+#, python-brace-format
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "Takes {nargs} values but 1 was given."
 msgstr[1] "Takes {nargs} values but 1 was given."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
+#, python-brace-format
 msgid ""
-"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
 msgstr ""
-"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2807
+#, python-brace-format
 msgid "env var: {var}"
 msgstr "Env was: {was}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
+#, python-brace-format
 msgid "default: {default}"
 msgstr "default: {default}"
 
@@ -5873,18 +5886,22 @@ msgstr "Show this message and exit."
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:50
 #: venv/lib/python3.13/site-packages/click/exceptions.py:89
+#, python-brace-format
 msgid "Error: {message}"
 msgstr "Error: {message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:81
+#, python-brace-format
 msgid "Try '{command} {option}' for help."
 msgstr "Try '{command} {option}' for help."
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:130
+#, python-brace-format
 msgid "Invalid value: {message}"
 msgstr "Invalid value: {message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:132
+#, python-brace-format
 msgid "Invalid value for {param_hint}: {message}"
 msgstr "Invalid value for {param_hint}: {message}"
 
@@ -5901,18 +5918,22 @@ msgid "Missing parameter"
 msgstr "Missing parameter"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:196
+#, python-brace-format
 msgid "Missing {param_type}"
 msgstr "Missing {param_type}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:203
+#, python-brace-format
 msgid "Missing parameter: {param_name}"
 msgstr "Missing parameter: {param_name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:223
+#, python-brace-format
 msgid "No such option: {name}"
 msgstr "No such option: {name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:237
+#, python-brace-format
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "Did you mean {possibility}?"
@@ -5923,6 +5944,7 @@ msgid "unknown error"
 msgstr "unknown error"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:289
+#, python-brace-format
 msgid "Could not open file {filename!r}: {message}"
 msgstr "Could not open file {filename!r}: {message}"
 
@@ -5931,14 +5953,17 @@ msgid "Usage:"
 msgstr "Usage:"
 
 #: venv/lib/python3.13/site-packages/click/parser.py:200
+#, python-brace-format
 msgid "Argument {name!r} takes {nargs} values."
 msgstr "Argument {name!r} takes {nargs} values."
 
 #: venv/lib/python3.13/site-packages/click/parser.py:383
+#, python-brace-format
 msgid "Option {name!r} does not take a value."
 msgstr "Option {name!r} does not take a value."
 
 #: venv/lib/python3.13/site-packages/click/parser.py:443
+#, python-brace-format
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "Option {name!r} requires an argument."
@@ -5961,6 +5986,7 @@ msgid "Error: The value you entered was invalid."
 msgstr "Error: The value you entered was invalid."
 
 #: venv/lib/python3.13/site-packages/click/termui.py:180
+#, python-brace-format
 msgid "Error: {e.message}"
 msgstr "Error: {e.message}"
 
@@ -5977,6 +6003,7 @@ msgid "Press any key to continue..."
 msgstr "Press any key to continue..."
 
 #: venv/lib/python3.13/site-packages/click/types.py:332
+#, python-brace-format
 msgid ""
 "Choose from:\n"
 "\t{choices}"
@@ -5985,30 +6012,36 @@ msgstr ""
 "\t{choices}"
 
 #: venv/lib/python3.13/site-packages/click/types.py:371
+#, python-brace-format
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value!r} is not {choice}."
 msgstr[1] "{value!r} is not {choice}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
+#, python-brace-format
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value!r} does not match the format {format}."
 msgstr[1] "{value!r} does not match the format {format}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
+#, python-brace-format
 msgid "{value!r} is not a valid {number_type}."
 msgstr "{value!r} is not a valid {number_type}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:538
+#, python-brace-format
 msgid "{value} is not in the range {range}."
 msgstr "{value} is not in the range {range}."
 
 #: venv/lib/python3.13/site-packages/click/types.py:679
+#, python-brace-format
 msgid "{value!r} is not a valid boolean."
 msgstr "{value!r} is not a valid boolean."
 
 #: venv/lib/python3.13/site-packages/click/types.py:703
+#, python-brace-format
 msgid "{value!r} is not a valid UUID."
 msgstr "{value!r} is not a valid UUID."
 
@@ -6025,30 +6058,37 @@ msgid "path"
 msgstr "path"
 
 #: venv/lib/python3.13/site-packages/click/types.py:944
+#, python-brace-format
 msgid "{name} {filename!r} does not exist."
 msgstr "{name} {filename!r} does not exist."
 
 #: venv/lib/python3.13/site-packages/click/types.py:953
+#, python-brace-format
 msgid "{name} {filename!r} is a file."
 msgstr "{name} {filename!r} is a file."
 
 #: venv/lib/python3.13/site-packages/click/types.py:961
+#, python-brace-format
 msgid "{name} {filename!r} is a directory."
 msgstr "{name} {filename!r} is a directory."
 
 #: venv/lib/python3.13/site-packages/click/types.py:970
+#, python-brace-format
 msgid "{name} {filename!r} is not readable."
 msgstr "{name} {filename!r} is not readable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:979
+#, python-brace-format
 msgid "{name} {filename!r} is not writable."
 msgstr "{name} {filename!r} is not writable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:988
+#, python-brace-format
 msgid "{name} {filename!r} is not executable."
 msgstr "{name} {filename!r} is not executable."
 
 #: venv/lib/python3.13/site-packages/click/types.py:1054
+#, python-brace-format
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type} values are required, but {len_value} was given."
@@ -6058,66 +6098,29 @@ msgstr[1] "{len_type} values are required, but {len_value} was given."
 msgid "show this help message and exit"
 msgstr "Show this message and exit."
 
-#~ msgid ""
-#~ "Если проблемы с иконками повторяются, создайте резервную копию рабочей "
-#~ "иконки после успешной сборки. Это поможет скоро восстановить "
-#~ "функциональность в случае проблем."
-#~ msgstr ""
-#~ "If problems with the icons are repeated, create a backup copy of the working"
-#~ " icon after successful assembly. This will help soon to restore "
-#~ "functionality in case of problems."
-
-#~ msgid "По умолчанию 22"
-#~ msgstr "Default 22"
-
-#~ msgid "URL панели"
-#~ msgstr "Panel URL"
-
-#~ msgid "Управление службами"
-#~ msgstr "Service Management (systemd)"
-
-#~ msgid "Управление пакетами"
-#~ msgstr "Package management"
-
-#~ msgid "Безопасность"
-#~ msgstr "Security"
-
-#~ msgid "Новый пароль панели"
-#~ msgstr "New password panel"
-
-#~ msgid "Язык изменен на %(lang)s"
-#~ msgstr "Language changed to %(lang)s"
-
-#~ msgid "Информация о Docker"
-#~ msgstr "Docker information"
-
-#~ msgid "Оставьте пустым, если не хотите менять."
-#~ msgstr "Leave empty if you do not want to change."
-
-#~ msgid "Docker информация"
-#~ msgstr "Information:"
-
-#~ msgid "Не удалось удалить чек:"
-#~ msgstr "Failed to copy text: "
-
-#~ msgid "%"
-#~ msgstr "%"
-
-#~ msgid "Выберать зашифрованный файл данных из другой установки"
-#~ msgstr "Select encrypted data file from another installation"
-
-
 msgid "(клик — копировать) и ссылку «Открыть» на"
 msgstr "(click to copy) and an «Open» link to"
 
 msgid "Backend:"
 msgstr "Backend:"
 
-msgid "Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере. Карточка показывает, запущены ли они, даёт готовую команду"
-msgstr "Dockhand (:8501) and Headplane (:3000) listen only on the server's localhost. The card shows whether they are running and provides a ready-made command"
+msgid ""
+"Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере."
+" Карточка показывает, запущены ли они, даёт готовую команду"
+msgstr ""
+"Dockhand (:8501) and Headplane (:3000) listen only on the server's "
+"localhost. The card shows whether they are running and provides a ready-"
+"made command"
 
-msgid "Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на самом сервере. Она доступна только на localhost VPS, поэтому открывайте её через SSH-туннель из карточки «Web-панели»."
-msgstr "Dockhand is a lightweight Streamlit diagnostics panel for the TelegramOnly stack running on the server itself. It is only available on the VPS localhost, so open it via an SSH tunnel from the «Web panels» card."
+msgid ""
+"Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на "
+"самом сервере. Она доступна только на localhost VPS, поэтому открывайте "
+"её через SSH-туннель из карточки «Web-панели»."
+msgstr ""
+"Dockhand is a lightweight Streamlit diagnostics panel for the "
+"TelegramOnly stack running on the server itself. It is only available on "
+"the VPS localhost, so open it via an SSH tunnel from the «Web panels» "
+"card."
 
 msgid "Fail2ban забанил IP"
 msgstr "Fail2ban banned IPs"
@@ -6179,7 +6182,9 @@ msgstr "Monitoring of all network interfaces"
 msgid "Мост запущен — hash появится в логе старта"
 msgstr "Bridge is running — the hash will appear in the startup log"
 
-msgid "На карточке сервера есть две кнопки для наблюдения за состоянием VPS по SSH."
+msgid ""
+"На карточке сервера есть две кнопки для наблюдения за состоянием VPS по "
+"SSH."
 msgstr "Each server card has two buttons for monitoring the VPS state over SSH."
 
 msgid "Настроить сервер"
@@ -6191,11 +6196,26 @@ msgstr "Not detected"
 msgid "Обновление системы"
 msgstr "System update"
 
-msgid "Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG» сохраняет снимок в картинку."
-msgstr "Opens a popup with the current state: CPU load, memory, disk, uptime, top processes, network interfaces (including tailscale0) and the list of Docker containers. TelegramOnly stack containers (headscale, headplane, bot, dockhand) are tagged with their role. The «Save as PNG» button saves the snapshot as an image."
+msgid ""
+"Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, "
+"диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и "
+"список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, "
+"headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG»"
+" сохраняет снимок в картинку."
+msgstr ""
+"Opens a popup with the current state: CPU load, memory, disk, uptime, top"
+" processes, network interfaces (including tailscale0) and the list of "
+"Docker containers. TelegramOnly stack containers (headscale, headplane, "
+"bot, dockhand) are tagged with their role. The «Save as PNG» button saves"
+" the snapshot as an image."
 
-msgid "Открывает страницу с автообновляемыми графиками и карточками. Если на сервере ещё нет инструментов мониторинга, появится экран «Установка системы мониторинга»."
-msgstr "Opens a page with auto-refreshing charts and cards. If the server has no monitoring tools yet, the «Install monitoring system» screen appears."
+msgid ""
+"Открывает страницу с автообновляемыми графиками и карточками. Если на "
+"сервере ещё нет инструментов мониторинга, появится экран «Установка "
+"системы мониторинга»."
+msgstr ""
+"Opens a page with auto-refreshing charts and cards. If the server has no "
+"monitoring tools yet, the «Install monitoring system» screen appears."
 
 msgid "Открыть"
 msgstr "Open"
@@ -6209,8 +6229,12 @@ msgstr "Journal errors in last 24h:"
 msgid "Подключение к серверу..."
 msgstr "Connecting to server..."
 
-msgid "Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше."
-msgstr "More about encryption, the Fernet algorithm and the SECRET_KEY is in the «Security and password storage» section above."
+msgid ""
+"Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе "
+"«Безопасность и хранение паролей» выше."
+msgstr ""
+"More about encryption, the Fernet algorithm and the SECRET_KEY is in the "
+"«Security and password storage» section above."
 
 msgid "Попробуйте подключиться вручную:"
 msgstr "Try connecting manually:"
@@ -6260,23 +6284,45 @@ msgstr "bot/API and the HA stack (ha-reticulum-bridge, ha-stub-grpc, ha-stub-udp
 msgid "не запущена"
 msgstr "not running"
 
-msgid "неудачные попытки входа по SSH и доступные обновления безопасности за 24 часа."
-msgstr "failed SSH login attempts and available security updates over the last 24 hours."
+msgid ""
+"неудачные попытки входа по SSH и доступные обновления безопасности за 24 "
+"часа."
+msgstr ""
+"failed SSH login attempts and available security updates over the last 24"
+" hours."
 
-msgid "слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — копировать)."
-msgstr "whether the bridge listens on port 50061 and its «bridge hash» (click the hash to copy)."
+msgid ""
+"слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — "
+"копировать)."
+msgstr ""
+"whether the bridge listens on port 50061 and its «bridge hash» (click the"
+" hash to copy)."
 
-msgid "состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Статус определяется по реально запущенному процессу на сервере, а не только по systemd."
-msgstr "state of the transports — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Status is determined by the actually running process on the server, not just by systemd."
+msgid ""
+"состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, "
+"Tailscale. Статус определяется по реально запущенному процессу на "
+"сервере, а не только по systemd."
+msgstr ""
+"state of the transports — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, "
+"Tailscale. Status is determined by the actually running process on the "
+"server, not just by systemd."
 
-msgid "ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq (обработка JSON), net-tools (сетевая статистика). Пакет ufw только устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
-msgstr "installs lightweight utilities on the server: vnstat (traffic stats), jq (JSON processing), net-tools (network stats). The ufw package is only installed, but NOT enabled automatically. Takes 1-2 minutes."
+msgid ""
+"ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq "
+"(обработка JSON), net-tools (сетевая статистика). Пакет ufw только "
+"устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
+msgstr ""
+"installs lightweight utilities on the server: vnstat (traffic stats), jq "
+"(JSON processing), net-tools (network stats). The ufw package is only "
+"installed, but NOT enabled automatically. Takes 1-2 minutes."
 
 msgid "— она заработает после поднятия туннеля."
 msgstr "— it will work once the tunnel is up."
 
 msgid "Сервис не запущен на сервере — туннель и «Открыть» недоступны."
-msgstr "The service is not running on the server — tunnel and «Open» are unavailable."
+msgstr ""
+"The service is not running on the server — tunnel and «Open» are "
+"unavailable."
 
 msgid "Что установить (выбери):"
 msgstr "What to install (choose):"
@@ -6293,8 +6339,12 @@ msgstr "Monitoring scripts are always installed. Installation takes 1-2 minutes"
 msgid "Пароль входа по SSH"
 msgstr "SSH login password"
 
-msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его."
-msgstr "The app logs in as the user above with this password. Status and monitoring use only this one."
+msgid ""
+"Этим паролем приложение входит как пользователь выше. Статус и мониторинг"
+" используют только его."
+msgstr ""
+"The app logs in as the user above with this password. Status and "
+"monitoring use only this one."
 
 msgid "Пароль учётной записи root"
 msgstr "Root account password"
@@ -6320,8 +6370,12 @@ msgstr "Current SSH login password"
 msgid "Новый пароль входа по SSH"
 msgstr "New SSH login password"
 
-msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять."
-msgstr "The app logs in as the user above with this password. Status and monitoring use only this one. Leave empty to keep the current password."
+msgid ""
+"Этим паролем приложение входит как пользователь выше. Статус и мониторинг"
+" используют только его. Оставьте пустым, чтобы не менять."
+msgstr ""
+"The app logs in as the user above with this password. Status and "
+"monitoring use only this one. Leave empty to keep the current password."
 
 msgid "Текущий пароль root (справка)"
 msgstr "Current root password (reference)"
@@ -6329,8 +6383,12 @@ msgstr "Current root password (reference)"
 msgid "Новый пароль root (справка)"
 msgstr "New root password (reference)"
 
-msgid "Письмо хостера или su. Для статуса не используется. Оставьте пустым, чтобы не менять."
-msgstr "Hoster email or su. Not used for Status. Leave empty to keep the current password."
+msgid ""
+"Письмо хостера или su. Для статуса не используется. Оставьте пустым, "
+"чтобы не менять."
+msgstr ""
+"Hoster email or su. Not used for Status. Leave empty to keep the current "
+"password."
 
 msgid "Пароль входа"
 msgstr "Login password"
@@ -6398,8 +6456,12 @@ msgstr "Paste the hoster password"
 msgid "Куреин М.Н."
 msgstr "Kurein M.N."
 
-msgid "Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — карточка на всю ширину. Повторный двойной клик сворачивает."
-msgstr "Drag by the handle. Double-click: restore from archive, again for a full-width card. Another double-click collapses it."
+msgid ""
+"Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — "
+"карточка на всю ширину. Повторный двойной клик сворачивает."
+msgstr ""
+"Drag by the handle. Double-click: restore from archive, again for a full-"
+"width card. Another double-click collapses it."
 
 msgid "Перетащить"
 msgstr "Drag"
@@ -6423,13 +6485,21 @@ msgid "Убрать иконку"
 msgstr "Remove icon"
 
 msgid "После выбора файла или выделения экрана сразу видно превью."
-msgstr "After you pick a file or select a screen region, the preview appears immediately."
+msgstr ""
+"After you pick a file or select a screen region, the preview appears "
+"immediately."
 
 msgid "Интерактивный обзор (htop / btop)"
 msgstr "Interactive overview (htop / btop)"
 
-msgid "htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q."
-msgstr "htop and btop show CPU, memory, load, and processes on one screen — faster than a pile of one-off commands. On a small VPS prefer htop: it is lighter. Press q to quit."
+msgid ""
+"htop и btop показывают CPU, память, нагрузку и процессы на одном экране —"
+" быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче."
+" Выход — клавиша q."
+msgstr ""
+"htop and btop show CPU, memory, load, and processes on one screen — "
+"faster than a pile of one-off commands. On a small VPS prefer htop: it is"
+" lighter. Press q to quit."
 
 msgid "Запустить htop"
 msgstr "Run htop"
@@ -6461,6 +6531,7 @@ msgstr "City and provider of this server IP: ipinfo.io"
 msgid "Владелец IP сервера: ip2location.com"
 msgstr "Owner of this server IP: ip2location.com"
 
+#, python-format
 msgid "Файл данных импортирован. Серверов: %(count)s"
 msgstr "Data file imported. Servers: %(count)s"
 
@@ -6475,3 +6546,345 @@ msgstr "Could not load IP details"
 
 msgid "Сервер вернул не JSON"
 msgstr "Server did not return JSON"
+
+msgid "Очистка TelegramOnly"
+msgstr "TelegramOnly cleanup"
+
+msgid "Архивы очистки"
+msgstr "Cleanup archives"
+
+msgid "Действия"
+msgstr "Actions"
+
+msgid "Действия с сервером"
+msgstr "Server actions"
+
+msgid "Мониторинг VPS"
+msgstr "Monitoring"
+
+msgid "Очистить стек"
+msgstr "Clean up stack"
+
+msgid "Удалить архив"
+msgstr "Delete archive"
+
+msgid "Удалить сервер"
+msgstr "Delete server"
+
+msgid "Проверить место на диске"
+msgstr "Check disk usage"
+
+msgid ""
+"Выбранные службы будут остановлены, контейнеры удалены, файлы перенесены "
+"в закрытый архив на VPS. Debian и доступ по SSH сохраняются."
+msgstr ""
+"Selected services will stop, containers will be removed, and files will "
+"move to a private archive on the VPS. Debian and SSH access will remain."
+
+msgid ""
+"Это подготовка к повторной установке, а не переустановка ОС. Docker, "
+"firewall и системные пакеты остаются."
+msgstr ""
+"This prepares the server for reinstalling the stack. Docker, firewall "
+"settings and system packages remain."
+
+msgid ""
+"Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: "
+"очистка выбранного прокси прервёт соединения через него."
+msgstr ""
+"Check Status and Monitoring first. Connect using the VPS IP directly: "
+"cleaning up a proxy will disconnect sessions using it."
+
+msgid "Компоненты для очистки"
+msgstr "Components to clean up"
+
+msgid "Проверить и показать план"
+msgstr "Inspect and show plan"
+
+msgid "Для подтверждения введите hostname из плана"
+msgstr "Enter the hostname from the plan to confirm"
+
+msgid "Очистить выбранные компоненты"
+msgstr "Clean up selected components"
+
+msgid "Операция не выполнена"
+msgstr "Operation failed"
+
+msgid "Проверяю сервер. Изменения не выполняются…"
+msgstr "Inspecting server. No changes are being made…"
+
+msgid ""
+"План действителен 10 минут. Проверьте каждый компонент перед "
+"подтверждением."
+msgstr "The plan is valid for 10 minutes. Review each component before confirming."
+
+msgid ""
+"Выполняю подтверждённую очистку. Не закрывайте окно и не запускайте её "
+"повторно…"
+msgstr ""
+"Running the confirmed cleanup. Keep this window open and do not start it "
+"again…"
+
+msgid "Очистка завершена. Архив: "
+msgstr "Cleanup complete. Archive: "
+
+msgid ". Теперь проверьте Status и Monitoring."
+msgstr ". Now check Status and Monitoring."
+
+msgid ""
+"\n"
+"Архив: "
+msgstr ""
+"\n"
+"Archive: "
+
+msgid "Службы: "
+msgstr "Services: "
+
+msgid "Контейнеры: "
+msgstr "Containers: "
+
+msgid "Тома с резервным копированием: "
+msgstr "Volumes to back up: "
+
+msgid "Перенести в архив:\n"
+msgstr "Move to archive:\n"
+
+msgid "Сохранить:\n"
+msgstr "Preserve:\n"
+
+msgid "Блокировки:\n"
+msgstr "Blockers:\n"
+
+msgid ""
+"Удаление архива необратимо: сохранённые настройки и данные восстановить "
+"из него уже не получится. Удаляйте архив после успешной повторной "
+"установки."
+msgstr ""
+"Deleting an archive is permanent: its saved settings and data can no "
+"longer be restored. Delete it after a successful reinstall."
+
+msgid ""
+"Показаны только архивы завершённых операций из /var/backups/telegramonly-"
+"reset. Архивы незавершённых операций защищены."
+msgstr ""
+"Only completed cleanup archives in /var/backups/telegramonly-reset are "
+"listed. Archives from incomplete operations are protected."
+
+msgid "Показать архивы и размеры"
+msgstr "Show archives and sizes"
+
+msgid "Для удаления введите имя VPS:"
+msgstr "Enter the VPS hostname to delete:"
+
+msgid "Читаю список архивов…"
+msgstr "Loading archives…"
+
+msgid " МиБ "
+msgstr " MiB "
+
+msgid "Безвозвратно удалить архив "
+msgstr "Permanently delete archive "
+
+msgid " на VPS "
+msgstr " on VPS "
+
+msgid "Удаляю выбранный архив…"
+msgstr "Deleting selected archive…"
+
+msgid "Архив удалён."
+msgstr "Archive deleted."
+
+msgid " Обновите список архивов."
+msgstr " Refresh the archive list."
+
+msgid "Список действителен 10 минут."
+msgstr "The list is valid for 10 minutes."
+
+msgid "Завершённых архивов для удаления нет."
+msgstr "No completed archives to delete."
+
+msgid "Место на диске"
+msgstr "Disk usage"
+
+msgid ""
+"Проверка покажет размеры каталогов, архивов очистки, кэша пакетов и "
+"системного журнала. Файлы не изменяются."
+msgstr ""
+"Check directory sizes, cleanup archives, package cache and system journal"
+" usage. Files will not be changed."
+
+msgid "Команды для Tabby"
+msgstr "Commands for Tabby"
+
+msgid "Копировать команды"
+msgstr "Copy commands"
+
+msgid "Выполнить на этом VPS"
+msgstr "Run on this VPS"
+
+msgid ""
+"При запуске здесь используется SSH из карточки сервера. Для root команды "
+"выполняются без sudo."
+msgstr ""
+"Uses the SSH connection from the server card. Commands run without sudo "
+"for root."
+
+msgid "Команды скопированы. Вставьте их в терминал Tabby на нужном VPS."
+msgstr "Commands copied. Paste them into Tabby on the intended VPS."
+
+msgid "Нажмите Ctrl+C, чтобы скопировать выделенные команды."
+msgstr "Press Ctrl+C to copy the selected commands."
+
+msgid "Проверяю диск. Это может занять несколько минут…"
+msgstr "Checking disk usage. This may take a few minutes…"
+
+msgid "Проверка не выполнена"
+msgstr "Check failed"
+
+msgid "Нет данных"
+msgstr "No data"
+
+msgid "Проверка завершена."
+msgstr "Check complete."
+
+msgid "Проверка завершена с замечаниями — см. результаты ниже."
+msgstr "Check completed with warnings. See the results below."
+
+msgid "Выберите компоненты из списка"
+msgstr "Select components from the list"
+
+msgid ""
+"Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не "
+"удалено."
+msgstr ""
+"Inspection failed. Check SSH, known_hosts and root/sudo -n. Nothing was "
+"deleted."
+
+msgid "Аудит не выполнен"
+msgstr "Inspection failed"
+
+msgid "Сначала получите план очистки"
+msgstr "Inspect the cleanup plan first"
+
+msgid "План устарел или относится к другому серверу/сеансу"
+msgstr "The plan expired or belongs to another server/session"
+
+msgid "Устраните блокировки и введите точное имя сервера"
+msgstr "Resolve the blockers and enter the exact hostname"
+
+msgid "Очистка этого сервера уже выполняется"
+msgstr "Cleanup is already running on this server"
+
+msgid ""
+"Ответ потерян или выполнение прервано. Не повторяйте автоматически: "
+"проверьте Status и /var/backups/telegramonly-reset по SSH."
+msgstr ""
+"The response was lost or execution stopped. Do not retry automatically: "
+"check Status and /var/backups/telegramonly-reset over SSH."
+
+msgid "Не удалось прочитать архивы. Проверьте SSH и права доступа."
+msgstr "Could not read archives. Check SSH and permissions."
+
+msgid "Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа."
+msgstr "Could not read archives. Check SSH, known_hosts and permissions."
+
+msgid "Сначала загрузите список архивов"
+msgstr "Load the archive list first"
+
+msgid "Обновите список архивов"
+msgstr "Refresh the archive list"
+
+msgid "Введите точное имя VPS"
+msgstr "Enter the exact VPS hostname"
+
+msgid "Другая операция уже выполняется"
+msgstr "Another operation is already running"
+
+msgid "Ответ потерян. Обновите список перед дальнейшими действиями."
+msgstr "The response was lost. Refresh the list before continuing."
+
+msgid "Не удалось получить данные о диске."
+msgstr "Could not retrieve disk usage."
+
+msgid "Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n."
+msgstr "Check failed. Verify SSH, known_hosts and root/sudo -n."
+
+msgid "Каталоги /var, /opt, /usr, /root"
+msgstr "Directories /var, /opt, /usr, /root"
+
+msgid "Архивы очистки и кэш пакетов"
+msgstr "Cleanup archives and package cache"
+
+msgid "Системный журнал"
+msgstr "System journal"
+
+msgid "Часть каталогов отсутствует или недоступна; показан полученный результат."
+msgstr "Some directories are missing or inaccessible; available results are shown."
+
+msgid "Превышено время ожидания (120 секунд)."
+msgstr "Timed out after 120 seconds."
+
+msgid "Команда недоступна на сервере."
+msgstr "Command unavailable on this server."
+
+msgid ""
+"Archive operation failed; refresh the list and inspect the server. No "
+"automatic retry."
+msgstr ""
+"Archive operation failed; refresh the list and inspect the server. No "
+"automatic retry."
+
+#~ msgid ""
+#~ "Если проблемы с иконками повторяются, "
+#~ "создайте резервную копию рабочей иконки "
+#~ "после успешной сборки. Это поможет скоро"
+#~ " восстановить функциональность в случае "
+#~ "проблем."
+#~ msgstr ""
+#~ "If problems with the icons are "
+#~ "repeated, create a backup copy of "
+#~ "the working icon after successful "
+#~ "assembly. This will help soon to "
+#~ "restore functionality in case of "
+#~ "problems."
+
+#~ msgid "По умолчанию 22"
+#~ msgstr "Default 22"
+
+#~ msgid "URL панели"
+#~ msgstr "Panel URL"
+
+#~ msgid "Управление службами"
+#~ msgstr "Service Management (systemd)"
+
+#~ msgid "Управление пакетами"
+#~ msgstr "Package management"
+
+#~ msgid "Безопасность"
+#~ msgstr "Security"
+
+#~ msgid "Новый пароль панели"
+#~ msgstr "New password panel"
+
+#~ msgid "Язык изменен на %(lang)s"
+#~ msgstr "Language changed to %(lang)s"
+
+#~ msgid "Информация о Docker"
+#~ msgstr "Docker information"
+
+#~ msgid "Оставьте пустым, если не хотите менять."
+#~ msgstr "Leave empty if you do not want to change."
+
+#~ msgid "Docker информация"
+#~ msgstr "Information:"
+
+#~ msgid "Не удалось удалить чек:"
+#~ msgstr "Failed to copy text: "
+
+#~ msgid "%"
+#~ msgstr "%"
+
+#~ msgid "Выберать зашифрованный файл данных из другой установки"
+#~ msgstr "Select encrypted data file from another installation"
+

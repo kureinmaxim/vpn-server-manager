@@ -10,13 +10,13 @@ msgstr ""
 "POT-Creation-Date: 2025-10-14 20:32+0300\n"
 "PO-Revision-Date: 2025-08-05 11:08+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: zh <LL@li.org>\n"
 "Language: zh\n"
+"Language-Team: zh <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"Generated-By: Babel 2.14.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: app/routes/api.py:81
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:81
@@ -218,22 +218,23 @@ msgstr "数据文件已成功分离。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:476
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:542
 msgid ""
-"Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ "
-"шифрования."
+"Сервис управления данными не инициализирован. Проверьте конфигурацию и "
+"ключ шифрования."
 msgstr "数据管理服务尚未初始化。检查配置和加密密钥。"
 
 #: app/routes/main.py:511
 #: backup_tools/legacy_backup_20251012_151015/app.py:1732
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:511
 msgid ""
-"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан с "
-"другим ключом."
+"Ошибка: файл не может быть расшифрован или поврежден. Возможно, он создан"
+" с другим ключом."
 msgstr "错误：文件无法解密或已损坏。可能是用不同的密钥创建的。"
 
 #: app/routes/main.py:519
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:519
 msgid ""
-"Не удалось сохранить путь к новому файлу данных. Изменение будет временным."
+"Не удалось сохранить путь к новому файлу данных. Изменение будет "
+"временным."
 msgstr "无法保存新数据文件的路径。这种变化将是暂时的。"
 
 #: app/routes/main.py:525 app/routes/main.py:553
@@ -267,8 +268,7 @@ msgstr "导入文件中的所有服务器已存在于您的列表中。"
 #: app/routes/main.py:674
 #: backup_tools/legacy_backup_20251012_151015/app.py:1928
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:674
-msgid ""
-"Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
+msgid "Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа."
 msgstr "错误：加密密钥无效。请检查输入的密钥是否正确。"
 
 #: app/routes/main.py:676
@@ -370,8 +370,8 @@ msgstr "认证成功"
 
 #: backup_tools/legacy_backup_20251012_151015/app.py:1053
 msgid ""
-"Не удалось загрузить данные серверов. Проверьте подключение к интернету и "
-"целостность файла данных."
+"Не удалось загрузить данные серверов. Проверьте подключение к интернету и"
+" целостность файла данных."
 msgstr "无法加载服务器数据。请检查互联网连接和数据文件完整性。"
 
 #: backup_tools/legacy_backup_20251012_151015/app.py:1089
@@ -402,8 +402,7 @@ msgstr "❌ Fernet密钥格式不正确。"
 msgid ""
 "✅ Ключ подходит! Найдено серверов: %(server_count)s. Провайдеры: "
 "%(provider_list)s. Серверы: %(name_preview)s"
-msgstr ""
-"✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
+msgstr "✅ 密钥有效！找到服务器：%(server_count)s。提供商：%(provider_list)s。服务器：%(name_preview)s"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:10
 #: templates/404.html:10
@@ -513,8 +512,8 @@ msgstr "开发者："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/about.html:16
 #: templates/about.html:16
 msgid ""
-"Программа для удобного и безопасного хранения информации о VPS/VDS серверах "
-"от различных провайдеров."
+"Программа для удобного и безопасного хранения информации о VPS/VDS "
+"серверах от различных провайдеров."
 msgstr "用于方便安全地存储来自各种提供商的VPS/VDS服务器信息的程序。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:3
@@ -1707,8 +1706,8 @@ msgstr "添加新服务器"
 #: templates/help.html:19
 msgid ""
 "Нажмите кнопку \"Добавить сервер\" на главной странице. Заполните все "
-"необходимые поля. Пароли будут автоматически зашифрованы перед сохранением. "
-"Вы также можете прикрепить файл (например, чек об оплате)."
+"необходимые поля. Пароли будут автоматически зашифрованы перед "
+"сохранением. Вы также можете прикрепить файл (например, чек об оплате)."
 msgstr "点击主页上的\"添加服务器\"按钮。填写所有必填字段。密码将在保存前自动加密。您还可以附加文件（例如付款收据）。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:27
@@ -1801,7 +1800,8 @@ msgstr "SSH、面板、主机（密码）- 高级别"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в файле"
+"Все пароли (для SSH, панели управления и кабинета хостера) хранятся в "
+"файле"
 msgstr "所有密码（SSH、控制面板和主机账户）都存储在文件中"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
@@ -1817,8 +1817,8 @@ msgstr "加密形式"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
 #: templates/help.html:67
 msgid ""
-"с использованием надежного алгоритма. Для шифрования используется секретный "
-"ключ из файла"
+"с использованием надежного алгоритма. Для шифрования используется "
+"секретный ключ из файла"
 msgstr "使用可靠的算法。加密使用文件中的密钥"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:67
@@ -1844,8 +1844,8 @@ msgstr "明文形式"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:71
 #: templates/help.html:71
 msgid ""
-"Они не шифруются, но на главной странице их пути маскируются для защиты от "
-"случайных взглядов."
+"Они не шифруются, но на главной странице их пути маскируются для защиты "
+"от случайных взглядов."
 msgstr "它们不加密，但在主页上路径被屏蔽以保护免受随意查看。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:74
@@ -1881,8 +1881,8 @@ msgstr "IP和DNS测试："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
 #: templates/help.html:92
 msgid ""
-"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", которые"
-" ведут на внешние сервисы"
+"Вверху главной страницы находятся кнопки \"Тест IP\" и \"Тест DNS\", "
+"которые ведут на внешние сервисы"
 msgstr "主页顶部有\"IP测试\"和\"DNS测试\"按钮，它们指向外部服务"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:92
@@ -1908,8 +1908,8 @@ msgstr "自动地理定位："
 #: templates/help.html:93
 msgid ""
 "При добавлении или редактировании сервера приложение автоматически "
-"определяет его геолокацию (страну и город) по IP-адресу и отображает её в "
-"шапке карточки."
+"определяет его геолокацию (страну и город) по IP-адресу и отображает её в"
+" шапке карточки."
 msgstr "添加或编辑服务器时，应用程序会根据IP地址自动确定其地理定位（国家和城市）并在卡片标题中显示。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:94
@@ -1952,8 +1952,8 @@ msgstr "“IP拥有者”开通服务"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:95
 #: templates/help.html:95
 msgid ""
-"в новой вкладке для детального анализа владельца IP-адреса сервера, включая "
-"информацию об организации, провайдере и геолокации."
+"в новой вкладке для детального анализа владельца IP-адреса сервера, "
+"включая информацию об организации, провайдере и геолокации."
 msgstr "在新选项卡中详细分析服务器 IP 地址的所有者，包括有关组织、提供商和地理位置的信息。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:104
@@ -1968,8 +1968,7 @@ msgid ""
 "помогают быстро оценить, подходит ли IP-адрес для использования со "
 "стриминговыми сервисами, имеющими геолокационные ограничения (например, "
 "9Now, Hulu, BBC iPlayer)."
-msgstr ""
-"每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
+msgstr "每个服务器卡片上有一行三个指示器，帮助快速评估IP地址是否适合用于具有地理位置限制的流媒体服务（例如，9Now、Hulu、BBC iPlayer）。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:111
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:114
@@ -2019,12 +2018,11 @@ msgstr "DNS 正常"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:120
 #: templates/help.html:120
 msgid ""
-"Это результат ручной проверки, которую вы должны провести самостоятельно. "
-"Многие стриминговые сервисы определяют ваше реальное местоположение через "
-"DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), сервис "
-"поймет, что вы используете VPN."
-msgstr ""
-"这是您必须自己执行的手动检查的结果。许多流媒体服务通过DNS请求确定您的真实位置。如果它们\"泄漏\"（绕过您的VPN服务器），服务将知道您正在使用VPN。"
+"Это результат ручной проверки, которую вы должны провести самостоятельно."
+" Многие стриминговые сервисы определяют ваше реальное местоположение "
+"через DNS-запросы. Если они \"утекают\" (идут мимо вашего VPN-сервера), "
+"сервис поймет, что вы используете VPN."
+msgstr "这是您必须自己执行的手动检查的结果。许多流媒体服务通过DNS请求确定您的真实位置。如果它们\"泄漏\"（绕过您的VPN服务器），服务将知道您正在使用VPN。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:122
 #: templates/help.html:122
@@ -2079,8 +2077,8 @@ msgstr "数据管理和加密"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:147
 #: templates/help.html:147
 msgid ""
-"Вся информация о ваших серверах хранится в одном зашифрованном файле, что "
-"обеспечивает как безопасность, так и портативность данных."
+"Вся информация о ваших серверах хранится в одном зашифрованном файле, что"
+" обеспечивает как безопасность, так и портативность данных."
 msgstr "有关您服务器的所有信息都存储在一个加密文件中，这既保证了安全性，又保证了数据的可移植性。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:149
@@ -2092,20 +2090,19 @@ msgstr "它是如何工作的？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:151
 #: templates/help.html:151
 msgid ""
-"Все данные о серверах, которые вы вводите, собираются вместе и преобразуются"
-" в единый текстовый блок (в формате JSON). Затем этот блок полностью "
-"шифруется и сохраняется в файл с расширением .enc."
+"Все данные о серверах, которые вы вводите, собираются вместе и "
+"преобразуются в единый текстовый блок (в формате JSON). Затем этот блок "
+"полностью шифруется и сохраняется в файл с расширением .enc."
 msgstr "您输入的所有服务器数据都被收集并转换为单个文本块（JSON格式）。然后，该块被完全加密并保存到扩展名为.enc的文件中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:154
 #: templates/help.html:154
 msgid ""
-"Можно представить это как подробный чертеж (ваши данные), который разрезали "
-"на тысячи мельчайших кусочков и сложили в коробку (файл .enc). Без точной "
-"инструкции по сборке (ключа шифрования SECRET_KEY) никто не сможет "
-"восстановить исходный чертеж."
-msgstr ""
-"您可以把它想象成一张详细的蓝图（您的数据），被切成成千上万个小块，然后放进一个盒子里（.enc文件）。没有精确的组装说明（SECRET_KEY加密密钥），任何人都无法恢复原始蓝图。"
+"Можно представить это как подробный чертеж (ваши данные), который "
+"разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). "
+"Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не "
+"сможет восстановить исходный чертеж."
+msgstr "您可以把它想象成一张详细的蓝图（您的数据），被切成成千上万个小块，然后放进一个盒子里（.enc文件）。没有精确的组装说明（SECRET_KEY加密密钥），任何人都无法恢复原始蓝图。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:157
 #: templates/help.html:157
@@ -2137,8 +2134,8 @@ msgstr "导入并附加："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:161
 #: templates/help.html:161
 msgid ""
-"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, и "
-"все ваши серверы появятся в списке."
+"Загрузить ранее экспортированный файл. Приложение начнет работать с ним, "
+"и все ваши серверы появятся в списке."
 msgstr "上传先前导出的文件。应用程序将开始使用它，您的所有服务器将出现在列表中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
@@ -2149,8 +2146,8 @@ msgstr "分离文件："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:162
 #: templates/help.html:162
 msgid ""
-"Прекратить работу с текущим файлом. Список серверов станет пустым, как при "
-"первой установке. Сам файл при этом не удаляется."
+"Прекратить работу с текущим файлом. Список серверов станет пустым, как "
+"при первой установке. Сам файл при этом не удаляется."
 msgstr "停止使用当前文件。服务器列表将变为空，就像第一次安装时一样。文件本身不会被删除。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:165
@@ -2161,8 +2158,9 @@ msgstr "Fernet加密算法"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:167
 #: templates/help.html:167
 msgid ""
-"Для защиты ваших данных используется Fernet — это высокоуровневая система "
-"симметричного (с секретным ключом) шифрования из библиотеки cryptography."
+"Для защиты ваших данных используется Fernet — это высокоуровневая система"
+" симметричного (с секретным ключом) шифрования из библиотеки "
+"cryptography."
 msgstr "为了保护您的数据，我们使用了Fernet——这是一个来自密码学库的高级对称（带密钥）加密系统。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:169
@@ -2178,9 +2176,9 @@ msgstr "真实性保证："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:171
 #: templates/help.html:171
 msgid ""
-"Fernet гарантирует, что зашифрованные данные не были изменены или подделаны."
-" Если кто-то попытается изменить хоть один символ в .enc файле, он не сможет"
-" быть расшифрован."
+"Fernet гарантирует, что зашифрованные данные не были изменены или "
+"подделаны. Если кто-то попытается изменить хоть один символ в .enc файле,"
+" он не сможет быть расшифрован."
 msgstr "Fernet保证加密数据没有被更改或篡改。如果有人试图更改.enc文件中的任何一个字符，它将无法解密。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:172
@@ -2192,10 +2190,9 @@ msgstr "可靠的算法："
 #: templates/help.html:172
 msgid ""
 "\"Под капотом\" Fernet использует стандартные и проверенные временем "
-"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с "
-"SHA256 для аутентификации (проверки подлинности)."
-msgstr ""
-"“在底层”，Fernet使用标准且经过时间考验的加密算法：用于加密的CBC模式下的AES-128和用于身份验证（真实性检查）的带SHA256的HMAC。"
+"криптографические алгоритмы: AES-128 в режиме CBC для шифрования и HMAC с"
+" SHA256 для аутентификации (проверки подлинности)."
+msgstr "“在底层”，Fernet使用标准且经过时间考验的加密算法：用于加密的CBC模式下的AES-128和用于身份验证（真实性检查）的带SHA256的HMAC。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:175
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:288
@@ -2212,8 +2209,8 @@ msgstr "重要："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:175
 #: templates/help.html:175
 msgid ""
-"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в "
-"файле .env. Никогда и никому его не передавайте."
+"Вся безопасность системы зависит от секретности вашего ключа SECRET_KEY в"
+" файле .env. Никогда и никому его не передавайте."
 msgstr "整个系统的安全性取决于您在.env文件中的SECRET_KEY的保密性。切勿与任何人分享。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:184
@@ -2224,8 +2221,8 @@ msgstr "从其他安装导入"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:189
 #: templates/help.html:189
 msgid ""
-"Эта функция позволяет перенести данные о серверах из другой установки VPN "
-"Server Manager, даже если у неё другой ключ шифрования."
+"Эта функция позволяет перенести данные о серверах из другой установки VPN"
+" Server Manager, даже если у неё другой ключ шифрования."
 msgstr "此功能允许您从另一个VPN服务器管理器安装中传输服务器数据，即使它具有不同的加密密钥。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:191
@@ -2236,8 +2233,8 @@ msgstr "何时需要？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:193
 #: templates/help.html:193
 msgid ""
-"Вы настроили приложение на другом компьютере и хотите перенести данные на "
-"новый"
+"Вы настроили приложение на другом компьютере и хотите перенести данные на"
+" новый"
 msgstr "您已在另一台计算机上设置了该应用程序，并希望将数据传输到新计算机"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:194
@@ -2304,8 +2301,8 @@ msgstr "转移："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:207
 #: templates/help.html:207
 msgid ""
-"Скопируйте оба элемента на новый компьютер любым удобным способом (флешка, "
-"облако, email)"
+"Скопируйте оба элемента на новый компьютер любым удобным способом "
+"(флешка, облако, email)"
 msgstr "以任何方便的方式将两个项目复制到新计算机（U盘、云、电子邮件）"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:208
@@ -2415,8 +2412,7 @@ msgstr "导入时会发生什么？"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:229
 #: templates/help.html:229
-msgid ""
-"Приложение расшифровывает внешний файл с помощью предоставленного ключа"
+msgid "Приложение расшифровывает внешний файл с помощью предоставленного ключа"
 msgstr "应用程序使用提供的密钥解密外部文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:230
@@ -2483,8 +2479,8 @@ msgstr "提示："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
 #: templates/help.html:248
 msgid ""
-"Для регулярного обмена данными между установками рекомендуется использовать "
-"одинаковый"
+"Для регулярного обмена данными между установками рекомендуется "
+"использовать одинаковый"
 msgstr "为定期在安装之间交换数据，建议使用相同的"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:248
@@ -2505,8 +2501,8 @@ msgstr "什么是SECRET_KEY以及如何获取？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:262
 #: templates/help.html:262
 msgid ""
-"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех данных "
-"в приложении. Он абсолютно необходим для работы."
+"<code>SECRET_KEY</code> — это ваш главный пароль для шифрования всех "
+"данных в приложении. Он абсолютно необходим для работы."
 msgstr "<code>SECRET_KEY</code> 是您加密应用程序中所有数据的主密码。它对于操作至关重要。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:264
@@ -2527,15 +2523,15 @@ msgstr "如何生成："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:265
 #: templates/help.html:265
 msgid ""
-"Если вы запускаете приложение в первый раз, вам нужно создать его. Для этого"
-" можно использовать Python:"
+"Если вы запускаете приложение в первый раз, вам нужно создать его. Для "
+"этого можно использовать Python:"
 msgstr "如果您是第一次运行该应用程序，您需要创建它。为此，您可以使用 Python："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:268
 #: templates/help.html:268
 msgid ""
-"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code> в "
-"таком виде:"
+"Скопируйте полученный длинный код и вставьте его в файл <code>.env</code>"
+" в таком виде:"
 msgstr "复制生成的长代码并将其以此形式粘贴到 <code>.env</code> 文件中："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:269
@@ -2551,11 +2547,12 @@ msgstr "重要："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:271
 #: templates/help.html:271
 msgid ""
-"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете доступ "
-"ко всем данным. Если вы переносите приложение, обязательно скопируйте файл "
-"<code>.env</code> вместе с остальными данными."
+"Никогда и никому не передавайте этот ключ! Потеряв его, вы потеряете "
+"доступ ко всем данным. Если вы переносите приложение, обязательно "
+"скопируйте файл <code>.env</code> вместе с остальными данными."
 msgstr ""
-"切勿与任何人分享此密钥！如果丢失，您将无法访问所有数据。如果您正在传输应用程序，请务必将 <code>.env</code> 文件与其余数据一起复制。"
+"切勿与任何人分享此密钥！如果丢失，您将无法访问所有数据。如果您正在传输应用程序，请务必将 <code>.env</code> "
+"文件与其余数据一起复制。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:280
 #: templates/help.html:280
@@ -2572,9 +2569,10 @@ msgstr "传输包含所有服务器、收据和设置的应用程序需要复制
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:288
 #: templates/help.html:288
 msgid ""
-"Эта инструкция предназначена для текущей \"портативной\" версии приложения. "
-"В будущем, для версий, установленных через инсталлятор (Windows, macOS), "
-"будет предусмотрен специальный механизм экспорта и импорта."
+"Эта инструкция предназначена для текущей \"портативной\" версии "
+"приложения. В будущем, для версий, установленных через инсталлятор "
+"(Windows, macOS), будет предусмотрен специальный механизм экспорта и "
+"импорта."
 msgstr "本说明适用于应用程序的当前\"便携式\"版本。将来，对于通过安装程序（Windows、macOS）安装的版本，将提供特殊的导出和导入机制。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:291
@@ -2597,10 +2595,12 @@ msgstr "文件 <code>.env</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:294
 #: templates/help.html:294
 msgid ""
-"— самый важный файл! В нем содержится ваш уникальный <code>SECRET_KEY</code>"
-" для расшифровки данных. <strong>Без него все данные будут утеряны.</strong>"
+"— самый важный файл! В нем содержится ваш уникальный "
+"<code>SECRET_KEY</code> для расшифровки данных. <strong>Без него все "
+"данные будут утеряны.</strong>"
 msgstr ""
-"— 最重要的文件！它包含您用于解密数据的唯一<code>SECRET_KEY</code>。<strong>没有它，所有数据都将丢失。</strong>"
+"— "
+"最重要的文件！它包含您用于解密数据的唯一<code>SECRET_KEY</code>。<strong>没有它，所有数据都将丢失。</strong>"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:295
 #: templates/help.html:295
@@ -2622,7 +2622,8 @@ msgstr "文件夹 <code>/uploads/</code>"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:296
 #: templates/help.html:296
 msgid ""
-"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об оплате."
+"— здесь лежат все загруженные вами файлы: иконки серверов и чеки об "
+"оплате."
 msgstr "— 这里存放着您上传的所有文件：服务器图标和付款收据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:299
@@ -2636,8 +2637,7 @@ msgid ""
 "На старом компьютере создайте архив всей папки с приложением (например, "
 "<code>VPNserverManage.zip</code>). Это самый надежный способ ничего не "
 "забыть."
-msgstr ""
-"在旧电脑上，创建整个应用程序文件夹的存档（例如，<code>VPNserverManage.zip</code>）。这是确保不会忘记任何东西的最可靠方法。"
+msgstr "在旧电脑上，创建整个应用程序文件夹的存档（例如，<code>VPNserverManage.zip</code>）。这是确保不会忘记任何东西的最可靠方法。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:302
 #: templates/help.html:302
@@ -2664,8 +2664,8 @@ msgstr "使用命令<code>pip install -r requirements.txt</code>安装依赖项�
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:309
 #: templates/help.html:309
 msgid ""
-"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на"
-" месте."
+"Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть"
+" на месте."
 msgstr "启动应用程序。您的所有数据，包括收据和图标，都应该在原位。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:312
@@ -2735,17 +2735,17 @@ msgstr "如何一次性查看所有密码（解密）？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:338
 #: templates/help.html:338
 msgid ""
-"Хотя приложение позволяет просматривать пароли по одному через интерфейс, "
-"может возникнуть ситуация, когда вам нужно получить доступ ко всем данным "
-"сразу в читаемом виде. Например, для резервного копирования в текстовый файл"
-" или для переноса в другую систему."
+"Хотя приложение позволяет просматривать пароли по одному через интерфейс,"
+" может возникнуть ситуация, когда вам нужно получить доступ ко всем "
+"данным сразу в читаемом виде. Например, для резервного копирования в "
+"текстовый файл или для переноса в другую систему."
 msgstr "虽然应用程序允许您通过界面逐个查看密码，但有时您可能需要以可读格式一次性访问所有数据。例如，备份到文本文件或传输到另一个系统。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:341
 #: templates/help.html:341
 msgid ""
-"Для этой цели в корневой папке проекта существует специальный инструмент — "
-"<code>decrypt_tool.py</code>."
+"Для этой цели в корневой папке проекта существует специальный инструмент "
+"— <code>decrypt_tool.py</code>."
 msgstr "为此，项目根文件夹中有一个专用工具——<code>decrypt_tool.py</code>。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:344
@@ -2760,10 +2760,9 @@ msgid ""
 "<code>.env</code> для полной расшифровки файла с данными "
 "<code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную "
 "структуру и расшифровывает все учетные данные: <strong>SSH, панель "
-"управления и кабинет хостера</strong>, после чего выводит все в терминал в "
-"структурированном виде."
-msgstr ""
-"此脚本使用您<code>.env</code>文件中的<code>SECRET_KEY</code>来完全解密数据文件<code>data/servers.json.enc</code>。它能正确处理嵌套结构并解密所有凭据：<strong>SSH、控制面板和主机帐户</strong>，然后以结构化形式将所有内容输出到终端。"
+"управления и кабинет хостера</strong>, после чего выводит все в терминал "
+"в структурированном виде."
+msgstr "此脚本使用您<code>.env</code>文件中的<code>SECRET_KEY</code>来完全解密数据文件<code>data/servers.json.enc</code>。它能正确处理嵌套结构并解密所有凭据：<strong>SSH、控制面板和主机帐户</strong>，然后以结构化形式将所有内容输出到终端。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:349
 #: templates/help.html:349
@@ -2780,8 +2779,8 @@ msgstr "您需要在项目的根文件夹中，在终端中执行一个命令：
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:354
 #: templates/help.html:354
 msgid ""
-"Эта команда сначала активирует необходимое виртуальное окружение, а затем "
-"запускает скрипт для расшифровки."
+"Эта команда сначала активирует необходимое виртуальное окружение, а затем"
+" запускает скрипт для расшифровки."
 msgstr "此命令首先激活必要的虚拟环境，然后运行解密脚本。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:357
@@ -2794,8 +2793,8 @@ msgstr "注意："
 #: templates/help.html:357
 msgid ""
 "Выводимые данные (включая все пароли) будут видны в вашем терминале. "
-"Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет "
-"увидеть ваш экран."
+"Убедитесь, что вы делаете это в безопасной обстановке, где никто не "
+"сможет увидеть ваш экран."
 msgstr "输出数据（包括所有密码）将在您的终端中可见。请确保您在安全的环境中执行此操作，以免他人看到您的屏幕。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:366
@@ -2807,7 +2806,8 @@ msgstr "在macOS上工作的特点"
 #: templates/help.html:371
 msgid ""
 "В установленной версии приложения для macOS данные хранятся в "
-"пользовательской директории для соответствия стандартам безопасности Apple."
+"пользовательской директории для соответствия стандартам безопасности "
+"Apple."
 msgstr "在macOS应用程序的安装版本中，数据存储在用户目录中，以符合Apple的安全标准。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:373
@@ -2827,10 +2827,10 @@ msgstr "所有应用程序数据（文件<code>servers.json.enc</code>、配置�
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:376
 #: templates/help.html:376
 msgid ""
-"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» "
-"(Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт "
-"«Library». В открывшейся папке далее перейдите в «Application Support», а "
-"затем в «VPNServerManager»."
+"Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню "
+"«Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите "
+"появившийся пункт «Library». В открывшейся папке далее перейдите в "
+"«Application Support», а затем в «VPNServerManager»."
 msgstr ""
 "要快速进入此文件夹：打开Finder，点击\"前往\"菜单，按住<code>Option "
 "(⌥)</code>键，然后选择出现的\"资源库\"项。在打开的文件夹中，接着进入\"Application "
@@ -2848,8 +2848,8 @@ msgstr "开发版本"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:421
 #: templates/help.html:379 templates/help.html:400 templates/help.html:421
 msgid ""
-"Если вы запускаете приложение из исходного кода, все данные хранятся прямо в"
-" папке проекта для удобства отладки."
+"Если вы запускаете приложение из исходного кода, все данные хранятся "
+"прямо в папке проекта для удобства отладки."
 msgstr "如果您从源代码运行应用程序，所有数据都直接存储在项目文件夹中，以方便调试。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:387
@@ -2906,8 +2906,7 @@ msgstr "在Linux上工作的特点"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
 #: templates/help.html:413
-msgid ""
-"В установленной версии приложения для Linux данные хранятся в директории"
+msgid "В установленной версии приложения для Linux данные хранятся в директории"
 msgstr "在Linux应用程序的安装版本中，数据存储在目录中"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:413
@@ -2942,8 +2941,8 @@ msgstr "创建和配置应用程序图标"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:434
 #: templates/help.html:434
 msgid ""
-"Приложение поддерживает кастомные иконки для каждой операционной системы. "
-"Это позволяет создать единый визуальный стиль на всех платформах."
+"Приложение поддерживает кастомные иконки для каждой операционной системы."
+" Это позволяет создать единый визуальный стиль на всех платформах."
 msgstr "该应用程序支持每个操作系统的自定义图标。这使您可以在所有平台上创建统一的视觉风格。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:436
@@ -2969,8 +2968,8 @@ msgstr "像素的PNG文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:438
 #: templates/help.html:438
 msgid ""
-"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах, "
-"включая Retina-дисплеи."
+"с прозрачным фоном. Это обеспечит наилучшее качество на всех устройствах,"
+" включая Retina-дисплеи."
 msgstr "带透明背景。这将确保在所有设备上（包括Retina显示屏）获得最佳质量。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:441
@@ -3123,8 +3122,7 @@ msgstr "在已构建的应用程序中替换图标"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:500
 #: templates/help.html:500
-msgid ""
-"Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
+msgid "Если вы хотите заменить иконку в уже готовом приложении без пересборки:"
 msgstr "如果您想在不重新构建的情况下替换已完成应用程序中的图标："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:502
@@ -3219,8 +3217,8 @@ msgstr "检查图标在不同背景（浅色/深色）下的显示效果。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:522
 #: templates/help.html:522
 msgid ""
-"Всегда используйте PNG с прозрачностью как исходник - это обеспечит лучшую "
-"совместимость."
+"Всегда используйте PNG с прозрачностью как исходник - это обеспечит "
+"лучшую совместимость."
 msgstr "始终使用带透明度的PNG作为源文件——这将确保最佳兼容性。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:526
@@ -3238,7 +3236,8 @@ msgstr "图标问题排查"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:530
 #: templates/help.html:530
 msgid ""
-"Если иконки не отображаются или приложение собирается с дефектными иконками:"
+"Если иконки не отображаются или приложение собирается с дефектными "
+"иконками:"
 msgstr "如果图标不显示或应用程序构建时图标有缺陷："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:532
@@ -3408,8 +3407,8 @@ msgstr "文件和目录说明"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:600
 #: templates/help.html:600
 msgid ""
-"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и интеграцию"
-" с PyWebView для создания окна."
+"Сердце приложения. Содержит веб-сервер Flask, логику шифрования и "
+"интеграцию с PyWebView для создания окна."
 msgstr "应用程序的核心。包含Flask Web服务器、加密逻辑以及与PyWebView的集成以创建窗口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:601
@@ -3429,8 +3428,7 @@ msgstr "运行所需的所有Python库的列表。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:603
 #: templates/help.html:603
-msgid ""
-"Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
+msgid "Файл настроек, хранит информацию о версии и URL-адреса внешних сервисов."
 msgstr "设置文件，存储有关版本和外部服务URL的信息。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:604
@@ -3451,8 +3449,8 @@ msgstr "包含所有服务器信息的JSON文件。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:605
 #: templates/help.html:605
 msgid ""
-"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для веб-"
-"интерфейса."
+"Папки со статическими ресурсами (CSS, картинки) и HTML-шаблонами для "
+"веб-интерфейса."
 msgstr "包含静态资源（CSS、图像）和Web界面HTML模板的文件夹。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:608
@@ -3468,8 +3466,8 @@ msgstr "启动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:610
 #: templates/help.html:610
 msgid ""
-"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное окно"
-" с помощью PyWebView."
+"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
+"окно с помощью PyWebView."
 msgstr "`app.py`在后台线程中启动Flask Web服务器，并使用PyWebView创建本机窗口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:611
@@ -3495,8 +3493,8 @@ msgstr "互动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:612
 #: templates/help.html:612
 msgid ""
-"Все действия пользователя обрабатываются Flask, который изменяет данные и "
-"снова шифрует их."
+"Все действия пользователя обрабатываются Flask, который изменяет данные и"
+" снова шифрует их."
 msgstr "所有用户操作都由Flask处理，它会更改数据并再次加密。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
@@ -3507,8 +3505,8 @@ msgstr "完成"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:613
 #: templates/help.html:613
 msgid ""
-"При закрытии окна PyWebView отправляет команду на выключение сервера Flask, "
-"который корректно завершает работу и освобождает порт."
+"При закрытии окна PyWebView отправляет команду на выключение сервера "
+"Flask, который корректно завершает работу и освобождает порт."
 msgstr "关闭窗口时，PyWebView会发送关闭Flask服务器的命令，该服务器会正确终止并释放端口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:622
@@ -3534,8 +3532,8 @@ msgstr "首次启动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:630
 #: templates/help.html:630
 msgid ""
-"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У вас "
-"есть два варианта:"
+"При первом запуске приложения вы увидите экран \"Доступ ограничен\". У "
+"вас есть два варианта:"
 msgstr "首次启动应用程序时，您将看到\"访问受限\"屏幕。您有两个选择："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:632
@@ -3546,8 +3544,8 @@ msgstr "创建新PIN码"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:632
 #: templates/help.html:632
 msgid ""
-"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый PIN"
-" и сбросит все данные."
+"Нажмите \"Первый запуск\" → \"Создать новый PIN-код\". Это создаст новый "
+"PIN и сбросит все данные."
 msgstr "点击\"首次启动\"→\"创建新PIN码\"。这将创建新的PIN码并重置所有数据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:633
@@ -3582,7 +3580,8 @@ msgstr "双击开发者姓名："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:639
 #: templates/help.html:639
 msgid ""
-"Внизу страницы найдите имя разработчика в футере и дважды кликните по нему."
+"Внизу страницы найдите имя разработчика в футере и дважды кликните по "
+"нему."
 msgstr "在页面底部找到页脚中的开发者姓名，然后双击它。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:640
@@ -3729,15 +3728,16 @@ msgstr "退出登录"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:670
 #: templates/help.html:670
 msgid ""
-"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели навигации. "
-"После выхода потребуется повторный ввод PIN-кода для доступа к данным."
+"Для выхода из системы нажмите кнопку \"Выход\" в верхней панели "
+"навигации. После выхода потребуется повторный ввод PIN-кода для доступа к"
+" данным."
 msgstr "要退出登录，请点击顶部导航栏中的\"退出\"按钮。退出后，需要重新输入PIN码才能访问数据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:676
 #: templates/help.html:676
 msgid ""
-"Запишите PIN-код в надежном месте - без него вы не сможете получить доступ к"
-" данным"
+"Запишите PIN-код в надежном месте - без него вы не сможете получить "
+"доступ к данным"
 msgstr "将PIN码记在安全的地方 - 没有它，您将无法访问数据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:677
@@ -3748,8 +3748,8 @@ msgstr "创建新PIN码时，所有现有数据将被删除"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:678
 #: templates/help.html:678
 msgid ""
-"PIN-код не восстанавливается - если вы его забудете, потребуется создавать "
-"новый"
+"PIN-код не восстанавливается - если вы его забудете, потребуется "
+"создавать новый"
 msgstr "PIN码无法恢复 - 如果您忘记了它，需要创建新的PIN码"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:684
@@ -3781,15 +3781,14 @@ msgstr ") 您看到错误 "
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:699
 #: templates/help.html:699
-msgid ""
-", это означает, что в вашем окружении отсутствует необходимая библиотека."
+msgid ", это означает, что в вашем окружении отсутствует необходимая библиотека."
 msgstr "，这意味着您的环境中缺少必需的库。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:700
 #: templates/help.html:700
 msgid ""
-"Это происходит, когда в проект добавляется новая функциональность (например,"
-" как недавно был добавлен `pywebview`)."
+"Это происходит, когда в проект добавляется новая функциональность "
+"(например, как недавно был добавлен `pywebview`)."
 msgstr "当新功能被添加到项目中时（例如，最近添加了 `pywebview`），就会发生这种情况。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:701
@@ -3812,7 +3811,8 @@ msgstr "该命令将读取文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:704
 #: templates/help.html:704
 msgid ""
-"и установит точные версии всех библиотек, необходимых для корректной работы."
+"и установит точные версии всех библиотек, необходимых для корректной "
+"работы."
 msgstr "并安装正确操作所需的所有库的确切版本。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:22
@@ -4242,8 +4242,8 @@ msgstr "要访问服务器数据，需要输入PIN码。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:24
 #: templates/index_locked.html:24
 msgid ""
-"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" для"
-" создания PIN-кода."
+"Если вы используете приложение впервые, нажмите кнопку \"Первый запуск\" "
+"для создания PIN-кода."
 msgstr "如果您是第一次使用应用程序，请点击\"首次运行\"按钮创建PIN码。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:31
@@ -4267,7 +4267,8 @@ msgstr "输入PIN"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:50
 #: templates/index_locked.html:50
 msgid ""
-"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту."
+"Все данные защищены шифрованием. PIN-код обеспечивает дополнительную "
+"защиту."
 msgstr "所有数据都通过加密保护。PIN码提供额外的保护。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:64
@@ -5114,8 +5115,7 @@ msgstr "监控已经安装"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:925
 #: templates/monitoring.html:925
-msgid ""
-"Система мониторинга уже активна на этом сервере. Сейчас загрузим данные..."
+msgid "Система мониторинга уже активна на этом сервере. Сейчас загрузим данные..."
 msgstr "该服务器上的监控系统已处于活动状态。现在让我们加载数据..."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:3
@@ -5137,8 +5137,8 @@ msgstr "更换主密钥"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:32
 #: templates/settings.html:32
 msgid ""
-"При смене ключа будет создан новый зашифрованный файл данных. Старый файл "
-"сохранится как резервная копия."
+"При смене ключа будет создан новый зашифрованный файл данных. Старый файл"
+" сохранится как резервная копия."
 msgstr "更换密钥时，将创建新的加密数据文件。旧文件将作为备份保存。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:36
@@ -5179,7 +5179,8 @@ msgstr "密钥-数据匹配检查"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:57
 #: templates/settings.html:57
 msgid ""
-"Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение."
+"Быстро проверить, подходит ли ключ к файлу данных, без импорта в "
+"приложение."
 msgstr "快速检查密钥是否与数据文件匹配，无需导入应用。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:61
@@ -5250,8 +5251,7 @@ msgstr "该文件将保存在VPN服务器管理器应用程序文件夹中。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:121
 #: templates/settings.html:121
-msgid ""
-"Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
+msgid "Вы уверены, что хотите открепить файл данных? Список серверов будет пуст."
 msgstr "您确定要解除数据文件的绑定吗？服务器列表将为空。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:123
@@ -5267,8 +5267,8 @@ msgstr "数据文件已成功分离。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:132
 #: templates/settings.html:132
 msgid ""
-"Приложение в данный момент не работает с каким-либо файлом данных. Вы можете"
-" импортировать существующий файл, чтобы восстановить свои записи."
+"Приложение в данный момент не работает с каким-либо файлом данных. Вы "
+"можете импортировать существующий файл, чтобы восстановить свои записи."
 msgstr "应用当前未使用任何数据文件。您可以导入现有文件以恢复记录。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:140
@@ -5279,8 +5279,8 @@ msgstr "导入数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:143
 #: templates/settings.html:143
 msgid ""
-"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить "
-"его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
+"Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить"
+" его и работать с ним. Текущий прикрепленный файл (если он есть) будет "
 "заменен."
 msgstr "上传加密数据文件（<code>.enc</code>）以绑定并使用。如有已绑定文件将被替换。"
 
@@ -5314,8 +5314,8 @@ msgstr "所需内容："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:167
 #: templates/settings.html:167
 msgid ""
-"файл <code>.env</code> и <code>servers.json.enc</code> из другой установки "
-"приложения."
+"файл <code>.env</code> и <code>servers.json.enc</code> из другой "
+"установки приложения."
 msgstr "来自其他安装的<code>.env</code>文件和<code>servers.json.enc</code>文件。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:174
@@ -5533,15 +5533,18 @@ msgid ""
 msgstr "您确定要删除这个服务器吗？"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:600
+#, python-brace-format
 msgid "{editor}: Editing failed"
 msgstr "{editor}：编辑失败"
 
 #: venv/lib/python3.13/site-packages/click/_termui_impl.py:604
+#, python-brace-format
 msgid "{editor}: Editing failed: {e}"
 msgstr "{editor}：编辑失败：{e}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1084
 #: venv/lib/python3.13/site-packages/click/core.py:1121
+#, python-brace-format
 msgid "{text} {deprecated_message}"
 msgstr "{text} {drevecated_message}"
 
@@ -5550,11 +5553,13 @@ msgid "Options"
 msgstr "选项"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1204
+#, python-brace-format
 msgid "Got unexpected extra argument ({args})"
 msgid_plural "Got unexpected extra arguments ({args})"
 msgstr[0] "有意外的额外参数（{args}）"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1220
+#, python-brace-format
 msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
 msgstr "debecationwarning：命令{name！r}已弃用。{extra_message}"
 
@@ -5571,6 +5576,7 @@ msgid "Missing command."
 msgstr "缺少命令。"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1888
+#, python-brace-format
 msgid "No such command {name!r}."
 msgstr "没有这样的命令{name！r}。"
 
@@ -5579,22 +5585,27 @@ msgid "Value must be an iterable."
 msgstr "价值必须是一个觉得的。"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2326
+#, python-brace-format
 msgid "Takes {nargs} values but 1 was given."
 msgid_plural "Takes {nargs} values but {len} were given."
 msgstr[0] "取{nargs}值，但给出了1个。"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2403
+#, python-brace-format
 msgid ""
-"DeprecationWarning: The {param_type} {name!r} is deprecated.{extra_message}"
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
 msgstr "debrecationwarning：{param_type} {name！r}已弃用。{extra_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2807
+#, python-brace-format
 msgid "env var: {var}"
 msgstr ""
-"Error 500 (Server Error)!!1500.That's an error.There was an error. Please "
-"try again later.That's all we know."
+"Error 500 (Server Error)!!1500.That's an error.There was an error. Please"
+" try again later.That's all we know."
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
+#, python-brace-format
 msgid "default: {default}"
 msgstr "默认值：{默认}"
 
@@ -5621,18 +5632,22 @@ msgstr "显示此消息并退出。"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:50
 #: venv/lib/python3.13/site-packages/click/exceptions.py:89
+#, python-brace-format
 msgid "Error: {message}"
 msgstr "错误信息}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:81
+#, python-brace-format
 msgid "Try '{command} {option}' for help."
 msgstr "尝试'{命令} {option}'寻求帮助。"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:130
+#, python-brace-format
 msgid "Invalid value: {message}"
 msgstr "无效的值：{消息}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:132
+#, python-brace-format
 msgid "Invalid value for {param_hint}: {message}"
 msgstr "{param_hint}的无效值：{messages}"
 
@@ -5649,18 +5664,22 @@ msgid "Missing parameter"
 msgstr "缺少参数"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:196
+#, python-brace-format
 msgid "Missing {param_type}"
 msgstr "缺少{param_type}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:203
+#, python-brace-format
 msgid "Missing parameter: {param_name}"
 msgstr "缺少参数：{param_name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:223
+#, python-brace-format
 msgid "No such option: {name}"
 msgstr "没有这样的选项：{name}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:237
+#, python-brace-format
 msgid "Did you mean {possibility}?"
 msgid_plural "(Possible options: {possibilities})"
 msgstr[0] "您的意思是{可能性}吗？"
@@ -5670,6 +5689,7 @@ msgid "unknown error"
 msgstr "未知错误"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:289
+#, python-brace-format
 msgid "Could not open file {filename!r}: {message}"
 msgstr "无法打开文件{filename！r}：{messages}"
 
@@ -5678,14 +5698,17 @@ msgid "Usage:"
 msgstr "用法："
 
 #: venv/lib/python3.13/site-packages/click/parser.py:200
+#, python-brace-format
 msgid "Argument {name!r} takes {nargs} values."
 msgstr "参数{name！r}获取{nargs}值。"
 
 #: venv/lib/python3.13/site-packages/click/parser.py:383
+#, python-brace-format
 msgid "Option {name!r} does not take a value."
 msgstr "选项{name！r}不采用值。"
 
 #: venv/lib/python3.13/site-packages/click/parser.py:443
+#, python-brace-format
 msgid "Option {name!r} requires an argument."
 msgid_plural "Option {name!r} requires {nargs} arguments."
 msgstr[0] "选项{name！r}需要一个参数。"
@@ -5707,6 +5730,7 @@ msgid "Error: The value you entered was invalid."
 msgstr "错误：您输入的值无效。"
 
 #: venv/lib/python3.13/site-packages/click/termui.py:180
+#, python-brace-format
 msgid "Error: {e.message}"
 msgstr "错误：{e.message}"
 
@@ -5723,6 +5747,7 @@ msgid "Press any key to continue..."
 msgstr "按任何键继续..."
 
 #: venv/lib/python3.13/site-packages/click/types.py:332
+#, python-brace-format
 msgid ""
 "Choose from:\n"
 "\t{choices}"
@@ -5731,28 +5756,34 @@ msgstr ""
 "\t{选择}"
 
 #: venv/lib/python3.13/site-packages/click/types.py:371
+#, python-brace-format
 msgid "{value!r} is not {choice}."
 msgid_plural "{value!r} is not one of {choices}."
 msgstr[0] "{value！r}不是{选择}。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:462
+#, python-brace-format
 msgid "{value!r} does not match the format {format}."
 msgid_plural "{value!r} does not match the formats {formats}."
 msgstr[0] "{value！r}与格式{格式}不匹配。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:482
+#, python-brace-format
 msgid "{value!r} is not a valid {number_type}."
 msgstr "{value！r}不是有效的{number_type}。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:538
+#, python-brace-format
 msgid "{value} is not in the range {range}."
 msgstr "{value}不在范围{range}范围内。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:679
+#, python-brace-format
 msgid "{value!r} is not a valid boolean."
 msgstr "{value！r}不是有效的布尔值。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:703
+#, python-brace-format
 msgid "{value!r} is not a valid UUID."
 msgstr "{value！r}不是有效的UUID。"
 
@@ -5769,30 +5800,37 @@ msgid "path"
 msgstr "小路"
 
 #: venv/lib/python3.13/site-packages/click/types.py:944
+#, python-brace-format
 msgid "{name} {filename!r} does not exist."
 msgstr "{name} {fileName！r}不存在。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:953
+#, python-brace-format
 msgid "{name} {filename!r} is a file."
 msgstr "{name} {filename！r}是一个文件。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:961
+#, python-brace-format
 msgid "{name} {filename!r} is a directory."
 msgstr "{name} {filename！r}是一个目录。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:970
+#, python-brace-format
 msgid "{name} {filename!r} is not readable."
 msgstr "{name} {filename！r}是不可读取的。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:979
+#, python-brace-format
 msgid "{name} {filename!r} is not writable."
 msgstr "{name} {fileName！r}不是可写的。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:988
+#, python-brace-format
 msgid "{name} {filename!r} is not executable."
 msgstr "{name} {fileName！r}无法执行。"
 
 #: venv/lib/python3.13/site-packages/click/types.py:1054
+#, python-brace-format
 msgid "{len_type} values are required, but {len_value} was given."
 msgid_plural "{len_type} values are required, but {len_value} were given."
 msgstr[0] "{len_type}需要{len_value}。"
@@ -5801,56 +5839,24 @@ msgstr[0] "{len_type}需要{len_value}。"
 msgid "show this help message and exit"
 msgstr "显示此消息并退出。"
 
-#~ msgid "По умолчанию 22"
-#~ msgstr "默认22"
-
-#~ msgid "URL панели"
-#~ msgstr "面板URL"
-
-#~ msgid "Управление службами"
-#~ msgstr "服务管理"
-
-#~ msgid "Управление пакетами"
-#~ msgstr "软件包管理"
-
-#~ msgid "Безопасность"
-#~ msgstr "安全"
-
-#~ msgid "Новый пароль панели"
-#~ msgstr "新密码面板"
-
-#~ msgid "Язык изменен на %(lang)s"
-#~ msgstr "语言更改为 %(lang)s"
-
-#~ msgid "Информация о Docker"
-#~ msgstr "Docker信息"
-
-#~ msgid "Оставьте пустым, если не хотите менять."
-#~ msgstr "如果您不想更改，请留空。"
-
-#~ msgid "Docker информация"
-#~ msgstr "信息："
-
-#~ msgid "Не удалось удалить чек:"
-#~ msgstr "复制文本失败："
-
-#~ msgid "%"
-#~ msgstr "%"
-
-#~ msgid "Выберать зашифрованный файл данных из другой установки"
-#~ msgstr "选择来自其他安装的加密数据文件"
-
 msgid "(клик — копировать) и ссылку «Открыть» на"
 msgstr "（点击复制）以及「打开」链接到"
 
 msgid "Backend:"
 msgstr "后端："
 
-msgid "Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере. Карточка показывает, запущены ли они, даёт готовую команду"
+msgid ""
+"Dockhand (:8501) и Headplane (:3000) слушают только localhost на сервере."
+" Карточка показывает, запущены ли они, даёт готовую команду"
 msgstr "Dockhand（:8501）和 Headplane（:3000）仅监听服务器的 localhost。卡片显示它们是否运行，并提供现成的命令"
 
-msgid "Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на самом сервере. Она доступна только на localhost VPS, поэтому открывайте её через SSH-туннель из карточки «Web-панели»."
-msgstr "Dockhand 是运行在服务器上的 TelegramOnly 栈轻量级 Streamlit 诊断面板。它仅在 VPS 的 localhost 上可用，请通过「Web 面板」卡片中的 SSH 隧道打开。"
+msgid ""
+"Dockhand — лёгкая Streamlit-панель диагностики стека TelegramOnly на "
+"самом сервере. Она доступна только на localhost VPS, поэтому открывайте "
+"её через SSH-туннель из карточки «Web-панели»."
+msgstr ""
+"Dockhand 是运行在服务器上的 TelegramOnly 栈轻量级 Streamlit 诊断面板。它仅在 VPS 的 localhost "
+"上可用，请通过「Web 面板」卡片中的 SSH 隧道打开。"
 
 msgid "Fail2ban забанил IP"
 msgstr "Fail2ban 已封禁的 IP"
@@ -5912,7 +5918,9 @@ msgstr "监控所有网络接口"
 msgid "Мост запущен — hash появится в логе старта"
 msgstr "网桥已启动 — hash 将出现在启动日志中"
 
-msgid "На карточке сервера есть две кнопки для наблюдения за состоянием VPS по SSH."
+msgid ""
+"На карточке сервера есть две кнопки для наблюдения за состоянием VPS по "
+"SSH."
 msgstr "服务器卡片上有两个按钮，可通过 SSH 观察 VPS 状态。"
 
 msgid "Настроить сервер"
@@ -5924,10 +5932,21 @@ msgstr "未发现"
 msgid "Обновление системы"
 msgstr "系统更新"
 
-msgid "Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG» сохраняет снимок в картинку."
-msgstr "打开一个弹窗显示当前状态：CPU 负载、内存、磁盘、运行时间、进程排行、网络接口（含 tailscale0）以及 Docker 容器列表。TelegramOnly 栈的容器（headscale、headplane、机器人、dockhand）会标注其角色。「保存为 PNG」按钮可将快照保存为图片。"
+msgid ""
+"Открывает всплывающее окно с текущим состоянием: загрузка CPU, память, "
+"диск, аптайм, топ процессов, сетевые интерфейсы (включая tailscale0) и "
+"список Docker-контейнеров. Контейнеры стека TelegramOnly (headscale, "
+"headplane, бот, dockhand) помечаются их ролью. Кнопка «Сохранить как PNG»"
+" сохраняет снимок в картинку."
+msgstr ""
+"打开一个弹窗显示当前状态：CPU 负载、内存、磁盘、运行时间、进程排行、网络接口（含 tailscale0）以及 Docker "
+"容器列表。TelegramOnly 栈的容器（headscale、headplane、机器人、dockhand）会标注其角色。「保存为 "
+"PNG」按钮可将快照保存为图片。"
 
-msgid "Открывает страницу с автообновляемыми графиками и карточками. Если на сервере ещё нет инструментов мониторинга, появится экран «Установка системы мониторинга»."
+msgid ""
+"Открывает страницу с автообновляемыми графиками и карточками. Если на "
+"сервере ещё нет инструментов мониторинга, появится экран «Установка "
+"системы мониторинга»."
 msgstr "打开带有自动刷新图表和卡片的页面。如果服务器尚未安装监控工具，将显示「安装监控系统」界面。"
 
 msgid "Открыть"
@@ -5942,7 +5961,9 @@ msgstr "24 小时内 journal 错误数："
 msgid "Подключение к серверу..."
 msgstr "正在连接服务器…"
 
-msgid "Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе «Безопасность и хранение паролей» выше."
+msgid ""
+"Подробнее о шифровании, алгоритме Fernet и ключе SECRET_KEY — в разделе "
+"«Безопасность и хранение паролей» выше."
 msgstr "关于加密、Fernet 算法和 SECRET_KEY 的更多信息，请见上方「安全与密码存储」一节。"
 
 msgid "Попробуйте подключиться вручную:"
@@ -5993,17 +6014,32 @@ msgstr "机器人/API 和 HA 栈（ha-reticulum-bridge、ha-stub-grpc、ha-stub-
 msgid "не запущена"
 msgstr "未运行"
 
-msgid "неудачные попытки входа по SSH и доступные обновления безопасности за 24 часа."
+msgid ""
+"неудачные попытки входа по SSH и доступные обновления безопасности за 24 "
+"часа."
 msgstr "过去 24 小时内的 SSH 登录失败次数和可用的安全更新。"
 
-msgid "слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — копировать)."
+msgid ""
+"слушает ли мост порт 50061 и его «bridge hash» (клик по хэшу — "
+"копировать)."
 msgstr "网桥是否监听 50061 端口及其「bridge hash」（点击 hash 复制）。"
 
-msgid "состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, Tailscale. Статус определяется по реально запущенному процессу на сервере, а не только по systemd."
-msgstr "传输状态 — VLESS（Xray）、Hysteria2、MTProto、NaiveProxy、Tailscale。状态依据服务器上实际运行的进程判断，而不仅是 systemd。"
+msgid ""
+"состояние транспортов — VLESS (Xray), Hysteria2, MTProto, NaiveProxy, "
+"Tailscale. Статус определяется по реально запущенному процессу на "
+"сервере, а не только по systemd."
+msgstr ""
+"传输状态 — "
+"VLESS（Xray）、Hysteria2、MTProto、NaiveProxy、Tailscale。状态依据服务器上实际运行的进程判断，而不仅是"
+" systemd。"
 
-msgid "ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq (обработка JSON), net-tools (сетевая статистика). Пакет ufw только устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
-msgstr "在服务器上安装轻量工具：vnstat（流量统计）、jq（JSON 处理）、net-tools（网络统计）。ufw 仅安装但不会自动启用。需要 1–2 分钟。"
+msgid ""
+"ставит на сервер лёгкие утилиты: vnstat (статистика трафика), jq "
+"(обработка JSON), net-tools (сетевая статистика). Пакет ufw только "
+"устанавливается, но НЕ включается автоматически. Занимает 1–2 минуты."
+msgstr ""
+"在服务器上安装轻量工具：vnstat（流量统计）、jq（JSON 处理）、net-tools（网络统计）。ufw 仅安装但不会自动启用。需要 "
+"1–2 分钟。"
 
 msgid "— она заработает после поднятия туннеля."
 msgstr "— 在建立隧道后即可使用。"
@@ -6026,7 +6062,9 @@ msgstr "监控脚本始终会安装。安装需要 1-2 分钟"
 msgid "Пароль входа по SSH"
 msgstr "SSH 登录密码"
 
-msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его."
+msgid ""
+"Этим паролем приложение входит как пользователь выше. Статус и мониторинг"
+" используют только его."
 msgstr "应用使用此密码以上方用户登录。状态和监控只用这一项。"
 
 msgid "Пароль учётной записи root"
@@ -6053,7 +6091,9 @@ msgstr "当前 SSH 登录密码"
 msgid "Новый пароль входа по SSH"
 msgstr "新的 SSH 登录密码"
 
-msgid "Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять."
+msgid ""
+"Этим паролем приложение входит как пользователь выше. Статус и мониторинг"
+" используют только его. Оставьте пустым, чтобы не менять."
 msgstr "应用使用此密码以上方用户登录。状态和监控只用这一项。留空则不更改。"
 
 msgid "Текущий пароль root (справка)"
@@ -6062,7 +6102,9 @@ msgstr "当前 root 密码（参考）"
 msgid "Новый пароль root (справка)"
 msgstr "新的 root 密码（参考）"
 
-msgid "Письмо хостера или su. Для статуса не используется. Оставьте пустым, чтобы не менять."
+msgid ""
+"Письмо хостера или su. Для статуса не используется. Оставьте пустым, "
+"чтобы не менять."
 msgstr "主机商邮件或 su。状态不会使用。留空则不更改。"
 
 msgid "Пароль входа"
@@ -6131,7 +6173,9 @@ msgstr "粘贴主机商密码"
 msgid "Куреин М.Н."
 msgstr "Kurein M.N."
 
-msgid "Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — карточка на всю ширину. Повторный двойной клик сворачивает."
+msgid ""
+"Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — "
+"карточка на всю ширину. Повторный двойной клик сворачивает."
 msgstr "用手柄拖动。双击：从归档恢复为活动，再双击展开全宽卡片。再次双击可收起。"
 
 msgid "Перетащить"
@@ -6161,7 +6205,10 @@ msgstr "选择文件或框选屏幕区域后会立即显示预览。"
 msgid "Интерактивный обзор (htop / btop)"
 msgstr "交互式总览（htop / btop）"
 
-msgid "htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q."
+msgid ""
+"htop и btop показывают CPU, память, нагрузку и процессы на одном экране —"
+" быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче."
+" Выход — клавиша q."
 msgstr "htop 和 btop 在一个屏幕上显示 CPU、内存、负载和进程，比一堆单独命令更快。小内存 VPS 更适合 htop，它更轻。按 q 退出。"
 
 msgid "Запустить htop"
@@ -6194,6 +6241,7 @@ msgstr "此服务器 IP 的城市和运营商：ipinfo.io"
 msgid "Владелец IP сервера: ip2location.com"
 msgstr "此服务器 IP 的所有者：ip2location.com"
 
+#, python-format
 msgid "Файл данных импортирован. Серверов: %(count)s"
 msgstr "数据文件已导入。服务器：%(count)s"
 
@@ -6208,3 +6256,309 @@ msgstr "无法获取 IP 信息"
 
 msgid "Сервер вернул не JSON"
 msgstr "服务器返回的不是 JSON"
+
+msgid "Очистка TelegramOnly"
+msgstr "清理 TelegramOnly"
+
+msgid "Архивы очистки"
+msgstr "清理备份"
+
+msgid "Действия"
+msgstr "操作"
+
+msgid "Действия с сервером"
+msgstr "服务器操作"
+
+msgid "Мониторинг VPS"
+msgstr "监控"
+
+msgid "Очистить стек"
+msgstr "清理服务栈"
+
+msgid "Удалить архив"
+msgstr "删除备份"
+
+msgid "Удалить сервер"
+msgstr "删除服务器"
+
+msgid "Проверить место на диске"
+msgstr "检查磁盘用量"
+
+msgid ""
+"Выбранные службы будут остановлены, контейнеры удалены, файлы перенесены "
+"в закрытый архив на VPS. Debian и доступ по SSH сохраняются."
+msgstr "将停止选中的服务、移除容器，并将文件移入 VPS 上的私有备份。Debian 和 SSH 访问将保留。"
+
+msgid ""
+"Это подготовка к повторной установке, а не переустановка ОС. Docker, "
+"firewall и системные пакеты остаются."
+msgstr "这将为重新安装服务栈做准备。Docker、防火墙设置和系统软件包将保留。"
+
+msgid ""
+"Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: "
+"очистка выбранного прокси прервёт соединения через него."
+msgstr "请先查看状态和监控。请直接通过 VPS IP 连接：清理代理会断开通过它建立的连接。"
+
+msgid "Компоненты для очистки"
+msgstr "要清理的组件"
+
+msgid "Проверить и показать план"
+msgstr "检查并显示计划"
+
+msgid "Для подтверждения введите hostname из плана"
+msgstr "输入计划中的主机名以确认"
+
+msgid "Очистить выбранные компоненты"
+msgstr "清理选中的组件"
+
+msgid "Операция не выполнена"
+msgstr "操作失败"
+
+msgid "Проверяю сервер. Изменения не выполняются…"
+msgstr "正在检查服务器，不会进行更改…"
+
+msgid ""
+"План действителен 10 минут. Проверьте каждый компонент перед "
+"подтверждением."
+msgstr "计划有效期为 10 分钟。确认前请检查每个组件。"
+
+msgid ""
+"Выполняю подтверждённую очистку. Не закрывайте окно и не запускайте её "
+"повторно…"
+msgstr "正在执行已确认的清理。请勿关闭窗口或重复启动…"
+
+msgid "Очистка завершена. Архив: "
+msgstr "清理完成。备份："
+
+msgid ". Теперь проверьте Status и Monitoring."
+msgstr "。现在请查看状态和监控。"
+
+msgid ""
+"\n"
+"Архив: "
+msgstr ""
+"\n"
+"备份："
+
+msgid "Службы: "
+msgstr "服务："
+
+msgid "Контейнеры: "
+msgstr "容器："
+
+msgid "Тома с резервным копированием: "
+msgstr "要备份的卷："
+
+msgid "Перенести в архив:\n"
+msgstr "移入备份：\n"
+
+msgid "Сохранить:\n"
+msgstr "保留：\n"
+
+msgid "Блокировки:\n"
+msgstr "阻止项：\n"
+
+msgid ""
+"Удаление архива необратимо: сохранённые настройки и данные восстановить "
+"из него уже не получится. Удаляйте архив после успешной повторной "
+"установки."
+msgstr "删除备份无法撤销，其设置和数据将无法恢复。请在成功重新安装后再删除。"
+
+msgid ""
+"Показаны только архивы завершённых операций из /var/backups/telegramonly-"
+"reset. Архивы незавершённых операций защищены."
+msgstr "仅列出 /var/backups/telegramonly-reset 中已完成清理的备份。未完成操作的备份受保护。"
+
+msgid "Показать архивы и размеры"
+msgstr "显示备份及大小"
+
+msgid "Для удаления введите имя VPS:"
+msgstr "输入 VPS 主机名以删除："
+
+msgid "Читаю список архивов…"
+msgstr "正在加载备份…"
+
+msgid " МиБ "
+msgstr " MiB "
+
+msgid "Безвозвратно удалить архив "
+msgstr "永久删除备份 "
+
+msgid " на VPS "
+msgstr "，所在 VPS："
+
+msgid "Удаляю выбранный архив…"
+msgstr "正在删除所选备份…"
+
+msgid "Архив удалён."
+msgstr "备份已删除。"
+
+msgid " Обновите список архивов."
+msgstr " 请刷新备份列表。"
+
+msgid "Список действителен 10 минут."
+msgstr "列表有效期为 10 分钟。"
+
+msgid "Завершённых архивов для удаления нет."
+msgstr "没有可删除的已完成备份。"
+
+msgid "Место на диске"
+msgstr "磁盘用量"
+
+msgid ""
+"Проверка покажет размеры каталогов, архивов очистки, кэша пакетов и "
+"системного журнала. Файлы не изменяются."
+msgstr "检查目录、清理备份、软件包缓存和系统日志的大小。不会修改文件。"
+
+msgid "Команды для Tabby"
+msgstr "Tabby 命令"
+
+msgid "Копировать команды"
+msgstr "复制命令"
+
+msgid "Выполнить на этом VPS"
+msgstr "在此 VPS 上运行"
+
+msgid ""
+"При запуске здесь используется SSH из карточки сервера. Для root команды "
+"выполняются без sudo."
+msgstr "使用服务器卡片中的 SSH 连接。root 用户运行命令时不使用 sudo。"
+
+msgid "Команды скопированы. Вставьте их в терминал Tabby на нужном VPS."
+msgstr "命令已复制。请粘贴到目标 VPS 的 Tabby 终端。"
+
+msgid "Нажмите Ctrl+C, чтобы скопировать выделенные команды."
+msgstr "按 Ctrl+C 复制选中的命令。"
+
+msgid "Проверяю диск. Это может занять несколько минут…"
+msgstr "正在检查磁盘用量，可能需要几分钟…"
+
+msgid "Проверка не выполнена"
+msgstr "检查失败"
+
+msgid "Нет данных"
+msgstr "无数据"
+
+msgid "Проверка завершена."
+msgstr "检查完成。"
+
+msgid "Проверка завершена с замечаниями — см. результаты ниже."
+msgstr "检查完成，但有提示。请查看以下结果。"
+
+msgid "Выберите компоненты из списка"
+msgstr "请从列表中选择组件"
+
+msgid ""
+"Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не "
+"удалено."
+msgstr "检查失败。请检查 SSH、known_hosts 和 root/sudo -n。未删除任何内容。"
+
+msgid "Аудит не выполнен"
+msgstr "检查失败"
+
+msgid "Сначала получите план очистки"
+msgstr "请先获取清理计划"
+
+msgid "План устарел или относится к другому серверу/сеансу"
+msgstr "计划已过期或属于其他服务器/会话"
+
+msgid "Устраните блокировки и введите точное имя сервера"
+msgstr "请解决阻止项并输入准确的主机名"
+
+msgid "Очистка этого сервера уже выполняется"
+msgstr "此服务器正在执行清理"
+
+msgid ""
+"Ответ потерян или выполнение прервано. Не повторяйте автоматически: "
+"проверьте Status и /var/backups/telegramonly-reset по SSH."
+msgstr "响应丢失或执行中断。请勿自动重试：通过 SSH 检查状态和 /var/backups/telegramonly-reset。"
+
+msgid "Не удалось прочитать архивы. Проверьте SSH и права доступа."
+msgstr "无法读取备份。请检查 SSH 和访问权限。"
+
+msgid "Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа."
+msgstr "无法读取备份。请检查 SSH、known_hosts 和访问权限。"
+
+msgid "Сначала загрузите список архивов"
+msgstr "请先加载备份列表"
+
+msgid "Обновите список архивов"
+msgstr "请刷新备份列表"
+
+msgid "Введите точное имя VPS"
+msgstr "请输入准确的 VPS 主机名"
+
+msgid "Другая операция уже выполняется"
+msgstr "另一项操作正在运行"
+
+msgid "Ответ потерян. Обновите список перед дальнейшими действиями."
+msgstr "响应丢失。请刷新列表后再继续。"
+
+msgid "Не удалось получить данные о диске."
+msgstr "无法获取磁盘用量。"
+
+msgid "Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n."
+msgstr "检查失败。请检查 SSH、known_hosts 和 root/sudo -n。"
+
+msgid "Каталоги /var, /opt, /usr, /root"
+msgstr "目录 /var、/opt、/usr、/root"
+
+msgid "Архивы очистки и кэш пакетов"
+msgstr "清理备份和软件包缓存"
+
+msgid "Системный журнал"
+msgstr "系统日志"
+
+msgid "Часть каталогов отсутствует или недоступна; показан полученный результат."
+msgstr "部分目录不存在或无法访问；已显示可获取的结果。"
+
+msgid "Превышено время ожидания (120 секунд)."
+msgstr "等待超时（120 秒）。"
+
+msgid "Команда недоступна на сервере."
+msgstr "此服务器上无法执行该命令。"
+
+msgid ""
+"Archive operation failed; refresh the list and inspect the server. No "
+"automatic retry."
+msgstr "备份操作失败；请刷新列表并检查服务器。不会自动重试。"
+
+#~ msgid "По умолчанию 22"
+#~ msgstr "默认22"
+
+#~ msgid "URL панели"
+#~ msgstr "面板URL"
+
+#~ msgid "Управление службами"
+#~ msgstr "服务管理"
+
+#~ msgid "Управление пакетами"
+#~ msgstr "软件包管理"
+
+#~ msgid "Безопасность"
+#~ msgstr "安全"
+
+#~ msgid "Новый пароль панели"
+#~ msgstr "新密码面板"
+
+#~ msgid "Язык изменен на %(lang)s"
+#~ msgstr "语言更改为 %(lang)s"
+
+#~ msgid "Информация о Docker"
+#~ msgstr "Docker信息"
+
+#~ msgid "Оставьте пустым, если не хотите менять."
+#~ msgstr "如果您不想更改，请留空。"
+
+#~ msgid "Docker информация"
+#~ msgstr "信息："
+
+#~ msgid "Не удалось удалить чек:"
+#~ msgstr "复制文本失败："
+
+#~ msgid "%"
+#~ msgstr "%"
+
+#~ msgid "Выберать зашифрованный файл данных из другой установки"
+#~ msgstr "选择来自其他安装的加密数据文件"
+

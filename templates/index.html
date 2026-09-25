@@ -2,6 +2,7 @@
 {% from "macros/credentials.html" import password_display, text_copy_display %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/server_actions.css') }}">
 <div class="container mt-4">
     <!-- Блок для вывода flash-сообщений -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -131,24 +132,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="card-footer py-1 px-2 d-flex justify-content-between gap-1">
-                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary" title="{{ _('Редактировать') }}">
-                        <i class="bi bi-pencil-square"></i>
-                    </a>
-                    <div class="d-flex gap-1">
-                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}" title="{{ _('Статус') }}">
-                            <i class="bi bi-activity"></i>
-                        </button>
-                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success" title="{{ _('Мониторинг') }}">
-                            <i class="bi bi-bar-chart-line"></i>
-                        </a>
-                        <a href="{{ url_for('reset.reset_page', server_id=server.id) }}" class="btn btn-sm btn-outline-danger" title="{{ _('Очистить TelegramOnly на VPS') }}"><i class="bi bi-arrow-counterclockwise"></i> {{ _('Очистить стек') }}</a>
-                        <a class="btn btn-sm btn-outline-danger" href="{{ url_for('reset.archive_page', server_id=server.id) }}"><i class="bi bi-archive"></i> {{ _('Удалить архив') }}</a>
-                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" class="d-inline" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
-                            <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ _('Удалить') }}"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </div>
-                </div>
+                {% include "partials/server_actions.html" %}
                 </div>
                 <div class="server-card-full">
                 <div class="card-header force-dark-text" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
@@ -376,24 +360,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="card-footer d-flex justify-content-between">
-                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-outline-secondary me-2">
-                        <i class="bi bi-pencil-square"></i> {{ _('Редактировать') }}
-                    </a>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-sm btn-outline-info btn-show-stats" data-server-id="{{ server.id }}" data-server-name="{{ server.name }}" data-server-ip="{{ server.ip_address }}">
-                            <i class="bi bi-activity"></i> {{ _('Статус') }}
-                        </button>
-                        <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success">
-                            <i class="bi bi-bar-chart-line"></i> {{ _('Мониторинг') }}
-                        </a>
-                        <a href="{{ url_for('reset.reset_page', server_id=server.id) }}" class="btn btn-sm btn-outline-danger" title="{{ _('Очистить TelegramOnly на VPS') }}"><i class="bi bi-arrow-counterclockwise"></i> {{ _('Очистить стек') }}</a>
-                        <a class="btn btn-sm btn-outline-danger" href="{{ url_for('reset.archive_page', server_id=server.id) }}"><i class="bi bi-archive"></i> {{ _('Удалить архив') }}</a>
-                        <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
-                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
-                        </form>
-                    </div>
-                </div>
+                {% include "partials/server_actions.html" %}
                 </div>
             </div>
         </div>
