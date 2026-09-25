@@ -6839,6 +6839,135 @@ msgstr ""
 "Archive operation failed; refresh the list and inspect the server. No "
 "automatic retry."
 
+msgid "Стек TelegramOnly"
+msgstr "TelegramOnly stack"
+
+msgid ""
+"Транспорты, бот, HA-стек и контейнеры TelegramOnly. Серым — то, чего на "
+"сервере нет."
+msgstr ""
+"TelegramOnly transports, bot, HA stack and containers. Gray means not "
+"present on the server."
+
+msgid "Загрузка…"
+msgstr "Loading…"
+
+msgid "Не удалось прочитать стек. Проверьте SSH."
+msgstr "Could not read the stack. Check SSH."
+
+msgid "Сервис"
+msgstr "Service"
+
+msgid "Если нет"
+msgstr "If missing"
+
+msgid "не установлено"
+msgstr "not installed"
+
+msgid "Транспорты"
+msgstr "Transports"
+
+msgid "Бот и HA"
+msgstr "Bot and HA"
+
+msgid "Контейнеры, которых нет"
+msgstr "Missing containers"
+
+msgid "установка Xray, затем /xray_apply в боте"
+msgstr "install Xray, then /xray_apply in the bot"
+
+msgid "обычно клиент; на VPS unit sing-box не обязателен"
+msgstr "usually a client; the sing-box unit is optional on a VPS"
+
+msgid "TelegramOnly бот/API"
+msgstr "TelegramOnly bot/API"
+
+msgid "HA Reticulum мост"
+msgstr "HA Reticulum bridge"
+
+msgid "ставится вместе с scripts/install_ha_stack.sh"
+msgstr "installed together with scripts/install_ha_stack.sh"
+
+msgid "опционально, unit shskm-remote-cli"
+msgstr "optional, unit shskm-remote-cli"
+
+msgid "i2pd (I2P для Reticulum)"
+msgstr "i2pd (I2P for Reticulum)"
+
+msgid "Headscale (координатор)"
+msgstr "Headscale (coordinator)"
+
+msgid "TelegramOnly бот"
+msgstr "TelegramOnly bot"
+
+msgid "docker compose, Web UI — scripts/install_headplane.sh"
+msgstr "docker compose; Web UI — scripts/install_headplane.sh"
+
+msgid "опционально, контейнер dockhand"
+msgstr "optional, dockhand container"
+
+msgid "Мониторинг:"
+msgstr "Monitoring:"
+
+msgid "интерфейс"
+msgstr "interface"
+
+msgid "интерфейсов"
+msgstr "interfaces"
+
+msgid "за 1 с по /proc/stat"
+msgstr "over 1s from /proc/stat"
+
+msgid "Load average:"
+msgstr "Load average:"
+
+msgid ""
+"Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная "
+"перегрузка."
+msgstr ""
+"The percentage is high but the run queue is almost empty: a short spike, not "
+"sustained overload."
+
+msgid "Сейчас в топе:"
+msgstr "Top processes now:"
+
+msgid "Команды htop и btop"
+msgstr "htop and btop commands"
+
+msgid "htop и btop уже стоят. Команды установки:"
+msgstr "htop and btop are already installed. Install commands:"
+
+msgid "Статистика сетевого трафика за 24 часа"
+msgstr "Network traffic statistics for 24 hours"
+
+msgid "JSON процессор для графиков истории"
+msgstr "JSON processor for history charts"
+
+msgid "Брандмауэр для мониторинга безопасности (НЕ РЕКОМЕНДУЕТСЯ включать)"
+msgstr "Firewall for security monitoring (NOT recommended to enable)"
+
+msgid ""
+"⚠️ НЕ включайте UFW! Мониторинг работает и без него. Включение UFW без "
+"правильной настройки заблокирует SSH доступ!"
+msgstr ""
+"⚠️ Do not enable UFW! Monitoring works without it. Enabling UFW without "
+"proper rules will block SSH access!"
+
+msgid "Статистика сетевых соединений"
+msgstr "Network connection statistics"
+
+msgid "Установлен, но не запущен"
+msgstr "Installed but not running"
+
+msgid "⚠️ UFW выключен (это ПРАВИЛЬНО! Оставьте выключенным)"
+msgstr "⚠️ UFW is disabled (this is CORRECT! Leave it disabled)"
+
+msgid "# НЕ включайте UFW! Команда: sudo ufw disable"
+msgstr "# Do not enable UFW! Command: sudo ufw disable"
+
+msgid "⚠️ UFW включен! Убедитесь что SSH-порт %(port)s разрешен!"
+msgstr "⚠️ UFW is enabled! Make sure SSH port %(port)s is allowed!"
+
 #~ msgid ""
 #~ "Если проблемы с иконками повторяются, "
 #~ "создайте резервную копию рабочей иконки "
