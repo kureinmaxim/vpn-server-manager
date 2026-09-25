@@ -320,6 +320,8 @@ def create_app(config_name='development'):
     app.register_blueprint(api_bp)
     app.register_blueprint(pin_bp)
     app.register_blueprint(vendor_bp)
+    from .routes.reset import reset_bp
+    app.register_blueprint(reset_bp)
     
     # Обработчики ошибок
     register_error_handlers(app)
