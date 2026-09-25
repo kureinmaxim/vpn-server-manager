@@ -13,7 +13,7 @@
     </div>
     <p>{{ _('Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: очистка выбранного прокси прервёт соединения через него.') }}</p>
     <a class="btn btn-outline-info btn-sm mb-3"
-       href="{{ url_for('main.index') }}">
+       href="{{ url_for('main.index', status_server=server.id) }}">
         <i class="bi bi-activity"></i> {{ _('Status') }}
     </a>
     <a class="btn btn-outline-success btn-sm mb-3" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
