@@ -504,8 +504,8 @@
             <div class="col-12 mb-3" id="app-services-block">
               <div class="card">
                 <div class="card-body">
-                  <h5 title="Транспорты, бот, HA-стек и контейнеры TelegramOnly. Серым — то, чего на сервере нет.">Стек TelegramOnly</h5>
-                  <div id="app-services-table" class="table-responsive text-muted">Загрузка…</div>
+                  <h5 title="{{ _('Транспорты, бот, HA-стек и контейнеры TelegramOnly. Серым — то, чего на сервере нет.') }}">{{ _('Стек TelegramOnly') }}</h5>
+                  <div id="app-services-table" class="table-responsive text-muted">{{ _('Загрузка…') }}</div>
                 </div>
               </div>
             </div>
@@ -984,15 +984,25 @@
         var appBlock = document.getElementById('app-services-block');
         var appWrap = document.getElementById('app-services-table');
         var appServices = (stats.app_services) || [];
+        var stackI18n = {
+            empty: {{ _('Не удалось прочитать стек. Проверьте SSH.') | tojson }},
+            service: {{ _('Сервис') | tojson }},
+            status: {{ _('Статус') | tojson }},
+            ifMissing: {{ _('Если нет') | tojson }},
+            notInstalled: {{ _('не установлено') | tojson }},
+            transports: {{ _('Транспорты') | tojson }},
+            botHa: {{ _('Бот и HA') | tojson }},
+            missingContainers: {{ _('Контейнеры, которых нет') | tojson }}
+        };
         if (appBlock) appBlock.style.display = '';
         if (appWrap) {
             if (appServices.length === 0) {
-                appWrap.innerHTML = '<div class="text-muted">Не удалось прочитать стек. Проверьте SSH.</div>';
+                appWrap.innerHTML = '<div class="text-muted">' + stackI18n.empty + '</div>';
             } else {
                 var groups = [
-                    {id: 'proxy', title: 'Транспорты'},
-                    {id: 'telegramonly', title: 'Бот и HA'},
-                    {id: 'docker', title: 'Контейнеры, которых нет'}
+                    {id: 'proxy', title: stackI18n.transports},
+                    {id: 'telegramonly', title: stackI18n.botHa},
+                    {id: 'docker', title: stackI18n.missingContainers}
                 ];
                 var ahtml = '';
                 for (var g = 0; g < groups.length; g++) {
@@ -1002,12 +1012,12 @@
                     }
                     if (!rows.length) continue;
                     ahtml += '<div class="small text-muted mt-2 mb-1">' + groups[g].title + '</div>';
-                    ahtml += '<table class="table table-sm table-borderless mb-1"><thead><tr><th class="ps-0">Сервис</th><th>Статус</th><th>Если нет</th></tr></thead><tbody>';
+                    ahtml += '<table class="table table-sm table-borderless mb-1"><thead><tr><th class="ps-0">' + stackI18n.service + '</th><th>' + stackI18n.status + '</th><th>' + stackI18n.ifMissing + '</th></tr></thead><tbody>';
                     for (var r = 0; r < rows.length; r++) {
                         var sv = rows[r];
                         var st = (sv.status || '').toLowerCase();
                         var cls = st === 'active' ? 'text-success' : (st === 'failed' ? 'text-danger' : (st === 'not_installed' ? 'text-muted' : 'text-warning'));
-                        var label = st === 'not_installed' ? 'не установлено' : (sv.status || '');
+                        var label = st === 'not_installed' ? stackI18n.notInstalled : (sv.status || '');
                         var icon = st === 'active' ? '●' : (st === 'failed' ? '✕' : '○');
                         var hint = (st === 'active') ? '' : (sv.hint || '');
                         var esc = function (value) {

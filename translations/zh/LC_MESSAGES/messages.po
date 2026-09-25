@@ -6527,6 +6527,129 @@ msgid ""
 "automatic retry."
 msgstr "备份操作失败；请刷新列表并检查服务器。不会自动重试。"
 
+msgid "Стек TelegramOnly"
+msgstr "TelegramOnly 技术栈"
+
+msgid ""
+"Транспорты, бот, HA-стек и контейнеры TelegramOnly. Серым — то, чего на "
+"сервере нет."
+msgstr "TelegramOnly 传输、机器人、HA 栈与容器。灰色表示服务器上未安装。"
+
+msgid "Загрузка…"
+msgstr "加载中…"
+
+msgid "Не удалось прочитать стек. Проверьте SSH."
+msgstr "无法读取技术栈。请检查 SSH。"
+
+msgid "Сервис"
+msgstr "服务"
+
+msgid "Если нет"
+msgstr "若未安装"
+
+msgid "не установлено"
+msgstr "未安装"
+
+msgid "Транспорты"
+msgstr "传输"
+
+msgid "Бот и HA"
+msgstr "机器人与 HA"
+
+msgid "Контейнеры, которых нет"
+msgstr "缺失的容器"
+
+msgid "установка Xray, затем /xray_apply в боте"
+msgstr "安装 Xray，然后在机器人中执行 /xray_apply"
+
+msgid "обычно клиент; на VPS unit sing-box не обязателен"
+msgstr "通常作为客户端；VPS 上不一定需要 sing-box unit"
+
+msgid "TelegramOnly бот/API"
+msgstr "TelegramOnly 机器人/API"
+
+msgid "HA Reticulum мост"
+msgstr "HA Reticulum 桥接"
+
+msgid "ставится вместе с scripts/install_ha_stack.sh"
+msgstr "与 scripts/install_ha_stack.sh 一并安装"
+
+msgid "опционально, unit shskm-remote-cli"
+msgstr "可选，unit shskm-remote-cli"
+
+msgid "i2pd (I2P для Reticulum)"
+msgstr "i2pd（供 Reticulum 使用的 I2P）"
+
+msgid "Headscale (координатор)"
+msgstr "Headscale（协调器）"
+
+msgid "TelegramOnly бот"
+msgstr "TelegramOnly 机器人"
+
+msgid "docker compose, Web UI — scripts/install_headplane.sh"
+msgstr "docker compose；Web UI — scripts/install_headplane.sh"
+
+msgid "опционально, контейнер dockhand"
+msgstr "可选，dockhand 容器"
+
+msgid "Мониторинг:"
+msgstr "监控："
+
+msgid "интерфейс"
+msgstr "个接口"
+
+msgid "интерфейсов"
+msgstr "个接口"
+
+msgid "за 1 с по /proc/stat"
+msgstr "按 /proc/stat 统计 1 秒"
+
+msgid "Load average:"
+msgstr "Load average："
+
+msgid ""
+"Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная "
+"перегрузка."
+msgstr "占用率很高，但运行队列几乎为空：这是短暂尖峰，不是持续过载。"
+
+msgid "Сейчас в топе:"
+msgstr "当前占用最高："
+
+msgid "Команды htop и btop"
+msgstr "htop 与 btop 命令"
+
+msgid "htop и btop уже стоят. Команды установки:"
+msgstr "htop 与 btop 已安装。安装命令："
+
+msgid "Статистика сетевого трафика за 24 часа"
+msgstr "过去 24 小时的网络流量统计"
+
+msgid "JSON процессор для графиков истории"
+msgstr "用于历史图表的 JSON 处理器"
+
+msgid "Брандмауэр для мониторинга безопасности (НЕ РЕКОМЕНДУЕТСЯ включать)"
+msgstr "用于安全监控的防火墙（不建议启用）"
+
+msgid ""
+"⚠️ НЕ включайте UFW! Мониторинг работает и без него. Включение UFW без "
+"правильной настройки заблокирует SSH доступ!"
+msgstr "⚠️ 请勿启用 UFW！监控无需它也能工作。未正确配置就启用会阻断 SSH！"
+
+msgid "Статистика сетевых соединений"
+msgstr "网络连接统计"
+
+msgid "Установлен, но не запущен"
+msgstr "已安装但未运行"
+
+msgid "⚠️ UFW выключен (это ПРАВИЛЬНО! Оставьте выключенным)"
+msgstr "⚠️ UFW 已关闭（这是正确的！请保持关闭）"
+
+msgid "# НЕ включайте UFW! Команда: sudo ufw disable"
+msgstr "# 请勿启用 UFW！命令：sudo ufw disable"
+
+msgid "⚠️ UFW включен! Убедитесь что SSH-порт %(port)s разрешен!"
+msgstr "⚠️ UFW 已启用！请确认 SSH 端口 %(port)s 已放行！"
+
 #~ msgid "По умолчанию 22"
 #~ msgstr "默认22"
 
