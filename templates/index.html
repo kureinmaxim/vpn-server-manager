@@ -142,6 +142,7 @@
                         <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success" title="{{ _('Мониторинг') }}">
                             <i class="bi bi-bar-chart-line"></i>
                         </a>
+                        <a href="{{ url_for('reset.reset_page', server_id=server.id) }}" class="btn btn-sm btn-outline-danger" title="{{ _('Очистить TelegramOnly на VPS') }}"><i class="bi bi-arrow-counterclockwise"></i> {{ _('Очистить стек') }}</a>
                         <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" class="d-inline" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
                             <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ _('Удалить') }}"><i class="bi bi-trash"></i></button>
                         </form>
@@ -385,6 +386,7 @@
                         <a href="{{ url_for('main.monitoring', server_id=server.id) }}" class="btn btn-sm btn-outline-success">
                             <i class="bi bi-bar-chart-line"></i> {{ _('Мониторинг') }}
                         </a>
+                        <a href="{{ url_for('reset.reset_page', server_id=server.id) }}" class="btn btn-sm btn-outline-danger" title="{{ _('Очистить TelegramOnly на VPS') }}"><i class="bi bi-arrow-counterclockwise"></i> {{ _('Очистить стек') }}</a>
                         <form action="{{ url_for('main.delete_server', server_id=server.id) }}" method="post" data-confirm-message="{{ _('Вы уверены, что хотите удалить этот сервер?') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
                             <button type="submit" class="btn btn-danger btn-sm">{{ _('Удалить') }}</button>
                         </form>

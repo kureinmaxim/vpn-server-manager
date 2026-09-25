@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4" style="max-width: 1000px">
+    <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
+    <h1 class="h3 mt-3">{{ _('Очистка TelegramOnly') }}</h1>
+    <p class="lead">{{ server.name }} · {{ server.ip_address }}</p>
+    <div class="alert alert-warning">
+        {{ _('Выбранные службы будут остановлены, контейнеры удалены, файлы перенесены в закрытый архив на VPS. Debian и доступ по SSH сохраняются.') }}
+        {{ _('Это подготовка к повторной установке, а не переустановка ОС. Docker, firewall и системные пакеты остаются.') }}
+    </div>
+    <p>{{ _('Сначала проверьте Status и Monitoring. Подключайтесь по прямому IP VPS: очистка выбранного прокси прервёт соединения через него.') }}</p>
+    <a class="btn btn-outline-success btn-sm mb-3" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Аудит и мониторинг') }}</a>
+    <fieldset id="components" class="mb-3">
+        <legend class="h6">{{ _('Компоненты для очистки') }}</legend>
+        {% for component in components %}
+        <label class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" value="{{ component }}" checked>
+            <span class="form-check-label">{{ component }}</span>
+        </label>
+        {% endfor %}
+    </fieldset>
+    <button class="btn btn-primary" id="inspect-reset" type="button">{{ _('Проверить и показать план') }}</button>
+    <p class="mt-3" id="reset-status" role="status" aria-live="polite"></p>
+    <pre id="reset-plan" class="border rounded p-3 text-wrap" hidden></pre>
+    <div id="reset-confirm" hidden>
+        <label class="form-label" for="reset-hostname">{{ _('Для подтверждения введите hostname из плана') }}</label>
+        <input id="reset-hostname" class="form-control mb-3" autocomplete="off" spellcheck="false">
+        <button class="btn btn-danger" id="apply-reset" type="button" disabled>{{ _('Очистить выбранные компоненты') }}</button>
+    </div>
+</div>
+<script>
+(() => {
+    const planUrl = {{ url_for('reset.reset_plan', server_id=server.id)|tojson }};
+    const applyUrl = {{ url_for('reset.reset_apply', server_id=server.id)|tojson }};
+    const csrf = {{ session.csrf_token|tojson }};
+    const status = document.getElementById('reset-status');
+    const output = document.getElementById('reset-plan');
+    const inspect = document.getElementById('inspect-reset');
+    const apply = document.getElementById('apply-reset');
+    const input = document.getElementById('reset-hostname');
+    const confirm = document.getElementById('reset-confirm');
+    const fields = document.getElementById('components');
+    let ticket = null, plan = null, busy = false;
+    const invalidate = () => { ticket = null; plan = null; apply.disabled = true; confirm.hidden = true; };
+    fields.addEventListener('change', invalidate);
+    input.addEventListener('input', () => { apply.disabled = busy || !ticket || !plan || plan.blockers.length > 0 || input.value !== plan.hostname; });
+    async function post(url, body) {
+        const response = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf}, body: JSON.stringify(body)});
+        const data = await response.json();
+        if (!response.ok) throw new Error((data.error || 'Операция не выполнена') + (data.backup ? '\nАрхив: ' + data.backup : ''));
+        return data;
+    }
+    inspect.addEventListener('click', async () => {
+        invalidate(); busy = true; inspect.disabled = true; fields.disabled = true;
+        status.textContent = 'Проверяю сервер. Изменения не выполняются…';
+        try {
+            const data = await post(planUrl, {components: [...fields.querySelectorAll('input:checked')].map(el => el.value)});
+            plan = data.plan; ticket = data.ticket; input.value = '';
+            output.textContent = ['Hostname: ' + plan.hostname, 'Службы: ' + plan.units.map(x => x.name).join(', '),
+                'Контейнеры: ' + plan.containers.map(x => x.name).join(', '), 'Тома с резервным копированием: ' + plan.volumes.map(x => x.name).join(', '),
+                'Перенести в архив:\n' + plan.paths.map(x => x.path).join('\n'),
+                'Сохранить:\n' + plan.preserved.join('\n'), 'Блокировки:\n' + (plan.blockers.join('\n') || 'нет')].join('\n\n');
+            output.hidden = false; confirm.hidden = plan.blockers.length > 0;
+            status.textContent = 'План действителен 10 минут. Проверьте каждый компонент перед подтверждением.';
+        } catch (error) { status.textContent = error.message; }
+        finally { busy = false; inspect.disabled = false; fields.disabled = false; }
+    });
+    apply.addEventListener('click', async () => {
+        if (!ticket || !plan || input.value !== plan.hostname || busy) return;
+        busy = true; apply.disabled = true; inspect.disabled = true; fields.disabled = true;
+        status.textContent = 'Выполняю подтверждённую очистку. Не закрывайте окно и не запускайте её повторно…';
+        try {
+            const data = await post(applyUrl, {ticket, confirmation: input.value});
+            status.textContent = 'Очистка завершена. Архив: ' + data.backup + '. Теперь проверьте Status и Monitoring.';
+        } catch (error) { status.textContent = error.message; }
+        finally { invalidate(); busy = false; inspect.disabled = false; fields.disabled = false; }
+    });
+})();
+</script>
+{% endblock %}
