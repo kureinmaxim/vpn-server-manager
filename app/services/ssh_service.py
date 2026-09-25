@@ -222,6 +222,18 @@ class SSHService:
         self.sftp_client: Optional[paramiko.SFTPClient] = None
 
     @staticmethod
+    def _translate(text: str) -> str:
+        """Перевести строку каталога под текущую локаль UI."""
+        if not text:
+            return text
+        try:
+            from flask_babel import gettext as _
+
+            return _(text)
+        except Exception:
+            return text
+
+    @staticmethod
     def _sort_ports(ports: List[str]) -> List[str]:
         return sorted(
             ports, key=lambda p: (not p.isdigit(), int(p) if p.isdigit() else p)
@@ -304,12 +316,13 @@ class SSHService:
         if not matched_name:
             return {
                 "name": descriptor["name"],
-                "display_name": descriptor["display_name"],
+                "display_name": self._translate(descriptor["display_name"]),
                 "group": descriptor["group"],
                 "status": "not_installed",
                 "enabled": "not-found",
                 "uptime": "-",
                 "unit_name": None,
+                "hint": self._translate(descriptor.get("hint", "")),
             }
 
         status = (
@@ -357,13 +370,13 @@ class SSHService:
 
         return {
             "name": descriptor["name"],
-            "display_name": descriptor["display_name"],
+            "display_name": self._translate(descriptor["display_name"]),
             "group": descriptor["group"],
             "status": status,
             "enabled": enabled,
             "uptime": uptime_str,
             "unit_name": matched_name,
-            "hint": descriptor.get("hint", ""),
+            "hint": self._translate(descriptor.get("hint", "")),
         }
 
     def _collect_stack_status(self, client, docker_names: List[str]) -> List[Dict]:
@@ -422,11 +435,15 @@ class SSHService:
             app_services.append(
                 {
                     "name": descriptor["name"],
-                    "display_name": descriptor["display_name"],
+                    "display_name": self._translate(descriptor["display_name"]),
                     "group": descriptor["group"],
                     "unit_name": unit,
                     "status": status,
-                    "hint": "" if status == "active" else descriptor.get("hint", ""),
+                    "hint": (
+                        ""
+                        if status == "active"
+                        else self._translate(descriptor.get("hint", ""))
+                    ),
                 }
             )
 
@@ -437,11 +454,11 @@ class SSHService:
             app_services.append(
                 {
                     "name": expected["name"],
-                    "display_name": expected["display_name"],
+                    "display_name": self._translate(expected["display_name"]),
                     "group": "docker",
                     "unit_name": expected["name"],
                     "status": "not_installed",
-                    "hint": expected.get("hint", ""),
+                    "hint": self._translate(expected.get("hint", "")),
                 }
             )
         return app_services
@@ -935,7 +952,9 @@ class SSHService:
                                     "name": parts[1],
                                     "status": parts[2],
                                     "image": parts[3],
-                                    "role": self._known_containers.get(parts[1], ""),
+                                    "role": self._translate(
+                                        self._known_containers.get(parts[1], "")
+                                    ),
                                 }
                             )
 
@@ -2019,12 +2038,26 @@ class SSHService:
                         "# НЕ включайте UFW! Команда: sudo ufw disable"
                     )
                 else:
-                    tools["ufw"]["warning"] = (
-                        f"⚠️ UFW включен! Убедитесь что SSH-порт {port} разрешен!"
+                    tools["ufw"]["_warning_tmpl"] = (
+                        "⚠️ UFW включен! Убедитесь что SSH-порт %(port)s разрешен!"
                     )
+                    tools["ufw"]["_warning_port"] = port
                     tools["ufw"]["fix_cmd"] = (
                         f"sudo ufw allow {port}/tcp && sudo ufw status numbered"
                     )
+
+            # Переводим описания и предупреждения под язык UI
+            for tool_info in tools.values():
+                if tool_info.get("description"):
+                    tool_info["description"] = self._translate(tool_info["description"])
+                tmpl = tool_info.pop("_warning_tmpl", None)
+                if tmpl is not None:
+                    port_val = tool_info.pop("_warning_port", port)
+                    tool_info["warning"] = self._translate(tmpl) % {"port": port_val}
+                elif tool_info.get("warning"):
+                    tool_info["warning"] = self._translate(tool_info["warning"])
+                if tool_info.get("fix_cmd") and tool_info["fix_cmd"].startswith("#"):
+                    tool_info["fix_cmd"] = self._translate(tool_info["fix_cmd"])
 
             # Подсчитываем статистику
             total = len(tools)

@@ -512,6 +512,17 @@ console.log('📡 Server IP:', '{{ server.ip_address }}');
 
 const serverId = '{{ server.id }}';
 const sshPort = {{ ssh_port }};
+const monI18n = {
+    monitoring: {{ _('Мониторинг:') | tojson }},
+    interfaceOne: {{ _('интерфейс') | tojson }},
+    interfaceMany: {{ _('интерфейсов') | tojson }},
+    cpuSample: {{ _('за 1 с по /proc/stat') | tojson }},
+    loadAverage: {{ _('Load average:') | tojson }},
+    cpuSpike: {{ _('Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная перегрузка.') | tojson }},
+    topNow: {{ _('Сейчас в топе:') | tojson }},
+    htopBtopTitle: {{ _('Команды htop и btop') | tojson }},
+    htopBtopInstalled: {{ _('htop и btop уже стоят. Команды установки:') | tojson }}
+};
 let rxPeak = 0;
 let txPeak = 0;
 let cpuChart, memoryChart;
@@ -554,12 +565,14 @@ async function updateNetworkStats() {
             // Отображаем список мониторимых интерфейсов
             if (stats.interfaces && stats.interfaces.length > 0) {
                 const interfacesList = stats.interfaces.join(', ');
-                document.getElementById('monitored-interfaces').innerHTML = 
-                    `🔍 Мониторинг: <strong>${interfacesList}</strong> (${stats.interfaces.length} интерфейс${stats.interfaces.length > 1 ? 'ов' : ''})`;
+                const n = stats.interfaces.length;
+                const unit = n === 1 ? monI18n.interfaceOne : monI18n.interfaceMany;
+                document.getElementById('monitored-interfaces').innerHTML =
+                    `🔍 ${monI18n.monitoring} <strong>${interfacesList}</strong> (${n} ${unit})`;
                 document.getElementById('summary-interfaces').textContent = interfacesList;
             } else if (stats.interface) {
-                document.getElementById('monitored-interfaces').textContent = 
-                    `🔍 Мониторинг: ${stats.interface}`;
+                document.getElementById('monitored-interfaces').textContent =
+                    `🔍 ${monI18n.monitoring} ${stats.interface}`;
                 document.getElementById('summary-interfaces').textContent = stats.interface;
             } else {
                 document.getElementById('summary-interfaces').textContent = '-';
@@ -1011,11 +1024,11 @@ function paintLoadDiagnosis(diagnosis) {
         return item.cmd + ' ' + item.cpu + '%';
     }).join(', ');
     let line = 'CPU ' + (Number.isFinite(cpu) ? cpu.toFixed(1) + '%' : '—')
-        + ' за 1 с по /proc/stat. Load average: ' + loadText + '.';
+        + ' ' + monI18n.cpuSample + '. ' + monI18n.loadAverage + ' ' + loadText + '.';
     if (Number.isFinite(cpu) && cpu >= 75 && load.length && Number(load[0]) < 0.7) {
-        line += ' Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная перегрузка.';
+        line += ' ' + monI18n.cpuSpike;
     }
-    if (procs) line += ' Сейчас в топе: ' + procs + '.';
+    if (procs) line += ' ' + monI18n.topNow + ' ' + procs + '.';
     text.textContent = line;
     if (tools) {
         var bothInstalled = diagnosis.htop && diagnosis.btop;
@@ -1023,8 +1036,8 @@ function paintLoadDiagnosis(diagnosis) {
         var title = tools.querySelector('.load-tools-title');
         if (title) {
             title.textContent = bothInstalled
-                ? '{{ _("htop и btop уже стоят. Команды установки:") }}'
-                : '{{ _("Команды htop и btop") }}';
+                ? monI18n.htopBtopInstalled
+                : monI18n.htopBtopTitle;
         }
     }
 }
