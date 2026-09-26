@@ -138,11 +138,36 @@
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/credentials.js') }}?v={{ app_info.get('version', '') }}"></script>
     <script>
-        // Применить сохранённый масштаб при загрузке
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const allowedZooms = ['60', '80', '100'];
+        const serverZoom = {{ (ui_zoom or '80')|tojson }};
+
+        function resolveZoom(preferred) {
+            const candidate = String(preferred || '').replace('%', '');
+            if (allowedZooms.includes(candidate)) {
+                return candidate;
+            }
+            const cookieZoom = getCookie('ui_zoom');
+            if (allowedZooms.includes(cookieZoom)) {
+                return cookieZoom;
+            }
+            return allowedZooms.includes(serverZoom) ? serverZoom : '80';
+        }
+
+        function applyZoom(zoom) {
+            document.body.style.zoom = zoom + '%';
+        }
+
+        // Применить сохранённый масштаб сразу, без ожидания DOMContentLoaded
+        applyZoom(resolveZoom(serverZoom));
+
         document.addEventListener('DOMContentLoaded', function() {
-            const allowedZooms = ['60', '80', '100'];
-            const savedZoom = allowedZooms.includes(getCookie('ui_zoom')) ? getCookie('ui_zoom') : '80';
-            document.body.style.zoom = savedZoom + '%';
+            applyZoom(resolveZoom(serverZoom));
             document.querySelectorAll('.alert-success, .alert-info').forEach(function(alertEl) {
                 setTimeout(function() {
                     if (window.bootstrap && bootstrap.Alert) {
@@ -258,12 +283,6 @@
         // Любые обработчики (даже возвращающие true) вызывают системные диалоги на Windows.
         // Пусть окно закрывается нативно через системные механизмы.
 
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
         function setTheme(theme, event) {
             if (event) {
                 event.preventDefault();
@@ -279,14 +298,24 @@
                 event.preventDefault();
                 event.stopPropagation();
             }
-            document.body.style.zoom = zoom + '%';
-            document.cookie = `ui_zoom=${zoom};path=/;max-age=31536000;SameSite=Lax`;
+            const nextZoom = resolveZoom(zoom);
+            applyZoom(nextZoom);
+            document.cookie = `ui_zoom=${nextZoom};path=/;max-age=31536000;SameSite=Lax`;
+            fetch('{{ url_for("main.save_ui_preferences_route") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ zoom: nextZoom }),
+                credentials: 'same-origin'
+            }).catch(function() { /* cookie already updated as a fallback */ });
             // Показать уведомление о применении масштаба
             const alertDiv = document.createElement('div');
             alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
             alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
             alertDiv.innerHTML = `
-                <i class="bi bi-info-circle"></i> Масштаб изменён на ${zoom}%
+                <i class="bi bi-info-circle"></i> Масштаб изменён на ${nextZoom}%
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             document.body.appendChild(alertDiv);
