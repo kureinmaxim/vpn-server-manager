@@ -1176,15 +1176,58 @@ def _save_hints(hints):
 @log_request
 def change_language(language):
     """Смена языка интерфейса"""
-    if language in ['ru', 'en', 'zh']:
+    from ..services.ui_preferences import ALLOWED_LANGUAGES, save_ui_preferences
+
+    if language in ALLOWED_LANGUAGES:
         session['language'] = language
         session.permanent = True  # Сохраняем сессию
         session.modified = True   # Явно помечаем как измененную
+        save_ui_preferences(current_app, language=language)
         flash(_('Language changed successfully'), 'success')
     else:
         flash(_('Unsupported language'), 'error')
     
     return redirect(request.referrer or url_for('main.index'))
+
+
+@main_bp.route('/ui_preferences', methods=['POST'])
+@log_request
+def save_ui_preferences_route():
+    """Сохранить масштаб и язык интерфейса в профиле пользователя."""
+    from ..services.ui_preferences import (
+        ALLOWED_LANGUAGES,
+        ALLOWED_ZOOMS,
+        load_ui_preferences,
+        save_ui_preferences,
+    )
+
+    payload = request.get_json(silent=True) or {}
+    language = payload.get('language')
+    zoom = payload.get('zoom')
+    if zoom is None and request.form.get('zoom') is not None:
+        zoom = request.form.get('zoom')
+    if language is None and request.form.get('language') is not None:
+        language = request.form.get('language')
+
+    kwargs = {}
+    if language is not None:
+        if language not in ALLOWED_LANGUAGES:
+            return jsonify({'success': False, 'error': 'unsupported_language'}), 400
+        kwargs['language'] = language
+        session['language'] = language
+        session.permanent = True
+        session.modified = True
+    if zoom is not None:
+        zoom = str(zoom).rstrip('%')
+        if zoom not in ALLOWED_ZOOMS:
+            return jsonify({'success': False, 'error': 'unsupported_zoom'}), 400
+        kwargs['zoom'] = zoom
+
+    if not kwargs:
+        return jsonify({'success': False, 'error': 'nothing_to_save'}), 400
+
+    prefs = save_ui_preferences(current_app, **kwargs)
+    return jsonify({'success': True, 'ui': prefs or load_ui_preferences(current_app)})
 
 @main_bp.route('/test_connection/<server_id>')
 @require_auth

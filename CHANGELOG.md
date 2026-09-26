@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.4.15] - 2026-09-26
+
+### Added
+- UI language and zoom are saved in the user profile (`config.json`) and restored on the next launch.
+
 ## [4.4.14] - 2026-09-25
 
 ### Added
