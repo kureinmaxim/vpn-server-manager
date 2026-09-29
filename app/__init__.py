@@ -69,6 +69,7 @@ def compile_translations(translations_dir: str) -> None:
 def get_locale():
     """Определяет язык для текущего запроса."""
     from flask import session, current_app
+    from .services.ui_preferences import load_ui_preferences, save_ui_preferences
 
     supported = list(current_app.config.get('BABEL_SUPPORTED_LOCALES') or ['ru', 'en', 'zh'])
     default = current_app.config.get('BABEL_DEFAULT_LOCALE') or 'en'
@@ -79,14 +80,24 @@ def get_locale():
     if lang in supported:
         session['language'] = lang
         session.permanent = True
+        save_ui_preferences(current_app, language=lang)
         return lang
 
     stored = session.get('language')
     if stored in supported:
         return stored
 
+    prefs = load_ui_preferences(current_app)
+    preferred = prefs.get('language')
+    if preferred in supported:
+        session['language'] = preferred
+        session.permanent = True
+        session.modified = True
+        return preferred
+
     session['language'] = default
     session.permanent = True
+    session.modified = True
     return default
 
 def setup_logging(app):
@@ -374,11 +385,14 @@ def create_app(config_name='development'):
         
         from flask_babel import gettext as _
         from flask_babel import get_locale as babel_get_locale
+        from .services.ui_preferences import load_ui_preferences
 
+        ui_prefs = load_ui_preferences(app)
         return {
             'app_info': app.config.get('app_info', {}),
             'developer_name': _('Куреин М.Н.'),
             'current_locale': str(babel_get_locale()),
+            'ui_zoom': ui_prefs.get('zoom', '80'),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {
                 'host': server_host,
