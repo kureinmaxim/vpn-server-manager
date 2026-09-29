@@ -17,6 +17,21 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 - Built-in TCP port, DNS, Ping, TLS, WHOIS/RDAP, HTTP, IP location and public IP checks. Reverse IP opens Connected's external database. Sources and the machine used for each check are shown explicitly.
 - PIN session and request-token protection, public-address validation, pinned connections, bounded output and concurrency, and timeouts for network diagnostics.
 
+## [4.4.15] - 2026-09-26
+
+### Added
+- UI language and zoom are saved in the user profile (`config.json`) and restored on the next launch.
+
+## [4.4.14] - 2026-09-25
+
+### Added
+- Server-card action to reset the TelegramOnly stack, with dedicated reset, archive, and disk-usage pages.
+- Status link on the reset page; Status opens for the selected server after install and leaves only setup checked.
+
+### Improved
+- Compact server-card layout and a **Delete archive** control for finished cleanup archives.
+- English and Chinese UI: the back link **Servers** is translated (`Серверы` / `服务器`).
+
 ## [4.4.11] - 2026-09-24
 
 ### Added
