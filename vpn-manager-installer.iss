@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.4.13
+; Version 4.5.1
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.4.13"
+#define MyAppVersion "4.5.1"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -42,16 +42,18 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "startupicon"; Description: "Запускать при входе в Windows"; GroupDescription: "Дополнительно:"; Flags: unchecked
 
 [Files]
+; Exclude local development artifacts at every depth without deleting them.
+#define SourceExcludes "__pycache__,*.pyc,*.pyo,.pytest_cache,.git,.venv*,venv,env"
 ; Основные файлы приложения
-Source: "app\*"; DestDir: "{app}\app"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "desktop\*"; DestDir: "{app}\desktop"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "static\*"; DestDir: "{app}\static"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "templates\*"; DestDir: "{app}\templates"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "translations\*"; DestDir: "{app}\translations"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "tests\*"; DestDir: "{app}\tests"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "app\*"; DestDir: "{app}\app"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "desktop\*"; DestDir: "{app}\desktop"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "static\*"; DestDir: "{app}\static"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "templates\*"; DestDir: "{app}\templates"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "translations\*"; DestDir: "{app}\translations"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "tests\*"; DestDir: "{app}\tests"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; Документация
-Source: "docs\*"; DestDir: "{app}\docs"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "docs\*"; DestDir: "{app}\docs"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "CHANGELOG.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE"; DestDir: "{app}"; Flags: ignoreversion

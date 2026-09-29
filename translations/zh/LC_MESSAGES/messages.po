@@ -4835,7 +4835,7 @@ msgstr "安装包"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:139
 #: templates/monitoring.html:139
 msgid "Копировать"
-msgstr "复制登录"
+msgstr "复制"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:151
 #: templates/monitoring.html:151
@@ -6562,3 +6562,243 @@ msgstr "备份操作失败；请刷新列表并检查服务器。不会自动重
 #~ msgid "Выберать зашифрованный файл данных из другой установки"
 #~ msgstr "选择来自其他安装的加密数据文件"
 
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверка портов"
+msgstr "端口检查"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверьте доступность TCP-порта на сервере."
+msgstr "检查服务器的 TCP 端口是否可访问。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Успешное соединение означает, что TCP-порт доступен с компьютера приложения. Тайм-аут может означать фильтрацию трафика. UDP не проверяется."
+msgstr "连接成功表示运行本应用的计算机可访问该 TCP 端口。超时可能表示流量被过滤。不检查 UDP。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Компьютер приложения"
+msgstr "运行应用的计算机"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "DNS-запрос / dig"
+msgstr "DNS 查询 / dig"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Просмотрите A, AAAA, MX, TXT и другие записи домена."
+msgstr "查询域名的 A、AAAA、MX、TXT 等记录。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Запрос отправляется в Google Public DNS. Ответ может отличаться от DNS вашего провайдера. Для PTR можно указать IP-адрес."
+msgstr "查询使用 Google Public DNS，结果可能与运营商的 DNS 不同。PTR 查询可以输入 IP 地址。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверьте доступность узла и задержку четырьмя ICMP-пакетами."
+msgstr "使用四个 ICMP 数据包检查连通性和延迟。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Некоторые серверы блокируют ICMP. Отсутствие ответа Ping не означает, что сайт или VPN недоступен."
+msgstr "某些服务器会屏蔽 ICMP。没有 Ping 响应不一定表示网站或 VPN 无法访问。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверка SSL/TLS"
+msgstr "SSL/TLS 检查"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверьте сертификат, срок действия и согласованный протокол TLS."
+msgstr "检查证书、有效期及协商的 TLS 协议。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверяются доверие к сертификату и соответствие имени узла. Это проверка одного TLS-соединения, а не полный аудит шифров."
+msgstr "检查证书信任及主机名匹配情况。仅测试一次 TLS 连接，不进行完整的密码套件审计。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Получите регистрационные данные домена или IP-адреса."
+msgstr "查询域名或 IP 地址的注册信息。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Используется RDAP — современный формат регистрационных данных. Реестр может скрывать персональные данные или ограничивать запросы."
+msgstr "使用现代注册数据格式 RDAP。注册机构可能隐藏个人信息或限制查询。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Найдите сайты, которые могут использовать тот же IP-адрес."
+msgstr "查找可能使用同一 IP 地址的网站。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Поиск соседних сайтов требует внешней базы. Откройте Connected и введите адрес там. PTR в DNS-запросе показывает обратную DNS-запись, а не список сайтов."
+msgstr "查找同 IP 网站需要外部数据库。请打开 Connected 并在那里输入地址。DNS PTR 查询返回反向 DNS 记录，而非网站列表。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Посмотрите HTTP-статус, заголовки и начало ответа сервера."
+msgstr "查看 HTTP 状态、响应头及响应内容开头。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Выполняется GET без cookies и авторизации. Перенаправления не выполняются автоматически. Ответ ограничен 64 КиБ и показан как текст."
+msgstr "发送不带 Cookie 和身份验证的 GET 请求。不自动跟随重定向。响应限制为 64 KiB，并以文本显示。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Сетевое расположение"
+msgstr "网络位置"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Узнайте примерное местоположение и организацию IP-адреса."
+msgstr "查询 IP 地址的大致位置及所属组织。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Геолокация IP приблизительна и может указывать на дата-центр или выход VPN. Для домена используется один из его IP-адресов."
+msgstr "IP 地理位置仅为估计值，可能指向数据中心或 VPN 出口。对于域名，使用其一个 IP 地址。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Мой внешний IP"
+msgstr "我的公网 IP"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Узнайте внешний IP и местоположение подключения приложения."
+msgstr "查询应用连接的公网 IP 及位置。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Показан адрес выхода компьютера приложения. При запуске на удалённом сервере это IP сервера, а не вашего браузера."
+msgstr "显示运行应用的计算机的出口地址。在远程服务器上运行时，此处显示服务器 IP，而非浏览器的 IP。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Введите корректный IP-адрес или доменное имя без протокола и пути."
+msgstr "请输入有效的 IP 地址或域名，不含协议和路径。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Порт должен быть целым числом от 1 до 65535."
+msgstr "端口必须是 1 到 65535 之间的整数。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Выберите поддерживаемый тип DNS-записи."
+msgstr "请选择支持的 DNS 记录类型。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Введите HTTP- или HTTPS-адрес без логина и пароля."
+msgstr "请输入不带用户名和密码的 HTTP 或 HTTPS 地址。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Для этой проверки нужен публичный IP-адрес. Локальные и служебные адреса недоступны."
+msgstr "此检查需要公网 IP 地址。不支持本地及保留地址。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Источник данных не ответил или не нашёл запись. Повторите запрос позже."
+msgstr "数据源未响应或未找到记录。请稍后重试。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Утилита ping не установлена. Используйте команду ниже на своём компьютере."
+msgstr "未安装 ping 工具。请在自己的计算机上使用下方命令。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Неизвестный инструмент."
+msgstr "未知工具。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Разблокируйте приложение и повторите проверку."
+msgstr "请解锁应用并重新检查。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Обновите страницу и повторите проверку."
+msgstr "请刷新页面并重新检查。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Некорректные параметры запроса."
+msgstr "请求参数无效。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Дождитесь завершения предыдущих проверок."
+msgstr "请等待之前的检查完成。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Сертификат не прошёл проверку доверия, имени или срока действия."
+msgstr "证书信任、主机名或有效期验证失败。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Время ожидания истекло. Проверьте адрес и повторите запрос."
+msgstr "请求超时。请检查地址并重试。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Не удалось определить IP-адрес домена."
+msgstr "无法解析域名的 IP 地址。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверка не выполнена. Проверьте адрес, подключение и доступность сервиса."
+msgstr "检查失败。请检查地址、网络连接及服务可用性。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Сетевые инструменты"
+msgstr "网络工具"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Навигация"
+msgstr "导航"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Выберите проверку: доступность сервера, DNS, сертификаты или сведения об IP. Внутри — параметры, пояснения и готовые команды."
+msgstr "选择服务器连通性、DNS、证书或 IP 信息检查。每个工具均提供参数、说明及可复制的命令。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Источник проверки"
+msgstr "检查来源"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Открыть Connected"
+msgstr "打开 Connected"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверка…"
+msgstr "正在检查…"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Не удалось получить ответ. Проверьте подключение и повторите запрос."
+msgstr "无法获取响应。请检查连接并重试。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "IP-адрес или домен"
+msgstr "IP 地址或域名"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Тип записи"
+msgstr "记录类型"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Запустить проверку"
+msgstr "开始检查"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Результат"
+msgstr "结果"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Команды для терминала"
+msgstr "终端命令"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Замените адрес и параметры в примере своими. Команды запускаются вручную; могут потребоваться curl, dig, nc или OpenSSL."
+msgstr "请将示例地址和参数替换为自己的值。命令需手动执行，可能需要 curl、dig、nc 或 OpenSSL。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Популярные порты"
+msgstr "常用端口"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Как читать результат"
+msgstr "如何理解结果"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Проверяются только публичные адреса. Точка проверки — компьютер приложения; выбор региона не применяется."
+msgstr "仅检查公网地址。检查从运行应用的计算机发起，不提供区域选择。"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Другие инструменты"
+msgstr "其他工具"
+
+#: app/routes/net_tools.py templates/net_tools.html
+msgid "Не удалось скопировать. Выделите текст и скопируйте вручную."
+msgstr "复制失败。请选中文本并手动复制。"
+
+#: templates/net_tools.html
+msgid "Скопировано"
+msgstr "已复制"
+
+#: app/routes/net_tools.py
+msgid "dig запрашивает DNS-записи, а не проверяет доступность хоста. Без @ используется настроенный DNS-сервер; @1.1.1.1 выбирает Cloudflare, а +short сокращает вывод. На Windows можно запустить dig в WSL, если он установлен, или использовать Resolve-DnsName в PowerShell. Для проверки доступности используйте Ping или Test-Connection."
+msgstr "dig 查询 DNS 记录，并不检查主机是否可达。不指定 @ 时使用已配置的 DNS 服务器；@1.1.1.1 指定 Cloudflare，+short 精简输出。在 Windows 上，可在 WSL 中运行已安装的 dig，或在 PowerShell 中使用 Resolve-DnsName。要检查连通性，请使用 Ping 或 Test-Connection。"

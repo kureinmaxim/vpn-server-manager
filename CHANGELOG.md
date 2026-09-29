@@ -2,6 +2,21 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.5.1] - 2026-09-29
+
+### Fixed
+- Net Tools examples use `example.com` instead of a personal hostname, including the dig and PowerShell commands and documentation.
+
+## [4.5.0] - 2026-09-29
+
+### Fixed
+- Windows installer builds no longer traverse or delete local virtual environments and logs. Python caches and development directories are excluded during packaging, avoiding access-denied errors in sandbox-created test environments.
+
+### Added
+- **Net Tools** beside DNS Test opens a translated Russian, English and Chinese catalogue with nine diagnostic cards, explanations, terminal commands and copy buttons.
+- Built-in TCP port, DNS, Ping, TLS, WHOIS/RDAP, HTTP, IP location and public IP checks. Reverse IP opens Connected's external database. Sources and the machine used for each check are shown explicitly.
+- PIN session and request-token protection, public-address validation, pinned connections, bounded output and concurrency, and timeouts for network diagnostics.
+
 ## [4.4.11] - 2026-09-24
 
 ### Added
