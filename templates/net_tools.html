@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+{% block title %}{{ selected.title if selected else _('Сетевые инструменты') }} · Net Tools{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
+<div class="container net-tools my-4">
+    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
+        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span>
+        {% if selected %}<a href="{{ url_for('net_tools.index') }}">Net Tools</a>{% else %}<span>Net Tools</span>{% endif %}
+    </nav>
+    {% if not selected %}
+    <header class="net-intro mb-4">
+        <h1>{{ _('Сетевые инструменты') }}</h1>
+        <p class="text-body-secondary">{{ _('Выберите проверку: доступность сервера, DNS, сертификаты или сведения об IP. Внутри — параметры, пояснения и готовые команды.') }}</p>
+    </header>
+    <div class="net-grid">
+        {% for tool in tools %}
+        <a class="net-card net-accent-{{ loop.index }}" href="{{ url_for('net_tools.detail', tool_id=tool.id) }}">
+            <i class="bi bi-{{ tool.icon }} net-icon" aria-hidden="true"></i>
+            <h2>{{ tool.title }}</h2>
+            <p>{{ tool.description }}</p>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <header class="net-intro mb-4">
+        <h1><i class="bi bi-{{ selected.icon }} me-2" aria-hidden="true"></i>{{ selected.title }}</h1>
+        <p class="text-body-secondary">{{ selected.description }}</p>
+    </header>
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <section class="card p-4 mb-4">
+                <p class="small text-body-secondary">{{ _('Источник проверки') }}: <strong>{{ selected.source }}</strong></p>
+                {% if selected.id == 'reverse-ip' %}
+                <p>{{ selected.note }}</p>
+                <a class="btn btn-primary align-self-start" href="https://www.connected.app/{{ current_locale if current_locale in ['ru', 'zh'] else '' }}{{ '/' if current_locale in ['ru', 'zh'] else '' }}tools/reverse-ip-lookup" target="_blank" rel="noopener noreferrer">{{ _('Открыть Connected') }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                {% else %}
+                <form id="net-tool-form" data-endpoint="{{ url_for('net_tools.run', tool_id=selected.id) }}" data-token="{{ token }}"
+                      data-running="{{ _('Проверка…') }}" data-failure="{{ _('Не удалось получить ответ. Проверьте подключение и повторите запрос.') }}">
+                    {% if selected.id == 'fetch' %}
+                    <label class="form-label" for="net-url">URL</label>
+                    <input class="form-control mb-3" id="net-url" name="url" type="url" placeholder="https://example.com" maxlength="2048" required>
+                    {% elif selected.id != 'my-ip' %}
+                    <label class="form-label" for="net-host">{{ _('IP-адрес или домен') }}</label>
+                    <input class="form-control mb-3" id="net-host" name="host" placeholder="example.com" maxlength="253" spellcheck="false" required>
+                    {% endif %}
+                    {% if selected.id in ['port', 'tls'] %}
+                    <label class="form-label" for="net-port">{{ _('Порт') }}</label>
+                    <input class="form-control mb-3" id="net-port" name="port" type="number" min="1" max="65535" value="443" required>
+                    {% elif selected.id == 'dns' %}
+                    <label class="form-label" for="net-record">{{ _('Тип записи') }}</label>
+                    <select class="form-select mb-3" id="net-record" name="record">
+                        {% for record in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'PTR', 'CAA'] %}<option>{{ record }}</option>{% endfor %}
+                    </select>
+                    {% endif %}
+                    <button class="btn btn-primary w-100" id="net-run" type="submit">{{ _('Запустить проверку') }}</button>
+                </form>
+                <div id="net-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
+                <section id="net-result" class="mt-4" aria-live="polite" aria-busy="false" hidden>
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                        <h2 class="h5 mb-0">{{ _('Результат') }}</h2>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-copy="net-output">{{ _('Копировать') }}</button>
+                    </div>
+                    <pre id="net-output" tabindex="0"></pre>
+                </section>
+                {% endif %}
+            </section>
+            {% if selected.command %}
+            <section class="card p-4">
+                <h2 class="h5">{{ _('Команды для терминала') }}</h2>
+                <p class="small text-body-secondary">{{ _('Замените адрес и параметры в примере своими. Команды запускаются вручную; могут потребоваться curl, dig, nc или OpenSSL.') }}</p>
+                {% if selected.command_note %}<p>{{ selected.command_note }}</p>{% endif %}
+                {% set command_examples = [('Linux / macOS / WSL' if selected.id == 'dns' else 'Linux / macOS', selected.command)] %}
+                {% if selected.extra_command %}{% set command_examples = command_examples + [('dig +short · Cloudflare (1.1.1.1)', selected.extra_command)] %}{% endif %}
+                {% for label, command in command_examples + [('Windows PowerShell', selected.windows)] %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">{{ label }}</span><button class="btn btn-sm btn-outline-secondary" type="button" data-copy="net-command-{{ loop.index }}">{{ _('Копировать') }}</button>
+                </div>
+                <pre id="net-command-{{ loop.index }}" tabindex="0">{{ command }}</pre>
+                {% endfor %}
+            </section>
+            {% endif %}
+        </div>
+        <aside class="col-lg-4">
+            {% if selected.id == 'port' %}
+            <section class="card p-4 mb-4">
+                <h2 class="h5">{{ _('Популярные порты') }}</h2>
+                <div class="net-ports">
+                    {% for port, label in [(21, 'FTP'), (22, 'SSH'), (25, 'SMTP'), (53, 'DNS (TCP)'), (80, 'HTTP'), (443, 'HTTPS'), (465, 'SMTPS'), (587, 'SMTP'), (993, 'IMAPS'), (3306, 'MySQL'), (3389, 'RDP'), (5432, 'PostgreSQL'), (8080, 'HTTP alternate')] %}
+                    <button class="btn btn-sm btn-outline-secondary text-start" type="button" data-port="{{ port }}">{{ port }} <span>{{ label }}</span></button>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+            <section class="card p-4 mb-4">
+                <h2 class="h5">{{ _('Как читать результат') }}</h2>
+                <p class="mb-0">{{ selected.note }}</p>
+                {% if selected.id in ['port', 'ping', 'tls', 'fetch', 'location'] %}<p class="small text-body-secondary mt-3 mb-0">{{ _('Проверяются только публичные адреса. Точка проверки — компьютер приложения; выбор региона не применяется.') }}</p>{% endif %}
+            </section>
+            <nav class="card p-4" aria-label="{{ _('Другие инструменты') }}">
+                <h2 class="h5">{{ _('Другие инструменты') }}</h2>
+                {% for tool in tools if tool.id != selected.id %}<a class="py-1" href="{{ url_for('net_tools.detail', tool_id=tool.id) }}">{{ tool.title }}</a>{% endfor %}
+            </nav>
+        </aside>
+    </div>
+    {% endif %}
+    <div id="net-copy-status" class="small mt-3" role="status" data-copied="{{ _('Скопировано') }}" data-failed="{{ _('Не удалось скопировать. Выделите текст и скопируйте вручную.') }}"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/net_tools.js') }}?v={{ app_info.get('version', '') }}"></script>
+{% endblock %}

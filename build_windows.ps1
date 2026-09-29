@@ -1,6 +1,8 @@
 # VPN Server Manager - Windows Installer Builder (PowerShell)
 # Reads version from config/config.json.template
 
+param([switch]$NoOpen)
+
 # Настройки
 $ErrorActionPreference = "Stop"
 $IsccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
@@ -119,7 +121,7 @@ if (-not $SecurityWarning) {
 Write-Host ""
 
 # Компиляция переводов (.po -> .mo). .mo в .gitignore, без них инсталлятор уедет
-# без переводов и переключение языков работать не будет. Делаем до удаления venv.
+# без переводов и переключение языков работать не будет.
 Write-Host "Compiling translations (.po -> .mo)..." -ForegroundColor Yellow
 try {
     python -m babel.messages.frontend compile -d translations
@@ -131,32 +133,18 @@ try {
 }
 Write-Host ""
 
-# [4/5] Очистка перед сборкой
-Write-Host "[4/5] Cleaning up before build..." -ForegroundColor Yellow
-
-# Удаляем виртуальное окружение
-if (Test-Path "venv") {
-    Write-Host "Removing old venv directory..." -ForegroundColor White
-    Remove-Item -Path "venv" -Recurse -Force -ErrorAction SilentlyContinue
-}
-
-# Удаляем Python кеш
-Write-Host "Removing Python cache..." -ForegroundColor White
-Get-ChildItem -Path . -Include "*.pyc" -Recurse -Force | Remove-Item -Force -ErrorAction SilentlyContinue
-Get-ChildItem -Path . -Include "__pycache__" -Recurse -Force -Directory | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
-
-# Удаляем логи
-if (Test-Path "logs") {
-    Write-Host "Removing logs directory..." -ForegroundColor White
-    Remove-Item -Path "logs" -Recurse -Force -ErrorAction SilentlyContinue
-}
+# [4/5] Подготовка сборки. Inno Setup упаковывает только явный список
+# исходных каталогов и исключает Python-кеш через Excludes. Обходить весь
+# репозиторий и удалять локальные окружения/логи для сборки не требуется.
+Write-Host "[4/5] Preparing build output..." -ForegroundColor Yellow
+Write-Host "Python caches are excluded by the installer; local environments and logs are preserved." -ForegroundColor White
 
 # Создаем папку для вывода
 if (-not (Test-Path "installer_output")) {
     New-Item -ItemType Directory -Path "installer_output" | Out-Null
 }
 
-Write-Host "[OK] Cleanup completed" -ForegroundColor Green
+Write-Host "[OK] Build output ready" -ForegroundColor Green
 Write-Host ""
 
 # [5/5] Компиляция инсталлятора
@@ -228,9 +216,11 @@ try {
         Write-Host ""
         
         # Открываем папку с результатом
-        Write-Host "Opening output folder..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 2
-        Invoke-Item "installer_output"
+        if (-not $NoOpen) {
+            Write-Host "Opening output folder..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 2
+            Invoke-Item "installer_output"
+        }
         
     } else {
         Write-Host "========================================" -ForegroundColor Red

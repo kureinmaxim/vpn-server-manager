@@ -40,6 +40,7 @@
             <div class="btn-group" role="group">
                 <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
                 <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
+                <a href="{{ url_for('net_tools.index') }}" class="btn btn-sm btn-outline-info" title="{{ _('Сетевые инструменты') }}">Net Tools</a>
             </div>
         </div>
         <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>

@@ -216,9 +216,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.4.13'),
-            "release_date": "25.09.2026",
-            "last_updated": "2026-09-25",
+            "version": app.config.get('APP_VERSION', '4.5.1'),
+            "release_date": "29.09.2026",
+            "last_updated": "2026-09-29",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -233,9 +233,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.4.13",
-            "release_date": "25.09.2026",
-            "last_updated": "2026-09-25",
+            "version": "4.5.1",
+            "release_date": "29.09.2026",
+            "last_updated": "2026-09-29",
             "developer": "Куреин М.Н."
         }
 
@@ -322,6 +322,8 @@ def create_app(config_name='development'):
     app.register_blueprint(vendor_bp)
     from .routes.reset import reset_bp
     app.register_blueprint(reset_bp)
+    from .routes.net_tools import net_tools_bp
+    app.register_blueprint(net_tools_bp)
     
     # Обработчики ошибок
     register_error_handlers(app)
