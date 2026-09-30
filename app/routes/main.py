@@ -9,6 +9,7 @@ import shutil
 import zipfile
 import signal
 from ..services import registry, dns_registry
+from ..services.data_manager_service import DataManagerService
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
 from ..utils.credentials import sanitize_secret
 from ..utils.icons import apply_icon_from_form
@@ -512,8 +513,13 @@ def change_main_key():
             return redirect(url_for('main.settings'))
         
         # Загружаем текущие данные с существующим ключом
-        current_servers = data_manager.load_servers(current_app.config)
-        dns = dns_registry.normalize(data_manager.load_dns(current_app.config))
+        # Читаем файл напрямую: load_servers() при ошибке вернул бы [] и мы записали бы пустой файл
+        active_file = data_manager.get_active_data_path(current_app.config)
+        if active_file and os.path.exists(active_file):
+            current_servers, dns = data_manager.read_payload(active_file)
+        else:
+            current_servers, dns = [], {}
+        dns = dns_registry.normalize(dns)
         
         # Создаем резервную копию
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -521,13 +527,33 @@ def change_main_key():
         data_dir = os.path.join(app_data_dir, "data")
         os.makedirs(data_dir, exist_ok=True)
         
-        active_file = current_app.config.get('active_data_file')
         if active_file and os.path.exists(active_file):
             backup_path = data_manager.create_backup(
                 active_file,
                 data_dir,
                 prefix=f"backup_before_key_change_{timestamp}"
             )
+        
+        # Сначала создаем файл с новым ключом: .env меняем только после успешной записи
+        new_filename = f"servers_reencrypted_{timestamp}.enc"
+        new_file_path = os.path.join(data_dir, new_filename)
+        new_data_manager = DataManagerService(new_key, app_data_dir)
+        old_key = data_manager.secret_key
+
+        def reencrypt(section, fields):
+            for field in fields:
+                if section.get(field):
+                    section[field] = new_data_manager.re_encrypt_password(section[field], old_key, new_key)
+
+        # Пароли внутри файла зашифрованы отдельно — перешифровываем их тоже
+        for server in current_servers:
+            reencrypt(server.get('ssh_credentials') or {}, ('password', 'root_password'))
+            reencrypt(server.get('panel_credentials') or {}, ('user', 'password'))
+            reencrypt(server.get('hoster_credentials') or {}, ('user', 'password'))
+        for provider in dns['providers']:
+            reencrypt(provider, dns_registry.SECRET_FIELDS)
+        new_data_manager.save_servers(current_servers, new_file_path,
+                                      dns={} if dns_registry.is_empty(dns) else dns)
         
         # Обновляем конфигурацию с новым ключом
         current_app.config['SECRET_KEY'] = new_key
@@ -562,20 +588,6 @@ def change_main_key():
         
         with open(env_file, 'w') as f:
             f.writelines(env_lines)
-        
-        # Создаем новый зашифрованный файл с новым ключом
-        new_filename = f"servers_reencrypted_{timestamp}.enc"
-        new_file_path = os.path.join(data_dir, new_filename)
-        
-        # Создаем новый DataManagerService с новым ключом
-        new_data_manager = DataManagerService(new_key, app_data_dir)
-        old_key = data_manager.secret_key
-        for provider in dns['providers']:
-            for field in dns_registry.SECRET_FIELDS:
-                if provider.get(field):
-                    provider[field] = new_data_manager.re_encrypt_password(provider[field], old_key, new_key)
-        new_data_manager.save_servers(current_servers, new_file_path,
-                                      dns={} if dns_registry.is_empty(dns) else dns)
         
         # Обновляем конфигурацию приложения
         current_app.config['active_data_file'] = new_file_path
@@ -640,7 +652,8 @@ def verify_key_data():
                 if len(server_names) > 3:
                     name_preview += f' и еще {len(server_names) - 3}'
                 
-                flash(f'✅ Ключ подходит! Найдено серверов: {server_count}. Провайдеры: {provider_list}. Серверы: {name_preview}', 'success')
+                dns_note = f" Доменов DNS: {result['dns_domain_count']}." if result.get('dns_domain_count') else ''
+                flash(f'✅ Ключ подходит! Найдено серверов: {server_count}. Провайдеры: {provider_list}. Серверы: {name_preview}.{dns_note}', 'success')
             else:
                 flash(_('✅ Ключ подходит, но структура данных неожиданная.'), 'warning')
         else:
