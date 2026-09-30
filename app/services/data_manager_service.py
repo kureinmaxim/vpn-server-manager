@@ -515,7 +515,11 @@ class DataManagerService:
             Словарь с результатами объединения
         """
         # Получаем списки существующих IP адресов и имен
-        existing_ips = {server.get('ip', '') for server in current_servers if server.get('ip')}
+        # Servers store their address in ip_address; 'ip' is kept for old files
+        def server_ip_of(server):
+            return server.get('ip_address') or server.get('ip') or ''
+
+        existing_ips = {server_ip_of(server) for server in current_servers if server_ip_of(server)}
         existing_names = {server.get('name', '') for server in current_servers if server.get('name')}
         
         # Находим максимальный ID среди существующих серверов
@@ -529,7 +533,7 @@ class DataManagerService:
         skipped_count = 0
         
         for server in new_servers:
-            server_ip = server.get('ip', '')
+            server_ip = server_ip_of(server)
             server_name = server.get('name', '')
             
             # Проверяем на дублирование по IP или имени

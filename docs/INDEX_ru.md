@@ -19,6 +19,7 @@
 - [CHECKSUM_GUIDE_ru.md](CHECKSUM_GUIDE_ru.md) — SHA-256 артефактов
 - [DOCKER_GUIDE_ru.md](DOCKER_GUIDE_ru.md) — Docker
 - [SECRET_KEY_ru.md](SECRET_KEY_ru.md) — шифрование
+- [BACKUP_RESTORE_ru.md](BACKUP_RESTORE_ru.md) — резервная копия, перенос и восстановление (серверы + DNS)
 - [DATA_STORAGE_GUIDE_ru.md](DATA_STORAGE_GUIDE_ru.md) — хранение данных
 - [SECURITY_BEST_PRACTICES_ru.md](SECURITY_BEST_PRACTICES_ru.md) — безопасность
 - [../MULTI_APP_IMPLEMENTATION_ru.md](../MULTI_APP_IMPLEMENTATION_ru.md) — несколько экземпляров сразу

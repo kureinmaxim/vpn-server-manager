@@ -11,77 +11,99 @@ The only release-version source of truth is `config/config.json.template`:
 ```json
 {
   "app_info": {
-    "version": "4.4.4",
-    "release_date": "03.09.2026",
-    "last_updated": "2026-09-03"
+    "version": "X.Y.Z",
+    "release_date": "DD.MM.YYYY",
+    "last_updated": "YYYY-MM-DD"
   }
 }
 ```
 
 Do **not** take the version from `%APPDATA%`, `~/Library/Application Support`, a local `config.json`, or `APP_VERSION` in the environment. Those are runtime settings for one machine.
 
-## What the tool syncs
+## Commands
 
-`tools/update_version.py` updates:
+`tools/update_version.py` uses only the Python standard library; no virtual environment is required.
 
-- `config/config.json.template`
-- `README.md`
-- `vpn-manager-installer.iss`
-- `env.example`
-- `app/config.py`
-- `app/__init__.py`
-- `setup.py`
-- `build_macos.py`
-- `docker-compose.yml`
+| Command | Version | Release dates |
+|---|---|---|
+| `status` | shows every tracked file | — |
+| `bump patch\|minor\|major` | next semantic version | set to today |
+| `sync X.Y.Z` | sets `X.Y.Z` | set to today |
+| `sync` | re-applies the current source version | kept from the source |
 
-Compatible wrapper: `tools/bump_version.py`.
+Flags for `bump` and `sync`: `--release-date DD.MM.YYYY`, `--last-updated YYYY-MM-DD`, `--dry-run` (show what would change, write nothing).
+
+`bump` and `sync` print the target first, then every updated file:
 
 ```text
-python tools/update_version.py status
-python tools/update_version.py sync
-python tools/update_version.py sync X.Y.Z
-python tools/update_version.py bump patch|minor|major
+Target version:      4.9.1
+Target release date: 30.09.2026
+Target last updated: 2026-09-30
+
+Updated config/config.json.template
+Updated README.md
+...
 ```
 
-Flags: `--release-date DD.MM.YYYY`, `--last-updated YYYY-MM-DD`, `--dry-run`.
+Compatible wrapper: `tools/bump_version.py --bump patch` or `--version X.Y.Z`.
 
-The script uses only the Python standard library. A project virtual environment is not required.
+## What the tool syncs
 
-## Examples
+`sync` and `bump` update, and `status` checks:
 
-Windows, from the project root:
+| `status` label | File | What changes |
+|---|---|---|
+| `template` / `source` | `config/config.json.template` | `app_info` version and dates |
+| `readme` | `README.md` | `# VPN Server Manager vX.Y.Z` |
+| `installer` | `vpn-manager-installer.iss` | header comment and `MyAppVersion` |
+| `env` | `env.example` | `APP_VERSION=` |
+| `app_config` | `app/config.py` | default `APP_VERSION` and the generated `.env` line |
+| `app_init` | `app/__init__.py` | fallback `app_info` (version and dates) |
+| `setup` | `setup.py` | fallback versions |
+| `macos` | `build_macos.py` | fallback versions |
+| `compose` | `docker-compose.yml` | header and `APP_VERSION=` |
+| `bug_form` | `.github/ISSUE_TEMPLATE/bug.yml` | version placeholder |
 
-```powershell
-python tools\update_version.py status
-python tools\update_version.py bump patch
-python tools\update_version.py sync X.Y.Z
-```
+The `local` row is a `config.json` in the project root. It is optional: `INFO MISSING` is normal. If the file exists, the tool updates it too.
 
-Use `.\venv\Scripts\python.exe` or `.\.venv\Scripts\python.exe` only when that folder exists. This repository does not ship a `venv`, so that path fails with `The term '.\venv\Scripts\python.exe' is not recognized`.
+Not synced on purpose: `CHANGELOG.md` (written by hand), version mentions in `docs/` (history), and `installer_output/checksum.txt` (changes only after a Windows installer build).
 
-macOS / Linux:
+## Release checklist
 
-```bash
-python3 tools/update_version.py status
-python3 tools/update_version.py bump patch
-```
+1. Bump the version:
+   ```bash
+   python3 tools/update_version.py bump patch
+   ```
+   On Windows: `python tools\update_version.py bump patch`.
+2. In `CHANGELOG.md`, rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` (same date as `last_updated`).
+3. Check that nothing drifted:
+   ```bash
+   python3 tools/update_version.py status
+   ```
+   Every row except `local` must be `OK`.
+4. Run the tests, commit, push.
+5. Build: `build_macos.py` / `build_windows.ps1` read the version from `config/config.json.template`. After a Windows build, commit the refreshed `installer_output/checksum.txt`.
 
-After a version change: update `CHANGELOG.md`, run `status`, then build.
+## Python on each system
 
-Build scripts read the version from `config/config.json.template` (`build_windows.ps1`, `build_macos.py`, `setup.py`).
+macOS / Linux: `python3 tools/update_version.py …` works everywhere. The project `venv/` (if you created one) also works: `venv/bin/python tools/update_version.py …`.
+
+Windows, from the project root: `python tools\update_version.py …`. Use `.\venv\Scripts\python.exe` only when that folder exists on your machine. `venv/` is local and never committed, so a fresh clone does not have it.
 
 ## Troubleshooting
 
-**`status` reports drift** — run `sync`.
+**`status` shows `DIFF`** — someone edited a file by hand. Run `sync` (keeps the source version and dates).
+
+**`RuntimeError: Could not update …` while syncing** — the line the tool looks for was reformatted. Restore the expected form (see the table above) and run `sync` again.
 
 **PowerShell: `.\venv\Scripts\python.exe` is not recognized** — there is no `venv` folder. Run `python tools\update_version.py status` instead.
 
 **PowerShell: The module 'venv' could not be loaded** — the command was started without `.\`. Prefer `python tools\update_version.py`.
 
-**UI version ≠ installer version** — check `config/config.json.template`, `vpn-manager-installer.iss`, `README.md`, and `status`. Someone edited one file by hand.
+**UI version ≠ installer version** — run `status`; rebuild after syncing.
 
-**Packaged app in `%APPDATA%` shows an old version** — rebuild after syncing. The user config is not the release source of truth.
+**Packaged app shows an old version** — rebuild and reinstall. The user `config.json` in `%APPDATA%` / `~/Library/Application Support` is not the release source of truth.
 
 ## Rule
 
-Change versions only through `tools/update_version.py`. Keep the source of truth in `config/config.json.template`. Always run `status` before a release.
+Change versions only through `tools/update_version.py` — never with search-and-replace across the repository. Keep the source of truth in `config/config.json.template`. Always run `status` before a release.

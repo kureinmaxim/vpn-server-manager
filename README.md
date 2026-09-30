@@ -1,4 +1,4 @@
-# VPN Server Manager v4.9.0
+# VPN Server Manager v4.9.1
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="220">
@@ -108,6 +108,30 @@ Installers (Windows setup `.exe`, macOS `.dmg`) are on the [Releases](https://gi
 <p align="center">
   <img src="docs/images/06-about.png" alt="About — version and developer" width="720">
 </p>
+
+## Backup and restore
+
+Servers (with their passwords) and the DNS card (providers, domains, records) are stored in **one encrypted `.enc` file**. It can only be decrypted with `SECRET_KEY` from `.env`, so a backup is always **data file + key**.
+
+**Back up:** Settings → **Full export** creates `vpn_servers_backup_<date>.zip` in Downloads:
+
+| File | Contents |
+|---|---|
+| `servers_<date>.enc` | All servers and the whole DNS card |
+| `SECRET_KEY.env` | The key for that `.enc` file |
+| `PIN.txt` | Login PIN of the source install (a reminder; the PIN is per install and is not restored) |
+| `uploads/` | Server icons |
+
+The archive holds data, key and PIN together: anyone with it can read every password. Keep it in a password manager or on an encrypted drive, never in chats or git.
+
+**Restore**, depending on the target computer:
+
+- **Fresh install (or full replacement):** close the app, put `SECRET_KEY.env` into the app data folder as `.env`, copy `uploads/`, start the app, then Settings → **Import Data File** → `servers_<date>.enc` → **Import and Attach**.
+- **The computer already has its own servers:** keep its `.env`. Settings → **Import servers from another installation** → choose `servers_<date>.enc`, paste the value after `SECRET_KEY=` → **Import and merge servers**. Duplicates (same name or IP) and existing domains are skipped; passwords are re-encrypted with the local key.
+
+App data folder: macOS `~/Library/Application Support/VPNServerManager-Clean/`, Windows `%APPDATA%\VPNServerManager-Clean\`, Linux `~/.local/share/VPNServerManager-Clean/`.
+
+Files with DNS data need version 4.6.0 or newer. Step-by-step guide with troubleshooting: [docs/BACKUP_RESTORE_ru.md](docs/BACKUP_RESTORE_ru.md) (Russian).
 
 ## Safety notes
 

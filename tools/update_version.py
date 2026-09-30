@@ -309,6 +309,7 @@ def print_status():
         ("setup", "setup.py", get_regex_value(SETUP_PY, r"return config\.get\('app_info', \{\}\)\.get\('version', '([^']+)'\)"), True),
         ("macos", "build_macos.py", get_regex_value(BUILD_MACOS, r"return '([0-9]+\.[0-9]+\.[0-9]+)'"), True),
         ("compose", "docker-compose.yml", get_regex_value(DOCKER_COMPOSE, r"APP_VERSION=([0-9]+\.[0-9]+\.[0-9]+)"), True),
+        ("bug_form", ".github/ISSUE_TEMPLATE/bug.yml", get_regex_value(BUG_TEMPLATE, r'placeholder: "([0-9]+\.[0-9]+\.[0-9]+)"'), True),
     ]
 
     print("[STATUS] VPN Server Manager version tracking")

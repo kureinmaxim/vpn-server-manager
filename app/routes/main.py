@@ -739,9 +739,8 @@ def import_data():
             try:
                 with open(file_path, 'rb') as f:
                     encrypted_content = f.read()
-                servers = data_manager.load_servers({'active_data_file': file_path})
-                if not isinstance(servers, list):
-                    raise ValueError("Invalid data structure")
+                # read_payload() raises on a wrong key; load_servers() would silently return []
+                servers, _dns = data_manager.read_payload(file_path)
                 
                 server_count = len(servers)
                 flash(_('Файл данных импортирован. Серверов: %(count)s', count=server_count), 'success')
@@ -1052,27 +1051,49 @@ def export_package():
                         zipf.write(file_path, f"uploads/{filename}")
             
             # Добавляем README с инструкциями
-            readme_content = f"""VPN Server Manager - Экспорт данных
-===========================================
+            readme_content = f"""VPN Server Manager — полный экспорт
+===================================
 
 Дата экспорта: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
+Версия: {current_app.config.get('app_info', {}).get('version', '')}
 
-Содержимое архива:
-- servers_{timestamp}.enc - Зашифрованные данные серверов
-- SECRET_KEY.env - Ключ шифрования (поместите в папку с приложением)
-- PIN.txt - PIN-код для входа в приложение
-- uploads/ - Загруженные файлы (счета, скриншоты и т.д.)
+СОДЕРЖИМОЕ
+- servers_{timestamp}.enc — все серверы с паролями и карточка DNS
+  (провайдеры, домены, регистраторы, записи). Зашифрован ключом ниже.
+- SECRET_KEY.env — ключ шифрования для этого файла.
+- PIN.txt — PIN исходной установки (напоминание; PIN хранится в каждой
+  установке отдельно и при восстановлении не переносится).
+- uploads/ — иконки серверов.
 
-Инструкция по импорту:
-1. Скопируйте SECRET_KEY.env в папку с новой установкой VPN Server Manager
-2. Переименуйте SECRET_KEY.env в .env
-3. Перезапустите приложение
-4. В разделе "Настройки" -> "Управление данными" импортируйте файл servers_{timestamp}.enc
-5. Скопируйте содержимое папки uploads/ в папку uploads/ новой установки
-6. Запомните PIN-код из файла PIN.txt для входа в приложение
+ПАПКА ДАННЫХ ПРИЛОЖЕНИЯ
+- macOS:   ~/Library/Application Support/VPNServerManager-Clean/
+- Windows: %APPDATA%\\VPNServerManager-Clean\\
+- Linux:   ~/.local/share/VPNServerManager-Clean/
 
-ВАЖНО: Храните этот архив в безопасном месте. Любой, кто имеет доступ к нему,
-может расшифровать ваши данные о серверах!
+ВОССТАНОВЛЕНИЕ — выберите вариант
+
+A. Новая установка или полная замена данных
+   1. Закройте приложение.
+   2. Скопируйте SECRET_KEY.env в папку данных и переименуйте в .env
+      (заменив существующий).
+   3. Скопируйте содержимое uploads/ в uploads/ папки данных.
+   4. Запустите приложение, войдите по PIN этого компьютера.
+   5. Настройки -> Импорт файла данных -> servers_{timestamp}.enc ->
+      Импортировать и прикрепить.
+
+B. На компьютере уже есть свои серверы — объединить
+   1. Файл .env НЕ меняйте.
+   2. Настройки -> Импорт серверов из другой установки ->
+      servers_{timestamp}.enc.
+   3. Ключ — значение из SECRET_KEY.env после "SECRET_KEY=".
+   4. Импортировать и объединить сервера. Дубликаты (то же имя или IP)
+      и уже имеющиеся домены пропускаются.
+
+Файлы с данными DNS открываются версией 4.6.0 и новее.
+
+ВАЖНО: в архиве вместе лежат данные, ключ и PIN. Любой, у кого он есть,
+получит все пароли. Храните его в менеджере паролей или на зашифрованном
+диске; после переноса удалите копию из «Загрузок».
 """
             zipf.writestr("README.txt", readme_content)
         

@@ -5470,7 +5470,7 @@ msgstr "Export Key"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:104
 #: templates/settings.html:104
 msgid "Полный экспорт"
-msgstr "Import and Export"
+msgstr "Full export"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:107
 #: templates/settings.html:107
@@ -5637,7 +5637,7 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:204
 #: templates/settings.html:204
 msgid "Импортировать и объединить сервера"
-msgstr "Import and Attach"
+msgstr "Import and merge servers"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:218
 #: templates/settings.html:218
@@ -7944,3 +7944,104 @@ msgstr "Operation completed"
 
 msgid "Текущий файл данных не расшифровывается ключом из .env этой установки. Восстановите прежний SECRET_KEY в .env и перезапустите приложение."
 msgstr "The current data file cannot be decrypted with the key from this installation's .env. Restore the previous SECRET_KEY in .env and restart the application."
+
+#: app/routes/dns.py templates/dns
+msgid "Серверы с паролями и карточка DNS (провайдеры, домены, записи) хранятся в одном зашифрованном файле .enc. Открыть его можно только ключом SECRET_KEY, поэтому резервная копия — это всегда файл данных плюс ключ."
+msgstr "Servers with their passwords and the DNS card (providers, domains, records) are stored in one encrypted .enc file. It opens only with SECRET_KEY, so a backup is always the data file plus the key."
+
+#: app/routes/dns.py templates/dns
+msgid "Полный экспорт (рекомендуется):"
+msgstr "Full export (recommended):"
+
+#: app/routes/dns.py templates/dns
+msgid "ZIP-архив в папке «Загрузки»: файл данных со всеми серверами и DNS, ключ SECRET_KEY.env, PIN.txt и иконки серверов. Это и есть резервная копия."
+msgstr "A ZIP archive in Downloads: the data file with all servers and DNS, the SECRET_KEY.env key, PIN.txt and server icons. This is your backup."
+
+#: app/routes/dns.py templates/dns
+msgid "Только файл .enc (серверы и DNS) без ключа — для копии туда, где уже стоит тот же ключ."
+msgstr "Only the .enc file (servers and DNS) without the key — for a copy where the same key is already installed."
+
+#: app/routes/dns.py templates/dns
+msgid "В архиве полного экспорта вместе лежат данные, ключ и PIN: любой, у кого он окажется, увидит все пароли. Храните его в менеджере паролей или на зашифрованном диске."
+msgstr "The full export archive holds the data, the key and the PIN together: anyone who gets it can see every password. Keep it in a password manager or on an encrypted drive."
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановление из полного экспорта"
+msgstr "Restoring from a full export"
+
+#: app/routes/dns.py templates/dns
+msgid "Новая установка или полная замена данных:"
+msgstr "New installation or full data replacement:"
+
+#: app/routes/dns.py templates/dns
+msgid "Закройте приложение."
+msgstr "Close the app."
+
+#: app/routes/dns.py templates/dns
+msgid "Скопируйте SECRET_KEY.env из архива в папку данных приложения и переименуйте в .env."
+msgstr "Copy SECRET_KEY.env from the archive into the app data folder and rename it to .env."
+
+#: app/routes/dns.py templates/dns
+msgid "Скопируйте иконки из папки uploads архива в папку uploads приложения."
+msgstr "Copy the icons from the archive uploads folder into the app uploads folder."
+
+#: app/routes/dns.py templates/dns
+msgid "Запустите приложение и войдите по PIN этого компьютера. PIN хранится в настройках установки и из архива не переносится; PIN.txt — напоминание о прежнем PIN."
+msgstr "Start the app and sign in with this computer PIN. The PIN is stored per installation and is not restored from the archive; PIN.txt is a reminder of the old PIN."
+
+#: app/routes/dns.py templates/dns
+msgid "«Настройки» → «Импорт файла данных» → выберите файл .enc из архива → «Импортировать и прикрепить»."
+msgstr "Settings → Import Data File → choose the .enc file from the archive → Import and Attach."
+
+#: app/routes/dns.py templates/dns
+msgid "На компьютере уже есть свои серверы — объединить:"
+msgstr "The computer already has its own servers — merge:"
+
+#: app/routes/dns.py templates/dns
+msgid "Файл .env не меняйте."
+msgstr "Do not change the .env file."
+
+#: app/routes/dns.py templates/dns
+msgid "«Настройки» → «Импорт серверов из другой установки» → файл .enc из архива."
+msgstr "Settings → Import servers from another installation → the .enc file from the archive."
+
+#: app/routes/dns.py templates/dns
+msgid "Вставьте ключ — значение из SECRET_KEY.env после «SECRET_KEY=»."
+msgstr "Paste the key: the value from SECRET_KEY.env after “SECRET_KEY=”."
+
+#: app/routes/dns.py templates/dns
+msgid "Нажмите «Импортировать и объединить сервера»."
+msgstr "Click Import and merge servers."
+
+
+#: app/routes/dns.py templates/dns
+msgid "Добавляет домены и DNS-провайдеров, которых у вас ещё нет; уже имеющиеся домены не меняются"
+msgstr "Adds domains and DNS providers you do not have yet; existing domains are not changed"
+
+#: app/routes/dns.py templates/dns
+msgid "Импорт добавляет серверы к вашим: дубликаты (то же имя или IP) пропускаются, текущие серверы не удаляются"
+msgstr "Import adds servers to yours: duplicates (same name or IP) are skipped and current servers are kept"
+
+#: app/routes/dns.py templates/dns
+msgid "Создаётся новый файл данных; прежний остаётся в папке data"
+msgstr "A new data file is created; the previous one stays in the data folder"
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановить из архива:"
+msgstr "Restore from an archive:"
+
+#: app/routes/dns.py templates/dns
+msgid "Создайте PIN, затем восстановите данные из полного экспорта по инструкции в разделе «Импорт и Экспорт». Кнопка «Импортировать из архива» на экране входа пока не работает."
+msgstr "Create a PIN, then restore data from the full export as described in Import and Export. The Import from archive button on the sign-in screen does not work yet."
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановление:"
+msgstr "Restore:"
+
+#: app/routes/dns.py templates/dns
+msgid "PIN хранится в каждой установке отдельно: PIN.txt — лишь напоминание, при восстановлении он не применяется. Чтобы оставить прежний PIN, задайте его в настройках"
+msgstr "The PIN is stored per installation: PIN.txt is only a reminder and is not applied on restore. To keep the old PIN, set it in Settings"
+
+#: templates/help.html
+msgid "Папка данных приложения:"
+msgstr "App data folder:"
