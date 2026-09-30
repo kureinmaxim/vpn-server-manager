@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.6.1] - 2026-09-30
+
+### Fixed
+- Changing the master key failed since 4.0 (`DataManagerService` was not imported) after `.env` had already been overwritten, leaving the data file unreadable on the next start. The re-encrypted data file is now written first and `.env` is updated only after it succeeds.
+- Key change now re-encrypts server SSH, panel and hoster credentials and DNS-provider credentials with the new key; previously they stayed encrypted with the old key.
+- Key change aborts on an unreadable data file instead of writing an empty one.
+
+### Added
+- Key verification reports the number of DNS domains in the file.
+- End-to-end tests for export, full archive, import, external merge, key verification and key change with DNS data.
+
 ## [4.6.0] - 2026-09-30
 
 ### Added
