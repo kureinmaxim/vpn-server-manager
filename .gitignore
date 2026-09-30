@@ -165,6 +165,12 @@ Thumbs.db
 *.backup
 
 # Application data
+data/*.enc
+data/*.json
+.env.*
+!.env.example
+client_secret*.json
+credentials*.json
 data/servers.json.enc
 data/hints.json
 pin_block_state.json

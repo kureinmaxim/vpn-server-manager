@@ -671,6 +671,13 @@ async function updateServicesStatus() {
                 `;
 
                 target.appendChild(serviceEl);
+                if (service.control_component) {
+                    const manage = document.createElement('a');
+                    manage.className = 'small d-inline-block mt-2';
+                    manage.href = {{ url_for('server_control.page', server_id=server.id)|tojson }};
+                    manage.textContent = {{ _('Управление сервером')|tojson }};
+                    serviceEl.appendChild(manage);
+                }
             };
 
             const proxyServices = services.filter(service => service.group === 'proxy');

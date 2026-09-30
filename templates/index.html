@@ -545,6 +545,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <a class="btn btn-outline-primary" id="statusManageServerBtn">{{ _('Управление сервером') }}</a>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Закрыть') }}</button>
         <button type="button" class="btn btn-primary" id="saveStatusImageBtn">{{ _('Сохранить как PNG') }}</button>
       </div>
@@ -743,6 +744,7 @@
 
     function openStatsModal(serverId) {
         currentServerId = serverId;
+        document.getElementById('statusManageServerBtn').href = {{ url_for('server_control.page', server_id='SERVER_ID')|tojson }}.replace('SERVER_ID', encodeURIComponent(serverId));
         consecutiveErrors = 0;
         var modalEl = document.getElementById('serverStatusModal');
         var modal = new bootstrap.Modal(modalEl);
