@@ -7940,3 +7940,7 @@ msgstr "State refreshed"
 
 msgid "Операция выполнена"
 msgstr "Operation completed"
+
+
+msgid "Текущий файл данных не расшифровывается ключом из .env этой установки. Восстановите прежний SECRET_KEY в .env и перезапустите приложение."
+msgstr "The current data file cannot be decrypted with the key from this installation's .env. Restore the previous SECRET_KEY in .env and restart the application."

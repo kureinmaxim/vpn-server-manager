@@ -6,12 +6,37 @@ Generate SECRET_KEY for VPN Server Manager.
 from cryptography.fernet import Fernet
 import os
 import shutil
+import sys
 
-def generate_key():
+
+def existing_valid_key(env_file):
+    """Return the current SECRET_KEY from env_file if it is a valid Fernet key."""
+    if not os.path.exists(env_file):
+        return None
+    with open(env_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip().startswith('SECRET_KEY='):
+                value = line.split('=', 1)[1].strip()
+                try:
+                    Fernet(value.encode())
+                    return value
+                except Exception:
+                    return None
+    return None
+
+
+def generate_key(force=False):
     """Generate and save SECRET_KEY to .env file"""
-    key = Fernet.generate_key()
     env_file = '.env'
     env_example = 'env.example'
+
+    # Setup runs on every (re)install; replacing the key would make all
+    # existing data files undecryptable.
+    if not force and existing_valid_key(env_file):
+        print("[OK] Existing SECRET_KEY in .env kept (use --force to replace it).")
+        return
+
+    key = Fernet.generate_key()
     
     # Если .env не существует, копируем из env.example
     if not os.path.exists(env_file):
@@ -49,4 +74,4 @@ def generate_key():
     print("[INFO] To start the application, use: python run.py")
 
 if __name__ == "__main__":
-    generate_key() 
+    generate_key(force='--force' in sys.argv)
