@@ -2,6 +2,28 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.9.1] - 2026-09-30
+
+### Fixed
+- Importing a data file encrypted with another key no longer reports "0 servers imported" and switches to an unreadable file; it now shows the key error and keeps the current file.
+- Merging servers from another installation skips duplicates by IP address again (the check read a non-existent `ip` field, so only names were compared).
+- English and Chinese labels of **Full export** and **Import and merge servers** no longer read "Import and Export" / "Import and Attach".
+
+### Documentation
+- New step-by-step guide `docs/BACKUP_RESTORE_ru.md`, a *Backup and restore* section in README, rewritten in-app Help and the README inside the full-export archive: what the archive contains (servers + DNS + key + PIN + icons), restoring on a fresh install versus merging into existing data, where the data folder is, and that the PIN is per installation.
+- Help no longer claims that importing from another installation replaces current data, or that the sign-in screen can import an archive (that button does not work yet).
+- `VERSION_MANAGEMENT.md` matches `tools/update_version.py`: every synced file (including the bug-report form), how `bump` and `sync` set dates, and a release checklist. `update_version.py status` now also checks `.github/ISSUE_TEMPLATE/bug.yml`.
+
+## [4.9.0] - 2026-09-30
+
+### Added
+- **Server control** page: systemd and Docker service lifecycle actions, a shared service catalog, read-only protocol inspection and client URI export — the first step of moving TelegramOnly management into the app.
+- Stricter `.gitignore` for private files and `tools/check_public_files.py` to check that no private paths are tracked.
+
+### Fixed
+- `setup_windows.bat` no longer replaces `SECRET_KEY` in an existing `.env` on reinstall, which made all data files undecryptable; the key is regenerated only with `--force`.
+- Importing external data when the current data file cannot be decrypted now reports that problem instead of a wrong external key.
+
 ## [4.8.0] - 2026-09-30
 
 ### Added

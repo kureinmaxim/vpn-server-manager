@@ -11,13 +11,13 @@ from app.services import dns_registry as dns_reg, registry
 from app.services.data_manager_service import DataManagerService
 
 
-def fill(manager, path, domain_name='example.com', provider_name='Cloudflare', server='vps'):
+def fill(manager, path, domain_name='example.com', provider_name='Cloudflare', server='vps', ip='203.0.113.5'):
     provider = dns_reg.build_provider({'kind': 'cloudflare', 'name': provider_name, 'user': 'me@x.io',
                                        'password': 'p%ss'}, None, manager.encrypt_data)
     domain = dns_reg.build_domain({'name': domain_name, 'provider_id': provider['id'], 'registrar': 'Namecheap',
                                    'expires_on': '2027-01-01'}, None, [provider])
     domain['records'].append(dns_reg.build_record({'name': 'vpn', 'type': 'A', 'content': '203.0.113.5'}, domain))
-    manager.save_servers([{'id': 1, 'name': server, 'ip_address': '203.0.113.5',
+    manager.save_servers([{'id': 1, 'name': server, 'ip_address': ip,
                            'ssh_credentials': {'password': manager.encrypt_data('ssh')}}], str(path),
                          dns={'providers': [provider], 'domains': [domain]})
 
@@ -75,7 +75,7 @@ def test_import_external_merges_dns_and_reencrypts(env, tmp_path):
     client, _ = env
     other = DataManagerService(Fernet.generate_key().decode(), str(tmp_path))
     other_path = tmp_path / 'other.enc'
-    fill(other, other_path, domain_name='other.org', provider_name='Porkbun', server='vps2')
+    fill(other, other_path, domain_name='other.org', provider_name='Porkbun', server='vps2', ip='203.0.113.7')
     fill_dup = other.read_payload(str(other_path))
     # Same domain as ours must be skipped
     fill_dup[1]['domains'].append(dict(fill_dup[1]['domains'][0], id='dup', name='example.com'))
@@ -137,3 +137,48 @@ def test_failed_key_change_keeps_old_key(env, monkeypatch):
     assert registry.get('data_manager').secret_key == old_key
     assert client.application.config['SECRET_KEY'] == old_key
     assert not os.path.exists(os.path.join(client.application.config['APP_DATA_DIR'], '.env'))
+
+
+def test_import_with_wrong_key_is_rejected_and_keeps_active_file(env, tmp_path):
+    client, _ = env
+    active = client.application.config['active_data_file']
+    other = DataManagerService(Fernet.generate_key().decode(), str(tmp_path))
+    foreign = tmp_path / 'foreign.enc'
+    other.save_servers([{'id': 1, 'name': 'x'}], str(foreign))
+    client.post('/import_data', data={'data_file': (io.BytesIO(foreign.read_bytes()), 'foreign.enc')},
+                content_type='multipart/form-data')
+    assert client.application.config['active_data_file'] == active
+    assert not list((tmp_path / 'data').glob('imported_*'))
+
+
+def test_external_merge_skips_same_ip_under_another_name(env, tmp_path):
+    client, _ = env
+    other = DataManagerService(Fernet.generate_key().decode(), str(tmp_path))
+    foreign = tmp_path / 'foreign.enc'
+    other.save_servers([{'id': 1, 'name': 'renamed', 'ip_address': '203.0.113.5'},
+                        {'id': 2, 'name': 'new', 'ip_address': '203.0.113.9'}], str(foreign))
+    client.post('/import_external_data', data={
+        'external_file': (io.BytesIO(foreign.read_bytes()), 'foreign.enc'), 'external_key': other.secret_key},
+        content_type='multipart/form-data')
+    assert sorted(s['name'] for s in current()[1]) == ['new', 'vps']
+
+
+def test_full_export_readme_explains_both_restore_paths(env):
+    client, exports = env
+    client.get('/export_package')
+    with zipfile.ZipFile(next(exports.glob('*.zip'))) as archive:
+        readme = archive.read('README.txt').decode()
+    for text in ('карточка DNS', 'Импорт файла данных', 'Импорт серверов из другой установки',
+                 'PIN этого компьютера', 'VPNServerManager-Clean'):
+        assert text in readme
+
+
+@pytest.mark.parametrize('lang,expected', [
+    ('en', ['Full export (recommended):', 'Restoring from a full export', 'VPNServerManager-Clean</code>', 'App data folder:']),
+    ('zh', ['完整导出（推荐）：', '从完整导出恢复']),
+])
+def test_help_explains_backup_and_restore(env, lang, expected):
+    client, _ = env
+    text = client.get('/help?lang=' + lang).text
+    for item in expected:
+        assert item in text

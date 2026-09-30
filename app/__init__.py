@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.9.0'),
+            "version": app.config.get('APP_VERSION', '4.9.1'),
             "release_date": "30.09.2026",
             "last_updated": "2026-09-30",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.9.0",
+            "version": "4.9.1",
             "release_date": "30.09.2026",
             "last_updated": "2026-09-30",
             "developer": "Куреин М.Н."

@@ -5236,7 +5236,7 @@ msgstr "导入数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:104
 #: templates/settings.html:104
 msgid "Полный экспорт"
-msgstr "导入和导出"
+msgstr "完整导出"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:107
 #: templates/settings.html:107
@@ -5278,7 +5278,7 @@ msgstr "应用当前未使用任何数据文件。您可以导入现有文件以
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:140
 #: templates/settings.html:140
 msgid "Импорт файла данных"
-msgstr "导入数据"
+msgstr "导入数据文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:143
 #: templates/settings.html:143
@@ -5303,7 +5303,7 @@ msgstr "请选择此前从本应用导出的<code>.enc</code>文件。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:152
 #: templates/settings.html:152
 msgid "Импортировать и прикрепить"
-msgstr "导入数据"
+msgstr "导入并附加"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:163
 #: templates/settings.html:163
@@ -5389,7 +5389,7 @@ msgstr "重复的服务器（通过IP或名称）将被错过。导入的服务�
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:204
 #: templates/settings.html:204
 msgid "Импортировать и объединить сервера"
-msgstr "导入数据"
+msgstr "导入并合并服务器"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:218
 #: templates/settings.html:218
@@ -7612,3 +7612,104 @@ msgstr "操作已完成"
 
 msgid "Текущий файл данных не расшифровывается ключом из .env этой установки. Восстановите прежний SECRET_KEY в .env и перезапустите приложение."
 msgstr "当前数据文件无法用本安装 .env 中的密钥解密。请在 .env 中恢复原来的 SECRET_KEY 并重启应用。"
+
+#: app/routes/dns.py templates/dns
+msgid "Серверы с паролями и карточка DNS (провайдеры, домены, записи) хранятся в одном зашифрованном файле .enc. Открыть его можно только ключом SECRET_KEY, поэтому резервная копия — это всегда файл данных плюс ключ."
+msgstr "服务器及其密码和 DNS 卡片（服务商、域名、记录）保存在同一个加密的 .enc 文件中。只有 SECRET_KEY 能打开它，因此备份始终是数据文件加密钥。"
+
+#: app/routes/dns.py templates/dns
+msgid "Полный экспорт (рекомендуется):"
+msgstr "完整导出（推荐）："
+
+#: app/routes/dns.py templates/dns
+msgid "ZIP-архив в папке «Загрузки»: файл данных со всеми серверами и DNS, ключ SECRET_KEY.env, PIN.txt и иконки серверов. Это и есть резервная копия."
+msgstr "“下载”文件夹中的 ZIP 压缩包：包含所有服务器和 DNS 的数据文件、SECRET_KEY.env 密钥、PIN.txt 和服务器图标。这就是您的备份。"
+
+#: app/routes/dns.py templates/dns
+msgid "Только файл .enc (серверы и DNS) без ключа — для копии туда, где уже стоит тот же ключ."
+msgstr "仅 .enc 文件（服务器和 DNS），不含密钥——用于复制到已安装相同密钥的位置。"
+
+#: app/routes/dns.py templates/dns
+msgid "В архиве полного экспорта вместе лежат данные, ключ и PIN: любой, у кого он окажется, увидит все пароли. Храните его в менеджере паролей или на зашифрованном диске."
+msgstr "完整导出压缩包同时包含数据、密钥和 PIN：任何拿到它的人都能看到所有密码。请将其保存在密码管理器或加密磁盘中。"
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановление из полного экспорта"
+msgstr "从完整导出恢复"
+
+#: app/routes/dns.py templates/dns
+msgid "Новая установка или полная замена данных:"
+msgstr "新安装或完全替换数据："
+
+#: app/routes/dns.py templates/dns
+msgid "Закройте приложение."
+msgstr "关闭应用。"
+
+#: app/routes/dns.py templates/dns
+msgid "Скопируйте SECRET_KEY.env из архива в папку данных приложения и переименуйте в .env."
+msgstr "将压缩包中的 SECRET_KEY.env 复制到应用数据文件夹并重命名为 .env。"
+
+#: app/routes/dns.py templates/dns
+msgid "Скопируйте иконки из папки uploads архива в папку uploads приложения."
+msgstr "将压缩包 uploads 文件夹中的图标复制到应用的 uploads 文件夹。"
+
+#: app/routes/dns.py templates/dns
+msgid "Запустите приложение и войдите по PIN этого компьютера. PIN хранится в настройках установки и из архива не переносится; PIN.txt — напоминание о прежнем PIN."
+msgstr "启动应用并使用本机的 PIN 登录。PIN 按安装分别保存，不会从压缩包恢复；PIN.txt 只是旧 PIN 的提醒。"
+
+#: app/routes/dns.py templates/dns
+msgid "«Настройки» → «Импорт файла данных» → выберите файл .enc из архива → «Импортировать и прикрепить»."
+msgstr "“设置” → “导入数据文件” → 选择压缩包中的 .enc 文件 → “导入并附加”。"
+
+#: app/routes/dns.py templates/dns
+msgid "На компьютере уже есть свои серверы — объединить:"
+msgstr "计算机上已有自己的服务器——合并："
+
+#: app/routes/dns.py templates/dns
+msgid "Файл .env не меняйте."
+msgstr "不要修改 .env 文件。"
+
+#: app/routes/dns.py templates/dns
+msgid "«Настройки» → «Импорт серверов из другой установки» → файл .enc из архива."
+msgstr "“设置” → “从其他安装导入服务器” → 压缩包中的 .enc 文件。"
+
+#: app/routes/dns.py templates/dns
+msgid "Вставьте ключ — значение из SECRET_KEY.env после «SECRET_KEY=»."
+msgstr "粘贴密钥：SECRET_KEY.env 中“SECRET_KEY=”之后的值。"
+
+#: app/routes/dns.py templates/dns
+msgid "Нажмите «Импортировать и объединить сервера»."
+msgstr "点击“导入并合并服务器”。"
+
+
+#: app/routes/dns.py templates/dns
+msgid "Добавляет домены и DNS-провайдеров, которых у вас ещё нет; уже имеющиеся домены не меняются"
+msgstr "添加您尚未拥有的域名和 DNS 服务商；已有域名不会更改"
+
+#: app/routes/dns.py templates/dns
+msgid "Импорт добавляет серверы к вашим: дубликаты (то же имя или IP) пропускаются, текущие серверы не удаляются"
+msgstr "导入会将服务器添加到您的列表：重复项（名称或 IP 相同）会被跳过，现有服务器保留"
+
+#: app/routes/dns.py templates/dns
+msgid "Создаётся новый файл данных; прежний остаётся в папке data"
+msgstr "会创建新的数据文件；原文件保留在 data 文件夹中"
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановить из архива:"
+msgstr "从压缩包恢复："
+
+#: app/routes/dns.py templates/dns
+msgid "Создайте PIN, затем восстановите данные из полного экспорта по инструкции в разделе «Импорт и Экспорт». Кнопка «Импортировать из архива» на экране входа пока не работает."
+msgstr "先创建 PIN，然后按照“导入和导出”部分的说明从完整导出恢复数据。登录界面上的“从压缩包导入”按钮目前无法使用。"
+
+#: app/routes/dns.py templates/dns
+msgid "Восстановление:"
+msgstr "恢复："
+
+#: app/routes/dns.py templates/dns
+msgid "PIN хранится в каждой установке отдельно: PIN.txt — лишь напоминание, при восстановлении он не применяется. Чтобы оставить прежний PIN, задайте его в настройках"
+msgstr "PIN 按安装分别保存：PIN.txt 只是提醒，恢复时不会应用。如需保留旧 PIN，请在设置中重新设置"
+
+#: templates/help.html
+msgid "Папка данных приложения:"
+msgstr "应用数据文件夹："
