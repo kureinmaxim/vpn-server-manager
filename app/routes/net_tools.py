@@ -8,9 +8,11 @@ import subprocess
 import threading
 
 import requests
-from flask import Blueprint, abort, jsonify, redirect, render_template, request, session, url_for
+from cryptography.fernet import InvalidToken
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, session, url_for
 from flask_babel import gettext as _, lazy_gettext as _l
 
+from ..services import dns_registry, registry
 from ..services.net_tools import ToolError, run_tool
 
 net_tools_bp = Blueprint('net_tools', __name__, url_prefix='/net-tools')
@@ -95,7 +97,16 @@ def detail(tool_id):
     if 'net_tools_token' not in session:
         session['net_tools_token'] = secrets.token_urlsafe(32)
     return render_template('net_tools.html', tools=TOOLS, selected=tool,
-                           token=session['net_tools_token'])
+                           token=session['net_tools_token'], hosts=_saved_hosts())
+
+
+def _saved_hosts():
+    """Domains and subdomains from the DNS card, offered as input suggestions."""
+    manager = registry.get('data_manager')
+    try:
+        return dns_registry.host_choices(manager.load_dns(current_app.config)) if manager else []
+    except (InvalidToken, ValueError, OSError):
+        return []
 
 
 @net_tools_bp.post('/<tool_id>/run')

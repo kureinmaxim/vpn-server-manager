@@ -55,6 +55,11 @@ def decrypt_servers_file():
 
         decrypted_json = fernet.decrypt(encrypted_data).decode('utf-8')
         servers = json.loads(decrypted_json)
+        # Новый формат с DNS-карточкой: {"servers": [...], "dns": {...}}
+        if isinstance(servers, dict):
+            dns = servers.get('dns') or {}
+            print(f"DNS: провайдеров {len(dns.get('providers') or [])}, доменов {len(dns.get('domains') or [])}")
+            servers = servers.get('servers') or []
 
     except (InvalidToken, Exception) as e:
         print(f"Критическая ошибка при расшифровке основного файла: {e}")

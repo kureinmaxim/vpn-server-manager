@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+{% from "macros/credentials.html" import password_input, current_secret_row %}
+{% set v = values or item or {} %}
+{% set is_provider = form == 'provider' %}
+{% block title %}{{ (_('DNS-провайдер') if is_provider else _('Домен')) }} · DNS{% endblock %}
+{% block content %}
+<div class="container dns-page my-4">
+    {% include "dns/_head.html" %}
+    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
+        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.index') }}">DNS</a>
+        {% if not is_provider and item %}<span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.domain', domain_id=item.id) }}">{{ item.name }}</a>{% endif %}
+    </nav>
+    <h1 class="h3 mb-4">
+        {% if is_provider %}{{ _('Редактировать DNS-провайдера') if item else _('Новый DNS-провайдер') }}
+        {% else %}{{ _('Редактировать домен') if item else _('Новый домен') }}{% endif %}
+    </h1>
+    <form method="post" class="card p-4 dns-form" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        {% if is_provider %}
+        <div class="row g-3">
+            <div class="col-sm-5">
+                <label class="form-label" for="kind">{{ _('Тип') }}</label>
+                <select class="form-select" id="kind" name="kind">
+                    {% for key, (title, url) in presets.items() %}
+                    <option value="{{ key }}" data-name="{{ title }}" data-url="{{ url }}" {% if v.get('kind', 'cloudflare') == key %}selected{% endif %}>{{ title or _('Другой') }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-7">
+                <label class="form-label" for="name">{{ _('Название') }}</label>
+                <input class="form-control" id="name" name="name" maxlength="80" value="{{ v.get('name', '') }}" placeholder="{{ _('Например, Cloudflare (личный)') }}">
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="login_url">{{ _('Страница входа') }}</label>
+                <input class="form-control" id="login_url" name="login_url" type="url" maxlength="2048" value="{{ v.get('login_url', '') }}" placeholder="https://dash.cloudflare.com/login">
+                <div class="form-text">{{ _('Пусто — адрес по умолчанию для выбранного типа.') }}</div>
+            </div>
+            <div class="col-sm-6">
+                {{ current_secret_row(item.user_decrypted if item else '', _('Текущий логин'), 'clear_user') }}
+                {{ password_input('user', 'user', _('Логин / email'), help_text=_('Оставьте пустым, чтобы не менять.') if item and item.user_decrypted else None, is_set=item and item.user_decrypted) }}
+            </div>
+            <div class="col-sm-6">
+                {{ current_secret_row(item.password_decrypted if item else '', _('Текущий пароль'), 'clear_password') }}
+                {{ password_input('password', 'password', _('Пароль'), help_text=_('Оставьте пустым, чтобы не менять.') if item and item.password_decrypted else None, is_set=item and item.password_decrypted) }}
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="notes">{{ _('Заметки') }}</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3" maxlength="2000" placeholder="{{ _('Например, способ 2FA или владелец аккаунта') }}">{{ v.get('notes', '') }}</textarea>
+            </div>
+        </div>
+        {% else %}
+        <div class="row g-3">
+            <div class="col-sm-7">
+                <label class="form-label" for="name">{{ _('Доменное имя') }}</label>
+                <input class="form-control font-monospace" id="name" name="name" maxlength="253" spellcheck="false" required value="{{ v.get('name', '') }}" placeholder="example.com">
+            </div>
+            <div class="col-sm-5">
+                <label class="form-label" for="provider_id">{{ _('DNS-провайдер') }}</label>
+                <select class="form-select" id="provider_id" name="provider_id">
+                    <option value="">{{ _('Не выбран') }}</option>
+                    {% for provider in providers %}<option value="{{ provider.id }}" {% if v.get('provider_id') == provider.id %}selected{% endif %}>{{ provider.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label" for="registrar">{{ _('Регистратор (кто выдал домен)') }}</label>
+                <input class="form-control" id="registrar" name="registrar" list="registrar-list" maxlength="120" value="{{ v.get('registrar', '') }}" placeholder="Namecheap, REG.RU, Cloudflare Registrar…">
+                <datalist id="registrar-list">{% for name in registrars %}<option value="{{ name }}">{% endfor %}</datalist>
+            </div>
+            <div class="col-sm-6">
+                <label class="form-label" for="registrar_url">{{ _('Кабинет регистратора') }}</label>
+                <input class="form-control" id="registrar_url" name="registrar_url" type="url" maxlength="2048" value="{{ v.get('registrar_url', '') }}" placeholder="https://">
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label" for="registered_on">{{ _('Дата регистрации') }}</label>
+                <input class="form-control" id="registered_on" name="registered_on" type="date" value="{{ v.get('registered_on', '') }}">
+            </div>
+            <div class="col-sm-4">
+                <label class="form-label" for="expires_on">{{ _('Действует до') }}</label>
+                <input class="form-control" id="expires_on" name="expires_on" type="date" value="{{ v.get('expires_on', '') }}">
+            </div>
+            <div class="col-sm-4 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="auto_renew" name="auto_renew" {% if v.get('auto_renew') %}checked{% endif %}>
+                    <label class="form-check-label" for="auto_renew">{{ _('Автопродление') }}</label>
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="notes">{{ _('Заметки') }}</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3" maxlength="2000">{{ v.get('notes', '') }}</textarea>
+            </div>
+        </div>
+        {% endif %}
+        <div class="d-flex gap-2 justify-content-end mt-4">
+            <a class="btn btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=item.id) if item and not is_provider else url_for('dns.index') }}">{{ _('Отмена') }}</a>
+            <button class="btn btn-dns-solid" type="submit">{{ _('Сохранить') }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{% if is_provider %}
+<script>
+(() => {
+    const kind = document.getElementById('kind');
+    const name = document.getElementById('name');
+    const url = document.getElementById('login_url');
+    let previous = kind.selectedOptions[0];
+    kind.addEventListener('change', () => {
+        const option = kind.selectedOptions[0];
+        // Replace only values that still match the previous preset
+        if (!name.value || name.value === previous.dataset.name) name.value = option.dataset.name;
+        url.placeholder = option.dataset.url || 'https://';
+        if (url.value === previous.dataset.url) url.value = '';
+        previous = option;
+    });
+    url.placeholder = previous.dataset.url || 'https://';
+    if (!name.value && !{{ 'true' if item else 'false' }}) name.value = previous.dataset.name;
+})();
+</script>
+{% endif %}
+{% endblock %}

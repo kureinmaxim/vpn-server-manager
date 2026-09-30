@@ -1,0 +1,19 @@
+{% macro expiry_badge(domain, left) -%}
+{% if left is none %}<span class="text-body-secondary">—</span>
+{% else %}
+<span class="badge {{ 'bg-danger' if left < 30 else ('bg-warning text-dark' if left < 60 else 'bg-success') }}"
+      title="{{ domain.expires_on }}">
+    {% if left < 0 %}{{ _('Истёк %(days)s дн. назад', days=-left) }}{% else %}{{ _('%(days)s дн.', days=left) }}{% endif %}
+</span>
+<span class="small text-body-secondary ms-1">{{ domain.expires_on }}</span>
+{% endif %}
+{%- endmacro %}
+
+{% macro confirm_delete(action, message, label=None, small=True) -%}
+<form method="post" action="{{ action }}" class="d-inline" onsubmit="return confirm(this.dataset.confirm)" data-confirm="{{ message }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+    <button type="submit" class="btn {{ 'btn-sm' if small }} btn-outline-danger" title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}">
+        <i class="bi bi-trash" aria-hidden="true"></i>{% if label %} {{ label }}{% endif %}
+    </button>
+</form>
+{%- endmacro %}

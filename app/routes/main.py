@@ -8,7 +8,7 @@ import datetime
 import shutil
 import zipfile
 import signal
-from ..services import registry
+from ..services import registry, dns_registry
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
 from ..utils.credentials import sanitize_secret
 from ..utils.icons import apply_icon_from_form
@@ -513,6 +513,7 @@ def change_main_key():
         
         # Загружаем текущие данные с существующим ключом
         current_servers = data_manager.load_servers(current_app.config)
+        dns = dns_registry.normalize(data_manager.load_dns(current_app.config))
         
         # Создаем резервную копию
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -568,7 +569,13 @@ def change_main_key():
         
         # Создаем новый DataManagerService с новым ключом
         new_data_manager = DataManagerService(new_key, app_data_dir)
-        new_data_manager.save_servers(current_servers, new_file_path)
+        old_key = data_manager.secret_key
+        for provider in dns['providers']:
+            for field in dns_registry.SECRET_FIELDS:
+                if provider.get(field):
+                    provider[field] = new_data_manager.re_encrypt_password(provider[field], old_key, new_key)
+        new_data_manager.save_servers(current_servers, new_file_path,
+                                      dns={} if dns_registry.is_empty(dns) else dns)
         
         # Обновляем конфигурацию приложения
         current_app.config['active_data_file'] = new_file_path
@@ -786,11 +793,7 @@ def import_external_data():
             
             fernet_external = Fernet(external_key.encode())
             decrypted_data = fernet_external.decrypt(encrypted_data)
-            servers_data = json.loads(decrypted_data.decode('utf-8'))
-            
-            # Проверяем структуру данных
-            if not isinstance(servers_data, list):
-                raise ValueError("Неверная структура данных")
+            servers_data, external_dns = data_manager.split_payload(json.loads(decrypted_data.decode('utf-8')))
             
             # Загружаем текущие серверы
             current_servers = data_manager.load_servers(current_app.config)
@@ -858,7 +861,11 @@ def import_external_data():
             os.makedirs(data_dir, exist_ok=True)
             
             file_path = os.path.join(data_dir, filename)
-            data_manager.save_servers(merged_servers, file_path)
+            merged_dns, dns_added = dns_registry.merge(
+                data_manager.load_dns(current_app.config), external_dns,
+                lambda value: data_manager.re_encrypt_password(value, external_key, our_secret_key))
+            data_manager.save_servers(merged_servers, file_path,
+                                      dns={} if dns_registry.is_empty(merged_dns) else merged_dns)
             
             # Обновляем конфигурацию
             current_app.config['active_data_file'] = file_path
@@ -882,8 +889,10 @@ def import_external_data():
                 if skipped_count > 0:
                     message += f' Пропущено {skipped_count} дублирующихся серверов.'
                 flash(_(message), 'success')
-            else:
+            elif not dns_added:
                 flash(_('Все сервера из импортируемого файла уже существуют в вашем списке.'), 'info')
+            if dns_added:
+                flash(_('Импортировано доменов DNS: %(count)s', count=dns_added), 'success')
             
         except InvalidToken:
             flash(_('Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа.'), 'danger')

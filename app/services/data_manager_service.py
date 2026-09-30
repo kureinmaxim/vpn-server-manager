@@ -280,14 +280,7 @@ class DataManagerService:
             return []
 
         try:
-            with open(active_file, 'rb') as f:
-                encrypted_data = f.read()
-
-            if not encrypted_data:
-                return []
-
-            decrypted_data = self.fernet.decrypt(encrypted_data)
-            servers = json.loads(decrypted_data.decode('utf-8'))
+            servers, _ = self.read_payload(active_file)
             
             # Нормализуем каждый сервер
             if isinstance(servers, list):
@@ -331,6 +324,40 @@ class DataManagerService:
             return []
 
     @staticmethod
+    def split_payload(data: Any):
+        """Разделяет содержимое файла на (серверы, DNS-реестр).
+
+        Старый формат — JSON-список серверов; новый — {"servers": [...], "dns": {...}}.
+        """
+        if isinstance(data, dict) and isinstance(data.get('servers'), list):
+            dns = data.get('dns')
+            return data['servers'], dns if isinstance(dns, dict) else {}
+        if isinstance(data, list):
+            return data, {}
+        raise ValueError("Invalid data structure")
+
+    def read_payload(self, file_path: str, fernet: Optional[Fernet] = None):
+        """Читает зашифрованный файл и возвращает (серверы, DNS-реестр) без нормализации."""
+        with open(file_path, 'rb') as f:
+            encrypted_data = f.read()
+        if not encrypted_data:
+            return [], {}
+        decrypted = (fernet or self.fernet).decrypt(encrypted_data)
+        return self.split_payload(json.loads(decrypted.decode('utf-8')))
+
+    def load_dns(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """Возвращает DNS-реестр активного файла (секреты остаются зашифрованными)."""
+        active_file = self.get_active_data_path(config)
+        if not active_file or not os.path.exists(active_file):
+            return {}
+        return self.read_payload(active_file)[1]
+
+    def save_dns(self, dns: Dict[str, Any], file_path: str) -> None:
+        """Сохраняет DNS-реестр, сохраняя серверы файла без изменений."""
+        servers = self.read_payload(file_path)[0] if os.path.exists(file_path) else []
+        self.save_servers(servers, file_path, dns=dns)
+
+    @staticmethod
     def _strip_runtime_secrets(servers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Убирает plaintext *_decrypted поля перед записью в файл."""
         cleaned = copy.deepcopy(servers)
@@ -344,14 +371,21 @@ class DataManagerService:
                         creds.pop(key, None)
         return cleaned
     
-    def save_servers(self, servers: List[Dict[str, Any]], file_path: str) -> None:
+    def save_servers(self, servers: List[Dict[str, Any]], file_path: str,
+                     dns: Optional[Dict[str, Any]] = None) -> None:
         """
         Сохраняет серверы в зашифрованный файл.
         
         Args:
             servers: Список серверов для сохранения
             file_path: Путь к файлу для сохранения
+            dns: DNS-реестр; None — сохранить реестр, уже записанный в file_path
         """
+        if dns is None:
+            try:
+                dns = self.read_payload(file_path)[1] if os.path.exists(file_path) else {}
+            except (InvalidToken, ValueError):
+                dns = {}
         # Создаем директорию если нужно
         parent = os.path.dirname(file_path)
         if parent:
@@ -359,9 +393,11 @@ class DataManagerService:
 
         # Не храним plaintext-поля внутри зашифрованного JSON
         servers_to_store = self._strip_runtime_secrets(servers)
+        # Без DNS-данных пишем прежний формат-список, совместимый со старыми версиями
+        payload = {'servers': servers_to_store, 'dns': dns} if dns else servers_to_store
         
         # Шифруем данные
-        json_string = json.dumps(servers_to_store, ensure_ascii=False, indent=2)
+        json_string = json.dumps(payload, ensure_ascii=False, indent=2)
         encrypted_data = self.fernet.encrypt(json_string.encode('utf-8'))
         
         # Сохраняем
@@ -409,9 +445,10 @@ class DataManagerService:
         try:
             test_fernet = Fernet(test_key.encode())
             decrypted_data = test_fernet.decrypt(file_content).decode()
-            data = json.loads(decrypted_data)
+            data, dns = self.split_payload(json.loads(decrypted_data))
             
             result['success'] = True
+            result['dns_domain_count'] = len(dns.get('domains') or [])
             result['data'] = data
             
             # Анализируем содержимое

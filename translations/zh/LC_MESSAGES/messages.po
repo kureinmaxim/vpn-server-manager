@@ -6929,3 +6929,299 @@ msgstr "已复制"
 #: app/routes/net_tools.py
 msgid "dig запрашивает DNS-записи, а не проверяет доступность хоста. Без @ используется настроенный DNS-сервер; @1.1.1.1 выбирает Cloudflare, а +short сокращает вывод. На Windows можно запустить dig в WSL, если он установлен, или использовать Resolve-DnsName в PowerShell. Для проверки доступности используйте Ping или Test-Connection."
 msgstr "dig 查询 DNS 记录，并不检查主机是否可达。不指定 @ 时使用已配置的 DNS 服务器；@1.1.1.1 指定 Cloudflare，+short 精简输出。在 Windows 上，可在 WSL 中运行已安装的 dig，或在 PowerShell 中使用 Resolve-DnsName。要检查连通性，请使用 Ping 或 Test-Connection。"
+
+#: app/routes/dns.py templates/dns
+msgid "Введите корректное доменное имя, например example.com."
+msgstr "请输入有效的域名，例如 example.com。"
+
+#: app/routes/dns.py templates/dns
+msgid "Адрес должен начинаться с http:// или https://."
+msgstr "地址必须以 http:// 或 https:// 开头。"
+
+#: app/routes/dns.py templates/dns
+msgid "Укажите дату в формате ГГГГ-ММ-ДД."
+msgstr "请按 YYYY-MM-DD 格式输入日期。"
+
+#: app/routes/dns.py templates/dns
+msgid "Укажите название провайдера."
+msgstr "请输入服务商名称。"
+
+#: app/routes/dns.py templates/dns
+msgid "Выбранный DNS-провайдер не найден."
+msgstr "未找到所选的 DNS 服务商。"
+
+#: app/routes/dns.py templates/dns
+msgid "Проверьте значение записи: для A нужен IPv4, для AAAA — IPv6."
+msgstr "请检查记录值：A 记录需要 IPv4，AAAA 记录需要 IPv6。"
+
+#: app/routes/dns.py templates/dns
+msgid "Такой домен уже есть в списке."
+msgstr "该域名已在列表中。"
+
+#: app/routes/dns.py templates/dns
+msgid "Нет активного файла данных. Добавьте сервер или импортируйте файл данных."
+msgstr "没有活动的数据文件。请添加服务器或导入数据文件。"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-провайдер сохранён."
+msgstr "DNS 服务商已保存。"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-провайдер удалён."
+msgstr "DNS 服务商已删除。"
+
+#: app/routes/dns.py templates/dns
+msgid "Домен сохранён."
+msgstr "域名已保存。"
+
+#: app/routes/dns.py templates/dns
+msgid "Домен удалён."
+msgstr "域名已删除。"
+
+#: app/routes/dns.py templates/dns
+msgid "Запись сохранена."
+msgstr "记录已保存。"
+
+#: app/routes/dns.py templates/dns
+msgid "Запись удалена."
+msgstr "记录已删除。"
+
+#: app/routes/dns.py templates/dns
+msgid "Импортировано доменов DNS: %(count)s"
+msgstr "已导入 DNS 域名：%(count)s"
+
+#: app/routes/dns.py templates/dns
+msgid "Домены и DNS-провайдеры"
+msgstr "域名和 DNS 服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Домены из карточки DNS"
+msgstr "DNS 卡片中的域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Выбрать домен из карточки DNS…"
+msgstr "从 DNS 卡片中选择域名…"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавьте домены в карточку DNS, чтобы выбирать их из списка."
+msgstr "将域名添加到 DNS 卡片后即可从列表中选择。"
+
+#: app/routes/dns.py templates/dns
+msgid "Истёк %(days)s дн. назад"
+msgstr "已过期 %(days)s 天"
+
+#: app/routes/dns.py templates/dns
+msgid "%(days)s дн."
+msgstr "%(days)s 天"
+
+#: app/routes/dns.py templates/dns
+msgid "Удалить домен %(name)s со всеми записями?"
+msgstr "删除域名 %(name)s 及其全部记录？"
+
+#: app/routes/dns.py templates/dns
+msgid "Регистрация"
+msgstr "注册信息"
+
+#: app/routes/dns.py templates/dns
+msgid "Регистратор"
+msgstr "注册商"
+
+#: app/routes/dns.py templates/dns
+msgid "Дата регистрации"
+msgstr "注册日期"
+
+#: app/routes/dns.py templates/dns
+msgid "Действует до"
+msgstr "到期日期"
+
+#: app/routes/dns.py templates/dns
+msgid "Автопродление"
+msgstr "自动续费"
+
+#: app/routes/dns.py templates/dns
+msgid "Да"
+msgstr "是"
+
+#: app/routes/dns.py templates/dns
+msgid "Нет"
+msgstr "否"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-провайдер"
+msgstr "DNS 服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Войти в панель"
+msgstr "登录控制台"
+
+#: app/routes/dns.py templates/dns
+msgid "Не выбран. Укажите провайдера в настройках домена."
+msgstr "未选择。请在域名设置中指定服务商。"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-записи и поддомены"
+msgstr "DNS 记录和子域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Имя"
+msgstr "名称"
+
+#: app/routes/dns.py templates/dns
+msgid "Тип"
+msgstr "类型"
+
+#: app/routes/dns.py templates/dns
+msgid "Значение"
+msgstr "值"
+
+#: app/routes/dns.py templates/dns
+msgid "Проксируется"
+msgstr "已代理"
+
+#: app/routes/dns.py templates/dns
+msgid "Только DNS"
+msgstr "仅 DNS"
+
+#: app/routes/dns.py templates/dns
+msgid "Удалить запись %(name)s?"
+msgstr "删除记录 %(name)s？"
+
+#: app/routes/dns.py templates/dns
+msgid "Записей пока нет. Добавьте корневую запись (@) и поддомены, например vpn или www."
+msgstr "暂无记录。请添加根记录 (@) 和子域名，例如 vpn 或 www。"
+
+#: app/routes/dns.py templates/dns
+msgid "Редактировать запись"
+msgstr "编辑记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Новая запись"
+msgstr "新建记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Проксировать (Cloudflare)"
+msgstr "代理 (Cloudflare)"
+
+#: app/routes/dns.py templates/dns
+msgid "Заметка"
+msgstr "备注"
+
+#: app/routes/dns.py templates/dns
+msgid "Например, какой сервер или сервис"
+msgstr "例如对应的服务器或服务"
+
+#: app/routes/dns.py templates/dns
+msgid "Сохранить запись"
+msgstr "保存记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавить запись"
+msgstr "添加记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Домен"
+msgstr "域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Редактировать DNS-провайдера"
+msgstr "编辑 DNS 服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Новый DNS-провайдер"
+msgstr "新建 DNS 服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Редактировать домен"
+msgstr "编辑域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Новый домен"
+msgstr "新建域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Название"
+msgstr "名称"
+
+#: app/routes/dns.py templates/dns
+msgid "Например, Cloudflare (личный)"
+msgstr "例如 Cloudflare（个人）"
+
+#: app/routes/dns.py templates/dns
+msgid "Страница входа"
+msgstr "登录页面"
+
+#: app/routes/dns.py templates/dns
+msgid "Пусто — адрес по умолчанию для выбранного типа."
+msgstr "留空则使用所选类型的默认地址。"
+
+#: app/routes/dns.py templates/dns
+msgid "Текущий логин"
+msgstr "当前登录名"
+
+#: app/routes/dns.py templates/dns
+msgid "Логин / email"
+msgstr "登录名 / 邮箱"
+
+#: app/routes/dns.py templates/dns
+msgid "Текущий пароль"
+msgstr "当前密码"
+
+#: app/routes/dns.py templates/dns
+msgid "Например, способ 2FA или владелец аккаунта"
+msgstr "例如双重验证方式或账户所有者"
+
+#: app/routes/dns.py templates/dns
+msgid "Доменное имя"
+msgstr "域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Не выбран"
+msgstr "未选择"
+
+#: app/routes/dns.py templates/dns
+msgid "Регистратор (кто выдал домен)"
+msgstr "注册商（域名签发方）"
+
+#: app/routes/dns.py templates/dns
+msgid "Кабинет регистратора"
+msgstr "注册商账户"
+
+#: app/routes/dns.py templates/dns
+msgid "Учётные записи DNS-провайдеров, домены, регистраторы, сроки действия и поддомены. Данные хранятся в зашифрованном файле вместе с серверами и попадают в экспорт."
+msgstr "DNS 服务商账户、域名、注册商、到期日期和子域名。数据与服务器一起保存在加密文件中，并包含在导出中。"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-провайдеры"
+msgstr "DNS 服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавить провайдера"
+msgstr "添加服务商"
+
+#: app/routes/dns.py templates/dns
+msgid "Доменов: %(count)s"
+msgstr "域名：%(count)s"
+
+#: app/routes/dns.py templates/dns
+msgid "Удалить провайдера %(name)s? Домены останутся без привязки."
+msgstr "删除服务商 %(name)s？其域名将保留但不再关联。"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавьте учётную запись Cloudflare или другого DNS-провайдера: логин и пароль будут зашифрованы, а кнопка «Войти в панель» откроет страницу входа."
+msgstr "添加 Cloudflare 或其他 DNS 服务商账户：登录名和密码将被加密，“登录控制台”按钮会打开登录页面。"
+
+#: app/routes/dns.py templates/dns
+msgid "Домены"
+msgstr "域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавить домен"
+msgstr "添加域名"
+
+#: app/routes/dns.py templates/dns
+msgid "Записей"
+msgstr "记录数"
+
+#: app/routes/dns.py templates/dns
+msgid "Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода."
+msgstr "暂无域名。添加的域名和子域名可在 Net Tools 中直接选择，无需手动输入。"
