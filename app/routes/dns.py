@@ -77,6 +77,7 @@ def index():
     providers = {p['id']: _decrypted(p) for p in dns['providers']}
     domains = sorted(dns['domains'], key=lambda d: d['name'])
     return render_template('dns/index.html', providers=list(providers.values()), provider_map=providers,
+                           main_count=lambda d: sum(dns_reg.role(r) == 'main' for r in d['records']),
                            domains=domains, days_left=dns_reg.days_left, presets=dns_reg.PRESETS)
 
 
@@ -163,7 +164,10 @@ def domain(domain_id):
     provider = dns_reg.find(dns['providers'], item.get('provider_id'))
     records = sorted(item['records'], key=lambda r: (r['name'] != '@', r['name'], r['type']))
     edit = dns_reg.find(item['records'], request.args.get('edit'))
+    main = [r for r in records if dns_reg.role(r) == 'main']
+    service = [r for r in records if dns_reg.role(r) == 'service']
     return render_template('dns/domain.html', domain=item, records=records, edit=edit,
+                           main_records=main, service_records=service, scope=dns_reg.address_scope,
                            provider=_decrypted(provider) if provider else None,
                            days_left=dns_reg.days_left(item), fqdn=dns_reg.record_fqdn,
                            record_types=dns_reg.RECORD_TYPES)
@@ -191,6 +195,20 @@ def record_save(domain_id, record_id=None):
     return redirect(url_for('dns.domain', domain_id=domain_id) + '#records')
 
 
+@dns_bp.post('/domains/<domain_id>/records/<record_id>/role')
+@csrf_protect
+def record_role(domain_id, record_id):
+    """Moves a record between main and service groups; returning to its automatic group resets it."""
+    dns = _load()
+    record = dns_reg.find(_domain_or_404(dns, domain_id)['records'], record_id)
+    if record is None:
+        abort(404)
+    target = 'service' if dns_reg.role(record) == 'main' else 'main'
+    record['role'] = 'auto' if dns_reg.auto_role(record) == target else target
+    _save(dns)
+    return redirect(url_for('dns.domain', domain_id=domain_id) + '#records')
+
+
 @dns_bp.post('/domains/<domain_id>/records/<record_id>/delete')
 @csrf_protect
 def record_delete(domain_id, record_id):
@@ -203,3 +221,37 @@ def record_delete(domain_id, record_id):
     _save(dns)
     flash(_('Запись удалена.'), 'success')
     return redirect(url_for('dns.domain', domain_id=domain_id) + '#records')
+
+
+def _servers():
+    return [s for s in _manager().load_servers(current_app.config) if s.get('ip_address')]
+
+
+@dns_bp.route('/move/<server_id>', methods=['GET', 'POST'])
+@csrf_protect
+def move(server_id):
+    """Helps move DNS records from a server that is being retired to another server."""
+    servers = _servers()
+    source = next((s for s in servers if str(s.get('id')) == server_id), None)
+    if source is None:
+        abort(404)
+    dns = _load()
+    targets = [s for s in servers if s is not source and s['ip_address'] != source['ip_address']]
+    target_id = request.values.get('to', '')
+    target = next((s for s in targets if str(s.get('id')) == target_id), None)
+    if request.method == 'POST' and target:
+        try:
+            changed = dns_reg.move_records(dns, source['ip_address'], target['ip_address'],
+                                           set(request.form.getlist('record')))
+        except ValueError:
+            changed = 0
+            flash(_('У нового сервера некорректный IP-адрес.'), 'danger')
+        if changed:
+            _save(dns)
+            flash(_('Записей перенесено в карточке DNS: %(count)s. Проверьте, что они изменены и у DNS-провайдера.',
+                    count=changed), 'success')
+            return redirect(url_for('dns.move', server_id=target['id']))
+    providers = {p['id']: p for p in dns['providers']}
+    return render_template('dns/move.html', source=source, target=target, targets=targets,
+                           items=dns_reg.records_for_ip(dns, source['ip_address']), providers=providers,
+                           role=dns_reg.role)

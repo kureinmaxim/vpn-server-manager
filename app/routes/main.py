@@ -139,7 +139,14 @@ def index():
             'ip2location_demo': current_app.config.get('IP2LOCATION_DEMO', 'https://www.ip2location.com/demo')
         }
         
-        return render_template('index.html', servers=servers, service_urls=service_urls)
+        dns_links = {}
+        if data_manager:
+            try:
+                dns = data_manager.load_dns(current_app.config)
+                dns_links = {s['id']: dns_registry.records_for_ip(dns, s.get('ip_address')) for s in servers}
+            except Exception as e:
+                logger.warning(f"Could not load DNS records: {e}")
+        return render_template('index.html', servers=servers, service_urls=service_urls, dns_links=dns_links)
     except Exception as e:
         logger.error(f"Error loading main page: {str(e)}")
         flash(_('Error loading servers'), 'error')

@@ -69,7 +69,7 @@
                 <td>{{ provider_map[domain.provider_id].name if domain.provider_id in provider_map else '—' }}</td>
                 <td>{{ domain.registrar or '—' }}</td>
                 <td>{{ expiry_badge(domain, days_left(domain)) }}</td>
-                <td>{{ domain.records|length }}</td>
+                <td>{{ main_count(domain) }} <span class="text-body-secondary small">/ {{ domain.records|length }}</span></td>
             </tr>
             {% endfor %}
             </tbody>

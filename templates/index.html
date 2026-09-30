@@ -83,6 +83,7 @@
     <p class="small text-muted mb-2">{{ _('Перетащите за ручку. Двойной клик: из архива в активные, ещё раз — карточка на всю ширину. Повторный двойной клик сворачивает.') }}</p>
     <div class="row g-2" id="server-board">
         {% for server in servers %}
+        {% set dns_items = dns_links.get(server.id, []) if dns_links is defined else [] %}
         <div class="col-sm-6 col-lg-4 col-xl-3 server-board-item" data-server-id="{{ server.id }}">
             <div class="card server-preview-card h-100{% if server.get('archived') %} is-archived{% endif %}">
                 <div class="server-card-compact">
@@ -104,6 +105,7 @@
                             <div class="fw-semibold text-truncate lh-sm">{{ server.name }}</div>
                             <div class="small text-truncate lh-sm">{{ server.ip_address }}{% if server.provider %} · {{ server.provider }}{% endif %}</div>
                         </div>
+                        {% set extra = '' %}{% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0{{ extra }}" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
                         <button type="button"
                                 class="btn btn-sm p-0 border-0 bg-transparent js-archive-toggle flex-shrink-0"
                                 data-server-id="{{ server.id }}"
@@ -151,6 +153,7 @@
                             <i class="bi {{ server.os_icon }} me-2" style="font-size: 32px;"></i>
                         {% endif %}
                         {{ server.name }}
+                        {% set extra = ' ms-auto fs-6' %}{% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0{{ extra }}" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
                     </h5>
                     <div class="d-flex justify-content-between align-items-center js-server-subtitle" data-ip="{{ server.ip_address }}">
                         <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
@@ -329,6 +332,32 @@
                                         <a href="{{ server.panel_url }}" target="_blank" class="btn btn-sm btn-outline-primary">{{ _('Перейти в панель') }}</a>
                                     </div>
                                     {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if dns_items %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-dns-{{ server.id }}">
+                                    <i class="bi bi-cloud-fill me-2 dns-proxied" aria-hidden="true"></i>{{ _('DNS-записи') }}
+                                    <span class="badge rounded-pill ms-2 dns-count">{{ dns_items|length }}</span>
+                                </button>
+                            </h2>
+                            <div id="collapse-dns-{{ server.id }}" class="accordion-collapse collapse" data-bs-parent="#accordion-{{ server.id }}">
+                                <div class="accordion-body py-2">
+                                    <p class="small text-body-secondary mb-2">{{ _('Эти имена указывают на IP сервера. При смене VPS их нужно перенаправить.') }}</p>
+                                    <ul class="list-unstyled small mb-2">
+                                        {% for item in dns_items %}
+                                        <li class="d-flex justify-content-between gap-2 font-monospace">
+                                            <a class="text-break" href="{{ url_for('dns.domain', domain_id=item.domain.id) }}#records">{{ item.fqdn }}</a>
+                                            <span class="text-body-secondary text-nowrap">{% if item.via %}→ {{ item.via }}{% else %}{{ item.record.type }}{% if item.record.proxied %} <i class="bi bi-cloud-fill dns-proxied" title="{{ _('Проксируется') }}"></i>{% endif %}{% endif %}</span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('dns.move', server_id=server.id) }}" class="btn btn-sm btn-dns"><i class="bi bi-arrow-left-right" aria-hidden="true"></i> {{ _('Перенести на другой VPS') }}</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

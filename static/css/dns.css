@@ -19,3 +19,13 @@
 .dns-proxied { color: var(--dns-orange); }
 .dns-form { max-width: 760px; }
 @media (max-width: 575.98px) { .dns-section-head { flex-wrap: wrap; } }
+.dns-sort { all: unset; cursor: pointer; font-weight: inherit; }
+.dns-sort:focus-visible { outline: 2px solid var(--dns-orange); outline-offset: 2px; }
+.dns-sort::after { content: '\2195'; margin-left: .3rem; opacity: .35; font-size: .8em; }
+th[aria-sort="ascending"] .dns-sort::after { content: '\2191'; opacity: 1; }
+th[aria-sort="descending"] .dns-sort::after { content: '\2193'; opacity: 1; }
+.dns-service { border: 1px solid var(--bs-border-color); border-radius: .75rem; padding: .75rem 1rem; }
+.dns-service > summary { cursor: pointer; font-weight: 600; }
+.dns-count { background: var(--dns-orange); color: #fff; }
+.dns-move-table td { vertical-align: middle; }
+.dns-arrow { color: var(--dns-orange); }

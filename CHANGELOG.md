@@ -2,6 +2,15 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.7.0] - 2026-09-30
+
+### Added
+- DNS records are split into **main** and **service** groups. Mail, cPanel, domain-verification and SPF/DKIM/DMARC records (MX, TXT, SRV, underscore names, cPanel hosts) are service records and collapsed by default; any record can be moved between groups manually.
+- Record tables sort by name, type or value; private and Tailscale/Headscale (100.64.0.0/10) addresses are marked.
+- Server cards show an orange DNS badge and a **DNS records** section listing names that point to the server IP, including CNAMEs that follow them.
+- **Move to another VPS** helper: choose the new server, see each record as old IP → new IP with copy buttons and the provider link, then update the selected records in the DNS card.
+- Net Tools suggests only main records; the domain list shows main / total record counts.
+
 ## [4.6.1] - 2026-09-30
 
 ### Fixed

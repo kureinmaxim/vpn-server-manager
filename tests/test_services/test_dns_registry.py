@@ -109,3 +109,42 @@ def test_merge_reencrypts_and_remaps_providers():
     assert porkbun['password'] == 'new-old' and porkbun['id'] != 'x2'
     by_name = {d['name']: d for d in merged['domains']}
     assert by_name['b.com']['provider_id'] == 'p1' and by_name['c.com']['provider_id'] == porkbun['id']
+
+
+@pytest.mark.parametrize('name,rtype,expected', [
+    ('@', 'A', 'main'), ('vpn', 'A', 'main'), ('www', 'CNAME', 'main'), ('headscale', 'A', 'main'),
+    ('@', 'MX', 'service'), ('@', 'TXT', 'service'), ('_dmarc', 'TXT', 'service'),
+    ('_domainconnect', 'CNAME', 'service'), ('default._domainkey', 'TXT', 'service'),
+    ('_caldav._tcp', 'SRV', 'service'), ('webmail', 'A', 'service'), ('cpcontacts', 'A', 'service'),
+    ('mail', 'CNAME', 'service'),
+])
+def test_auto_role(name, rtype, expected):
+    assert dns_reg.role({'name': name, 'type': rtype}) == expected
+
+
+def test_manual_role_overrides_and_hides_from_host_choices():
+    domain = {'name': 'example.com'}
+    record = dns_reg.build_record({'name': 'ftp', 'type': 'A', 'content': '1.2.3.4', 'role': 'main'}, domain)
+    assert dns_reg.role(record) == 'main'
+    hidden = dns_reg.build_record({'name': 'nas', 'type': 'A', 'content': '100.64.0.12', 'role': 'service'}, domain)
+    dns = {'domains': [dict(domain, id='d', records=[record, hidden])]}
+    assert dns_reg.host_choices(dns) == ['example.com', 'ftp.example.com']
+    assert dns_reg.address_scope(hidden) == 'private' and dns_reg.address_scope(record) == ''
+    assert dns_reg.build_record({'type': 'A', 'content': '1.2.3.4'}, domain, record)['role'] == 'main'
+
+
+def test_records_for_ip_and_move():
+    domain = {'id': 'd', 'name': 'kurein.me', 'records': []}
+    for name, rtype, content in [('@', 'A', '138.124.71.73'), ('vpn', 'A', '138.124.71.73'),
+                                 ('hip', 'A', '192.0.2.1'), ('www', 'CNAME', 'kurein.me'),
+                                 ('_dmarc', 'TXT', '138.124.71.73')]:
+        domain['records'].append(dns_reg.build_record({'name': name, 'type': rtype, 'content': content}, domain))
+    dns = {'domains': [domain]}
+    items = dns_reg.records_for_ip(dns, '138.124.71.73')
+    assert [(i['fqdn'], i['via']) for i in items] == [
+        ('kurein.me', None), ('vpn.kurein.me', None), ('www.kurein.me', 'kurein.me')]
+    vpn = next(i['record'] for i in items if i['fqdn'] == 'vpn.kurein.me')
+    assert dns_reg.move_records(dns, '138.124.71.73', '203.0.113.9', {vpn['id']}) == 1
+    assert vpn['content'] == '203.0.113.9'
+    assert dns_reg.move_records(dns, '138.124.71.73', '2001:db8::1', {i['record']['id'] for i in items}) == 0
+    assert dns_reg.records_for_ip(dns, '') == []

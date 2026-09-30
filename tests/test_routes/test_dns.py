@@ -11,7 +11,8 @@ from app.services.data_manager_service import DataManagerService
 def unlocked(app, client, tmp_path):
     manager = DataManagerService(Fernet.generate_key().decode(), str(tmp_path))
     path = tmp_path / 'servers.enc'
-    manager.save_servers([{'id': 1, 'name': 'vps'}], str(path))
+    manager.save_servers([{'id': 1, 'name': 'vps', 'ip_address': '138.124.71.73'},
+                          {'id': 2, 'name': 'new', 'ip_address': '203.0.113.9'}], str(path))
     registry.register('data_manager', manager)
     app.config['active_data_file'] = str(path)
     with client.session_transaction() as session:
@@ -88,3 +89,49 @@ def test_pages_localized(unlocked, lang):
         section = text.split('<div class="container dns-page')[1].split('</main>')[0]
         # Flash messages from the POSTs above are also localized
         assert not re.search('[А-Яа-яЁё]', section), url
+
+
+def test_service_records_are_grouped_and_toggle(unlocked):
+    post(unlocked, '/dns/domains/new', name='example.com')
+    domain_id = dns(unlocked)['domains'][0]['id']
+    post(unlocked, f'/dns/domains/{domain_id}/records', name='vpn', type='A', content='203.0.113.5')
+    post(unlocked, f'/dns/domains/{domain_id}/records', name='webmail', type='A', content='203.0.113.5')
+    page = unlocked.get(f'/dns/domains/{domain_id}').text
+    main, service = page.split('class="dns-service')
+    assert 'vpn.example.com' in main and 'webmail.example.com' not in main and 'webmail.example.com' in service
+
+    webmail = next(r for r in dns(unlocked)['domains'][0]['records'] if r['name'] == 'webmail')
+    post(unlocked, f"/dns/domains/{domain_id}/records/{webmail['id']}/role")
+    assert next(r for r in dns(unlocked)['domains'][0]['records'] if r['name'] == 'webmail')['role'] == 'main'
+    assert 'webmail.example.com' in unlocked.get('/net-tools/port').text
+    post(unlocked, f"/dns/domains/{domain_id}/records/{webmail['id']}/role")
+    assert next(r for r in dns(unlocked)['domains'][0]['records'] if r['name'] == 'webmail')['role'] == 'auto'
+
+
+def test_server_card_lists_dns_and_moves_records(unlocked):
+    post(unlocked, '/dns/domains/new', name='kurein.me')
+    domain_id = dns(unlocked)['domains'][0]['id']
+    for name, rtype, content in [('@', 'A', '138.124.71.73'), ('vpn', 'A', '138.124.71.73'), ('www', 'CNAME', 'kurein.me')]:
+        post(unlocked, f'/dns/domains/{domain_id}/records', name=name, type=rtype, content=content)
+    index = unlocked.get('/').text
+    assert 'collapse-dns-1' in index and 'vpn.kurein.me' in index and 'collapse-dns-2' not in index
+
+    page = unlocked.get('/dns/move/1?to=2').text
+    assert '203.0.113.9' in page and 'www.kurein.me' in page
+    vpn = next(r for r in dns(unlocked)['domains'][0]['records'] if r['name'] == 'vpn')
+    response = unlocked.post('/dns/move/1', data={'csrf_token': 'token', 'to': '2', 'record': [vpn['id']]})
+    assert response.status_code == 302 and response.headers['Location'].endswith('/dns/move/2')
+    contents = {r['name']: r['content'] for r in dns(unlocked)['domains'][0]['records']}
+    assert contents == {'@': '138.124.71.73', 'vpn': '203.0.113.9', 'www': 'kurein.me'}
+    assert unlocked.get('/dns/move/99').status_code == 404
+
+
+@pytest.mark.parametrize('lang', ['en', 'zh'])
+def test_move_page_localized(unlocked, lang):
+    unlocked.get('/?lang=' + lang)
+    post(unlocked, '/dns/domains/new', name='kurein.me')
+    domain_id = dns(unlocked)['domains'][0]['id']
+    post(unlocked, f'/dns/domains/{domain_id}/records', name='vpn', type='A', content='138.124.71.73')
+    text = unlocked.get('/dns/move/1?to=2').text
+    section = text.split('<div class="container dns-page')[1].split('</main>')[0]
+    assert not re.search('[А-Яа-яЁё]', section)

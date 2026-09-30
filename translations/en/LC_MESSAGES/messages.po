@@ -7557,3 +7557,143 @@ msgstr "Records"
 #: app/routes/dns.py templates/dns
 msgid "Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода."
 msgstr "No domains yet. Added domains and subdomains can be chosen in Net Tools instead of typing them."
+
+#: app/routes/dns.py templates/dns
+msgid "Частный адрес: локальная сеть или Tailscale/Headscale"
+msgstr "Private address: local network or Tailscale/Headscale"
+
+#: app/routes/dns.py templates/dns
+msgid "частный"
+msgstr "private"
+
+#: app/routes/dns.py templates/dns
+msgid "В основные"
+msgstr "Move to main"
+
+#: app/routes/dns.py templates/dns
+msgid "В служебные"
+msgstr "Move to service"
+
+#: app/routes/dns.py templates/dns
+msgid "Все записи служебные. Стрелкой вверх можно перенести нужные в основные."
+msgstr "All records are service records. Use the up arrow to move the ones you need to main."
+
+#: app/routes/dns.py templates/dns
+msgid "Служебные записи"
+msgstr "Service records"
+
+#: app/routes/dns.py templates/dns
+msgid "почта, cPanel, проверки домена, SPF/DKIM/DMARC"
+msgstr "mail, cPanel, domain verification, SPF/DKIM/DMARC"
+
+#: app/routes/dns.py templates/dns
+msgid "Автоматически"
+msgstr "Automatic"
+
+#: app/routes/dns.py templates/dns
+msgid "Основная"
+msgstr "Main"
+
+#: app/routes/dns.py templates/dns
+msgid "Служебная"
+msgstr "Service"
+
+#: app/routes/dns.py templates/dns
+msgid "У нового сервера некорректный IP-адрес."
+msgstr "The new server has an invalid IP address."
+
+#: app/routes/dns.py templates/dns
+msgid "Записей перенесено в карточке DNS: %(count)s. Проверьте, что они изменены и у DNS-провайдера."
+msgstr "Records moved in the DNS card: %(count)s. Make sure they are also changed at the DNS provider."
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-записи"
+msgstr "DNS records"
+
+#: app/routes/dns.py templates/dns
+msgid "Эти имена указывают на IP сервера. При смене VPS их нужно перенаправить."
+msgstr "These names point to the server IP. Redirect them when you replace the VPS."
+
+#: app/routes/dns.py templates/dns
+msgid "Перенести на другой VPS"
+msgstr "Move to another VPS"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос DNS-записей"
+msgstr "Move DNS records"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос"
+msgstr "Move"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос DNS-записей на другой VPS"
+msgstr "Move DNS records to another VPS"
+
+#: app/routes/dns.py templates/dns
+msgid "Сервер"
+msgstr "Server"
+
+#: app/routes/dns.py templates/dns
+msgid "На IP этого сервера не указывает ни одна запись из карточки DNS."
+msgstr "No record in the DNS card points to this server IP."
+
+#: app/routes/dns.py templates/dns
+msgid "Добавьте новый сервер в список, чтобы выбрать его для переноса."
+msgstr "Add the new server to the list to choose it as the target."
+
+#: app/routes/dns.py templates/dns
+msgid "Новый сервер"
+msgstr "New server"
+
+#: app/routes/dns.py templates/dns
+msgid "Выберите сервер…"
+msgstr "Choose a server…"
+
+#: app/routes/dns.py templates/dns
+msgid "Показать"
+msgstr "Show"
+
+#: app/routes/dns.py templates/dns
+msgid "Записи, указывающие на этот сервер"
+msgstr "Records pointing to this server"
+
+#: app/routes/dns.py templates/dns
+msgid "Измените отмеченные записи у DNS-провайдера: замените %(old)s на %(new)s. Кнопки копируют имя и новый адрес."
+msgstr "Change the selected records at the DNS provider: replace %(old)s with %(new)s. The buttons copy the name and the new address."
+
+#: app/routes/dns.py templates/dns
+msgid "Убедитесь, что на новом сервере уже работают сервисы, иначе они станут недоступны."
+msgstr "Make sure the services already run on the new server, otherwise they become unavailable."
+
+#: app/routes/dns.py templates/dns
+msgid "Нажмите «Сохранить в карточке DNS», чтобы записи в приложении совпадали с провайдером."
+msgstr "Click “Save to DNS card” so the app matches the provider."
+
+#: app/routes/dns.py templates/dns
+msgid "Перенести"
+msgstr "Move"
+
+#: app/routes/dns.py templates/dns
+msgid "служебная"
+msgstr "service"
+
+#: app/routes/dns.py templates/dns
+msgid "Копировать имя"
+msgstr "Copy name"
+
+#: app/routes/dns.py templates/dns
+msgid "Копировать новый IP"
+msgstr "Copy new IP"
+
+#: app/routes/dns.py templates/dns
+msgid "Указывает на %(name)s — перейдёт автоматически."
+msgstr "Points to %(name)s and follows it automatically."
+
+#: app/routes/dns.py templates/dns
+msgid "Сохранить в карточке DNS"
+msgstr "Save to DNS card"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-записей указывает на этот сервер: %(count)s. Открыть перенос."
+msgstr "DNS records pointing to this server: %(count)s. Open the move helper."
