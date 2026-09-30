@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}{{ _('Перенос DNS-записей') }} · {{ source.name }}{% endblock %}
+{% block content %}
+<div class="container dns-page my-4">
+    {% include "dns/_head.html" %}
+    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
+        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.index') }}">DNS</a>
+        <span aria-hidden="true" class="mx-2">/</span><span>{{ _('Перенос') }}</span>
+    </nav>
+    <header class="mb-4">
+        <h1 class="h3"><i class="bi bi-arrow-left-right me-2" aria-hidden="true"></i>{{ _('Перенос DNS-записей на другой VPS') }}</h1>
+        <p class="text-body-secondary mb-0">{{ _('Сервер') }} <strong>{{ source.name }}</strong> · <span class="font-monospace">{{ source.ip_address }}</span></p>
+    </header>
+
+    {% set direct = items|selectattr('via', 'none')|list %}
+    {% set linked = items|rejectattr('via', 'none')|list %}
+    {% if not items %}
+    <p class="dns-empty">{{ _('На IP этого сервера не указывает ни одна запись из карточки DNS.') }}</p>
+    {% elif not targets %}
+    <p class="dns-empty">{{ _('Добавьте новый сервер в список, чтобы выбрать его для переноса.') }}</p>
+    {% else %}
+    <form method="get" class="card p-4 mb-4">
+        <label class="form-label" for="move-to">{{ _('Новый сервер') }}</label>
+        <div class="d-flex flex-wrap gap-2">
+            <select class="form-select w-auto flex-grow-1" id="move-to" name="to" onchange="this.form.submit()">
+                <option value="">{{ _('Выберите сервер…') }}</option>
+                {% for server in targets %}<option value="{{ server.id }}" {% if target and target.id == server.id %}selected{% endif %}>{{ server.name }} · {{ server.ip_address }}</option>{% endfor %}
+            </select>
+            <noscript><button class="btn btn-outline-secondary" type="submit">{{ _('Показать') }}</button></noscript>
+        </div>
+    </form>
+    {% endif %}
+
+    {% if items %}
+    <form method="post" class="card p-4">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input type="hidden" name="to" value="{{ target.id if target else '' }}">
+        <h2 class="h5">{{ _('Записи, указывающие на этот сервер') }}</h2>
+        {% if target %}
+        <ol class="small mb-3">
+            <li>{{ _('Измените отмеченные записи у DNS-провайдера: замените %(old)s на %(new)s. Кнопки копируют имя и новый адрес.', old=source.ip_address, new=target.ip_address) }}</li>
+            <li>{{ _('Убедитесь, что на новом сервере уже работают сервисы, иначе они станут недоступны.') }}</li>
+            <li>{{ _('Нажмите «Сохранить в карточке DNS», чтобы записи в приложении совпадали с провайдером.') }}</li>
+        </ol>
+        {% endif %}
+        <div class="table-responsive">
+            <table class="table dns-table dns-move-table">
+                <thead><tr>
+                    <th scope="col"><span class="visually-hidden">{{ _('Перенести') }}</span></th>
+                    <th scope="col">{{ _('Имя') }}</th><th scope="col">{{ _('Тип') }}</th>
+                    <th scope="col">{{ _('Значение') }}</th><th scope="col">{{ _('DNS-провайдер') }}</th>
+                </tr></thead>
+                <tbody>
+                {% for item in direct %}
+                {% set provider = providers.get(item.domain.provider_id) %}
+                <tr>
+                    <td><input class="form-check-input" type="checkbox" name="record" value="{{ item.record.id }}" id="rec-{{ item.record.id }}" aria-label="{{ item.fqdn }}"{% if not target %} disabled{% endif %} checked></td>
+                    <td class="dns-name">
+                        <label for="rec-{{ item.record.id }}">{{ item.fqdn }}</label>
+                        {% if role(item.record) == 'service' %}<span class="badge text-bg-secondary ms-1">{{ _('служебная') }}</span>{% endif %}
+                        {% if target %}<button type="button" class="btn btn-sm btn-link p-0 ms-1" onclick="copyToClipboard(this)" data-copy-value="{{ item.fqdn }}" title="{{ _('Копировать имя') }}" aria-label="{{ _('Копировать имя') }}"><i class="bi bi-clipboard" aria-hidden="true"></i></button>{% endif %}
+                    </td>
+                    <td><span class="badge text-bg-light border">{{ item.record.type }}</span>{% if item.record.proxied %} <i class="bi bi-cloud-fill dns-proxied" title="{{ _('Проксируется') }}"></i>{% endif %}</td>
+                    <td class="dns-content">
+                        {% if target %}<s class="text-body-secondary">{{ source.ip_address }}</s> <span class="dns-arrow">→</span> <strong>{{ target.ip_address }}</strong>
+                        <button type="button" class="btn btn-sm btn-link p-0 ms-1" onclick="copyToClipboard(this)" data-copy-value="{{ target.ip_address }}" title="{{ _('Копировать новый IP') }}" aria-label="{{ _('Копировать новый IP') }}"><i class="bi bi-clipboard" aria-hidden="true"></i></button>
+                        {% else %}{{ item.record.content }}{% endif %}
+                    </td>
+                    <td>{% if provider and provider.login_url %}<a href="{{ provider.login_url }}" target="_blank" rel="noopener noreferrer">{{ provider.name }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>{% else %}{{ provider.name if provider else '—' }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+                {% for item in linked %}
+                <tr class="text-body-secondary">
+                    <td></td>
+                    <td class="dns-name">{{ item.fqdn }}</td>
+                    <td><span class="badge text-bg-light border">CNAME</span></td>
+                    <td colspan="2">{{ _('Указывает на %(name)s — перейдёт автоматически.', name=item.via) }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if target %}
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-dns-solid" type="submit">{{ _('Сохранить в карточке DNS') }}</button>
+        </div>
+        {% endif %}
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

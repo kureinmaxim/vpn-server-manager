@@ -1,4 +1,4 @@
-# VPN Server Manager v4.6.1
+# VPN Server Manager v4.7.0
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="220">

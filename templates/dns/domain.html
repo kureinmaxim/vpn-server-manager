@@ -55,32 +55,53 @@
             <h2>{{ _('DNS-записи и поддомены') }}</h2>
             <span class="badge text-bg-secondary">{{ records|length }}</span>
         </div>
-        {% if records %}
+        {% macro record_table(rows, service=False) -%}
         <div class="table-responsive">
-            <table class="table dns-table">
+            <table class="table dns-table dns-sortable">
                 <thead><tr>
-                    <th scope="col">{{ _('Имя') }}</th><th scope="col">{{ _('Тип') }}</th>
-                    <th scope="col">{{ _('Значение') }}</th><th scope="col">Proxy</th>
+                    <th scope="col" aria-sort="none"><button type="button" class="dns-sort" data-col="0">{{ _('Имя') }}</button></th>
+                    <th scope="col" aria-sort="none"><button type="button" class="dns-sort" data-col="1">{{ _('Тип') }}</button></th>
+                    <th scope="col" aria-sort="none"><button type="button" class="dns-sort" data-col="2">{{ _('Значение') }}</button></th>
+                    <th scope="col">Proxy</th>
                     <th scope="col"><span class="visually-hidden">{{ _('Действия') }}</span></th>
                 </tr></thead>
                 <tbody>
-                {% for record in records %}
+                {% for record in rows %}
+                {% set name = fqdn(record, domain) %}
                 <tr{% if edit and edit.id == record.id %} class="table-active"{% endif %}>
-                    <td class="dns-name">{{ fqdn(record, domain) }}{% if record.notes %}<div class="small text-body-secondary font-sans-serif">{{ record.notes }}</div>{% endif %}</td>
-                    <td><span class="badge text-bg-light border">{{ record.type }}</span></td>
-                    <td class="dns-content">{{ record.content }}</td>
+                    <td class="dns-name" data-sort="{{ '' if record.name == '@' else record.name }}">{{ name }}{% if record.notes %}<div class="small text-body-secondary font-sans-serif">{{ record.notes }}</div>{% endif %}</td>
+                    <td data-sort="{{ record.type }}"><span class="badge text-bg-light border">{{ record.type }}</span></td>
+                    <td class="dns-content" data-sort="{{ record.content }}">{{ record.content }}{% if scope(record) %} <span class="badge text-bg-info" title="{{ _('Частный адрес: локальная сеть или Tailscale/Headscale') }}">{{ _('частный') }}</span>{% endif %}</td>
                     <td>{% if record.proxied %}<i class="bi bi-cloud-fill dns-proxied" title="{{ _('Проксируется') }}" aria-label="{{ _('Проксируется') }}"></i>{% else %}<i class="bi bi-cloud text-body-secondary" title="{{ _('Только DNS') }}" aria-label="{{ _('Только DNS') }}"></i>{% endif %}</td>
                     <td class="text-end text-nowrap">
+                        <form method="post" action="{{ url_for('dns.record_role', domain_id=domain.id, record_id=record.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                            {% set move = _('В основные') if service else _('В служебные') %}
+                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ move }}" aria-label="{{ move }}: {{ name }}">
+                                <i class="bi bi-{{ 'arrow-up' if service else 'arrow-down' }}" aria-hidden="true"></i>
+                            </button>
+                        </form>
                         <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=domain.id, edit=record.id) }}#record-form" title="{{ _('Редактировать') }}" aria-label="{{ _('Редактировать') }}"><i class="bi bi-pencil" aria-hidden="true"></i></a>
-                        {{ confirm_delete(url_for('dns.record_delete', domain_id=domain.id, record_id=record.id), _('Удалить запись %(name)s?', name=fqdn(record, domain))) }}
+                        {{ confirm_delete(url_for('dns.record_delete', domain_id=domain.id, record_id=record.id), _('Удалить запись %(name)s?', name=name)) }}
                     </td>
                 </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        {% else %}
+        {%- endmacro %}
+        {% if main_records %}{{ record_table(main_records) }}
+        {% elif not records %}
         <p class="dns-empty">{{ _('Записей пока нет. Добавьте корневую запись (@) и поддомены, например vpn или www.') }}</p>
+        {% else %}
+        <p class="dns-empty">{{ _('Все записи служебные. Стрелкой вверх можно перенести нужные в основные.') }}</p>
+        {% endif %}
+        {% if service_records %}
+        <details class="dns-service mt-3"{% if edit and edit in service_records %} open{% endif %}>
+            <summary>{{ _('Служебные записи') }} <span class="badge text-bg-secondary">{{ service_records|length }}</span>
+                <span class="small text-body-secondary ms-2">{{ _('почта, cPanel, проверки домена, SPF/DKIM/DMARC') }}</span></summary>
+            <div class="mt-2">{{ record_table(service_records, service=True) }}</div>
+        </details>
         {% endif %}
 
         {% set r = edit or {} %}
@@ -112,7 +133,15 @@
                         <label class="form-check-label" for="record-proxied">{{ _('Проксировать (Cloudflare)') }}</label>
                     </div>
                 </div>
-                <div class="col-12">
+                <div class="col-md-4">
+                    <label class="form-label" for="record-role">{{ _('Группа') }}</label>
+                    <select class="form-select" id="record-role" name="role">
+                        {% for value, label in [('auto', _('Автоматически')), ('main', _('Основная')), ('service', _('Служебная'))] %}
+                        <option value="{{ value }}" {% if r.get('role', 'auto') == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-8">
                     <label class="form-label" for="record-notes">{{ _('Заметка') }}</label>
                     <input class="form-control" id="record-notes" name="notes" maxlength="500" value="{{ r.get('notes', '') }}" placeholder="{{ _('Например, какой сервер или сервис') }}">
                 </div>
@@ -124,4 +153,7 @@
         </form>
     </section>
 </div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dns.js') }}?v={{ app_info.get('version', '') }}"></script>
 {% endblock %}

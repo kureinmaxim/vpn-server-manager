@@ -7225,3 +7225,143 @@ msgstr "记录数"
 #: app/routes/dns.py templates/dns
 msgid "Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода."
 msgstr "暂无域名。添加的域名和子域名可在 Net Tools 中直接选择，无需手动输入。"
+
+#: app/routes/dns.py templates/dns
+msgid "Частный адрес: локальная сеть или Tailscale/Headscale"
+msgstr "私有地址：局域网或 Tailscale/Headscale"
+
+#: app/routes/dns.py templates/dns
+msgid "частный"
+msgstr "私有"
+
+#: app/routes/dns.py templates/dns
+msgid "В основные"
+msgstr "移到主要"
+
+#: app/routes/dns.py templates/dns
+msgid "В служебные"
+msgstr "移到服务"
+
+#: app/routes/dns.py templates/dns
+msgid "Все записи служебные. Стрелкой вверх можно перенести нужные в основные."
+msgstr "所有记录均为服务记录。可用向上箭头将需要的记录移到主要。"
+
+#: app/routes/dns.py templates/dns
+msgid "Служебные записи"
+msgstr "服务记录"
+
+#: app/routes/dns.py templates/dns
+msgid "почта, cPanel, проверки домена, SPF/DKIM/DMARC"
+msgstr "邮件、cPanel、域名验证、SPF/DKIM/DMARC"
+
+#: app/routes/dns.py templates/dns
+msgid "Автоматически"
+msgstr "自动"
+
+#: app/routes/dns.py templates/dns
+msgid "Основная"
+msgstr "主要"
+
+#: app/routes/dns.py templates/dns
+msgid "Служебная"
+msgstr "服务"
+
+#: app/routes/dns.py templates/dns
+msgid "У нового сервера некорректный IP-адрес."
+msgstr "新服务器的 IP 地址无效。"
+
+#: app/routes/dns.py templates/dns
+msgid "Записей перенесено в карточке DNS: %(count)s. Проверьте, что они изменены и у DNS-провайдера."
+msgstr "DNS 卡片中已迁移记录：%(count)s。请确认 DNS 服务商处也已修改。"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-записи"
+msgstr "DNS 记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Эти имена указывают на IP сервера. При смене VPS их нужно перенаправить."
+msgstr "这些名称指向服务器 IP。更换 VPS 时需要重新指向。"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенести на другой VPS"
+msgstr "迁移到其他 VPS"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос DNS-записей"
+msgstr "迁移 DNS 记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос"
+msgstr "迁移"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенос DNS-записей на другой VPS"
+msgstr "将 DNS 记录迁移到其他 VPS"
+
+#: app/routes/dns.py templates/dns
+msgid "Сервер"
+msgstr "服务器"
+
+#: app/routes/dns.py templates/dns
+msgid "На IP этого сервера не указывает ни одна запись из карточки DNS."
+msgstr "DNS 卡片中没有记录指向此服务器 IP。"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавьте новый сервер в список, чтобы выбрать его для переноса."
+msgstr "请先将新服务器添加到列表，才能选择为迁移目标。"
+
+#: app/routes/dns.py templates/dns
+msgid "Новый сервер"
+msgstr "新服务器"
+
+#: app/routes/dns.py templates/dns
+msgid "Выберите сервер…"
+msgstr "选择服务器…"
+
+#: app/routes/dns.py templates/dns
+msgid "Показать"
+msgstr "显示"
+
+#: app/routes/dns.py templates/dns
+msgid "Записи, указывающие на этот сервер"
+msgstr "指向此服务器的记录"
+
+#: app/routes/dns.py templates/dns
+msgid "Измените отмеченные записи у DNS-провайдера: замените %(old)s на %(new)s. Кнопки копируют имя и новый адрес."
+msgstr "在 DNS 服务商处修改所选记录：将 %(old)s 替换为 %(new)s。按钮可复制名称和新地址。"
+
+#: app/routes/dns.py templates/dns
+msgid "Убедитесь, что на новом сервере уже работают сервисы, иначе они станут недоступны."
+msgstr "请确认服务已在新服务器上运行，否则将无法访问。"
+
+#: app/routes/dns.py templates/dns
+msgid "Нажмите «Сохранить в карточке DNS», чтобы записи в приложении совпадали с провайдером."
+msgstr "点击“保存到 DNS 卡片”，使应用中的记录与服务商一致。"
+
+#: app/routes/dns.py templates/dns
+msgid "Перенести"
+msgstr "迁移"
+
+#: app/routes/dns.py templates/dns
+msgid "служебная"
+msgstr "服务"
+
+#: app/routes/dns.py templates/dns
+msgid "Копировать имя"
+msgstr "复制名称"
+
+#: app/routes/dns.py templates/dns
+msgid "Копировать новый IP"
+msgstr "复制新 IP"
+
+#: app/routes/dns.py templates/dns
+msgid "Указывает на %(name)s — перейдёт автоматически."
+msgstr "指向 %(name)s，将自动跟随。"
+
+#: app/routes/dns.py templates/dns
+msgid "Сохранить в карточке DNS"
+msgstr "保存到 DNS 卡片"
+
+#: app/routes/dns.py templates/dns
+msgid "DNS-записей указывает на этот сервер: %(count)s. Открыть перенос."
+msgstr "指向此服务器的 DNS 记录：%(count)s。打开迁移助手。"

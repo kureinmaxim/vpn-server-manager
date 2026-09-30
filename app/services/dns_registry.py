@@ -20,6 +20,12 @@ PRESETS = {
 }
 RECORD_TYPES = ('A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA', 'PTR')
 SECRET_FIELDS = ('user', 'password')
+ROLES = ('auto', 'main', 'service')
+# Hosts that cPanel and mail autoconfiguration create automatically
+SERVICE_HOSTS = {'autoconfig', 'autodiscover', 'cpanel', 'cpcalendars', 'cpcontacts', 'webdisk', 'webmail',
+                 'whm', 'ftp', 'mail', 'imap', 'pop', 'smtp'}
+SERVICE_TYPES = {'MX', 'TXT', 'SRV', 'NS', 'CAA', 'PTR'}
+_SHARED = (ipaddress.ip_network('100.64.0.0/10'),)
 _LABEL = re.compile(r'(?!-)[a-z0-9_-]{1,63}(?<!-)')
 
 
@@ -126,6 +132,30 @@ def build_domain(form, current, providers):
     return domain
 
 
+def auto_role(record):
+    """Records created by mail, cPanel or domain verification are 'service'; the rest are 'main'."""
+    name = record.get('name') or '@'
+    if record.get('type') in SERVICE_TYPES or any(label.startswith('_') for label in name.split('.')):
+        return 'service'
+    return 'service' if name in SERVICE_HOSTS else 'main'
+
+
+def role(record):
+    chosen = record.get('role', 'auto')
+    return chosen if chosen in ('main', 'service') else auto_role(record)
+
+
+def address_scope(record):
+    """'private' for LAN/Tailscale (CGNAT) addresses in A/AAAA records, else ''."""
+    if record.get('type') not in ('A', 'AAAA'):
+        return ''
+    try:
+        address = ipaddress.ip_address(record.get('content', ''))
+    except ValueError:
+        return ''
+    return 'private' if address.is_private or any(address in net for net in _SHARED) else ''
+
+
 def build_record(form, domain, current=None):
     record_type = (form.get('type') or '').upper()
     if record_type not in RECORD_TYPES:
@@ -151,7 +181,8 @@ def build_record(form, domain, current=None):
     record = dict(current or {'id': new_id()})
     record.update(name=name, type=record_type, content=content,
                   proxied=bool(form.get('proxied')) and record_type in ('A', 'AAAA', 'CNAME'),
-                  notes=(form.get('notes') or '').strip()[:500])
+                  notes=(form.get('notes') or '').strip()[:500],
+                  role=form.get('role') if form.get('role') in ROLES else record.get('role', 'auto'))
     return record
 
 
@@ -166,8 +197,44 @@ def host_choices(dns):
     names = []
     for domain in normalize(dns)['domains']:
         names.append(domain['name'])
-        names.extend(record_fqdn(r, domain) for r in domain['records'] if not r['name'].startswith('*'))
+        names.extend(record_fqdn(r, domain) for r in domain['records']
+                     if role(r) == 'main' and not r['name'].startswith('*'))
     return sorted(set(names), key=lambda n: (n.split('.')[-2:], n.count('.'), n))
+
+
+def records_for_ip(dns, ip):
+    """A/AAAA records pointing at ip, plus CNAMEs that reach them (marked with 'via')."""
+    ip = (ip or '').strip()
+    if not ip:
+        return []
+    direct, fqdns = [], set()
+    domains = normalize(dns)['domains']
+    for domain in domains:
+        for record in domain['records']:
+            if record['type'] in ('A', 'AAAA') and record['content'] == ip:
+                direct.append({'domain': domain, 'record': record, 'fqdn': record_fqdn(record, domain), 'via': None})
+                fqdns.add(record_fqdn(record, domain))
+    linked = []
+    for domain in domains:
+        for record in domain['records']:
+            target = record['content'].rstrip('.').lower()
+            if record['type'] == 'CNAME' and target in fqdns:
+                linked.append({'domain': domain, 'record': record, 'fqdn': record_fqdn(record, domain), 'via': target})
+    key = lambda item: (item['domain']['name'], role(item['record']) != 'main', item['fqdn'])
+    return sorted(direct, key=key) + sorted(linked, key=key)
+
+
+def move_records(dns, old_ip, new_ip, record_ids):
+    """Points the selected A/AAAA records from old_ip to new_ip; returns how many changed."""
+    new_ip = ipaddress.ip_address(new_ip)
+    changed = 0
+    for item in records_for_ip(dns, old_ip):
+        record = item['record']
+        if item['via'] is None and record['id'] in record_ids \
+                and (record['type'] == 'A') == (new_ip.version == 4):
+            record['content'] = str(new_ip)
+            changed += 1
+    return changed
 
 
 def merge(current, incoming, reencrypt):
