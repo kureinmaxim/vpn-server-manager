@@ -21,6 +21,7 @@ ERRORS = {
     'record': _l('Выберите поддерживаемый тип DNS-записи.'),
     'content': _l('Проверьте значение записи: для A нужен IPv4, для AAAA — IPv6.'),
     'duplicate': _l('Такой домен уже есть в списке.'),
+    'zone': _l('Не удалось распознать файл зоны. Загрузите файл из Cloudflare: DNS → Records → Export.'),
     'no_file': _l('Нет активного файла данных. Добавьте сервер или импортируйте файл данных.'),
 }
 
@@ -221,6 +222,37 @@ def record_delete(domain_id, record_id):
     _save(dns)
     flash(_('Запись удалена.'), 'success')
     return redirect(url_for('dns.domain', domain_id=domain_id) + '#records')
+
+
+@dns_bp.post('/import-zone')
+@csrf_protect
+def import_zone():
+    """Imports BIND zone files (Cloudflare "Export"): creates missing domains, adds new records."""
+    dns = _load()
+    provider_id = request.form.get('provider_id', '')
+    if provider_id and not dns_reg.find(dns['providers'], provider_id):
+        provider_id = ''
+    files = [f for f in request.files.getlist('zone') if f and f.filename]
+    for upload in files:
+        try:
+            text = upload.read(1024 * 1024).decode('utf-8', 'replace')
+            name = dns_reg.zone_domain(text)
+            domain = next((d for d in dns['domains'] if d['name'] == name), None)
+            if domain is None:
+                domain = dns_reg.build_domain({'name': name, 'provider_id': provider_id}, None, dns['providers'])
+                dns['domains'].append(domain)
+            records, skipped = dns_reg.parse_zone(text, domain)
+            added = dns_reg.add_zone_records(domain, records)
+            flash(_('%(domain)s: добавлено записей %(added)s, уже были %(same)s, пропущено %(skipped)s.',
+                    domain=name, added=added, same=len(records) - added, skipped=skipped), 'success')
+        except dns_reg.DnsError as exc:
+            _fail(exc)
+    if files:
+        try:
+            _save(dns)
+        except dns_reg.DnsError as exc:
+            _fail(exc)
+    return redirect(url_for('dns.index'))
 
 
 def _servers():

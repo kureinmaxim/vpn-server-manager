@@ -7697,3 +7697,23 @@ msgstr "Save to DNS card"
 #: app/routes/dns.py templates/dns
 msgid "DNS-записей указывает на этот сервер: %(count)s. Открыть перенос."
 msgstr "DNS records pointing to this server: %(count)s. Open the move helper."
+
+#: app/routes/dns.py templates/dns
+msgid "Не удалось распознать файл зоны. Загрузите файл из Cloudflare: DNS → Records → Export."
+msgstr "Could not read the zone file. Upload the file from Cloudflare: DNS → Records → Export."
+
+#: app/routes/dns.py templates/dns
+msgid "%(domain)s: добавлено записей %(added)s, уже были %(same)s, пропущено %(skipped)s."
+msgstr "%(domain)s: %(added)s records added, %(same)s already present, %(skipped)s skipped."
+
+#: app/routes/dns.py templates/dns
+msgid "Импорт файла зоны"
+msgstr "Import zone file"
+
+#: app/routes/dns.py templates/dns
+msgid "В Cloudflare откройте домен → DNS → Records → Export и загрузите полученные файлы. Новые домены будут созданы, к существующим добавятся недостающие записи."
+msgstr "In Cloudflare open the domain → DNS → Records → Export and upload the files. New domains are created; missing records are added to existing ones."
+
+#: app/routes/dns.py templates/dns
+msgid "Файлы зоны"
+msgstr "Zone files"

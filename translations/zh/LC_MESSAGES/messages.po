@@ -7365,3 +7365,23 @@ msgstr "保存到 DNS 卡片"
 #: app/routes/dns.py templates/dns
 msgid "DNS-записей указывает на этот сервер: %(count)s. Открыть перенос."
 msgstr "指向此服务器的 DNS 记录：%(count)s。打开迁移助手。"
+
+#: app/routes/dns.py templates/dns
+msgid "Не удалось распознать файл зоны. Загрузите файл из Cloudflare: DNS → Records → Export."
+msgstr "无法识别区域文件。请上传 Cloudflare 导出的文件：DNS → Records → Export。"
+
+#: app/routes/dns.py templates/dns
+msgid "%(domain)s: добавлено записей %(added)s, уже были %(same)s, пропущено %(skipped)s."
+msgstr "%(domain)s：已添加 %(added)s 条记录，已存在 %(same)s 条，跳过 %(skipped)s 条。"
+
+#: app/routes/dns.py templates/dns
+msgid "Импорт файла зоны"
+msgstr "导入区域文件"
+
+#: app/routes/dns.py templates/dns
+msgid "В Cloudflare откройте домен → DNS → Records → Export и загрузите полученные файлы. Новые домены будут созданы, к существующим добавятся недостающие записи."
+msgstr "在 Cloudflare 中打开域名 → DNS → Records → Export 并上传文件。新域名会被创建，已有域名将补充缺少的记录。"
+
+#: app/routes/dns.py templates/dns
+msgid "Файлы зоны"
+msgstr "区域文件"
