@@ -815,6 +815,15 @@ def import_external_data():
             decrypted_data = fernet_external.decrypt(encrypted_data)
             servers_data, external_dns = data_manager.split_payload(json.loads(decrypted_data.decode('utf-8')))
             
+            # load_servers() молча возвращает [] при ошибке расшифровки, поэтому
+            # сначала проверяем, что текущий файл читается ключом этой установки.
+            try:
+                current_dns = data_manager.load_dns(current_app.config)
+            except InvalidToken:
+                flash(_('Текущий файл данных не расшифровывается ключом из .env этой установки. '
+                        'Восстановите прежний SECRET_KEY в .env и перезапустите приложение.'), 'danger')
+                return redirect(url_for('main.settings'))
+
             # Загружаем текущие серверы
             current_servers = data_manager.load_servers(current_app.config)
             
@@ -882,7 +891,7 @@ def import_external_data():
             
             file_path = os.path.join(data_dir, filename)
             merged_dns, dns_added = dns_registry.merge(
-                data_manager.load_dns(current_app.config), external_dns,
+                current_dns, external_dns,
                 lambda value: data_manager.re_encrypt_password(value, external_key, our_secret_key))
             data_manager.save_servers(merged_servers, file_path,
                                       dns={} if dns_registry.is_empty(merged_dns) else merged_dns)
