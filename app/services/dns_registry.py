@@ -237,6 +237,65 @@ def move_records(dns, old_ip, new_ip, record_ids):
     return changed
 
 
+_ZONE_LINE = re.compile(r'^(\S+)\s+(?:(\d+)\s+)?(?:IN\s+)?([A-Za-z]+)\s+(.*)$')
+
+
+def _zone_value(rtype, raw):
+    body, sep, tags = raw.rpartition(' ; cf_tags=')
+    if not sep:
+        body, tags = raw, ''
+    if rtype == 'TXT':
+        # Long TXT values are split into several quoted strings
+        value = ''.join(re.findall(r'"((?:[^"\\]|\\.)*)"', body)) or body.strip()
+    else:
+        value = body.strip()
+        if rtype in ('CNAME', 'MX', 'SRV', 'NS', 'PTR'):
+            value = ' '.join(part.rstrip('.') for part in value.split())
+    return value, 'cf-proxied:true' in tags
+
+
+def zone_domain(text):
+    """Domain of a zone file: the ';; Domain:' header or the SOA owner."""
+    for line in text.splitlines():
+        match = re.match(r';;\s*Domain:\s*(\S+)', line) or re.match(r'(\S+)\s+(?:\d+\s+)?(?:IN\s+)?SOA\s', line)
+        if match:
+            return clean_domain(match.group(1))
+    raise DnsError('zone')
+
+
+def add_zone_records(domain, records):
+    """Adds records that are not present yet (same name, type and value); returns the count."""
+    existing = {(r['name'], r['type'], r['content']) for r in domain['records']}
+    added = [r for r in records if (r['name'], r['type'], r['content']) not in existing]
+    domain['records'].extend(added)
+    return len(added)
+
+
+def parse_zone(text, domain):
+    """Records from a BIND zone file (Cloudflare "Export"); SOA and apex NS are skipped."""
+    records, skipped = [], 0
+    for line in text.splitlines():
+        line = line.strip()
+        if not line or line.startswith(';'):
+            continue
+        match = _ZONE_LINE.match(line)
+        if not match:
+            skipped += 1
+            continue
+        owner, _, rtype, rest = match.groups()
+        rtype = rtype.upper()
+        name = owner.rstrip('.').lower()
+        if rtype == 'SOA' or (rtype == 'NS' and name == domain['name']):
+            continue
+        content, proxied = _zone_value(rtype, rest)
+        try:
+            records.append(build_record({'name': name, 'type': rtype, 'content': content,
+                                         'proxied': proxied}, domain))
+        except DnsError:
+            skipped += 1
+    return records, skipped
+
+
 def merge(current, incoming, reencrypt):
     """Adds providers and domains from an imported file; existing names win."""
     current, incoming = normalize(current), normalize(incoming)

@@ -50,8 +50,29 @@
 
     <div class="dns-section-head">
         <h2>{{ _('Домены') }}</h2>
-        <a class="btn btn-dns btn-sm" href="{{ url_for('dns.domain_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить домен') }}</a>
+        <div class="d-flex flex-wrap gap-2">
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#zone-import" aria-expanded="false" aria-controls="zone-import"><i class="bi bi-upload" aria-hidden="true"></i> {{ _('Импорт файла зоны') }}</button>
+            <a class="btn btn-dns btn-sm" href="{{ url_for('dns.domain_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить домен') }}</a>
+        </div>
     </div>
+    <form id="zone-import" class="collapse card p-3 mb-3" method="post" action="{{ url_for('dns.import_zone') }}" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <p class="small text-body-secondary mb-2">{{ _('В Cloudflare откройте домен → DNS → Records → Export и загрузите полученные файлы. Новые домены будут созданы, к существующим добавятся недостающие записи.') }}</p>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label" for="zone-files">{{ _('Файлы зоны') }}</label>
+                <input class="form-control" id="zone-files" type="file" name="zone" accept=".txt,.zone,.bind,text/plain" multiple required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="zone-provider">{{ _('DNS-провайдер') }}</label>
+                <select class="form-select" id="zone-provider" name="provider_id">
+                    <option value="">{{ _('Не выбран') }}</option>
+                    {% for provider in providers %}<option value="{{ provider.id }}" {% if loop.first %}selected{% endif %}>{{ provider.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid"><button class="btn btn-dns-solid" type="submit">{{ _('Импорт') }}</button></div>
+        </div>
+    </form>
     {% if domains %}
     <div class="table-responsive">
         <table class="table dns-table align-middle">

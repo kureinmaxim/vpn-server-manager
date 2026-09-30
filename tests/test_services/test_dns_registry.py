@@ -148,3 +148,35 @@ def test_records_for_ip_and_move():
     assert vpn['content'] == '203.0.113.9'
     assert dns_reg.move_records(dns, '138.124.71.73', '2001:db8::1', {i['record']['id'] for i in items}) == 0
     assert dns_reg.records_for_ip(dns, '') == []
+
+
+ZONE = """;; Domain:     example.com.
+example.com	3600	IN	SOA	cora.ns.cloudflare.com. dns.cloudflare.com. 1 10000 2400 604800 3600
+example.com.	86400	IN	NS	cora.ns.cloudflare.com.
+vpn.example.com.	1	IN	A	203.0.113.5 ; cf_tags=cf-proxied:false
+example.com.	1	IN	A	203.0.113.5 ; cf_tags=cf-proxied:true
+www.example.com.	1	IN	CNAME	example.com. ; cf_tags=cf-proxied:true
+example.com.	1	IN	MX	0 example.com.
+_caldav._tcp.example.com.	1	IN	SRV	0 0 2079 example.com.
+_dmarc.example.com.	1	IN	TXT	"v=DMARC1; p=quarantine; rua=mailto:a@b.net;"
+default._domainkey.example.com.	1	IN	TXT	"v=DKIM1; p=AAA" "BBB;"
+bad name.example.com.	1	IN	A	203.0.113.5
+"""
+
+
+def test_parse_zone():
+    assert dns_reg.zone_domain(ZONE) == 'example.com'
+    domain = {'name': 'example.com', 'records': []}
+    records, skipped = dns_reg.parse_zone(ZONE, domain)
+    got = {(r['name'], r['type']): (r['content'], r['proxied']) for r in records}
+    assert got == {
+        ('vpn', 'A'): ('203.0.113.5', False), ('@', 'A'): ('203.0.113.5', True),
+        ('www', 'CNAME'): ('example.com', True), ('@', 'MX'): ('0 example.com', False),
+        ('_caldav._tcp', 'SRV'): ('0 0 2079 example.com', False),
+        ('_dmarc', 'TXT'): ('v=DMARC1; p=quarantine; rua=mailto:a@b.net;', False),
+        ('default._domainkey', 'TXT'): ('v=DKIM1; p=AAABBB;', False)}
+    assert skipped == 1
+    assert dns_reg.add_zone_records(domain, records) == 7
+    assert dns_reg.add_zone_records(domain, dns_reg.parse_zone(ZONE, domain)[0]) == 0
+    with pytest.raises(dns_reg.DnsError):
+        dns_reg.zone_domain('just text')

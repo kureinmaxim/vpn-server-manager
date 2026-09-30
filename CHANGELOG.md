@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.8.0] - 2026-09-30
+
+### Added
+- **Import zone file** on the DNS page: upload one or more BIND zone files (Cloudflare DNS → Records → Export). Missing domains are created with the chosen DNS provider; only records not already present are added. Multi-string TXT values (DKIM), MX/SRV targets and Cloudflare proxy status are preserved; SOA and apex NS records are skipped.
+
 ## [4.7.0] - 2026-09-30
 
 ### Added

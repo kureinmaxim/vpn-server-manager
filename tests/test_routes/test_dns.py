@@ -135,3 +135,18 @@ def test_move_page_localized(unlocked, lang):
     text = unlocked.get('/dns/move/1?to=2').text
     section = text.split('<div class="container dns-page')[1].split('</main>')[0]
     assert not re.search('[А-Яа-яЁё]', section)
+
+
+def test_import_zone_files(unlocked):
+    import io
+    from tests.test_services.test_dns_registry import ZONE
+    post(unlocked, '/dns/providers/new', kind='cloudflare')
+    for _ in range(2):
+        response = unlocked.post('/dns/import-zone', data={
+            'csrf_token': 'token', 'provider_id': dns(unlocked)['providers'][0]['id'],
+            'zone': [(io.BytesIO(ZONE.encode()), 'example.com.txt'), (io.BytesIO(b'junk'), 'x.txt')]},
+            content_type='multipart/form-data', follow_redirects=True)
+    data = dns(unlocked)
+    assert len(data['domains']) == 1 and len(data['domains'][0]['records']) == 7
+    assert data['domains'][0]['provider_id'] == data['providers'][0]['id']
+    assert '0 records added, 7 already present' in response.text
