@@ -7717,3 +7717,226 @@ msgstr "In Cloudflare open the domain → DNS → Records → Export and upload 
 #: app/routes/dns.py templates/dns
 msgid "Файлы зоны"
 msgstr "Zone files"
+
+msgid "Неверный запрос клиента"
+msgstr "Invalid client request"
+
+
+msgid "Конфигурация изменилась или профиль не поддерживается. Прочитайте настройки заново."
+msgstr "The configuration changed or the profile is unsupported. Read the settings again."
+
+
+msgid "Показать клиентов"
+msgstr "Show clients"
+
+
+msgid "Показать секретную ссылку"
+msgstr "Reveal secret link"
+
+
+msgid "Секретная ссылка подключения"
+msgstr "Secret connection link"
+
+
+msgid "Скрыть ссылку"
+msgstr "Hide link"
+
+
+msgid "Ссылка содержит доступ клиента. Она будет скрыта через минуту. Настройки взяты из файла менеджера и могут отличаться от работающей службы."
+msgstr "This link grants client access and will be hidden after one minute. Settings come from the manager file and may differ from the running service."
+
+
+msgid "Экспорт этого протокола ещё не перенесён"
+msgstr "Export for this protocol has not been migrated yet"
+
+
+msgid "Список клиентов загружен без секретов"
+msgstr "Client list loaded without secrets"
+
+
+msgid "Конфигурации протоколов"
+msgstr "Protocol configurations"
+
+
+msgid "Прочитать конфигурации"
+msgstr "Read configurations"
+
+
+msgid "Проверка ищет файлы настроек TelegramOnly на хосте и в bind mounts бота, включая остановленные контейнеры. Пароли, ключи и клиентские ссылки не отображаются. Наличие файла не подтверждает применение настроек к службе."
+msgstr "Finds TelegramOnly settings on the host and in bot bind mounts, including stopped containers. Passwords, keys and client links are not shown. A settings file does not prove that its settings have been applied to the service."
+
+
+msgid "Возможный файл настроек; владелец не подтверждён"
+msgstr "Possible settings file; ownership unconfirmed"
+
+
+msgid "TelegramOnly / systemd"
+msgstr "TelegramOnly / systemd"
+
+
+msgid "TelegramOnly / Docker"
+msgstr "TelegramOnly / Docker"
+
+
+msgid "Найдено несколько конфигураций"
+msgstr "Multiple configurations found"
+
+
+msgid "Файлы менеджера не найдены"
+msgstr "Manager configuration files not found"
+
+
+msgid "Обнаружена 3x-ui: требуется проверка владельца VLESS"
+msgstr "3x-ui detected: VLESS ownership needs verification"
+
+
+msgid "Включён в менеджере"
+msgstr "Enabled in manager"
+
+
+msgid "Проверка TLS отключена"
+msgstr "TLS verification disabled"
+
+
+msgid "Транспорт"
+msgstr "Transport"
+
+
+msgid "Режим"
+msgstr "Mode"
+
+
+msgid "Защита"
+msgstr "Security"
+
+
+msgid "Файл недоступен или имеет неподдерживаемый формат"
+msgstr "File is inaccessible or uses an unsupported format"
+
+
+msgid "Количество клиентов"
+msgstr "Client count"
+
+
+msgid "Конфигурации прочитаны без изменений"
+msgstr "Configurations read without changes"
+
+
+msgid "Данные из «Статуса»"
+msgstr "Data from Status"
+
+
+msgid "Данные мониторинга"
+msgstr "Monitoring data"
+
+
+msgid "Загружаю данные мониторинга…"
+msgstr "Loading monitoring data…"
+
+
+msgid "Данные получены из мониторинга. Для управления выполните проверку по SSH."
+msgstr "Data loaded from monitoring. Run the SSH inspection to manage services."
+
+
+msgid "Мониторинг недоступен. Можно выполнить отдельную проверку по SSH."
+msgstr "Monitoring is unavailable. You can run a separate SSH inspection."
+
+
+msgid "Управление сервером"
+msgstr "Server management"
+
+
+msgid "Не удалось выполнить операцию. Проверьте SSH, known_hosts и root/sudo -n. После потери ответа обновите состояние перед повтором."
+msgstr "Operation could not be completed. Check SSH, known_hosts and root/sudo -n. If the response was lost, refresh the state before retrying."
+
+
+msgid "Выберите службу и действие"
+msgstr "Select a service and an action"
+
+
+msgid "Цель изменилась. Обновите состояние и создайте новый план."
+msgstr "The target changed. Refresh the state and create a new plan."
+
+
+msgid "Сначала создайте план"
+msgstr "Create a plan first"
+
+
+msgid "Операция не подтверждена. Обновите состояние: служба могла измениться или команда завершилась с ошибкой."
+msgstr "The operation is unconfirmed. Refresh the state: the service may have changed or the command may have failed."
+
+
+msgid "Проверить по SSH"
+msgstr "Inspect over SSH"
+
+
+msgid "Управление использует SSH из карточки. Бот не обязателен. Способ запуска определяется отдельно для каждой службы."
+msgstr "Management uses the SSH details saved in this server card. A bot is optional. The runtime is detected separately for each service."
+
+
+msgid "Подключение требует известного ключа в known_hosts и прав root или sudo -n."
+msgstr "The connection requires a trusted key in known_hosts and root or sudo -n access."
+
+
+msgid "Перенос в разработке: доступны обнаружение и запуск, остановка, перезапуск служб. Настройки протоколов, клиенты и установщики пока не перенесены."
+msgstr "Migration in progress: service discovery, start, stop and restart are available. Protocol settings, clients and installers have not been migrated yet."
+
+
+msgid "План изменения"
+msgstr "Change plan"
+
+
+msgid "Остановка или перезапуск может прервать активные подключения. Проверьте выбранную службу и введите имя VPS из плана."
+msgstr "Stopping or restarting may interrupt active connections. Check the selected service and enter the VPS hostname shown in the plan."
+
+
+msgid "Имя VPS"
+msgstr "VPS hostname"
+
+
+msgid "Применить план"
+msgstr "Apply plan"
+
+
+msgid "Запустить"
+msgstr "Start"
+
+
+msgid "Остановить"
+msgstr "Stop"
+
+
+msgid "Перезапустить"
+msgstr "Restart"
+
+
+msgid "Работает"
+msgstr "Running"
+
+
+msgid "Остановлена"
+msgstr "Stopped"
+
+
+msgid "Создана"
+msgstr "Created"
+
+
+msgid "Выполняется…"
+msgstr "Working…"
+
+
+msgid "Не обнаружено в доступных средах"
+msgstr "Not found in accessible runtimes"
+
+
+msgid "План готов. Срок действия — 5 минут."
+msgstr "Plan ready. Valid for 5 minutes."
+
+
+msgid "Состояние обновлено"
+msgstr "State refreshed"
+
+
+msgid "Операция выполнена"
+msgstr "Operation completed"

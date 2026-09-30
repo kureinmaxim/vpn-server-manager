@@ -94,6 +94,10 @@ Write-Host ""
 
 # [3/5] Проверка безопасности
 Write-Host "[3/5] Security check..." -ForegroundColor Yellow
+python tools/check_public_files.py
+if ($LASTEXITCODE -ne 0) {
+    throw "Private files detected or privacy check unavailable. Installer build stopped."
+}
 
 $SecurityWarning = $false
 

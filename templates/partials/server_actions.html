@@ -5,6 +5,7 @@
     <div class="dropdown server-actions-more">
         <button type="button" class="btn server-action server-action-menu-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('Действия с сервером') }}" title="{{ _('Действия с сервером') }}"><span>{{ _('Действия') }}</span><span aria-hidden="true">⌄</span></button>
         <ul class="dropdown-menu dropdown-menu-end server-actions-menu">
+            <li><a class="dropdown-item" href="{{ url_for('server_control.page', server_id=server.id) }}"><i class="bi bi-sliders" aria-hidden="true"></i>{{ _('Управление сервером') }}</a></li>
             <li><a class="dropdown-item" href="{{ url_for('reset.disk_page', server_id=server.id) }}"><i class="bi bi-hdd" aria-hidden="true"></i>{{ _('Проверить место на диске') }}</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ url_for('reset.reset_page', server_id=server.id) }}"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>{{ _('Очистить стек') }}</a></li>

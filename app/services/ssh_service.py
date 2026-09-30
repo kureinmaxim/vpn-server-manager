@@ -7,6 +7,7 @@ import paramiko
 from paramiko.ssh_exception import AuthenticationException, SSHException
 
 from ..exceptions import AuthenticationError, SSHConnectionError
+from .service_catalog import SERVICE_CATALOG
 
 logger = logging.getLogger(__name__)
 
@@ -36,158 +37,7 @@ class SSHService:
         "7070": "i2pd web console",
         "7656": "i2pd SAM (I2P)",
     }
-    _service_catalog = [
-        # --- VPN / proxy транспорты (секция «VPN / Proxy сервисы») ---
-        {
-            "name": "mtproto-proxy",
-            "display_name": "MTProto Proxy",
-            "group": "proxy",
-            "unit_candidates": ["mtproto-proxy"],
-            "hint": "scripts/install_mtproto.sh",
-        },
-        {
-            "name": "xray",
-            "display_name": "Xray (VLESS-Reality)",
-            "group": "proxy",
-            "unit_candidates": ["xray"],
-            "hint": "установка Xray, затем /xray_apply в боте",
-        },
-        {
-            "name": "sing-box",
-            "display_name": "Sing-box",
-            "group": "proxy",
-            "unit_candidates": ["sing-box", "singbox"],
-            "hint": "обычно клиент; на VPS unit sing-box не обязателен",
-        },
-        {
-            "name": "hysteria",
-            "display_name": "Hysteria2",
-            "group": "proxy",
-            "unit_candidates": ["hysteria-server", "hysteria"],
-            "hint": "scripts/install_hysteria2.sh",
-        },
-        {
-            "name": "naiveproxy",
-            "display_name": "NaiveProxy (Caddy)",
-            "group": "proxy",
-            "unit_candidates": ["caddy-naive", "naiveproxy", "naive"],
-            "hint": "scripts/install_naiveproxy.sh",
-        },
-        {
-            "name": "mita",
-            "display_name": "Mieru (mita)",
-            "group": "proxy",
-            "unit_candidates": ["mita"],
-            "hint": "scripts/install_mieru.sh",
-        },
-        {
-            "name": "tailscaled",
-            "display_name": "Tailscale (mesh)",
-            "group": "proxy",
-            "unit_candidates": ["tailscaled", "tailscale"],
-            "hint": "curl -fsSL https://tailscale.com/install.sh | sh",
-        },
-        # --- TelegramOnly: бот + HA-стек/Reticulum (группа telegramonly) ---
-        {
-            "name": "telegramonly",
-            "display_name": "TelegramOnly бот/API",
-            "group": "telegramonly",
-            "unit_candidates": ["telegramonly"],
-            "hint": "scripts/install_telegramonly_vps.sh",
-        },
-        {
-            "name": "ha-reticulum-bridge",
-            "display_name": "HA Reticulum мост",
-            "group": "telegramonly",
-            "unit_candidates": ["ha-reticulum-bridge"],
-            "hint": "scripts/install_ha_stack.sh",
-        },
-        {
-            "name": "ha-stub-grpc",
-            "display_name": "HA stub gRPC",
-            "group": "telegramonly",
-            "unit_candidates": ["ha-stub-grpc"],
-            "hint": "scripts/install_ha_stack.sh",
-        },
-        {
-            "name": "ha-stub-udp",
-            "display_name": "HA stub UDP",
-            "group": "telegramonly",
-            "unit_candidates": ["ha-stub-udp"],
-            "hint": "scripts/install_ha_stack.sh",
-        },
-        {
-            "name": "ha-adapter-grpc",
-            "display_name": "HA adapter gRPC",
-            "group": "telegramonly",
-            "unit_candidates": ["ha-adapter-grpc"],
-            "hint": "scripts/install_ha_adapter.sh",
-        },
-        {
-            "name": "ha-rns-watchdog",
-            "display_name": "HA RNS watchdog",
-            "group": "telegramonly",
-            "unit_candidates": ["ha-rns-watchdog"],
-            "hint": "ставится вместе с scripts/install_ha_stack.sh",
-        },
-        {
-            "name": "shskm-remote-cli",
-            "display_name": "SHSK-M Remote CLI",
-            "group": "telegramonly",
-            "unit_candidates": ["shskm-remote-cli"],
-            "hint": "опционально, unit shskm-remote-cli",
-        },
-        {
-            "name": "i2pd",
-            "display_name": "i2pd (I2P для Reticulum)",
-            "group": "telegramonly",
-            "unit_candidates": ["i2pd"],
-            "hint": "scripts/install_i2p_bridge.sh",
-        },
-        # --- системные ---
-        {
-            "name": "nginx",
-            "display_name": "Nginx",
-            "group": "system",
-            "unit_candidates": ["nginx"],
-        },
-        {
-            "name": "apache2",
-            "display_name": "Apache",
-            "group": "system",
-            "unit_candidates": ["apache2"],
-        },
-        {
-            "name": "ssh",
-            "display_name": "OpenSSH",
-            "group": "system",
-            "unit_candidates": ["ssh", "sshd"],
-        },
-        {
-            "name": "postgresql",
-            "display_name": "PostgreSQL",
-            "group": "system",
-            "unit_candidates": ["postgresql"],
-        },
-        {
-            "name": "mysql",
-            "display_name": "MySQL",
-            "group": "system",
-            "unit_candidates": ["mysql", "mariadb"],
-        },
-        {
-            "name": "docker",
-            "display_name": "Docker",
-            "group": "system",
-            "unit_candidates": ["docker"],
-        },
-        {
-            "name": "redis-server",
-            "display_name": "Redis",
-            "group": "system",
-            "unit_candidates": ["redis-server"],
-        },
-    ]
+    _service_catalog = SERVICE_CATALOG
     # Известные контейнеры стека TelegramOnly — для подсветки в списке Docker.
     _known_containers = {
         "headscale": "Headscale (координатор)",
@@ -438,6 +288,7 @@ class SSHService:
                     "display_name": self._translate(descriptor["display_name"]),
                     "group": descriptor["group"],
                     "unit_name": unit,
+                    "control_component": descriptor.get("control_component"),
                     "status": status,
                     "hint": (
                         ""
@@ -1321,7 +1172,9 @@ class SSHService:
             client = self.get_connection_pooled(ip, port, user, password)
             services = []
             for descriptor in self._service_catalog:
-                services.append(self._probe_service(client, descriptor))
+                service = self._probe_service(client, descriptor)
+                service["control_component"] = descriptor.get("control_component")
+                services.append(service)
 
             return services
 

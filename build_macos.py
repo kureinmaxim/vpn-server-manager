@@ -129,7 +129,8 @@ def build_app():
         "env.example:.",                # Пример конфигурации (шаблон)
         # NOTE: .env и config.json НЕ включаются в сборку по соображениям безопасности
         # Пользователь должен создать их самостоятельно после установки
-        "data:data",                    # Данные
+        # WARNING: data contains private server databases and notes.
+        # Runtime creates user data separately; never package the local directory.
         "app:app",                      # Новое приложение
         "desktop:desktop",              # Desktop GUI
     ]
@@ -728,10 +729,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '4.8.0'
+        return '4.9.0'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '4.8.0'
+        return '4.9.0'
 
 def main():
     """Основная функция сборки"""
@@ -791,4 +792,4 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main() 
+    main()

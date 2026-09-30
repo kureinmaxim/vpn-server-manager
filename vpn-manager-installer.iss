@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 4.8.0
+; Version 4.9.0
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "4.8.0"
+#define MyAppVersion "4.9.0"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"
@@ -43,7 +43,7 @@ Name: "startupicon"; Description: "Запускать при входе в Windo
 
 [Files]
 ; Exclude local development artifacts at every depth without deleting them.
-#define SourceExcludes "__pycache__,*.pyc,*.pyo,.pytest_cache,.git,.venv*,venv,env"
+#define SourceExcludes "__pycache__,*.pyc,*.pyo,.pytest_cache,.git,.venv*,venv,env,.env,.env.*,*.enc,*.key,*.pem,*.p12,*.pfx,client_secret*.json,credentials*.json"
 ; Основные файлы приложения
 Source: "app\*"; DestDir: "{app}\app"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "desktop\*"; DestDir: "{app}\desktop"; Excludes: "{#SourceExcludes}"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -82,7 +82,8 @@ Source: "setup_windows.bat"; DestDir: "{app}"; Flags: ignoreversion
 Source: "start_windows.bat"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Создаем пустые директории
-Source: "data\hints.json"; DestDir: "{app}\data"; Flags: ignoreversion
+; WARNING: data\hints.json contains local user notes; never distribute it.
+Source: "config\hints.json.template"; DestDir: "{app}\data"; DestName: "hints.json"; Flags: onlyifdoesntexist
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
