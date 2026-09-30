@@ -1,5 +1,15 @@
 {% extends "layout.html" %}
 {% block title %}{{ selected.title if selected else _('Сетевые инструменты') }} · Net Tools{% endblock %}
+{% macro saved_hosts(target, prefix='') -%}
+{% if hosts %}
+<select class="form-select form-select-sm mb-2 net-saved" data-target="{{ target }}" data-prefix="{{ prefix }}" aria-label="{{ _('Домены из карточки DNS') }}">
+    <option value="">{{ _('Выбрать домен из карточки DNS…') }}</option>
+    {% for host in hosts %}<option value="{{ host }}">{{ host }}</option>{% endfor %}
+</select>
+{% else %}
+<p class="small mb-2"><a href="{{ url_for('dns.index') }}">{{ _('Добавьте домены в карточку DNS, чтобы выбирать их из списка.') }}</a></p>
+{% endif %}
+{%- endmacro %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
 <div class="container net-tools my-4">
@@ -39,9 +49,11 @@
                       data-running="{{ _('Проверка…') }}" data-failure="{{ _('Не удалось получить ответ. Проверьте подключение и повторите запрос.') }}">
                     {% if selected.id == 'fetch' %}
                     <label class="form-label" for="net-url">URL</label>
+                    {{ saved_hosts('net-url', 'https://') }}
                     <input class="form-control mb-3" id="net-url" name="url" type="url" placeholder="https://example.com" maxlength="2048" required>
                     {% elif selected.id != 'my-ip' %}
                     <label class="form-label" for="net-host">{{ _('IP-адрес или домен') }}</label>
+                    {{ saved_hosts('net-host') }}
                     <input class="form-control mb-3" id="net-host" name="host" placeholder="example.com" maxlength="253" spellcheck="false" required>
                     {% endif %}
                     {% if selected.id in ['port', 'tls'] %}

@@ -36,6 +36,13 @@
             result.setAttribute('aria-busy', 'false');
         }
     });
+    document.querySelectorAll('.net-saved').forEach(select => select.addEventListener('change', () => {
+        if (!select.value) return;
+        const input = document.getElementById(select.dataset.target);
+        input.value = select.dataset.prefix + select.value;
+        select.value = '';
+        input.focus();
+    }));
     document.querySelectorAll('[data-port]').forEach(button => button.addEventListener('click', () => {
         const input = document.getElementById('net-port');
         input.value = button.dataset.port;

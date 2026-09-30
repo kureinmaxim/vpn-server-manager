@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% from "macros/credentials.html" import password_display, text_copy_display %}
+{% from "dns/_macros.html" import expiry_badge, confirm_delete %}
+{% block title %}DNS · {{ _('Домены и DNS-провайдеры') }}{% endblock %}
+{% block content %}
+<div class="container dns-page my-4">
+    {% include "dns/_head.html" %}
+    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
+        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span><span>DNS</span>
+    </nav>
+    <header class="mb-2">
+        <h1><i class="bi bi-cloud-fill me-2" aria-hidden="true"></i>{{ _('Домены и DNS-провайдеры') }}</h1>
+        <p class="text-body-secondary mb-0">{{ _('Учётные записи DNS-провайдеров, домены, регистраторы, сроки действия и поддомены. Данные хранятся в зашифрованном файле вместе с серверами и попадают в экспорт.') }}</p>
+    </header>
+
+    <div class="dns-section-head">
+        <h2>{{ _('DNS-провайдеры') }}</h2>
+        <a class="btn btn-dns-solid btn-sm" href="{{ url_for('dns.provider_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить провайдера') }}</a>
+    </div>
+    {% if providers %}
+    <div class="dns-providers">
+        {% for provider in providers %}
+        <article class="dns-provider kind-{{ provider.kind }}">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+                <h3 class="text-truncate">{{ provider.name }}</h3>
+                {% set count = domains|selectattr('provider_id', 'equalto', provider.id)|list|length %}
+                <span class="badge text-bg-secondary flex-shrink-0">{{ _('Доменов: %(count)s', count=count) }}</span>
+            </div>
+            {% if provider.user_decrypted %}
+            <div class="dns-cred"><small>{{ _('Логин') }}:</small>{{ text_copy_display(provider.user_decrypted, _('Копировать логин')) }}</div>
+            {% endif %}
+            {% if provider.password_decrypted %}
+            <div class="dns-cred"><small>{{ _('Пароль') }}:</small>{{ password_display(provider.password_decrypted, fluid=True) }}</div>
+            {% endif %}
+            {% if provider.notes %}<p class="small text-body-secondary mb-0">{{ provider.notes }}</p>{% endif %}
+            <div class="dns-actions">
+                {% if provider.login_url %}
+                <a class="btn btn-sm btn-dns-solid" href="{{ provider.login_url }}" target="_blank" rel="noopener noreferrer">{{ _('Войти в панель') }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+                {% endif %}
+                <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('dns.provider_form', provider_id=provider.id) }}" title="{{ _('Редактировать') }}" aria-label="{{ _('Редактировать') }}"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                {{ confirm_delete(url_for('dns.provider_delete', provider_id=provider.id), _('Удалить провайдера %(name)s? Домены останутся без привязки.', name=provider.name)) }}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="dns-empty mb-0">{{ _('Добавьте учётную запись Cloudflare или другого DNS-провайдера: логин и пароль будут зашифрованы, а кнопка «Войти в панель» откроет страницу входа.') }}</p>
+    {% endif %}
+
+    <div class="dns-section-head">
+        <h2>{{ _('Домены') }}</h2>
+        <a class="btn btn-dns btn-sm" href="{{ url_for('dns.domain_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить домен') }}</a>
+    </div>
+    {% if domains %}
+    <div class="table-responsive">
+        <table class="table dns-table align-middle">
+            <thead><tr>
+                <th scope="col">{{ _('Домен') }}</th>
+                <th scope="col">{{ _('DNS-провайдер') }}</th>
+                <th scope="col">{{ _('Регистратор') }}</th>
+                <th scope="col">{{ _('Действует до') }}</th>
+                <th scope="col">{{ _('Записей') }}</th>
+            </tr></thead>
+            <tbody>
+            {% for domain in domains %}
+            <tr>
+                <td class="dns-name"><a href="{{ url_for('dns.domain', domain_id=domain.id) }}">{{ domain.name }}</a></td>
+                <td>{{ provider_map[domain.provider_id].name if domain.provider_id in provider_map else '—' }}</td>
+                <td>{{ domain.registrar or '—' }}</td>
+                <td>{{ expiry_badge(domain, days_left(domain)) }}</td>
+                <td>{{ domain.records|length }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="dns-empty mb-0">{{ _('Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода.') }}</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+:root { --dns-orange: #f38020; --dns-orange-hover: #d86c10; }
+.btn-dns { --bs-btn-color: var(--dns-orange); --bs-btn-border-color: var(--dns-orange); --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--dns-orange); --bs-btn-hover-border-color: var(--dns-orange); --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--dns-orange-hover); --bs-btn-active-border-color: var(--dns-orange-hover); --bs-btn-focus-shadow-rgb: 243, 128, 32; }
+.btn-dns-solid { --bs-btn-color: #fff; --bs-btn-bg: var(--dns-orange); --bs-btn-border-color: var(--dns-orange); --bs-btn-hover-color: #fff; --bs-btn-hover-bg: var(--dns-orange-hover); --bs-btn-hover-border-color: var(--dns-orange-hover); --bs-btn-active-color: #fff; --bs-btn-active-bg: var(--dns-orange-hover); --bs-btn-focus-shadow-rgb: 243, 128, 32; }
+.dns-page { max-width: 1120px; }
+.dns-page h1 i { color: var(--dns-orange); }
+.dns-section-head { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin: 2rem 0 1rem; }
+.dns-section-head h2 { font-size: 1.3rem; margin: 0; }
+.dns-providers { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1rem; }
+.dns-provider { border: 1px solid var(--bs-border-color); border-top: 4px solid var(--dns-orange); border-radius: .75rem; background: var(--bs-tertiary-bg); padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem; min-width: 0; }
+.dns-provider.kind-other { border-top-color: var(--bs-secondary); }
+.dns-provider h3 { font-size: 1.15rem; margin: 0; }
+.dns-provider .dns-cred { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr); align-items: center; gap: .5rem; }
+.dns-provider .dns-cred .input-group { width: 100% !important; }
+.dns-provider .dns-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: auto; padding-top: .4rem; }
+.dns-empty { border: 1px dashed var(--bs-border-color); border-radius: .75rem; padding: 1.5rem; color: var(--bs-secondary-color); }
+.dns-table td, .dns-table th { vertical-align: middle; }
+.dns-table .dns-name { font-family: var(--bs-font-monospace); overflow-wrap: anywhere; }
+.dns-content { font-family: var(--bs-font-monospace); font-size: .875rem; overflow-wrap: anywhere; max-width: 28rem; }
+.dns-proxied { color: var(--dns-orange); }
+.dns-form { max-width: 760px; }
+@media (max-width: 575.98px) { .dns-section-head { flex-wrap: wrap; } }

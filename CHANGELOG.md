@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.6.0] - 2026-09-30
+
+### Added
+- **DNS** card (orange button beside Net Tools): DNS-provider accounts (Cloudflare, Namecheap, GoDaddy, Porkbun, REG.RU, Route 53 or custom) with encrypted login and password and an "Open dashboard" button; domains with registrar, registration and expiry dates, auto-renewal and expiry warnings; DNS records and subdomains.
+- Net Tools offers saved domains and subdomains from the DNS card instead of typing them.
+- DNS data is stored in the same encrypted data file as servers, so it is included in export, import, merge of external files and key change. Files without DNS data keep the previous list format.
+
 ## [4.5.1] - 2026-09-29
 
 ### Fixed

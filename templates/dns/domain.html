@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% from "macros/credentials.html" import password_display, text_copy_display %}
+{% from "dns/_macros.html" import expiry_badge, confirm_delete %}
+{% block title %}{{ domain.name }} · DNS{% endblock %}
+{% block content %}
+<div class="container dns-page my-4">
+    {% include "dns/_head.html" %}
+    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
+        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.index') }}">DNS</a>
+        <span aria-hidden="true" class="mx-2">/</span><span>{{ domain.name }}</span>
+    </nav>
+    <header class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+        <h1 class="h2 mb-0 font-monospace text-break"><i class="bi bi-globe2 me-2" aria-hidden="true"></i>{{ domain.name }}</h1>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="{{ url_for('dns.domain_form', domain_id=domain.id) }}"><i class="bi bi-pencil" aria-hidden="true"></i> {{ _('Редактировать') }}</a>
+            {{ confirm_delete(url_for('dns.domain_delete', domain_id=domain.id), _('Удалить домен %(name)s со всеми записями?', name=domain.name), small=False) }}
+        </div>
+    </header>
+
+    <div class="row g-4">
+        <section class="col-lg-6">
+            <div class="card p-4 h-100">
+                <h2 class="h5">{{ _('Регистрация') }}</h2>
+                <dl class="row mb-0">
+                    <dt class="col-5">{{ _('Регистратор') }}</dt>
+                    <dd class="col-7">{% if domain.registrar_url %}<a href="{{ domain.registrar_url }}" target="_blank" rel="noopener noreferrer">{{ domain.registrar or domain.registrar_url }}</a>{% else %}{{ domain.registrar or '—' }}{% endif %}</dd>
+                    <dt class="col-5">{{ _('Дата регистрации') }}</dt>
+                    <dd class="col-7">{{ domain.registered_on or '—' }}</dd>
+                    <dt class="col-5">{{ _('Действует до') }}</dt>
+                    <dd class="col-7">{{ expiry_badge(domain, days_left) }}</dd>
+                    <dt class="col-5">{{ _('Автопродление') }}</dt>
+                    <dd class="col-7">{{ _('Да') if domain.auto_renew else _('Нет') }}</dd>
+                </dl>
+                {% if domain.notes %}<p class="small text-body-secondary mt-3 mb-0">{{ domain.notes }}</p>{% endif %}
+            </div>
+        </section>
+        <section class="col-lg-6">
+            <div class="card p-4 h-100">
+                <h2 class="h5">{{ _('DNS-провайдер') }}</h2>
+                {% if provider %}
+                <p class="fw-semibold mb-2">{{ provider.name }}</p>
+                {% if provider.user_decrypted %}<div class="d-flex align-items-center gap-2 mb-2"><small>{{ _('Логин') }}:</small>{{ text_copy_display(provider.user_decrypted, _('Копировать логин')) }}</div>{% endif %}
+                {% if provider.password_decrypted %}<div class="d-flex align-items-center gap-2 mb-2"><small>{{ _('Пароль') }}:</small>{{ password_display(provider.password_decrypted) }}</div>{% endif %}
+                {% if provider.login_url %}<a class="btn btn-sm btn-dns-solid align-self-start mt-auto" href="{{ provider.login_url }}" target="_blank" rel="noopener noreferrer">{{ _('Войти в панель') }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>{% endif %}
+                {% else %}
+                <p class="text-body-secondary mb-0">{{ _('Не выбран. Укажите провайдера в настройках домена.') }}</p>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+
+    <section id="records" class="mt-4">
+        <div class="dns-section-head">
+            <h2>{{ _('DNS-записи и поддомены') }}</h2>
+            <span class="badge text-bg-secondary">{{ records|length }}</span>
+        </div>
+        {% if records %}
+        <div class="table-responsive">
+            <table class="table dns-table">
+                <thead><tr>
+                    <th scope="col">{{ _('Имя') }}</th><th scope="col">{{ _('Тип') }}</th>
+                    <th scope="col">{{ _('Значение') }}</th><th scope="col">Proxy</th>
+                    <th scope="col"><span class="visually-hidden">{{ _('Действия') }}</span></th>
+                </tr></thead>
+                <tbody>
+                {% for record in records %}
+                <tr{% if edit and edit.id == record.id %} class="table-active"{% endif %}>
+                    <td class="dns-name">{{ fqdn(record, domain) }}{% if record.notes %}<div class="small text-body-secondary font-sans-serif">{{ record.notes }}</div>{% endif %}</td>
+                    <td><span class="badge text-bg-light border">{{ record.type }}</span></td>
+                    <td class="dns-content">{{ record.content }}</td>
+                    <td>{% if record.proxied %}<i class="bi bi-cloud-fill dns-proxied" title="{{ _('Проксируется') }}" aria-label="{{ _('Проксируется') }}"></i>{% else %}<i class="bi bi-cloud text-body-secondary" title="{{ _('Только DNS') }}" aria-label="{{ _('Только DNS') }}"></i>{% endif %}</td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=domain.id, edit=record.id) }}#record-form" title="{{ _('Редактировать') }}" aria-label="{{ _('Редактировать') }}"><i class="bi bi-pencil" aria-hidden="true"></i></a>
+                        {{ confirm_delete(url_for('dns.record_delete', domain_id=domain.id, record_id=record.id), _('Удалить запись %(name)s?', name=fqdn(record, domain))) }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="dns-empty">{{ _('Записей пока нет. Добавьте корневую запись (@) и поддомены, например vpn или www.') }}</p>
+        {% endif %}
+
+        {% set r = edit or {} %}
+        <form id="record-form" method="post" class="card p-4 mt-3"
+              action="{{ url_for('dns.record_save', domain_id=domain.id, record_id=edit.id) if edit else url_for('dns.record_save', domain_id=domain.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <h3 class="h6 mb-3">{{ _('Редактировать запись') if edit else _('Новая запись') }}</h3>
+            <div class="row g-3">
+                <div class="col-lg-4 col-md-8">
+                    <label class="form-label" for="record-name">{{ _('Имя') }}</label>
+                    <div class="input-group">
+                        <input class="form-control font-monospace" id="record-name" name="name" maxlength="253" spellcheck="false" value="{{ r.get('name', '') }}" placeholder="@ / vpn">
+                        <span class="input-group-text text-truncate" style="max-width: 55%">.{{ domain.name }}</span>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label class="form-label" for="record-type">{{ _('Тип') }}</label>
+                    <select class="form-select" id="record-type" name="type">
+                        {% for t in record_types %}<option {% if r.get('type', 'A') == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-8">
+                    <label class="form-label" for="record-content">{{ _('Значение') }}</label>
+                    <input class="form-control font-monospace" id="record-content" name="content" maxlength="2048" spellcheck="false" required value="{{ r.get('content', '') }}" placeholder="203.0.113.10">
+                </div>
+                <div class="col-lg-2 col-md-4 d-flex align-items-end">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="record-proxied" name="proxied" {% if r.get('proxied') %}checked{% endif %}>
+                        <label class="form-check-label" for="record-proxied">{{ _('Проксировать (Cloudflare)') }}</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="record-notes">{{ _('Заметка') }}</label>
+                    <input class="form-control" id="record-notes" name="notes" maxlength="500" value="{{ r.get('notes', '') }}" placeholder="{{ _('Например, какой сервер или сервис') }}">
+                </div>
+            </div>
+            <div class="d-flex gap-2 justify-content-end mt-3">
+                {% if edit %}<a class="btn btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=domain.id) }}#records">{{ _('Отмена') }}</a>{% endif %}
+                <button class="btn btn-dns-solid" type="submit">{{ _('Сохранить запись') if edit else _('Добавить запись') }}</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
