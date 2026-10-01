@@ -25,6 +25,17 @@ TRICKY_SECRETS = [
 ]
 
 
+@pytest.fixture(autouse=True)
+def _request_context(app):
+    """Макросы вызывают _(), а селектор локали читает request.args и session.
+
+    Без активного request context рендер падает на RuntimeError ещё до
+    проверок, поэтому контекст нужен всем тестам этого модуля.
+    """
+    with app.test_request_context('/'):
+        yield
+
+
 def _attr(html, name):
     """Достаёт значение атрибута name и разэкранирует его как это делает браузер."""
     match = re.search(r'%s="([^"]*)"' % re.escape(name), html)
