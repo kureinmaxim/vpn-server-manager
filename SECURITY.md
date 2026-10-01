@@ -24,6 +24,11 @@ prepared before any public disclosure.
 
 ## What this app stores
 
-Server credentials live in a local Fernet-encrypted file. The `SECRET_KEY` in
-`.env` is the only way to read them. There is no cloud sync and no key recovery.
-Treat `.env` and full exports like a password database.
+Server credentials and the DNS card live in a single local Fernet-encrypted file.
+The `SECRET_KEY` in `.env` is the only way to read them. There is no cloud sync
+and no key recovery. Treat `.env` and full exports like a password database.
+
+The login PIN is a UI lock, not a second layer of encryption: it is stored in
+plain text in `config.json` and is not hashed. It keeps a shared machine from
+being an open notebook, but it does not protect the data from anyone who can read
+the files. Full exports bundle the data file, the key and the PIN together.

@@ -3466,9 +3466,9 @@ msgstr "启动"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:610
 #: templates/help.html:610
 msgid ""
-"`app.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
+"`run.py` запускает веб-сервер Flask в фоновом потоке и создает нативное "
 "окно с помощью PyWebView."
-msgstr "`app.py`在后台线程中启动Flask Web服务器，并使用PyWebView创建本机窗口。"
+msgstr "`run.py`在后台线程中启动Flask Web服务器，并使用PyWebView创建本机窗口。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:611
 #: templates/help.html:611

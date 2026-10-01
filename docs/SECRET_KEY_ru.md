@@ -4,155 +4,161 @@
 
 ## 🔐 Назначение ключа
 
-SECRET_KEY - это криптографический ключ, используемый для шифрования всех чувствительных данных в приложении:
+`SECRET_KEY` — симметричный ключ Fernet. Им зашифрованы:
 
-- **Пароли SSH** серверов
-- **Данные панелей управления** (логины, пароли)
-- **Информация о хостингах** (учетные данные)
-- **Все данные серверов** в файле `servers.json.enc`
+- пароли SSH (основной и root);
+- логины и пароли панели управления;
+- логины и пароли личного кабинета хостера;
+- файл данных целиком — серверы **и** DNS-карточка.
+
+Без ключа файл данных не читается. Восстановления ключа нет.
+
+## 🧅 Два слоя шифрования
+
+Данные шифруются Fernet'ом дважды — это важно понимать при ротации и отладке.
+
+| Слой | Что шифруется | Как выглядит |
+|---|---|---|
+| 1. Поля | Отдельные пароли и логины внутри JSON | строка-токен `gAAAAA...` |
+| 2. Файл | Весь `servers.json.enc` поверх первого слоя | бинарный Fernet-токен |
+
+Поэтому в расшифрованном JSON пароли всё ещё остаются токенами `gAAAAA...` — их расшифровывает второй вызов Fernet.
+
+Реализация: `app/services/data_manager_service.py` (`encrypt_data`, `decrypt_data`, `load_servers`, `save_servers`).
+
+## 📦 Формат файла данных
+
+С версии 4.x внутри зашифрованного файла лежит объект:
+
+```json
+{
+  "servers": [ ... ],
+  "dns": { "domains": [ ... ] }
+}
+```
+
+Старый формат — просто список серверов `[ ... ]` — по-прежнему читается: `split_payload()` распознаёт оба варианта.
 
 ## 🎲 Создание ключа
 
-### Автоматическая генерация
 ```bash
 python3 tools/generate_key.py
 ```
 
-### Ручное создание
+Или вручную:
+
 ```python
 from cryptography.fernet import Fernet
-key = Fernet.generate_key()
-print(key.decode())  # Сохраните в .env файл
+print(Fernet.generate_key().decode())   # 44 символа base64
 ```
+
+Ключ Fernet — это **не** токен: он не начинается с `gAAAAA`.
+
+При первом запуске собранного приложения `.env` с новым ключом создаётся автоматически (`app/config.py`), если файла ещё нет.
 
 ## 📁 Хранение ключа
 
-### Файл .env
+Файл `.env`:
+
 ```
-SECRET_KEY=ваш_ключ_здесь
+SECRET_KEY=44-символьный_base64_ключ
 ```
 
-### Расположение файла
-- **Режим разработки**: В корне проекта
-- **Упакованное приложение**: `~/Library/Application Support/VPNServerManager/.env`
+Расположение зависит от режима:
+
+| Режим | Путь |
+|---|---|
+| Разработка | `.env` в корне проекта |
+| macOS (собранное) | `~/Library/Application Support/VPNServerManager-Clean/.env` |
+| Windows (собранное) | `%APPDATA%\VPNServerManager-Clean\.env` |
+| Linux (собранное) | `~/.local/share/VPNServerManager-Clean/.env` |
+
+Каталог приложения называется `VPNServerManager-Clean` — именно так, с суффиксом.
 
 ## ⚙️ Применение в приложении
 
-### Инициализация
-```python
-from cryptography.fernet import Fernet
-import os
-from dotenv import load_dotenv
+Ключ читается в `app/config.py` и отдаётся `DataManagerService`:
 
-load_dotenv()
-SECRET_KEY = os.environ.get('SECRET_KEY')
-fernet = Fernet(SECRET_KEY.encode())
+```python
+SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 ```
 
-### Шифрование данных
-```python
-def encrypt_data(data):
-    return fernet.encrypt(data.encode()).decode()
+Шифрование и расшифровка поля — `app/services/data_manager_service.py`:
 
-# Пример использования
-encrypted_password = encrypt_data("mypassword123")
-```
-
-### Расшифровка данных
 ```python
-def decrypt_data(encrypted_data):
-    try:
-        return fernet.decrypt(encrypted_data.encode()).decode()
-    except:
+def encrypt_data(self, data: str) -> str:
+    if not data:
         return ""
+    return self.fernet.encrypt(data.encode()).decode()
 
-# Пример использования
-password = decrypt_data(encrypted_password)
+def decrypt_data(self, encrypted_data) -> str:
+    if encrypted_data.startswith('gAAAAA'):
+        try:
+            return self.fernet.decrypt(encrypted_data.encode()).decode()
+        except InvalidToken:
+            return encrypted_data
+    return encrypted_data          # не токен — возвращаем как есть
 ```
 
-## 🔄 Смена ключа
+## 👁️ Расшифрованные пароли в памяти
 
-### Процесс смены
-1. Генерируется новый ключ
-2. Создается резервная копия старых данных
-3. Все данные перешифровываются новым ключом
-4. Обновляется файл .env
+При загрузке `load_servers()` кладёт открытые значения в отдельные поля с суффиксом `_decrypted`:
 
-### Код смены ключа
-```python
-# В функции change_main_key()
-old_key = os.environ.get('SECRET_KEY')
-new_key = request.form.get('new_key')
-
-# Обновляем глобальные переменные
-SECRET_KEY = new_key
-fernet = Fernet(SECRET_KEY.encode())
-
-# Перешифровываем все данные
-servers = load_servers()  # Загружаем старыми ключом
-save_servers(servers)     # Сохраняем новым ключом
 ```
+ssh_credentials.password_decrypted
+ssh_credentials.root_password_decrypted
+panel_credentials.user_decrypted / password_decrypted
+hoster_credentials.user_decrypted / password_decrypted
+```
+
+Эти поля нужны только для показа в интерфейсе. Перед записью на диск их снимает `_strip_runtime_secrets()`, поэтому **открытые пароли в файл не попадают**. Если вы видите `_decrypted` в расшифрованном дампе — значит дамп снят из памяти, а не из файла.
+
+Все открытые значения проходят `sanitize_secret()` (`app/utils/credentials.py`): убираются CR/LF, zero-width-символы, BOM, soft hyphen и bidi-метки, выполняется нормализация Unicode NFC и обрезка пробелов по краям.
+
+## 🖥️ Передача секрета в интерфейс
+
+Пароль попадает в HTML-атрибут **в base64**, а не в открытом виде:
+
+```html
+<span data-password="{{ value | secret_attr }}" data-enc="b64">
+```
+
+Фильтр `secret_attr` — это `encode_secret_attr()` из `app/utils/credentials.py`, он регистрируется в `app/__init__.py`. Base64 выбран потому, что WebView декодирует `%`, `&` и `#` в обычных атрибутах и искажает пароль. Обратное преобразование делает `static/js/credentials.js` (`atob` + UTF-8) при `data-enc="b64"`.
+
+Не подставляйте секреты через `|tojson` в атрибут и не вставляйте их в `onclick="...('пароль')"`.
+
+## 🔄 Ротация ключа
+
+Если ключ скомпрометирован (попал в git, в чат, в публичный артефакт), его надо сменить. Простая замена строки в `.env` **уничтожит доступ к данным** — нужен перешифровывающий скрипт:
+
+```bash
+python scripts/rotate_secret_key.py --dry-run   # показать план, ничего не менять
+python scripts/rotate_secret_key.py             # выполнить ротацию
+python scripts/rotate_secret_key.py --data-file data/servers.json.enc
+```
+
+Скрипт читает старый ключ из `.env`, расшифровывает оба слоя, генерирует новый ключ, перешифровывает поля и файл, а также делает резервные копии `.env` и файла данных с отметкой времени.
 
 ## 🛡️ Безопасность
 
-### Алгоритм шифрования
-- **Fernet** (AES-128 + HMAC-SHA256)
-- **Симметричное шифрование**
-- **Аутентификация сообщений**
-
-### Защита ключа
-- Ключ НЕ хранится в Git
-- Файл .env в .gitignore
-- Автоматическое резервное копирование при смене
-
-## ⚠️ Важные моменты
+- Алгоритм: Fernet — AES-128-CBC + HMAC-SHA256, симметричный, с аутентификацией.
+- Ключ не хранится в Git; `.env` в `.gitignore`.
+- Облачной синхронизации и восстановления ключа нет.
 
 ### Потеря ключа
-- **Без ключа данные НЕВОЗМОЖНО восстановить**
-- Всегда делайте резервные копии
-- Используйте "Полный экспорт" для backup
 
-### Проверка ключа
-```python
-# Проверка соответствия ключа и данных
-try:
-    decrypted_data = fernet.decrypt(encrypted_data)
-    return True
-except InvalidToken:
-    return False
-```
-
-## 📋 Примеры использования
-
-### В app.py
-```python
-# Шифрование пароля SSH
-server['ssh_credentials']['password'] = encrypt_data(password)
-
-# Расшифровка для отображения
-decrypted_password = decrypt_data(server['ssh_credentials']['password'])
-```
-
-### В функциях экспорта
-```python
-# Экспорт ключа
-with open('exported_key.env', 'w') as f:
-    f.write(f'SECRET_KEY={SECRET_KEY}')
-```
+Без ключа данные восстановить **невозможно**. Резервная копия всегда состоит из двух частей: файл `.enc` **и** ключ.
 
 ## 🔍 Отладка
 
-### Проверка ключа
+Просмотр расшифрованных данных без запуска GUI:
+
 ```bash
 python3 tools/decrypt_tool.py
 ```
 
-### Генерация нового ключа
-```bash
-python3 tools/generate_key.py
-```
+Проверка, подходит ли ключ к файлу, — `verify_key_for_file()` в `DataManagerService`; тот же путь используется в настройках приложения и показывает количество серверов и доменов DNS в файле.
 
-### Проверка соответствия
-- В настройках приложения
-- Функция "Проверить соответствие"
-- Показывает количество серверов в файле 
+## ⚠️ PIN — это не SECRET_KEY
+
+PIN блокирует интерфейс, но **ничего не шифрует** и хранится в открытом виде в `config.json`. Подробности — в [DATA_STORAGE_GUIDE_ru.md](DATA_STORAGE_GUIDE_ru.md), раздел про `config.json`. Не путайте эти два механизма: знание PIN не даёт доступа к данным без ключа, и наоборот.
