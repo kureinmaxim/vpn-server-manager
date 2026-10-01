@@ -51,7 +51,7 @@ app.config['SESSION_COOKIE_NAME'] = 'vps_manager_session_vpn'
 
 ```python
 def get_app_data_dir():
-    app_name = "VPNServerManager"
+    app_name = "VPNServerManager-Clean"
     if is_frozen:  # Установленное приложение
         if sys.platform == 'darwin':  # macOS
             return os.path.join(
@@ -60,8 +60,10 @@ def get_app_data_dir():
                 app_name
             )
     else:  # Режим разработки
-        return os.path.join(os.getcwd())
+        return project_root
 ```
+
+Windows использует `%APPDATA%\VPNServerManager-Clean\`, Linux — `~/.local/share/VPNServerManager-Clean/`. В режиме разработки каталогом данных служит корень проекта.
 
 **Преимущества:**
 - ✅ Каждое приложение имеет свои данные

@@ -53,7 +53,7 @@ app.config['SESSION_COOKIE_NAME'] = 'vps_manager_session_vpn'
 
 ```python
 def get_app_data_dir():
-    app_name = "VPNServerManager"
+    app_name = "VPNServerManager-Clean"
     if is_frozen:  # packaged app
         if sys.platform == 'darwin':  # macOS
             return os.path.join(
@@ -62,10 +62,10 @@ def get_app_data_dir():
                 app_name,
             )
     else:  # development
-        return os.getcwd()
+        return project_root
 ```
 
-Packaged Windows uses `%APPDATA%\VPNServerManager\`; Linux uses `~/.local/share/VPNServerManager/`. Sync between copies is import/export, not a shared file.
+Packaged Windows uses `%APPDATA%\VPNServerManager-Clean\`; Linux uses `~/.local/share/VPNServerManager-Clean/`. In development the data directory is the project root. Sync between copies is import/export, not a shared file.
 
 **Benefits:**
 - Each copy keeps its own data
