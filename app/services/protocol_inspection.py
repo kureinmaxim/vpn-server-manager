@@ -47,6 +47,9 @@ def summarize(data):
               if type(value := data.get(key)) is kind and (not isinstance(value, str) or len(value) <= 255)}
     clients = data.get('clients')
     result = {'fields': fields, 'client_count': len(clients) if isinstance(clients, list) else None}
+    if not clients and data.get('password'):
+        # Legacy shared credentials (NaiveProxy / Hysteria2); never return them.
+        result['client_count'] = 1
     if isinstance(data.get('port_bindings'), list):
         result['ports'] = [{'port': row['port'], 'protocol': row['protocol']}
                            for row in data['port_bindings'] if isinstance(row, dict)

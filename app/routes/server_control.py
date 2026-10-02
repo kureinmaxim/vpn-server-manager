@@ -11,12 +11,31 @@ from .reset import target, identity, remote, _guard, _locks
 from ..services.server_control_payload import SCRIPT_SOURCE
 from ..services.server_control_remote import CATALOG, ACTIONS
 from ..services.protocol_inspection import PROTOCOL_FILES
+from ..services.protocol_mutations import validate_change
 from ..utils.decorators import require_auth, require_pin, csrf_protect
 import threading
 
 control_bp = Blueprint("server_control", __name__)
 _pending = {}
 TTL = 300
+
+
+def mutation_error(code):
+    messages = {
+        'bot_running': _("Сначала остановите TelegramOnly: одновременное изменение настроек ботом не поддерживается."),
+        'config_mismatch': _("Настройки менеджера отличаются от файла службы. Изменения заблокированы."),
+        'unsupported_runtime': _("Изменение доступно для одной работающей службы AnyTLS systemd с выделенным конфигом sing-box."),
+        'unsupported_config': _("Этот формат конфигурации пока доступен только для чтения."),
+        'ambiguous_config': _("Найдено несколько файлов настроек. Изменения заблокированы."),
+        'client_exists': _("Клиент с таким именем уже существует."),
+        'client_missing': _("Клиент больше не существует. Прочитайте настройки заново."),
+        'last_client': _("Нельзя удалить последнего клиента."),
+        'validation_failed': _("Проверка sing-box не прошла. Рабочие файлы не изменены."),
+        'rolled_back': _("Изменение не применилось. Предыдущие файлы восстановлены, служба работает."),
+        'recovery_required': _("Требуется восстановление по SSH. Резервная копия сохранена; новые изменения заблокированы."),
+        'unsafe_path': _("Права или расположение файлов не позволяют безопасно изменить конфигурацию."),
+    }
+    return messages.get(code, _("Цель изменилась. Обновите состояние и создайте новый план."))
 
 
 def invoke(creds, body):
@@ -114,16 +133,27 @@ def clients(server_id, operation):
 @csrf_protect
 def create_plan(server_id):
     body = request.get_json(silent=True)
-    if not isinstance(body, dict) or not all(isinstance(body.get(k), str) for k in ("component", "action", "instance", "runtime")):
+    if not isinstance(body, dict):
         return jsonify(error=_("Выберите службу и действие")), 400
-    if body["component"] not in CATALOG or body["action"] not in ACTIONS or body["runtime"] not in ("docker", "systemd") or len(body["instance"]) > 256:
-        return jsonify(error=_("Выберите службу и действие")), 400
-    command = {k: body[k] for k in ("component", "action", "instance", "runtime")}
+    if body.get('action') == 'configure':
+        try:
+            if body.get('component') != 'anytls' or any(not isinstance(body.get(k), str) or not re.fullmatch('[0-9a-f]{64}', body[k]) for k in ('source_id', 'revision')):
+                raise ValueError()
+            command = {k: body[k] for k in ('component', 'action', 'source_id', 'revision')}
+            command['change'] = validate_change(body.get('change'))
+        except ValueError:
+            return jsonify(error=_("Неверные параметры изменения")), 400
+    else:
+        if not all(isinstance(body.get(k), str) for k in ("component", "action", "instance", "runtime")):
+            return jsonify(error=_("Выберите службу и действие")), 400
+        if body["component"] not in CATALOG or body["action"] not in ACTIONS or body["runtime"] not in ("docker", "systemd") or len(body["instance"]) > 256:
+            return jsonify(error=_("Выберите службу и действие")), 400
+        command = {k: body[k] for k in ("component", "action", "instance", "runtime")}
     server, creds = target(server_id)
     try:
         plan = invoke(creds, dict(command, operation="plan"))
         if not isinstance(plan.get("plan_hash"), str) or not isinstance(plan.get("hostname"), str):
-            return jsonify(error=_("Цель изменилась. Обновите состояние и создайте новый план.")), 409
+            return jsonify(error=mutation_error(plan.get('error'))), 409
     except Exception:
         return remote_error()
     owner = session.setdefault("control_session", secrets.token_urlsafe(32))
@@ -160,7 +190,7 @@ def apply_plan(server_id):
     try:
         result = invoke(creds, dict(item["command"], operation="apply", plan_hash=item["plan"]["plan_hash"], confirmation=item["plan"]["hostname"]))
         if not result.get("success"):
-            result["error"] = _("Операция не подтверждена. Обновите состояние: служба могла измениться или команда завершилась с ошибкой.")
+            result["error"] = mutation_error(result.get('error')) if item['command']['action'] == 'configure' else _("Операция не подтверждена. Обновите состояние: служба могла измениться или команда завершилась с ошибкой.")
         if "inventory" in result:
             localize_inventory(result["inventory"])
         return jsonify(result), (200 if result.get("success") else 409)

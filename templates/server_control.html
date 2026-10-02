@@ -1,14 +1,18 @@
 {% extends 'layout.html' %}
 {% block content %}
-<div class="container py-4" id="server-control" data-csrf="{{ session.csrf_token }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/server-control.css') }}">
+<div class="container py-2" id="server-control" data-csrf="{{ session.csrf_token }}">
     <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
     <div class="d-flex justify-content-between flex-wrap gap-3 mt-3">
         <div><h1 class="h3">{{ _('Управление сервером') }}</h1><p class="text-muted">{{ server.name }} · {{ server.ip_address }}</p></div>
         <div class="d-flex gap-2 align-items-start"><a class="btn btn-outline-secondary" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Мониторинг VPS') }}</a><button class="btn btn-primary" id="control-refresh">{{ _('Проверить по SSH') }}</button></div>
     </div>
-    <p>{{ _('Управление использует SSH из карточки. Бот не обязателен. Способ запуска определяется отдельно для каждой службы.') }}</p>
-    <p class="small text-muted">{{ _('Подключение требует известного ключа в known_hosts и прав root или sudo -n.') }}</p>
-    <div class="alert alert-info">{{ _('Перенос в разработке: доступны обнаружение и запуск, остановка, перезапуск служб. Настройки протоколов, клиенты и установщики пока не перенесены.') }}</div>
+    <details class="control-help mb-2">
+        <summary>{{ _('Возможности и подключение') }}</summary>
+        <p class="mt-2 mb-1">{{ _('Управление использует SSH из карточки. Бот не обязателен. Способ запуска определяется отдельно для каждой службы.') }}</p>
+        <p class="small text-muted mb-1">{{ _('Подключение требует известного ключа в known_hosts и прав root или sudo -n.') }}</p>
+        <p class="small mb-1">{{ _('Для AnyTLS systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается.') }}</p>
+    </details>
     <p id="control-status" role="status" aria-live="polite"></p>
     <p id="control-monitoring-status" class="small text-muted" role="status"></p>
     <div id="control-host-summary" class="card mb-3" hidden><div class="card-body">
@@ -27,8 +31,22 @@
             <button class="btn btn-outline-secondary" id="control-cancel">{{ _('Отмена') }}</button>
         </div>
     </section>
-    <div id="control-services" class="row g-3"></div>
-    <section class="mt-4">
+    <div class="control-toolbar mb-2">
+        <label for="control-search" class="visually-hidden">{{ _('Поиск службы') }}</label>
+        <input id="control-search" type="search" class="form-control" placeholder="{{ _('Поиск службы') }}">
+        <label for="control-filter" class="visually-hidden">{{ _('Показать службы') }}</label>
+        <select id="control-filter" class="form-select">
+            <option value="installed">{{ _('Обнаруженные') }}</option>
+            <option value="all">{{ _('Все службы') }}</option>
+            <option value="running">{{ _('Работающие') }}</option>
+            <option value="stopped">{{ _('Остановленные и ошибки') }}</option>
+        </select>
+        <span id="control-count" class="small text-muted" role="status"></span>
+    </div>
+    <div id="control-services" class="control-service-list"></div>
+    <details class="mt-3 control-protocol-section">
+        <summary class="h5">{{ _('Конфигурации протоколов и клиенты') }}</summary>
+    <section class="mt-3">
         <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
             <h2 class="h4">{{ _('Конфигурации протоколов') }}</h2>
             <button class="btn btn-outline-primary" id="control-protocols">{{ _('Прочитать конфигурации') }}</button>
@@ -36,6 +54,7 @@
         <p class="text-muted">{{ _('Проверка ищет файлы настроек TelegramOnly на хосте и в bind mounts бота, включая остановленные контейнеры. Пароли, ключи и клиентские ссылки не отображаются. Наличие файла не подтверждает применение настроек к службе.') }}</p>
         <div id="control-protocol-results" class="row g-3"></div>
     </section>
+    </details>
     <div class="d-flex gap-3 mt-4 flex-wrap">
         <a href="{{ url_for('reset.disk_page', server_id=server.id) }}">{{ _('Проверить место на диске') }}</a>
         <a href="{{ url_for('reset.archive_page', server_id=server.id) }}">{{ _('Архивы очистки') }}</a>
@@ -52,22 +71,42 @@
     urls.exportClient = {{ url_for('server_control.clients', server_id=server.id, operation='export')|tojson }};
     const actions = {{ {'start': _('Запустить'), 'stop': _('Остановить'), 'restart': _('Перезапустить')}|tojson }};
     const states = {{ {'active': _('Работает'), 'running': _('Работает'), 'inactive': _('Остановлена'), 'exited': _('Остановлена'), 'failed': _('Ошибка'), 'created': _('Создана'), 'unknown': _('Неизвестно')}|tojson }};
-    let ticket = null, busy = false, monitoring = [], latestInventory = null;
+    let ticket = null, busy = false, monitoring = [], latestInventory = null, plannedMutation = false;
+    const expanded = new Set(), search = document.getElementById('control-search'), filter = document.getElementById('control-filter');
     let secretTimer;
     function hideProfiles() {
         root.querySelectorAll('[data-private-profile]').forEach(el => { el.value = ''; el.remove(); });
         clearTimeout(secretTimer);
     }
     document.addEventListener('visibilitychange', () => { if (document.hidden) hideProfiles(); });
+    document.querySelector('.control-protocol-section').addEventListener('toggle', event => { if (!event.target.open) hideProfiles(); });
     window.addEventListener('pagehide', hideProfiles);
     function node(tag, cls, text) { const el = document.createElement(tag); el.className = cls; el.textContent = text; return el; }
-    function clearPlan() { ticket = null; panel.hidden = true; confirmation.value = ''; }
+    function clearPlan() { ticket = null; plannedMutation = false; panel.hidden = true; confirmation.value = ''; }
     async function request(kind, body = {}) {
         const response = await fetch(urls[kind], {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': root.dataset.csrf}, body: JSON.stringify(body)});
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || {{ _('Операция не выполнена')|tojson }});
+        if (!response.ok) throw new Error((data.error || {{ _('Операция не выполнена')|tojson }}) + (data.backup ? '\n' + {{ _('Резервная копия')|tojson }} + ': ' + data.backup : ''));
         return data;
     }
+    function filterServices() {
+        let visible = 0;
+        const term = search.value.trim().toLocaleLowerCase();
+        services.querySelectorAll('[data-service]').forEach(row => {
+            const state = row.dataset.state;
+            row.hidden = !row.textContent.toLocaleLowerCase().includes(term) ||
+                (filter.value === 'installed' && state === 'absent') ||
+                (filter.value === 'running' && state !== 'running') ||
+                (filter.value === 'stopped' && state !== 'stopped');
+            if (!row.hidden) visible++;
+        });
+        document.getElementById('control-count').textContent = visible + ' / ' + services.querySelectorAll('[data-service]').length;
+        let empty = services.querySelector('[data-empty]');
+        if (!empty) { empty = node('p', 'text-muted p-3', {{ _('Нет служб по выбранному фильтру. Выберите «Все службы» или выполните проверку по SSH.')|tojson }}); empty.dataset.empty = 'true'; services.append(empty); }
+        empty.hidden = visible > 0;
+    }
+    search.addEventListener('input', filterServices);
+    filter.addEventListener('change', filterServices);
     async function task(fn) {
         if (busy) return;
         busy = true; root.querySelectorAll('button').forEach(b => b.disabled = true);
@@ -80,21 +119,31 @@
         services.replaceChildren();
         document.getElementById('control-summary').textContent = data.hostname + ' · systemd: ' + (data.systemd_available ? '✓' : '—') + ' · Docker: ' + (data.docker_available ? '✓' : '—');
         data.components.forEach(component => {
-            const col = node('div', 'col-md-6 col-xl-4', ''), card = node('section', 'card h-100', ''), body = node('div', 'card-body', '');
-            body.append(node('h2', 'h5', component.title));
+            const card = node('details', 'control-service', ''), body = node('div', 'control-service-body', '');
+            card.dataset.service = component.key;
+            card.dataset.state = !component.instances.length ? 'absent' : component.instances.some(i => ['running', 'active'].includes(i.state)) ? 'running' : 'stopped';
+            card.open = expanded.has(component.key);
+            card.addEventListener('toggle', () => { if (!card.isConnected) return; if (card.open) expanded.add(component.key); else expanded.delete(component.key); });
+            const summary = node('summary', 'control-service-summary', '');
+            summary.append(node('span', 'fw-semibold', component.title));
+            const labels = component.instances.map(i => i.runtime + ': ' + (states[i.state] || i.state));
+            summary.append(node('span', 'small control-state', labels.join(' · ') || {{ _('Не обнаружено')|tojson }}));
+            card.append(summary);
             monitoring.filter(service => service.control_component === component.key && service.status !== 'not_installed').forEach(service => {
                 const details = [service.unit_name, service.uptime, service.enabled].filter(value => value && value !== '-');
                 body.append(node('p', 'small text-muted', {{ _('Данные мониторинга')|tojson }} + ': ' + details.join(' · ')));
             });
             if (!component.instances.length) body.append(node('p', 'text-muted mb-0', {{ _('Не обнаружено в доступных средах')|tojson }}));
             component.instances.forEach(instance => {
-                const section = node('div', 'border-top pt-3 mt-3', '');
+                const section = node('div', 'control-instance', '');
                 section.append(node('div', 'fw-semibold', instance.runtime + ' · ' + (states[instance.state] || instance.state)));
                 section.append(node('div', 'small text-break text-muted mb-2', instance.name || instance.id));
                 if (instance.project) section.append(node('div', 'small text-muted mb-2', instance.project + ' / ' + instance.service));
                 const buttons = node('div', 'd-flex gap-2 flex-wrap', '');
                 Object.entries(actions).forEach(([action, title]) => {
-                    const button = node('button', 'btn btn-sm btn-outline-secondary', title); button.type = 'button';
+                    if (action === 'start' && ['running', 'active'].includes(instance.state)) return;
+                    if (action === 'stop' && ['inactive', 'exited', 'created'].includes(instance.state)) return;
+                    const button = node('button', 'btn btn-sm ' + (action === 'stop' ? 'btn-outline-warning' : 'btn-outline-primary'), title); button.type = 'button';
                     button.addEventListener('click', () => task(async () => {
                         clearPlan();
                         const response = await request('plan', {component: component.key, runtime: instance.runtime, instance: instance.id, action});
@@ -104,20 +153,41 @@
                         status.textContent = {{ _('План готов. Срок действия — 5 минут.')|tojson }};
                     })); buttons.append(button);
                 }); section.append(buttons); body.append(section);
-            }); card.append(body); col.append(card); services.append(col);
+            });
+            if (['vless', 'hysteria2', 'naiveproxy', 'mieru', 'mtproto', 'tuic', 'anytls', 'xhttp'].includes(component.key)) {
+                const settings = node('button', 'btn btn-sm btn-outline-primary mt-2', {{ _('Конфигурации протоколов и клиенты')|tojson }});
+                settings.addEventListener('click', () => task(() => loadProtocolSettings(component.key)));
+                body.append(settings);
+            }
+            card.append(body); services.append(card);
         });
+        filterServices();
     }
     document.getElementById('control-refresh').addEventListener('click', () => task(async () => { clearPlan(); render(await request('discover')); status.textContent = {{ _('Состояние обновлено')|tojson }}; }));
     document.getElementById('control-cancel').addEventListener('click', clearPlan);
-    document.getElementById('control-protocols').addEventListener('click', () => task(async () => {
+    async function planMutation(selector, change) {
+        clearPlan(); hideProfiles();
+        const response = await request('plan', {...selector, action: 'configure', change});
+        ticket = response.ticket; plannedMutation = true;
+        const titles = {{ {'port': _('Изменить порт'), 'add_client': _('Создать клиента'), 'remove_client': _('Отозвать клиента')}|tojson }};
+        document.getElementById('control-plan-text').textContent = response.plan.hostname + '\nAnyTLS · ' + response.plan.target.id + '\n' + titles[change.kind] + ': ' + (change.name || change.port) + '\n' + {{ _('Будут сохранены резервные копии обоих файлов, проверен конфиг и перезапущена служба. При ошибке будет выполнен откат.')|tojson }};
+        panel.hidden = false; panel.scrollIntoView({block: 'center'}); confirmation.focus();
+        status.textContent = {{ _('План готов. Срок действия — 5 минут.')|tojson }};
+    }
+    async function loadProtocolSettings(selected = null) {
         hideProfiles();
+        const protocolSection = document.querySelector('.control-protocol-section');
+        protocolSection.open = true;
         const results = document.getElementById('control-protocol-results'); results.replaceChildren();
         const data = await request('protocols');
         const owners = {{ {'candidate': _('Возможный файл настроек; владелец не подтверждён'), 'telegramonly-systemd': _('TelegramOnly / systemd'), 'telegramonly-docker': _('TelegramOnly / Docker'), 'ambiguous': _('Найдено несколько конфигураций'), 'not_found': _('Файлы менеджера не найдены'), 'xui_detected': _('Обнаружена 3x-ui: требуется проверка владельца VLESS')}|tojson }};
         const fields = {{ {'enabled': _('Включён в менеджере'), 'server': _('Сервер'), 'domain': _('Домен'), 'port': _('Порт'), 'sni': 'SNI', 'insecure': _('Проверка TLS отключена'), 'transport': _('Транспорт'), 'mode': _('Режим'), 'security': _('Защита')}|tojson }};
         data.protocols.forEach(protocol => {
-            const col = node('div', 'col-lg-6', ''), card = node('article', 'card h-100', ''), body = node('div', 'card-body', '');
-            body.append(node('h3', 'h5', protocol.key === 'vless' ? 'VLESS / Reality' : protocol.key));
+            if (selected && protocol.key !== selected) return;
+            const col = node('div', 'col-12', ''), card = node('details', 'control-service', ''), body = node('div', 'control-service-body', '');
+            card.open = Boolean(selected);
+            card.append(node('summary', 'control-service-summary fw-semibold', protocol.key === 'vless' ? 'VLESS / Reality' : protocol.key));
+            card.addEventListener('toggle', () => { if (!card.open) hideProfiles(); });
             body.append(node('p', 'text-muted', owners[protocol.ownership] || protocol.ownership));
             protocol.sources.forEach(source => {
                 body.append(node('div', 'small font-monospace text-break mb-2', source.path));
@@ -129,10 +199,27 @@
                 if (source.client_count !== null) list.append(node('dt', 'col-6', {{ _('Количество клиентов')|tojson }}), node('dd', 'col-6', String(source.client_count)));
                 (source.ports || []).forEach(port => list.append(node('dt', 'col-6', {{ _('Порт')|tojson }}), node('dd', 'col-6', port.port + ' / ' + port.protocol)));
                 body.append(list);
+                const selector = {component: protocol.key, source_id: source.source_id, revision: source.revision};
+                if (protocol.key === 'anytls' && protocol.sources.length === 1) {
+                    const controls = node('div', 'border-top pt-3 mb-3', '');
+                    controls.append(node('p', 'small text-muted', {{ _('Изменение требует одной работающей службы AnyTLS systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением.')|tojson }}));
+                    const portForm = node('form', 'd-flex gap-2 flex-wrap mb-2', '');
+                    const port = node('input', 'form-control', ''); port.type = 'number'; port.min = '1'; port.max = '65535'; port.required = true; port.value = source.fields.port || 443; port.style.maxWidth = '10rem';
+                    port.setAttribute('aria-label', {{ _('Новый порт AnyTLS')|tojson }});
+                    const portButton = node('button', 'btn btn-outline-primary', {{ _('Изменить порт')|tojson }}); portButton.type = 'submit';
+                    portForm.append(port, portButton);
+                    portForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'port', port:Number(port.value)})); });
+                    const clientForm = node('form', 'd-flex gap-2 flex-wrap', '');
+                    const name = node('input', 'form-control', ''); name.required = true; name.maxLength = 64; name.pattern = '[A-Za-z0-9][A-Za-z0-9_.-]{0,63}'; name.style.maxWidth = '20rem';
+                    name.placeholder = {{ _('Имя клиента: латиница, цифры, точка, дефис')|tojson }}; name.setAttribute('aria-label', {{ _('Имя нового клиента')|tojson }});
+                    const add = node('button', 'btn btn-outline-primary', {{ _('Создать клиента')|tojson }}); add.type = 'submit';
+                    clientForm.append(name, add);
+                    clientForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'add_client', name:name.value})); });
+                    controls.append(portForm, clientForm); body.append(controls);
+                }
                 if (source.client_count) {
                     const showClients = node('button', 'btn btn-sm btn-outline-primary mb-3', {{ _('Показать клиентов')|tojson }});
                     const clientList = node('div', 'mb-3', '');
-                    const selector = {component: protocol.key, source_id: source.source_id, revision: source.revision};
                     showClients.addEventListener('click', () => task(async () => {
                         hideProfiles(); clientList.replaceChildren();
                         const response = await request('clients', selector);
@@ -154,6 +241,11 @@
                                     status.textContent = {{ _('Ссылка содержит доступ клиента. Она будет скрыта через минуту. Настройки взяты из файла менеджера и могут отличаться от работающей службы.')|tojson }};
                                 })); row.append(reveal);
                             } else row.append(node('span', 'small text-muted', {{ _('Экспорт этого протокола ещё не перенесён')|tojson }}));
+                            if (protocol.key === 'anytls' && protocol.sources.length === 1) {
+                                const revoke = node('button', 'btn btn-sm btn-outline-warning ms-2', {{ _('Отозвать клиента')|tojson }});
+                                revoke.addEventListener('click', () => task(() => planMutation(selector, {kind:'remove_client', name:client.name})));
+                                row.append(revoke);
+                            }
                             clientList.append(row);
                         });
                         status.textContent = {{ _('Список клиентов загружен без секретов')|tojson }};
@@ -162,10 +254,15 @@
             }); card.append(body); col.append(card); results.append(col);
         });
         status.textContent = {{ _('Конфигурации прочитаны без изменений')|tojson }};
-    }));
+        if (selected) protocolSection.scrollIntoView({block: 'start'});
+    }
+    document.getElementById('control-protocols').addEventListener('click', () => task(() => loadProtocolSettings()));
     document.getElementById('control-apply').addEventListener('click', () => task(async () => {
-        const body = {ticket, confirmation: confirmation.value}; clearPlan();
-        const result = await request('apply', body); render(result.inventory); status.textContent = {{ _('Операция выполнена')|tojson }}; loadMonitoring();
+        const body = {ticket, confirmation: confirmation.value}, mutation = plannedMutation; clearPlan();
+        const result = await request('apply', body);
+        if (result.inventory) render(result.inventory);
+        if (mutation) { hideProfiles(); document.getElementById('control-protocol-results').replaceChildren(); await loadProtocolSettings('anytls'); }
+        status.textContent = {{ _('Операция выполнена')|tojson }} + (result.backup ? '\n' + {{ _('Резервная копия')|tojson }} + ': ' + result.backup : ''); loadMonitoring();
     }));
     // Same endpoint as the existing monitoring page, with no additional installation.
     async function loadMonitoring() {
@@ -180,12 +277,15 @@
             if (latestInventory) { render(latestInventory); return; }
             services.replaceChildren();
             monitoring.filter(service => service.control_component).forEach(service => {
-                const col = node('div', 'col-md-6 col-xl-4', ''), card = node('section', 'card h-100', ''), body = node('div', 'card-body', '');
-                body.append(node('h2', 'h5', service.display_name || service.name));
+                const card = node('details', 'control-service', ''), body = node('div', 'control-service-body', '');
+                card.dataset.service = service.control_component;
+                card.dataset.state = service.status === 'not_installed' ? 'absent' : ['active', 'running'].includes(service.status) ? 'running' : 'stopped';
+                card.append(node('summary', 'control-service-summary fw-semibold', service.display_name || service.name));
                 body.append(node('p', 'mb-1', states[service.status] || (service.status === 'not_installed' ? {{ _('Не обнаружено')|tojson }} : service.status)));
                 body.append(node('p', 'small text-muted mb-0', [service.unit_name, service.uptime, service.enabled].filter(v => v && v !== '-').join(' · ')));
-                card.append(body); col.append(card); services.append(col);
+                card.append(body); services.append(card);
             });
+            filterServices();
         } catch (_) { note.textContent = {{ _('Мониторинг недоступен. Можно выполнить отдельную проверку по SSH.')|tojson }}; }
     }
     async function loadStatus() {

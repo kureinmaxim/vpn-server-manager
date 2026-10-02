@@ -13,3 +13,6 @@ SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_inspection import inspect_
 SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_clients import client_operation",
     Path(__file__).with_name("protocol_clients.py").read_text(encoding="utf-8").replace(
         "from .protocol_inspection import PROTOCOL_FILES, sources, read_metadata", ""))
+SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_mutations import prepare_mutation, apply_mutation",
+    Path(__file__).with_name("protocol_mutations.py").read_text(encoding="utf-8").replace(
+        "from .protocol_inspection import read_metadata, sources", ""))

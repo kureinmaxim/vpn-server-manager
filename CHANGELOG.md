@@ -2,6 +2,19 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.9.2] - 2026-10-02
+
+### Added
+- AnyTLS port changes and client creation/revocation for a single running, dedicated sing-box systemd service. Changes require matching manager/runtime configurations and a stopped TelegramOnly bot; plans are session-bound and expire after five minutes.
+- Private backups, sing-box validation, atomic file replacement and rollback on failed service restart. Interrupted or unsuccessful recovery blocks further edits pending SSH recovery.
+- Profile export for VLESS/Reality TCP, Hysteria2, NaiveProxy and Mieru, in addition to AnyTLS, TUIC, XHTTP and MTProto.
+
+### Changed
+- Server management uses a compact searchable service list with status filters and expandable actions. Protocol settings and clients can be opened from a service row; English and Chinese translations are included.
+
+### Limitations
+- AnyTLS configuration changes currently support systemd only, not Docker, and require an existing manager configuration and dedicated `/etc/anytls/config.json`. Standalone installation, other protocol edits and Mesh/HA/TLS settings remain in development. Filesystem rollback was tested locally on Linux with a simulated service, not on a live VPS.
+
 ## [4.9.1] - 2026-09-30
 
 ### Fixed

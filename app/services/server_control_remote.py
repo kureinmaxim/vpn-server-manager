@@ -10,6 +10,7 @@ import time
 from .service_catalog import CONTROL_CATALOG as CATALOG
 from .protocol_inspection import inspect_protocols
 from .protocol_clients import client_operation
+from .protocol_mutations import prepare_mutation, apply_mutation
 ACTIONS = ("start", "stop", "restart")
 
 
@@ -106,12 +107,22 @@ def execute(body):
     if operation not in ("plan", "apply"):
         raise ValueError("invalid_operation")
     if operation == "plan":
+        if body.get('action') == 'configure':
+            return prepare_mutation(body, discover(), run)[0]
         return plan(body)
     # Cross-process lock: independent app windows must not operate concurrently.
     import fcntl
     fd = os.open("/run/vpn-server-manager-control.lock", os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
     try:
         fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        if body.get('action') == 'configure':
+            current = prepare_mutation(body, discover(), run)[0]
+            if current['plan_hash'] != body.get('plan_hash') or current['hostname'] != body.get('confirmation'):
+                raise ValueError('target_changed')
+            journal(current, 'started')
+            result = apply_mutation(body, discover(), run, discover)
+            journal(current, 'complete' if result.get('success') else result.get('error', 'unconfirmed'))
+            return result
         current = plan(body)
         if current["plan_hash"] != body.get("plan_hash") or current["hostname"] != body.get("confirmation"):
             raise ValueError("target_changed")
@@ -154,7 +165,10 @@ def main():
         result = execute(body)
     except ValueError as error:
         code = str(error)
-        result = {"success": False, "error": code if code in ("invalid_operation", "target_changed") else "remote_failed"}
+        allowed = ('invalid_operation', 'target_changed', 'invalid_change', 'unsupported_config',
+                   'config_mismatch', 'client_exists', 'client_missing', 'last_client',
+                   'bot_running', 'unsupported_runtime', 'ambiguous_config', 'recovery_required', 'unsafe_path')
+        result = {"success": False, "error": code if code in allowed else "remote_failed"}
     except Exception:
         result = {"success": False, "error": "remote_failed"}
     print(json.dumps(result))

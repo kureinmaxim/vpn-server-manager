@@ -41,6 +41,41 @@ def test_page(control_client):
     assert b'control-protocols' in result.data
 
 
+def test_configuration_plan_and_apply_use_saved_change(control_client, monkeypatch):
+    plan = {'hostname': 'test-vps', 'plan_hash': 'a' * 64}
+    run = MagicMock(return_value=plan)
+    monkeypatch.setattr(routes, 'invoke', run)
+    body = {'action': 'configure', 'component': 'anytls', 'source_id': 'b'*64,
+            'revision': 'c'*64, 'change': {'kind': 'add_client', 'name': 'alice'}}
+    response = post(control_client, 'plan', body)
+    assert response.status_code == 200
+    ticket = response.get_json()['ticket']
+    run.return_value = {'success': True}
+    response = post(control_client, 'apply', {'ticket': ticket, 'confirmation': 'test-vps',
+                     'change': {'kind': 'remove_client', 'name': 'bob'}})
+    assert response.status_code == 200
+    assert run.call_args.args[1]['change'] == body['change']
+    assert post(control_client, 'apply', {'ticket': ticket, 'confirmation': 'test-vps'}).status_code == 409
+
+
+def test_configuration_invalid_change_never_calls_ssh(control_client, monkeypatch):
+    run = MagicMock()
+    monkeypatch.setattr(routes, 'invoke', run)
+    body = {'action': 'configure', 'component': 'anytls', 'source_id': 'b'*64,
+            'revision': 'c'*64, 'change': {'kind': 'port', 'port': True}}
+    assert post(control_client, 'plan', body).status_code == 400
+    run.assert_not_called()
+
+
+def test_configuration_blocker_is_explained(control_client, monkeypatch):
+    monkeypatch.setattr(routes, 'invoke', lambda *a: {'success': False, 'error': 'bot_running'})
+    body = {'action': 'configure', 'component': 'anytls', 'source_id': 'b'*64,
+            'revision': 'c'*64, 'change': {'kind': 'port', 'port': 8443}}
+    response = post(control_client, 'plan', body)
+    assert response.status_code == 409
+    assert 'TelegramOnly' in response.get_json()['error']
+
+
 def test_protocols_read_only_and_no_store(control_client, monkeypatch):
     run = MagicMock(return_value={'hostname': 'test-vps', 'protocols': []})
     monkeypatch.setattr(routes, 'invoke', run)
