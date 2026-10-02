@@ -8045,3 +8045,107 @@ msgstr "The PIN is stored per installation: PIN.txt is only a reminder and is no
 #: templates/help.html
 msgid "Папка данных приложения:"
 msgstr "App data folder:"
+
+msgid "Возможности и подключение"
+msgstr "Capabilities and connection"
+
+msgid "Доступны управление службами, чтение конфигураций и экспорт поддерживаемых профилей. Установка, изменение настроек и создание клиентов ещё разрабатываются."
+msgstr "Service controls, configuration inspection and supported profile exports are available. Installation, settings changes and client creation are still in development."
+
+msgid "Поиск службы"
+msgstr "Search services"
+
+msgid "Показать службы"
+msgstr "Show services"
+
+msgid "Обнаруженные"
+msgstr "Detected"
+
+msgid "Все службы"
+msgstr "All services"
+
+msgid "Работающие"
+msgstr "Running"
+
+msgid "Остановленные и ошибки"
+msgstr "Stopped and failed"
+
+msgid "Нет служб по выбранному фильтру. Выберите «Все службы» или выполните проверку по SSH."
+msgstr "No services match this filter. Select All services or inspect over SSH."
+
+msgid "Конфигурации протоколов и клиенты"
+msgstr "Protocol settings and clients"
+
+
+msgid "Сначала остановите TelegramOnly: одновременное изменение настроек ботом не поддерживается."
+msgstr "Stop TelegramOnly first: concurrent configuration changes by the bot are not supported."
+
+msgid "Настройки менеджера отличаются от файла службы. Изменения заблокированы."
+msgstr "Manager settings differ from the service configuration. Changes are blocked."
+
+msgid "Изменение доступно для одной работающей службы AnyTLS systemd с выделенным конфигом sing-box."
+msgstr "Changes require one running AnyTLS systemd service with a dedicated sing-box configuration."
+
+msgid "Этот формат конфигурации пока доступен только для чтения."
+msgstr "This configuration format is currently read-only."
+
+msgid "Найдено несколько файлов настроек. Изменения заблокированы."
+msgstr "Multiple configuration files found. Changes are blocked."
+
+msgid "Клиент с таким именем уже существует."
+msgstr "A client with this name already exists."
+
+msgid "Клиент больше не существует. Прочитайте настройки заново."
+msgstr "The client no longer exists. Read the configuration again."
+
+msgid "Нельзя удалить последнего клиента."
+msgstr "The last client cannot be removed."
+
+msgid "Проверка sing-box не прошла. Рабочие файлы не изменены."
+msgstr "sing-box validation failed. Live files were not changed."
+
+msgid "Изменение не применилось. Предыдущие файлы восстановлены, служба работает."
+msgstr "The change failed. Previous files were restored and the service is running."
+
+msgid "Требуется восстановление по SSH. Резервная копия сохранена; новые изменения заблокированы."
+msgstr "Recovery over SSH is required. A backup is saved; further changes are blocked."
+
+msgid "Права или расположение файлов не позволяют безопасно изменить конфигурацию."
+msgstr "File permissions or locations prevent a safe configuration change."
+
+msgid "Неверные параметры изменения"
+msgstr "Invalid change parameters"
+
+msgid "Для AnyTLS systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается."
+msgstr "AnyTLS systemd supports port and client changes with backup and rollback. Other protocols support inspection and service controls. Standalone installation is still in development."
+
+msgid "Резервная копия"
+msgstr "Backup"
+
+msgid "Изменить порт"
+msgstr "Change port"
+
+msgid "Создать клиента"
+msgstr "Create client"
+
+msgid "Отозвать клиента"
+msgstr "Revoke client"
+
+msgid "Будут сохранены резервные копии обоих файлов, проверен конфиг и перезапущена служба. При ошибке будет выполнен откат."
+msgstr "Both files will be backed up, the configuration validated and the service restarted. Failure triggers rollback."
+
+msgid "Изменение требует одной работающей службы AnyTLS systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением."
+msgstr "Changes require one running AnyTLS systemd service and a stopped bot. Settings are compared with the live configuration before applying."
+
+msgid "Новый порт AnyTLS"
+msgstr "New AnyTLS port"
+
+msgid "Имя клиента: латиница, цифры, точка, дефис"
+msgstr "Client name: Latin letters, digits, dot, hyphen"
+
+msgid "Имя нового клиента"
+msgstr "New client name"
+
+
+msgid "Неизвестно"
+msgstr "Unknown"

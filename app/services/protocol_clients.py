@@ -11,7 +11,7 @@ from urllib.parse import quote, urlencode
 
 from .protocol_inspection import PROTOCOL_FILES, sources, read_metadata
 
-EXPORT_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'mtproto')
+EXPORT_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'mtproto', 'vless', 'hysteria2', 'naiveproxy', 'mieru')
 
 
 def source_id(path):
@@ -30,6 +30,12 @@ def selected_config(body, inventory, run):
     if revision != body.get('revision'):
         raise ValueError('target_changed')
     clients = data.get('clients', [])
+    if component == 'naiveproxy':
+        # NaiveProxy has one shared account, not a Telegram client list.
+        clients = [{'name': data.get('username') or 'NaiveProxy',
+                    'password': data.get('password')}]
+    elif component == 'hysteria2' and not clients and data.get('password'):
+        clients = [{'name': '', 'password': data['password']}]
     if not isinstance(clients, list) or len(clients) > 10000:
         raise ValueError('invalid_operation')
     return data, clients, revision
@@ -74,11 +80,72 @@ def endpoint(config):
 def export_profile(component, config, client):
     if component not in EXPORT_PROTOCOLS:
         raise ValueError('unsupported_profile')
-    host, port = endpoint(config)
+    host, port = endpoint(dict(config, server=config.get('domain') or config.get('server')) if component == 'naiveproxy' else config)
     params = {}
     if config.get('sni'):
         params['sni'] = required_text(config['sni'])
     title = quote(str(client.get('name') or component), safe='')
+    if component == 'naiveproxy':
+        scheme = config.get('scheme', 'https')
+        if scheme not in ('https', 'quic'):
+            raise ValueError('unsupported_profile')
+        user = quote(required_text(config.get('username')), safe='')
+        password = quote(required_text(config.get('password')), safe='')
+        return f'naive+{scheme}://{user}:{password}@{host}:{port}#{title}'
+    if component == 'mieru':
+        pairs = [('profile', client.get('name') or 'Mieru'),
+                 ('mtu', str(config.get('mtu', 1400))),
+                 ('multiplexing', config.get('multiplexing', 'MULTIPLEXING_LOW')),
+                 ('handshake-mode', config.get('handshake_mode', 'HANDSHAKE_STANDARD'))]
+        bindings = config.get('port_bindings')
+        if not isinstance(bindings, list) or not bindings or len(bindings) > 64:
+            raise ValueError('invalid_profile')
+        for binding in bindings:
+            if not isinstance(binding, dict) or binding.get('protocol') not in ('TCP', 'UDP'):
+                raise ValueError('invalid_profile')
+            binding_port = binding.get('port')
+            if type(binding_port) is int and 1 <= binding_port <= 65535:
+                encoded_port = str(binding_port)
+            else:
+                span = binding.get('portRange')
+                if isinstance(span, dict):
+                    low, high = span.get('from'), span.get('to')
+                elif isinstance(span, str) and re.fullmatch(r'\d{1,5}-\d{1,5}', span):
+                    low, high = map(int, span.split('-'))
+                else:
+                    raise ValueError('invalid_profile')
+                if type(low) is not int or type(high) is not int or not 1 <= low <= high <= 65535:
+                    raise ValueError('invalid_profile')
+                encoded_port = f'{low}-{high}'
+            pairs.extend([('port', encoded_port), ('protocol', binding['protocol'])])
+        for _, value in pairs: required_text(value)
+        user = quote(required_text(client.get('name')), safe='')
+        password = quote(required_text(client.get('password')), safe='')
+        return f'mierus://{user}:{password}@{host}?' + urlencode(pairs, quote_via=quote) + '#' + title
+    if component == 'hysteria2':
+        auth = quote(required_text(client.get('password')), safe='')
+        if config.get('clients'):
+            auth = quote(required_text(client.get('name')), safe='') + ':' + auth
+        params['sni'] = required_text(config.get('sni') or 'yahoo.com')
+        if config.get('insecure') is True: params['insecure'] = '1'
+        if config.get('obfs_type'):
+            if config['obfs_type'] != 'salamander': raise ValueError('unsupported_profile')
+            params.update(obfs='salamander', **{'obfs-password': required_text(config.get('obfs_password'))})
+        return f'hy2://{auth}@{host}:{port}/?' + urlencode(params, quote_via=quote) + '#' + title
+    if component == 'vless':
+        auth = str(uuid.UUID(required_text(client.get('uuid'))))
+        if config.get('transport', 'tcp') != 'tcp' or config.get('security', 'reality') != 'reality':
+            raise ValueError('unsupported_profile')
+        public_key = required_text(config.get('public_key'))
+        short_id = config.get('short_id', '')
+        if not re.fullmatch(r'[A-Za-z0-9_-]{43}', public_key) or not isinstance(short_id, str) or not re.fullmatch(r'(?:[a-fA-F0-9]{2}){0,8}', short_id):
+            raise ValueError('invalid_profile')
+        params.update(security='reality', encryption='none', pbk=public_key,
+                      fp=required_text(config.get('fingerprint', 'chrome')), type='tcp',
+                      flow=config.get('flow', 'xtls-rprx-vision'),
+                      sni=required_text(config.get('sni') or 'www.microsoft.com'), sid=short_id)
+        if params['flow'] not in ('', 'xtls-rprx-vision'): raise ValueError('unsupported_profile')
+        return f'vless://{auth}@{host}:{port}?' + urlencode(params, quote_via=quote) + '#' + title
     if component == 'mtproto':
         secret = required_text(client.get('secret'))
         if not re.fullmatch(r'(?:[0-9a-fA-F]{32}|dd[0-9a-fA-F]{32}|ee[0-9a-fA-F]{34,})', secret) or len(secret) % 2:
