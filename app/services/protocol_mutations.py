@@ -18,18 +18,20 @@ import uuid
 
 from .protocol_inspection import read_metadata, sources
 from .hysteria_mutations import parse_hysteria, changed_hysteria
+from .naive_mutations import parse_caddyfile, change_naive, replace_port
 
 ANYTLS_CONFIG = '/etc/anytls/config.json'
 TUIC_CONFIG = '/etc/tuic/config.json'
 XHTTP_CONFIG = '/etc/xhttp/config.json'
 VLESS_CONFIG = '/usr/local/etc/xray/config.json'
 HYSTERIA2_CONFIG = '/etc/hysteria/config.yaml'
-MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'vless', 'hysteria2')
+NAIVEPROXY_CONFIG = '/etc/caddy-naive/Caddyfile'
+MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'vless', 'hysteria2', 'naiveproxy')
 MUTATION_BACKUPS = '/var/backups/vpn-server-manager'
 
 
 def runtime_path(component):
-    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG, 'vless': VLESS_CONFIG, 'hysteria2': HYSTERIA2_CONFIG}[component]
+    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG, 'vless': VLESS_CONFIG, 'hysteria2': HYSTERIA2_CONFIG, 'naiveproxy': NAIVEPROXY_CONFIG}[component]
 
 
 def mutation_digest(value):
@@ -57,6 +59,8 @@ def changed_anytls(manager, runtime, change, *, password=None):
 def changed_protocol(component, manager, runtime, change, *, password=None, client_uuid=None):
     if component == 'hysteria2':
         return changed_hysteria(manager, runtime, validate_change(change), password=password)
+    if component == 'naiveproxy':
+        return change_naive(manager, runtime, validate_change(change))
     if component == 'vless':
         return changed_vless(manager, runtime, change, client_uuid=client_uuid)
     if component not in MUTATION_PROTOCOLS:
@@ -207,7 +211,11 @@ def prepare_mutation(body, inventory, run):
     if not match: raise ValueError('unsupported_runtime')
     executable = match[1]
     arguments = shlex.split(match[2])
-    if component == 'hysteria2':
+    if component == 'naiveproxy':
+        supported = executable in ('/usr/bin/caddy', '/usr/local/bin/caddy', '/usr/local/bin/caddy-naive') and arguments in (
+            [executable, 'run', '--config', config_path, '--adapter', 'caddyfile'],
+            [executable, 'run', '--config', config_path])
+    elif component == 'hysteria2':
         supported = executable in ('/usr/bin/hysteria', '/usr/local/bin/hysteria') and arguments == [executable, 'server', '-c', config_path]
     elif component == 'vless':
         supported = executable in ('/usr/bin/xray', '/usr/local/bin/xray') and arguments in (
@@ -217,7 +225,10 @@ def prepare_mutation(body, inventory, run):
         supported = executable in ('/usr/bin/sing-box', '/usr/local/bin/sing-box') and arguments == [executable, 'run', '-c', config_path]
     if not supported:
         raise ValueError('unsupported_runtime')
-    if component == 'hysteria2':
+    if component == 'naiveproxy':
+        raw_runtime = snapshot(config_path)[0]
+        runtime, runtime_revision = parse_caddyfile(raw_runtime), hashlib.sha256(raw_runtime).hexdigest()
+    elif component == 'hysteria2':
         raw_runtime = snapshot(config_path)[0]
         runtime, runtime_revision = parse_hysteria(raw_runtime), hashlib.sha256(raw_runtime).hexdigest()
     else:
@@ -301,8 +312,12 @@ def apply_mutation(body, inventory, run, rediscover):
     if hashlib.sha256(originals[source][0]).hexdigest() != plan['revision'] or hashlib.sha256(originals[config_path][0]).hexdigest() != plan['runtime_revision']:
         raise ValueError('target_changed')
     updated_manager, updated_runtime = changed_protocol(plan['component'], manager, runtime, plan['change'], password=secrets.token_urlsafe(32), client_uuid=str(uuid.uuid4()))
-    replacements = {source: json.dumps(updated_manager, ensure_ascii=False, indent=2).encode(),
-                    config_path: json.dumps(updated_runtime, ensure_ascii=False, indent=2).encode()}
+    if plan['component'] == 'naiveproxy':
+        replacements = {source: json.dumps(updated_manager, ensure_ascii=False, indent=2).encode(),
+                        config_path: replace_port(originals[config_path][0], manager['domain'], manager['port'], updated_runtime['port'])}
+    else:
+        replacements = {source: json.dumps(updated_manager, ensure_ascii=False, indent=2).encode(),
+                        config_path: json.dumps(updated_runtime, ensure_ascii=False, indent=2).encode()}
     backup_root = private_directory(MUTATION_BACKUPS)
     backup = private_directory(backup_root / (time.strftime('%Y%m%d-%H%M%S') + '-' + secrets.token_hex(6)))
     for index, (path, (raw, info)) in enumerate(originals.items()):
@@ -322,7 +337,7 @@ def apply_mutation(body, inventory, run, rediscover):
         stream.write(replacements[config_path]); stream.flush(); os.fsync(stream.fileno())
     sync_directory(backup)
     sync_directory(backup_root)
-    validation = [executable, 'run', '-test', '-config', str(candidate)] if plan['component'] == 'vless' else [executable, 'check', '-c', str(candidate)]
+    validation = ([executable, 'validate', '--config', str(candidate), '--adapter', 'caddyfile'] if plan['component'] == 'naiveproxy' else [executable, 'run', '-test', '-config', str(candidate)] if plan['component'] == 'vless' else [executable, 'check', '-c', str(candidate)])
     if plan['component'] == 'hysteria2':
         # Hysteria has no native dry-run: check the serialized structure only.
         # Startup is checked after replacement; failure triggers the same rollback.

@@ -206,19 +206,22 @@
                     const controls = node('div', 'border-top pt-3 mb-3', '');
                     controls.append(node('p', 'small text-muted', {{ _('Изменение требует одной работающей службы systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением.')|tojson }}));
                     if (protocol.key === 'hysteria2') controls.append(node('p', 'small text-muted', hysteriaNotice));
+                    if (protocol.key === 'naiveproxy') controls.append(node('p', 'small text-muted', {{ _('NaiveProxy использует одну учётную запись: доступна только смена порта. Caddyfile проверяется перед перезапуском.')|tojson }}));
                     const portForm = node('form', 'd-flex gap-2 flex-wrap mb-2', '');
                     const port = node('input', 'form-control', ''); port.type = 'number'; port.min = '1'; port.max = '65535'; port.required = true; port.value = source.fields.port || 443; port.style.maxWidth = '10rem';
                     port.setAttribute('aria-label', {{ _('Новый порт')|tojson }});
                     const portButton = node('button', 'btn btn-outline-primary', {{ _('Изменить порт')|tojson }}); portButton.type = 'submit';
                     portForm.append(port, portButton);
                     portForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'port', port:Number(port.value)})); });
+                    if (protocol.key === 'naiveproxy') { controls.append(portForm); body.append(controls); }
+                    else {
                     const clientForm = node('form', 'd-flex gap-2 flex-wrap', '');
                     const name = node('input', 'form-control', ''); name.required = true; name.maxLength = 64; name.pattern = protocol.key === 'hysteria2' ? '[a-z0-9][a-z0-9_-]{0,63}' : '[A-Za-z0-9][A-Za-z0-9_.-]{0,63}'; name.style.maxWidth = '20rem';
                     name.placeholder = {{ _('Имя клиента: латиница, цифры, точка, дефис')|tojson }}; name.setAttribute('aria-label', {{ _('Имя нового клиента')|tojson }});
                     const add = node('button', 'btn btn-outline-primary', {{ _('Создать клиента')|tojson }}); add.type = 'submit';
                     clientForm.append(name, add);
                     clientForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'add_client', name:name.value})); });
-                    controls.append(portForm, clientForm); body.append(controls);
+                    controls.append(portForm, clientForm); body.append(controls); }
                 }
                 if (source.client_count) {
                     const showClients = node('button', 'btn btn-sm btn-outline-primary mb-3', {{ _('Показать клиентов')|tojson }});

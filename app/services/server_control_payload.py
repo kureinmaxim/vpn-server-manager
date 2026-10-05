@@ -19,3 +19,5 @@ SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_mutations import prepare_m
 
 SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .hysteria_mutations import parse_hysteria, changed_hysteria",
     Path(__file__).with_name("hysteria_mutations.py").read_text(encoding="utf-8"))
+SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .naive_mutations import parse_caddyfile, change_naive, replace_port",
+    Path(__file__).with_name("naive_mutations.py").read_text(encoding="utf-8"))
