@@ -1,4 +1,4 @@
-"""Conservative protocol edits against a verified, dedicated sing-box service.
+"""Conservative protocol edits against a verified, dedicated service.
 
 No Telegram imports. Passwords are generated on the VPS and never returned by
 plans or apply responses. Unsupported/ambiguous installations remain read-only.
@@ -21,12 +21,13 @@ from .protocol_inspection import read_metadata, sources
 ANYTLS_CONFIG = '/etc/anytls/config.json'
 TUIC_CONFIG = '/etc/tuic/config.json'
 XHTTP_CONFIG = '/etc/xhttp/config.json'
-MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp')
+VLESS_CONFIG = '/usr/local/etc/xray/config.json'
+MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'vless')
 MUTATION_BACKUPS = '/var/backups/vpn-server-manager'
 
 
 def runtime_path(component):
-    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG}[component]
+    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG, 'vless': VLESS_CONFIG}[component]
 
 
 def mutation_digest(value):
@@ -52,6 +53,8 @@ def changed_anytls(manager, runtime, change, *, password=None):
 
 
 def changed_protocol(component, manager, runtime, change, *, password=None, client_uuid=None):
+    if component == 'vless':
+        return changed_vless(manager, runtime, change, client_uuid=client_uuid)
     if component not in MUTATION_PROTOCOLS:
         raise ValueError('unsupported_config')
     manager, runtime = copy.deepcopy(manager), copy.deepcopy(runtime)
@@ -118,6 +121,59 @@ def changed_protocol(component, manager, runtime, change, *, password=None, clie
     return manager, runtime
 
 
+def changed_vless(manager, runtime, change, *, client_uuid=None):
+    manager, runtime = copy.deepcopy(manager), copy.deepcopy(runtime)
+    change = validate_change(change)
+    clients, inbounds = manager.get('clients'), runtime.get('inbounds')
+    if not isinstance(clients, list) or not clients or len(clients) > 9999 or not isinstance(inbounds, list) or len(inbounds) != 1:
+        raise ValueError('unsupported_config')
+    inbound = inbounds[0]
+    if not isinstance(inbound, dict) or inbound.get('protocol') != 'vless':
+        raise ValueError('unsupported_config')
+    settings, stream = inbound.get('settings'), inbound.get('streamSettings')
+    if not isinstance(settings, dict) or not isinstance(stream, dict): raise ValueError('unsupported_config')
+    if manager.get('transport', 'tcp') != 'tcp' or manager.get('security', 'reality') != 'reality' or stream.get('network') not in ('tcp', 'raw') or stream.get('security') != 'reality' or settings.get('decryption') != 'none':
+        raise ValueError('unsupported_config')
+    reality = stream.get('realitySettings')
+    if not isinstance(reality, dict): raise ValueError('unsupported_config')
+    flow = manager.get('flow', 'xtls-rprx-vision')
+    if flow not in ('', 'xtls-rprx-vision'): raise ValueError('unsupported_config')
+    names, identifiers, expected = set(), set(), []
+    for client in clients:
+        if not isinstance(client, dict) or not isinstance(client.get('name'), str) or not client['name'] or client['name'] in names:
+            raise ValueError('unsupported_config')
+        try: identifier = str(uuid.UUID(client['uuid']))
+        except (ValueError, AttributeError, KeyError, TypeError): raise ValueError('unsupported_config') from None
+        if identifier in identifiers: raise ValueError('unsupported_config')
+        names.add(client['name']); identifiers.add(identifier)
+        expected.append({'email': client['name'], 'id': client['uuid'], 'flow': flow})
+    users = settings.get('clients')
+    if not isinstance(users, list) or not all(isinstance(u, dict) and isinstance(u.get('email'), str) for u in users) or sorted(users, key=lambda u: u['email']) != sorted(expected, key=lambda u: u['email']):
+        raise ValueError('config_mismatch')
+    if type(manager.get('port')) is not int or inbound.get('port') != manager['port']:
+        raise ValueError('config_mismatch')
+    if not isinstance(manager.get('private_key'), str) or not manager['private_key'] or reality.get('privateKey') != manager['private_key'] or reality.get('shortIds') != [manager.get('short_id', '')] or reality.get('serverNames') != [manager.get('sni', 'www.microsoft.com')]:
+        raise ValueError('config_mismatch')
+    # WARNING: TelegramOnly recreates default from the root UUID on its next read.
+    # Refuse inconsistent metadata and protect default instead of a paper revoke.
+    if manager.get('uuid') and not any(c['name'] == 'default' and c['uuid'] == manager['uuid'] for c in clients):
+        raise ValueError('config_mismatch')
+    if change['kind'] == 'port':
+        manager['port'] = inbound['port'] = change['port']
+    elif change['kind'] == 'add_client':
+        if change['name'] in names: raise ValueError('client_exists')
+        identifier = client_uuid or '00000000-0000-4000-8000-000000000000'
+        if str(uuid.UUID(identifier)) in identifiers: raise ValueError('client_exists')
+        manager['clients'].append({'name': change['name'], 'uuid': identifier})
+    else:
+        if change['name'] not in names: raise ValueError('client_missing')
+        if len(clients) == 1: raise ValueError('last_client')
+        if change['name'] == 'default': raise ValueError('protected_client')
+        manager['clients'] = [c for c in clients if c['name'] != change['name']]
+    settings['clients'] = [{'email': c['name'], 'id': c['uuid'], 'flow': flow} for c in manager['clients']]
+    return manager, runtime
+
+
 def prepare_mutation(body, inventory, run):
     component = body.get('component')
     if component not in MUTATION_PROTOCOLS: raise ValueError('unsupported_config')
@@ -125,6 +181,8 @@ def prepare_mutation(body, inventory, run):
     if (Path(MUTATION_BACKUPS) / f'{component}-pending.json').exists():
         raise ValueError('recovery_required')
     change = validate_change(body.get('change'))
+    if component == 'vless' and any(c['key'] == 'xui' and c['instances'] for c in inventory['components']):
+        raise ValueError('managed_by_panel')
     if any(c['key'] == 'bot' and any(i['state'] not in ('inactive', 'exited', 'created', 'failed') for i in c['instances']) for c in inventory['components']):
         raise ValueError('bot_running')
     instances = [i for c in inventory['components'] if c['key'] == component for i in c['instances']]
@@ -144,9 +202,14 @@ def prepare_mutation(body, inventory, run):
     match = re.fullmatch(r'\{ path=([^ ;]+) ; argv\[\]=(.*?) ; .*?\}', raw.strip()) if code == 0 else None
     if not match: raise ValueError('unsupported_runtime')
     executable = match[1]
-    if executable not in ('/usr/bin/sing-box', '/usr/local/bin/sing-box'):
-        raise ValueError('unsupported_runtime')
-    if shlex.split(match[2]) != [executable, 'run', '-c', config_path]:
+    arguments = shlex.split(match[2])
+    if component == 'vless':
+        supported = executable in ('/usr/bin/xray', '/usr/local/bin/xray') and arguments in (
+            [executable, 'run', '-config', config_path], [executable, '-config', config_path],
+            [executable, 'run', '-c', config_path], [executable, '-c', config_path])
+    else:
+        supported = executable in ('/usr/bin/sing-box', '/usr/local/bin/sing-box') and arguments == [executable, 'run', '-c', config_path]
+    if not supported:
         raise ValueError('unsupported_runtime')
     runtime, runtime_revision = read_metadata(config_path)
     changed_protocol(component, manager, runtime, change)
@@ -249,7 +312,8 @@ def apply_mutation(body, inventory, run, rediscover):
         stream.write(replacements[config_path]); stream.flush(); os.fsync(stream.fileno())
     sync_directory(backup)
     sync_directory(backup_root)
-    code, _ = run([executable, 'check', '-c', str(candidate)])
+    validation = [executable, 'run', '-test', '-config', str(candidate)] if plan['component'] == 'vless' else [executable, 'check', '-c', str(candidate)]
+    code, _ = run(validation)
     if code: return {'success': False, 'error': 'validation_failed'}
     # Recheck service, bot and file revisions after potentially slow validation.
     current = prepare_mutation(body, rediscover(), run)[0]

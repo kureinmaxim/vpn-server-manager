@@ -8162,3 +8162,19 @@ msgstr "Changes require one running systemd service and a stopped bot. Settings 
 
 msgid "Новый порт"
 msgstr "New port"
+
+
+msgid "Клиент default защищён: TelegramOnly может восстановить его из основного UUID."
+msgstr "The default client is protected: TelegramOnly can restore it from the primary UUID."
+
+msgid "Обнаружена 3x-ui. Изменяйте VLESS через панель владельца конфигурации."
+msgstr "3x-ui detected. Edit VLESS in the panel that owns the configuration."
+
+msgid "Изменение доступно для одной работающей службы systemd с выделенным конфигом sing-box или Xray."
+msgstr "Changes require one running systemd service with a dedicated sing-box or Xray configuration."
+
+msgid "Проверка конфигурации службой не прошла. Рабочие файлы не изменены."
+msgstr "Service configuration validation failed. Live files were not changed."
+
+msgid "Для AnyTLS, TUIC, XHTTP и VLESS/Reality systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается."
+msgstr "AnyTLS, TUIC, XHTTP and VLESS/Reality systemd support port and client changes with backup and rollback. Other protocols support inspection and service controls. Standalone installation is still in development."
