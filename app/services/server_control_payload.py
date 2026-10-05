@@ -16,3 +16,6 @@ SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_clients import client_oper
 SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .protocol_mutations import prepare_mutation, apply_mutation",
     Path(__file__).with_name("protocol_mutations.py").read_text(encoding="utf-8").replace(
         "from .protocol_inspection import read_metadata, sources", ""))
+
+SCRIPT_SOURCE = SCRIPT_SOURCE.replace("from .hysteria_mutations import parse_hysteria, changed_hysteria",
+    Path(__file__).with_name("hysteria_mutations.py").read_text(encoding="utf-8"))

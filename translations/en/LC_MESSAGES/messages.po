@@ -8178,3 +8178,20 @@ msgstr "Service configuration validation failed. Live files were not changed."
 
 msgid "Для AnyTLS, TUIC, XHTTP и VLESS/Reality systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается."
 msgstr "AnyTLS, TUIC, XHTTP and VLESS/Reality systemd support port and client changes with backup and rollback. Other protocols support inspection and service controls. Standalone installation is still in development."
+
+
+msgid "Общий пароль Hysteria2: доступна только смена порта. Переход на отдельных клиентов требует отдельной настройки."
+msgstr "Hysteria2 shared password: only port changes are available. Switching to individual clients requires separate configuration."
+
+msgid "Hysteria2: проверяется структура конфигурации. Нативной проверки без запуска нет; ошибка запуска приведёт к откату. Имена клиентов: строчные латинские буквы, цифры, дефис и подчёркивание."
+msgstr "Hysteria2: configuration structure is checked. There is no native check without startup; startup failure triggers rollback. Client names: lowercase Latin letters, digits, hyphens and underscores."
+
+msgid "Изменение доступно для одной работающей службы systemd с выделенным конфигом sing-box, Xray или Hysteria2."
+msgstr "Changes require one running systemd service with a dedicated sing-box, Xray or Hysteria2 configuration."
+
+msgid "Для AnyTLS, TUIC, XHTTP, VLESS/Reality и Hysteria2 systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается."
+msgstr "AnyTLS, TUIC, XHTTP, VLESS/Reality and Hysteria2 systemd support port and client changes with backup and rollback. Other protocols support inspection and service controls. Standalone installation is still in development."
+
+
+msgid "Клиент default защищён: TelegramOnly может восстановить его из основного UUID или пароля."
+msgstr "The default client is protected: TelegramOnly can restore it from the primary UUID or password."

@@ -17,17 +17,19 @@ import time
 import uuid
 
 from .protocol_inspection import read_metadata, sources
+from .hysteria_mutations import parse_hysteria, changed_hysteria
 
 ANYTLS_CONFIG = '/etc/anytls/config.json'
 TUIC_CONFIG = '/etc/tuic/config.json'
 XHTTP_CONFIG = '/etc/xhttp/config.json'
 VLESS_CONFIG = '/usr/local/etc/xray/config.json'
-MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'vless')
+HYSTERIA2_CONFIG = '/etc/hysteria/config.yaml'
+MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp', 'vless', 'hysteria2')
 MUTATION_BACKUPS = '/var/backups/vpn-server-manager'
 
 
 def runtime_path(component):
-    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG, 'vless': VLESS_CONFIG}[component]
+    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG, 'vless': VLESS_CONFIG, 'hysteria2': HYSTERIA2_CONFIG}[component]
 
 
 def mutation_digest(value):
@@ -53,6 +55,8 @@ def changed_anytls(manager, runtime, change, *, password=None):
 
 
 def changed_protocol(component, manager, runtime, change, *, password=None, client_uuid=None):
+    if component == 'hysteria2':
+        return changed_hysteria(manager, runtime, validate_change(change), password=password)
     if component == 'vless':
         return changed_vless(manager, runtime, change, client_uuid=client_uuid)
     if component not in MUTATION_PROTOCOLS:
@@ -203,7 +207,9 @@ def prepare_mutation(body, inventory, run):
     if not match: raise ValueError('unsupported_runtime')
     executable = match[1]
     arguments = shlex.split(match[2])
-    if component == 'vless':
+    if component == 'hysteria2':
+        supported = executable in ('/usr/bin/hysteria', '/usr/local/bin/hysteria') and arguments == [executable, 'server', '-c', config_path]
+    elif component == 'vless':
         supported = executable in ('/usr/bin/xray', '/usr/local/bin/xray') and arguments in (
             [executable, 'run', '-config', config_path], [executable, '-config', config_path],
             [executable, 'run', '-c', config_path], [executable, '-c', config_path])
@@ -211,7 +217,11 @@ def prepare_mutation(body, inventory, run):
         supported = executable in ('/usr/bin/sing-box', '/usr/local/bin/sing-box') and arguments == [executable, 'run', '-c', config_path]
     if not supported:
         raise ValueError('unsupported_runtime')
-    runtime, runtime_revision = read_metadata(config_path)
+    if component == 'hysteria2':
+        raw_runtime = snapshot(config_path)[0]
+        runtime, runtime_revision = parse_hysteria(raw_runtime), hashlib.sha256(raw_runtime).hexdigest()
+    else:
+        runtime, runtime_revision = read_metadata(config_path)
     changed_protocol(component, manager, runtime, change)
     public = {'hostname': inventory['hostname'], 'component': component, 'action': 'configure',
               'target': instance, 'change': change, 'source_id': body['source_id'],
@@ -313,7 +323,12 @@ def apply_mutation(body, inventory, run, rediscover):
     sync_directory(backup)
     sync_directory(backup_root)
     validation = [executable, 'run', '-test', '-config', str(candidate)] if plan['component'] == 'vless' else [executable, 'check', '-c', str(candidate)]
-    code, _ = run(validation)
+    if plan['component'] == 'hysteria2':
+        # Hysteria has no native dry-run: check the serialized structure only.
+        # Startup is checked after replacement; failure triggers the same rollback.
+        code = 0 if parse_hysteria(candidate.read_bytes()) == updated_runtime else 1
+    else:
+        code, _ = run(validation)
     if code: return {'success': False, 'error': 'validation_failed'}
     # Recheck service, bot and file revisions after potentially slow validation.
     current = prepare_mutation(body, rediscover(), run)[0]
