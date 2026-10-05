@@ -8149,3 +8149,16 @@ msgstr "New client name"
 
 msgid "Неизвестно"
 msgstr "Unknown"
+
+
+msgid "Изменение доступно для одной работающей службы systemd с выделенным конфигом sing-box."
+msgstr "Changes require one running systemd service with a dedicated sing-box configuration."
+
+msgid "Для AnyTLS, TUIC и XHTTP systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается."
+msgstr "AnyTLS, TUIC and XHTTP systemd support port and client changes with backup and rollback. Other protocols support inspection and service controls. Standalone installation is still in development."
+
+msgid "Изменение требует одной работающей службы systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением."
+msgstr "Changes require one running systemd service and a stopped bot. Settings are compared with the live configuration before applying."
+
+msgid "Новый порт"
+msgstr "New port"

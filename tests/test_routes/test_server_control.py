@@ -41,11 +41,12 @@ def test_page(control_client):
     assert b'control-protocols' in result.data
 
 
-def test_configuration_plan_and_apply_use_saved_change(control_client, monkeypatch):
+@pytest.mark.parametrize('component', ['anytls', 'tuic', 'xhttp'])
+def test_configuration_plan_and_apply_use_saved_change(control_client, monkeypatch, component):
     plan = {'hostname': 'test-vps', 'plan_hash': 'a' * 64}
     run = MagicMock(return_value=plan)
     monkeypatch.setattr(routes, 'invoke', run)
-    body = {'action': 'configure', 'component': 'anytls', 'source_id': 'b'*64,
+    body = {'action': 'configure', 'component': component, 'source_id': 'b'*64,
             'revision': 'c'*64, 'change': {'kind': 'add_client', 'name': 'alice'}}
     response = post(control_client, 'plan', body)
     assert response.status_code == 200
@@ -55,6 +56,7 @@ def test_configuration_plan_and_apply_use_saved_change(control_client, monkeypat
                      'change': {'kind': 'remove_client', 'name': 'bob'}})
     assert response.status_code == 200
     assert run.call_args.args[1]['change'] == body['change']
+    assert run.call_args.args[1]['component'] == component
     assert post(control_client, 'apply', {'ticket': ticket, 'confirmation': 'test-vps'}).status_code == 409
 
 

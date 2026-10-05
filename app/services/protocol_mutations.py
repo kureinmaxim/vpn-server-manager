@@ -1,4 +1,4 @@
-"""Conservative AnyTLS edits against a verified, dedicated sing-box service.
+"""Conservative protocol edits against a verified, dedicated sing-box service.
 
 No Telegram imports. Passwords are generated on the VPS and never returned by
 plans or apply responses. Unsupported/ambiguous installations remain read-only.
@@ -14,11 +14,19 @@ import shlex
 import stat
 import tempfile
 import time
+import uuid
 
 from .protocol_inspection import read_metadata, sources
 
 ANYTLS_CONFIG = '/etc/anytls/config.json'
+TUIC_CONFIG = '/etc/tuic/config.json'
+XHTTP_CONFIG = '/etc/xhttp/config.json'
+MUTATION_PROTOCOLS = ('anytls', 'tuic', 'xhttp')
 MUTATION_BACKUPS = '/var/backups/vpn-server-manager'
+
+
+def runtime_path(component):
+    return {'anytls': ANYTLS_CONFIG, 'tuic': TUIC_CONFIG, 'xhttp': XHTTP_CONFIG}[component]
 
 
 def mutation_digest(value):
@@ -40,60 +48,91 @@ def validate_change(change):
 
 
 def changed_anytls(manager, runtime, change, *, password=None):
+    return changed_protocol('anytls', manager, runtime, change, password=password)
+
+
+def changed_protocol(component, manager, runtime, change, *, password=None, client_uuid=None):
+    if component not in MUTATION_PROTOCOLS:
+        raise ValueError('unsupported_config')
     manager, runtime = copy.deepcopy(manager), copy.deepcopy(runtime)
     clients = manager.get('clients')
     inbounds = runtime.get('inbounds')
     if not isinstance(clients, list) or not clients or len(clients) > 9999:
         raise ValueError('unsupported_config')
-    if not isinstance(inbounds, list) or len(inbounds) != 1 or inbounds[0].get('type') != 'anytls':
+    inbound_type = 'vless' if component == 'xhttp' else component
+    if not isinstance(inbounds, list) or len(inbounds) != 1 or not isinstance(inbounds[0], dict) or inbounds[0].get('type') != inbound_type:
         raise ValueError('unsupported_config')
     inbound = inbounds[0]
     names = set()
+    identifiers = set()
+    fields = ('name', 'uuid') if component == 'xhttp' else ('name', 'uuid', 'password') if component == 'tuic' else ('name', 'password')
     expected = []
     for client in clients:
         if not isinstance(client, dict) or not isinstance(client.get('name'), str) or not client['name'] or client['name'] in names:
             raise ValueError('unsupported_config')
-        if not isinstance(client.get('password'), str) or not client['password']:
+        if any(not isinstance(client.get(field), str) or not client[field] for field in fields):
             raise ValueError('unsupported_config')
+        if 'uuid' in fields:
+            try: identifier = str(uuid.UUID(client['uuid']))
+            except (ValueError, AttributeError): raise ValueError('unsupported_config') from None
+            if identifier in identifiers: raise ValueError('unsupported_config')
+            identifiers.add(identifier)
         names.add(client['name'])
-        expected.append({'name': client['name'], 'password': client['password']})
+        expected.append({field: client[field] for field in fields})
     # WARNING: Editing a manager file alone can revoke access only on paper.
     # Require agreement with the exact runtime file before changing either.
     users = inbound.get('users')
-    if not isinstance(users, list) or sorted(users, key=lambda u: u.get('name', '')) != sorted(expected, key=lambda u: u['name']):
+    if not isinstance(users, list) or not all(isinstance(u, dict) and isinstance(u.get('name'), str) for u in users) or sorted(users, key=lambda u: u['name']) != sorted(expected, key=lambda u: u['name']):
         raise ValueError('config_mismatch')
     if type(manager.get('port')) is not int or inbound.get('listen_port') != manager['port']:
         raise ValueError('config_mismatch')
     tls = inbound.get('tls', {})
-    if tls.get('enabled') is not True or tls.get('certificate_path') != manager.get('tls_cert_path', '/etc/anytls/server.crt') or tls.get('key_path') != manager.get('tls_key_path', '/etc/anytls/server.key'):
+    security = manager.get('security', 'tls') if component == 'xhttp' else 'tls'
+    if security not in ('tls', 'none') or not isinstance(tls, dict) or tls.get('enabled') is not (security == 'tls'):
         raise ValueError('config_mismatch')
+    if security == 'tls' and (tls.get('certificate_path') != manager.get('tls_cert_path', f'/etc/{component}/server.crt') or tls.get('key_path') != manager.get('tls_key_path', f'/etc/{component}/server.key')):
+        raise ValueError('config_mismatch')
+    if component == 'tuic':
+        if inbound.get('congestion_control', 'bbr') != manager.get('congestion_control', 'bbr') or tls.get('alpn', []) != manager.get('alpn', ['h3']):
+            raise ValueError('config_mismatch')
+    if component == 'xhttp':
+        transport = inbound.get('transport')
+        if not isinstance(transport, dict) or transport.get('type') != 'xhttp' or transport.get('path') != manager.get('path', '/') or transport.get('mode', 'auto') != manager.get('mode', 'auto') or transport.get('host', '') != manager.get('host', ''):
+            raise ValueError('config_mismatch')
     change = validate_change(change)
     if change['kind'] == 'port':
         manager['port'] = inbound['listen_port'] = change['port']
     elif change['kind'] == 'add_client':
         if change['name'] in names: raise ValueError('client_exists')
-        manager['clients'].append({'name': change['name'], 'password': password or 'validation-only'})
+        client = {'name': change['name']}
+        if 'password' in fields: client['password'] = password or 'validation-only'
+        if 'uuid' in fields:
+            client['uuid'] = client_uuid or '00000000-0000-4000-8000-000000000000'
+            if str(uuid.UUID(client['uuid'])) in identifiers: raise ValueError('client_exists')
+        manager['clients'].append(client)
     else:
         if change['name'] not in names: raise ValueError('client_missing')
         if len(clients) == 1: raise ValueError('last_client')
         manager['clients'] = [c for c in clients if c['name'] != change['name']]
-    inbound['users'] = [{'name': c['name'], 'password': c['password']} for c in manager['clients']]
+    inbound['users'] = [{field: c[field] for field in fields} for c in manager['clients']]
     return manager, runtime
 
 
 def prepare_mutation(body, inventory, run):
-    if body.get('component') != 'anytls': raise ValueError('unsupported_config')
-    if (Path(MUTATION_BACKUPS) / 'anytls-pending.json').exists():
+    component = body.get('component')
+    if component not in MUTATION_PROTOCOLS: raise ValueError('unsupported_config')
+    config_path = runtime_path(component)
+    if (Path(MUTATION_BACKUPS) / f'{component}-pending.json').exists():
         raise ValueError('recovery_required')
     change = validate_change(body.get('change'))
     if any(c['key'] == 'bot' and any(i['state'] not in ('inactive', 'exited', 'created', 'failed') for i in c['instances']) for c in inventory['components']):
         raise ValueError('bot_running')
-    instances = [i for c in inventory['components'] if c['key'] == 'anytls' for i in c['instances']]
+    instances = [i for c in inventory['components'] if c['key'] == component for i in c['instances']]
     if len(instances) != 1 or instances[0]['runtime'] != 'systemd' or instances[0]['state'] != 'active':
         raise ValueError('unsupported_runtime')
     instance = instances[0]
     found = {}
-    for path, _ in sources(inventory, run)['anytls']:
+    for path, _ in sources(inventory, run)[component]:
         try: data, revision = read_metadata(path)
         except FileNotFoundError: continue
         found[path] = (data, revision)
@@ -107,11 +146,11 @@ def prepare_mutation(body, inventory, run):
     executable = match[1]
     if executable not in ('/usr/bin/sing-box', '/usr/local/bin/sing-box'):
         raise ValueError('unsupported_runtime')
-    if shlex.split(match[2]) != [executable, 'run', '-c', ANYTLS_CONFIG]:
+    if shlex.split(match[2]) != [executable, 'run', '-c', config_path]:
         raise ValueError('unsupported_runtime')
-    runtime, runtime_revision = read_metadata(ANYTLS_CONFIG)
-    changed_anytls(manager, runtime, change)
-    public = {'hostname': inventory['hostname'], 'component': 'anytls', 'action': 'configure',
+    runtime, runtime_revision = read_metadata(config_path)
+    changed_protocol(component, manager, runtime, change)
+    public = {'hostname': inventory['hostname'], 'component': component, 'action': 'configure',
               'target': instance, 'change': change, 'source_id': body['source_id'],
               'revision': revision, 'runtime_revision': runtime_revision,
               'unit_revision': hashlib.sha256(raw.encode()).hexdigest()}
@@ -184,12 +223,13 @@ def apply_mutation(body, inventory, run, rediscover):
     plan, source, manager, runtime, executable = prepare_mutation(body, inventory, run)
     if plan['plan_hash'] != body.get('plan_hash') or plan['hostname'] != body.get('confirmation'):
         raise ValueError('target_changed')
-    originals = {p: snapshot(p) for p in (source, ANYTLS_CONFIG)}
-    if hashlib.sha256(originals[source][0]).hexdigest() != plan['revision'] or hashlib.sha256(originals[ANYTLS_CONFIG][0]).hexdigest() != plan['runtime_revision']:
+    config_path = runtime_path(plan['component'])
+    originals = {p: snapshot(p) for p in (source, config_path)}
+    if hashlib.sha256(originals[source][0]).hexdigest() != plan['revision'] or hashlib.sha256(originals[config_path][0]).hexdigest() != plan['runtime_revision']:
         raise ValueError('target_changed')
-    updated_manager, updated_runtime = changed_anytls(manager, runtime, plan['change'], password=secrets.token_urlsafe(32))
+    updated_manager, updated_runtime = changed_protocol(plan['component'], manager, runtime, plan['change'], password=secrets.token_urlsafe(32), client_uuid=str(uuid.uuid4()))
     replacements = {source: json.dumps(updated_manager, ensure_ascii=False, indent=2).encode(),
-                    ANYTLS_CONFIG: json.dumps(updated_runtime, ensure_ascii=False, indent=2).encode()}
+                    config_path: json.dumps(updated_runtime, ensure_ascii=False, indent=2).encode()}
     backup_root = private_directory(MUTATION_BACKUPS)
     backup = private_directory(backup_root / (time.strftime('%Y%m%d-%H%M%S') + '-' + secrets.token_hex(6)))
     for index, (path, (raw, info)) in enumerate(originals.items()):
@@ -206,7 +246,7 @@ def apply_mutation(body, inventory, run, rediscover):
     candidate = backup / 'candidate.json'
     with candidate.open('xb') as stream:
         os.chmod(stream.name, 0o600)
-        stream.write(replacements[ANYTLS_CONFIG]); stream.flush(); os.fsync(stream.fileno())
+        stream.write(replacements[config_path]); stream.flush(); os.fsync(stream.fileno())
     sync_directory(backup)
     sync_directory(backup_root)
     code, _ = run([executable, 'check', '-c', str(candidate)])
@@ -214,7 +254,7 @@ def apply_mutation(body, inventory, run, rediscover):
     # Recheck service, bot and file revisions after potentially slow validation.
     current = prepare_mutation(body, rediscover(), run)[0]
     if current['plan_hash'] != plan['plan_hash']: raise ValueError('target_changed')
-    marker = backup_root / 'anytls-pending.json'
+    marker = backup_root / f'{plan["component"]}-pending.json'
     with marker.open('x', encoding='utf-8') as stream:
         os.chmod(marker, 0o600)
         json.dump({'backup': str(backup), 'files': list(originals), 'unit': plan['target']['id']}, stream)
