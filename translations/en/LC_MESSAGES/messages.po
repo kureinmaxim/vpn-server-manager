@@ -8195,3 +8195,12 @@ msgstr "AnyTLS, TUIC, XHTTP, VLESS/Reality and Hysteria2 systemd support port an
 
 msgid "Клиент default защищён: TelegramOnly может восстановить его из основного UUID или пароля."
 msgstr "The default client is protected: TelegramOnly can restore it from the primary UUID or password."
+
+msgid "Общий пароль NaiveProxy: доступна только смена порта."
+msgstr "NaiveProxy uses one shared account: only port changes are available."
+
+msgid "NaiveProxy использует одну учётную запись: доступна только смена порта."
+msgstr "NaiveProxy uses one shared account: only port changes are available."
+
+msgid "NaiveProxy использует одну учётную запись: доступна только смена порта. Caddyfile проверяется перед перезапуском."
+msgstr "NaiveProxy uses one shared account: only port changes are available. The Caddyfile is validated before restart."

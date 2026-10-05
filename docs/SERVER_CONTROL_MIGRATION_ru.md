@@ -1,6 +1,6 @@
 # Перенос управления TelegramOnly в VPN Server Manager
 
-Статус на 05.10.2026: версия **4.10.2**, ветка `codex/protocol-controls`.
+Статус на 05.10.2026: версия **4.10.3**, ветка `codex/protocol-controls`.
 Исследованы локальные исходники VPN Server Manager `b397d1f` (4.8.0) и TelegramOnly `fcfa15a`.
 Рабочие серверы не опрашивались и не изменялись.
 
@@ -13,6 +13,7 @@
 - TUIC и XHTTP: смена порта, создание и отзыв клиентов с генерацией UUID (и пароля TUIC) на VPS. Поддерживаются отдельные sing-box службы systemd с конфигами `/etc/tuic/config.json` и `/etc/xhttp/config.json`. Перед записью сверяются клиенты, TLS, ALPN/congestion control TUIC и transport/path/mode/host XHTTP. Нативный TUIC и XHTTP на Xray не изменяются. XHTTP требует сборки sing-box, которая принимает этот транспорт: отказ `sing-box check` оставляет рабочие файлы без изменений.
 - VLESS/Reality TCP: порт, создание и отзыв клиентов для отдельного Xray systemd с `/usr/local/etc/xray/config.json`. Требуются один inbound и совпадение UUID/flow/Reality/SNI/порта. Ключи, маршрутизация и fallbacks сохраняются; перед записью выполняется `xray run -test -config`. Установки 3x-ui блокируются даже при остановленной панели. Клиент `default` защищён от отзыва, чтобы TelegramOnly не восстановил его из корневого UUID. Синтаксис проверки: [документация Xray](https://xtls.github.io/en/document/command.html#xray-run).
 - Hysteria2: порт и отдельные клиенты `userpass` для выделенной службы systemd, запускающей `/usr/local/bin/hysteria` или `/usr/bin/hysteria` с `server -c /etc/hysteria/config.yaml`. С общим паролем разрешена только смена порта. Поддержан ограниченный YAML TelegramOnly (вложенные словари и простые значения), а также JSON; сложный YAML, неоднозначные ключи, ACME и внешняя авторизация отклоняются. Запись использует JSON-синтаксис, допустимый в YAML; оригинальные байты сохраняются в резервной копии. Проверяется структура, нативного dry-run нет: ошибка запуска вызывает откат. Это отдельно указано в плане. [Режимы авторизации Hysteria2](https://v2.hysteria.network/docs/advanced/Full-Server-Config/#authentication).
+- NaiveProxy: смена порта для одной общей учётной записи TelegramOnly. Сверяются JSON менеджера и `/etc/caddy-naive/Caddyfile`; выполняется `caddy validate`, затем перезапуск с откатом при ошибке. Создание и отзыв отдельных клиентов недоступны для shared-account режима; сложные Caddyfile, Docker и внешняя авторизация остаются только для чтения.
 - Обзор использует существующие API «Статуса» (ОС, uptime, CPU, Docker) и мониторинга (службы, uptime и автозапуск). Каталог служб общий для всех трёх представлений. Из окна «Статус» можно перейти к управлению.
 - Отдельная проверка точных целей systemd/Docker, включая остановленные контейнеры и Compose service labels. Несколько установок показаны отдельно.
 - Запуск, остановка, перезапуск выбранной службы: одноразовый план на 5 минут, подтверждение hostname, привязка к SSH-хосту и сеансу, повторная проверка состояния.
