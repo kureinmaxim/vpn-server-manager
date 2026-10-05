@@ -11,7 +11,7 @@
         <summary>{{ _('Возможности и подключение') }}</summary>
         <p class="mt-2 mb-1">{{ _('Управление использует SSH из карточки. Бот не обязателен. Способ запуска определяется отдельно для каждой службы.') }}</p>
         <p class="small text-muted mb-1">{{ _('Подключение требует известного ключа в known_hosts и прав root или sudo -n.') }}</p>
-        <p class="small mb-1">{{ _('Для AnyTLS systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается.') }}</p>
+        <p class="small mb-1">{{ _('Для AnyTLS, TUIC и XHTTP systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается.') }}</p>
     </details>
     <p id="control-status" role="status" aria-live="polite"></p>
     <p id="control-monitoring-status" class="small text-muted" role="status"></p>
@@ -168,9 +168,9 @@
     async function planMutation(selector, change) {
         clearPlan(); hideProfiles();
         const response = await request('plan', {...selector, action: 'configure', change});
-        ticket = response.ticket; plannedMutation = true;
+        ticket = response.ticket; plannedMutation = selector.component;
         const titles = {{ {'port': _('Изменить порт'), 'add_client': _('Создать клиента'), 'remove_client': _('Отозвать клиента')}|tojson }};
-        document.getElementById('control-plan-text').textContent = response.plan.hostname + '\nAnyTLS · ' + response.plan.target.id + '\n' + titles[change.kind] + ': ' + (change.name || change.port) + '\n' + {{ _('Будут сохранены резервные копии обоих файлов, проверен конфиг и перезапущена служба. При ошибке будет выполнен откат.')|tojson }};
+        document.getElementById('control-plan-text').textContent = response.plan.hostname + '\n' + response.plan.component.toUpperCase() + ' · ' + response.plan.target.id + '\n' + titles[change.kind] + ': ' + (change.name || change.port) + '\n' + {{ _('Будут сохранены резервные копии обоих файлов, проверен конфиг и перезапущена служба. При ошибке будет выполнен откат.')|tojson }};
         panel.hidden = false; panel.scrollIntoView({block: 'center'}); confirmation.focus();
         status.textContent = {{ _('План готов. Срок действия — 5 минут.')|tojson }};
     }
@@ -200,12 +200,12 @@
                 (source.ports || []).forEach(port => list.append(node('dt', 'col-6', {{ _('Порт')|tojson }}), node('dd', 'col-6', port.port + ' / ' + port.protocol)));
                 body.append(list);
                 const selector = {component: protocol.key, source_id: source.source_id, revision: source.revision};
-                if (protocol.key === 'anytls' && protocol.sources.length === 1) {
+                if ({{ mutation_protocols|tojson }}.includes(protocol.key) && protocol.sources.length === 1) {
                     const controls = node('div', 'border-top pt-3 mb-3', '');
-                    controls.append(node('p', 'small text-muted', {{ _('Изменение требует одной работающей службы AnyTLS systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением.')|tojson }}));
+                    controls.append(node('p', 'small text-muted', {{ _('Изменение требует одной работающей службы systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением.')|tojson }}));
                     const portForm = node('form', 'd-flex gap-2 flex-wrap mb-2', '');
                     const port = node('input', 'form-control', ''); port.type = 'number'; port.min = '1'; port.max = '65535'; port.required = true; port.value = source.fields.port || 443; port.style.maxWidth = '10rem';
-                    port.setAttribute('aria-label', {{ _('Новый порт AnyTLS')|tojson }});
+                    port.setAttribute('aria-label', {{ _('Новый порт')|tojson }});
                     const portButton = node('button', 'btn btn-outline-primary', {{ _('Изменить порт')|tojson }}); portButton.type = 'submit';
                     portForm.append(port, portButton);
                     portForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'port', port:Number(port.value)})); });
@@ -241,7 +241,7 @@
                                     status.textContent = {{ _('Ссылка содержит доступ клиента. Она будет скрыта через минуту. Настройки взяты из файла менеджера и могут отличаться от работающей службы.')|tojson }};
                                 })); row.append(reveal);
                             } else row.append(node('span', 'small text-muted', {{ _('Экспорт этого протокола ещё не перенесён')|tojson }}));
-                            if (protocol.key === 'anytls' && protocol.sources.length === 1) {
+                            if ({{ mutation_protocols|tojson }}.includes(protocol.key) && protocol.sources.length === 1) {
                                 const revoke = node('button', 'btn btn-sm btn-outline-warning ms-2', {{ _('Отозвать клиента')|tojson }});
                                 revoke.addEventListener('click', () => task(() => planMutation(selector, {kind:'remove_client', name:client.name})));
                                 row.append(revoke);
@@ -261,7 +261,7 @@
         const body = {ticket, confirmation: confirmation.value}, mutation = plannedMutation; clearPlan();
         const result = await request('apply', body);
         if (result.inventory) render(result.inventory);
-        if (mutation) { hideProfiles(); document.getElementById('control-protocol-results').replaceChildren(); await loadProtocolSettings('anytls'); }
+        if (mutation) { hideProfiles(); document.getElementById('control-protocol-results').replaceChildren(); await loadProtocolSettings(mutation); }
         status.textContent = {{ _('Операция выполнена')|tojson }} + (result.backup ? '\n' + {{ _('Резервная копия')|tojson }} + ': ' + result.backup : ''); loadMonitoring();
     }));
     // Same endpoint as the existing monitoring page, with no additional installation.

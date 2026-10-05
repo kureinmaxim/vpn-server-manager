@@ -2,6 +2,19 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.10.0] - 2026-10-05
+
+### Added
+- TUIC and XHTTP port changes and client creation/revocation through SSH for existing dedicated sing-box systemd services. UUIDs and passwords are generated on the server; plans and operation responses contain no credentials.
+- Protocol-specific checks compare client credentials, TLS settings, TUIC ALPN/congestion control and XHTTP transport settings before writing. Both configurations are backed up and validated; failed restarts trigger rollback.
+
+### Changed
+- The confirmation panel and settings refresh follow the selected protocol. Updated Russian, English and Chinese interface text.
+- Linux filesystem verification covers all three editable protocols, including failed writes, restarts and recovery.
+
+### Limitations
+- Edits require a single running service, matching manager metadata and a stopped TelegramOnly bot. Docker, native TUIC and Xray configurations remain read-only. XHTTP requires a sing-box build that accepts its configuration; validation failures leave live files unchanged. These changes were tested locally with simulated services, not on live VPS instances.
+
 ## [4.9.2] - 2026-10-02
 
 ### Added

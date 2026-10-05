@@ -1,5 +1,5 @@
 """Local Linux filesystem integration; simulated service, no networking."""
-import copy, hashlib, importlib, json, os, sys, tempfile, types
+import copy, hashlib, importlib, itertools, json, os, sys, tempfile, types, uuid
 from pathlib import Path
 root = Path(__file__).resolve().parent.parent
 for name, path in [('app', root/'app'), ('app.services', root/'app/services')]:
@@ -7,19 +7,28 @@ for name, path in [('app', root/'app'), ('app.services', root/'app/services')]:
 edits = importlib.import_module('app.services.protocol_mutations')
 edits.time.sleep = lambda _: None
 passed = 0
-for scenario in ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable'):
+for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp'), ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable')):
     with tempfile.TemporaryDirectory(prefix='vpn-manager-test-', dir='/root') as directory:
         base = Path(directory)
         source, live = base/'manager.json', base/'live.json'
         manager = {'port':443, 'clients':[{'name':'fixture','password':'test-only-password'}]}
         runtime = {'inbounds':[{'type':'anytls','listen_port':443,'users':copy.deepcopy(manager['clients']),
             'tls':{'enabled':True,'certificate_path':'/etc/anytls/server.crt','key_path':'/etc/anytls/server.key'}}]}
+        inbound = runtime['inbounds'][0]
+        inbound['type'] = 'vless' if component == 'xhttp' else component
+        inbound['tls'].update(certificate_path=f'/etc/{component}/server.crt', key_path=f'/etc/{component}/server.key')
+        if component != 'anytls':
+            manager['clients'][0]['uuid'] = str(uuid.UUID(int=1))
+            if component == 'xhttp': del manager['clients'][0]['password']
+        inbound['users'] = copy.deepcopy(manager['clients'])
+        if component == 'tuic': inbound['tls']['alpn'] = ['h3']
+        if component == 'xhttp': inbound['transport'] = {'type': 'xhttp', 'path': '/'}
         source.write_text(json.dumps(manager)); live.write_text(json.dumps(runtime))
         originals = source.read_bytes(), live.read_bytes()
-        edits.ANYTLS_CONFIG = str(live); edits.MUTATION_BACKUPS = str(base/'backups')
-        edits.sources = lambda *a: {'anytls': [(str(source),'candidate')]}
-        inventory = {'hostname':'fixture-vps', 'components':[{'key':'anytls','instances':[
-            {'runtime':'systemd','state':'active','id':'anytls.service'}]}]}
+        setattr(edits, component.upper() + '_CONFIG', str(live)); edits.MUTATION_BACKUPS = str(base/'backups')
+        edits.sources = lambda *a: {component: [(str(source),'candidate')]}
+        inventory = {'hostname':'fixture-vps', 'components':[{'key':component,'instances':[
+            {'runtime':'systemd','state':'active','id':component + '.service'}]}]}
         restarts = 0; checks = 0
         def run(argv):
             global restarts, checks
@@ -33,7 +42,7 @@ for scenario in ('success', 'restart_failure', 'write_failure', 'late_failure', 
                 checks += 1
                 return (3, 'failed') if scenario == 'late_failure' and checks == 2 else (0,'active')
             raise AssertionError('Unexpected command')
-        body = {'component':'anytls','action':'configure','source_id':hashlib.sha256(str(source).encode()).hexdigest(),
+        body = {'component':component,'action':'configure','source_id':hashlib.sha256(str(source).encode()).hexdigest(),
                 'revision':hashlib.sha256(source.read_bytes()).hexdigest(),'change':{'kind':'add_client','name':'second'}}
         plan = edits.prepare_mutation(body, inventory, run)[0]
         body.update(plan_hash=plan['plan_hash'],confirmation=plan['hostname'])
@@ -67,6 +76,6 @@ for scenario in ('success', 'restart_failure', 'write_failure', 'late_failure', 
         assert (backup/'0.json').stat().st_mode & 0o777 == 0o600
         assert (backup/'0.json').read_bytes() == originals[0]
         assert json.loads((backup/'manifest.json').read_text())['files'][0]['path'] == str(source)
-        assert (base/'backups/anytls-pending.json').exists() == (scenario == 'recovery_failure')
+        assert (base/f'backups/{component}-pending.json').exists() == (scenario == 'recovery_failure')
         passed += 1
 print(f'Linux filesystem integration: {passed} scenarios passed; no real services or networks used.')

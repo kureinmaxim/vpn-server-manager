@@ -11,7 +11,7 @@ from .reset import target, identity, remote, _guard, _locks
 from ..services.server_control_payload import SCRIPT_SOURCE
 from ..services.server_control_remote import CATALOG, ACTIONS
 from ..services.protocol_inspection import PROTOCOL_FILES
-from ..services.protocol_mutations import validate_change
+from ..services.protocol_mutations import validate_change, MUTATION_PROTOCOLS
 from ..utils.decorators import require_auth, require_pin, csrf_protect
 import threading
 
@@ -24,7 +24,7 @@ def mutation_error(code):
     messages = {
         'bot_running': _("Сначала остановите TelegramOnly: одновременное изменение настроек ботом не поддерживается."),
         'config_mismatch': _("Настройки менеджера отличаются от файла службы. Изменения заблокированы."),
-        'unsupported_runtime': _("Изменение доступно для одной работающей службы AnyTLS systemd с выделенным конфигом sing-box."),
+        'unsupported_runtime': _("Изменение доступно для одной работающей службы systemd с выделенным конфигом sing-box."),
         'unsupported_config': _("Этот формат конфигурации пока доступен только для чтения."),
         'ambiguous_config': _("Найдено несколько файлов настроек. Изменения заблокированы."),
         'client_exists': _("Клиент с таким именем уже существует."),
@@ -64,7 +64,7 @@ def private_response(response):
 def page(server_id):
     server, _creds = target(server_id)
     session.setdefault("csrf_token", secrets.token_urlsafe(32))
-    return render_template("server_control.html", server=server)
+    return render_template("server_control.html", server=server, mutation_protocols=MUTATION_PROTOCOLS)
 
 
 @control_bp.route("/api/servers/<server_id>/control/discover", methods=["POST"])
@@ -137,7 +137,7 @@ def create_plan(server_id):
         return jsonify(error=_("Выберите службу и действие")), 400
     if body.get('action') == 'configure':
         try:
-            if body.get('component') != 'anytls' or any(not isinstance(body.get(k), str) or not re.fullmatch('[0-9a-f]{64}', body[k]) for k in ('source_id', 'revision')):
+            if body.get('component') not in MUTATION_PROTOCOLS or any(not isinstance(body.get(k), str) or not re.fullmatch('[0-9a-f]{64}', body[k]) for k in ('source_id', 'revision')):
                 raise ValueError()
             command = {k: body[k] for k in ('component', 'action', 'source_id', 'revision')}
             command['change'] = validate_change(body.get('change'))
