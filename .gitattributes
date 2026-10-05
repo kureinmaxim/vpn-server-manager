@@ -53,3 +53,44 @@
 *.dll binary
 *.dylib binary
 
+
+# Translations
+*.po text eol=lf
+*.pot text eol=lf
+*.mo binary
+
+# Windows-only tooling (keep CRLF so Windows tools don't choke)
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+*.psd1 text eol=crlf
+*.iss text eol=crlf
+
+# Templates / examples / Cursor rules
+*.template text eol=lf
+*.example text eol=lf
+*.mdc text eol=lf
+
+# Files without extensions
+Dockerfile text eol=lf
+Makefile text eol=lf
+LICENSE text eol=lf
+
+# Dotfiles
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.dockerignore text eol=lf
+.editorconfig text eol=lf
+
+# Databases and archives
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.7z binary
+
+# Backups kept in-tree
+*.old text eol=lf
+*.bak text eol=lf
