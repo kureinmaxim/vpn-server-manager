@@ -7,7 +7,7 @@ for name, path in [('app', root/'app'), ('app.services', root/'app/services')]:
 edits = importlib.import_module('app.services.protocol_mutations')
 edits.time.sleep = lambda _: None
 passed = 0
-for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp', 'vless'), ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable')):
+for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp', 'vless', 'hysteria2'), ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable')):
     with tempfile.TemporaryDirectory(prefix='vpn-manager-test-', dir='/root') as directory:
         base = Path(directory)
         source, live = base/'manager.json', base/'live.json'
@@ -29,7 +29,13 @@ for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp', 'vless'
                 'settings':{'decryption':'none','clients':[{'email':c['name'],'id':c['uuid'],'flow':'xtls-rprx-vision'} for c in manager['clients']]},
                 'streamSettings':{'network':'tcp','security':'reality','realitySettings':{
                     'privateKey':manager['private_key'],'shortIds':['abcd'],'serverNames':['example.com']}}}]
+        if component == 'hysteria2':
+            manager['clients'][0].pop('uuid', None)
+            runtime = {'listen':':443','tls':{'cert':'/etc/hysteria/server.crt','key':'/etc/hysteria/server.key'},
+                'auth':{'type':'userpass','userpass':{'fixture':'test-only-password'}}}
         source.write_text(json.dumps(manager)); live.write_text(json.dumps(runtime))
+        if component == 'hysteria2':
+            live.write_text('listen: ":443"\ntls:\n  cert: "/etc/hysteria/server.crt"\n  key: "/etc/hysteria/server.key"\nauth:\n  type: "userpass"\n  userpass:\n    fixture: "test-only-password"\n')
         originals = source.read_bytes(), live.read_bytes()
         setattr(edits, component.upper() + '_CONFIG', str(live)); edits.MUTATION_BACKUPS = str(base/'backups')
         edits.sources = lambda *a: {component: [(str(source),'candidate')]}
@@ -39,6 +45,8 @@ for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp', 'vless'
         def run(argv):
             global restarts, checks
             if argv[:2] == ['systemctl','show']:
+                if component == 'hysteria2':
+                    return 0, '{ path=/usr/local/bin/hysteria ; argv[]=/usr/local/bin/hysteria server -c '+str(live)+' ; ignore_errors=no ; }'
                 if component == 'vless':
                     return 0, '{ path=/usr/local/bin/xray ; argv[]=/usr/local/bin/xray run -config '+str(live)+' ; ignore_errors=no ; }'
                 return 0, '{ path=/usr/bin/sing-box ; argv[]=/usr/bin/sing-box run -c '+str(live)+' ; ignore_errors=no ; }'

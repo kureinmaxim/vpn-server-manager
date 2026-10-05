@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.10.2] - 2026-10-05
+
+### Added
+- Hysteria2 port changes and userpass client creation/revocation for dedicated systemd services using `/etc/hysteria/config.yaml`. Shared-password installations support port changes without changing authentication mode.
+- Restricted parser for TelegramOnly's mapping-only YAML and JSON. Ambiguous YAML, duplicate keys and unsupported authentication/configuration formats are rejected. TLS and obfuscation must agree with manager metadata; unrelated settings are retained. The updated file uses JSON syntax, which is also valid YAML; backups retain original bytes and permissions.
+- Protects the default client and checks its consistency with the root password to prevent TelegramOnly from restoring revoked credentials.
+- Hysteria2 plans explicitly explain that validation checks structure, not native startup. Service startup failure triggers rollback. Client names use lowercase ASCII letters, digits, hyphens and underscores.
+
+### Limitations
+- No native Hysteria dry-run is used. Complex YAML, ACME, external authentication, Docker and automatic migration from shared passwords remain unsupported. Verification uses local files and simulated services; live VPS validation remains outstanding.
+
 ## [4.10.1] - 2026-10-05
 
 ### Added

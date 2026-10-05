@@ -11,7 +11,7 @@
         <summary>{{ _('Возможности и подключение') }}</summary>
         <p class="mt-2 mb-1">{{ _('Управление использует SSH из карточки. Бот не обязателен. Способ запуска определяется отдельно для каждой службы.') }}</p>
         <p class="small text-muted mb-1">{{ _('Подключение требует известного ключа в known_hosts и прав root или sudo -n.') }}</p>
-        <p class="small mb-1">{{ _('Для AnyTLS, TUIC, XHTTP и VLESS/Reality systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается.') }}</p>
+        <p class="small mb-1">{{ _('Для AnyTLS, TUIC, XHTTP, VLESS/Reality и Hysteria2 systemd доступны смена порта и управление клиентами с резервной копией и откатом. Остальные протоколы пока доступны для чтения и управления службами. Автономная установка ещё разрабатывается.') }}</p>
     </details>
     <p id="control-status" role="status" aria-live="polite"></p>
     <p id="control-monitoring-status" class="small text-muted" role="status"></p>
@@ -165,12 +165,14 @@
     }
     document.getElementById('control-refresh').addEventListener('click', () => task(async () => { clearPlan(); render(await request('discover')); status.textContent = {{ _('Состояние обновлено')|tojson }}; }));
     document.getElementById('control-cancel').addEventListener('click', clearPlan);
+    const hysteriaNotice = {{ _('Hysteria2: проверяется структура конфигурации. Нативной проверки без запуска нет; ошибка запуска приведёт к откату. Имена клиентов: строчные латинские буквы, цифры, дефис и подчёркивание.')|tojson }};
     async function planMutation(selector, change) {
         clearPlan(); hideProfiles();
         const response = await request('plan', {...selector, action: 'configure', change});
         ticket = response.ticket; plannedMutation = selector.component;
         const titles = {{ {'port': _('Изменить порт'), 'add_client': _('Создать клиента'), 'remove_client': _('Отозвать клиента')}|tojson }};
         document.getElementById('control-plan-text').textContent = response.plan.hostname + '\n' + response.plan.component.toUpperCase() + ' · ' + response.plan.target.id + '\n' + titles[change.kind] + ': ' + (change.name || change.port) + '\n' + {{ _('Будут сохранены резервные копии обоих файлов, проверен конфиг и перезапущена служба. При ошибке будет выполнен откат.')|tojson }};
+        if (selector.component === 'hysteria2') document.getElementById('control-plan-text').textContent += '\n' + hysteriaNotice;
         panel.hidden = false; panel.scrollIntoView({block: 'center'}); confirmation.focus();
         status.textContent = {{ _('План готов. Срок действия — 5 минут.')|tojson }};
     }
@@ -203,6 +205,7 @@
                 if ({{ mutation_protocols|tojson }}.includes(protocol.key) && protocol.sources.length === 1) {
                     const controls = node('div', 'border-top pt-3 mb-3', '');
                     controls.append(node('p', 'small text-muted', {{ _('Изменение требует одной работающей службы systemd и остановленного бота. Совпадение настроек с рабочим конфигом проверяется перед применением.')|tojson }}));
+                    if (protocol.key === 'hysteria2') controls.append(node('p', 'small text-muted', hysteriaNotice));
                     const portForm = node('form', 'd-flex gap-2 flex-wrap mb-2', '');
                     const port = node('input', 'form-control', ''); port.type = 'number'; port.min = '1'; port.max = '65535'; port.required = true; port.value = source.fields.port || 443; port.style.maxWidth = '10rem';
                     port.setAttribute('aria-label', {{ _('Новый порт')|tojson }});
@@ -210,7 +213,7 @@
                     portForm.append(port, portButton);
                     portForm.addEventListener('submit', event => { event.preventDefault(); task(() => planMutation(selector, {kind:'port', port:Number(port.value)})); });
                     const clientForm = node('form', 'd-flex gap-2 flex-wrap', '');
-                    const name = node('input', 'form-control', ''); name.required = true; name.maxLength = 64; name.pattern = '[A-Za-z0-9][A-Za-z0-9_.-]{0,63}'; name.style.maxWidth = '20rem';
+                    const name = node('input', 'form-control', ''); name.required = true; name.maxLength = 64; name.pattern = protocol.key === 'hysteria2' ? '[a-z0-9][a-z0-9_-]{0,63}' : '[A-Za-z0-9][A-Za-z0-9_.-]{0,63}'; name.style.maxWidth = '20rem';
                     name.placeholder = {{ _('Имя клиента: латиница, цифры, точка, дефис')|tojson }}; name.setAttribute('aria-label', {{ _('Имя нового клиента')|tojson }});
                     const add = node('button', 'btn btn-outline-primary', {{ _('Создать клиента')|tojson }}); add.type = 'submit';
                     clientForm.append(name, add);

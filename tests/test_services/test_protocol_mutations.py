@@ -63,6 +63,9 @@ def protocol_configs(component, configs):
         inbound['congestion_control'] = 'bbr'
         inbound['tls']['alpn'] = ['h3']
     if component == 'xhttp': inbound['transport'] = {'type': 'xhttp', 'path': '/'}
+    if component == 'hysteria2':
+        for client in manager['clients']: client.pop('uuid', None)
+        return manager, {'listen':':443','tls':{'cert':'/etc/hysteria/server.crt','key':'/etc/hysteria/server.key'}, 'auth':{'type':'userpass','userpass':{c['name']:c['password'] for c in manager['clients']}}}
     if component == 'vless':
         manager.update(private_key='fixture-private-key', short_id='abcd', sni='example.com')
         runtime['inbounds'] = [{'protocol':'vless', 'port':443,
@@ -72,13 +75,15 @@ def protocol_configs(component, configs):
     return manager, runtime
 
 
-@pytest.fixture(params=['anytls', 'tuic', 'xhttp', 'vless'])
+@pytest.fixture(params=['anytls', 'tuic', 'xhttp', 'vless', 'hysteria2'])
 def host(tmp_path, monkeypatch, configs, request):
     component = request.param
     configs = protocol_configs(component, configs)
     source, live = tmp_path / f'{component}_config.json', tmp_path / 'live.json'
     source.write_text(json.dumps(configs[0]))
     live.write_text(json.dumps(configs[1]))
+    if component == 'hysteria2':
+        live.write_text('listen: ":443"\ntls:\n  cert: "/etc/hysteria/server.crt"\n  key: "/etc/hysteria/server.key"\nauth:\n  type: "userpass"\n  userpass:\n    alice: "fixture-one"\n    bob: "fixture-two"\n')
     monkeypatch.setattr(edits, component.upper() + '_CONFIG', live.as_posix())
     monkeypatch.setattr(edits, 'MUTATION_BACKUPS', str(tmp_path / 'backups'))
     monkeypatch.setattr(edits, 'sources', lambda *a: {component: [(str(source), 'candidate')]})
@@ -99,6 +104,8 @@ def host(tmp_path, monkeypatch, configs, request):
     def run(argv):
         commands.append(argv)
         if argv[:2] == ['systemctl', 'show']:
+            if component == 'hysteria2':
+                return 0, '{ path=/usr/local/bin/hysteria ; argv[]=/usr/local/bin/hysteria server -c ' + live.as_posix() + ' ; ignore_errors=no ; }'
             if component == 'vless':
                 return 0, '{ path=/usr/local/bin/xray ; argv[]=/usr/local/bin/xray run -config ' + live.as_posix() + ' ; ignore_errors=no ; }'
             return 0, '{ path=/usr/bin/sing-box ; argv[]=/usr/bin/sing-box run -c ' + live.as_posix() + ' ; ignore_errors=no ; }'
@@ -128,7 +135,9 @@ def test_apply_generates_secret_only_on_host_and_backups(host):
     client = manager['clients'][-1]
     secret = client.get('password', client.get('uuid'))
     assert len(secret) >= 32 and secret not in json.dumps(result)
-    if host[4]['component'] == 'vless':
+    if host[4]['component'] == 'hysteria2':
+        assert runtime['auth']['userpass'][client['name']] == client['password']
+    elif host[4]['component'] == 'vless':
         assert runtime['inbounds'][0]['settings']['clients'][-1] == {'email':client['name'],'id':client['uuid'],'flow':'xtls-rprx-vision'}
     else:
         assert runtime['inbounds'][0]['users'][-1] == client
@@ -156,6 +165,7 @@ def test_failed_recovery_blocks_next_plan(host):
         edits.prepare_mutation(body, inventory, run)
 
 
+@pytest.mark.parametrize('host', ['anytls', 'tuic', 'xhttp', 'vless'], indirect=True)
 def test_validation_failure_never_changes_live_files(host):
     source, live, _, _, _, outcomes = host
     original = (source.read_bytes(), live.read_bytes())
