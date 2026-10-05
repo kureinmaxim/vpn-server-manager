@@ -41,7 +41,7 @@ def test_page(control_client):
     assert b'control-protocols' in result.data
 
 
-@pytest.mark.parametrize('component', ['anytls', 'tuic', 'xhttp'])
+@pytest.mark.parametrize('component', ['anytls', 'tuic', 'xhttp', 'vless'])
 def test_configuration_plan_and_apply_use_saved_change(control_client, monkeypatch, component):
     plan = {'hostname': 'test-vps', 'plan_hash': 'a' * 64}
     run = MagicMock(return_value=plan)

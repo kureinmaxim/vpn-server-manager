@@ -57,16 +57,22 @@ def protocol_configs(component, configs):
     if component != 'anytls':
         for index, client in enumerate(manager['clients']):
             client['uuid'] = str(uuid.UUID(int=index + 1))
-            if component == 'xhttp': del client['password']
+            if component in ('xhttp', 'vless'): del client['password']
     inbound['users'] = copy.deepcopy(manager['clients'])
     if component == 'tuic':
         inbound['congestion_control'] = 'bbr'
         inbound['tls']['alpn'] = ['h3']
     if component == 'xhttp': inbound['transport'] = {'type': 'xhttp', 'path': '/'}
+    if component == 'vless':
+        manager.update(private_key='fixture-private-key', short_id='abcd', sni='example.com')
+        runtime['inbounds'] = [{'protocol':'vless', 'port':443,
+            'settings':{'decryption':'none','clients':[{'email':c['name'],'id':c['uuid'],'flow':'xtls-rprx-vision'} for c in manager['clients']], 'fallbacks':[{'dest':'127.0.0.1:8000'}]},
+            'streamSettings':{'network':'tcp','security':'reality','realitySettings':{
+                'privateKey':manager['private_key'],'shortIds':['abcd'],'serverNames':['example.com'],'dest':'example.com:443'}}}]
     return manager, runtime
 
 
-@pytest.fixture(params=['anytls', 'tuic', 'xhttp'])
+@pytest.fixture(params=['anytls', 'tuic', 'xhttp', 'vless'])
 def host(tmp_path, monkeypatch, configs, request):
     component = request.param
     configs = protocol_configs(component, configs)
@@ -93,8 +99,10 @@ def host(tmp_path, monkeypatch, configs, request):
     def run(argv):
         commands.append(argv)
         if argv[:2] == ['systemctl', 'show']:
+            if component == 'vless':
+                return 0, '{ path=/usr/local/bin/xray ; argv[]=/usr/local/bin/xray run -config ' + live.as_posix() + ' ; ignore_errors=no ; }'
             return 0, '{ path=/usr/bin/sing-box ; argv[]=/usr/bin/sing-box run -c ' + live.as_posix() + ' ; ignore_errors=no ; }'
-        if 'check' in argv: return outcomes['check'], ''
+        if 'check' in argv or '-test' in argv: return outcomes['check'], ''
         if argv[:2] == ['systemctl', 'restart']:
             return outcomes['restart'].pop(0) if outcomes['restart'] else 0, ''
         if argv[:2] == ['systemctl', 'is-active']: return 0, 'active'
@@ -120,7 +128,10 @@ def test_apply_generates_secret_only_on_host_and_backups(host):
     client = manager['clients'][-1]
     secret = client.get('password', client.get('uuid'))
     assert len(secret) >= 32 and secret not in json.dumps(result)
-    assert runtime['inbounds'][0]['users'][-1] == client
+    if host[4]['component'] == 'vless':
+        assert runtime['inbounds'][0]['settings']['clients'][-1] == {'email':client['name'],'id':client['uuid'],'flow':'xtls-rprx-vision'}
+    else:
+        assert runtime['inbounds'][0]['users'][-1] == client
     if 'uuid' in client:
         assert uuid.UUID(client['uuid']).version == 4
         assert client['uuid'] not in [c.get('uuid') for c in manager['clients'][:-1]]
@@ -253,3 +264,48 @@ def test_plan_cannot_be_reused_for_another_protocol(host):
     body['component'] = 'xhttp' if body['component'] != 'xhttp' else 'tuic'
     with pytest.raises(ValueError):
         edits.apply_mutation(dict(body, plan_hash=plan['plan_hash'], confirmation=plan['hostname']), inventory, run, lambda: inventory)
+
+
+def test_vless_preserves_reality_routing_and_fallbacks(configs):
+    manager, runtime = protocol_configs('vless', configs)
+    updated, live = edits.changed_protocol('vless', manager, runtime, {'kind':'port','port':8443})
+    assert updated['port'] == live['inbounds'][0]['port'] == 8443
+    assert live['inbounds'][0]['streamSettings'] == runtime['inbounds'][0]['streamSettings']
+    assert live['outbounds'] == runtime['outbounds']
+    assert live['inbounds'][0]['settings']['fallbacks'] == runtime['inbounds'][0]['settings']['fallbacks']
+    updated, live = edits.changed_protocol('vless', updated, live, {'kind':'remove_client','name':'alice'})
+    assert updated['clients'] == [manager['clients'][1]]
+    assert live['inbounds'][0]['settings']['clients'] == [{'email':'bob','id':manager['clients'][1]['uuid'],'flow':'xtls-rprx-vision'}]
+
+
+@pytest.mark.parametrize('field', ['privateKey', 'shortIds', 'serverNames', 'uuid', 'root_uuid', 'duplicate', 'flow', 'transport'])
+def test_vless_rejects_mismatch(configs, field):
+    manager, runtime = protocol_configs('vless', configs)
+    inbound = runtime['inbounds'][0]
+    if field in ('privateKey', 'shortIds', 'serverNames'): inbound['streamSettings']['realitySettings'][field] = 'different'
+    elif field == 'uuid': inbound['settings']['clients'][0]['id'] = str(uuid.uuid4())
+    elif field == 'root_uuid': manager['uuid'] = manager['clients'][0]['uuid']
+    elif field == 'duplicate': manager['clients'][1]['uuid'] = manager['clients'][0]['uuid']
+    elif field == 'flow': inbound['settings']['clients'][0]['flow'] = ''
+    else: inbound['streamSettings']['network'] = 'ws'
+    with pytest.raises(ValueError):
+        edits.changed_protocol('vless', manager, runtime, {'kind':'port','port':8443})
+
+
+def test_vless_default_cannot_be_resurrected(configs):
+    manager, runtime = protocol_configs('vless', configs)
+    manager['clients'][0]['name'] = 'default'
+    manager['uuid'] = manager['clients'][0]['uuid']
+    runtime['inbounds'][0]['settings']['clients'][0]['email'] = 'default'
+    with pytest.raises(ValueError, match='protected_client'):
+        edits.changed_protocol('vless', manager, runtime, {'kind':'remove_client','name':'default'})
+    updated, _ = edits.changed_protocol('vless', manager, runtime, {'kind':'remove_client','name':'bob'})
+    assert updated['uuid'] == updated['clients'][0]['uuid']
+
+
+@pytest.mark.parametrize('host', ['vless'], indirect=True)
+def test_vless_panel_blocks_even_when_stopped(host):
+    _, _, inventory, run, body, _ = host
+    inventory['components'].append({'key':'xui','instances':[{'state':'inactive'}]})
+    with pytest.raises(ValueError, match='managed_by_panel'):
+        edits.prepare_mutation(body, inventory, run)

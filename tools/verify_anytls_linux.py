@@ -7,7 +7,7 @@ for name, path in [('app', root/'app'), ('app.services', root/'app/services')]:
 edits = importlib.import_module('app.services.protocol_mutations')
 edits.time.sleep = lambda _: None
 passed = 0
-for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp'), ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable')):
+for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp', 'vless'), ('success', 'restart_failure', 'write_failure', 'late_failure', 'recovery_failure', 'symlink', 'writable')):
     with tempfile.TemporaryDirectory(prefix='vpn-manager-test-', dir='/root') as directory:
         base = Path(directory)
         source, live = base/'manager.json', base/'live.json'
@@ -19,10 +19,16 @@ for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp'), ('succ
         inbound['tls'].update(certificate_path=f'/etc/{component}/server.crt', key_path=f'/etc/{component}/server.key')
         if component != 'anytls':
             manager['clients'][0]['uuid'] = str(uuid.UUID(int=1))
-            if component == 'xhttp': del manager['clients'][0]['password']
+            if component in ('xhttp', 'vless'): del manager['clients'][0]['password']
         inbound['users'] = copy.deepcopy(manager['clients'])
         if component == 'tuic': inbound['tls']['alpn'] = ['h3']
         if component == 'xhttp': inbound['transport'] = {'type': 'xhttp', 'path': '/'}
+        if component == 'vless':
+            manager.update(private_key='fixture-private-key',short_id='abcd',sni='example.com')
+            runtime['inbounds']=[{'protocol':'vless','port':443,
+                'settings':{'decryption':'none','clients':[{'email':c['name'],'id':c['uuid'],'flow':'xtls-rprx-vision'} for c in manager['clients']]},
+                'streamSettings':{'network':'tcp','security':'reality','realitySettings':{
+                    'privateKey':manager['private_key'],'shortIds':['abcd'],'serverNames':['example.com']}}}]
         source.write_text(json.dumps(manager)); live.write_text(json.dumps(runtime))
         originals = source.read_bytes(), live.read_bytes()
         setattr(edits, component.upper() + '_CONFIG', str(live)); edits.MUTATION_BACKUPS = str(base/'backups')
@@ -33,8 +39,10 @@ for component, scenario in itertools.product(('anytls', 'tuic', 'xhttp'), ('succ
         def run(argv):
             global restarts, checks
             if argv[:2] == ['systemctl','show']:
+                if component == 'vless':
+                    return 0, '{ path=/usr/local/bin/xray ; argv[]=/usr/local/bin/xray run -config '+str(live)+' ; ignore_errors=no ; }'
                 return 0, '{ path=/usr/bin/sing-box ; argv[]=/usr/bin/sing-box run -c '+str(live)+' ; ignore_errors=no ; }'
-            if 'check' in argv: return 0, ''
+            if 'check' in argv or '-test' in argv: return 0, ''
             if argv[:2] == ['systemctl','restart']:
                 restarts += 1
                 return (1 if scenario == 'recovery_failure' or (scenario == 'restart_failure' and restarts == 1) else 0), ''

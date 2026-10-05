@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.10.1] - 2026-10-05
+
+### Added
+- VLESS/Reality TCP port changes and client creation/revocation for a dedicated Xray systemd service using `/usr/local/etc/xray/config.json`. Validates the candidate with Xray before writing, with private backups and rollback on restart failure.
+- Checks UUIDs, flow, Reality private key, short IDs, SNI and manager/runtime agreement. Existing routing and fallbacks are preserved. Detected 3x-ui installations cannot be edited directly, even when the panel is stopped.
+- Protects TelegramOnly's default client from revocation because the bot can recreate it from the root UUID. Updated Russian, English and Chinese messages.
+
+### Limitations
+- Requires one existing matching manager file and one VLESS/Reality inbound, a running dedicated systemd service and a stopped bot. Docker, multi-inbound configurations, Hysteria2 edits and standalone installers remain unsupported. Validation was performed with simulated services and local Linux files, not a live VPS.
+
 ## [4.10.0] - 2026-10-05
 
 ### Added

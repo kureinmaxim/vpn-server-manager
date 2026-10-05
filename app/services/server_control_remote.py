@@ -167,7 +167,7 @@ def main():
         code = str(error)
         allowed = ('invalid_operation', 'target_changed', 'invalid_change', 'unsupported_config',
                    'config_mismatch', 'client_exists', 'client_missing', 'last_client',
-                   'bot_running', 'unsupported_runtime', 'ambiguous_config', 'recovery_required', 'unsafe_path')
+                   'protected_client', 'managed_by_panel', 'bot_running', 'unsupported_runtime', 'ambiguous_config', 'recovery_required', 'unsafe_path')
         result = {"success": False, "error": code if code in allowed else "remote_failed"}
     except Exception:
         result = {"success": False, "error": "remote_failed"}
