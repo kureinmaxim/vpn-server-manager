@@ -8,6 +8,7 @@ from paramiko.ssh_exception import AuthenticationException, SSHException
 
 from ..exceptions import AuthenticationError, SSHConnectionError
 from .service_catalog import SERVICE_CATALOG
+from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class SSHService:
     # Кэш подключений
     _connection_pool = {}
     _pool_lock = threading.Lock()
+    _connection_locks = {}
     _process_exclusions = {"ps", "head", "bash", "sh", "sudo", "timeout"}
     _known_port_labels = {
         "22": "SSH",
@@ -396,22 +398,28 @@ class SSHService:
         key = f"{hostname}:{port}:{username}"
 
         with cls._pool_lock:
+            connection_lock = cls._connection_locks.setdefault(key, threading.Lock())
+
+        # A slow host must not block connections to every other server.
+        if not connection_lock.acquire(timeout=connection_timeout):
+            raise TimeoutError("SSH connection is busy")
+        try:
             # Проверяем есть ли живое подключение
-            if key in cls._connection_pool:
-                conn = cls._connection_pool[key]
+            with cls._pool_lock:
+                conn = cls._connection_pool.get(key)
+            if conn is not None:
                 try:
                     if conn.get_transport() and conn.get_transport().is_active():
                         # Проверяем что подключение работает
-                        conn.exec_command("echo test", timeout=5)
+                        _, stdout, _ = conn.exec_command("echo test", timeout=5)
+                        stdout.channel.close()
                         logger.info(f"♻️ Reusing existing connection to {hostname}")
                         return conn
-                    else:
-                        logger.info(f"💀 Old connection dead, removing")
-                        del cls._connection_pool[key]
                 except Exception as e:
                     logger.warning(f"Connection check failed: {e}")
-                    if key in cls._connection_pool:
-                        del cls._connection_pool[key]
+                with cls._pool_lock:
+                    cls._connection_pool.pop(key, None)
+                conn.close()
 
             # Создаем новое подключение
             logger.info(
@@ -437,13 +445,26 @@ class SSHService:
                     allow_agent=False,  # Не использовать SSH agent
                 )
 
-                cls._connection_pool[key] = ssh
+                with cls._pool_lock:
+                    cls._connection_pool[key] = ssh
                 logger.info(f"✅ New connection created and pooled: {hostname}")
                 return ssh
 
             except Exception as e:
+                ssh.close()
                 logger.error(f"Failed to connect to {hostname}: {e}")
                 raise
+        finally:
+            connection_lock.release()
+
+    def get_load_snapshot(self, ip: str, user: str, password: str, port: int = 22) -> Dict:
+        """Collect only the overview metrics, with bounded SSH/command timeouts."""
+        client = self.get_connection_pooled(ip, port, user, password, connection_timeout=5)
+        _, stdout, _ = client.exec_command(SNAPSHOT_COMMAND, timeout=8)
+        try:
+            return parse_snapshot(stdout.read().decode("utf-8", errors="replace"))
+        finally:
+            stdout.channel.close()
 
     @classmethod
     def close_all(cls):

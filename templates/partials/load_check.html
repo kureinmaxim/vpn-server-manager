@@ -1,0 +1,69 @@
+<div class="modal fade" id="loadCheckModal" tabindex="-1" aria-labelledby="loadCheckTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="loadCheckTitle"><i class="bi bi-speedometer2 me-2" aria-hidden="true"></i>{{ _('Загрузка серверов') }}</h5>
+                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Разовый замер по SSH • активные серверы вне архива') }}</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div id="load-check-progress" class="small" role="status" aria-live="polite"></div>
+                    <div class="d-flex gap-2">
+                        <input id="load-check-filter" class="form-control form-control-sm" type="search" placeholder="{{ _('Найти сервер…') }}" aria-label="{{ _('Найти сервер…') }}">
+                        <button id="load-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                    </div>
+                </div>
+                <div class="table-responsive load-check-table-wrap">
+                    <table class="table table-hover align-middle mb-0 load-check-table">
+                        <caption class="visually-hidden">{{ _('Быстрая проверка загрузки активных серверов') }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col" aria-sort="ascending"><button type="button" data-load-sort="name">{{ _('Сервер') }} ↕</button></th>
+                                <th scope="col">{{ _('Состояние') }}</th>
+                                <th scope="col"><button type="button" data-load-sort="cpu">{{ _('ЦП') }} ↕</button></th>
+                                <th scope="col"><button type="button" data-load-sort="memory">{{ _('Память') }} ↕</button></th>
+                                <th scope="col"><button type="button" data-load-sort="disk">{{ _('Диск /') }} ↕</button></th>
+                                <th scope="col"><button type="button" data-load-sort="load">{{ _('Ср. загрузка') }} ↕</button></th>
+                                <th scope="col"><button type="button" data-load-sort="network">{{ _('Сеть ↓ / ↑') }} ↕</button></th>
+                                <th scope="col">{{ _('Замер') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="load-check-rows"></tbody>
+                    </table>
+                </div>
+                <p class="small text-body-secondary mt-3 mb-0">{{ _('ЦП и сеть — за интервал около 1 с. Память — без доступного кеша. Диск — корневой раздел /. Средняя загрузка — за 1 / 5 / 15 мин, рядом число ядер.') }}</p>
+                <p class="small text-body-secondary mt-1 mb-0">{{ _('Сеть — сумма интерфейсов, как в мониторинге; VPN-трафик может учитываться повторно. Это текущая скорость, не пропускная способность канала.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+window.LOAD_CHECK_CONFIG = {
+    serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    snapshotUrl: {{ url_for('api.load_snapshot', server_id='__SERVER__') | tojson }},
+    monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
+    i18n: {
+        byteUnits: {{ [_('Б'), _('КиБ'), _('МиБ'), _('ГиБ'), _('ТиБ')] | tojson }},
+        perSecond: {{ _('/с') | tojson }},
+        loading: {{ _('Получаю список серверов…') | tojson }},
+        waiting: {{ _('В очереди') | tojson }},
+        checking: {{ _('Проверка…') | tojson }},
+        ready: {{ _('Получено') | tojson }},
+        partial: {{ _('Часть метрик недоступна') | tojson }},
+        failed: {{ _('Нет данных') | tojson }},
+        empty: {{ _('Нет активных серверов вне архива.') | tojson }},
+        noMatches: {{ _('Серверы не найдены.') | tojson }},
+        progress: {{ _('Проверено: {done} / {total} · с данными: {ok} · ошибок: {errors}') | tojson }},
+        free: {{ _('свободно') | tojson }},
+        cores: {{ _('ядер') | tojson }},
+        perCore: {{ _('на ядро') | tojson }},
+        unavailable: {{ _('Метрика недоступна') | tojson }},
+        requestError: {{ _('Не удалось получить ответ приложения.') | tojson }},
+        timeout: {{ _('Время ожидания истекло. Повторите проверку.') | tojson }},
+        auth: {{ _('Разблокируйте приложение и повторите проверку.') | tojson }}
+    }
+};
+</script>
