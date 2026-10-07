@@ -484,7 +484,7 @@ msgstr "Contact your administrator if the problem persists"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:37
 #: templates/500.html:37
 msgid "Обновить"
-msgstr "Add"
+msgstr "Refresh"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:44
 #: templates/500.html:44
@@ -8204,3 +8204,167 @@ msgstr "NaiveProxy uses one shared account: only port changes are available."
 
 msgid "NaiveProxy использует одну учётную запись: доступна только смена порта. Caddyfile проверяется перед перезапуском."
 msgstr "NaiveProxy uses one shared account: only port changes are available. The Caddyfile is validated before restart."
+
+#. Quick server load check
+msgid "Быстрая проверка загрузки активных серверов"
+msgstr "Quick load check for active servers"
+
+#. Quick server load check
+msgid "Загрузка серверов"
+msgstr "Server load"
+
+#. Quick server load check
+msgid "Разовый замер по SSH • активные серверы вне архива"
+msgstr "One-time SSH snapshot • active, non-archived servers"
+
+#. Quick server load check
+msgid "Найти сервер…"
+msgstr "Find a server…"
+
+#. Quick server load check
+msgid "Состояние"
+msgstr "Status"
+
+#. Quick server load check
+msgid "Память"
+msgstr "Memory"
+
+#. Quick server load check
+msgid "Диск /"
+msgstr "Disk /"
+
+#. Quick server load check
+msgid "Ср. загрузка"
+msgstr "Load average"
+
+#. Quick server load check
+msgid "Сеть ↓ / ↑"
+msgstr "Network ↓ / ↑"
+
+#. Quick server load check
+msgid "Замер"
+msgstr "Checked"
+
+#. Quick server load check
+msgid "ЦП и сеть — за интервал около 1 с. Память — без доступного кеша. Диск — корневой раздел /. Средняя загрузка — за 1 / 5 / 15 мин, рядом число ядер."
+msgstr "CPU and network are sampled over about 1 second. Memory excludes available cache. Disk is the root filesystem /. Load averages cover 1 / 5 / 15 minutes, with the core count shown below."
+
+#. Quick server load check
+msgid "Сеть — сумма интерфейсов, как в мониторинге; VPN-трафик может учитываться повторно. Это текущая скорость, не пропускная способность канала."
+msgstr "Network sums the interfaces used by monitoring; VPN traffic may be counted more than once. This is current traffic, not link capacity."
+
+#. Quick server load check
+msgid "Получаю список серверов…"
+msgstr "Loading servers…"
+
+#. Quick server load check
+msgid "В очереди"
+msgstr "Queued"
+
+#. Quick server load check
+msgid "Получено"
+msgstr "Received"
+
+#. Quick server load check
+msgid "Часть метрик недоступна"
+msgstr "Some metrics unavailable"
+
+#. Quick server load check
+msgid "Нет активных серверов вне архива."
+msgstr "No active, non-archived servers."
+
+#. Quick server load check
+msgid "Серверы не найдены."
+msgstr "No matching servers."
+
+#. Quick server load check
+msgid "Проверено: {done} / {total} · с данными: {ok} · ошибок: {errors}"
+msgstr "Checked: {done} / {total} · with data: {ok} · errors: {errors}"
+
+#. Quick server load check
+msgid "свободно"
+msgstr "free"
+
+#. Quick server load check
+msgid "ядер"
+msgstr "cores"
+
+#. Quick server load check
+msgid "на ядро"
+msgstr "per core"
+
+#. Quick server load check
+msgid "Метрика недоступна"
+msgstr "Metric unavailable"
+
+#. Quick server load check
+msgid "Не удалось получить ответ приложения."
+msgstr "Could not get a response from the app."
+
+#. Quick server load check
+msgid "Время ожидания истекло. Повторите проверку."
+msgstr "Request timed out. Try checking again."
+
+#. Quick server load check
+msgid "Сервис данных недоступен."
+msgstr "Data service unavailable."
+
+#. Quick server load check
+msgid "Сервис мониторинга недоступен."
+msgstr "Monitoring service unavailable."
+
+#. Quick server load check
+msgid "Сервер не найден или SSH-данные недоступны."
+msgstr "Server not found or SSH credentials unavailable."
+
+#. Quick server load check
+msgid "Сервер больше не активен. Обновите список."
+msgstr "Server is no longer active. Refresh the list."
+
+#. Quick server load check
+msgid "Укажите IP и пароль SSH в карточке сервера."
+msgstr "Set the IP address and SSH password in the server card."
+
+#. Quick server load check
+msgid "Слишком частые проверки. Повторите через минуту."
+msgstr "Too many checks. Try again in a minute."
+
+#. Quick server load check
+msgid "SSH: проверьте логин и пароль."
+msgstr "SSH: check the username and password."
+
+#. Quick server load check
+msgid "Не удалось прочитать метрики Linux."
+msgstr "Could not read Linux metrics."
+
+#. Quick server load check
+msgid "Сервер не ответил. Проверьте доступность и порт SSH."
+msgstr "Server did not respond. Check connectivity and the SSH port."
+
+#. Quick server load check
+msgid "ЦП"
+msgstr "CPU"
+
+#. Quick server load check
+msgid "Б"
+msgstr "B"
+
+#. Quick server load check
+msgid "КиБ"
+msgstr "KiB"
+
+#. Quick server load check
+msgid "МиБ"
+msgstr "MiB"
+
+#. Quick server load check
+msgid "ГиБ"
+msgstr "GiB"
+
+#. Quick server load check
+msgid "ТиБ"
+msgstr "TiB"
+
+#. Quick server load check
+msgid "/с"
+msgstr "/s"

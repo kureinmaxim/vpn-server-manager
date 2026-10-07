@@ -474,7 +474,7 @@ msgstr "如果问题仍然存在，请联系您的管理员"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:37
 #: templates/500.html:37
 msgid "Обновить"
-msgstr "添加"
+msgstr "刷新"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:44
 #: templates/500.html:44
@@ -7872,3 +7872,167 @@ msgstr "NaiveProxy 使用一个共享账户：仅支持修改端口。"
 
 msgid "NaiveProxy использует одну учётную запись: доступна только смена порта. Caddyfile проверяется перед перезапуском."
 msgstr "NaiveProxy 使用一个共享账户：仅支持修改端口。重启前会验证 Caddyfile。"
+
+#. Quick server load check
+msgid "Быстрая проверка загрузки активных серверов"
+msgstr "快速检查活跃服务器负载"
+
+#. Quick server load check
+msgid "Загрузка серверов"
+msgstr "服务器负载"
+
+#. Quick server load check
+msgid "Разовый замер по SSH • активные серверы вне архива"
+msgstr "通过 SSH 单次采样 • 活跃且未归档的服务器"
+
+#. Quick server load check
+msgid "Найти сервер…"
+msgstr "查找服务器…"
+
+#. Quick server load check
+msgid "Состояние"
+msgstr "状态"
+
+#. Quick server load check
+msgid "Память"
+msgstr "内存"
+
+#. Quick server load check
+msgid "Диск /"
+msgstr "磁盘 /"
+
+#. Quick server load check
+msgid "Ср. загрузка"
+msgstr "平均负载"
+
+#. Quick server load check
+msgid "Сеть ↓ / ↑"
+msgstr "网络 ↓ / ↑"
+
+#. Quick server load check
+msgid "Замер"
+msgstr "采样时间"
+
+#. Quick server load check
+msgid "ЦП и сеть — за интервал около 1 с. Память — без доступного кеша. Диск — корневой раздел /. Средняя загрузка — за 1 / 5 / 15 мин, рядом число ядер."
+msgstr "CPU 和网络采样间隔约为 1 秒。内存不含可用缓存。磁盘为根文件系统 /。平均负载显示 1 / 5 / 15 分钟的数据，下方为核心数。"
+
+#. Quick server load check
+msgid "Сеть — сумма интерфейсов, как в мониторинге; VPN-трафик может учитываться повторно. Это текущая скорость, не пропускная способность канала."
+msgstr "网络统计与监控页面一样，对接口求和；VPN 流量可能重复计算。这是当前流量速率，而非链路带宽。"
+
+#. Quick server load check
+msgid "Получаю список серверов…"
+msgstr "正在加载服务器…"
+
+#. Quick server load check
+msgid "В очереди"
+msgstr "排队中"
+
+#. Quick server load check
+msgid "Получено"
+msgstr "已获取"
+
+#. Quick server load check
+msgid "Часть метрик недоступна"
+msgstr "部分指标不可用"
+
+#. Quick server load check
+msgid "Нет активных серверов вне архива."
+msgstr "没有活跃且未归档的服务器。"
+
+#. Quick server load check
+msgid "Серверы не найдены."
+msgstr "未找到匹配的服务器。"
+
+#. Quick server load check
+msgid "Проверено: {done} / {total} · с данными: {ok} · ошибок: {errors}"
+msgstr "已检查：{done} / {total} · 有数据：{ok} · 错误：{errors}"
+
+#. Quick server load check
+msgid "свободно"
+msgstr "可用"
+
+#. Quick server load check
+msgid "ядер"
+msgstr "核心"
+
+#. Quick server load check
+msgid "на ядро"
+msgstr "每核心"
+
+#. Quick server load check
+msgid "Метрика недоступна"
+msgstr "指标不可用"
+
+#. Quick server load check
+msgid "Не удалось получить ответ приложения."
+msgstr "无法获取应用响应。"
+
+#. Quick server load check
+msgid "Время ожидания истекло. Повторите проверку."
+msgstr "请求超时，请重新检查。"
+
+#. Quick server load check
+msgid "Сервис данных недоступен."
+msgstr "数据服务不可用。"
+
+#. Quick server load check
+msgid "Сервис мониторинга недоступен."
+msgstr "监控服务不可用。"
+
+#. Quick server load check
+msgid "Сервер не найден или SSH-данные недоступны."
+msgstr "未找到服务器或 SSH 凭据不可用。"
+
+#. Quick server load check
+msgid "Сервер больше не активен. Обновите список."
+msgstr "服务器已不再活跃，请刷新列表。"
+
+#. Quick server load check
+msgid "Укажите IP и пароль SSH в карточке сервера."
+msgstr "请在服务器卡片中设置 IP 地址和 SSH 密码。"
+
+#. Quick server load check
+msgid "Слишком частые проверки. Повторите через минуту."
+msgstr "检查过于频繁，请在一分钟后重试。"
+
+#. Quick server load check
+msgid "SSH: проверьте логин и пароль."
+msgstr "SSH：请检查用户名和密码。"
+
+#. Quick server load check
+msgid "Не удалось прочитать метрики Linux."
+msgstr "无法读取 Linux 指标。"
+
+#. Quick server load check
+msgid "Сервер не ответил. Проверьте доступность и порт SSH."
+msgstr "服务器未响应，请检查连接和 SSH 端口。"
+
+#. Quick server load check
+msgid "ЦП"
+msgstr "处理器"
+
+#. Quick server load check
+msgid "Б"
+msgstr "B"
+
+#. Quick server load check
+msgid "КиБ"
+msgstr "KiB"
+
+#. Quick server load check
+msgid "МиБ"
+msgstr "MiB"
+
+#. Quick server load check
+msgid "ГиБ"
+msgstr "GiB"
+
+#. Quick server load check
+msgid "ТиБ"
+msgstr "TiB"
+
+#. Quick server load check
+msgid "/с"
+msgstr "/秒"

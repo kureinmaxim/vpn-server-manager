@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Создать лимитер (макс 10 запросов в минуту на сервер)
 rate_limiter = RateLimiter(max_requests=10, time_window=60)
+load_check_limiter = RateLimiter(max_requests=6, time_window=60)
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -594,6 +595,61 @@ def test_speed():
         }), 500
 
 # Monitoring Endpoints
+def _is_load_check_server(server):
+    return not server.get('archived') and server.get('status', 'Active') == 'Active'
+
+
+@api_bp.route('/monitoring/load-check/servers', methods=['GET'])
+@require_auth
+@require_pin
+def load_check_servers():
+    """Fresh inventory on every run, including archive changes made on the board."""
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return jsonify(error=_('Сервис данных недоступен.')), 503
+    servers = data_manager.load_servers(current_app.config)
+    response = jsonify(servers=[
+        {'id': str(server['id']), 'name': server.get('name', ''),
+         'ip_address': server.get('ip_address', '')}
+        for server in servers if _is_load_check_server(server)
+    ])
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@api_bp.route('/monitoring/<server_id>/load-snapshot', methods=['GET'])
+@require_auth
+@require_pin
+def load_snapshot(server_id):
+    ssh_service = registry.get('ssh')
+    data_manager = registry.get('data_manager')
+    if not ssh_service or not data_manager:
+        return jsonify(error=_('Сервис мониторинга недоступен.')), 503
+    try:
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        if server is None:
+            return jsonify(error=_('Сервер не найден или SSH-данные недоступны.')), 404
+        if not _is_load_check_server(server):
+            return jsonify(error=_('Сервер больше не активен. Обновите список.')), 409
+        if not creds.get('ip') or not creds.get('password'):
+            return jsonify(error=_('Укажите IP и пароль SSH в карточке сервера.')), 400
+        if not load_check_limiter.is_allowed(str(server_id)):
+            return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
+        stats = ssh_service.get_load_snapshot(**creds)
+        response = jsonify(stats=stats)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except Exception as exc:
+        # Do not expose SSH internals, addresses or credentials in error text.
+        logger.warning('Load snapshot failed (%s)', type(exc).__name__)
+        from paramiko.ssh_exception import AuthenticationException
+        if isinstance(exc, (AuthenticationException, AuthenticationError)):
+            return jsonify(error=_('SSH: проверьте логин и пароль.')), 502
+        if isinstance(exc, ValueError):
+            return jsonify(error=_('Не удалось прочитать метрики Linux.')), 502
+        return jsonify(error=_('Сервер не ответил. Проверьте доступность и порт SSH.')), 502
+
+
 def _get_server_ssh_credentials(server_id, data_manager):
     """Helper: Получить SSH credentials с расшифровкой пароля"""
     from flask import current_app

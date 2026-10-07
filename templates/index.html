@@ -4,6 +4,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/server_actions.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dns.css') }}?v={{ app_info.get('version', '') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/load_check.css') }}?v={{ app_info.get('version', '') }}">
 <div class="container mt-4">
     <!-- Блок для вывода flash-сообщений -->
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -35,14 +36,15 @@
         </div>
     {% endif %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
         <div>
             <h1>{{ _('Список серверов') }}</h1>
-            <div class="btn-group" role="group">
+            <div class="btn-group flex-wrap" role="group">
                 <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
                 <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
                 <a href="{{ url_for('net_tools.index') }}" class="btn btn-sm btn-outline-info" title="{{ _('Сетевые инструменты') }}">Net Tools</a>
                 <a href="{{ url_for('dns.index') }}" class="btn btn-sm btn-dns" title="{{ _('Домены и DNS-провайдеры') }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> DNS</a>
+                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#loadCheckModal" title="{{ _('Быстрая проверка загрузки активных серверов') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> {{ _('Загрузка серверов') }}</button>
             </div>
         </div>
         <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
@@ -555,6 +557,8 @@
 {% endblock %}
 
 {% block scripts %}
+{% include 'partials/load_check.html' %}
+<script src="{{ url_for('static', filename='js/load_check.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script>
     window.SERVER_BOARD_I18N = {
         archive: {{ _('В архив') | tojson }},
