@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.11.1] - 2026-10-08
+
+### Added
+- DERP overview with the PC's home region, UDP status, netcheck preferred region, five lowest measured latencies and all custom regions. Netcheck runs separately from load metrics with a 12-second budget and a three-minute in-memory cache; exit-node measurements show a warning.
+- Read-only SSH diagnostics for Headscale's embedded DERP, local HTTPS probe, STUN listener and prospective DERP hosts (public interface IPv4 and TCP 443/UDP 3478 occupancy). Only allowlisted configuration fields are returned; missing permissions or unsupported YAML remain unknown.
+- On-demand, bounded `tailscale ping` confirms the peer path. Empty `CurAddr` no longer implies relay use: idle peers show an unconfirmed path and their home DERP separately. A later direct pong supersedes the initial relay pong.
+
+### Changed
+- Removed the per-row Checked column; completion time appears beside the counters above the table. Added RU/EN/ZH labels for DERP diagnostics.
+
 ## [4.11.0] - 2026-10-08
 
 ### Added

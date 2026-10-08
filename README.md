@@ -1,12 +1,12 @@
-# VPN Server Manager v4.11.0
+# VPN Server Manager v4.11.1
 
 <p align="center">
-  <img src="static/VPSc.png" alt="VPN Server Manager" width="220">
+  <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
 </p>
 
 <p align="center">
-  <strong>A local desktop app for people who actually run VPN servers.</strong><br>
-  Encrypted inventory, SSH monitoring, PIN lock — no cloud account.
+  <strong>Your servers, their health, and how they connect — in one desktop app.</strong><br>
+  Encrypted inventory · SSH management · Tailscale &amp; DERP diagnostics
 </p>
 
 <p align="center">
@@ -17,7 +17,43 @@
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-1F2937?style=flat-square" alt="Windows, macOS, Linux">
 </p>
 
-VPN Server Manager keeps server logins, panel credentials, and hoster details in an encrypted local vault. It opens as a native desktop window (`Flask` + `PyWebView`) or in a browser. Monitoring talks to the machine over SSH — there is no always-on agent.
+<p align="center">
+  <a href="https://github.com/kureinmaxim/vpn-server-manager/releases/latest"><strong>Download for Windows</strong></a>
+  &nbsp; · &nbsp; <a href="#quick-start">Run from source</a>
+  &nbsp; · &nbsp; <a href="docs/INDEX_ru.md">Документация на русском</a>
+  &nbsp; · &nbsp; <a href="CHANGELOG.md">What's new</a>
+</p>
+
+VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
+
+## See your fleet at a glance
+
+Open **Server load** next to DNS to compare CPU, memory, disk space, load averages and network traffic across active servers. Filter by name or address and sort by the metric that matters.
+
+<p align="center">
+  <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency" width="1100">
+  <br><sub>v4.11.1 · English interface · demonstration servers and addresses</sub>
+</p>
+
+| What you want to know | Where to look |
+|---|---|
+| **Which server is under pressure?** | CPU, memory and disk meters; sortable load and traffic columns. |
+| **Is it in this PC's mesh?** | The mesh column matches visible Tailscale peers and shows regular nodes, available exits and the exit selected on the PC. |
+| **Where is the coordinator?** | The control endpoint is named above the table and marked on matching server cards. |
+| **Which relay is closest?** | The DERP summary shows measured region latencies, highlights custom regions and warns when netcheck runs through an exit node. |
+
+## Understand the connection, not just the status
+
+An idle peer can have an empty direct address. Its home DERP region alone does **not** prove that traffic is being relayed. Click **Check path** to send up to three Tailscale pings and see the last confirmed direct or DERP path with its check time.
+
+<p align="center">
+  <img src="docs/images/08-derp-diagnostics.jpg" alt="Expanded custom DERP diagnostics showing the confirmed peer path, Headscale version, HTTPS probe, STUN listener and port availability" width="1000">
+  <br><sub>Read-only diagnostics · demonstration data, no private infrastructure details</sub>
+</p>
+
+Expand **DERP and port availability** to inspect an existing Headscale relay or assess a possible relay host: embedded DERP configuration, local HTTPS probe, STUN listener, public interface IPv4 and port occupancy. A successful local probe does not establish internet reachability; firewall and NAT still matter. [How the checks work →](docs/README_MONITORING_ru.md#derp-в-обзоре-загрузки-4111)
+
+## Keep everyday operations together
 
 <p align="center">
   <img src="docs/images/03-server-board.png" alt="Server board — compact cards, drag to reorder, archive" width="900">
@@ -31,14 +67,30 @@ VPN Server Manager keeps server logins, panel credentials, and hoster details in
 | **Desktop or browser** | Native window on Windows, macOS, and Linux, or `python run.py` for web mode. |
 | **PIN lock** | Quick lock on the local app so a shared machine is not an open notebook. |
 | **SSH monitoring** | Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
+| **Server management** | Inspect Docker and systemd services, control their lifecycle, and use supported protocol settings and client operations. [Supported configurations and limits](CHANGELOG.md). |
+| **DNS & network tools** | Keep domains, providers, renewal dates and notes together. Run network checks and use terminal examples, including DNS queries with `dig`. |
+| **Mesh & DERP** | Local Tailscale membership, coordinator and exit roles, custom relay diagnostics and an explicit path check. No Tailscale configuration changes. |
 | **Works offline** | The inventory stays usable without internet. Network-only actions disable themselves cleanly. |
 | **Languages** | Russian, English, and Chinese. `.po` catalogs compile on first launch. |
+
+<details>
+<summary>More screenshots: PIN protection, server editing and settings</summary>
 
 <p align="center">
   <img src="docs/images/01-pin-lock.png" alt="PIN lock screen" width="430">
   &nbsp;
   <img src="docs/images/02-pin-modal.png" alt="PIN login dialog" width="430">
 </p>
+
+<p align="center">
+  <img src="docs/images/04-add-server.png" alt="Edit a server and its SSH connection details" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/05-settings.png" alt="Application settings, encryption and import or export" width="720">
+</p>
+
+</details>
 
 ## Quick start
 
@@ -95,19 +147,9 @@ Desktop: python run_desktop.py
 Debug:   python run.py --debug
 ```
 
-Installers (Windows setup `.exe`, macOS `.dmg`) are on the [Releases](https://github.com/kureinmaxim/vpn-server-manager/releases) page. Build steps: [BUILD.md](BUILD.md).
+The current [release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest) includes a Windows installer and SHA256 checksum. macOS and Linux users can run from source; see [BUILD.md](BUILD.md) for packaging.
 
-<p align="center">
-  <img src="docs/images/04-add-server.png" alt="Add server — inventory fields, icon picker, SSH and panel credentials" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/05-settings.png" alt="Settings — encryption key, import and export" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/06-about.png" alt="About — version and developer" width="720">
-</p>
+For the load overview, save working SSH credentials in each server card. Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
 
 ## Backup and restore
 

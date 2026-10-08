@@ -466,6 +466,15 @@ class SSHService:
         finally:
             stdout.channel.close()
 
+    def get_derp_snapshot(self, ip: str, user: str, password: str, port: int = 22) -> Dict:
+        from .remote_derp import probe_command, parse_remote_derp
+        client = self.get_connection_pooled(ip, port, user, password, connection_timeout=5)
+        _, stdout, _ = client.exec_command(probe_command(), timeout=14)
+        try:
+            return parse_remote_derp(stdout.read(65537).decode('utf-8', errors='replace'))
+        finally:
+            stdout.channel.close()
+
     @classmethod
     def close_all(cls):
         """Закрыть все подключения (вызывать при остановке приложения)"""

@@ -8410,3 +8410,96 @@ msgstr "Node offline"
 
 msgid "Завершено: {time}"
 msgstr "Completed: {time}"
+
+msgid "Домашний DERP этого ПК"
+msgstr "Home DERP of this PC"
+
+msgid "Ближайший по netcheck"
+msgstr "Nearest by netcheck"
+
+msgid "Проверка DERP…"
+msgstr "Checking DERP…"
+
+msgid "Данные DERP недоступны"
+msgstr "DERP data unavailable"
+
+msgid "DERP: замер {time}, кеш до 3 минут"
+msgstr "DERP: measured at {time}, cached for up to 3 minutes"
+
+msgid "⚠ Замер через exit node {name}: задержки до регионов искажены."
+msgstr "⚠ Measured through exit node {name}: region latencies are distorted."
+
+msgid "да"
+msgstr "yes"
+
+msgid "неизвестно"
+msgstr "unknown"
+
+msgid "свой"
+msgstr "custom"
+
+msgid "мс"
+msgstr "ms"
+
+msgid "Свой DERP"
+msgstr "Custom DERP"
+
+msgid "основной"
+msgstr "primary"
+
+msgid "запасной"
+msgstr "standby"
+
+msgid "не отвечает"
+msgstr "not responding"
+
+msgid "DERP и доступность портов"
+msgstr "DERP and port availability"
+
+msgid "Встроенный DERP включён"
+msgstr "Embedded DERP enabled"
+
+msgid "Публичные регионы Tailscale в конфиге"
+msgstr "Public Tailscale regions in config"
+
+msgid "Конфиг DERP недоступен или имеет неподдерживаемый формат."
+msgstr "DERP config is unavailable or uses an unsupported format."
+
+msgid "Публичный IPv4 на интерфейсе"
+msgstr "Public IPv4 on an interface"
+
+msgid "занят"
+msgstr "busy"
+
+msgid "свободен"
+msgstr "free"
+
+msgid "TCP 443 занят: {owner} → для нового DERP нужен другой порт или SNI."
+msgstr "TCP 443 is used by {owner} → a new DERP needs another port or SNI."
+
+msgid "Кандидат на DERP: проверьте IPv4 и порты. Внешняя доступность, NAT и firewall здесь не проверяются."
+msgstr "DERP candidate: check IPv4 and ports. External reachability, NAT and firewall are not tested here."
+
+msgid "Напрямую {address}"
+msgstr "Direct {address}"
+
+msgid "Через DERP {region}"
+msgstr "Via DERP {region}"
+
+msgid "Путь не определён"
+msgstr "Path unknown"
+
+msgid "Проверить путь"
+msgstr "Check path"
+
+msgid "До 3 tailscale ping по нажатию. Первый ответ может идти через DERP, пока устанавливается прямой путь."
+msgstr "Sends up to 3 tailscale pings on click. The first reply may use DERP while a direct path is being established."
+
+msgid "Домашний DERP пира: {region}"
+msgstr "Peer home DERP: {region}"
+
+msgid "Прямой адрес в status: {address}"
+msgstr "Direct address in status: {address}"
+
+msgid "Путь не подтверждён: возможно, нет трафика."
+msgstr "Path unconfirmed: the peer may be idle."

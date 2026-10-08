@@ -8078,3 +8078,96 @@ msgstr "节点离线"
 
 msgid "Завершено: {time}"
 msgstr "完成时间：{time}"
+
+msgid "Домашний DERP этого ПК"
+msgstr "此电脑的主 DERP"
+
+msgid "Ближайший по netcheck"
+msgstr "netcheck 首选区域"
+
+msgid "Проверка DERP…"
+msgstr "正在检查 DERP…"
+
+msgid "Данные DERP недоступны"
+msgstr "DERP 数据不可用"
+
+msgid "DERP: замер {time}, кеш до 3 минут"
+msgstr "DERP：测量时间 {time}，缓存最多 3 分钟"
+
+msgid "⚠ Замер через exit node {name}: задержки до регионов искажены."
+msgstr "⚠ 通过出口节点 {name} 测量：区域延迟会失真。"
+
+msgid "да"
+msgstr "是"
+
+msgid "неизвестно"
+msgstr "未知"
+
+msgid "свой"
+msgstr "自建"
+
+msgid "мс"
+msgstr "毫秒"
+
+msgid "Свой DERP"
+msgstr "自建 DERP"
+
+msgid "основной"
+msgstr "主用"
+
+msgid "запасной"
+msgstr "备用"
+
+msgid "не отвечает"
+msgstr "无响应"
+
+msgid "DERP и доступность портов"
+msgstr "DERP 和端口可用性"
+
+msgid "Встроенный DERP включён"
+msgstr "已启用内置 DERP"
+
+msgid "Публичные регионы Tailscale в конфиге"
+msgstr "配置中的 Tailscale 公共区域"
+
+msgid "Конфиг DERP недоступен или имеет неподдерживаемый формат."
+msgstr "DERP 配置不可用或格式不受支持。"
+
+msgid "Публичный IPv4 на интерфейсе"
+msgstr "接口上的公网 IPv4"
+
+msgid "занят"
+msgstr "已占用"
+
+msgid "свободен"
+msgstr "空闲"
+
+msgid "TCP 443 занят: {owner} → для нового DERP нужен другой порт или SNI."
+msgstr "TCP 443 被 {owner} 占用 → 新 DERP 需要其他端口或 SNI。"
+
+msgid "Кандидат на DERP: проверьте IPv4 и порты. Внешняя доступность, NAT и firewall здесь не проверяются."
+msgstr "DERP 候选：检查 IPv4 和端口。此处不测试外部可达性、NAT 和防火墙。"
+
+msgid "Напрямую {address}"
+msgstr "直连 {address}"
+
+msgid "Через DERP {region}"
+msgstr "通过 DERP {region}"
+
+msgid "Путь не определён"
+msgstr "路径未知"
+
+msgid "Проверить путь"
+msgstr "检查路径"
+
+msgid "До 3 tailscale ping по нажатию. Первый ответ может идти через DERP, пока устанавливается прямой путь."
+msgstr "点击后最多发送 3 次 tailscale ping。建立直连期间，首次回复可能通过 DERP。"
+
+msgid "Домашний DERP пира: {region}"
+msgstr "对等节点主 DERP：{region}"
+
+msgid "Прямой адрес в status: {address}"
+msgstr "status 中的直连地址：{address}"
+
+msgid "Путь не подтверждён: возможно, нет трафика."
+msgstr "路径未确认：该节点可能没有流量。"
