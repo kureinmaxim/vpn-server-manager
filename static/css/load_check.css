@@ -1,5 +1,5 @@
 #loadCheckModal .modal-dialog { max-width: 1380px; }
-.load-check-table { min-width: 1090px; font-size: .875rem; }
+.load-check-table { min-width: 1010px; font-size: .875rem; }
 .load-check-table th { white-space: nowrap; color: var(--bs-secondary-color); }
 .load-check-table th button {
     border: 0; background: none; padding: .2rem 0; color: inherit; font: inherit;

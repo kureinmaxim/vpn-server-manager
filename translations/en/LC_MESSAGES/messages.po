@@ -8407,3 +8407,6 @@ msgstr "Exit node (selected on PC)"
 
 msgid "Узел офлайн"
 msgstr "Node offline"
+
+msgid "Завершено: {time}"
+msgstr "Completed: {time}"
