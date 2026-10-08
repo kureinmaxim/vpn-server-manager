@@ -9,6 +9,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
+                <p id="load-check-mesh" class="small text-body-secondary" role="status"></p>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                     <div id="load-check-progress" class="small" role="status" aria-live="polite"></div>
                     <div class="d-flex gap-2">
@@ -23,6 +24,7 @@
                             <tr>
                                 <th scope="col" aria-sort="ascending"><button type="button" data-load-sort="name">{{ _('Сервер') }} ↕</button></th>
                                 <th scope="col">{{ _('Состояние') }}</th>
+                                <th scope="col">{{ _('Mesh рабочего ПК') }}</th>
                                 <th scope="col"><button type="button" data-load-sort="cpu">{{ _('ЦП') }} ↕</button></th>
                                 <th scope="col"><button type="button" data-load-sort="memory">{{ _('Память') }} ↕</button></th>
                                 <th scope="col"><button type="button" data-load-sort="disk">{{ _('Диск /') }} ↕</button></th>
@@ -43,9 +45,22 @@
 <script>
 window.LOAD_CHECK_CONFIG = {
     serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    meshUrl: {{ url_for('api.load_check_mesh') | tojson }},
     snapshotUrl: {{ url_for('api.load_snapshot', server_id='__SERVER__') | tojson }},
     monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
     i18n: {
+        meshLoading: {{ _('Определяю Tailscale-сеть приложения…') | tojson }},
+        meshUnavailable: {{ _('Tailscale на хосте приложения недоступен или не подключён. Принадлежность серверов к mesh неизвестна.') | tojson }},
+        meshHost: {{ _('Сеть / ПК') | tojson }},
+        coordinator: {{ _('Координатор (адрес управления)') | tojson }},
+        coordinatorHint: {{ _('Адрес карточки совпадает с адресом управления сетью. При reverse proxy/NAT это может быть входной узел, а не сам Headscale.') | tojson }},
+        meshMember: {{ _('В mesh этого ПК') | tojson }},
+        meshOther: {{ _('Не виден в mesh этого ПК') | tojson }},
+        meshUnknown: {{ _('Mesh не определена') | tojson }},
+        meshNode: {{ _('Обычный node') | tojson }},
+        meshExit: {{ _('Exit node (доступен)') | tojson }},
+        meshSelected: {{ _('Exit node (выбран на ПК)') | tojson }},
+        meshOffline: {{ _('Узел офлайн') | tojson }},
         byteUnits: {{ [_('Б'), _('КиБ'), _('МиБ'), _('ГиБ'), _('ТиБ')] | tojson }},
         perSecond: {{ _('/с') | tojson }},
         loading: {{ _('Получаю список серверов…') | tojson }},

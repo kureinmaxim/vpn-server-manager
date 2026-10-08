@@ -8368,3 +8368,42 @@ msgstr "TiB"
 #. Quick server load check
 msgid "/с"
 msgstr "/s"
+
+msgid "Mesh рабочего ПК"
+msgstr "Workstation mesh"
+
+msgid "Определяю Tailscale-сеть приложения…"
+msgstr "Checking the application host Tailscale network…"
+
+msgid "Tailscale на хосте приложения недоступен или не подключён. Принадлежность серверов к mesh неизвестна."
+msgstr "Tailscale on the application host is unavailable or disconnected. Server mesh membership is unknown."
+
+msgid "Сеть / ПК"
+msgstr "Network / PC"
+
+msgid "Координатор (адрес управления)"
+msgstr "Coordinator (control address)"
+
+msgid "Адрес карточки совпадает с адресом управления сетью. При reverse proxy/NAT это может быть входной узел, а не сам Headscale."
+msgstr "The server address matches the network control address. With a reverse proxy or NAT, this may be the entry point rather than Headscale itself."
+
+msgid "В mesh этого ПК"
+msgstr "In this PC’s mesh"
+
+msgid "Не виден в mesh этого ПК"
+msgstr "Not visible in this PC’s mesh"
+
+msgid "Mesh не определена"
+msgstr "Mesh unknown"
+
+msgid "Обычный node"
+msgstr "Regular node"
+
+msgid "Exit node (доступен)"
+msgstr "Exit node (available)"
+
+msgid "Exit node (выбран на ПК)"
+msgstr "Exit node (selected on PC)"
+
+msgid "Узел офлайн"
+msgstr "Node offline"

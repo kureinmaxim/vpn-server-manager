@@ -14,6 +14,32 @@
     const filter = document.getElementById('load-check-filter');
     let run = null;
     let rows = [];
+    let mesh = null;
+    const meshSummary = document.getElementById('load-check-mesh');
+
+    function meshCell(row) {
+        const cell = element('td', undefined, 'load-mesh');
+        const address = (row.server.ip_address || '').toLowerCase().replace(/\.$/, '');
+        const remote = row.stats && row.stats.mesh;
+        const identity = remote && remote.state === 'ready' && remote.self;
+        const nodes = mesh && mesh.state === 'ready' ? mesh.nodes : [];
+        const matches = nodes.filter(node => identity && identity.id
+            ? node.id === identity.id
+            : node.ips.includes(address) || (node.dns && node.dns.toLowerCase() === address));
+        const peer = matches.length === 1 ? matches[0] : null;
+        if (mesh && mesh.coordinator && (address === mesh.coordinator.toLowerCase() || (mesh.coordinator_ips || []).includes(address))) {
+            const badge = element('span', t.coordinator, 'badge text-bg-primary d-block mb-1');
+            badge.title = t.coordinatorHint; cell.append(badge);
+        }
+        cell.append(element('span', peer ? t.meshMember : mesh && mesh.state === 'ready' && identity ? t.meshOther : t.meshUnknown, peer ? 'text-success' : 'text-body-secondary'));
+        if (peer) {
+            cell.append(element('span', peer.exit_selected ? t.meshSelected : peer.exit_available ? t.meshExit : t.meshNode,
+                'badge d-block mt-1 ' + (peer.exit_selected ? 'text-bg-success' : peer.exit_available ? 'text-bg-info' : 'text-bg-secondary')));
+            cell.append(element('span', peer.ips.join(', '), 'load-detail'));
+            if (!peer.online) cell.append(element('span', t.meshOffline, 'load-detail text-warning'));
+        }
+        return cell;
+    }
     let sort = {key: 'name', direction: 1};
 
     function element(tag, text, className) {
@@ -68,7 +94,7 @@
         });
         if (!visible.length) {
             const cell = element('td', rows.length ? t.noMatches : t.empty, 'text-center text-body-secondary py-5');
-            cell.colSpan = 8;
+            cell.colSpan = 9;
             const tr = element('tr'); tr.append(cell); body.append(tr);
         }
         for (const row of visible) {
@@ -83,6 +109,7 @@
             state.append(element('span', row.error ? t.failed : row.stats ? (row.partial ? t.partial : t.ready) : (row.checking ? t.checking : t.waiting), stateClass));
             if (row.error) state.append(element('span', row.error, 'load-detail'));
             tr.append(state);
+            tr.append(meshCell(row));
             const stats = row.stats || {};
             tr.append(metricCell(stats.cpu));
             tr.append(metricCell(stats.memory, stats.memory && `${bytes(stats.memory.used_bytes)} / ${bytes(stats.memory.total_bytes)}`));
@@ -140,10 +167,20 @@
         run = pass;
         refresh.disabled = true;
         rows = [];
+        mesh = null;
+        meshSummary.textContent = t.meshLoading;
         body.replaceChildren();
         progress.textContent = t.loading;
         body.setAttribute('aria-busy', 'true');
         try {
+            const meshRequest = getJSON(config.meshUrl, pass).then(data => {
+                if (run !== pass) return;
+                mesh = data;
+                meshSummary.textContent = data.state === 'ready'
+                    ? `${t.meshHost}: ${data.name || '—'} / ${data.host || '—'} · ${t.coordinator}: ${data.coordinator || '—'}`
+                    : t.meshUnavailable;
+                render();
+            }).catch(() => { if (run === pass) meshSummary.textContent = t.meshUnavailable; });
             const inventory = await getJSON(config.serversUrl, pass);
             if (run !== pass) return;
             rows = inventory.servers.map(server => ({server}));
@@ -167,6 +204,7 @@
                 }
             }
             await Promise.all(Array.from({length: Math.min(4, rows.length)}, worker));
+            await meshRequest;
         } catch (error) {
             if (run === pass) progress.textContent = error.message;
         } finally {

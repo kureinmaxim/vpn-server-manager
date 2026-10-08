@@ -25,6 +25,11 @@ awk '{print "LOAD", $1, $2, $3}' /proc/loadavg
 printf 'CORES '
 getconf _NPROCESSORS_ONLN 2>/dev/null || awk '/^processor/ {n++} END {print n}' /proc/cpuinfo
 df -kP / 2>/dev/null | awk 'NR == 2 {print "DISK", $2, $3, $4, $5}'
+printf 'VPN_MESH_BEGIN\n'
+if command -v tailscale >/dev/null 2>&1 && command -v timeout >/dev/null 2>&1; then
+    timeout 3 tailscale status --json 2>/dev/null
+fi
+printf '\nVPN_MESH_END\n'
 """
 SNAPSHOT_COMMAND = "sh -c " + shlex.quote(SNAPSHOT_SCRIPT)
 
@@ -64,6 +69,8 @@ def parse_snapshot(output):
         network=None,
         checked_at=int(time.time()),
     )
+    from .mesh_context import remote_mesh
+    result['mesh'] = remote_mesh(output)
     try:
         first = _numbers(fields.get("CPU1", []), 8)
         second = _numbers(fields.get("CPU2", []), 8)
