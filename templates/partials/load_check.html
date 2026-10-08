@@ -10,6 +10,7 @@
             </div>
             <div class="modal-body">
                 <p id="load-check-mesh" class="small text-body-secondary" role="status"></p>
+                <div id="load-check-derp" class="small border rounded p-2 mb-3" role="status" aria-live="polite"></div>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                     <div id="load-check-progress" class="small" role="status" aria-live="polite"></div>
                     <div class="d-flex gap-2">
@@ -45,9 +46,44 @@
 window.LOAD_CHECK_CONFIG = {
     serversUrl: {{ url_for('api.load_check_servers') | tojson }},
     meshUrl: {{ url_for('api.load_check_mesh') | tojson }},
+    derpUrl: {{ url_for('api.load_check_derp') | tojson }},
+    derpSnapshotUrl: {{ url_for('api.derp_snapshot', server_id='__SERVER__') | tojson }},
+    peerPathUrl: {{ url_for('api.load_check_peer_path', node_id='__NODE__') | tojson }},
     snapshotUrl: {{ url_for('api.load_snapshot', server_id='__SERVER__') | tojson }},
     monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
     i18n: {
+        checkPath: {{ _('Проверить путь') | tojson }},
+        pathHint: {{ _('До 3 tailscale ping по нажатию. Первый ответ может идти через DERP, пока устанавливается прямой путь.') | tojson }},
+        peerHome: {{ _('Домашний DERP пира: {region}') | tojson }},
+        statusAddress: {{ _('Прямой адрес в status: {address}') | tojson }},
+        pathUnconfirmed: {{ _('Путь не подтверждён: возможно, нет трафика.') | tojson }},
+        homeDerp: {{ _('Домашний DERP этого ПК') | tojson }},
+        preferredDerp: {{ _('Ближайший по netcheck') | tojson }},
+        derpLoading: {{ _('Проверка DERP…') | tojson }},
+        derpUnavailable: {{ _('Данные DERP недоступны') | tojson }},
+        derpCache: {{ _('DERP: замер {time}, кеш до 3 минут') | tojson }},
+        exitWarning: {{ _('⚠ Замер через exit node {name}: задержки до регионов искажены.') | tojson }},
+        yes: {{ _('Да') | tojson }},
+        no: {{ _('Нет') | tojson }},
+        unknown: {{ _('неизвестно') | tojson }},
+        own: {{ _('свой') | tojson }},
+        ms: {{ _('мс') | tojson }},
+        ownDerp: {{ _('Свой DERP') | tojson }},
+        derpPrimary: {{ _('основной') | tojson }},
+        derpStandby: {{ _('запасной') | tojson }},
+        derpFailed: {{ _('не отвечает') | tojson }},
+        derpDetails: {{ _('DERP и доступность портов') | tojson }},
+        derpEnabled: {{ _('Встроенный DERP включён') | tojson }},
+        publicMap: {{ _('Публичные регионы Tailscale в конфиге') | tojson }},
+        derpConfigUnknown: {{ _('Конфиг DERP недоступен или имеет неподдерживаемый формат.') | tojson }},
+        publicIpv4: {{ _('Публичный IPv4 на интерфейсе') | tojson }},
+        busy: {{ _('занят') | tojson }},
+        freePort: {{ _('свободен') | tojson }},
+        portConflict: {{ _('TCP 443 занят: {owner} → для нового DERP нужен другой порт или SNI.') | tojson }},
+        derpCandidateHint: {{ _('Кандидат на DERP: проверьте IPv4 и порты. Внешняя доступность, NAT и firewall здесь не проверяются.') | tojson }},
+        directPath: {{ _('Напрямую {address}') | tojson }},
+        relayPath: {{ _('Через DERP {region}') | tojson }},
+        pathUnknown: {{ _('Путь не определён') | tojson }},
         meshLoading: {{ _('Определяю Tailscale-сеть приложения…') | tojson }},
         meshUnavailable: {{ _('Tailscale на хосте приложения недоступен или не подключён. Принадлежность серверов к mesh неизвестна.') | tojson }},
         meshHost: {{ _('Сеть / ПК') | tojson }},

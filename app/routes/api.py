@@ -627,10 +627,43 @@ def load_check_mesh():
     return response
 
 
+@api_bp.route('/monitoring/load-check/derp', methods=['GET'])
+@require_auth
+@require_pin
+def load_check_derp():
+    from ..services.derp_context import local_derp
+    response = jsonify(local_derp())
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@api_bp.route('/monitoring/<server_id>/derp-snapshot', methods=['GET'])
+@require_auth
+@require_pin
+def derp_snapshot(server_id):
+    return _load_check_snapshot(server_id, derp=True)
+
+
+@api_bp.route('/monitoring/load-check/peer-path/<node_id>', methods=['GET'])
+@require_auth
+@require_pin
+def load_check_peer_path(node_id):
+    if not load_check_limiter.is_allowed('local-peer-path'):
+        return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
+    from ..services.derp_context import check_peer_path
+    response = jsonify(check_peer_path(node_id))
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
 @api_bp.route('/monitoring/<server_id>/load-snapshot', methods=['GET'])
 @require_auth
 @require_pin
 def load_snapshot(server_id):
+    return _load_check_snapshot(server_id)
+
+
+def _load_check_snapshot(server_id, derp=False):
     ssh_service = registry.get('ssh')
     data_manager = registry.get('data_manager')
     if not ssh_service or not data_manager:
@@ -643,9 +676,9 @@ def load_snapshot(server_id):
             return jsonify(error=_('Сервер больше не активен. Обновите список.')), 409
         if not creds.get('ip') or not creds.get('password'):
             return jsonify(error=_('Укажите IP и пароль SSH в карточке сервера.')), 400
-        if not load_check_limiter.is_allowed(str(server_id)):
+        if not load_check_limiter.is_allowed(('derp:' if derp else '') + str(server_id)):
             return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
-        stats = ssh_service.get_load_snapshot(**creds)
+        stats = ssh_service.get_derp_snapshot(**creds) if derp else ssh_service.get_load_snapshot(**creds)
         response = jsonify(stats=stats)
         response.headers['Cache-Control'] = 'no-store'
         return response

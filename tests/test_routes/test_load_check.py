@@ -41,7 +41,8 @@ def load_client(client):
 
 
 @pytest.mark.parametrize(
-    "url", ["/api/monitoring/load-check/servers", "/api/monitoring/one/load-snapshot", "/api/monitoring/load-check/mesh"]
+    "url", ["/api/monitoring/load-check/servers", "/api/monitoring/one/load-snapshot", "/api/monitoring/load-check/mesh",
+            "/api/monitoring/load-check/derp", "/api/monitoring/one/derp-snapshot", "/api/monitoring/load-check/peer-path/demo"]
 )
 def test_load_check_requires_auth_and_pin(client, url):
     assert client.get(url).status_code == 401
@@ -77,6 +78,22 @@ def test_snapshot_uses_saved_ssh_credentials(load_client):
     )
     assert b"secret" not in response.data
     assert response.headers["Cache-Control"] == "no-store"
+
+
+def test_derp_endpoints_are_separate_from_load(load_client, monkeypatch):
+    from app.services import derp_context
+    monkeypatch.setattr(derp_context, 'local_derp', lambda: {'state': 'ready', 'regions': []})
+    response = load_client.get('/api/monitoring/load-check/derp')
+    assert response.status_code == 200 and response.headers['Cache-Control'] == 'no-store'
+    ssh = registry.get('ssh')
+    ssh.get_derp_snapshot.return_value = {'state': 'ready', 'probe_code': 200}
+    for _ in range(6):
+        response = load_client.get('/api/monitoring/one/derp-snapshot')
+        assert response.status_code == 200 and response.json['stats']['probe_code'] == 200
+    assert load_client.get('/api/monitoring/one/derp-snapshot').status_code == 429
+    assert load_client.get('/api/monitoring/one/load-snapshot').status_code == 200
+    assert load_client.get('/api/monitoring/archived/derp-snapshot').status_code == 409
+    ssh.get_derp_snapshot.assert_called_with(ip='192.0.2.1', user='admin', password='decrypted-secret', port=2222)
 
 
 @pytest.mark.parametrize(

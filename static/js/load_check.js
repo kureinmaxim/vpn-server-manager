@@ -15,8 +15,88 @@
     let run = null;
     let rows = [];
     let mesh = null;
+    let derp = null;
+    const pathRequests = new Set();
     let completedAt = null;
     const meshSummary = document.getElementById('load-check-mesh');
+    const derpSummary = document.getElementById('load-check-derp');
+
+    const truth = value => value === true ? t.yes : value === false ? t.no : t.unknown;
+
+    function cancelPaths() {
+        pathRequests.forEach(pass => pass.abort());
+        pathRequests.clear();
+    }
+
+    async function checkPath(row, peer) {
+        if (row.pathChecking) return;
+        const pass = new AbortController();
+        pathRequests.add(pass);
+        row.pathChecking = true;
+        render();
+        try {
+            const data = await getJSON(config.peerPathUrl.replace('__NODE__', encodeURIComponent(peer.id)), pass, 15000);
+            if (!pass.signal.aborted && rows.includes(row)) row.path = data;
+        } catch (error) {
+            if (!pass.signal.aborted && rows.includes(row)) row.path = {state: 'unknown', error: error.message};
+        } finally {
+            pathRequests.delete(pass);
+            row.pathChecking = false;
+            if (!pass.signal.aborted && rows.includes(row)) render();
+        }
+    }
+
+    function renderDerp() {
+        derpSummary.replaceChildren();
+        if (!derp || derp.state !== 'ready') {
+            derpSummary.textContent = derp ? t.derpUnavailable : t.derpLoading;
+            return;
+        }
+        const home = mesh && mesh.state === 'ready' ? mesh.home_relay : derp.home_relay;
+        derpSummary.append(element('div', `${t.homeDerp}: ${home || '—'} · UDP: ${truth(derp.udp)} · ${t.preferredDerp}: ${derp.preferred || '—'}`));
+        if (derp.exit_selected) derpSummary.append(element('div', t.exitWarning.replace('{name}', derp.exit_name || '—'), 'text-warning'));
+        const regions = element('div', undefined, 'd-flex flex-wrap gap-2 mt-2');
+        for (const region of derp.regions || []) {
+            const latency = region.latency_ms === null ? t.unknown : region.latency_ms.toLocaleString(locale, {maximumFractionDigits: 1}) + ' ' + t.ms;
+            const badge = element('span', `${region.own ? t.own + ' ' : ''}${region.code}: ${latency}`, region.own ? 'badge text-bg-info' : 'badge text-bg-secondary');
+            badge.title = `${region.name} (${region.id}) · ${region.hosts.join(', ')}`;
+            regions.append(badge);
+        }
+        derpSummary.append(regions);
+        derpSummary.append(element('div', t.derpCache.replace('{time}', new Date(derp.checked_at * 1000).toLocaleTimeString(locale)), 'text-body-secondary mt-1'));
+    }
+
+    function remoteDerpDetails(row, cell) {
+        const data = row.derp;
+        if (!data || data.state !== 'ready') {
+            cell.append(element('span', data ? t.derpUnavailable : t.derpLoading, 'load-detail'));
+            return;
+        }
+        const cfg = data.config;
+        if (cfg && cfg.enabled === true) {
+            const nodes = mesh && mesh.state === 'ready' ? mesh.nodes : [];
+            const used = nodes.some(node => node.relay && node.relay === cfg.region_code);
+            const healthy = data.probe_code === 200 && data.stun_listening === true;
+            const failed = data.probe_code !== null && data.probe_code !== 200 || data.stun_listening === false;
+            const role = failed ? t.derpFailed : healthy ? (used ? t.derpPrimary : mesh && mesh.state === 'ready' ? t.derpStandby : t.unknown) : t.unknown;
+            cell.append(element('span', `${t.ownDerp} ${cfg.region_code || '—'} (${cfg.region_id ?? '—'}) — ${role}`,
+                'badge d-block mt-1 ' + (failed ? 'text-bg-warning' : healthy ? 'text-bg-info' : 'text-bg-secondary')));
+        }
+        const details = element('details', undefined, 'load-detail');
+        details.append(element('summary', t.derpDetails));
+        details.append(element('div', `Headscale: ${truth(data.headscale)} ${data.version || ''}`));
+        if (cfg) {
+            details.append(element('div', `${t.derpEnabled}: ${truth(cfg.enabled)} · verify_clients: ${truth(cfg.verify_clients)}`));
+            details.append(element('div', `/derp/probe: ${data.probe_code ?? '—'} · STUN ${data.stun_port ?? '—'}: ${truth(data.stun_listening)}`));
+            details.append(element('div', `${t.publicMap}: ${truth(cfg.public_map)}`));
+        } else details.append(element('div', t.derpConfigUnknown));
+        details.append(element('div', `${t.publicIpv4}: ${truth(data.public_ipv4)} · UDP 3478 ${data.udp3478_busy === true ? t.busy : data.udp3478_busy === false ? t.freePort : t.unknown}`));
+        details.append(element('div', data.tcp443_busy === true
+            ? t.portConflict.replace('{owner}', data.tcp443_owner || t.unknown)
+            : `TCP 443: ${data.tcp443_busy === false ? t.freePort : t.unknown}`));
+        details.append(element('div', t.derpCandidateHint));
+        cell.append(details);
+    }
 
     function meshCell(row) {
         const cell = element('td', undefined, 'load-mesh');
@@ -38,7 +118,23 @@
                 'badge d-block mt-1 ' + (peer.exit_selected ? 'text-bg-success' : peer.exit_available ? 'text-bg-info' : 'text-bg-secondary')));
             cell.append(element('span', peer.ips.join(', '), 'load-detail'));
             if (!peer.online) cell.append(element('span', t.meshOffline, 'load-detail text-warning'));
+            if (!row.path || !['direct', 'relay'].includes(row.path.state)) {
+                cell.append(element('span', peer.cur_addr ? t.statusAddress.replace('{address}', peer.cur_addr) : t.pathUnconfirmed, 'load-detail'));
+            }
+            if (peer.relay) cell.append(element('span', t.peerHome.replace('{region}', peer.relay), 'load-detail'));
+            if (row.path) {
+                const path = row.path;
+                cell.append(element('span', path.state === 'direct' ? t.directPath.replace('{address}', path.address)
+                    : path.state === 'relay' ? t.relayPath.replace('{region}', path.relay) : t.pathUnknown, 'load-detail text-info'));
+                if (path.checked_at) cell.append(element('span', 'ping: ' + new Date(path.checked_at * 1000).toLocaleTimeString(locale), 'load-detail'));
+                if (path.error) cell.append(element('span', path.error, 'load-detail text-warning'));
+            }
+            const ping = element('button', row.pathChecking ? t.checking : t.checkPath, 'btn btn-sm btn-outline-secondary mt-1');
+            ping.type = 'button'; ping.disabled = !!row.pathChecking; ping.title = t.pathHint;
+            ping.addEventListener('click', () => checkPath(row, peer));
+            cell.append(ping);
         }
+        remoteDerpDetails(row, cell);
         return cell;
     }
     let sort = {key: 'name', direction: 1};
@@ -141,12 +237,13 @@
         if (completedAt) progress.textContent += ' · ' + t.completed.replace('{time}', completedAt.toLocaleTimeString(locale));
     }
 
-    async function getJSON(url, pass) {
+    async function getJSON(url, pass, timeout = 40000) {
         const controller = new AbortController();
+        if (pass.signal.aborted) throw new DOMException('Aborted', 'AbortError');
         const cancel = () => controller.abort();
         pass.signal.addEventListener('abort', cancel, {once: true});
         let timedOut = false;
-        const timer = setTimeout(() => { timedOut = true; controller.abort(); }, 40000);
+        const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeout);
         try {
             const response = await fetch(url, {signal: controller.signal, cache: 'no-store', headers: {'Accept': 'application/json'}});
             if (response.status === 401) throw new Error(t.auth);
@@ -165,11 +262,14 @@
 
     async function start() {
         if (run) return;
+        cancelPaths();
         const pass = new AbortController();
         run = pass;
         refresh.disabled = true;
         rows = [];
         mesh = null;
+        derp = null;
+        renderDerp();
         completedAt = null;
         meshSummary.textContent = t.meshLoading;
         body.replaceChildren();
@@ -182,12 +282,34 @@
                 meshSummary.textContent = data.state === 'ready'
                     ? `${t.meshHost}: ${data.name || '—'} / ${data.host || '—'} · ${t.coordinator}: ${data.coordinator || '—'}`
                     : t.meshUnavailable;
-                render();
+                render(); renderDerp();
             }).catch(() => { if (run === pass) meshSummary.textContent = t.meshUnavailable; });
+            const derpRequest = getJSON(config.derpUrl, pass, 15000).then(data => {
+                if (run !== pass) return;
+                derp = data; renderDerp();
+            }).catch(() => {
+                if (run === pass) { derp = {state: 'unavailable'}; renderDerp(); }
+            });
             const inventory = await getJSON(config.serversUrl, pass);
             if (run !== pass) return;
             rows = inventory.servers.map(server => ({server}));
             render(); showProgress();
+            let nextDerp = 0;
+            async function derpWorker() {
+                while (run === pass && nextDerp < rows.length) {
+                    const row = rows[nextDerp++];
+                    try {
+                        const data = await getJSON(config.derpSnapshotUrl.replace('__SERVER__', encodeURIComponent(row.server.id)), pass, 22000);
+                        if (run !== pass) return;
+                        row.derp = data.stats;
+                    } catch (_) {
+                        if (run !== pass) return;
+                        row.derp = {state: 'unavailable'};
+                    }
+                    render();
+                }
+            }
+            const remoteDerpRequest = Promise.all(Array.from({length: Math.min(2, rows.length)}, derpWorker));
             let next = 0;
             async function worker() {
                 while (run === pass && next < rows.length) {
@@ -207,11 +329,11 @@
                 }
             }
             await Promise.all(Array.from({length: Math.min(4, rows.length)}, worker));
-            await meshRequest;
             if (run === pass) {
                 completedAt = new Date();
                 showProgress();
             }
+            await Promise.all([meshRequest, derpRequest, remoteDerpRequest]);
         } catch (error) {
             if (run === pass) progress.textContent = error.message;
         } finally {
@@ -225,6 +347,7 @@
 
     modal.addEventListener('shown.bs.modal', start);
     modal.addEventListener('hide.bs.modal', () => {
+        cancelPaths();
         if (run) { const pass = run; run = null; pass.abort(); }
         refresh.disabled = false;
         body.setAttribute('aria-busy', 'false');
