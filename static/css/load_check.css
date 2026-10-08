@@ -14,3 +14,5 @@
 .load-check-meter.is-warm span { background: var(--bs-warning); }
 .load-check-meter.is-hot span { background: var(--bs-danger); }
 #load-check-filter { max-width: 200px; }
+.load-check-table .load-mesh { min-width: 180px; max-width: 230px; font-size: .8rem; overflow-wrap: anywhere; }
+.load-check-table .load-mesh .badge { white-space: normal; }

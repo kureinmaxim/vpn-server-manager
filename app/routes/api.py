@@ -617,6 +617,16 @@ def load_check_servers():
     return response
 
 
+@api_bp.route('/monitoring/load-check/mesh', methods=['GET'])
+@require_auth
+@require_pin
+def load_check_mesh():
+    from ..services.mesh_context import local_mesh
+    response = jsonify(local_mesh())
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
 @api_bp.route('/monitoring/<server_id>/load-snapshot', methods=['GET'])
 @require_auth
 @require_pin

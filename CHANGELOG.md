@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.11.0] - 2026-10-08
+
+### Added
+- Server load overview now shows Tailscale membership relative to the application host, ordinary nodes, available exit nodes, the exit selected on the PC and offline peers. Public SSH addresses are matched using remote Tailscale node IDs.
+- Displays the local network/PC and coordinator control hostname. Cards matching that hostname or its DNS addresses are marked as the control endpoint, with a reverse-proxy/NAT caveat. Unavailable local status and invisible peers remain explicit rather than being labelled as outside the network.
+- Authenticated, PIN-protected read-only mesh endpoint; only selected fields are returned, without raw Tailscale preferences or keys. Includes RU/EN/ZH labels.
+
 ## [4.10.3] - 2026-10-05
 
 ### Added

@@ -41,7 +41,7 @@ def load_client(client):
 
 
 @pytest.mark.parametrize(
-    "url", ["/api/monitoring/load-check/servers", "/api/monitoring/one/load-snapshot"]
+    "url", ["/api/monitoring/load-check/servers", "/api/monitoring/one/load-snapshot", "/api/monitoring/load-check/mesh"]
 )
 def test_load_check_requires_auth_and_pin(client, url):
     assert client.get(url).status_code == 401
@@ -57,6 +57,15 @@ def test_inventory_filters_inactive_and_archived_without_exposing_secrets(load_c
     assert set(response.json["servers"][0]) == {"id", "name", "ip_address"}
     assert response.headers["Cache-Control"] == "no-store"
     registry.get("ssh").get_load_snapshot.assert_not_called()
+
+
+def test_mesh_context_is_local_and_not_cached(load_client, monkeypatch):
+    from app.services import mesh_context
+    monkeypatch.setattr(mesh_context, 'local_mesh', lambda: {'state':'ready','nodes':[],'host':'test-pc'})
+    response = load_client.get('/api/monitoring/load-check/mesh')
+    assert response.json['host'] == 'test-pc'
+    assert response.headers['Cache-Control'] == 'no-store'
+    registry.get('ssh').get_load_snapshot.assert_not_called()
 
 
 def test_snapshot_uses_saved_ssh_credentials(load_client):

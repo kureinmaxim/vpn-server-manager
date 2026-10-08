@@ -8036,3 +8036,42 @@ msgstr "TiB"
 #. Quick server load check
 msgid "/с"
 msgstr "/秒"
+
+msgid "Mesh рабочего ПК"
+msgstr "工作站 Mesh"
+
+msgid "Определяю Tailscale-сеть приложения…"
+msgstr "正在检查应用主机的 Tailscale 网络…"
+
+msgid "Tailscale на хосте приложения недоступен или не подключён. Принадлежность серверов к mesh неизвестна."
+msgstr "应用主机上的 Tailscale 不可用或未连接。无法确定服务器的 Mesh 归属。"
+
+msgid "Сеть / ПК"
+msgstr "网络 / 电脑"
+
+msgid "Координатор (адрес управления)"
+msgstr "协调器（控制地址）"
+
+msgid "Адрес карточки совпадает с адресом управления сетью. При reverse proxy/NAT это может быть входной узел, а не сам Headscale."
+msgstr "服务器地址与网络控制地址匹配。使用反向代理或 NAT 时，这可能是入口节点，而非 Headscale 本身。"
+
+msgid "В mesh этого ПК"
+msgstr "在此电脑的 Mesh 中"
+
+msgid "Не виден в mesh этого ПК"
+msgstr "在此电脑的 Mesh 中不可见"
+
+msgid "Mesh не определена"
+msgstr "Mesh 未确定"
+
+msgid "Обычный node"
+msgstr "普通节点"
+
+msgid "Exit node (доступен)"
+msgstr "出口节点（可用）"
+
+msgid "Exit node (выбран на ПК)"
+msgstr "出口节点（此电脑已选择）"
+
+msgid "Узел офлайн"
+msgstr "节点离线"
