@@ -20,11 +20,13 @@
 <p align="center">
   <a href="https://github.com/kureinmaxim/vpn-server-manager/releases/latest"><strong>Download for Windows</strong></a>
   &nbsp; · &nbsp; <a href="#quick-start">Run from source</a>
-  &nbsp; · &nbsp; <a href="docs/INDEX_ru.md">Документация на русском</a>
+  &nbsp; · &nbsp; <a href="docs/INDEX_ru.md">Russian documentation</a>
   &nbsp; · &nbsp; <a href="CHANGELOG.md">What's new</a>
 </p>
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
+
+**Latest patch · 4.11.2:** Tailscale detection on macOS now also works when the app is launched from Finder or the Dock with a limited PATH. [Release notes →](https://github.com/kureinmaxim/vpn-server-manager/releases/tag/v4.11.2)
 
 ## See your fleet at a glance
 
