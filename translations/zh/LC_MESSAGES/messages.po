@@ -8075,3 +8075,6 @@ msgstr "出口节点（此电脑已选择）"
 
 msgid "Узел офлайн"
 msgstr "节点离线"
+
+msgid "Завершено: {time}"
+msgstr "完成时间：{time}"

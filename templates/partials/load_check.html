@@ -30,7 +30,6 @@
                                 <th scope="col"><button type="button" data-load-sort="disk">{{ _('Диск /') }} ↕</button></th>
                                 <th scope="col"><button type="button" data-load-sort="load">{{ _('Ср. загрузка') }} ↕</button></th>
                                 <th scope="col"><button type="button" data-load-sort="network">{{ _('Сеть ↓ / ↑') }} ↕</button></th>
-                                <th scope="col">{{ _('Замер') }}</th>
                             </tr>
                         </thead>
                         <tbody id="load-check-rows"></tbody>
@@ -72,6 +71,7 @@ window.LOAD_CHECK_CONFIG = {
         empty: {{ _('Нет активных серверов вне архива.') | tojson }},
         noMatches: {{ _('Серверы не найдены.') | tojson }},
         progress: {{ _('Проверено: {done} / {total} · с данными: {ok} · ошибок: {errors}') | tojson }},
+        completed: {{ _('Завершено: {time}') | tojson }},
         free: {{ _('свободно') | tojson }},
         cores: {{ _('ядер') | tojson }},
         perCore: {{ _('на ядро') | tojson }},

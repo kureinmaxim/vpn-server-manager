@@ -15,6 +15,7 @@
     let run = null;
     let rows = [];
     let mesh = null;
+    let completedAt = null;
     const meshSummary = document.getElementById('load-check-mesh');
 
     function meshCell(row) {
@@ -94,7 +95,7 @@
         });
         if (!visible.length) {
             const cell = element('td', rows.length ? t.noMatches : t.empty, 'text-center text-body-secondary py-5');
-            cell.colSpan = 9;
+            cell.colSpan = 8;
             const tr = element('tr'); tr.append(cell); body.append(tr);
         }
         for (const row of visible) {
@@ -128,7 +129,7 @@
                 network.append(element('span', `↑ ${bytes(stats.network.tx_bytes_per_second)}${t.perSecond}`, 'load-detail'));
                 network.title = stats.network.interfaces.join(', ');
             }
-            tr.append(network, element('td', stats.checked_at ? new Date(stats.checked_at * 1000).toLocaleTimeString(document.documentElement.lang) : '—', 'text-nowrap text-body-secondary'));
+            tr.append(network);
             body.append(tr);
         }
     }
@@ -137,6 +138,7 @@
         const done = rows.filter(row => row.stats || row.error).length;
         const ok = rows.filter(row => row.stats).length;
         progress.textContent = t.progress.replace('{done}', done).replace('{total}', rows.length).replace('{ok}', ok).replace('{errors}', done - ok);
+        if (completedAt) progress.textContent += ' · ' + t.completed.replace('{time}', completedAt.toLocaleTimeString(locale));
     }
 
     async function getJSON(url, pass) {
@@ -168,6 +170,7 @@
         refresh.disabled = true;
         rows = [];
         mesh = null;
+        completedAt = null;
         meshSummary.textContent = t.meshLoading;
         body.replaceChildren();
         progress.textContent = t.loading;
@@ -205,6 +208,10 @@
             }
             await Promise.all(Array.from({length: Math.min(4, rows.length)}, worker));
             await meshRequest;
+            if (run === pass) {
+                completedAt = new Date();
+                showProgress();
+            }
         } catch (error) {
             if (run === pass) progress.textContent = error.message;
         } finally {
