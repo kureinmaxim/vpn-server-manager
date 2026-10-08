@@ -34,3 +34,13 @@ def test_remote_snapshot_only_returns_self():
     result = mesh.remote_mesh('metrics\nVPN_MESH_BEGIN\n'+json.dumps(data)+'\nVPN_MESH_END\n')
     assert result['self']['id'] == 'node' and 'hidden' not in json.dumps(result)
     assert mesh.remote_mesh('metrics') == {'state':'unavailable'}
+
+
+def test_macos_app_bundle_finds_cli_outside_path(monkeypatch, tmp_path):
+    cli = tmp_path / 'Tailscale'
+    cli.write_text('#!/bin/sh\n'); cli.chmod(0o755)
+    monkeypatch.setattr(mesh.shutil, 'which', lambda _: None)
+    monkeypatch.setattr(mesh.os, 'name', 'posix')
+    monkeypatch.setattr(mesh.sys, 'platform', 'darwin')
+    monkeypatch.setattr(mesh, '_fallback_paths', lambda: [tmp_path / 'missing', cli])
+    assert mesh.tailscale_executable() == str(cli)
