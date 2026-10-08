@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.11.2] - 2026-10-08
+
+### Fixed
+- macOS: the server load overview showed "Mesh unknown" and DERP diagnostics were unavailable when the app was launched from Finder/Dock. The bundle receives a minimal PATH without `/usr/local/bin`, so the Tailscale CLI is now also looked up in `/usr/local/bin`, `/opt/homebrew/bin` and `/Applications/Tailscale.app`.
+
 ## [4.11.1] - 2026-10-08
 
 ### Added

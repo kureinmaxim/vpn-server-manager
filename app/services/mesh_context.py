@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import socket
 import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from urllib.parse import urlsplit
 
@@ -21,11 +22,20 @@ def public_node(node):
             'online': node.get('Online') is True}
 
 
+def _fallback_paths():
+    if os.name == 'nt':
+        return [Path(os.environ.get('ProgramFiles', r'C:\Program Files')) / 'Tailscale/tailscale.exe']
+    if sys.platform == 'darwin':
+        # A Finder-launched .app gets PATH=/usr/bin:/bin:/usr/sbin:/sbin, so the CLI is not found.
+        return [Path('/usr/local/bin/tailscale'), Path('/opt/homebrew/bin/tailscale'),
+                Path('/Applications/Tailscale.app/Contents/MacOS/Tailscale')]
+    return []
+
+
 def tailscale_executable():
     executable = shutil.which('tailscale')
-    if not executable and os.name == 'nt':
-        candidate = Path(os.environ.get('ProgramFiles', r'C:\Program Files')) / 'Tailscale/tailscale.exe'
-        if candidate.is_file(): executable = str(candidate)
+    if not executable:
+        executable = next((str(p) for p in _fallback_paths() if p.is_file() and os.access(p, os.X_OK)), None)
     return executable
 
 
