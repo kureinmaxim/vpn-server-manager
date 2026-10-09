@@ -59,17 +59,29 @@
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <p class="small text-body-secondary mb-2">{{ _('В Cloudflare откройте домен → DNS → Records → Export и загрузите полученные файлы. Новые домены будут созданы, к существующим добавятся недостающие записи.') }}</p>
         <div class="row g-2 align-items-end">
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <label class="form-label" for="zone-files">{{ _('Файлы зоны') }}</label>
                 <input class="form-control" id="zone-files" type="file" name="zone" accept=".txt,.zone,.bind,text/plain" multiple required>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <label class="form-label" for="zone-provider">{{ _('DNS-провайдер') }}</label>
                 <select class="form-select" id="zone-provider" name="provider_id">
                     <option value="">{{ _('Не выбран') }}</option>
                     {% for provider in providers %}<option value="{{ provider.id }}" {% if loop.first %}selected{% endif %}>{{ provider.name }}</option>{% endfor %}
                 </select>
             </div>
+            <fieldset class="col-md-10 mt-2">
+                <legend class="visually-hidden">{{ _('Режим импорта') }}</legend>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mode" id="zone-mode-add" value="add" checked>
+                    <label class="form-check-label" for="zone-mode-add">{{ _('Добавить недостающие записи') }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mode" id="zone-mode-replace" value="replace" aria-describedby="zone-mode-replace-help">
+                    <label class="form-check-label" for="zone-mode-replace">{{ _('Заменить записи как в файле') }}</label>
+                    <div class="form-text" id="zone-mode-replace-help">{{ _('У доменов из файла будут удалены записи, которых в файле нет. Провайдер, регистратор, даты, группы и заметки совпавших записей сохранятся. Если в файле есть нераспознанные строки, домен не изменится.') }}</div>
+                </div>
+            </fieldset>
             <div class="col-md-2 d-grid"><button class="btn btn-dns-solid" type="submit">{{ _('Импорт') }}</button></div>
         </div>
     </form>
