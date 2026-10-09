@@ -7711,6 +7711,30 @@ msgid "Импорт файла зоны"
 msgstr "Import zone file"
 
 #: app/routes/dns.py templates/dns
+msgid "%(domain)s: замена отменена — в файле нет записей или есть нераспознанные строки (%(skipped)s). Записи домена не изменены."
+msgstr "%(domain)s: replacement cancelled — the file has no records or has unrecognized lines (%(skipped)s). The domain's records were not changed."
+
+#: app/routes/dns.py templates/dns
+msgid "%(domain)s: записи заменены — добавлено %(added)s, удалено %(removed)s, без изменений %(same)s."
+msgstr "%(domain)s: records replaced — %(added)s added, %(removed)s removed, %(same)s unchanged."
+
+#: app/routes/dns.py templates/dns
+msgid "Режим импорта"
+msgstr "Import mode"
+
+#: app/routes/dns.py templates/dns
+msgid "Добавить недостающие записи"
+msgstr "Add missing records"
+
+#: app/routes/dns.py templates/dns
+msgid "Заменить записи как в файле"
+msgstr "Replace records to match the file"
+
+#: app/routes/dns.py templates/dns
+msgid "У доменов из файла будут удалены записи, которых в файле нет. Провайдер, регистратор, даты, группы и заметки совпавших записей сохранятся. Если в файле есть нераспознанные строки, домен не изменится."
+msgstr "Records of the domains in the file that are not in the file will be deleted. The provider, registrar, dates, groups and notes of matching records are kept. If the file has unrecognized lines, the domain is left unchanged."
+
+#: app/routes/dns.py templates/dns
 msgid "В Cloudflare откройте домен → DNS → Records → Export и загрузите полученные файлы. Новые домены будут созданы, к существующим добавятся недостающие записи."
 msgstr "In Cloudflare open the domain → DNS → Records → Export and upload the files. New domains are created; missing records are added to existing ones."
 

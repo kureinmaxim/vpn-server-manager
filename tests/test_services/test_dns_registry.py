@@ -180,3 +180,23 @@ def test_parse_zone():
     assert dns_reg.add_zone_records(domain, dns_reg.parse_zone(ZONE, domain)[0]) == 0
     with pytest.raises(dns_reg.DnsError):
         dns_reg.zone_domain('just text')
+
+
+def test_replace_zone_records_keeps_matches_and_drops_the_rest():
+    domain = {'name': 'example.com', 'records': []}
+    dns_reg.add_zone_records(domain, dns_reg.parse_zone(ZONE, domain)[0])
+    vpn = next(r for r in domain['records'] if r['name'] == 'vpn')
+    vpn.update(notes='main VPS', role='service')
+    zone = (";; Domain:     example.com.\n"
+            "vpn.example.com.\t1\tIN\tA\t203.0.113.5 ; cf_tags=cf-proxied:true\n"
+            "files.example.com.\t1\tIN\tA\t203.0.113.7 ; cf_tags=cf-proxied:false\n"
+            'example.com.\t1\tIN\tTXT\t"v=spf1 -all"\n')
+    records, skipped = dns_reg.parse_zone(zone, domain)
+    assert skipped == 0
+    assert dns_reg.replace_zone_records(domain, records) == (2, 6, 1)
+    assert {(r['name'], r['type'], r['content']) for r in domain['records']} == {
+        ('vpn', 'A', '203.0.113.5'), ('files', 'A', '203.0.113.7'), ('@', 'TXT', 'v=spf1 -all')}
+    kept = next(r for r in domain['records'] if r['name'] == 'vpn')
+    # The same record object stays: id, group and note survive, the proxy flag follows the file
+    assert kept is vpn and kept['notes'] == 'main VPS' and kept['role'] == 'service' and kept['proxied'] is True
+    assert dns_reg.replace_zone_records(domain, dns_reg.parse_zone(zone, domain)[0]) == (0, 0, 3)
