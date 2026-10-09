@@ -150,3 +150,41 @@ def test_import_zone_files(unlocked):
     assert len(data['domains']) == 1 and len(data['domains'][0]['records']) == 7
     assert data['domains'][0]['provider_id'] == data['providers'][0]['id']
     assert '0 records added, 7 already present' in response.text
+
+
+def test_import_zone_replace(unlocked):
+    import io
+    from tests.test_services.test_dns_registry import ZONE
+    post(unlocked, '/dns/providers/new', kind='cloudflare')
+    provider_id = dns(unlocked)['providers'][0]['id']
+
+    def upload(text, mode):
+        return unlocked.post('/dns/import-zone', data={
+            'csrf_token': 'token', 'provider_id': provider_id, 'mode': mode,
+            'zone': [(io.BytesIO(text.encode()), 'zone.txt')]},
+            content_type='multipart/form-data', follow_redirects=True)
+
+    assert 'zone-mode-replace' in unlocked.get('/dns/').text
+    clean = '\n'.join(line for line in ZONE.splitlines() if not line.startswith('bad name')) + '\n'
+    upload(clean, 'add')
+    domain_id = dns(unlocked)['domains'][0]['id']
+    post(unlocked, f'/dns/domains/{domain_id}/edit', name='example.com', provider_id=provider_id,
+         registrar='Example Registrar', registered_on='2026-07-30', expires_on='2027-07-30')
+    zone = (";; Domain:     example.com.\n"
+            "files.example.com.\t1\tIN\tA\t203.0.113.7 ; cf_tags=cf-proxied:false\n"
+            'example.com.\t1\tIN\tTXT\t"v=spf1 -all"\n')
+    response = upload(zone, 'replace')
+    domain = dns(unlocked)['domains'][0]
+    assert {(r['name'], r['type']) for r in domain['records']} == {('files', 'A'), ('@', 'TXT')}
+    assert (domain['id'], domain['provider_id'], domain['registrar'], domain['expires_on']) == (
+        domain_id, provider_id, 'Example Registrar', '2027-07-30')
+    assert 'records replaced — 2 added, 7 removed, 0 unchanged' in response.text
+
+    # A file with an unreadable line could drop records that still exist: the domain stays as is
+    response = upload(ZONE, 'replace')
+    assert 'replacement cancelled' in response.text
+    assert {(r['name'], r['type']) for r in dns(unlocked)['domains'][0]['records']} == {('files', 'A'), ('@', 'TXT')}
+
+    # A domain that is not in the list yet is created as with a normal import
+    upload(zone.replace('example.com', 'example.org'), 'replace')
+    assert [d['name'] for d in dns(unlocked)['domains']] == ['example.com', 'example.org']
