@@ -70,7 +70,7 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 | **PIN lock** | Quick lock on the local app so a shared machine is not an open notebook. |
 | **SSH monitoring** | Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
 | **Server management** | Inspect Docker and systemd services, control their lifecycle, and use supported protocol settings and client operations. [Supported configurations and limits](CHANGELOG.md). |
-| **DNS & network tools** | Keep domains, providers, renewal dates and notes together. Run network checks and use terminal examples, including DNS queries with `dig`. |
+| **DNS & network tools** | Keep domains, providers, renewal dates and records together. Import Cloudflare zone exports: add missing records, or replace them to match the file after a cleanup at the provider. Run network checks and use terminal examples, including DNS queries with `dig`. [DNS card guide (RU)](docs/DNS_CARD_ru.md). |
 | **Mesh & DERP** | Local Tailscale membership, coordinator and exit roles, custom relay diagnostics and an explicit path check. No Tailscale configuration changes. |
 | **Works offline** | The inventory stays usable without internet. Network-only actions disable themselves cleanly. |
 | **Languages** | Russian, English, and Chinese. `.po` catalogs compile on first launch. |
