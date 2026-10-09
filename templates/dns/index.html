@@ -71,6 +71,18 @@
                 </select>
             </div>
             <div class="col-md-2 d-grid"><button class="btn btn-dns-solid" type="submit">{{ _('Импорт') }}</button></div>
+            <fieldset class="col-12 mt-2">
+                <legend class="visually-hidden">{{ _('Режим импорта') }}</legend>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mode" id="zone-mode-add" value="add" checked>
+                    <label class="form-check-label" for="zone-mode-add">{{ _('Добавить недостающие записи') }}</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="mode" id="zone-mode-replace" value="replace" aria-describedby="zone-mode-replace-help">
+                    <label class="form-check-label" for="zone-mode-replace">{{ _('Заменить записи как в файле') }}</label>
+                    <div class="form-text" id="zone-mode-replace-help">{{ _('У доменов из файла будут удалены записи, которых в файле нет. Провайдер, регистратор, даты, группы и заметки совпавших записей сохранятся. Если в файле есть нераспознанные строки, домен не изменится.') }}</div>
+                </div>
+            </fieldset>
         </div>
     </form>
     {% if domains %}

@@ -271,6 +271,29 @@ def add_zone_records(domain, records):
     return len(added)
 
 
+def replace_zone_records(domain, records):
+    """Makes the domain's records match a zone file; returns (added, removed, kept).
+
+    A record with the same name, type and value as one in the file is kept as is
+    (id, group and note stay; only the Cloudflare proxy flag is refreshed). Records
+    missing from the file are removed. Domain fields — provider, registrar, dates —
+    are not touched.
+    """
+    incoming = {}
+    for record in records:
+        incoming.setdefault((record['name'], record['type'], record['content']), record)
+    kept, removed = [], 0
+    for record in domain['records']:
+        match = incoming.pop((record['name'], record['type'], record['content']), None)
+        if match is None:
+            removed += 1
+            continue
+        record['proxied'] = match['proxied']
+        kept.append(record)
+    domain['records'] = kept + list(incoming.values())
+    return len(incoming), removed, len(kept)
+
+
 def parse_zone(text, domain):
     """Records from a BIND zone file (Cloudflare "Export"); SOA and apex NS are skipped."""
     records, skipped = [], 0

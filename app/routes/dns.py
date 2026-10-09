@@ -227,8 +227,10 @@ def record_delete(domain_id, record_id):
 @dns_bp.post('/import-zone')
 @csrf_protect
 def import_zone():
-    """Imports BIND zone files (Cloudflare "Export"): creates missing domains, adds new records."""
+    """Imports BIND zone files (Cloudflare "Export"): creates missing domains and adds new
+    records, or with mode=replace makes an existing domain's records match the file."""
     dns = _load()
+    replace = request.form.get('mode') == 'replace'
     provider_id = request.form.get('provider_id', '')
     if provider_id and not dns_reg.find(dns['providers'], provider_id):
         provider_id = ''
@@ -238,10 +240,24 @@ def import_zone():
             text = upload.read(1024 * 1024).decode('utf-8', 'replace')
             name = dns_reg.zone_domain(text)
             domain = next((d for d in dns['domains'] if d['name'] == name), None)
+            existed = domain is not None
             if domain is None:
                 domain = dns_reg.build_domain({'name': name, 'provider_id': provider_id}, None, dns['providers'])
-                dns['domains'].append(domain)
             records, skipped = dns_reg.parse_zone(text, domain)
+            if replace and existed:
+                # Deleting by an incomplete file would drop records that still exist in the
+                # zone, so a file with unreadable lines or no records leaves the domain as is.
+                if skipped or not records:
+                    flash(_('%(domain)s: замена отменена — в файле нет записей или есть нераспознанные строки '
+                            '(%(skipped)s). Записи домена не изменены.', domain=name, skipped=skipped), 'danger')
+                    continue
+                added, removed, kept = dns_reg.replace_zone_records(domain, records)
+                flash(_('%(domain)s: записи заменены — добавлено %(added)s, удалено %(removed)s, '
+                        'без изменений %(same)s.', domain=name, added=added, removed=removed, same=kept),
+                      'success')
+                continue
+            if not existed:
+                dns['domains'].append(domain)
             added = dns_reg.add_zone_records(domain, records)
             flash(_('%(domain)s: добавлено записей %(added)s, уже были %(same)s, пропущено %(skipped)s.',
                     domain=name, added=added, same=len(records) - added, skipped=skipped), 'success')

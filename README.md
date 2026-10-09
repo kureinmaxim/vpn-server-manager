@@ -1,4 +1,4 @@
-# VPN Server Manager v4.11.2
+# VPN Server Manager v4.11.3
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest patch · 4.11.2:** Tailscale detection on macOS now also works when the app is launched from Finder or the Dock with a limited PATH. [Release notes →](https://github.com/kureinmaxim/vpn-server-manager/releases/tag/v4.11.2)
+**Latest patch · 4.11.3:** DNS zone import can replace a domain's records to match a Cloudflare export, removing records deleted at the provider while keeping the domain's registrar, dates and notes. [Release notes →](https://github.com/kureinmaxim/vpn-server-manager/releases/tag/v4.11.3)
 
 ## See your fleet at a glance
 
