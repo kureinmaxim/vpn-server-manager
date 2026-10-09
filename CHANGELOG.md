@@ -8,6 +8,9 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 - DNS → **Import zone file** has a **Replace records to match the file** mode. For a domain that is already in the list, records that are not in the file are deleted, so the card matches the provider after records were removed there (for example, after cleaning up leftovers of an old hosting). Matching records keep their id, group and note; only the Cloudflare proxy flag is refreshed. The domain's provider, registrar, dates and notes are not touched. Domains that are not in the list yet are created as with a normal import.
 - Safety: if a file has unreadable lines or no records, replacement for that domain is cancelled and its records stay unchanged, so an incomplete export cannot wipe live records. RU/EN/ZH labels and messages.
 
+### Documentation
+- New `docs/DNS_CARD_ru.md`: what the DNS card stores, both zone import modes, the replace guard, and when a Cloudflare record must stay **DNS only** (private and Tailscale addresses, Headscale, VPN protocols, SSH, mail, certbot sites), including the dashboard banner "Proxying is required for most security and performance features". Linked from README and the docs index.
+
 ## [4.11.2] - 2026-10-08
 
 ### Fixed
