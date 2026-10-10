@@ -176,6 +176,10 @@ class DataManagerService:
                 'port': 22,
                 'root_password': '',
                 'root_login_allowed': False,
+                'private_key': '',
+                'key_passphrase': '',
+                'key_hint': '',
+                'key_path': '',
                 'password_decrypted': '',
                 'root_password_decrypted': ''
             }
@@ -187,6 +191,11 @@ class DataManagerService:
                 'port': ssh.get('port', 22),
                 'root_password': ssh.get('root_password', ''),
                 'root_login_allowed': ssh.get('root_login_allowed', False),
+                # SSH-ключ: зашифрованный путь или текст, фраза-пароль; отпечаток и путь — для показа
+                'private_key': ssh.get('private_key', ''),
+                'key_passphrase': ssh.get('key_passphrase', ''),
+                'key_hint': ssh.get('key_hint', ''),
+                'key_path': ssh.get('key_path', ''),
                 'password_decrypted': ssh.get('password_decrypted', ''),
                 'root_password_decrypted': ssh.get('root_password_decrypted', '')
             }

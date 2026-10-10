@@ -2,6 +2,20 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.0] - 2026-10-10
+
+### Added
+- SSH key login. The server card (SSH access) accepts an SSH key: a path to the private key on this computer (`~/.ssh/id_ed25519`) or the pasted key, with an optional passphrase. Ed25519, ECDSA and RSA keys are supported, including encrypted ones. The key is checked on save; an unreadable key is not saved, the rest of the card is, and a warning explains why. The key and passphrase are stored encrypted like passwords; the card shows only the fingerprint (`ssh-ed25519 SHA256:…`) and the path, never the key. The trash button removes it.
+- Every SSH connection uses the key from the card: status, monitoring, load overview and DERP, security events and brief, monitoring install/uninstall, service control and reset. If both a key and a password are set, the key is tried first, then the password. Servers without a key work exactly as before.
+
+### Changed
+- Security brief: the advice to turn off `PasswordAuthentication` (and root login by password) now warns that the app still logs in with a password and will lose access until an SSH key is set in the card. When the card already uses a key, it says that password login can be turned off.
+- Change of the main key and import from another data file re-encrypt the SSH key and its passphrase together with passwords.
+
+### Documentation
+- README: new section **SSH login: password or key** — what the card accepts, how the app chooses between key and password, switching a server to key-only login, and what backups contain for keys saved as a path.
+- `docs/SECURITY_BEST_PRACTICES_ru.md`: how the key is stored and the safe order for switching a server to key-only login; the monitoring guide mentions the key option.
+
 ## [4.11.3] - 2026-10-09
 
 ### Added
