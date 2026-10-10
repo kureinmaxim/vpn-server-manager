@@ -2,6 +2,7 @@
 import hmac
 import json
 import logging
+import os
 import secrets
 import shlex
 import threading
@@ -131,11 +132,51 @@ def describe_failure(exc, creds, *, may_have_run=False):
 OUTPUT_MARKER = "__VSM_REMOTE_OUTPUT__"
 
 
+def _load_known_hosts(client):
+    """~/.ssh/known_hosts для строгой проверки ключа хоста.
+
+    paramiko прерывает чтение всего файла на строке, которую не может разобрать
+    (метки @cert-authority/@revoked, испорченная запись): его InvalidHostKey не
+    наследуется от SSHException. Тогда файл читается построчно, такие строки
+    пропускаются, остальные ключи проверяются как обычно.
+    """
+    try:
+        client.load_system_host_keys()
+        return
+    except Exception as exc:
+        logger.warning("known_hosts: paramiko could not read the file (%s), reading line by line", type(exc).__name__)
+    keys = client.get_host_keys()
+    skipped = 0
+    try:
+        with open(os.path.expanduser("~/.ssh/known_hosts"), encoding="utf-8", errors="replace") as handle:
+            for lineno, line in enumerate(handle, 1):
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                try:
+                    entry = None if line.startswith("@") else paramiko.hostkeys.HostKeyEntry.from_line(line, lineno)
+                except Exception:
+                    entry = None
+                if entry is None:
+                    skipped += 1
+                    continue
+                for name in entry.hostnames:
+                    keys.add(name, entry.key.get_name(), entry.key)
+    except OSError:
+        return
+    logger.warning("known_hosts: skipped %d unreadable lines", skipped)
+
+
+def failure_code(exc):
+    """Имя типа исключения для общего сообщения — без текста исключения, только класс."""
+    return f" ({type(exc).__name__})" if exc is not None else ""
+
+
 def remote(creds, args, *, source=SCRIPT_SOURCE):
     # WARNING: The general SSH pool accepts unknown host keys. Destructive reset
     # must use verified OpenSSH known_hosts and RejectPolicy instead.
     client = paramiko.SSHClient()
-    client.load_system_host_keys()
+    _load_known_hosts(client)
     client.set_missing_host_key_policy(RejectUnknownHost())
     try:
         _connect(client, creds)
@@ -204,7 +245,7 @@ def reset_plan(server_id):
     try:
         plan = remote(creds, ["--components", ",".join(components)])
     except Exception as exc:
-        return jsonify(error=describe_failure(exc, creds) or translate("Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено.")), 502
+        return jsonify(error=describe_failure(exc, creds) or translate("Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено.") + failure_code(exc)), 502
     if "plan_hash" not in plan:
         return jsonify(error=plan.get("error", translate("Аудит не выполнен"))), 409
     ticket = secrets.token_urlsafe(32)
@@ -248,7 +289,7 @@ def reset_apply(server_id):
                                 "--plan-hash", plan["plan_hash"], "--confirm", plan["hostname"]])
         return jsonify(result), (200 if result.get("success") else 409)
     except Exception as exc:
-        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate("Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH.")), 502
+        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate("Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH.") + failure_code(exc)), 502
     finally:
         lock.release()
 
@@ -278,7 +319,7 @@ def archive_list(server_id):
         if 'archives' not in result:
             return jsonify(error=translate('Не удалось прочитать архивы. Проверьте SSH и права доступа.')), 502
     except Exception as exc:
-        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.')), 502
+        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.') + failure_code(exc)), 502
     owner = session.setdefault('reset_session', secrets.token_urlsafe(32))
     with _guard:
         now = time.monotonic()
@@ -321,7 +362,7 @@ def archive_delete(server_id):
             result['error'] = translate(result['error'])
         return jsonify(result), (200 if result.get('success') else 409)
     except Exception as exc:
-        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate('Ответ потерян. Обновите список перед дальнейшими действиями.')), 502
+        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate('Ответ потерян. Обновите список перед дальнейшими действиями.') + failure_code(exc)), 502
     finally:
         lock.release()
 
@@ -354,4 +395,4 @@ def disk_run(server_id):
                 row['note'] = translate(row['note'])
         return jsonify(result)
     except Exception as exc:
-        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n.')), 502
+        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n.') + failure_code(exc)), 502

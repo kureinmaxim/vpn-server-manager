@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.3] - 2026-10-10
+
+### Fixed
+- Disk usage, Cleanup archives, Reset and Service control failed with the generic SSH message when `~/.ssh/known_hosts` contained a line paramiko cannot parse (an `@cert-authority`/`@revoked` marker or a damaged entry): paramiko stops reading the whole file with `InvalidHostKey`, which is not an `SSHException`, so the failure was not recognized. Such lines are now skipped and the rest of the file is read line by line; host key checking stays strict.
+- When a failure still has no known cause, the message ends with the exception class, for example `(EOFError)`, so the cause can be found without logs. The exception text is still not shown.
+
 ## [4.12.2] - 2026-10-10
 
 ### Fixed
