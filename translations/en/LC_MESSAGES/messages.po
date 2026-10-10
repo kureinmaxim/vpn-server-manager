@@ -8575,3 +8575,21 @@ msgstr "Only if the key is protected by one. Enter it together with a new key."
 
 msgid "SSH-ключ"
 msgstr "SSH key"
+
+msgid "Ключа этого сервера нет в ~/.ssh/known_hosts на этом компьютере — проверка ключа хоста здесь обязательна. Один раз подключитесь из терминала и подтвердите ключ: ssh -p %(port)s %(user)s@%(ip)s"
+msgstr "This server's key is not in ~/.ssh/known_hosts on this computer, and host key checking is required here. Connect once from a terminal and accept the key: ssh -p %(port)s %(user)s@%(ip)s"
+
+msgid "Ключ сервера не совпадает с записью в ~/.ssh/known_hosts (сервер переустановлен?). Если это ожидаемо, удалите старую запись: ssh-keygen -R '[%(ip)s]:%(port)s' — и подключитесь из терминала заново."
+msgstr "The server key does not match ~/.ssh/known_hosts (was the server reinstalled?). If this is expected, remove the old entry: ssh-keygen -R '[%(ip)s]:%(port)s' — then connect from a terminal again."
+
+msgid "SSH: не удалось войти. Проверьте пароль или SSH-ключ в карточке сервера."
+msgstr "SSH: login failed. Check the password or SSH key in the server card."
+
+msgid "Сервер не ответил по SSH. Проверьте IP, порт %(port)s и доступность сервера."
+msgstr "The server did not answer over SSH. Check the IP, port %(port)s and whether the server is reachable."
+
+msgid "На сервере нет python3 — он нужен для этой операции: apt-get install -y python3"
+msgstr "python3 is missing on the server and is required for this operation: apt-get install -y python3"
+
+msgid "sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля."
+msgstr "sudo asks for a password. Connect as root or allow this user passwordless sudo."
