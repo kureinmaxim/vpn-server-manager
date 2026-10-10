@@ -106,3 +106,40 @@ def test_control_discover_shows_auth_hint(control_client, monkeypatch):  # noqa:
     assert response.status_code == 502
     assert "SSH" in response.get_json()["error"]
     assert "known_hosts and root/sudo -n" not in response.get_json()["error"]
+
+
+def test_login_banner_before_the_marker_is_ignored(monkeypatch):
+    banner = "Welcome to HIP-Hosting\n\xd0 not utf-8\n".encode("latin-1")
+    client = ssh_client(monkeypatch, stdout_data=banner + routes.OUTPUT_MARKER.encode() + b'\n{"results": [1]}\n')
+    assert routes.remote(CREDS, []) == {"results": [1]}
+    command = client.exec_command.call_args.args[0]
+    assert command.startswith("printf '%s\\n' " + routes.OUTPUT_MARKER + "; ")
+    assert command.endswith("python3 -")
+
+
+@pytest.mark.parametrize("stdout_data,status,stderr_data,reason", [
+    (routes.OUTPUT_MARKER.encode() + b"\nnot json at all", 0, b"", "bad_output"),
+    (routes.OUTPUT_MARKER.encode() + b"\n", 1, b"Traceback (most recent call last):", "python_error"),
+])
+def test_unparsable_answers_are_classified(monkeypatch, stdout_data, status, stderr_data, reason):
+    ssh_client(monkeypatch, stdout_data=stdout_data, status=status, stderr_data=stderr_data)
+    with pytest.raises(RemoteOutputError) as caught:
+        routes.remote(CREDS, [])
+    assert caught.value.reason == reason
+
+
+def test_channel_failure_after_login_is_classified(monkeypatch):
+    client = ssh_client(monkeypatch)
+    client.exec_command.side_effect = paramiko.SSHException("channel closed")
+    with pytest.raises(RemoteOutputError) as caught:
+        routes.remote(CREDS, [])
+    assert caught.value.reason == "exec_failed"
+
+
+def test_new_messages(app):
+    with app.test_request_context("/"):
+        assert "ssh -p 22542 root@192.0.2.1 true" in describe_failure(RemoteOutputError("bad_output"), CREDS)
+        assert "python3 --version" in describe_failure(RemoteOutputError("python_error"), CREDS)
+        assert "python3 --version" in describe_failure(RemoteOutputError("no_output"), CREDS)
+        assert describe_failure(RemoteOutputError("exec_failed"), CREDS)
+        assert describe_failure(RemoteOutputError("bad_output"), CREDS, may_have_run=True) is None
