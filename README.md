@@ -68,7 +68,7 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 | **Encrypted vault** | Fernet encryption for server data. Import / export full backups. Lose the key, lose the data — by design. |
 | **Desktop or browser** | Native window on Windows, macOS, and Linux, or `python run.py` for web mode. |
 | **PIN lock** | Quick lock on the local app so a shared machine is not an open notebook. |
-| **SSH monitoring** | Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
+| **SSH monitoring** | Logs in with a password or an SSH key from the server card. Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
 | **Server management** | Inspect Docker and systemd services, control their lifecycle, and use supported protocol settings and client operations. [Supported configurations and limits](CHANGELOG.md). |
 | **DNS & network tools** | Keep domains, providers, renewal dates and records together. Import Cloudflare zone exports: add missing records, or replace them to match the file after a cleanup at the provider. Run network checks and use terminal examples, including DNS queries with `dig`. [DNS card guide (RU)](docs/DNS_CARD_ru.md). |
 | **Mesh & DERP** | Local Tailscale membership, coordinator and exit roles, custom relay diagnostics and an explicit path check. No Tailscale configuration changes. |
@@ -151,7 +151,40 @@ Debug:   python run.py --debug
 
 The current [release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest) includes a Windows installer and SHA256 checksum. macOS and Linux users can run from source; see [BUILD.md](BUILD.md) for packaging.
 
-For the load overview, save working SSH credentials in each server card: a password, an SSH key (a path such as `~/.ssh/id_ed25519` or the pasted private key, optionally with a passphrase), or both — then the key is tried first. With a key in the card, password login can be turned off on the server; see [Login with an SSH key](docs/SECURITY_BEST_PRACTICES_ru.md#вход-по-ssh-ключу). Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
+For the load overview, save working SSH credentials in each server card — a password, an SSH key or both (see [SSH login](#ssh-login-password-or-key)). Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
+
+## SSH login: password or key
+
+Every server card has an **SSH access** block. The app logs in with what you save there:
+
+| In the card | How the app logs in |
+|---|---|
+| Password only | With the password, as before |
+| SSH key only | With the key; password login on the server can be turned off |
+| Key and password | Key first; the password is used if the key is refused |
+
+The **SSH key** field takes either:
+
+- a path to a private key on the computer running the app, for example `~/.ssh/id_ed25519` (works on macOS, Linux and Windows);
+- or the private key text itself (`-----BEGIN OPENSSH PRIVATE KEY-----` …).
+
+Ed25519, ECDSA and RSA keys are supported, including keys protected with a passphrase (enter it in **Key passphrase**). The key is checked when the card is saved. If it cannot be read (no such file, unsupported format, wrong passphrase), the card is saved without the key and a warning explains why.
+
+The key and its passphrase are encrypted like passwords. The card shows only the fingerprint (`ssh-ed25519 SHA256:…`) and the path, never the key; the trash button removes it. Everything that connects over SSH uses the key: status and monitoring, the load overview and DERP, security events and brief, monitoring install, service control and reset.
+
+### Switch a server to key-only login
+
+1. On the computer running the app, create a key if you do not have one: `ssh-keygen -t ed25519`.
+2. Copy its public part to the server: `ssh-copy-id -p PORT root@SERVER_IP`.
+3. Check the login without a password: `ssh -o PasswordAuthentication=no -p PORT root@SERVER_IP`.
+4. In the server card set **SSH key** to `~/.ssh/id_ed25519`, save, and check that status and monitoring load.
+5. Only then turn off password login on the server: `PasswordAuthentication no` (for root also `PermitRootLogin prohibit-password`), then reload sshd. Keep the current SSH session open and test the login from a second terminal.
+
+Until the card has a key, the security brief warns that turning off password login would lock the app out of the server.
+
+A key saved as a **path** is read from that file on every connection. Backups contain the path, not the key file: on another computer put the key at the same path, or paste the key text into the card. A pasted key travels inside the encrypted data file.
+
+Details in Russian: [docs/SECURITY_BEST_PRACTICES_ru.md](docs/SECURITY_BEST_PRACTICES_ru.md#вход-по-ssh-ключу).
 
 ## Backup and restore
 
@@ -168,6 +201,8 @@ Servers (with their passwords) and the DNS card (providers, domains, records) ar
 
 The archive holds data, key and PIN together: anyone with it can read every password. Keep it in a password manager or on an encrypted drive, never in chats or git.
 
+SSH keys saved in cards as a file path are not copied into the archive — only the path is. Pasted keys are included, encrypted. See [SSH login](#ssh-login-password-or-key).
+
 **Restore**, depending on the target computer:
 
 - **Fresh install (or full replacement):** close the app, put `SECRET_KEY.env` into the app data folder as `.env`, copy `uploads/`, start the app, then Settings → **Import Data File** → `servers_<date>.enc` → **Import and Attach**.
@@ -182,6 +217,7 @@ Files with DNS data need version 4.6.0 or newer. Step-by-step guide with trouble
 - Default PIN in the template is `1234`. Change it before real use.
 - Keep `.env` (`SECRET_KEY`) and encrypted exports off shared drives and out of git.
 - There is no password recovery. A full export is the backup.
+- Prefer SSH keys for servers: with a key in the card, password login can be turned off on the server without cutting off the app.
 
 ## Docs
 
