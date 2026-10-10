@@ -10,6 +10,7 @@ from ..utils.validators import Validators
 from ..utils.rate_limiter import RateLimiter
 from ..exceptions import ValidationError, AuthenticationError, APIError
 from ..models.server import Server
+from ..services.ssh_auth import connect_kwargs, has_ssh_auth
 
 logger = logging.getLogger(__name__)
 
@@ -416,28 +417,27 @@ def get_server_stats(server_id):
         ssh_user = ssh_creds.get('user', 'root')
         ssh_port = ssh_creds.get('port', 22)  # Получаем SSH порт
         
-        # Проверяем, есть ли уже расшифрованный пароль
-        ssh_password = ssh_creds.get('password_decrypted', '')
+        # Пароль и/или ключ из карточки
+        try:
+            auth = _ssh_auth(ssh_creds, data_manager)
+        except Exception as e:
+            logger.error(f"Failed to decrypt SSH credentials: {str(e)}")
+            auth = {}
         
-        # Если нет, пытаемся расшифровать
-        if not ssh_password and ssh_creds.get('password'):
-            try:
-                ssh_password = data_manager.decrypt_data(ssh_creds['password'])
-            except Exception as e:
-                logger.error(f"Failed to decrypt SSH password: {str(e)}")
-        
-        if not ssh_password:
+        if not has_ssh_auth(auth):
             return jsonify({
-                'error': 'SSH password not available. Please edit server and set SSH credentials.'
+                'error': 'SSH password or key not available. Please edit server and set SSH credentials.'
             }), 400
         
         # Получаем статистику через SSH
         stats = ssh_service.get_server_stats(
             ip=server.get('ip_address', server.get('ip', '')),
             user=ssh_user,
-            password=ssh_password,
+            password=auth['password'],
             port=ssh_port,  # Передаем SSH порт
-            timeout=timeout
+            timeout=timeout,
+            key=auth['key'],
+            key_passphrase=auth['key_passphrase'],
         )
         
         return jsonify({
@@ -674,8 +674,8 @@ def _load_check_snapshot(server_id, derp=False):
             return jsonify(error=_('Сервер не найден или SSH-данные недоступны.')), 404
         if not _is_load_check_server(server):
             return jsonify(error=_('Сервер больше не активен. Обновите список.')), 409
-        if not creds.get('ip') or not creds.get('password'):
-            return jsonify(error=_('Укажите IP и пароль SSH в карточке сервера.')), 400
+        if not creds.get('ip') or not has_ssh_auth(creds):
+            return jsonify(error=_('Укажите IP и пароль или SSH-ключ в карточке сервера.')), 400
         if not load_check_limiter.is_allowed(('derp:' if derp else '') + str(server_id)):
             return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
         stats = ssh_service.get_derp_snapshot(**creds) if derp else ssh_service.get_load_snapshot(**creds)
@@ -693,8 +693,27 @@ def _load_check_snapshot(server_id, derp=False):
         return jsonify(error=_('Сервер не ответил. Проверьте доступность и порт SSH.')), 502
 
 
+def _ssh_auth(ssh_creds, data_manager):
+    """Пароль и ключ входа из карточки, расшифрованные. Ошибку расшифровки пробрасывает.
+
+    Ключ расшифровывается только здесь, перед подключением: в списке серверов и в
+    HTML его открытого текста нет.
+    """
+    def secret(field):
+        value = ssh_creds.get(field + '_decrypted', '')
+        if not value and ssh_creds.get(field):
+            value = data_manager.decrypt_data(ssh_creds[field])
+        return value or ''
+
+    return {
+        'password': secret('password'),
+        'key': secret('private_key'),
+        'key_passphrase': secret('key_passphrase'),
+    }
+
+
 def _get_server_ssh_credentials(server_id, data_manager):
-    """Helper: Получить SSH credentials с расшифровкой пароля"""
+    """Helper: SSH credentials карточки (пароль и/или ключ) с расшифровкой"""
     from flask import current_app
     servers = data_manager.load_servers(current_app.config)
     server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
@@ -703,22 +722,22 @@ def _get_server_ssh_credentials(server_id, data_manager):
         return None, None
     
     ssh_creds = server.get('ssh_credentials', {})
-    password = ssh_creds.get('password_decrypted', '')
+    try:
+        auth = _ssh_auth(ssh_creds, data_manager)
+    except Exception as e:
+        logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
+        return None, None
     
-    # Расшифровываем пароль, если нужно
-    if not password and ssh_creds.get('password'):
-        try:
-            password = data_manager.decrypt_data(ssh_creds['password'])
-        except Exception as e:
-            logger.error(f"Failed to decrypt password for server {server_id}: {e}")
-            return None, None
-    
-    return server, {
+    creds = {
         'ip': server.get('ip_address'),
         'user': ssh_creds.get('user', 'root'),
-        'password': password,
-        'port': ssh_creds.get('port', 22)
+        'password': auth['password'],
+        'port': ssh_creds.get('port', 22),
     }
+    if auth['key']:
+        # Поля ключа — только если он задан: без ключа набор прежний (ip, user, password, port)
+        creds.update(key=auth['key'], key_passphrase=auth['key_passphrase'])
+    return server, creds
 
 @api_bp.route('/monitoring/<server_id>/network-stats', methods=['GET'])
 @require_auth
@@ -752,6 +771,8 @@ def get_network_stats(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         
@@ -799,6 +820,8 @@ def get_firewall_stats(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         
@@ -846,6 +869,8 @@ def get_services_stats(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         
@@ -892,6 +917,8 @@ def get_reticulum_status(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
 
@@ -938,6 +965,8 @@ def get_webpanels(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
 
@@ -985,6 +1014,8 @@ def get_security_events(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         
@@ -1031,6 +1062,8 @@ def get_security_brief(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=40,
             server_name=server.get('name', ''),
         )
@@ -1079,6 +1112,8 @@ def get_metrics_history(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         diagnosis = {}
@@ -1131,6 +1166,8 @@ def check_monitoring_tools(server_id):
             user=creds['user'],
             password=creds['password'],
             port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=30
         )
         
@@ -1175,19 +1212,17 @@ def check_monitoring_installed(server_id):
                 'error': f'Server with id {server_id} not found'
             }), 404
         
-        # Расшифровываем пароль SSH
+        # Пароль и/или ключ SSH из карточки
         ssh_creds = server.get('ssh_credentials', {})
-        password = ssh_creds.get('password_decrypted', '')
-        if not password and ssh_creds.get('password'):
-            try:
-                password = data_manager.decrypt_data(ssh_creds['password'])
-            except Exception as e:
-                logger.error(f"Failed to decrypt password for server {server_id}: {e}")
-                return jsonify({
-                    'success': False,
-                    'error': 'Failed to decrypt server password',
-                    'installed': False
-                })
+        try:
+            auth = _ssh_auth(ssh_creds, data_manager)
+        except Exception as e:
+            logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
+            return jsonify({
+                'success': False,
+                'error': 'Failed to decrypt server password',
+                'installed': False
+            })
         
         # Проверяем наличие скрипта мониторинга на сервере
         logger.info(f"Checking if monitoring is installed on server {server_id}")
@@ -1197,9 +1232,11 @@ def check_monitoring_installed(server_id):
         result = ssh_service.execute_remote_command(
             ip=server.get('ip_address'),
             user=ssh_creds.get('user', 'root'),
-            password=password,
+            password=auth['password'],
             command=check_cmd,
             port=ssh_creds.get('port', 22),
+            key=auth['key'],
+            key_passphrase=auth['key_passphrase'],
             timeout=8,              # Таймаут выполнения команды
             connection_timeout=10   # Быстрый таймаут подключения для проверки (вместо 30)
         )
@@ -1279,20 +1316,17 @@ def install_monitoring(server_id):
             user = ssh_creds.get('user', 'root')
             port = ssh_creds.get('port', 22)
             
-            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
-            password = ssh_creds.get('password_decrypted', '')
+            # Пароль и/или ключ из карточки (как в get_server_stats)
+            try:
+                auth = _ssh_auth(ssh_creds, data_manager)
+            except Exception as e:
+                logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
+                yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                return
+            password = auth['password']
             
-            # Если нет расшифрованного, пытаемся расшифровать
-            if not password and ssh_creds.get('password'):
-                try:
-                    password = data_manager.decrypt_data(ssh_creds['password'])
-                except Exception as e:
-                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
-                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
-                    return
-            
-            if not password:
-                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+            if not has_ssh_auth(auth):
+                yield f"data: {json.dumps({'error': 'Нет ни пароля, ни SSH-ключа. Отредактируйте сервер и укажите данные входа по SSH.', 'status': 'error'})}\n\n"
                 return
             
             # Функция проверки отмены
@@ -1308,8 +1342,9 @@ def install_monitoring(server_id):
             try:
                 check_client = paramiko.SSHClient()
                 check_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                check_client.connect(hostname=ip, username=user, password=password, port=port, timeout=30, 
-                                   banner_timeout=60, auth_timeout=30, look_for_keys=False, allow_agent=False)
+                check_client.connect(hostname=ip, username=user, port=port, timeout=30,
+                                     banner_timeout=60, auth_timeout=30,
+                                     **connect_kwargs(password, auth['key'], auth['key_passphrase']))
                 
                 # Проверяем наличие файла мониторинга
                 _, stdout, _ = check_client.exec_command('test -f /usr/local/bin/monitoring/get-all-stats.sh && echo "exists"', timeout=10)
@@ -1338,7 +1373,10 @@ def install_monitoring(server_id):
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(hostname=ip, username=user, password=password, port=port, timeout=30)
+                # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
+                client.connect(hostname=ip, username=user, port=port, timeout=30,
+                               **connect_kwargs(password, auth['key'], auth['key_passphrase'],
+                                                use_local_keys=True))
                 
                 yield f"data: {json.dumps({'step': 1, 'total': 7, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
                 if check_cancelled():
@@ -1511,7 +1549,10 @@ jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USA
                 
                 # Проверяем только ВЫБРАННЫЕ утилиты (ufw мог быть снят в чеклисте —
                 # тогда его отсутствие не ошибка). Ключ net-tools в детекторе — netstat.
-                tools_status = ssh_service.check_required_tools(ip=ip, user=user, password=password, port=port, timeout=30)
+                tools_status = ssh_service.check_required_tools(
+                    ip=ip, user=user, password=password, port=port, timeout=30,
+                    key=auth['key'], key_passphrase=auth['key_passphrase'],
+                )
                 tools_map = tools_status.get('tools', {})
                 key_map = {'vnstat': 'vnstat', 'jq': 'jq', 'net-tools': 'netstat', 'ufw': 'ufw'}
                 missing_selected = [t for t in selected_tools
@@ -1578,20 +1619,17 @@ def uninstall_monitoring(server_id):
             user = ssh_creds.get('user', 'root')
             port = ssh_creds.get('port', 22)
             
-            # Расшифровываем пароль (используем тот же метод, что и в get_server_stats)
-            password = ssh_creds.get('password_decrypted', '')
+            # Пароль и/или ключ из карточки (как в get_server_stats)
+            try:
+                auth = _ssh_auth(ssh_creds, data_manager)
+            except Exception as e:
+                logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
+                yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
+                return
+            password = auth['password']
             
-            # Если нет расшифрованного, пытаемся расшифровать
-            if not password and ssh_creds.get('password'):
-                try:
-                    password = data_manager.decrypt_data(ssh_creds['password'])
-                except Exception as e:
-                    logger.error(f"Failed to decrypt password for server {server_id}: {e}")
-                    yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
-                    return
-            
-            if not password:
-                yield f"data: {json.dumps({'error': 'SSH пароль недоступен. Пожалуйста, отредактируйте сервер и установите SSH credentials.', 'status': 'error'})}\n\n"
+            if not has_ssh_auth(auth):
+                yield f"data: {json.dumps({'error': 'Нет ни пароля, ни SSH-ключа. Отредактируйте сервер и укажите данные входа по SSH.', 'status': 'error'})}\n\n"
                 return
             
             # Шаг 1: Подключение
@@ -1603,7 +1641,10 @@ def uninstall_monitoring(server_id):
             try:
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                client.connect(hostname=ip, username=user, password=password, port=port, timeout=30)
+                # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
+                client.connect(hostname=ip, username=user, port=port, timeout=30,
+                               **connect_kwargs(password, auth['key'], auth['key_passphrase'],
+                                                use_local_keys=True))
                 
                 yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
 

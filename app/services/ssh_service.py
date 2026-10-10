@@ -9,8 +9,15 @@ from paramiko.ssh_exception import AuthenticationException, SSHException
 from ..exceptions import AuthenticationError, SSHConnectionError
 from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
+from .ssh_auth import connect_kwargs
 
 logger = logging.getLogger(__name__)
+
+
+def _key_kwargs(key: Optional[str], key_passphrase: Optional[str]) -> Dict:
+    """Поля ключа для вызова get_connection_pooled — только если ключ задан:
+    без ключа вызов остаётся прежним (ip, port, user, password)."""
+    return {"key": key, "key_passphrase": key_passphrase} if key else {}
 
 
 class SSHService:
@@ -393,12 +400,18 @@ class SSHService:
         username: str,
         password: Optional[str] = None,
         connection_timeout: int = 30,
+        key: Optional[str] = None,
+        key_passphrase: Optional[str] = None,
     ):
-        """Получить или создать SSH подключение (с переиспользованием)"""
-        key = f"{hostname}:{port}:{username}"
+        """Получить или создать SSH подключение (с переиспользованием).
+
+        Вход — паролем и/или ключом из карточки (ssh_auth.connect_kwargs).
+        """
+        # pool_key, а не key: key — это SSH-ключ из карточки
+        pool_key = f"{hostname}:{port}:{username}"
 
         with cls._pool_lock:
-            connection_lock = cls._connection_locks.setdefault(key, threading.Lock())
+            connection_lock = cls._connection_locks.setdefault(pool_key, threading.Lock())
 
         # A slow host must not block connections to every other server.
         if not connection_lock.acquire(timeout=connection_timeout):
@@ -406,7 +419,7 @@ class SSHService:
         try:
             # Проверяем есть ли живое подключение
             with cls._pool_lock:
-                conn = cls._connection_pool.get(key)
+                conn = cls._connection_pool.get(pool_key)
             if conn is not None:
                 try:
                     if conn.get_transport() and conn.get_transport().is_active():
@@ -418,7 +431,7 @@ class SSHService:
                 except Exception as e:
                     logger.warning(f"Connection check failed: {e}")
                 with cls._pool_lock:
-                    cls._connection_pool.pop(key, None)
+                    cls._connection_pool.pop(pool_key, None)
                 conn.close()
 
             # Создаем новое подключение
@@ -437,16 +450,15 @@ class SSHService:
                     hostname,
                     port=port,
                     username=username,
-                    password=password,
                     timeout=connection_timeout,  # Настраиваемый таймаут
                     banner_timeout=banner_timeout,  # Динамический на основе connection_timeout
                     auth_timeout=auth_timeout,  # Динамический на основе connection_timeout
-                    look_for_keys=False,  # Не искать SSH ключи (быстрее)
-                    allow_agent=False,  # Не использовать SSH agent
+                    # Пароль и/или ключ из карточки; без ~/.ssh и ssh-agent (быстрее)
+                    **connect_kwargs(password, key, key_passphrase),
                 )
 
                 with cls._pool_lock:
-                    cls._connection_pool[key] = ssh
+                    cls._connection_pool[pool_key] = ssh
                 logger.info(f"✅ New connection created and pooled: {hostname}")
                 return ssh
 
@@ -457,18 +469,28 @@ class SSHService:
         finally:
             connection_lock.release()
 
-    def get_load_snapshot(self, ip: str, user: str, password: str, port: int = 22) -> Dict:
+    def get_load_snapshot(
+        self, ip: str, user: str, password: Optional[str], port: int = 22,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
+    ) -> Dict:
         """Collect only the overview metrics, with bounded SSH/command timeouts."""
-        client = self.get_connection_pooled(ip, port, user, password, connection_timeout=5)
+        client = self.get_connection_pooled(
+            ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
+        )
         _, stdout, _ = client.exec_command(SNAPSHOT_COMMAND, timeout=8)
         try:
             return parse_snapshot(stdout.read().decode("utf-8", errors="replace"))
         finally:
             stdout.channel.close()
 
-    def get_derp_snapshot(self, ip: str, user: str, password: str, port: int = 22) -> Dict:
+    def get_derp_snapshot(
+        self, ip: str, user: str, password: Optional[str], port: int = 22,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
+    ) -> Dict:
         from .remote_derp import probe_command, parse_remote_derp
-        client = self.get_connection_pooled(ip, port, user, password, connection_timeout=5)
+        client = self.get_connection_pooled(
+            ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
+        )
         _, stdout, _ = client.exec_command(probe_command(), timeout=14)
         try:
             return parse_remote_derp(stdout.read(65537).decode('utf-8', errors='replace'))
@@ -497,6 +519,8 @@ class SSHService:
         key_filename: Optional[str] = None,
         port: int = 22,
         timeout: int = 30,
+        key: Optional[str] = None,
+        key_passphrase: Optional[str] = None,
     ) -> None:  # Увеличен с 10 до 30
         """Установка SSH соединения"""
         try:
@@ -504,18 +528,20 @@ class SSHService:
             self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
             logger.info(f"Connecting to {hostname}:{port} as {username}")
+            auth = connect_kwargs(password, key, key_passphrase)
+            if key_filename and key_passphrase and not key:
+                auth["passphrase"] = key_passphrase
 
             self.client.connect(
                 hostname=hostname,
                 username=username,
-                password=password,
-                key_filename=key_filename,
+                key_filename=key_filename,  # путь к ключу: читает сам paramiko, как раньше
                 port=port,
                 timeout=timeout,
                 banner_timeout=60,  # Время ожидания SSH banner
                 auth_timeout=30,  # Время на аутентификацию
-                look_for_keys=False,  # Не искать SSH ключи (быстрее)
-                allow_agent=False,  # Не использовать SSH agent
+                # password, ключ из карточки (key: путь или текст); без ~/.ssh и ssh-agent
+                **auth,
             )
 
             logger.info(f"Successfully connected to {hostname}")
@@ -571,11 +597,13 @@ class SSHService:
         self,
         ip: str,
         user: str,
-        password: str,
+        password: Optional[str],
         command: str,
         port: int = 22,
         timeout: int = 30,
         connection_timeout: int = None,
+        key: Optional[str] = None,
+        key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Выполнение команды на удаленном сервере (без предварительного подключения)"""
         try:
@@ -585,7 +613,7 @@ class SSHService:
 
             # Используем connection pooling с настраиваемым таймаутом
             client = self.get_connection_pooled(
-                ip, port, user, password, connection_timeout=connection_timeout
+                ip, port, user, password, connection_timeout=connection_timeout, **_key_kwargs(key, key_passphrase)
             )
 
             logger.info(f"Executing remote command on {ip}: {command}")
@@ -666,14 +694,15 @@ class SSHService:
             raise SSHConnectionError(f"Directory listing failed: {str(e)}")
 
     def get_server_stats(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Получение статистики сервера через SSH"""
         stats = {}
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             # Uptime
             try:
@@ -905,14 +934,15 @@ class SSHService:
         return self.client is not None and self.client.get_transport() is not None
 
     def get_network_stats(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Получение статистики сетевого трафика (суммарно со всех интерфейсов)"""
         import time
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             # Получаем список всех активных сетевых интерфейсов (кроме lo - loopback)
             # Включаем физические (eth0, ens3) и виртуальные VPN-интерфейсы (tun0, wg0, tap0)
@@ -1063,14 +1093,15 @@ class SSHService:
             }
 
     def get_firewall_stats(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Получение статистики брандмауэра и listening ports"""
         import datetime
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             listening_ports = self._get_listening_ports(client)
             open_ports = ", ".join(listening_ports) if listening_ports else "none"
@@ -1194,12 +1225,13 @@ class SSHService:
             }
 
     def get_services_stats(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> List[Dict]:
         """Получение статистики системных сервисов"""
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
             services = []
             for descriptor in self._service_catalog:
                 service = self._probe_service(client, descriptor)
@@ -1220,7 +1252,8 @@ class SSHService:
             ]
 
     def get_reticulum_status(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Статус HA-стека TelegramOnly и Reticulum-моста.
 
@@ -1229,7 +1262,7 @@ class SSHService:
         печатается в лог при старте моста (последняя строка с 'destination').
         """
         try:
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             def _active(unit: str) -> bool:
                 return (
@@ -1281,7 +1314,8 @@ class SSHService:
             return {"installed": False, "error": str(e)}
 
     def get_webpanels_status(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Веб-панели стека (Dockhand, Headplane) — слушают localhost на VPS.
 
@@ -1293,7 +1327,7 @@ class SSHService:
             {"name": "headplane", "label": "Headplane", "local_port": 3000},
         ]
         try:
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             def _listening(p: int) -> bool:
                 return bool(
@@ -1323,14 +1357,15 @@ class SSHService:
             return {"panels": [], "error": str(e)}
 
     def get_security_events(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Получение событий безопасности"""
         import time
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             ssh_failures_output = self._read_command_output(
                 client,
@@ -1511,15 +1546,17 @@ class SSHService:
         self,
         ip: str,
         user: str,
-        password: str,
+        password: Optional[str],
         port: int = 22,
         timeout: int = 30,
         server_name: str = "",
+        key: Optional[str] = None,
+        key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Разбор ситуации и промпт для LLM. Секреты из журнала вырезаются."""
-        facts = self.get_security_events(ip, user, password, port, timeout)
+        facts = self.get_security_events(ip, user, password, port, timeout, **_key_kwargs(key, key_passphrase))
         try:
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
             failed_raw = self._read_command_output(
                 client,
                 "systemctl --failed --no-legend --plain --no-pager 2>/dev/null | awk '{print $1}' | head -15",
@@ -1567,13 +1604,21 @@ class SSHService:
             facts.setdefault("journal_samples", [])
             facts.setdefault("sshd", {})
             facts.setdefault("fail2ban_installed", None)
-        return self.build_security_brief(facts, server_name=server_name, server_ip=ip)
+        return self.build_security_brief(
+            facts, server_name=server_name, server_ip=ip,
+            app_uses_key=bool(key), app_user=user,
+        )
 
     @staticmethod
     def build_security_brief(
-        facts: Dict, server_name: str = "", server_ip: str = ""
+        facts: Dict, server_name: str = "", server_ip: str = "",
+        app_uses_key: bool = False, app_user: str = "",
     ) -> Dict:
-        """Текст разбора и промпт. Только защита этого хоста, без шагов атаки."""
+        """Текст разбора и промпт. Только защита этого хоста, без шагов атаки.
+
+        app_uses_key / app_user — как само приложение входит на этот сервер: совет
+        выключить вход по паролю не должен отрезать приложение от сервера.
+        """
         ssh_failures = int(facts.get("ssh_failures_24h") or 0)
         top_ips = facts.get("top_failed_ips") or []
         failed_units = facts.get("failed_units") or []
@@ -1625,13 +1670,22 @@ class SSHService:
                     "Fail2ban не найден. Для такого числа попыток его стоит поставить на jail sshd, а не банить адреса вручную."
                 )
         if password_auth == "yes":
-            actions.append(
-                "sshd принимает пароль. После входа по ключу выключить PasswordAuthentication."
-            )
+            if app_uses_key:
+                actions.append(
+                    "sshd принимает пароль. Приложение входит по SSH-ключу из карточки — "
+                    "PasswordAuthentication можно выключить."
+                )
+            else:
+                actions.append(
+                    "sshd принимает пароль. PasswordAuthentication выключать только после того, "
+                    "как в карточке сервера задан SSH-ключ и вход по нему проверен: приложение "
+                    "сейчас входит паролем и без ключа потеряет доступ к серверу."
+                )
         if root_login == "yes":
-            actions.append(
-                "Root по паролю разрешён. Оставить вход root только по ключу или запретить его."
-            )
+            advice = "Root по паролю разрешён. Оставить вход root только по ключу или запретить его."
+            if app_user == "root" and not app_uses_key:
+                advice += " Приложение входит как root по паролю: сначала задайте SSH-ключ в карточке."
+            actions.append(advice)
         if failed_units:
             actions.append(
                 "Один failed unit — отдельный сбой службы. Имя ниже; смотреть systemctl status и журнал этой службы, не перезапускать всё подряд."
@@ -1715,14 +1769,15 @@ class SSHService:
         }
 
     def get_metrics_history(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> List[Dict]:
         """Получение истории метрик CPU/Memory"""
         import time
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             history_file = "/var/tmp/metrics_history.json"
             max_points = 60
@@ -1834,13 +1889,14 @@ class SSHService:
         }
 
     def check_required_tools(
-        self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
+        self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
         """Проверка наличия необходимых утилит для мониторинга"""
 
         try:
             # Используем connection pooling
-            client = self.get_connection_pooled(ip, port, user, password)
+            client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
             tools = {
                 "vnstat": {

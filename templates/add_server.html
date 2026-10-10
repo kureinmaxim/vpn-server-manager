@@ -117,7 +117,7 @@
                     <div class="col-md-6">
                         {{ password_input(
                             'ssh_password', 'ssh_password', _('Пароль входа по SSH'),
-                            help_text=_('Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его.'),
+                            help_text=_('Этим паролем приложение входит как пользователь выше. С SSH-ключом ниже пароль можно не указывать.'),
                             placeholder=_('Вставьте пароль входа по SSH')
                         ) }}
                     </div>
@@ -136,6 +136,22 @@
                                 {{ _('На сервере разрешён вход root по SSH') }}
                             </label>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="ssh_key" class="form-label">{{ _('SSH-ключ (необязательно)') }}</label>
+                        <textarea class="form-control font-monospace" id="ssh_key" name="ssh_key" rows="3"
+                                  spellcheck="false" autocomplete="off" placeholder="~/.ssh/id_ed25519"
+                                  aria-describedby="ssh_keyHelp"></textarea>
+                        <div id="ssh_keyHelp" class="form-text">{{ _('Путь к приватному ключу на этом компьютере или его текст (-----BEGIN … PRIVATE KEY-----). Если заданы и ключ, и пароль, сначала пробуется ключ. Ключ хранится зашифрованным и в карточке не показывается.') }}</div>
+                    </div>
+                    <div class="col-md-4">
+                        {{ password_input(
+                            'ssh_key_passphrase', 'ssh_key_passphrase', _('Фраза-пароль ключа'),
+                            help_text=_('Только если ключ ею защищён.'),
+                            placeholder=_('Необязательно')
+                        ) }}
                     </div>
                 </div>
 

@@ -140,7 +140,7 @@
                             {{ current_secret_row(server.ssh_credentials.password_decrypted, _('Текущий пароль входа по SSH'), 'clear_ssh_password') }}
                             {{ password_input(
                                 'ssh_password', 'ssh_password', _('Новый пароль входа по SSH'),
-                                help_text=_('Этим паролем приложение входит как пользователь выше. Статус и мониторинг используют только его. Оставьте пустым, чтобы не менять.'),
+                                help_text=_('Этим паролем приложение входит как пользователь выше. С SSH-ключом пароль можно не указывать. Оставьте пустым, чтобы не менять.'),
                                 is_set=server.ssh_credentials.password_decrypted,
                                 placeholder=_('Вставьте пароль входа по SSH'),
                                 compact=True
@@ -164,6 +164,35 @@
                                     {{ _('На сервере разрешён вход root по SSH') }}
                                 </label>
                             </div>
+                        </div>
+                        <div class="col-12">
+                            {% if server.ssh_credentials.key_hint %}
+                            <div class="current-secret mb-2">
+                                <div class="form-label text-muted mb-1">{{ _('Текущий SSH-ключ') }}</div>
+                                <div class="d-flex align-items-center gap-1 min-w-0">
+                                    <code class="flex-grow-1 min-w-0 text-truncate" title="{{ server.ssh_credentials.key_hint }}">{{ server.ssh_credentials.key_hint }}{% if server.ssh_credentials.key_path %} · {{ server.ssh_credentials.key_path }}{% endif %}</code>
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm flex-shrink-0 js-clear-secret-btn"
+                                            onclick="markSecretCleared(this)"
+                                            title="{{ _('Удалить сохранённый SSH-ключ') }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    <input type="hidden" name="clear_ssh_key" value="" class="js-clear-secret">
+                                </div>
+                                <div class="form-text text-warning d-none js-clear-note">{{ _('Будет удалён при сохранении. Нажмите корзину ещё раз, чтобы отменить.') }}</div>
+                            </div>
+                            {% endif %}
+                            <label for="ssh_key" class="form-label">{{ _('Новый SSH-ключ') }}</label>
+                            <textarea class="form-control form-control-sm font-monospace mb-1" id="ssh_key" name="ssh_key" rows="3"
+                                      spellcheck="false" autocomplete="off" placeholder="~/.ssh/id_ed25519"
+                                      aria-describedby="ssh_keyHelp"></textarea>
+                            <div id="ssh_keyHelp" class="form-text mb-2">{{ _('Путь к приватному ключу на этом компьютере или его текст. Если заданы и ключ, и пароль, сначала пробуется ключ. Оставьте пустым, чтобы не менять.') }}</div>
+                            {{ password_input(
+                                'ssh_key_passphrase', 'ssh_key_passphrase', _('Фраза-пароль ключа'),
+                                help_text=_('Только если ключ ею защищён. Указывается вместе с новым ключом.'),
+                                placeholder=_('Необязательно'),
+                                compact=True
+                            ) }}
                         </div>
                     </div>
                 </section>

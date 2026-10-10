@@ -12,6 +12,7 @@ from flask import Blueprint, current_app, jsonify, render_template, request, ses
 
 from ..services import registry
 from ..services.reset_payload import SCRIPT_SOURCE
+from ..services.ssh_auth import connect_kwargs
 from ..utils.decorators import require_auth, require_pin, csrf_protect
 from .api import _get_server_ssh_credentials
 
@@ -44,9 +45,11 @@ def remote(creds, args, *, source=SCRIPT_SOURCE):
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.RejectPolicy())
     try:
+        # Пароль и/или ключ из карточки; как и раньше, также ~/.ssh и ssh-agent.
         client.connect(hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
-                       password=creds["password"] or None, timeout=20,
-                       auth_timeout=20, banner_timeout=20)
+                       timeout=20, auth_timeout=20, banner_timeout=20,
+                       **connect_kwargs(creds.get("password"), creds.get("key"),
+                                        creds.get("key_passphrase"), use_local_keys=True))
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
         stdin, stdout, stderr = client.exec_command(shlex.join(command), timeout=1800)
         stdin.write(source)
