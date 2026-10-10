@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.2] - 2026-10-10
+
+### Fixed
+- Disk usage, Cleanup archives, Reset and Service control failed with the generic SSH message on servers whose login prints text (a banner or output from `~/.bashrc`/`~/.profile`): the text was read together with the script's JSON answer. The command now prints a marker first and only the output after it is parsed; text printed at login is ignored.
+- The remaining failures after login are named too: an answer in an unexpected format (with the `ssh … true` check), a `python3` error (version older than 3.7), no data, or an SSH channel closed by the server. Operations that change the server still show "answer lost" for anything after the command may have started.
+
 ## [4.12.1] - 2026-10-10
 
 ### Fixed

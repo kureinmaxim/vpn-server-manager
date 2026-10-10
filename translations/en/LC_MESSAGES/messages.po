@@ -8593,3 +8593,15 @@ msgstr "python3 is missing on the server and is required for this operation: apt
 
 msgid "sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля."
 msgstr "sudo asks for a password. Connect as root or allow this user passwordless sudo."
+
+msgid "python3 на сервере завершился с ошибкой — возможно, версия старше 3.7. Проверьте: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+msgstr "python3 on the server exited with an error — it may be older than 3.7. Check: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+
+msgid "Сервер ответил не в ожидаемом формате. Проверьте, что вход по SSH ничего не печатает и не запускает программ: ssh -p %(port)s %(user)s@%(ip)s true — не должна ничего выводить (см. ~/.bashrc и ~/.profile на сервере)."
+msgstr "The server's answer has an unexpected format. Make sure SSH login prints nothing and starts no programs: ssh -p %(port)s %(user)s@%(ip)s true must print nothing (see ~/.bashrc and ~/.profile on the server)."
+
+msgid "Сервер не вернул данных. Проверьте вручную: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+msgstr "The server returned no data. Check manually: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+
+msgid "Подключение есть, но выполнить команду не удалось: сервер закрыл канал SSH или не ответил вовремя."
+msgstr "Connected, but the command could not be run: the server closed the SSH channel or did not answer in time."
