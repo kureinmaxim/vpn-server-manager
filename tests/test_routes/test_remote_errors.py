@@ -143,3 +143,38 @@ def test_new_messages(app):
         assert "python3 --version" in describe_failure(RemoteOutputError("no_output"), CREDS)
         assert describe_failure(RemoteOutputError("exec_failed"), CREDS)
         assert describe_failure(RemoteOutputError("bad_output"), CREDS, may_have_run=True) is None
+
+
+def _ed25519_public_line():
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import ed25519
+    return ed25519.Ed25519PrivateKey.generate().public_key().public_bytes(
+        serialization.Encoding.OpenSSH, serialization.PublicFormat.OpenSSH
+    ).decode()
+
+
+def test_unreadable_known_hosts_lines_do_not_hide_the_server_key(tmp_path, monkeypatch):
+    public = _ed25519_public_line()
+    (tmp_path / ".ssh").mkdir()
+    (tmp_path / ".ssh" / "known_hosts").write_text(
+        "@cert-authority *.example.com " + public + "\n"
+        "broken.example.com ssh-ed25519 !!!not-base64!!!\n"
+        "[192.0.2.1]:22542 " + public + "\n"
+    )
+    monkeypatch.setenv("HOME", str(tmp_path))
+    client = paramiko.SSHClient()
+    routes._load_known_hosts(client)
+    name = "[192.0.2.1]:22542"
+    found = client._system_host_keys.lookup(name) or client.get_host_keys().lookup(name)
+    assert found is not None and "ssh-ed25519" in found
+    # Ключ другого сервера по-прежнему неизвестен — проверка остаётся строгой.
+    assert not (client._system_host_keys.lookup("[192.0.2.9]:22") or client.get_host_keys().lookup("[192.0.2.9]:22"))
+
+
+def test_unclassified_failure_names_only_the_exception_class(reset_client, monkeypatch):  # noqa: F811
+    monkeypatch.setattr(routes, "remote", Mock(side_effect=KeyError("secret-detail")))
+    response = reset_client.post("/api/servers/one/disk-usage", json={}, headers={"X-CSRF-Token": "test-csrf"})
+    assert response.status_code == 502
+    error = response.get_json()["error"]
+    assert error.endswith("(KeyError)")
+    assert "secret-detail" not in error
