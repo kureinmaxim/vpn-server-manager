@@ -407,10 +407,11 @@ class SSHService:
 
         Вход — паролем и/или ключом из карточки (ssh_auth.connect_kwargs).
         """
-        key = f"{hostname}:{port}:{username}"
+        # pool_key, а не key: key — это SSH-ключ из карточки
+        pool_key = f"{hostname}:{port}:{username}"
 
         with cls._pool_lock:
-            connection_lock = cls._connection_locks.setdefault(key, threading.Lock())
+            connection_lock = cls._connection_locks.setdefault(pool_key, threading.Lock())
 
         # A slow host must not block connections to every other server.
         if not connection_lock.acquire(timeout=connection_timeout):
@@ -418,7 +419,7 @@ class SSHService:
         try:
             # Проверяем есть ли живое подключение
             with cls._pool_lock:
-                conn = cls._connection_pool.get(key)
+                conn = cls._connection_pool.get(pool_key)
             if conn is not None:
                 try:
                     if conn.get_transport() and conn.get_transport().is_active():
@@ -430,7 +431,7 @@ class SSHService:
                 except Exception as e:
                     logger.warning(f"Connection check failed: {e}")
                 with cls._pool_lock:
-                    cls._connection_pool.pop(key, None)
+                    cls._connection_pool.pop(pool_key, None)
                 conn.close()
 
             # Создаем новое подключение
@@ -457,7 +458,7 @@ class SSHService:
                 )
 
                 with cls._pool_lock:
-                    cls._connection_pool[key] = ssh
+                    cls._connection_pool[pool_key] = ssh
                 logger.info(f"✅ New connection created and pooled: {hostname}")
                 return ssh
 
