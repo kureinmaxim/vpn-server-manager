@@ -8527,3 +8527,51 @@ msgstr "Direct address in status: {address}"
 
 msgid "Путь не подтверждён: возможно, нет трафика."
 msgstr "Path unconfirmed: the peer may be idle."
+
+msgid "Укажите IP и пароль или SSH-ключ в карточке сервера."
+msgstr "Set the IP and an SSH password or key in the server card."
+
+msgid "SSH-ключ не сохранён: файл не найден, формат не поддерживается или неверная фраза-пароль."
+msgstr "SSH key not saved: the file was not found, the format is not supported, or the passphrase is wrong."
+
+msgid "Этим паролем приложение входит как пользователь выше. С SSH-ключом ниже пароль можно не указывать."
+msgstr "The app logs in as the user above with this password. With an SSH key below, the password is optional."
+
+msgid "SSH-ключ (необязательно)"
+msgstr "SSH key (optional)"
+
+msgid "Путь к приватному ключу на этом компьютере или его текст (-----BEGIN … PRIVATE KEY-----). Если заданы и ключ, и пароль, сначала пробуется ключ. Ключ хранится зашифрованным и в карточке не показывается."
+msgstr "Path to the private key on this computer, or the key text (-----BEGIN … PRIVATE KEY-----). If both a key and a password are set, the key is tried first. The key is stored encrypted and never shown in the card."
+
+msgid "Фраза-пароль ключа"
+msgstr "Key passphrase"
+
+msgid "Только если ключ ею защищён."
+msgstr "Only if the key is protected by one."
+
+msgid "Необязательно"
+msgstr "Optional"
+
+msgid "Этим паролем приложение входит как пользователь выше. С SSH-ключом пароль можно не указывать. Оставьте пустым, чтобы не менять."
+msgstr "The app logs in as the user above with this password. With an SSH key, the password is optional. Leave empty to keep it."
+
+msgid "Текущий SSH-ключ"
+msgstr "Current SSH key"
+
+msgid "Удалить сохранённый SSH-ключ"
+msgstr "Delete the saved SSH key"
+
+msgid "Будет удалён при сохранении. Нажмите корзину ещё раз, чтобы отменить."
+msgstr "Will be deleted on save. Click the trash icon again to cancel."
+
+msgid "Новый SSH-ключ"
+msgstr "New SSH key"
+
+msgid "Путь к приватному ключу на этом компьютере или его текст. Если заданы и ключ, и пароль, сначала пробуется ключ. Оставьте пустым, чтобы не менять."
+msgstr "Path to the private key on this computer, or the key text. If both a key and a password are set, the key is tried first. Leave empty to keep it."
+
+msgid "Только если ключ ею защищён. Указывается вместе с новым ключом."
+msgstr "Only if the key is protected by one. Enter it together with a new key."
+
+msgid "SSH-ключ"
+msgstr "SSH key"
