@@ -1,4 +1,4 @@
-# VPN Server Manager v4.12.0
+# VPN Server Manager v4.12.1
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -181,6 +181,8 @@ The key and its passphrase are encrypted like passwords. The card shows only the
 5. Only then turn off password login on the server: `PasswordAuthentication no` (for root also `PermitRootLogin prohibit-password`), then reload sshd. Keep the current SSH session open and test the login from a second terminal.
 
 Until the card has a key, the security brief warns that turning off password login would lock the app out of the server.
+
+**Known host key.** Monitoring and the load overview accept the server's host key on first contact. Operations that change or inspect the server more deeply — **Reset**, **Service control**, **Disk usage** and **Cleanup archives** — require the key to be in `~/.ssh/known_hosts` of the user running the app, so a replaced server cannot receive commands. Connect once from a terminal on the same computer (`ssh -p PORT root@SERVER_IP`) and accept the key. If one of these pages fails, it says why: unknown or changed host key, failed login, no answer, missing `python3` or `sudo` asking for a password.
 
 A key saved as a **path** is read from that file on every connection. Backups contain the path, not the key file: on another computer put the key at the same path, or paste the key text into the card. A pasted key travels inside the encrypted data file.
 

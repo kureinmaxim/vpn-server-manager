@@ -2,6 +2,15 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.1] - 2026-10-10
+
+### Fixed
+- Disk usage, Cleanup archives, Reset and Service control showed only "Check SSH, known_hosts and root/sudo -n" on any failure. They now name the cause and the fix: the server key is not in `~/.ssh/known_hosts` (with the exact `ssh -p … user@ip` command to accept it), the key changed (with `ssh-keygen -R`), login failed, the server did not answer, `python3` is missing, or `sudo` asks for a password. Operations that change the server report only causes known to happen before any command ran; otherwise the previous "answer lost" text stays. Exception texts and server stderr are still never shown; the log records only the cause code.
+- These operations now log in exactly like monitoring: with the password and/or key from the card. `~/.ssh` keys and ssh-agent are tried only when the card has neither, so agent keys no longer use up `MaxAuthTries` before the password.
+
+### Documentation
+- README (SSH login) and `docs/SECURITY_BEST_PRACTICES_ru.md`: these pages require the server key in `~/.ssh/known_hosts`; how to add it.
+
 ## [4.12.0] - 2026-10-10
 
 ### Added
