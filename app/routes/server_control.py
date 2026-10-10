@@ -7,7 +7,7 @@ import re
 from flask import Blueprint, jsonify, render_template, request, session
 from flask_babel import gettext as _
 
-from .reset import target, identity, remote, _guard, _locks
+from .reset import target, identity, remote, _guard, _locks, describe_failure
 from ..services.server_control_payload import SCRIPT_SOURCE
 from ..services.server_control_remote import CATALOG, ACTIONS
 from ..services.protocol_inspection import PROTOCOL_FILES
@@ -46,8 +46,10 @@ def invoke(creds, body):
     return remote(creds, [json.dumps(body, separators=(",", ":"))], source=SCRIPT_SOURCE)
 
 
-def remote_error():
-    return jsonify(error=_("Не удалось выполнить операцию. Проверьте SSH, known_hosts и root/sudo -n. После потери ответа обновите состояние перед повтором.")), 502
+def remote_error(exc=None, creds=None, *, may_have_run=False):
+    """Причина сбоя SSH, если она известна (reset.describe_failure), иначе общий текст."""
+    message = describe_failure(exc, creds, may_have_run=may_have_run) if exc is not None and creds else None
+    return jsonify(error=message or _("Не удалось выполнить операцию. Проверьте SSH, known_hosts и root/sudo -n. После потери ответа обновите состояние перед повтором.")), 502
 
 
 def localize_inventory(result):
@@ -82,8 +84,8 @@ def discover(server_id):
         if "components" not in result:
             return remote_error()
         return jsonify(localize_inventory(result))
-    except Exception:
-        return remote_error()
+    except Exception as exc:
+        return remote_error(exc, creds)
 
 
 @control_bp.route("/api/servers/<server_id>/control/protocols", methods=["POST"])
@@ -97,8 +99,8 @@ def protocols(server_id):
         if not isinstance(result.get("protocols"), list):
             return remote_error()
         return jsonify(result)
-    except Exception:
-        return remote_error()
+    except Exception as exc:
+        return remote_error(exc, creds)
 
 
 @control_bp.route("/api/servers/<server_id>/control/clients/<operation>", methods=["POST"])
@@ -127,8 +129,8 @@ def clients(server_id, operation):
         if expected not in result:
             return jsonify(error=_("Конфигурация изменилась или профиль не поддерживается. Прочитайте настройки заново.")), 409
         return jsonify(result)
-    except Exception:
-        return remote_error()
+    except Exception as exc:
+        return remote_error(exc, creds)
 
 
 @control_bp.route("/api/servers/<server_id>/control/plan", methods=["POST"])
@@ -158,8 +160,8 @@ def create_plan(server_id):
         plan = invoke(creds, dict(command, operation="plan"))
         if not isinstance(plan.get("plan_hash"), str) or not isinstance(plan.get("hostname"), str):
             return jsonify(error=mutation_error(plan.get('error'))), 409
-    except Exception:
-        return remote_error()
+    except Exception as exc:
+        return remote_error(exc, creds)
     owner = session.setdefault("control_session", secrets.token_urlsafe(32))
     ticket = secrets.token_urlsafe(32)
     with _guard:
@@ -198,7 +200,7 @@ def apply_plan(server_id):
         if "inventory" in result:
             localize_inventory(result["inventory"])
         return jsonify(result), (200 if result.get("success") else 409)
-    except Exception:
-        return remote_error()
+    except Exception as exc:
+        return remote_error(exc, creds, may_have_run=True)
     finally:
         lock.release()
