@@ -1,4 +1,4 @@
-# VPN Server Manager v4.11.3
+# VPN Server Manager v4.12.0
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -151,7 +151,7 @@ Debug:   python run.py --debug
 
 The current [release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest) includes a Windows installer and SHA256 checksum. macOS and Linux users can run from source; see [BUILD.md](BUILD.md) for packaging.
 
-For the load overview, save working SSH credentials in each server card. Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
+For the load overview, save working SSH credentials in each server card: a password, an SSH key (a path such as `~/.ssh/id_ed25519` or the pasted private key, optionally with a passphrase), or both — then the key is tried first. With a key in the card, password login can be turned off on the server; see [Login with an SSH key](docs/SECURITY_BEST_PRACTICES_ru.md#вход-по-ssh-ключу). Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
 
 ## Backup and restore
 

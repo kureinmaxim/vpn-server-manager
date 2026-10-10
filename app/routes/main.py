@@ -11,7 +11,8 @@ import signal
 from ..services import registry, dns_registry
 from ..services.data_manager_service import DataManagerService
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
-from ..utils.credentials import sanitize_secret
+from ..utils.credentials import sanitize_secret, sanitize_private_key
+from ..services.ssh_auth import SshKeyError, fingerprint, is_key_text, load_private_key
 from ..utils.icons import apply_icon_from_form
 from ..exceptions import ValidationError, AuthenticationError, APIError
 from ..utils.validators import Validators
@@ -99,6 +100,35 @@ def _apply_fresh_geolocation(server):
         server['geolocation'] = {'city': '', 'country': '', 'region': '', 'ip': current_ip}
         return True
     return False
+
+
+SSH_KEY_FIELDS = ('private_key', 'key_passphrase', 'key_hint', 'key_path')
+
+
+def _apply_ssh_key(ssh, form, data_manager):
+    """SSH-ключ из формы карточки: путь к файлу на этой машине или текст ключа.
+
+    Ключ проверяется до записи (файл есть, формат поддерживается, фраза-пароль
+    верна) и хранится зашифрованным, как пароль. Рядом — отпечаток и путь для
+    показа в карточке; сам ключ в HTML не выводится. Пустое поле ничего не
+    меняет, корзина (clear_ssh_key=1) удаляет ключ. Возвращает текст ошибки.
+    """
+    if form.get('clear_ssh_key') == '1':
+        for field in SSH_KEY_FIELDS:
+            ssh[field] = ''
+    value = sanitize_private_key(form.get('ssh_key', ''))
+    if not value:
+        return None
+    passphrase = sanitize_secret(form.get('ssh_key_passphrase', ''))
+    try:
+        key = load_private_key(value, passphrase)
+    except SshKeyError:
+        return _('SSH-ключ не сохранён: файл не найден, формат не поддерживается или неверная фраза-пароль.')
+    ssh['private_key'] = data_manager.encrypt_data(value)
+    ssh['key_passphrase'] = data_manager.encrypt_data(passphrase)
+    ssh['key_hint'] = fingerprint(key)
+    ssh['key_path'] = '' if is_key_text(value) else value
+    return None
 
 
 def get_secret_pin():
@@ -284,6 +314,7 @@ def add_server():
                 "port": int(request.form.get('ssh_port') or 22),
                 "root_password": data_manager.encrypt_data(sanitize_secret(request.form.get('ssh_root_password', ''))),
                 "root_login_allowed": 'root_login_allowed' in request.form,
+                **{field: '' for field in SSH_KEY_FIELDS},
             },
             "panel_url": request.form.get('panel_url', ''),
             "panel_credentials": {
@@ -304,6 +335,11 @@ def add_server():
         }
 
         _apply_fresh_geolocation(new_server)
+
+        # Ошибка ключа не теряет остальную карточку: сервер сохраняется без ключа
+        key_error = _apply_ssh_key(new_server['ssh_credentials'], request.form, data_manager)
+        if key_error:
+            flash(key_error, 'warning')
 
         # Загрузка иконки сервера
         upload_folder = current_app.config.get('UPLOAD_FOLDER')
@@ -433,6 +469,9 @@ def edit_server(server_id):
 
                 store_secret(server['ssh_credentials'], 'password', request.form.get('ssh_password', ''), 'clear_ssh_password')
                 store_secret(server['ssh_credentials'], 'root_password', request.form.get('ssh_root_password', ''), 'clear_root_password')
+                key_error = _apply_ssh_key(server['ssh_credentials'], request.form, data_manager)
+                if key_error:
+                    flash(key_error, 'warning')
 
                 store_login(server['panel_credentials'], 'panel_user')
                 store_secret(server['panel_credentials'], 'password', request.form.get('panel_password', ''), 'clear_panel_password')
@@ -554,7 +593,7 @@ def change_main_key():
 
         # Пароли внутри файла зашифрованы отдельно — перешифровываем их тоже
         for server in current_servers:
-            reencrypt(server.get('ssh_credentials') or {}, ('password', 'root_password'))
+            reencrypt(server.get('ssh_credentials') or {}, ('password', 'root_password', 'private_key', 'key_passphrase'))
             reencrypt(server.get('panel_credentials') or {}, ('user', 'password'))
             reencrypt(server.get('hoster_credentials') or {}, ('user', 'password'))
         for provider in dns['providers']:
@@ -849,6 +888,14 @@ def import_external_data():
                             external_key,
                             our_secret_key
                         )
+                    # SSH-ключ и его фраза-пароль зашифрованы так же, как пароли
+                    for field in ('private_key', 'key_passphrase'):
+                        if server['ssh_credentials'].get(field):
+                            server['ssh_credentials'][field] = data_manager.re_encrypt_password(
+                                server['ssh_credentials'][field],
+                                external_key,
+                                our_secret_key
+                            )
                 
                 # Перешифровываем пароли панели управления
                 if 'panel_credentials' in server:
