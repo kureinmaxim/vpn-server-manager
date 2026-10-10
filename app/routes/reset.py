@@ -60,7 +60,7 @@ class RemoteConnectError(Exception):
 
 
 class RemoteOutputError(ValueError):
-    """Команда запустилась, но ответа нет: нет python3 или sudo -n просит пароль."""
+    """Команда запустилась, но ответ не получен или не разобран (см. reason)."""
 
     def __init__(self, reason):
         super().__init__(reason)
@@ -113,7 +113,22 @@ def describe_failure(exc, creds, *, may_have_run=False):
             return translate("На сервере нет python3 — он нужен для этой операции: apt-get install -y python3")
         if exc.reason == "sudo_password":
             return translate("sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля.")
+        if exc.reason == "python_error":
+            return translate("python3 на сервере завершился с ошибкой — возможно, версия старше 3.7. "
+                             "Проверьте: ssh -p %(port)s %(user)s@%(ip)s python3 --version", port=port, user=user, ip=ip)
+        if exc.reason == "bad_output":
+            return translate("Сервер ответил не в ожидаемом формате. Проверьте, что вход по SSH ничего не печатает "
+                             "и не запускает программ: ssh -p %(port)s %(user)s@%(ip)s true — не должна ничего выводить "
+                             "(см. ~/.bashrc и ~/.profile на сервере).", port=port, user=user, ip=ip)
+        if exc.reason == "no_output":
+            return translate("Сервер не вернул данных. Проверьте вручную: ssh -p %(port)s %(user)s@%(ip)s python3 --version",
+                             port=port, user=user, ip=ip)
+        if exc.reason == "exec_failed":
+            return translate("Подключение есть, но выполнить команду не удалось: сервер закрыл канал SSH или не ответил вовремя.")
     return None
+
+
+OUTPUT_MARKER = "__VSM_REMOTE_OUTPUT__"
 
 
 def remote(creds, args, *, source=SCRIPT_SOURCE):
@@ -125,22 +140,37 @@ def remote(creds, args, *, source=SCRIPT_SOURCE):
     try:
         _connect(client, creds)
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
-        stdin, stdout, stderr = client.exec_command(shlex.join(command), timeout=1800)
-        stdin.write(source)
-        stdin.flush()
-        stdin.channel.shutdown_write()
-        raw = stdout.read(2 * 1024 * 1024)
-        status = stdout.channel.recv_exit_status()
-        if not raw.strip():
+        # Метка отделяет ответ скрипта от того, что при входе печатают ~/.bashrc,
+        # ~/.profile и скрипты входа: такой текст ломал разбор JSON.
+        shell_command = f"printf '%s\\n' {OUTPUT_MARKER}; {shlex.join(command)}"
+        try:
+            stdin, stdout, stderr = client.exec_command(shell_command, timeout=1800)
+            stdin.write(source)
+            stdin.flush()
+            stdin.channel.shutdown_write()
+            raw = stdout.read(2 * 1024 * 1024)
+            status = stdout.channel.recv_exit_status()
+        except (OSError, paramiko.SSHException) as exc:
+            raise RemoteOutputError("exec_failed") from exc
+        text = raw.decode("utf-8", errors="replace")
+        _, found, body = text.partition(OUTPUT_MARKER + "\n")
+        if not found:
+            body = text  # ответ без метки (старые сценарии, заглушки тестов)
+        if not body.strip():
             # Ответа нет: по stderr определяется только причина, сам текст никуда не уходит.
             err = (stderr.read(4096) or b"").lower()
             if b"password is required" in err or b"terminal is required" in err:
                 raise RemoteOutputError("sudo_password")
             if status == 127 or b"not found" in err:
                 raise RemoteOutputError("no_python")
+            if b"traceback" in err or b"syntaxerror" in err:
+                raise RemoteOutputError("python_error")
             raise RemoteOutputError("no_output")
         # Never return SSH exceptions or arbitrary remote stderr to the UI/log.
-        result = json.loads(raw.decode("utf-8"))
+        try:
+            result = json.loads(body)
+        except ValueError as exc:
+            raise RemoteOutputError("bad_output") from exc
         if not isinstance(result, dict):
             raise ValueError("Invalid reset response")
         if status and "plan_hash" not in result:

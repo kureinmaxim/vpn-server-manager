@@ -8261,3 +8261,15 @@ msgstr "服务器上没有 python3，此操作需要它：apt-get install -y pyt
 
 msgid "sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля."
 msgstr "sudo 要求输入密码。请以 root 连接，或允许该用户免密码使用 sudo。"
+
+msgid "python3 на сервере завершился с ошибкой — возможно, версия старше 3.7. Проверьте: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+msgstr "服务器上的 python3 运行出错，可能版本低于 3.7。请检查：ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+
+msgid "Сервер ответил не в ожидаемом формате. Проверьте, что вход по SSH ничего не печатает и не запускает программ: ssh -p %(port)s %(user)s@%(ip)s true — не должна ничего выводить (см. ~/.bashrc и ~/.profile на сервере)."
+msgstr "服务器返回的格式不符合预期。请确认 SSH 登录时不输出内容、不启动程序：ssh -p %(port)s %(user)s@%(ip)s true 应当没有任何输出（检查服务器上的 ~/.bashrc 和 ~/.profile）。"
+
+msgid "Сервер не вернул данных. Проверьте вручную: ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+msgstr "服务器没有返回数据。请手动检查：ssh -p %(port)s %(user)s@%(ip)s python3 --version"
+
+msgid "Подключение есть, но выполнить команду не удалось: сервер закрыл канал SSH или не ответил вовремя."
+msgstr "已连接，但无法执行命令：服务器关闭了 SSH 通道或未及时响应。"
