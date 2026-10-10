@@ -7,7 +7,7 @@ import re
 from flask import Blueprint, jsonify, render_template, request, session
 from flask_babel import gettext as _
 
-from .reset import target, identity, remote, _guard, _locks, describe_failure
+from .reset import target, identity, remote, _guard, _locks, describe_failure, failure_code
 from ..services.server_control_payload import SCRIPT_SOURCE
 from ..services.server_control_remote import CATALOG, ACTIONS
 from ..services.protocol_inspection import PROTOCOL_FILES
@@ -49,7 +49,7 @@ def invoke(creds, body):
 def remote_error(exc=None, creds=None, *, may_have_run=False):
     """Причина сбоя SSH, если она известна (reset.describe_failure), иначе общий текст."""
     message = describe_failure(exc, creds, may_have_run=may_have_run) if exc is not None and creds else None
-    return jsonify(error=message or _("Не удалось выполнить операцию. Проверьте SSH, known_hosts и root/sudo -n. После потери ответа обновите состояние перед повтором.")), 502
+    return jsonify(error=message or _("Не удалось выполнить операцию. Проверьте SSH, known_hosts и root/sudo -n. После потери ответа обновите состояние перед повтором.") + failure_code(exc)), 502
 
 
 def localize_inventory(result):
