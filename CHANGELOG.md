@@ -13,7 +13,8 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 - Change of the main key and import from another data file re-encrypt the SSH key and its passphrase together with passwords.
 
 ### Documentation
-- `docs/SECURITY_BEST_PRACTICES_ru.md`: how the key is stored and the safe order for switching a server to key-only login. README and monitoring guide mention the key option.
+- README: new section **SSH login: password or key** — what the card accepts, how the app chooses between key and password, switching a server to key-only login, and what backups contain for keys saved as a path.
+- `docs/SECURITY_BEST_PRACTICES_ru.md`: how the key is stored and the safe order for switching a server to key-only login; the monitoring guide mentions the key option.
 
 ## [4.11.3] - 2026-10-09
 
