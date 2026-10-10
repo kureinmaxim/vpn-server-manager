@@ -1,6 +1,7 @@
 """Explicit, CSRF-protected TelegramOnly reset, bound to an audited SSH host."""
 import hmac
 import json
+import logging
 import secrets
 import shlex
 import threading
@@ -12,11 +13,12 @@ from flask import Blueprint, current_app, jsonify, render_template, request, ses
 
 from ..services import registry
 from ..services.reset_payload import SCRIPT_SOURCE
-from ..services.ssh_auth import connect_kwargs
+from ..services.ssh_auth import connect_kwargs, has_ssh_auth
 from ..utils.decorators import require_auth, require_pin, csrf_protect
 from .api import _get_server_ssh_credentials
 
 reset_bp = Blueprint("reset", __name__)
+logger = logging.getLogger(__name__)
 COMPONENTS = ("bot", "mieru", "naiveproxy", "hysteria2", "vless", "mtproto", "ha")
 _pending = {}
 _locks = {}
@@ -38,18 +40,90 @@ def identity(creds):
     return (creds["ip"], int(creds["port"]), creds["user"])
 
 
+class UnknownHostKeyError(paramiko.SSHException):
+    """Ключа сервера нет в ~/.ssh/known_hosts этого компьютера."""
+
+
+class RejectUnknownHost(paramiko.RejectPolicy):
+    """RejectPolicy со своим типом ошибки: отказ тот же, но причину можно назвать в интерфейсе."""
+
+    def missing_host_key(self, client, hostname, key):
+        raise UnknownHostKeyError(f"Server {hostname!r} not found in known_hosts")
+
+
+class RemoteConnectError(Exception):
+    """Подключение не удалось — команда на сервере не запускалась."""
+
+    def __init__(self, reason):
+        super().__init__(reason)
+        self.reason = reason
+
+
+class RemoteOutputError(ValueError):
+    """Команда запустилась, но ответа нет: нет python3 или sudo -n просит пароль."""
+
+    def __init__(self, reason):
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _connect(client, creds):
+    try:
+        # Вход как у мониторинга: пароль и/или ключ из карточки. ~/.ssh и ssh-agent —
+        # только если в карточке нет ни того, ни другого: иначе чужие ключи агента
+        # исчерпают MaxAuthTries раньше пароля (Too many authentication failures).
+        client.connect(hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
+                       timeout=20, auth_timeout=20, banner_timeout=20,
+                       **connect_kwargs(creds.get("password"), creds.get("key"), creds.get("key_passphrase"),
+                                        use_local_keys=not has_ssh_auth(creds)))
+    except UnknownHostKeyError as exc:
+        raise RemoteConnectError("unknown_host") from exc
+    except paramiko.BadHostKeyException as exc:
+        raise RemoteConnectError("changed_host") from exc
+    except paramiko.AuthenticationException as exc:
+        raise RemoteConnectError("auth") from exc
+    except (OSError, paramiko.SSHException) as exc:
+        raise RemoteConnectError("unreachable") from exc
+
+
+def describe_failure(exc, creds, *, may_have_run=False):
+    """Понятная причина сбоя remote() или None (тогда показывается общий текст).
+
+    may_have_run=True — операция с изменениями: после запуска команды точная причина
+    неизвестна, поэтому называются только отказы до подключения. Текст исключений
+    paramiko и stderr сервера не показываются и не пишутся в журнал.
+    """
+    reason = getattr(exc, "reason", None)
+    logger.warning("SSH remote operation failed: %s (%s)", reason or "unknown", type(exc).__name__)
+    ip, port, user = creds.get("ip"), creds.get("port", 22), creds.get("user", "root")
+    if isinstance(exc, RemoteConnectError):
+        if reason == "unknown_host":
+            return translate("Ключа этого сервера нет в ~/.ssh/known_hosts на этом компьютере — проверка ключа "
+                             "хоста здесь обязательна. Один раз подключитесь из терминала и подтвердите ключ: "
+                             "ssh -p %(port)s %(user)s@%(ip)s", port=port, user=user, ip=ip)
+        if reason == "changed_host":
+            return translate("Ключ сервера не совпадает с записью в ~/.ssh/known_hosts (сервер переустановлен?). "
+                             "Если это ожидаемо, удалите старую запись: ssh-keygen -R '[%(ip)s]:%(port)s' — "
+                             "и подключитесь из терминала заново.", ip=ip, port=port)
+        if reason == "auth":
+            return translate("SSH: не удалось войти. Проверьте пароль или SSH-ключ в карточке сервера.")
+        return translate("Сервер не ответил по SSH. Проверьте IP, порт %(port)s и доступность сервера.", port=port)
+    if isinstance(exc, RemoteOutputError) and not may_have_run:
+        if exc.reason == "no_python":
+            return translate("На сервере нет python3 — он нужен для этой операции: apt-get install -y python3")
+        if exc.reason == "sudo_password":
+            return translate("sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля.")
+    return None
+
+
 def remote(creds, args, *, source=SCRIPT_SOURCE):
     # WARNING: The general SSH pool accepts unknown host keys. Destructive reset
     # must use verified OpenSSH known_hosts and RejectPolicy instead.
     client = paramiko.SSHClient()
     client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.RejectPolicy())
+    client.set_missing_host_key_policy(RejectUnknownHost())
     try:
-        # Пароль и/или ключ из карточки; как и раньше, также ~/.ssh и ssh-agent.
-        client.connect(hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
-                       timeout=20, auth_timeout=20, banner_timeout=20,
-                       **connect_kwargs(creds.get("password"), creds.get("key"),
-                                        creds.get("key_passphrase"), use_local_keys=True))
+        _connect(client, creds)
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
         stdin, stdout, stderr = client.exec_command(shlex.join(command), timeout=1800)
         stdin.write(source)
@@ -57,6 +131,14 @@ def remote(creds, args, *, source=SCRIPT_SOURCE):
         stdin.channel.shutdown_write()
         raw = stdout.read(2 * 1024 * 1024)
         status = stdout.channel.recv_exit_status()
+        if not raw.strip():
+            # Ответа нет: по stderr определяется только причина, сам текст никуда не уходит.
+            err = (stderr.read(4096) or b"").lower()
+            if b"password is required" in err or b"terminal is required" in err:
+                raise RemoteOutputError("sudo_password")
+            if status == 127 or b"not found" in err:
+                raise RemoteOutputError("no_python")
+            raise RemoteOutputError("no_output")
         # Never return SSH exceptions or arbitrary remote stderr to the UI/log.
         result = json.loads(raw.decode("utf-8"))
         if not isinstance(result, dict):
@@ -91,8 +173,8 @@ def reset_plan(server_id):
     components = sorted(set(components))
     try:
         plan = remote(creds, ["--components", ",".join(components)])
-    except Exception:
-        return jsonify(error=translate("Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено.")), 502
+    except Exception as exc:
+        return jsonify(error=describe_failure(exc, creds) or translate("Аудит не выполнен. Проверьте SSH, known_hosts и root/sudo -n. Ничего не удалено.")), 502
     if "plan_hash" not in plan:
         return jsonify(error=plan.get("error", translate("Аудит не выполнен"))), 409
     ticket = secrets.token_urlsafe(32)
@@ -135,8 +217,8 @@ def reset_apply(server_id):
         result = remote(creds, ["--components", ",".join(item["components"]), "--apply",
                                 "--plan-hash", plan["plan_hash"], "--confirm", plan["hostname"]])
         return jsonify(result), (200 if result.get("success") else 409)
-    except Exception:
-        return jsonify(error=translate("Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH.")), 502
+    except Exception as exc:
+        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate("Ответ потерян или выполнение прервано. Не повторяйте автоматически: проверьте Status и /var/backups/telegramonly-reset по SSH.")), 502
     finally:
         lock.release()
 
@@ -165,8 +247,8 @@ def archive_list(server_id):
         result = remote(creds, [], source=ARCHIVE_SOURCE)
         if 'archives' not in result:
             return jsonify(error=translate('Не удалось прочитать архивы. Проверьте SSH и права доступа.')), 502
-    except Exception:
-        return jsonify(error=translate('Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.')), 502
+    except Exception as exc:
+        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось прочитать архивы. Проверьте SSH, known_hosts и права доступа.')), 502
     owner = session.setdefault('reset_session', secrets.token_urlsafe(32))
     with _guard:
         now = time.monotonic()
@@ -208,8 +290,8 @@ def archive_delete(server_id):
         if result.get('error'):
             result['error'] = translate(result['error'])
         return jsonify(result), (200 if result.get('success') else 409)
-    except Exception:
-        return jsonify(error=translate('Ответ потерян. Обновите список перед дальнейшими действиями.')), 502
+    except Exception as exc:
+        return jsonify(error=describe_failure(exc, creds, may_have_run=True) or translate('Ответ потерян. Обновите список перед дальнейшими действиями.')), 502
     finally:
         lock.release()
 
@@ -241,5 +323,5 @@ def disk_run(server_id):
             if row.get('note'):
                 row['note'] = translate(row['note'])
         return jsonify(result)
-    except Exception:
-        return jsonify(error=translate('Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n.')), 502
+    except Exception as exc:
+        return jsonify(error=describe_failure(exc, creds) or translate('Не удалось выполнить проверку. Проверьте SSH, known_hosts и root/sudo -n.')), 502
