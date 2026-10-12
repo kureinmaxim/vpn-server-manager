@@ -200,3 +200,35 @@ def test_replace_zone_records_keeps_matches_and_drops_the_rest():
     # The same record object stays: id, group and note survive, the proxy flag follows the file
     assert kept is vpn and kept['notes'] == 'main VPS' and kept['role'] == 'service' and kept['proxied'] is True
     assert dns_reg.replace_zone_records(domain, dns_reg.parse_zone(zone, domain)[0]) == (0, 0, 3)
+
+
+RDAP_XYZ = {
+    'events': [{'eventAction': 'registration', 'eventDate': '2026-07-30T18:11:03.0Z'},
+               {'eventAction': 'expiration', 'eventDate': '2027-07-30T23:59:59.0Z'},
+               {'eventAction': 'last changed', 'eventDate': '2026-08-18T19:52:02.0Z'}],
+    'entities': [{'roles': ['registrar'],
+                  'vcardArray': ['vcard', [['version', {}, 'text', '4.0'], ['fn', {}, 'text', 'Example Registrar, Inc.']]],
+                  'links': [{'rel': 'self', 'href': 'https://rdap.centralnic.com/xyz/entity/4331'},
+                            {'rel': 'about', 'href': 'https://example.net'}]}],
+}
+
+
+def test_parse_rdap_reads_registrar_site_and_dates():
+    assert dns_reg.parse_rdap(RDAP_XYZ) == {'registrar': 'Example Registrar, Inc.', 'registrar_url': 'https://example.net',
+                                            'registered_on': '2026-07-30', 'expires_on': '2027-07-30'}
+
+
+def test_parse_rdap_ignores_malformed_values():
+    data = {'events': [{'eventAction': 'expiration', 'eventDate': 'soon'}, 'junk'],
+            'entities': [{'roles': ['registrar'], 'vcardArray': 'bad',
+                          'links': [{'rel': 'about', 'href': 'javascript:alert(1)'}]}]}
+    assert dns_reg.parse_rdap(data) == {'registrar': '', 'registrar_url': '', 'registered_on': '', 'expires_on': ''}
+    assert dns_reg.parse_rdap(None)['expires_on'] == ''
+
+
+def test_parse_rdap_skips_registrar_rdap_server_link():
+    data = {'entities': [{'roles': ['registrar'], 'vcardArray': ['vcard', [['fn', {}, 'text', 'GoDaddy.com, LLC']]],
+                          'links': [{'rel': 'about', 'type': 'application/rdap+json',
+                                     'href': 'https://rdap.godaddy.com/v1/'}]}]}
+    assert dns_reg.parse_rdap(data)['registrar_url'] == ''
+    assert dns_reg.parse_rdap(data)['registrar'] == 'GoDaddy.com, LLC'

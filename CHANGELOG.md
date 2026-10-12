@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.5] - 2026-10-12
+
+### Added
+- Domains can take their registrar, registration date and expiry date from the public RDAP record of the registry. **From RDAP** in the domain form fills the fields for review before saving; the **RDAP** button in the domain list updates the domain and lists the changed fields. The registrar website fills the account field only when it is empty. Lookups go through the existing WHOIS/RDAP check (HTTPS and public addresses only).
+
+### Changed
+- The domain list shows DNS records as "N main" and "N more service" instead of "N / M"; the column header explains the two groups.
+
+### Fixed
+- RDAP lookups for `.me` domains, whose registry is missing from the IANA bootstrap used by rdap.org, go to the Identity Digital RDAP server directly. A registrar's RDAP server link is no longer taken for its website.
+
 ## [4.12.4] - 2026-10-12
 
 ### Changed

@@ -53,7 +53,13 @@
         <div class="row g-3">
             <div class="col-sm-7">
                 <label class="form-label" for="name">{{ _('Доменное имя') }}</label>
-                <input class="form-control font-monospace" id="name" name="name" maxlength="253" spellcheck="false" required value="{{ v.get('name', '') }}" placeholder="example.com">
+                <div class="input-group">
+                    <input class="form-control font-monospace" id="name" name="name" maxlength="253" spellcheck="false" required value="{{ v.get('name', '') }}" placeholder="example.com">
+                    <button class="btn btn-outline-secondary" type="button" id="rdap-fill" title="{{ _('Подставить регистратора и даты из открытой записи RDAP реестра') }}">
+                        <i class="bi bi-cloud-download"></i> {{ _('Из RDAP') }}
+                    </button>
+                </div>
+                <div class="form-text" id="rdap-status" role="status" aria-live="polite"></div>
             </div>
             <div class="col-sm-5">
                 <label class="form-label" for="provider_id">{{ _('DNS-провайдер') }}</label>
@@ -116,6 +122,51 @@
     });
     url.placeholder = previous.dataset.url || 'https://';
     if (!name.value && !{{ 'true' if item else 'false' }}) name.value = previous.dataset.name;
+})();
+</script>
+{% else %}
+<script>
+(() => {
+    const button = document.getElementById('rdap-fill');
+    const status = document.getElementById('rdap-status');
+    const text = {
+        loading: {{ _('Запрашиваю реестр…') | tojson }},
+        filled: {{ _('Данные из открытой записи реестра подставлены. Сверьте срок окончания в кабинете регистратора и нажмите «Сохранить».') | tojson }},
+        failed: {{ _('Не удалось получить данные из реестра. Заполните поля вручную.') | tojson }},
+        domain: {{ _('Введите корректное доменное имя, например example.com.') | tojson }}
+    };
+    button.addEventListener('click', async () => {
+        const name = document.getElementById('name').value.trim();
+        if (!name) {
+            status.textContent = text.domain;
+            return;
+        }
+        button.disabled = true;
+        status.textContent = text.loading;
+        try {
+            const response = await fetch({{ url_for('dns.rdap') | tojson }}, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json',
+                          'X-CSRF-Token': document.querySelector('input[name=csrf_token]').value},
+                body: JSON.stringify({name})
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.result) {
+                status.textContent = data.error || text.failed;
+                return;
+            }
+            for (const field of ['registrar', 'registered_on', 'expires_on']) {
+                if (data.result[field]) document.getElementById(field).value = data.result[field];
+            }
+            const url = document.getElementById('registrar_url');
+            if (data.result.registrar_url && !url.value) url.value = data.result.registrar_url;
+            status.textContent = text.filled;
+        } catch (error) {
+            status.textContent = text.failed;
+        } finally {
+            button.disabled = false;
+        }
+    });
 })();
 </script>
 {% endif %}

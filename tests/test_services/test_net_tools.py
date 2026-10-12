@@ -100,6 +100,19 @@ def test_rdap_redirect_and_json():
         assert fetch.call_count == 2
 
 
+def test_rdap_falls_back_to_registry_missing_from_bootstrap():
+    with patch('app.services.net_tools.fetch_url', side_effect=[
+        {'status': 404, 'headers': {}},
+        {'status': 200, 'body': '{"ldhName":"example.net"}'}
+    ]) as fetch:
+        assert run_tool('whois', {'host': 'example.net'}) == {'ldhName': 'example.net'}
+    assert fetch.call_args_list[1].args[0] == 'https://rdap.identitydigital.services/rdap/domain/example.net'
+    with patch('app.services.net_tools.fetch_url', return_value={'status': 404, 'headers': {}}) as fetch:
+        with pytest.raises(ToolError):
+            run_tool('whois', {'host': 'example.com'})
+    assert fetch.call_count == 1
+
+
 def test_rdap_rejects_https_downgrade():
     with patch('app.services.net_tools.fetch_url', return_value={'status': 302, 'headers': {'location': 'http://registry.example'}}):
         with pytest.raises(ToolError):
