@@ -8836,3 +8836,69 @@ msgstr "Calculating load from /proc/stat and load average…"
 
 msgid "Нагрузка сервера"
 msgstr "Server load"
+
+msgid "Отслеживаемые проекты"
+msgstr "Tracked projects"
+
+msgid "Настроить список"
+msgstr "Edit list"
+
+msgid "Добавить проект"
+msgstr "Add project"
+
+msgid "Службы systemd"
+msgstr "systemd services"
+
+msgid "Восстановить стандартный список"
+msgstr "Restore default list"
+
+msgid "Вернуть стандартный список проектов? Ваши изменения будут потеряны."
+msgstr "Restore the default project list? Your changes will be lost."
+
+msgid "Восстановлен стандартный список проектов."
+msgstr "The default project list has been restored."
+
+msgid "Список проектов сохранён."
+msgstr "Project list saved."
+
+msgid "Не удалось сохранить список проектов."
+msgstr "Could not save the project list."
+
+msgid "Слишком много проектов."
+msgstr "Too many projects."
+
+msgid "У каждого проекта должны быть название и хотя бы одна служба или контейнер."
+msgstr "Each project needs a name and at least one service or container."
+
+msgid "Имена служб: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект)."
+msgstr "Service names: Latin letters, digits and @ . _ - (up to 64 characters, at most 16 per project)."
+
+msgid "Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект)."
+msgstr "Container names: Latin letters, digits and @ . _ - (up to 64 characters, at most 16 per project)."
+
+msgid "Список отслеживаемых проектов пуст. Добавьте проекты через «Настроить список»."
+msgstr "The tracked project list is empty. Add projects with “Edit list”."
+
+#, python-format
+msgid "Стандартный список: %(names)s."
+msgstr "Default list: %(names)s."
+
+msgid "Эти проекты ищутся на серверах в окне «Проекты», в статусе сервера и в мониторинге. TelegramOnly показан в своём разделе. Укажите имена служб systemd (без .service) и контейнеров Docker через запятую — проект считается найденным, если на сервере есть хотя бы одна из них."
+msgstr "These projects are looked up on servers in the Projects window, Server Status and Monitoring. TelegramOnly has its own section. Enter systemd service names (without .service) and Docker container names separated by commas. A project counts as found if at least one of them exists on the server."
+
+msgid "Сервер успешно добавлен."
+msgstr "Server added."
+
+#, python-format
+msgid "Ошибка при добавлении сервера: %(error)s"
+msgstr "Could not add the server: %(error)s"
+
+msgid "Создан новый файл для хранения серверов."
+msgstr "A new file for storing servers has been created."
+
+#, python-format
+msgid "Критическая ошибка: не удалось создать файл данных. %(error)s"
+msgstr "Critical error: could not create the data file. %(error)s"
+
+msgid "Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена."
+msgstr "For a service started periodically by a timer, enter the timer with its .timer suffix, for example ha-rns-watchdog.timer: the service itself is stopped between runs."

@@ -10,7 +10,7 @@ import zipfile
 import signal
 from ..services import registry, dns_registry
 from ..services.data_manager_service import DataManagerService
-from ..utils.decorators import require_auth, require_pin, handle_errors, log_request
+from ..utils.decorators import require_auth, require_pin, handle_errors, log_request, csrf_protect
 from ..utils.credentials import sanitize_secret, sanitize_private_key
 from ..services.ssh_auth import SshKeyError, fingerprint, is_key_text, load_private_key
 from ..utils.icons import apply_icon_from_form
@@ -514,6 +514,40 @@ def edit_server(server_id):
         logger.error(f"Error loading server {server_id}: {str(e)}")
         flash(_('Ошибка при загрузке данных сервера.'), 'error')
         return redirect(url_for('main.index'))
+
+@main_bp.route('/settings/projects', methods=['GET', 'POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def tracked_projects():
+    """Projects shown in Server Status, Monitoring and the Projects overview."""
+    import secrets
+    from ..services.project_stats import DEFAULT_PROJECTS, ProjectError, clean_projects, load_projects, save_projects
+    session.setdefault('csrf_token', secrets.token_urlsafe(32))
+    if request.method == 'POST':
+        if request.form.get('action') == 'reset':
+            projects = None
+        else:
+            names, units, containers = (request.form.getlist(field) for field in ('name', 'units', 'containers'))
+            projects = [{'name': n, 'units': u, 'containers': c} for n, u, c in zip(names, units, containers)]
+        try:
+            saved = save_projects(current_app, projects)
+        except ProjectError as error:
+            flash({'incomplete': _('У каждого проекта должны быть название и хотя бы одна служба или контейнер.'),
+                   'units': _('Имена служб: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
+                   'containers': _('Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
+                   }.get(str(error), _('Слишком много проектов.')), 'danger')
+            return render_template('tracked_projects.html', projects=projects or [],
+                                   defaults=clean_projects(DEFAULT_PROJECTS)), 400
+        if saved:
+            flash(_('Список проектов сохранён.') if projects is not None
+                  else _('Восстановлен стандартный список проектов.'), 'success')
+        else:
+            flash(_('Не удалось сохранить список проектов.'), 'danger')
+        return redirect(url_for('main.tracked_projects'))
+    return render_template('tracked_projects.html', projects=load_projects(current_app),
+                           defaults=clean_projects(DEFAULT_PROJECTS))
+
 
 @main_bp.route('/settings')
 @require_auth

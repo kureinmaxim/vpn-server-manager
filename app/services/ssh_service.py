@@ -11,7 +11,7 @@ from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
 from .ssh_auth import connect_kwargs
 
-from .project_stats import COMMAND as PROJECTS_COMMAND, parse_sample as parse_projects, summarize as summarize_projects
+from .project_stats import build_command, load_projects, parse_sample as parse_projects, summarize as summarize_projects
 
 logger = logging.getLogger(__name__)
 
@@ -898,7 +898,8 @@ class SSHService:
                 logger.exception("Failed to collect TelegramOnly stack status")
                 stats["app_services"] = []
 
-            stats["projects"] = summarize_projects(self._collect_projects(client))
+            projects = load_projects()
+            stats["projects"] = summarize_projects(self._collect_projects(client, projects), projects)
             logger.info(f"Successfully collected stats from {ip}")
             return stats
 
@@ -1227,13 +1228,13 @@ class SSHService:
                 "error": str(e),
             }
 
-    def _collect_projects(self, client):
+    def _collect_projects(self, client, projects):
         try:
-            output = self._read_command_output(client, PROJECTS_COMMAND, timeout=8)
-            return parse_projects(output)
+            output = self._read_command_output(client, build_command(projects), timeout=8)
+            return parse_projects(output, projects)
         except Exception:
             # Failure here must not discard the rest of the server snapshot.
-            return parse_projects('')
+            return parse_projects('', projects)
 
     def get_projects_snapshot(
         self, ip: str, user: str, password: Optional[str], port: int = 22,
@@ -1242,7 +1243,9 @@ class SSHService:
         client = self.get_connection_pooled(
             ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
         )
-        return summarize_projects(parse_projects(self._read_command_output(client, PROJECTS_COMMAND, timeout=8)))
+        projects = load_projects()
+        output = self._read_command_output(client, build_command(projects), timeout=8)
+        return summarize_projects(parse_projects(output, projects), projects)
 
     def get_services_stats(
         self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
@@ -1258,7 +1261,7 @@ class SSHService:
                 service["control_component"] = descriptor.get("control_component")
                 services.append(service)
 
-            services.extend(self._collect_projects(client))
+            services.extend(self._collect_projects(client, load_projects()))
             return services
 
         except Exception as e:

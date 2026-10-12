@@ -11,7 +11,10 @@
             <div class="modal-body">
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                     <div id="projects-check-progress" class="small" role="status" aria-live="polite"></div>
-                    <button id="projects-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('main.tracked_projects') }}" class="btn btn-sm btn-outline-secondary text-nowrap"><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Настроить список') }}</a>
+                        <button id="projects-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                    </div>
                 </div>
                 <div class="table-responsive">
                     <table class="table align-middle mb-0 projects-check-table">
@@ -48,6 +51,7 @@ window.PROJECTS_CHECK_CONFIG = {
         failed: {{ _('ошибка') | tojson }},
         container: {{ _('контейнер') | tojson }},
         notFound: {{ _('Не найден ни на одном проверенном сервере') | tojson }},
+        noProjects: {{ _('Список отслеживаемых проектов пуст. Добавьте проекты через «Настроить список».') | tojson }},
         checking: {{ _('Проверка…') | tojson }},
         absent: {{ _('Не найдены: {names}') | tojson }},
         errors: {{ _('Не удалось проверить: {names}') | tojson }},

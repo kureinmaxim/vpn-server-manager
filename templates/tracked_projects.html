@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('Отслеживаемые проекты') }}{% endblock %}
+
+{% macro project_row(project, hint=False) %}
+<tr data-project-row>
+    <td><input class="form-control form-control-sm" name="name" maxlength="60" value="{{ project.name }}" aria-label="{{ _('Название') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ project.units if project.units is string else project.units|join(', ') }}"{% if hint %} placeholder="myapp, myapp-worker"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ project.containers if project.containers is string else project.containers|join(', ') }}"{% if hint %} placeholder="myapp"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
+    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" data-remove-project title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
+</tr>
+{% endmacro %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 1100px">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Отслеживаемые проекты') }}</li>
+        </ol>
+    </nav>
+    <h2><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Отслеживаемые проекты') }}</h2>
+    <p class="text-body-secondary">{{ _('Эти проекты ищутся на серверах в окне «Проекты», в статусе сервера и в мониторинге. TelegramOnly показан в своём разделе. Укажите имена служб systemd (без .service) и контейнеров Docker через запятую — проект считается найденным, если на сервере есть хотя бы одна из них.') }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="post" id="tracked-projects-form">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 24%">{{ _('Название') }}</th>
+                        <th scope="col">{{ _('Службы systemd') }}</th>
+                        <th scope="col" style="width: 28%">{{ _('Контейнеры Docker') }}</th>
+                        <th scope="col" style="width: 3rem"><span class="visually-hidden">{{ _('Действия') }}</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tracked-projects-rows">
+                    {% for project in projects %}{{ project_row(project) }}{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <template id="tracked-project-template">{{ project_row({'name': '', 'units': [], 'containers': []}, hint=True) }}</template>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-info" id="add-project"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить проект') }}</button>
+            <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
+            <button type="submit" class="btn btn-outline-secondary ms-auto" name="action" value="reset"
+                    formnovalidate onclick="return confirm({{ _('Вернуть стандартный список проектов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
+        </div>
+    </form>
+    <p class="small text-body-secondary mt-3 mb-1">{{ _('Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена.') }}</p>
+    <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
+</div>
+<script>
+(function () {
+    const rows = document.getElementById('tracked-projects-rows');
+    const template = document.getElementById('tracked-project-template');
+    document.getElementById('add-project').addEventListener('click', () => {
+        rows.append(template.content.cloneNode(true));
+        rows.lastElementChild.querySelector('input').focus();
+    });
+    rows.addEventListener('click', event => {
+        const button = event.target.closest('[data-remove-project]');
+        if (button) button.closest('[data-project-row]').remove();
+    });
+})();
+</script>
+{% endblock %}

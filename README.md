@@ -1,4 +1,4 @@
-# VPN Server Manager v4.12.6
+# VPN Server Manager v4.12.7
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -32,7 +32,7 @@ VPN Server Manager keeps server logins, panel credentials, domains and provider 
 
 Open **Server load** next to DNS to compare CPU, memory, disk space, load averages and network traffic across active servers. Filter by name or address and sort by the metric that matters.
 
-Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services and containers are up. Server Status and Monitoring list the same projects for one server.
+Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services and containers are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service and Docker container names.
 
 <p align="center">
   <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency" width="1100">
