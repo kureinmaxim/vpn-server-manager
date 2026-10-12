@@ -1,12 +1,14 @@
 """DNS card: provider accounts, domains, registrars and records."""
+import http.client
 import secrets
 
 from cryptography.fernet import InvalidToken
-from flask import (Blueprint, abort, current_app, flash, redirect, render_template, request,
+from flask import (Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request,
                    session, url_for)
 from flask_babel import gettext as _, lazy_gettext as _l
 
 from ..services import dns_registry as dns_reg, registry
+from ..services.net_tools import ToolError, run_tool
 from ..utils.credentials import sanitize_secret
 from ..utils.decorators import csrf_protect
 
@@ -146,6 +148,58 @@ def domain_form(domain_id=None):
                         | {p['name'] for p in dns['providers']})
     return render_template('dns/form.html', form='domain', item=current, providers=dns['providers'],
                            registrars=registrars, values=request.form if request.method == 'POST' else None)
+
+
+def _rdap_fields(name):
+    """(fields, None) or (None, (message, status)) for the public RDAP record of a domain."""
+    try:
+        fields = dns_reg.parse_rdap(run_tool('whois', {'host': name}))
+    except (ToolError, OSError, ValueError, http.client.HTTPException):
+        return None, (_('Реестр не ответил или не публикует данные этого домена. Заполните поля вручную.'), 502)
+    if not any(fields.values()):
+        return None, (_('Реестр не публикует даты и регистратора этого домена. Заполните поля вручную.'), 404)
+    return fields, None
+
+
+@dns_bp.post('/rdap')
+@csrf_protect
+def rdap():
+    """Public registration data for the domain form; nothing is saved until the form is submitted."""
+    data = request.get_json(silent=True) or {}
+    try:
+        name = dns_reg.clean_domain(data.get('name'))
+    except dns_reg.DnsError:
+        return jsonify(error=str(ERRORS['domain'])), 400
+    fields, error = _rdap_fields(name)
+    if error:
+        return jsonify(error=error[0]), error[1]
+    return jsonify(result=fields)
+
+
+@dns_bp.post('/domains/<domain_id>/rdap')
+@csrf_protect
+def domain_rdap(domain_id):
+    """Updates the registrar and dates of a listed domain from its public RDAP record."""
+    dns = _load()
+    item = _domain_or_404(dns, domain_id)
+    fields, error = _rdap_fields(item['name'])
+    if error:
+        flash(f"{item['name']}: {error[0]}", 'danger')
+        return redirect(url_for('dns.index'))
+    changed = dns_reg.apply_rdap(item, fields)
+    if not changed:
+        flash(_('%(domain)s: данные совпадают с записью реестра.', domain=item['name']), 'info')
+        return redirect(url_for('dns.index'))
+    try:
+        _save(dns)
+    except dns_reg.DnsError as exc:
+        _fail(exc)
+        return redirect(url_for('dns.index'))
+    labels = {'registrar': _('регистратор'), 'registered_on': _('дата регистрации'),
+              'expires_on': _('действует до'), 'registrar_url': _('кабинет регистратора')}
+    flash(_('%(domain)s: из реестра обновлено — %(fields)s. Сверьте срок окончания в кабинете регистратора.',
+            domain=item['name'], fields=', '.join(str(labels[f]) for f in changed)), 'success')
+    return redirect(url_for('dns.index'))
 
 
 @dns_bp.post('/domains/<domain_id>/delete')

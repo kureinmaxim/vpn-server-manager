@@ -12,6 +12,12 @@ from urllib.parse import quote, urlsplit
 
 import requests
 
+# ccTLDs whose registries publish RDAP but are absent from the IANA bootstrap
+# that rdap.org relies on.
+RDAP_FALLBACK = {
+    'me': 'https://rdap.identitydigital.services/rdap/',
+}
+
 
 class ToolError(Exception):
     def __init__(self, code):
@@ -89,8 +95,12 @@ def run_tool(tool, data):
         # rdap.org only redirects to the authoritative HTTPS registry. Follow
         # explicitly with the same public-address checks used by HTTP diagnostics.
         url = 'https://rdap.org/' + kind + '/' + quote(host, safe='')
+        fallback = RDAP_FALLBACK.get(host.rsplit('.', 1)[-1].lower()) if kind == 'domain' else None
         for _ in range(4):
             result = fetch_url(url)
+            if result['status'] == 404 and fallback:
+                url, fallback = fallback + 'domain/' + quote(host, safe=''), None
+                continue
             if result['status'] in (301, 302, 303, 307, 308):
                 from urllib.parse import urljoin
                 url = urljoin(url, result['headers'].get('location', ''))

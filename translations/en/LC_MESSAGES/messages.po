@@ -8680,3 +8680,57 @@ msgstr "Could not check the monitoring installation. Check the SSH connection an
 
 msgid "Повторить"
 msgstr "Retry"
+
+msgid "Из RDAP"
+msgstr "From RDAP"
+
+msgid "Подставить регистратора и даты из открытой записи RDAP реестра"
+msgstr "Fill in the registrar and dates from the registry's public RDAP record"
+
+msgid "Запрашиваю реестр…"
+msgstr "Querying the registry…"
+
+msgid "Данные из открытой записи реестра подставлены. Сверьте срок окончания в кабинете регистратора и нажмите «Сохранить»."
+msgstr "Data from the registry's public record has been filled in. Check the expiry date in your registrar account, then click Save."
+
+msgid "Не удалось получить данные из реестра. Заполните поля вручную."
+msgstr "Could not get data from the registry. Fill in the fields manually."
+
+msgid "Реестр не ответил или не публикует данные этого домена. Заполните поля вручную."
+msgstr "The registry did not respond or does not publish data for this domain. Fill in the fields manually."
+
+msgid "Реестр не публикует даты и регистратора этого домена. Заполните поля вручную."
+msgstr "The registry does not publish the dates or registrar for this domain. Fill in the fields manually."
+
+msgid "Основные записи указывают на ваши сайты и серверы. Служебные — почта, cPanel и проверки владения доменом."
+msgstr "Main records point to your sites and servers. Service records cover mail, cPanel and domain ownership checks."
+
+msgid "%(main)s основных"
+msgstr "%(main)s main"
+
+msgid "ещё %(count)s служебных"
+msgstr "%(count)s more service"
+
+msgid "Обновить регистратора и даты из открытой записи RDAP реестра"
+msgstr "Update the registrar and dates from the registry's public RDAP record"
+
+msgid "Обновить %(domain)s из RDAP"
+msgstr "Update %(domain)s from RDAP"
+
+msgid "%(domain)s: данные совпадают с записью реестра."
+msgstr "%(domain)s: data already matches the registry record."
+
+msgid "регистратор"
+msgstr "registrar"
+
+msgid "дата регистрации"
+msgstr "registration date"
+
+msgid "действует до"
+msgstr "expiry date"
+
+msgid "кабинет регистратора"
+msgstr "registrar account"
+
+msgid "%(domain)s: из реестра обновлено — %(fields)s. Сверьте срок окончания в кабинете регистратора."
+msgstr "%(domain)s: updated from the registry — %(fields)s. Check the expiry date in your registrar account."

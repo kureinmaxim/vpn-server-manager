@@ -132,6 +132,63 @@ def build_domain(form, current, providers):
     return domain
 
 
+def _vcard(entity, field):
+    card = entity.get('vcardArray')
+    if not (isinstance(card, list) and len(card) > 1 and isinstance(card[1], list)):
+        return ''
+    for item in card[1]:
+        if isinstance(item, list) and len(item) > 3 and item[0] == field and isinstance(item[3], str):
+            return item[3].strip()
+    return ''
+
+
+def parse_rdap(data):
+    """Registrar, its website and registration/expiration dates from an RDAP domain answer."""
+    data = data if isinstance(data, dict) else {}
+    result = {'registrar': '', 'registrar_url': '', 'registered_on': '', 'expires_on': ''}
+    for event in data.get('events') or []:
+        if not isinstance(event, dict):
+            continue
+        field = {'registration': 'registered_on', 'expiration': 'expires_on'}.get(event.get('eventAction'))
+        day = str(event.get('eventDate') or '')[:10]
+        if field and not result[field]:
+            try:
+                result[field] = clean_date(day)
+            except DnsError:
+                pass
+    for entity in data.get('entities') or []:
+        if isinstance(entity, dict) and 'registrar' in (entity.get('roles') or []):
+            result['registrar'] = _vcard(entity, 'fn')[:120]
+            about = [link.get('href') for link in entity.get('links') or []
+                     if isinstance(link, dict) and link.get('rel') == 'about'
+                     and link.get('type') != 'application/rdap+json']
+            for url in [_vcard(entity, 'url')] + about:
+                try:
+                    result['registrar_url'] = clean_url(url if isinstance(url, str) else '')
+                except DnsError:
+                    continue
+                if result['registrar_url']:
+                    break
+            break
+    return result
+
+
+def apply_rdap(domain, fields):
+    """Registry values replace the registrar and dates; the account URL is filled only when empty.
+
+    Returns the names of fields that changed.
+    """
+    changed = []
+    for field in ('registrar', 'registered_on', 'expires_on'):
+        if fields.get(field) and domain.get(field) != fields[field]:
+            domain[field] = fields[field]
+            changed.append(field)
+    if fields.get('registrar_url') and not domain.get('registrar_url'):
+        domain['registrar_url'] = fields['registrar_url']
+        changed.append('registrar_url')
+    return changed
+
+
 def auto_role(record):
     """Records created by mail, cPanel or domain verification are 'service'; the rest are 'main'."""
     name = record.get('name') or '@'

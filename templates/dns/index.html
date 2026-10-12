@@ -93,16 +93,29 @@
                 <th scope="col">{{ _('DNS-провайдер') }}</th>
                 <th scope="col">{{ _('Регистратор') }}</th>
                 <th scope="col">{{ _('Действует до') }}</th>
-                <th scope="col">{{ _('Записей') }}</th>
+                <th scope="col" title="{{ _('Основные записи указывают на ваши сайты и серверы. Служебные — почта, cPanel и проверки владения доменом.') }}">{{ _('DNS-записи') }}</th>
+                <th scope="col"><span class="visually-hidden">{{ _('Действия') }}</span></th>
             </tr></thead>
             <tbody>
             {% for domain in domains %}
+            {% set main = main_count(domain) %}
             <tr>
                 <td class="dns-name"><a href="{{ url_for('dns.domain', domain_id=domain.id) }}">{{ domain.name }}</a></td>
                 <td>{{ provider_map[domain.provider_id].name if domain.provider_id in provider_map else '—' }}</td>
                 <td>{{ domain.registrar or '—' }}</td>
                 <td>{{ expiry_badge(domain, days_left(domain)) }}</td>
-                <td>{{ main_count(domain) }} <span class="text-body-secondary small">/ {{ domain.records|length }}</span></td>
+                <td>{{ _('%(main)s основных', main=main) }}
+                    <span class="text-body-secondary small d-block">{{ _('ещё %(count)s служебных', count=domain.records|length - main) }}</span></td>
+                <td class="text-end">
+                    <form method="post" action="{{ url_for('dns.domain_rdap', domain_id=domain.id) }}" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <button class="btn btn-sm btn-outline-secondary" type="submit"
+                                title="{{ _('Обновить регистратора и даты из открытой записи RDAP реестра') }}"
+                                aria-label="{{ _('Обновить %(domain)s из RDAP', domain=domain.name) }}">
+                            <i class="bi bi-cloud-download" aria-hidden="true"></i> RDAP
+                        </button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
             </tbody>

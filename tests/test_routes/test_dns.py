@@ -188,3 +188,51 @@ def test_import_zone_replace(unlocked):
     # A domain that is not in the list yet is created as with a normal import
     upload(zone.replace('example.com', 'example.org'), 'replace')
     assert [d['name'] for d in dns(unlocked)['domains']] == ['example.com', 'example.org']
+
+
+def test_rdap_fills_form_without_saving(unlocked, monkeypatch):
+    from app.routes import dns as dns_routes
+    from app.services.net_tools import ToolError
+    from tests.test_services.test_dns_registry import RDAP_XYZ
+    calls = []
+    monkeypatch.setattr(dns_routes, 'run_tool', lambda tool, data: calls.append((tool, data)) or RDAP_XYZ)
+
+    def lookup(name, token='token'):
+        return unlocked.post('/dns/rdap', json={'name': name}, headers={'X-CSRF-Token': token})
+
+    assert lookup('kurein.xyz', token='wrong').status_code == 403
+    response = lookup('Kurein.XYZ')
+    assert response.status_code == 200 and calls == [('whois', {'host': 'kurein.xyz'})]
+    assert response.json['result']['expires_on'] == '2027-07-30'
+    assert response.json['result']['registrar'] == 'Ultahost, Inc.'
+    assert dns(unlocked) == {}
+    assert lookup('not a domain').status_code == 400
+
+    def fail(tool, data):
+        raise ToolError('provider')
+    monkeypatch.setattr(dns_routes, 'run_tool', fail)
+    assert lookup('kurein.xyz').status_code == 502
+    monkeypatch.setattr(dns_routes, 'run_tool', lambda tool, data: {})
+    assert lookup('kurein.xyz').status_code == 404
+
+
+def test_rdap_button_in_list_updates_domain(unlocked, monkeypatch):
+    from app.routes import dns as dns_routes
+    from tests.test_services.test_dns_registry import RDAP_XYZ
+    monkeypatch.setattr(dns_routes, 'run_tool', lambda tool, data: RDAP_XYZ)
+    post(unlocked, '/dns/domains/new', name='kurein.xyz', registrar_url='https://my.ultahost.com/')
+    domain_id = dns(unlocked)['domains'][0]['id']
+    page = unlocked.get('/dns/').text
+    assert f'/dns/domains/{domain_id}/rdap' in page and '0 main' in page
+
+    assert unlocked.post(f'/dns/domains/{domain_id}/rdap').status_code == 302
+    assert dns(unlocked)['domains'][0]['expires_on'] == ''
+
+    response = post(unlocked, f'/dns/domains/{domain_id}/rdap')
+    assert response.status_code == 302
+    domain = dns(unlocked)['domains'][0]
+    assert (domain['registrar'], domain['registered_on'], domain['expires_on']) == (
+        'Ultahost, Inc.', '2026-07-30', '2027-07-30')
+    assert domain['registrar_url'] == 'https://my.ultahost.com/'
+    assert 'already matches the registry record' in unlocked.post(f'/dns/domains/{domain_id}/rdap', data={'csrf_token': 'token'},
+                                               follow_redirects=True).text
