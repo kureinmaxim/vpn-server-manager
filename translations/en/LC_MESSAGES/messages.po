@@ -8920,3 +8920,14 @@ msgstr "Process names: Latin letters, digits and . _ - (up to 15 characters, as 
 
 msgid "Процессы — для программ, запущенных без службы и контейнера, например rnsd вручную в терминале. Проверяется только имя процесса, как в ps (до 15 знаков), и число таких процессов."
 msgstr "Processes are for programs started without a service or container, for example rnsd run by hand in a terminal. Only the process name, as shown by ps (up to 15 characters), and the number of such processes are checked."
+
+msgid "Цифры — сколько служб, контейнеров и процессов проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг."
+msgstr "Numbers show how many of the project’s services, containers and processes found on the server are running. Click a server to open its monitoring."
+
+#, python-format
+msgid "Процессы %(names)s показываются, только если запущены."
+msgstr "Processes %(names)s are shown only while they are running."
+
+#, python-format
+msgid "Отслеживаются: %(projects)s. Показаны только найденные на сервере службы, контейнеры и запущенные процессы."
+msgstr "Tracked: %(projects)s. Only services and containers found on the server and running processes are shown."

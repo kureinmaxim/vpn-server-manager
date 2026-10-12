@@ -112,6 +112,9 @@ def test_manually_started_processes_are_counted_by_name_only():
     assert row(rows, 'lxmd')['status'] == 'not_installed'
     reticulum = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Reticulum')
     assert reticulum['state'] == 'running' and [c['kind'] for c in reticulum['components']] == ['process']
+    rows = parse_sample(sample(100, unit('rnsd.service')) + sample(101, unit('rnsd.service')) + '\nPROC\nP=rnsd=1\nP=lxmd=0\nPROC_OK', PROJECTS)
+    reticulum = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Reticulum')
+    assert [(c['kind'], c['name']) for c in reticulum['components']] == [('unit', 'rnsd.service')]
     for missing in ('\nPROC\nNO_PGREP\nDOCKER\nNO_DOCKER', '\nPROC\nP=rnsd=1\n', ''):
         assert row(parse_sample(base + missing, PROJECTS), 'rnsd')['status'] == 'unknown'
 

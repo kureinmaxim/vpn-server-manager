@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.9] - 2026-10-12
+
+### Changed
+- **Projects** lists the components found under each server badge, marking processes and their count, and names the processes it checks. A process with the same name as a running service, such as `rnsd`, is no longer counted twice.
+
 ## [4.12.8] - 2026-10-12
 
 ### Added

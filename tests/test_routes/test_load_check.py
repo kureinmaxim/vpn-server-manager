@@ -151,6 +151,7 @@ def test_main_page_includes_load_check_in_offline_mode(load_client):
     assert b"js/load_check.js" in response.data
     assert b'data-bs-target="#projectsCheckModal"' in response.data
     assert b"js/projects_check.js" in response.data and b"BotCriptoM" in response.data
+    assert "Процессы rnsd, lxmd показываются, только если запущены." in response.get_data(as_text=True)
 
 
 def test_projects_snapshot_uses_saved_credentials_and_own_rate_limit(load_client):

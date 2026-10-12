@@ -30,7 +30,8 @@
                 </div>
                 <p id="projects-check-absent" class="small text-body-secondary mt-3 mb-0"></p>
                 <p id="projects-check-errors" class="small text-warning-emphasis mt-1 mb-0"></p>
-                <p class="small text-body-secondary mt-2 mb-0">{{ _('Цифры — сколько служб и контейнеров проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг.') }}</p>
+                <p class="small text-body-secondary mt-2 mb-0">{{ _('Цифры — сколько служб, контейнеров и процессов проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг.') }}</p>
+                {% if tracked_processes %}<p class="small text-body-secondary mt-1 mb-0">{{ _('Процессы %(names)s показываются, только если запущены.', names=tracked_processes|join(', ')) }}</p>{% endif %}
             </div>
         </div>
     </div>

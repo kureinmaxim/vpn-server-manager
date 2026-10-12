@@ -35,15 +35,26 @@
         }
     }
 
+    function component(row) {
+        const kind = t[row.kind] ? ` (${t[row.kind]}${row.kind === 'process' && row.count > 1 ? ' ×' + row.count : ''})` : '';
+        return row.name + kind + (row.status === 'active' ? '' : ': ' + (t[row.status] || t.unknown));
+    }
+
     function placement(server, project) {
+        const box = document.createElement('div');
+        box.className = 'd-inline-flex flex-column align-items-start me-3 mb-2';
         const link = document.createElement('a');
         const active = project.components.filter(row => row.status === 'active').length;
-        link.className = 'badge text-decoration-none me-1 mb-1 ' + (window.PROJECT_STATE_CLASSES[project.state] || '');
+        link.className = 'badge text-decoration-none ' + (window.PROJECT_STATE_CLASSES[project.state] || '');
         link.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(server.id));
         link.textContent = `${server.name || server.ip_address} · ${active}/${project.components.length}`;
         link.title = `${t[project.state] || t.unknown}\n` + project.components.map(row =>
             `${row.name}${t[row.kind] ? ' (' + t[row.kind] + ')' : ''}: ${t[row.status] || t.unknown}`).join('\n');
-        return link;
+        const parts = document.createElement('small');
+        parts.className = 'text-body-secondary mt-1';
+        parts.textContent = project.components.map(component).join(' · ');
+        box.append(link, parts);
+        return box;
     }
 
     function render() {
