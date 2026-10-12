@@ -9,6 +9,7 @@ from paramiko.ssh_exception import AuthenticationException, SSHException
 from ..exceptions import AuthenticationError, SSHConnectionError
 from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
+from .file_manager_stats import COMMAND as FILE_MANAGER_COMMAND, parse_sample as parse_file_manager
 
 logger = logging.getLogger(__name__)
 
@@ -867,6 +868,7 @@ class SSHService:
                 logger.exception("Failed to collect TelegramOnly stack status")
                 stats["app_services"] = []
 
+            stats["file_manager"] = self._collect_file_manager(client)
             logger.info(f"Successfully collected stats from {ip}")
             return stats
 
@@ -1193,6 +1195,14 @@ class SSHService:
                 "error": str(e),
             }
 
+    def _collect_file_manager(self, client):
+        try:
+            output = self._read_command_output(client, FILE_MANAGER_COMMAND, timeout=8)
+            return parse_file_manager(output)
+        except Exception:
+            # Failure here must not discard the rest of the server snapshot.
+            return parse_file_manager('')
+
     def get_services_stats(
         self, ip: str, user: str, password: str, port: int = 22, timeout: int = 30
     ) -> List[Dict]:
@@ -1206,6 +1216,7 @@ class SSHService:
                 service["control_component"] = descriptor.get("control_component")
                 services.append(service)
 
+            services.extend(self._collect_file_manager(client))
             return services
 
         except Exception as e:
