@@ -33,7 +33,7 @@ window.renderProjectStats = function (root, projects) {
             const details = document.createElement('span');
             details.className = row.status === 'active' ? 'text-body-secondary' : 'text-danger';
             const parts = [states[row.status] || labels.unknown];
-            if (row.kind === 'unit' && row.status === 'active') {
+            if (row.kind === 'unit' && row.status === 'active' && row.name.endsWith('.service')) {
                 parts.push('CPU ' + (metric(row.cpu_percent) ? row.cpu_percent.toFixed(1) + '%' : '—'));
                 parts.push(`${labels.memory} ` + (metric(row.memory_bytes) ? (row.memory_bytes / 1048576).toFixed(1) + ' MiB' : '—'));
                 parts.push(`${labels.tasks} ` + (metric(row.tasks) ? row.tasks : '—'));

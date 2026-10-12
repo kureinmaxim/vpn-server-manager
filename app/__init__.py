@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.12.6'),
+            "version": app.config.get('APP_VERSION', '4.12.7'),
             "release_date": "12.10.2026",
             "last_updated": "2026-10-12",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.12.6",
+            "version": "4.12.7",
             "release_date": "12.10.2026",
             "last_updated": "2026-10-12",
             "developer": "Куреин М.Н."
@@ -391,12 +391,12 @@ def create_app(config_name='development'):
         from flask_babel import get_locale as babel_get_locale
         from .services.ui_preferences import load_ui_preferences
 
-        from .services.project_stats import PROJECTS
+        from .services.project_stats import load_projects
 
         ui_prefs = load_ui_preferences(app)
         return {
             'app_info': app.config.get('app_info', {}),
-            'tracked_projects': [project['name'] for project in PROJECTS],
+            'tracked_projects': [project['name'] for project in load_projects(app)],
             'developer_name': _('Куреин М.Н.'),
             'current_locale': str(babel_get_locale()),
             'ui_zoom': ui_prefs.get('zoom', '80'),

@@ -2,6 +2,19 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.7] - 2026-10-12
+
+### Added
+- The list of tracked projects is editable under **Projects → Edit list**. For each project, enter its systemd service and Docker container names. Each name is checked against an allowlist of characters before it is used in the read-only server check. The list is stored in the user profile, and **Restore default list** brings back the built-in list.
+
+### Changed
+- The default list now covers BotCriptoM, Rust File Manager, UGCTL, Reticulum, Dockhand, and Headscale with Headplane. ApiAigRPC, ApiNgRPC, ApiXgRPC, TelegramHelper and PDF3MD are no longer checked.
+- Reticulum is found however it runs:
+  - as the HA bridge, either the `ha-reticulum-bridge` service with the `ha-rns-watchdog.timer` timer or the `ha_rns_bridge` container;
+  - as the `rnsd` or `lxmd` daemon;
+  - as the `reticulumpn` propagation-node container. Services can be tracked by their `.timer` or `.socket` unit.
+- **Projects** shows why a server could not be checked.
+
 ## [4.12.6] - 2026-10-12
 
 ### Added

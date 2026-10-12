@@ -79,7 +79,8 @@
             ? t.absent.replace('{names}', missing.join(', ')) : '';
         const failed = servers.filter(server => server.error || (server.projects || []).some(p => p.state === 'unknown'));
         errors.textContent = failed.length
-            ? t.errors.replace('{names}', failed.map(server => server.name || server.ip_address).join(', ')) : '';
+            ? t.errors.replace('{names}', failed.map(server => (server.name || server.ip_address)
+                + (server.error ? ` (${server.error})` : '')).join('; ')) : '';
         if (servers.length) {
             progress.textContent = t.progress.replace('{done}', done.length).replace('{total}', servers.length);
             if (completedAt) progress.textContent += ' · ' + t.completed.replace('{time}', completedAt.toLocaleTimeString(locale));
@@ -89,6 +90,7 @@
 
     async function start() {
         if (run) return;
+        if (!config.projects.length) { progress.textContent = t.noProjects; return; }
         const pass = new AbortController();
         run = pass;
         refresh.disabled = true;

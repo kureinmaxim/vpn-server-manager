@@ -1,38 +1,127 @@
-"""Read-only detection of the owner's own projects on a server (TelegramOnly is listed separately)."""
+"""Read-only detection of tracked projects on a server (TelegramOnly is listed separately).
+
+The list is editable on the Projects settings page and stored in the user profile config.json.
+"""
 import math
 import re
 
-PROJECTS = [
-    {'key': 'botcriptom', 'name': 'BotCriptoM',
+from .ui_preferences import _config_path, _read_config, _write_config
+
+DEFAULT_PROJECTS = [
+    {'name': 'BotCriptoM',
      'units': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop',
                'botcriptom-dash-bridge', 'botcriptom-stop-bridge'],
      'containers': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop', 'botcriptom-proxy']},
-    {'key': 'rust_file_manager', 'name': 'Rust File Manager',
-     'units': ['rust-file-manager', 'rfm-internal-bridge'], 'containers': []},
-    {'key': 'ugctl', 'name': 'UGCTL (UDP gRPC COM Lite)',
+    {'name': 'Rust File Manager', 'units': ['rust-file-manager', 'rfm-internal-bridge'], 'containers': []},
+    {'name': 'UGCTL (UDP gRPC COM Lite)',
      'units': ['ugctl-server', 'ugctl-api', 'ugctl-bu', 'ugctl-bz', 'ugctl-bf',
                'ugctl-ha', 'ugctl-remote-cli'], 'containers': []},
-    {'key': 'apiai', 'name': 'ApiAigRPC', 'units': ['apiai-backend'], 'containers': []},
-    {'key': 'aping', 'name': 'ApiNgRPC', 'units': ['aping-server'], 'containers': []},
-    {'key': 'apix', 'name': 'ApiXgRPC', 'units': ['apix-server'], 'containers': []},
-    {'key': 'telegramhelper', 'name': 'TelegramHelper', 'units': ['telegramhelper'], 'containers': []},
-    {'key': 'pdf3md', 'name': 'PDF3MD', 'units': [], 'containers': ['pdf3md-backend', 'pdf3md-frontend']},
+    {'name': 'Reticulum', 'units': ['ha-reticulum-bridge', 'rnsd', 'lxmd', 'reticulum', 'ha-rns-watchdog.timer'],
+     'containers': ['ha_rns_bridge', 'reticulumpn', 'reticulum']},
+    {'name': 'Dockhand', 'units': [], 'containers': ['dockhand']},
+    {'name': 'Headscale / Headplane', 'units': ['headscale', 'headplane'], 'containers': ['headscale', 'headplane']},
 ]
-UNITS = [unit + '.service' for project in PROJECTS for unit in project['units']]
-CONTAINERS = {name for project in PROJECTS for name in project['containers']}
+CONFIG_KEY = 'tracked_projects'
+MAX_PROJECTS = 30
+MAX_ITEMS = 16
+# Names go into a shell command line, so only systemd/Docker-safe characters are accepted.
+_ITEM = re.compile(r'[A-Za-z0-9][A-Za-z0-9@._-]{0,63}')
 _DOCKER_STATES = {'running': 'active', 'restarting': 'failed', 'dead': 'failed',
                   'exited': 'inactive', 'created': 'inactive', 'paused': 'inactive'}
 
-# Fixed unit/property allowlist; never read Environment, command lines or user files.
-# Docker is asked only for container names and states.
-_SHOW = ('systemctl show --no-pager -p Id -p LoadState -p ActiveState '
-         '-p MainPID -p ActiveEnterTimestampMonotonic -p CPUUsageNSec '
-         '-p MemoryCurrent -p TasksCurrent -- ' + ' '.join(UNITS) + ' 2>/dev/null')
-_UPTIME = "awk '{print \"UP=\" $1}' /proc/uptime; "
-COMMAND = ("printf 'SAMPLE\\n'; " + _UPTIME + _SHOW + "; sleep 1; printf '\\nSAMPLE\\n'; " + _UPTIME + _SHOW
-           + "; printf '\\nDOCKER\\n'; if command -v docker >/dev/null 2>&1; then "
-           "docker ps -a --format '{{.Names}}|{{.State}}' 2>/dev/null && echo DOCKER_OK; "
-           "else echo NO_DOCKER; fi")
+
+class ProjectError(ValueError):
+    pass
+
+
+def unit_id(unit):
+    """Timers and sockets keep their suffix; any other name is a .service unit."""
+    return unit if unit.endswith(('.timer', '.socket')) else unit + '.service'
+
+
+def _items(value, field):
+    if isinstance(value, str):
+        value = re.split(r'[\s,]+', value)
+    if not isinstance(value, (list, tuple)):
+        raise ProjectError(field)
+    items = []
+    for item in value:
+        item = str(item).strip()
+        if field == 'units' and item.endswith('.service'):
+            item = item[:-len('.service')]
+        if not item:
+            continue
+        if not _ITEM.fullmatch(item):
+            raise ProjectError(field)
+        if item not in items:
+            items.append(item)
+    if len(items) > MAX_ITEMS:
+        raise ProjectError(field)
+    return items
+
+
+def clean_projects(projects):
+    """Validated list; entries without a name, services or containers are dropped."""
+    if not isinstance(projects, list):
+        raise ProjectError('projects')
+    result, keys = [], set()
+    for project in projects:
+        if not isinstance(project, dict):
+            raise ProjectError('projects')
+        name = ' '.join(str(project.get('name') or '').split())[:60]
+        units = _items(project.get('units') or [], 'units')
+        containers = _items(project.get('containers') or [], 'containers')
+        if not name and not units and not containers:
+            continue
+        if not name or not (units or containers):
+            raise ProjectError('incomplete')
+        key = re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_') or 'project'
+        while key in keys:
+            key += '_'
+        keys.add(key)
+        result.append({'key': key, 'name': name, 'units': units, 'containers': containers})
+    if len(result) > MAX_PROJECTS:
+        raise ProjectError('projects')
+    return result
+
+
+def load_projects(app=None):
+    if app is None:
+        from flask import current_app, has_app_context
+        if not has_app_context():
+            return clean_projects(DEFAULT_PROJECTS)
+        app = current_app
+    stored = _read_config(_config_path(app)).get(CONFIG_KEY)
+    try:
+        return clean_projects(stored) if stored is not None else clean_projects(DEFAULT_PROJECTS)
+    except ProjectError:
+        return clean_projects(DEFAULT_PROJECTS)
+
+
+def save_projects(app, projects):
+    """Raises ProjectError on invalid input; None restores the defaults."""
+    path = _config_path(app)
+    data = _read_config(path)
+    if projects is None:
+        data.pop(CONFIG_KEY, None)
+    else:
+        data[CONFIG_KEY] = [{k: p[k] for k in ('name', 'units', 'containers')} for p in clean_projects(projects)]
+    return _write_config(path, data)
+
+
+def build_command(projects):
+    """Fixed unit/property allowlist; never reads Environment, command lines or user files.
+    Docker is asked only for container names and states."""
+    units = ' '.join(unit_id(unit) for p in projects for unit in p['units'])
+    show = ('systemctl show --no-pager -p Id -p LoadState -p ActiveState '
+            '-p MainPID -p ActiveEnterTimestampMonotonic -p CPUUsageNSec '
+            '-p MemoryCurrent -p TasksCurrent -- ' + units + ' 2>/dev/null') if units else 'true'
+    uptime = "awk '{print \"UP=\" $1}' /proc/uptime; "
+    docker = ("; printf '\\nDOCKER\\n'; if command -v docker >/dev/null 2>&1; then "
+              "docker ps -a --format '{{.Names}}|{{.State}}' 2>/dev/null && echo DOCKER_OK; "
+              "else echo NO_DOCKER; fi") if any(p['containers'] for p in projects) else ''
+    return ("printf 'SAMPLE\\n'; " + uptime + show + "; sleep 1; printf '\\nSAMPLE\\n'; "
+            + uptime + show + docker)
 
 
 def number(value):
@@ -60,7 +149,7 @@ def _samples(text):
     return samples
 
 
-def _containers(text):
+def _containers(text, names):
     """None when Docker did not answer (e.g. no access), so containers stay unknown."""
     lines = ('\n' + text).split('\nDOCKER\n', 1)[1].splitlines() if '\nDOCKER\n' in '\n' + text else []
     if 'NO_DOCKER' in lines:
@@ -70,13 +159,13 @@ def _containers(text):
     states = {}
     for line in lines:
         name, _, state = line.strip().partition('|')
-        if name in CONTAINERS and re.fullmatch(r'[a-z]+', state):
+        if name in names and re.fullmatch(r'[a-z]+', state):
             states[name] = _DOCKER_STATES.get(state, 'unknown')
     return states
 
 
-def parse_sample(text):
-    """Component rows for every catalogued unit and container.
+def parse_sample(text, projects):
+    """Component rows for every tracked unit and container.
 
     Missing/permission-denied measurements remain unknown, not zero.
     """
@@ -85,11 +174,12 @@ def parse_sample(text):
     before = samples[0] if len(samples) >= 2 else (None, {})
     after = samples[-1] if samples else (None, {})
     elapsed = after[0] - before[0] if None not in (before[0], after[0]) else 0
-    docker = _containers(text) if samples else None
+    names = {name for p in projects for name in p['containers']}
+    docker = _containers(text, names) if samples else None
     rows = []
-    for project in PROJECTS:
+    for project in projects:
         for unit in project['units']:
-            old, state = before[1].get(unit + '.service', {}), after[1].get(unit + '.service', {})
+            old, state = before[1].get(unit_id(unit), {}), after[1].get(unit_id(unit), {})
             status = ('not_installed' if state.get('LoadState') == 'not-found'
                       else state.get('ActiveState', 'unknown'))
             cpu = None
@@ -99,7 +189,7 @@ def parse_sample(text):
                         and number(state.get('MainPID')) not in (None, 0))
             if status == 'active' and same_run and elapsed > 0 and a is not None and b is not None and b >= a:
                 cpu = round((b - a) / (elapsed * 1e9) * 100, 1)
-            rows.append(_row(project, unit + '.service', 'unit', status, cpu,
+            rows.append(_row(project, unit_id(unit), 'unit', status, cpu,
                              number(state.get('MemoryCurrent')) if status == 'active' else None,
                              number(state.get('TasksCurrent')) if status == 'active' else None))
         for name in project['containers']:
@@ -115,17 +205,17 @@ def _row(project, name, kind, status, cpu, memory, tasks):
             'memory_bytes': memory, 'tasks': tasks}
 
 
-def summarize(rows):
+def summarize(rows, projects):
     """Projects found on the server, each with its installed components."""
-    projects = []
-    for project in PROJECTS:
+    result = []
+    for project in projects:
         own = [row for row in rows if row['project'] == project['key']]
         found = [row for row in own if row['status'] not in ('not_installed', 'unknown')]
         if not found:
             if own and all(row['status'] == 'unknown' for row in own):
-                projects.append({'key': project['key'], 'name': project['name'], 'state': 'unknown', 'components': []})
+                result.append({'key': project['key'], 'name': project['name'], 'state': 'unknown', 'components': []})
             continue
         active = sum(row['status'] == 'active' for row in found)
         state = 'running' if active == len(found) else 'partial' if active else 'stopped'
-        projects.append({'key': project['key'], 'name': project['name'], 'state': state, 'components': found})
-    return projects
+        result.append({'key': project['key'], 'name': project['name'], 'state': state, 'components': found})
+    return result

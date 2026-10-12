@@ -883,11 +883,11 @@ def get_services_stats(server_id):
             timeout=30
         )
         
-        from ..services.project_stats import summarize
+        from ..services.project_stats import load_projects, summarize
         return jsonify({
             'success': True,
             'data': stats,
-            'projects': summarize([s for s in stats if s.get('group') == 'project']),
+            'projects': summarize([s for s in stats if s.get('group') == 'project'], load_projects()),
         })
         
     except Exception as e:
