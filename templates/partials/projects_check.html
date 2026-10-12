@@ -1,0 +1,63 @@
+<div class="modal fade" id="projectsCheckModal" tabindex="-1" aria-labelledby="projectsCheckTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="projectsCheckTitle"><i class="bi bi-boxes me-2" aria-hidden="true"></i>{{ _('Мои проекты на серверах') }}</h5>
+                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Где запущены ваши проекты, кроме TelegramOnly • разовая проверка по SSH, только чтение') }}</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div id="projects-check-progress" class="small" role="status" aria-live="polite"></div>
+                    <button id="projects-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 projects-check-table">
+                        <caption class="visually-hidden">{{ _('Где запущены ваши проекты') }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">{{ _('Проект') }}</th>
+                                <th scope="col">{{ _('Где запущен') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-check-rows" aria-busy="false"></tbody>
+                    </table>
+                </div>
+                <p id="projects-check-absent" class="small text-body-secondary mt-3 mb-0"></p>
+                <p id="projects-check-errors" class="small text-warning-emphasis mt-1 mb-0"></p>
+                <p class="small text-body-secondary mt-2 mb-0">{{ _('Цифры — сколько служб и контейнеров проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+window.PROJECTS_CHECK_CONFIG = {
+    serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    snapshotUrl: {{ url_for('api.projects_snapshot', server_id='__SERVER__') | tojson }},
+    monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
+    projects: {{ tracked_projects | tojson }},
+    i18n: {
+        running: {{ _('Работает') | tojson }},
+        partial: {{ _('Работает частично') | tojson }},
+        stopped: {{ _('Остановлен') | tojson }},
+        unknown: {{ _('Нет данных') | tojson }},
+        active: {{ _('работает') | tojson }},
+        inactive: {{ _('остановлен') | tojson }},
+        failed: {{ _('ошибка') | tojson }},
+        container: {{ _('контейнер') | tojson }},
+        notFound: {{ _('Не найден ни на одном проверенном сервере') | tojson }},
+        checking: {{ _('Проверка…') | tojson }},
+        absent: {{ _('Не найдены: {names}') | tojson }},
+        errors: {{ _('Не удалось проверить: {names}') | tojson }},
+        loading: {{ _('Получаю список серверов…') | tojson }},
+        empty: {{ _('Нет активных серверов вне архива.') | tojson }},
+        progress: {{ _('Проверено серверов: {done} / {total}') | tojson }},
+        completed: {{ _('Завершено: {time}') | tojson }},
+        requestError: {{ _('Не удалось получить ответ приложения.') | tojson }},
+        timeout: {{ _('Время ожидания истекло. Повторите проверку.') | tojson }},
+        auth: {{ _('Разблокируйте приложение и повторите проверку.') | tojson }}
+    }
+};
+</script>

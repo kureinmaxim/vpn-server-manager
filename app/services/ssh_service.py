@@ -11,7 +11,7 @@ from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
 from .ssh_auth import connect_kwargs
 
-from .file_manager_stats import COMMAND as FILE_MANAGER_COMMAND, parse_sample as parse_file_manager
+from .project_stats import COMMAND as PROJECTS_COMMAND, parse_sample as parse_projects, summarize as summarize_projects
 
 logger = logging.getLogger(__name__)
 
@@ -898,7 +898,7 @@ class SSHService:
                 logger.exception("Failed to collect TelegramOnly stack status")
                 stats["app_services"] = []
 
-            stats["file_manager"] = self._collect_file_manager(client)
+            stats["projects"] = summarize_projects(self._collect_projects(client))
             logger.info(f"Successfully collected stats from {ip}")
             return stats
 
@@ -1227,13 +1227,22 @@ class SSHService:
                 "error": str(e),
             }
 
-    def _collect_file_manager(self, client):
+    def _collect_projects(self, client):
         try:
-            output = self._read_command_output(client, FILE_MANAGER_COMMAND, timeout=8)
-            return parse_file_manager(output)
+            output = self._read_command_output(client, PROJECTS_COMMAND, timeout=8)
+            return parse_projects(output)
         except Exception:
             # Failure here must not discard the rest of the server snapshot.
-            return parse_file_manager('')
+            return parse_projects('')
+
+    def get_projects_snapshot(
+        self, ip: str, user: str, password: Optional[str], port: int = 22,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
+    ) -> List[Dict]:
+        client = self.get_connection_pooled(
+            ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
+        )
+        return summarize_projects(parse_projects(self._read_command_output(client, PROJECTS_COMMAND, timeout=8)))
 
     def get_services_stats(
         self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
@@ -1249,7 +1258,7 @@ class SSHService:
                 service["control_component"] = descriptor.get("control_component")
                 services.append(service)
 
-            services.extend(self._collect_file_manager(client))
+            services.extend(self._collect_projects(client))
             return services
 
         except Exception as e:
