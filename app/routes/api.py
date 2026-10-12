@@ -1241,7 +1241,13 @@ def check_monitoring_installed(server_id):
             connection_timeout=10   # Быстрый таймаут подключения для проверки (вместо 30)
         )
         
-        is_installed = 'EXISTS' in result.get('output', '')
+        # A failed SSH probe is unknown, never evidence of a missing installation.
+        markers = [line.strip() for line in result.get('output', '').splitlines()
+                   if line.strip() in ('EXISTS', 'NOT_FOUND')]
+        if not result.get('success') or not markers:
+            return jsonify(success=False, installed=None,
+                           error='Monitoring installation check failed'), 503
+        is_installed = markers[-1] == 'EXISTS'
         
         logger.info(f"Monitoring installed on server {server_id}: {is_installed}")
         
@@ -1255,7 +1261,7 @@ def check_monitoring_installed(server_id):
         return jsonify({
             'success': False,
             'error': str(e),
-            'installed': False
+            'installed': None
         })
 
 # Глобальная переменная для отслеживания отмены установки
@@ -1353,7 +1359,7 @@ def install_monitoring(server_id):
                 
                 if result == 'exists':
                     logger.warning(f"Monitoring already installed on server {server_id}, aborting installation")
-                    yield f"data: {json.dumps({'error': 'Мониторинг уже установлен на этом сервере! Обновите страницу.', 'status': 'error'})}\n\n"
+                    yield f"data: {json.dumps({'already_installed': True, 'status': 'success'})}\n\n"
                     return
             except Exception as e:
                 if check_client:
