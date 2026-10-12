@@ -1,0 +1,29 @@
+/* Keep the server snapshot inside the application theme and viewport. */
+#serverStatusModal .modal-dialog { max-width: 1200px; }
+#serverStatusModal .modal-header { flex-wrap: wrap; gap: .6rem; padding: 1rem 1.25rem; }
+#serverStatusModal .modal-title { flex: 1; flex-wrap: wrap; min-width: 0; gap: .2rem; font-size: 1.1rem; overflow-wrap: anywhere; }
+#serverStatusModal .status-update-meta { order: 3; width: 100%; font-size: .85rem; }
+#serverStatusModal .modal-body { background: var(--bs-body-bg); padding: 1.25rem; }
+#serverStatusModal .card { border-color: var(--bs-border-color); border-radius: .75rem; box-shadow: none; }
+#serverStatusModal h5 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+#serverStatusModal #status-cpu-value { color: var(--bs-primary); font-variant-numeric: tabular-nums; }
+#serverStatusModal .card-body { padding: .75rem; }
+#serverStatusModal .card-body .small { gap: .75rem; padding-block: .2rem; }
+#serverStatusModal .card-body strong { overflow-wrap: anywhere; text-align: right; }
+#serverStatusModal .card-body .small > span:first-child { color: var(--bs-secondary-color); }
+#serverStatusModal .status-detail { display: block; }
+#serverStatusModal .status-detail > summary { padding: .65rem .85rem; font-weight: 600; cursor: pointer; }
+#serverStatusModal .status-detail[open] > summary { border-bottom: 1px solid var(--bs-border-color); }
+#serverStatusModal summary:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: -3px; border-radius: .75rem; }
+#serverStatusModal .status-inodes > summary { cursor: pointer; font-size: .875rem; color: var(--bs-secondary-color); }
+#serverStatusModal .table { font-size: .875rem; margin-bottom: 0; --bs-table-bg: transparent; }
+#serverStatusModal .table th { color: var(--bs-secondary-color); font-weight: 500; white-space: nowrap; }
+#serverStatusModal .table td { border-bottom: 1px solid var(--bs-border-color); vertical-align: middle; }
+#serverStatusModal .list-group-item { background: transparent; border-color: var(--bs-border-color); gap: 1rem; }
+#serverStatusModal .modal-footer { gap: .4rem; }
+@media (max-width: 575.98px) {
+    #serverStatusModal .modal-dialog { margin: .5rem; }
+    #serverStatusModal .modal-header, #serverStatusModal .modal-body { padding: .75rem; }
+    #serverStatusModal .modal-footer .btn { flex: 1 1 auto; font-size: .85rem; }
+    #serverStatusModal .table { min-width: 460px; }
+}
