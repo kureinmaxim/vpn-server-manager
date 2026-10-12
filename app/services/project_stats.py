@@ -4,6 +4,7 @@ The list is editable on the Projects settings page and stored in the user profil
 """
 import math
 import re
+import shlex
 
 from .ui_preferences import _config_path, _read_config, _write_config
 
@@ -17,7 +18,7 @@ DEFAULT_PROJECTS = [
      'units': ['ugctl-server', 'ugctl-api', 'ugctl-bu', 'ugctl-bz', 'ugctl-bf',
                'ugctl-ha', 'ugctl-remote-cli'], 'containers': []},
     {'name': 'Reticulum', 'units': ['ha-reticulum-bridge', 'rnsd', 'lxmd', 'reticulum', 'ha-rns-watchdog.timer'],
-     'containers': ['ha_rns_bridge', 'reticulumpn', 'reticulum']},
+     'containers': ['ha_rns_bridge', 'reticulumpn', 'reticulum'], 'processes': ['rnsd', 'lxmd']},
     {'name': 'Dockhand', 'units': [], 'containers': ['dockhand']},
     {'name': 'Headscale / Headplane', 'units': ['headscale', 'headplane'], 'containers': ['headscale', 'headplane']},
 ]
@@ -26,6 +27,9 @@ MAX_PROJECTS = 30
 MAX_ITEMS = 16
 # Names go into a shell command line, so only systemd/Docker-safe characters are accepted.
 _ITEM = re.compile(r'[A-Za-z0-9][A-Za-z0-9@._-]{0,63}')
+# pgrep -x matches the kernel process name, which Linux truncates to 15 characters.
+_PROCESS = re.compile(r'[A-Za-z0-9][A-Za-z0-9._-]{0,14}')
+FIELDS = ('units', 'containers', 'processes')
 _DOCKER_STATES = {'running': 'active', 'restarting': 'failed', 'dead': 'failed',
                   'exited': 'inactive', 'created': 'inactive', 'paused': 'inactive'}
 
@@ -51,7 +55,7 @@ def _items(value, field):
             item = item[:-len('.service')]
         if not item:
             continue
-        if not _ITEM.fullmatch(item):
+        if not (_PROCESS if field == 'processes' else _ITEM).fullmatch(item):
             raise ProjectError(field)
         if item not in items:
             items.append(item)
@@ -69,17 +73,16 @@ def clean_projects(projects):
         if not isinstance(project, dict):
             raise ProjectError('projects')
         name = ' '.join(str(project.get('name') or '').split())[:60]
-        units = _items(project.get('units') or [], 'units')
-        containers = _items(project.get('containers') or [], 'containers')
-        if not name and not units and not containers:
+        items = {field: _items(project.get(field) or [], field) for field in FIELDS}
+        if not name and not any(items.values()):
             continue
-        if not name or not (units or containers):
+        if not name or not any(items.values()):
             raise ProjectError('incomplete')
         key = re.sub(r'[^a-z0-9]+', '_', name.lower()).strip('_') or 'project'
         while key in keys:
             key += '_'
         keys.add(key)
-        result.append({'key': key, 'name': name, 'units': units, 'containers': containers})
+        result.append({'key': key, 'name': name, **items})
     if len(result) > MAX_PROJECTS:
         raise ProjectError('projects')
     return result
@@ -105,13 +108,13 @@ def save_projects(app, projects):
     if projects is None:
         data.pop(CONFIG_KEY, None)
     else:
-        data[CONFIG_KEY] = [{k: p[k] for k in ('name', 'units', 'containers')} for p in clean_projects(projects)]
+        data[CONFIG_KEY] = [{k: p[k] for k in ('name',) + FIELDS} for p in clean_projects(projects)]
     return _write_config(path, data)
 
 
 def build_command(projects):
     """Fixed unit/property allowlist; never reads Environment, command lines or user files.
-    Docker is asked only for container names and states."""
+    Docker is asked only for container names and states, pgrep only for process-name counts."""
     units = ' '.join(unit_id(unit) for p in projects for unit in p['units'])
     show = ('systemctl show --no-pager -p Id -p LoadState -p ActiveState '
             '-p MainPID -p ActiveEnterTimestampMonotonic -p CPUUsageNSec '
@@ -120,8 +123,12 @@ def build_command(projects):
     docker = ("; printf '\\nDOCKER\\n'; if command -v docker >/dev/null 2>&1; then "
               "docker ps -a --format '{{.Names}}|{{.State}}' 2>/dev/null && echo DOCKER_OK; "
               "else echo NO_DOCKER; fi") if any(p['containers'] for p in projects) else ''
+    names = ' '.join(shlex.quote(name) for p in projects for name in p['processes'])
+    processes = ("; printf '\\nPROC\\n'; if command -v pgrep >/dev/null 2>&1; then for p in " + names
+                 + "; do printf 'P=%s=%s\\n' \"$p\" \"$(pgrep -x -- \"$p\" | wc -l | tr -d ' ')\"; done; "
+                 "echo PROC_OK; else echo NO_PGREP; fi") if names else ''
     return ("printf 'SAMPLE\\n'; " + uptime + show + "; sleep 1; printf '\\nSAMPLE\\n'; "
-            + uptime + show + docker)
+            + uptime + show + processes + docker)
 
 
 def number(value):
@@ -164,18 +171,35 @@ def _containers(text, names):
     return states
 
 
+def _processes(text):
+    """Process-name counts; None when pgrep is missing or did not finish."""
+    if '\nPROC\n' not in '\n' + text:
+        return None
+    lines = ('\n' + text).split('\nPROC\n', 1)[1].split('\nDOCKER\n', 1)[0].splitlines()
+    if 'PROC_OK' not in lines:
+        return None
+    counts = {}
+    for line in lines:
+        if line.startswith('P='):
+            name, _, count = line[2:].rpartition('=')
+            if count.isdigit():
+                counts[name] = int(count)
+    return counts
+
+
 def parse_sample(text, projects):
-    """Component rows for every tracked unit and container.
+    """Component rows for every tracked unit, container and process name.
 
     Missing/permission-denied measurements remain unknown, not zero.
     """
     text = text or ''
-    samples = _samples(text.split('\nDOCKER\n', 1)[0])
+    samples = _samples(re.split(r'\n(?:PROC|DOCKER)\n', text, maxsplit=1)[0])
     before = samples[0] if len(samples) >= 2 else (None, {})
     after = samples[-1] if samples else (None, {})
     elapsed = after[0] - before[0] if None not in (before[0], after[0]) else 0
     names = {name for p in projects for name in p['containers']}
     docker = _containers(text, names) if samples else None
+    processes = _processes(text) if samples else None
     rows = []
     for project in projects:
         for unit in project['units']:
@@ -195,6 +219,10 @@ def parse_sample(text, projects):
         for name in project['containers']:
             status = 'unknown' if docker is None else docker.get(name, 'not_installed')
             rows.append(_row(project, name, 'container', status, None, None, None))
+        for name in project['processes']:
+            count = None if processes is None else processes.get(name)
+            status = 'unknown' if count is None else 'active' if count else 'not_installed'
+            rows.append(dict(_row(project, name, 'process', status, None, None, None), count=count))
     return rows
 
 

@@ -29,7 +29,8 @@ window.renderProjectStats = function (root, projects) {
             const line = document.createElement('div');
             line.className = 'small mt-1 d-flex justify-content-between flex-wrap gap-2';
             const title = document.createElement('code');
-            title.textContent = row.kind === 'container' ? `${row.name} (${labels.container})` : row.name;
+            const kinds = {container: labels.container, process: labels.process};
+            title.textContent = kinds[row.kind] ? `${row.name} (${kinds[row.kind]})` : row.name;
             const details = document.createElement('span');
             details.className = row.status === 'active' ? 'text-body-secondary' : 'text-danger';
             const parts = [states[row.status] || labels.unknown];
@@ -38,6 +39,7 @@ window.renderProjectStats = function (root, projects) {
                 parts.push(`${labels.memory} ` + (metric(row.memory_bytes) ? (row.memory_bytes / 1048576).toFixed(1) + ' MiB' : '—'));
                 parts.push(`${labels.tasks} ` + (metric(row.tasks) ? row.tasks : '—'));
             }
+            if (row.kind === 'process' && metric(row.count)) parts.push(`${labels.count}: ${row.count}`);
             details.textContent = parts.join(' · ');
             line.append(title, details);
             item.append(line);

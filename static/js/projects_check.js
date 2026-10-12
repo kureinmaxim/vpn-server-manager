@@ -42,7 +42,7 @@
         link.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(server.id));
         link.textContent = `${server.name || server.ip_address} · ${active}/${project.components.length}`;
         link.title = `${t[project.state] || t.unknown}\n` + project.components.map(row =>
-            `${row.name}${row.kind === 'container' ? ' (' + t.container + ')' : ''}: ${t[row.status] || t.unknown}`).join('\n');
+            `${row.name}${t[row.kind] ? ' (' + t[row.kind] + ')' : ''}: ${t[row.status] || t.unknown}`).join('\n');
         return link;
     }
 
