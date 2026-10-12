@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.8] - 2026-10-12
+
+### Added
+- Tracked projects can include **processes**: programs started without a systemd service or container, such as `rnsd` run by hand in a terminal. Only the process name (as shown by `ps`, up to 15 characters) and the number of matching processes are read. Reticulum checks `rnsd` and `lxmd` by default.
+
 ## [4.12.7] - 2026-10-12
 
 ### Added

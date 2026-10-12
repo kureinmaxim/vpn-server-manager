@@ -528,12 +528,15 @@ def tracked_projects():
         if request.form.get('action') == 'reset':
             projects = None
         else:
-            names, units, containers = (request.form.getlist(field) for field in ('name', 'units', 'containers'))
-            projects = [{'name': n, 'units': u, 'containers': c} for n, u, c in zip(names, units, containers)]
+            names, units, containers, processes = (request.form.getlist(field)
+                                                   for field in ('name', 'units', 'containers', 'processes'))
+            projects = [{'name': n, 'units': u, 'containers': c, 'processes': p}
+                        for n, u, c, p in zip(names, units, containers, processes)]
         try:
             saved = save_projects(current_app, projects)
         except ProjectError as error:
-            flash({'incomplete': _('У каждого проекта должны быть название и хотя бы одна служба или контейнер.'),
+            flash({'incomplete': _('У каждого проекта должны быть название и хотя бы одна служба, контейнер или процесс.'),
+                   'processes': _('Имена процессов: латиница, цифры и символы . _ - (до 15 знаков, как в ps; не больше 16 на проект).'),
                    'units': _('Имена служб: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
                    'containers': _('Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
                    }.get(str(error), _('Слишком много проектов.')), 'danger')

@@ -102,12 +102,30 @@ def test_reticulum_found_via_ha_bridge_and_watchdog_timer():
     assert reticulum['state'] == 'running' and reticulum['components'][0]['name'] == 'ha_rns_bridge'
 
 
+def test_manually_started_processes_are_counted_by_name_only():
+    command = build_command(PROJECTS)
+    assert "for p in rnsd lxmd;" in command and 'pgrep -x -- "$p"' in command
+    assert 'pgrep -f' not in command and '/proc/' + '*/cmdline' not in command
+    base = sample(100) + sample(101)
+    rows = parse_sample(base + '\nPROC\nP=rnsd=2\nP=lxmd=0\nPROC_OK\nDOCKER\nNO_DOCKER', PROJECTS)
+    assert row(rows, 'rnsd')['status'] == 'active' and row(rows, 'rnsd')['count'] == 2
+    assert row(rows, 'lxmd')['status'] == 'not_installed'
+    reticulum = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Reticulum')
+    assert reticulum['state'] == 'running' and [c['kind'] for c in reticulum['components']] == ['process']
+    for missing in ('\nPROC\nNO_PGREP\nDOCKER\nNO_DOCKER', '\nPROC\nP=rnsd=1\n', ''):
+        assert row(parse_sample(base + missing, PROJECTS), 'rnsd')['status'] == 'unknown'
+
+
 def test_custom_projects_are_validated_before_reaching_the_shell():
     projects = clean_projects([{'name': '  My   app ', 'units': 'myapp.service, myapp-worker myapp', 'containers': ''},
                                {'name': '', 'units': '', 'containers': ''},
                                {'name': 'My app', 'units': [], 'containers': ['web']}])
-    assert projects == [{'key': 'my_app', 'name': 'My app', 'units': ['myapp', 'myapp-worker'], 'containers': []},
-                        {'key': 'my_app_', 'name': 'My app', 'units': [], 'containers': ['web']}]
+    assert projects == [{'key': 'my_app', 'name': 'My app', 'units': ['myapp', 'myapp-worker'], 'containers': [], 'processes': []},
+                        {'key': 'my_app_', 'name': 'My app', 'units': [], 'containers': ['web'], 'processes': []}]
+    assert clean_projects([{'name': 'Manual', 'processes': 'rnsd lxmd'}])[0]['processes'] == ['rnsd', 'lxmd']
+    for bad in ('a' * 16, 'x@y', '$(id)'):
+        with pytest.raises(ProjectError):
+            clean_projects([{'name': 'evil', 'processes': [bad]}])
     assert 'docker' not in build_command(projects[:1]) and 'myapp-worker.service' in build_command(projects)
     for bad in ('x; rm -rf /', '$(id)', 'a`b`', '-flag', 'a' * 65):
         with pytest.raises(ProjectError):

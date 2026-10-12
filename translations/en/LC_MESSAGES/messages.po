@@ -8902,3 +8902,21 @@ msgstr "Critical error: could not create the data file. %(error)s"
 
 msgid "Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена."
 msgstr "For a service started periodically by a timer, enter the timer with its .timer suffix, for example ha-rns-watchdog.timer: the service itself is stopped between runs."
+
+msgid "Процессы"
+msgstr "Processes"
+
+msgid "процесс"
+msgstr "process"
+
+msgid "запущено"
+msgstr "running"
+
+msgid "У каждого проекта должны быть название и хотя бы одна служба, контейнер или процесс."
+msgstr "Each project needs a name and at least one service, container or process."
+
+msgid "Имена процессов: латиница, цифры и символы . _ - (до 15 знаков, как в ps; не больше 16 на проект)."
+msgstr "Process names: Latin letters, digits and . _ - (up to 15 characters, as shown by ps; at most 16 per project)."
+
+msgid "Процессы — для программ, запущенных без службы и контейнера, например rnsd вручную в терминале. Проверяется только имя процесса, как в ps (до 15 знаков), и число таких процессов."
+msgstr "Processes are for programs started without a service or container, for example rnsd run by hand in a terminal. Only the process name, as shown by ps (up to 15 characters), and the number of such processes are checked."

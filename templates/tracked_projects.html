@@ -7,6 +7,7 @@
     <td><input class="form-control form-control-sm" name="name" maxlength="60" value="{{ project.name }}" aria-label="{{ _('Название') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ project.units if project.units is string else project.units|join(', ') }}"{% if hint %} placeholder="myapp, myapp-worker"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ project.containers if project.containers is string else project.containers|join(', ') }}"{% if hint %} placeholder="myapp"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="processes" value="{{ (project.processes or []) if (project.processes or []) is string else (project.processes or [])|join(', ') }}"{% if hint %} placeholder="myapp"{% endif %} aria-label="{{ _('Процессы') }}"></td>
     <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" data-remove-project title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
 </tr>
 {% endmacro %}
@@ -37,9 +38,10 @@
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th scope="col" style="width: 24%">{{ _('Название') }}</th>
+                        <th scope="col" style="width: 20%">{{ _('Название') }}</th>
                         <th scope="col">{{ _('Службы systemd') }}</th>
-                        <th scope="col" style="width: 28%">{{ _('Контейнеры Docker') }}</th>
+                        <th scope="col" style="width: 24%">{{ _('Контейнеры Docker') }}</th>
+                        <th scope="col" style="width: 16%">{{ _('Процессы') }}</th>
                         <th scope="col" style="width: 3rem"><span class="visually-hidden">{{ _('Действия') }}</span></th>
                     </tr>
                 </thead>
@@ -48,7 +50,7 @@
                 </tbody>
             </table>
         </div>
-        <template id="tracked-project-template">{{ project_row({'name': '', 'units': [], 'containers': []}, hint=True) }}</template>
+        <template id="tracked-project-template">{{ project_row({'name': '', 'units': [], 'containers': [], 'processes': []}, hint=True) }}</template>
         <div class="d-flex flex-wrap gap-2">
             <button type="button" class="btn btn-outline-info" id="add-project"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить проект') }}</button>
             <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
@@ -56,7 +58,8 @@
                     formnovalidate onclick="return confirm({{ _('Вернуть стандартный список проектов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
         </div>
     </form>
-    <p class="small text-body-secondary mt-3 mb-1">{{ _('Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена.') }}</p>
+    <p class="small text-body-secondary mt-3 mb-1">{{ _('Процессы — для программ, запущенных без службы и контейнера, например rnsd вручную в терминале. Проверяется только имя процесса, как в ps (до 15 знаков), и число таких процессов.') }}</p>
+    <p class="small text-body-secondary mb-1">{{ _('Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена.') }}</p>
     <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
 </div>
 <script>
