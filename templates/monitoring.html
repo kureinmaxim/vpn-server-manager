@@ -21,6 +21,11 @@
         </div>
     </div>
 
+    <div id="installation-check-error" class="alert alert-warning" role="alert" hidden>
+        <p>{{ _('Не удалось проверить установку мониторинга. Проверьте SSH-подключение и повторите попытку.') }}</p>
+        <button type="button" id="retry-installation-check" class="btn btn-outline-primary">{{ _('Повторить') }}</button>
+    </div>
+
     <!-- Loading Indicator (показывается сразу, скрывается через JS) -->
     <div id="initial-loading" class="text-center py-5">
         <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
@@ -1322,30 +1327,29 @@ let isUninstalling = false;
 let currentEventSource = null;
 
 async function checkInstallation() {
-    console.log('🔧 Checking monitoring installation status...');
-    console.log('🔗 URL:', `/api/monitoring/${serverId}/check-installed`);
     try {
         const response = await fetch(`/api/monitoring/${serverId}/check-installed`);
-        console.log('📡 Response status:', response.status);
-        
-        if (!response.ok) {
-            console.error('❌ Response not OK:', response.status, response.statusText);
-            return false;
-        }
-        
+        if (!response.ok) return null;
         const data = await response.json();
-        console.log('📊 Installation check result:', data);
-        console.log('✅ Installed:', data.installed);
-        
-        if (!data.installed && data.error) {
-            console.error('❌ Check error:', data.error);
-        }
-        
-        return data.installed || false;
+        return data.success && typeof data.installed === 'boolean' ? data.installed : null;
     } catch (error) {
-        console.error('💥 Error checking installation:', error);
-        return false;
+        return null;
     }
+}
+
+function showInstallationCheckError() {
+    document.getElementById('initial-loading').style.display = 'none';
+    document.getElementById('installation-panel').style.display = 'none';
+    document.getElementById('installation-check-error').hidden = false;
+}
+
+async function loadMonitoringState() {
+    document.getElementById('installation-check-error').hidden = true;
+    document.getElementById('initial-loading').style.display = 'block';
+    const installed = await checkInstallation();
+    if (installed === true) showMonitoring();
+    else if (installed === false) showInstallationPanel();
+    else showInstallationCheckError();
 }
 
 function showInstallationPanel() {
@@ -1361,9 +1365,7 @@ function showInstallationPanel() {
     document.getElementById('stats-container').style.display = 'none';
     
     // Добавляем обработчик кнопки установки
-    document.getElementById('install-btn').addEventListener('click', function() {
-        startInstallation();
-    });
+    document.getElementById('install-btn').onclick = startInstallation;
 }
 
 function showMonitoring() {
@@ -1385,7 +1387,7 @@ function showMonitoring() {
     document.getElementById('stats-container').style.display = 'block';
     
     // Инициализируем мониторинг
-    initMonitoring();
+    if (!cpuChart) initMonitoring();
     
     // setupSettingsPanel() уже вызван в DOMContentLoaded
 }
@@ -1459,36 +1461,14 @@ async function startInstallation() {
     // Проверяем, не установлен ли уже мониторинг
     console.log('🔍 Checking if monitoring is already installed...');
     const alreadyInstalled = await checkInstallation();
-    if (alreadyInstalled) {
-        console.warn('⚠️ Monitoring is already installed on this server!');
-        
-        // Показываем красивое уведомление
-        const notification = document.createElement('div');
-        notification.className = 'alert alert-info alert-dismissible fade show';
-        notification.style.position = 'fixed';
-        notification.style.top = '80px';
-        notification.style.right = '20px';
-        notification.style.zIndex = '9999';
-        notification.style.maxWidth = '400px';
-        notification.innerHTML = `
-            <div class="d-flex align-items-start">
-                <div style="font-size: 2rem; margin-right: 15px;">✅</div>
-                <div>
-                    <strong>{{ _("Мониторинг уже установлен") }}</strong><br>
-                    <span class="small">{{ _("Система мониторинга уже активна на этом сервере. Сейчас загрузим данные...") }}</span>
-                </div>
-                <button type="button" class="btn-close ms-2" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        document.body.appendChild(notification);
-        
-        // Через 2 секунды перезагружаем страницу
-        setTimeout(() => {
-            location.reload();
-        }, 2000);
+    if (alreadyInstalled !== false) {
+        installBtn.disabled = false;
+        installBtn.innerHTML = originalText;
+        if (alreadyInstalled === true) showMonitoring();
+        else showInstallationCheckError();
         return;
     }
-    
+
     // Восстанавливаем текст кнопки и продолжаем установку
     installBtn.innerHTML = originalText;
     
@@ -1519,6 +1499,13 @@ async function startInstallation() {
             const data = JSON.parse(event.data);
             console.log('📥 Installation progress:', data);
             
+            if (data.already_installed) {
+                currentEventSource.close();
+                resetInstallation();
+                showMonitoring();
+                return;
+            }
+
             // Отмена
             if (data.cancelled) {
                 addLog(logsContainer, data.message, 'warning');
@@ -1743,16 +1730,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // ВАЖНО: Настраиваем панель настроек ВСЕГДА (кнопки существуют в DOM)
     setupSettingsPanel();
     
-    // Проверяем, установлен ли мониторинг
-    const isInstalled = await checkInstallation();
-    
-    if (isInstalled) {
-        // Мониторинг установлен - показываем данные
-        showMonitoring();
-    } else {
-        // Мониторинг не установлен - показываем панель установки
-        showInstallationPanel();
-    }
+    document.getElementById('retry-installation-check').onclick = loadMonitoringState;
+    await loadMonitoringState();
 });
 </script>
 <script src="{{ url_for('static', filename='js/monitoring_view.js') }}?v={{ app_info.get('version', '') }}"></script>

@@ -8672,5 +8672,11 @@ msgstr "Not installed"
 msgid "Задачи"
 msgstr "Tasks"
 
-msgid "CPU: 100%% = одно ядро. Память учитывает всю службу. Недоступные метрики обозначены прочерком."
-msgstr "CPU: 100%% = one core. Memory covers the entire service. Unavailable metrics are shown as a dash."
+msgid "CPU — доля одного ядра: полностью занятое ядро даёт 100%%, на многоядерном сервере значение может быть выше. Память учитывает всю службу. Недоступные метрики обозначены прочерком."
+msgstr "CPU is a share of one core: a fully busy core is 100%%, so on a multi-core server the value can exceed it. Memory covers the entire service. Unavailable metrics are shown as a dash."
+
+msgid "Не удалось проверить установку мониторинга. Проверьте SSH-подключение и повторите попытку."
+msgstr "Could not check the monitoring installation. Check the SSH connection and try again."
+
+msgid "Повторить"
+msgstr "Retry"
