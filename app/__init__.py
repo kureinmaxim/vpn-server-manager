@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.12.8'),
+            "version": app.config.get('APP_VERSION', '4.12.9'),
             "release_date": "12.10.2026",
             "last_updated": "2026-10-12",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.12.8",
+            "version": "4.12.9",
             "release_date": "12.10.2026",
             "last_updated": "2026-10-12",
             "developer": "Куреин М.Н."
@@ -394,9 +394,11 @@ def create_app(config_name='development'):
         from .services.project_stats import load_projects
 
         ui_prefs = load_ui_preferences(app)
+        projects = load_projects(app)
         return {
             'app_info': app.config.get('app_info', {}),
-            'tracked_projects': [project['name'] for project in load_projects(app)],
+            'tracked_projects': [project['name'] for project in projects],
+            'tracked_processes': list(dict.fromkeys(name for project in projects for name in project['processes'])),
             'developer_name': _('Куреин М.Н.'),
             'current_locale': str(babel_get_locale()),
             'ui_zoom': ui_prefs.get('zoom', '80'),

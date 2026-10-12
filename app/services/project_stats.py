@@ -239,6 +239,8 @@ def summarize(rows, projects):
     for project in projects:
         own = [row for row in rows if row['project'] == project['key']]
         found = [row for row in own if row['status'] not in ('not_installed', 'unknown')]
+        services = {row['name'] for row in found if row['kind'] == 'unit' and row['status'] == 'active'}
+        found = [row for row in found if row['kind'] != 'process' or row['name'] + '.service' not in services]
         if not found:
             if own and all(row['status'] == 'unknown' for row in own):
                 result.append({'key': project['key'], 'name': project['name'], 'state': 'unknown', 'components': []})
