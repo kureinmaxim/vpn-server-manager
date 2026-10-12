@@ -324,10 +324,10 @@
             </div>
         </div>
         <div class="col-12 col-xl-5">
-            <div class="file-manager-status card monitoring-card mb-3">
+            <div class="project-status card monitoring-card mb-3">
                 <div class="card-body">
-                    <h3><i class="bi bi-folder2-open"></i> Rust File Manager</h3>
-                    {% include 'partials/file_manager_stats.html' %}
+                    <h3><i class="bi bi-boxes"></i> {{ _('Мои проекты') }}</h3>
+                    {% include 'partials/project_stats.html' %}
                 </div>
             </div>
             <div id="monitoring-services" tabindex="-1" class="active-services card monitoring-card mb-3">
@@ -510,7 +510,7 @@
 
 <!-- Styles moved to static/css/monitoring.css -->
 
-<script src="{{ url_for('static', filename='js/file_manager_stats.js') }}?v={{ app_info.get('version', '') }}"></script>
+<script src="{{ url_for('static', filename='js/project_stats.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 // Debug output - проверка загрузки
@@ -691,9 +691,8 @@ async function updateServicesStatus() {
 
             const proxyServices = services.filter(service => service.group === 'proxy');
             const teloServices = services.filter(service => service.group === 'telegramonly');
-            const systemServices = services.filter(service => !['proxy', 'telegramonly', 'file_manager'].includes(service.group));
-            renderFileManagerStats(document.querySelector('[data-file-manager-stats]'),
-                services.filter(service => service.group === 'file_manager'));
+            const systemServices = services.filter(service => !['proxy', 'telegramonly', 'project'].includes(service.group));
+            renderProjectStats(document.querySelector('[data-project-stats]'), data.projects);
 
             if (proxyServices.length) {
                 proxyServices.forEach(service => renderService(service, proxyContainer));

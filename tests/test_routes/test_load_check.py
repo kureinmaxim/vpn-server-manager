@@ -149,6 +149,30 @@ def test_main_page_includes_load_check_in_offline_mode(load_client):
     assert response.status_code == 200
     assert b'data-bs-target="#loadCheckModal"' in response.data
     assert b"js/load_check.js" in response.data
+    assert b'data-bs-target="#projectsCheckModal"' in response.data
+    assert b"js/projects_check.js" in response.data and b"BotCriptoM" in response.data
+
+
+def test_projects_snapshot_uses_saved_credentials_and_own_rate_limit(load_client):
+    ssh = registry.get("ssh")
+    ssh.get_projects_snapshot.return_value = [{"key": "botcriptom", "name": "BotCriptoM", "state": "running", "components": []}]
+    assert client_get_ok(load_client, "/api/monitoring/one/load-snapshot")
+    response = load_client.get("/api/monitoring/one/projects-snapshot")
+    assert response.status_code == 200 and response.json["stats"][0]["name"] == "BotCriptoM"
+    assert response.headers["Cache-Control"] == "no-store"
+    ssh.get_projects_snapshot.assert_called_once_with(
+        ip="192.0.2.1", user="admin", port=2222, password="decrypted-secret"
+    )
+    assert load_client.get("/api/monitoring/archived/projects-snapshot").status_code == 409
+    for _ in range(5):
+        load_client.get("/api/monitoring/one/projects-snapshot")
+    assert load_client.get("/api/monitoring/one/projects-snapshot").status_code == 429
+    with load_client.application.test_client() as anonymous:
+        assert anonymous.get("/api/monitoring/one/projects-snapshot").status_code == 401
+
+
+def client_get_ok(client, url):
+    return client.get(url).status_code == 200
 
 
 def test_load_check_follows_language_switch_for_labels_units_and_api(load_client):

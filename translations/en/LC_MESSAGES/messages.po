@@ -8734,3 +8734,105 @@ msgstr "registrar account"
 
 msgid "%(domain)s: из реестра обновлено — %(fields)s. Сверьте срок окончания в кабинете регистратора."
 msgstr "%(domain)s: updated from the registry — %(fields)s. Check the expiry date in your registrar account."
+
+msgid "Мои проекты"
+msgstr "My projects"
+
+msgid "Проекты"
+msgstr "Projects"
+
+msgid "Проект"
+msgstr "Project"
+
+msgid "Где запущен"
+msgstr "Running on"
+
+msgid "Где запущены ваши проекты"
+msgstr "Where your projects run"
+
+msgid "Где запущены ваши проекты, кроме TelegramOnly"
+msgstr "Where your projects run, except TelegramOnly"
+
+msgid "Где запущены ваши проекты, кроме TelegramOnly • разовая проверка по SSH, только чтение"
+msgstr "Where your projects run, except TelegramOnly • one-time read-only SSH check"
+
+msgid "Мои проекты на серверах"
+msgstr "My projects on servers"
+
+msgid "Ваши проекты на этом сервере не найдены."
+msgstr "None of your projects were found on this server."
+
+msgid "Работает частично"
+msgstr "Partly running"
+
+msgid "контейнер"
+msgstr "container"
+
+msgid "работает"
+msgstr "running"
+
+msgid "остановлен"
+msgstr "stopped"
+
+msgid "ошибка"
+msgstr "failed"
+
+msgid "Не найден ни на одном проверенном сервере"
+msgstr "None of your projects were found on the checked servers"
+
+msgid "Не найдены: {names}"
+msgstr "Not found: {names}"
+
+msgid "Не удалось проверить: {names}"
+msgstr "Could not check: {names}"
+
+msgid "Проверено серверов: {done} / {total}"
+msgstr "Servers checked: {done} / {total}"
+
+#, python-format
+msgid "Отслеживаются: %(projects)s. Показаны только найденные на сервере службы и контейнеры."
+msgstr "Tracked: %(projects)s. Only services and containers found on the server are shown."
+
+msgid "Цифры — сколько служб и контейнеров проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг."
+msgstr "Numbers show how many of the project’s services and containers found on the server are running. Click a server to open its monitoring."
+
+msgid "Атаки и сбои"
+msgstr "Attacks and failures"
+
+#, python-format
+msgid "Команда входа как %(user)s. Пароль — «Пароль входа»."
+msgstr "Login command as %(user)s. Password: “Login password”."
+
+msgid "Команда входа как root. Пароль — справочный пароль root."
+msgstr "Login command as root. Password: the reference root password."
+
+#, python-format
+msgid "Команда для %(user)s"
+msgstr "Command for %(user)s"
+
+msgid "Команда для root"
+msgstr "Command for root"
+
+msgid "Пароль к этой команде — «Пароль входа» ниже."
+msgstr "The password for this command is the “Login password” below."
+
+msgid "Пароль к этой команде — справочный пароль root."
+msgstr "The password for this command is the reference root password."
+
+msgid "Последнее обновление пакетов: нет данных"
+msgstr "Last package update: no data"
+
+msgid "Промпт для LLM"
+msgstr "LLM prompt"
+
+msgid "Разбор"
+msgstr "Analysis"
+
+msgid "Разобрать ситуацию"
+msgstr "Analyse the situation"
+
+msgid "Считаю загрузку по /proc/stat и load average…"
+msgstr "Calculating load from /proc/stat and load average…"
+
+msgid "Нагрузка сервера"
+msgstr "Server load"

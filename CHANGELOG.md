@@ -2,6 +2,15 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.6] - 2026-10-12
+
+### Added
+- **Projects** next to **Server load** shows where your own projects run across active servers: BotCriptoM, Rust File Manager, UGCTL, ApiAigRPC, ApiNgRPC, ApiXgRPC, TelegramHelper and PDF3MD (TelegramOnly has its own section). Each server badge shows the project state and how many of its services and containers are running, and opens that server's monitoring.
+
+### Changed
+- Server Status and Monitoring show **My projects** instead of the Rust File Manager block: every found project with its systemd services (CPU, memory, tasks) and Docker containers. The check reads only fixed systemd properties and container names and states.
+- Translated remaining Monitoring and Status labels for English and Chinese.
+
 ## [4.12.5] - 2026-10-12
 
 ### Added

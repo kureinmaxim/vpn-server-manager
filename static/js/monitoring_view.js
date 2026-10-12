@@ -5,7 +5,7 @@
     const groups = {
         overview: '.monitoring-overview, #load-diagnosis',
         network: '.network-traffic, .firewall-status',
-        services: '.active-services, .telegramonly-stack, .reticulum-status, .webpanels, .file-manager-status',
+        services: '.active-services, .telegramonly-stack, .reticulum-status, .webpanels, .project-status',
         security: '.security-events',
         history: '.mini-charts',
     };

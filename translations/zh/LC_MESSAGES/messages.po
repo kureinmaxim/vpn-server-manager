@@ -8402,3 +8402,105 @@ msgstr "注册商账户"
 
 msgid "%(domain)s: из реестра обновлено — %(fields)s. Сверьте срок окончания в кабинете регистратора."
 msgstr "%(domain)s：已从注册局更新 — %(fields)s。请在注册商账户中核对到期日期。"
+
+msgid "Мои проекты"
+msgstr "我的项目"
+
+msgid "Проекты"
+msgstr "项目"
+
+msgid "Проект"
+msgstr "项目"
+
+msgid "Где запущен"
+msgstr "运行位置"
+
+msgid "Где запущены ваши проекты"
+msgstr "您的项目运行位置"
+
+msgid "Где запущены ваши проекты, кроме TelegramOnly"
+msgstr "您的项目运行位置（TelegramOnly 除外）"
+
+msgid "Где запущены ваши проекты, кроме TelegramOnly • разовая проверка по SSH, только чтение"
+msgstr "您的项目运行位置（TelegramOnly 除外）• 一次性只读 SSH 检查"
+
+msgid "Мои проекты на серверах"
+msgstr "服务器上的我的项目"
+
+msgid "Ваши проекты на этом сервере не найдены."
+msgstr "此服务器上未找到您的项目。"
+
+msgid "Работает частично"
+msgstr "部分运行"
+
+msgid "контейнер"
+msgstr "容器"
+
+msgid "работает"
+msgstr "运行中"
+
+msgid "остановлен"
+msgstr "已停止"
+
+msgid "ошибка"
+msgstr "故障"
+
+msgid "Не найден ни на одном проверенном сервере"
+msgstr "已检查的服务器上均未找到您的项目"
+
+msgid "Не найдены: {names}"
+msgstr "未找到：{names}"
+
+msgid "Не удалось проверить: {names}"
+msgstr "无法检查：{names}"
+
+msgid "Проверено серверов: {done} / {total}"
+msgstr "已检查服务器：{done} / {total}"
+
+#, python-format
+msgid "Отслеживаются: %(projects)s. Показаны только найденные на сервере службы и контейнеры."
+msgstr "跟踪项目：%(projects)s。仅显示在服务器上找到的服务和容器。"
+
+msgid "Цифры — сколько служб и контейнеров проекта работает из найденных на сервере. Нажмите на сервер, чтобы открыть его мониторинг."
+msgstr "数字表示服务器上找到的该项目服务和容器中正在运行的数量。点击服务器可打开其监控。"
+
+msgid "Атаки и сбои"
+msgstr "攻击与故障"
+
+#, python-format
+msgid "Команда входа как %(user)s. Пароль — «Пароль входа»."
+msgstr "以 %(user)s 登录的命令。密码为“登录密码”。"
+
+msgid "Команда входа как root. Пароль — справочный пароль root."
+msgstr "以 root 登录的命令。密码为参考 root 密码。"
+
+#, python-format
+msgid "Команда для %(user)s"
+msgstr "%(user)s 的命令"
+
+msgid "Команда для root"
+msgstr "root 的命令"
+
+msgid "Пароль к этой команде — «Пароль входа» ниже."
+msgstr "此命令的密码为下方的“登录密码”。"
+
+msgid "Пароль к этой команде — справочный пароль root."
+msgstr "此命令的密码为参考 root 密码。"
+
+msgid "Последнее обновление пакетов: нет данных"
+msgstr "上次软件包更新：无数据"
+
+msgid "Промпт для LLM"
+msgstr "LLM 提示词"
+
+msgid "Разбор"
+msgstr "分析"
+
+msgid "Разобрать ситуацию"
+msgstr "分析情况"
+
+msgid "Считаю загрузку по /proc/stat и load average…"
+msgstr "正在根据 /proc/stat 和平均负载计算…"
+
+msgid "Нагрузка сервера"
+msgstr "服务器负载"

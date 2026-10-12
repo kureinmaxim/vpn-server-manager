@@ -663,7 +663,15 @@ def load_snapshot(server_id):
     return _load_check_snapshot(server_id)
 
 
-def _load_check_snapshot(server_id, derp=False):
+@api_bp.route('/monitoring/<server_id>/projects-snapshot', methods=['GET'])
+@require_auth
+@require_pin
+def projects_snapshot(server_id):
+    return _load_check_snapshot(server_id, kind='projects')
+
+
+def _load_check_snapshot(server_id, derp=False, kind=None):
+    kind = kind or ('derp' if derp else 'load')
     ssh_service = registry.get('ssh')
     data_manager = registry.get('data_manager')
     if not ssh_service or not data_manager:
@@ -676,9 +684,10 @@ def _load_check_snapshot(server_id, derp=False):
             return jsonify(error=_('Сервер больше не активен. Обновите список.')), 409
         if not creds.get('ip') or not has_ssh_auth(creds):
             return jsonify(error=_('Укажите IP и пароль или SSH-ключ в карточке сервера.')), 400
-        if not load_check_limiter.is_allowed(('derp:' if derp else '') + str(server_id)):
+        if not load_check_limiter.is_allowed(('' if kind == 'load' else kind + ':') + str(server_id)):
             return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
-        stats = ssh_service.get_derp_snapshot(**creds) if derp else ssh_service.get_load_snapshot(**creds)
+        stats = {'derp': ssh_service.get_derp_snapshot, 'projects': ssh_service.get_projects_snapshot,
+                 'load': ssh_service.get_load_snapshot}[kind](**creds)
         response = jsonify(stats=stats)
         response.headers['Cache-Control'] = 'no-store'
         return response
@@ -874,9 +883,11 @@ def get_services_stats(server_id):
             timeout=30
         )
         
+        from ..services.project_stats import summarize
         return jsonify({
             'success': True,
-            'data': stats
+            'data': stats,
+            'projects': summarize([s for s in stats if s.get('group') == 'project']),
         })
         
     except Exception as e:
