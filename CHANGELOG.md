@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.11.4] - 2026-10-12
+
+### Changed
+- Rust File Manager and its optional internal bridge appear in Status and Monitoring, with systemd state, sampled CPU usage, service memory and task count. Unavailable counters remain unknown; checks do not read credentials or alter services.
+- Monitoring uses the application's light/dark theme, with persistent CPU, memory and network readings, compact section switching, and expandable terminal commands. Only the selected section is shown, reducing vertical scrolling.
+- Server Status keeps resource readings visible and groups processes, interfaces, Docker containers and service details into keyboard-accessible disclosures. CPU usage now includes a numeric percentage.
+- Improved responsive layouts and English/Chinese labels. PNG export expands diagnostic sections in its capture copy.
+
+### Fixed
+- Monitoring's stylesheet was declared in an unused template block and never loaded. It is now included in the rendered page, with styles scoped to monitoring and its uninstall dialog.
+
 ## [4.11.2] - 2026-10-08
 
 ### Fixed

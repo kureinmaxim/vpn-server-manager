@@ -1,15 +1,10 @@
 {% extends "layout.html" %}
 
-{% block head %}
-{{ super() }}
-<!-- Monitoring CSS with cache buster -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v=3.0">
-{% endblock %}
-
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui1">
 {% set ssh_port = server.get('ssh_credentials', {}).get('port', 22) %}
 <div class="container-fluid mt-3 monitoring-page">
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1>
                 <i class="bi bi-bar-chart-line"></i> {{ _('Расширенный мониторинг') }}
@@ -114,26 +109,62 @@
             <section class="security-brief-block">
                 <div class="security-brief-head">
                     <h4>{{ _('Промпт для LLM') }}</h4>
-                    <button type="button" class="btn btn-outline-light btn-sm" id="copy-security-prompt">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-security-prompt">
                         <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
                     </button>
                 </div>
                 <pre id="security-brief-prompt" class="security-brief-text"></pre>
             </section>
         </div>
+        <nav class="monitoring-nav" aria-label="{{ _('Разделы мониторинга') }}">
+            <a href="#monitoring-overview">{{ _('Обзор') }}</a>
+            <a href="#monitoring-network">{{ _('Сеть') }}</a>
+            <a href="#monitoring-services">{{ _('Сервисы') }}</a>
+            <a href="#monitoring-security">{{ _('Безопасность') }}</a>
+            <a href="#monitoring-history">{{ _('История') }}</a>
+        </nav>
+    <div class="btop-board" id="monitoring-overview" tabindex="-1" aria-label="{{ _('Нагрузка сервера') }}">
+        <section class="btop-box" id="btop-cpu-box">
+            <header>
+                <span>CPU</span>
+                <strong id="btop-cpu-val">—</strong>
+            </header>
+            <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
+            <div class="btop-spark" id="btop-cpu-spark"></div>
+        </section>
+        <section class="btop-box" id="btop-mem-box">
+            <header>
+                <span>{{ _('Память') }}</span>
+                <strong id="btop-mem-val">—</strong>
+            </header>
+            <div class="btop-bar"><i id="btop-mem-fill"></i></div>
+            <div class="btop-spark" id="btop-mem-spark"></div>
+        </section>
+        <section class="btop-box">
+            <header>
+                <span>{{ _('Сеть') }}</span>
+                <strong id="btop-net-val">MB/s</strong>
+            </header>
+            <div class="btop-net-row">
+                <span>↓</span>
+                <div class="btop-bar"><i id="btop-rx-fill"></i></div>
+                <em id="btop-rx-val">0.00</em>
+            </div>
+            <div class="btop-net-row">
+                <span>↑</span>
+                <div class="btop-bar"><i id="btop-tx-fill"></i></div>
+                <em id="btop-tx-val">0.00</em>
+            </div>
+        </section>
+    </div>
         <div class="monitoring-overview card mb-4">
             <div class="card-body">
                 <div class="overview-header">
                     <div>
-                        <div class="overview-eyebrow">{{ _('Сводка по серверу') }}</div>
-                        <h2 class="overview-title">{{ server.name }}</h2>
-                        <p class="overview-subtitle mb-0">
-                            {{ server.ip_address }}
-                            {% if server.provider %}<span class="badge bg-secondary ms-2">{{ server.provider }}</span>{% endif %}
-                        </p>
+                        <h2 class="overview-title">{{ _('Сводка по серверу') }}</h2>
                     </div>
                     <div class="overview-actions">
-                        <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-outline-light btn-sm">
+                        <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-pencil-square"></i> {{ _('Настроить сервер') }}
                         </a>
                     </div>
@@ -220,44 +251,10 @@
         </div>
     </div>
 
-    <div class="btop-board" aria-label="{{ _('Нагрузка сервера') }}">
-        <section class="btop-box" id="btop-cpu-box">
-            <header>
-                <span>CPU</span>
-                <strong id="btop-cpu-val">—</strong>
-            </header>
-            <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
-            <div class="btop-spark" id="btop-cpu-spark"></div>
-        </section>
-        <section class="btop-box" id="btop-mem-box">
-            <header>
-                <span>MEM</span>
-                <strong id="btop-mem-val">—</strong>
-            </header>
-            <div class="btop-bar"><i id="btop-mem-fill"></i></div>
-            <div class="btop-spark" id="btop-mem-spark"></div>
-        </section>
-        <section class="btop-box">
-            <header>
-                <span>NET</span>
-                <strong id="btop-net-val">MB/s</strong>
-            </header>
-            <div class="btop-net-row">
-                <span>↓</span>
-                <div class="btop-bar"><i id="btop-rx-fill"></i></div>
-                <em id="btop-rx-val">0.00</em>
-            </div>
-            <div class="btop-net-row">
-                <span>↑</span>
-                <div class="btop-bar"><i id="btop-tx-fill"></i></div>
-                <em id="btop-tx-val">0.00</em>
-            </div>
-        </section>
-    </div>
     <div id="load-diagnosis" class="load-diagnosis">
         <p id="load-diagnosis-text" class="mb-2">{{ _('Считаю загрузку по /proc/stat и load average…') }}</p>
-        <div id="load-tools" class="load-tools">
-            <div class="load-tools-title">{{ _('Команды htop и btop') }}</div>
+        <details class="load-tools" id="load-tools">
+            <summary class="load-tools-title">{{ _('Команды htop и btop') }}</summary>
             <div class="load-tool-row">
                 <span>htop</span>
                 <input type="text" class="form-control font-monospace" id="load-htop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop">
@@ -268,12 +265,12 @@
                 <input type="text" class="form-control font-monospace" id="load-btop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y btop">
                 <button class="btn btn-warning" type="button" onclick="copyCommand('load-btop-cmd')">{{ _('Копировать') }}</button>
             </div>
-        </div>
+        </details>
     </div>
 
     <div class="row g-4 monitoring-grid">
-        <div class="col-12 col-xxl-7">
-            <div class="network-traffic card monitoring-card">
+        <div class="col-12 col-lg-7">
+            <div id="monitoring-network" tabindex="-1" class="network-traffic card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
                     <div class="mb-2 monitoring-caption">
@@ -297,7 +294,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-xxl-5">
+        <div class="col-12 col-lg-5">
             <div class="firewall-status card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-shield-check"></i> {{ _('Статус брандмауэра') }}</h3>
@@ -322,7 +319,13 @@
             </div>
         </div>
         <div class="col-12 col-xl-5">
-            <div class="active-services card monitoring-card mb-3">
+            <div class="file-manager-status card monitoring-card mb-3">
+                <div class="card-body">
+                    <h3><i class="bi bi-folder2-open"></i> Rust File Manager</h3>
+                    {% include 'partials/file_manager_stats.html' %}
+                </div>
+            </div>
+            <div id="monitoring-services" tabindex="-1" class="active-services card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-router"></i> {{ _('VPN / Proxy сервисы') }}</h3>
                     <div id="proxy-services-list" class="services-grid">
@@ -364,7 +367,7 @@
                     </div>
                 </div>
             </div>
-            <div class="security-events card monitoring-card">
+            <div id="monitoring-security" tabindex="-1" class="security-events card monitoring-card">
                 <div class="card-body">
                     <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
                     <div class="events-grid">
@@ -424,7 +427,7 @@
             </div>
         </div>
         <div class="col-12">
-            <div class="mini-charts card monitoring-card mb-4">
+            <div id="monitoring-history" tabindex="-1" class="mini-charts card monitoring-card mb-4">
                 <div class="card-body">
                     <h3><i class="bi bi-graph-up-arrow"></i> {{ _('История производительности (60 мин)') }}</h3>
                     <div class="charts-container">
@@ -502,6 +505,7 @@
 
 <!-- Styles moved to static/css/monitoring.css -->
 
+<script src="{{ url_for('static', filename='js/file_manager_stats.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 // Debug output - проверка загрузки
@@ -682,7 +686,9 @@ async function updateServicesStatus() {
 
             const proxyServices = services.filter(service => service.group === 'proxy');
             const teloServices = services.filter(service => service.group === 'telegramonly');
-            const systemServices = services.filter(service => service.group !== 'proxy' && service.group !== 'telegramonly');
+            const systemServices = services.filter(service => !['proxy', 'telegramonly', 'file_manager'].includes(service.group));
+            renderFileManagerStats(document.querySelector('[data-file-manager-stats]'),
+                services.filter(service => service.group === 'file_manager'));
 
             if (proxyServices.length) {
                 proxyServices.forEach(service => renderService(service, proxyContainer));
@@ -819,7 +825,7 @@ async function updateSecurityEvents() {
                 if (updateLine) {
                     updateLine.textContent = '{{ _("Последнее обновление пакетов:") }} ' + stats.days_since_update + ' {{ _("дней назад") }}';
                 }
-                if (updateSummary) updateSummary.textContent = stats.days_since_update + ' дн';
+                if (updateSummary) updateSummary.textContent = stats.days_since_update + ' {{ _("дней назад") }}';
             } else {
                 if (updateLine) updateLine.textContent = '{{ _("Последнее обновление пакетов: нет данных") }}';
                 if (updateSummary) updateSummary.textContent = '-';
@@ -896,6 +902,7 @@ document.getElementById('copy-security-prompt').addEventListener('click', functi
 
 // Charts
 function createCharts() {
+    const theme = getComputedStyle(document.documentElement);
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -903,12 +910,12 @@ function createCharts() {
             y: {
                 beginAtZero: true,
                 max: 100,
-                ticks: { color: '#6c757d' },
-                grid: { color: '#dee2e6' }
+                ticks: { color: theme.getPropertyValue('--bs-secondary-color').trim() },
+                grid: { color: theme.getPropertyValue('--bs-border-color').trim() }
             },
             x: {
-                ticks: { color: '#6c757d' },
-                grid: { color: '#dee2e6' }
+                ticks: { color: theme.getPropertyValue('--bs-secondary-color').trim() },
+                grid: { color: theme.getPropertyValue('--bs-border-color').trim() }
             }
         },
         plugins: {
@@ -982,7 +989,7 @@ async function updateCharts() {
 }
 
 function meterColor(pct) {
-    if (pct < 50) return '#3dd68c';
+    if (pct < 50) return 'var(--bs-primary)';
     if (pct < 75) return '#e6b325';
     return '#f07178';
 }
@@ -1748,5 +1755,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 </script>
+<script src="{{ url_for('static', filename='js/monitoring_view.js') }}?v={{ app_info.get('version', '') }}"></script>
 {% endblock %}
 
