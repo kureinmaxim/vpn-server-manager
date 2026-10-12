@@ -4138,7 +4138,7 @@ msgstr "加载中..."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:491
 #: templates/index.html:491
 msgid "Сохранить как PNG"
-msgstr "另存为PNG"
+msgstr "保存为 PNG"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:546
 #: templates/index.html:546
@@ -4739,7 +4739,7 @@ msgstr "暂无提示。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:14
 #: templates/monitoring.html:14
 msgid "Расширенный мониторинг"
-msgstr "审计和监控"
+msgstr "高级监控"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:23
 #: templates/monitoring.html:23
@@ -4849,18 +4849,18 @@ msgstr "网络流量"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:154
 #: templates/monitoring.html:154
 msgid "Загрузка:"
-msgstr "加载中..."
+msgstr "下载："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:156
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:161
 #: templates/monitoring.html:156 templates/monitoring.html:161
 msgid "Пик:"
-msgstr "文件夹："
+msgstr "峰值："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:159
 #: templates/monitoring.html:159
 msgid "Отдача:"
-msgstr "畏缩："
+msgstr "上传："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:165
 #: templates/monitoring.html:165
@@ -4880,7 +4880,7 @@ msgstr "开放端口："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
 #: templates/monitoring.html:180
 msgid "Заблокировано за 24ч:"
-msgstr "已阻止"
+msgstr "24小时内已阻止："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:467
@@ -4906,7 +4906,7 @@ msgstr "系统服务"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:204
 #: templates/monitoring.html:204
 msgid "События безопасности (24ч)"
-msgstr "安全基础"
+msgstr "安全事件（24小时）"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:210
 #: templates/monitoring.html:210
@@ -4916,7 +4916,7 @@ msgstr "SSH 尝试失败"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:218
 #: templates/monitoring.html:218
 msgid "Обновления безопасности"
-msgstr "安全基础"
+msgstr "安全更新"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:226
 #: templates/monitoring.html:226
@@ -4931,7 +4931,7 @@ msgstr "最新系统更新："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:236
 #: templates/monitoring.html:236
 msgid "дней назад"
-msgstr "未指定"
+msgstr "天前"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:244
 #: templates/monitoring.html:244
@@ -4941,7 +4941,7 @@ msgstr "表演历史（60 分钟）"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:247
 #: templates/monitoring.html:247
 msgid "Использование CPU"
-msgstr "用户"
+msgstr "CPU 使用率"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:251
 #: templates/monitoring.html:251
@@ -4997,7 +4997,7 @@ msgstr "从服务器上彻底删除监控系统"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:310
 #: templates/monitoring.html:310
 msgid "Удалить мониторинг"
-msgstr "审计和监控"
+msgstr "卸载监控"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:318
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:576
@@ -8273,3 +8273,72 @@ msgstr "服务器没有返回数据。请手动检查：ssh -p %(port)s %(user)s
 
 msgid "Подключение есть, но выполнить команду не удалось: сервер закрыл канал SSH или не ответил вовремя."
 msgstr "已连接，但无法执行命令：服务器关闭了 SSH 通道或未及时响应。"
+
+msgid "Разделы мониторинга"
+msgstr "监控分区"
+
+msgid "Обзор"
+msgstr "概览"
+
+msgid "Сеть"
+msgstr "网络"
+
+msgid "Сервисы"
+msgstr "服务"
+
+msgid "Безопасность"
+msgstr "安全"
+
+msgid "История"
+msgstr "历史"
+
+msgid "Хранилище"
+msgstr "存储"
+
+msgid "Сводка"
+msgstr "概况"
+
+msgid "Процессы с высокой загрузкой CPU"
+msgstr "CPU 占用最高的进程"
+
+msgid "Контейнеры Docker"
+msgstr "Docker 容器"
+
+msgid "Ядра:"
+msgstr "核心数："
+
+msgid "Ядро:"
+msgstr "内核："
+
+msgid "ОС:"
+msgstr "操作系统："
+
+msgid "Использовано / всего:"
+msgstr "已用 / 总量："
+
+msgid "Средняя нагрузка:"
+msgstr "平均负载："
+
+msgid "Swap:"
+msgstr "交换空间："
+
+msgid "Статус файрвола"
+msgstr "防火墙状态"
+
+msgid "Проблемные systemd unit'ы"
+msgstr "失败的 systemd 单元"
+
+msgid "Последнее обновление пакетов:"
+msgstr "上次软件包更新："
+
+msgid "Остановлен"
+msgstr "已停止"
+
+msgid "Не установлен"
+msgstr "未安装"
+
+msgid "Задачи"
+msgstr "任务"
+
+msgid "CPU: 100%% = одно ядро. Память учитывает всю службу. Недоступные метрики обозначены прочерком."
+msgstr "CPU：100%% 表示一个核心。内存统计涵盖整个服务。不可用的指标显示为破折号。"

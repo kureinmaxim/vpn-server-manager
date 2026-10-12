@@ -54,6 +54,7 @@ class TestLoadPrivateKey:
         (tmp_path / ".ssh").mkdir()
         (tmp_path / ".ssh" / "id_ed25519").write_text(text)
         monkeypatch.setenv("HOME", str(tmp_path))
+        monkeypatch.setenv("USERPROFILE", str(tmp_path))
         key = load_private_key("~/.ssh/id_ed25519")
         assert fingerprint(key) == expected_fingerprint(public)
 

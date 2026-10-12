@@ -4299,12 +4299,12 @@ msgstr "IP Information"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:391
 #: templates/index.html:375 templates/index.html:391
 msgid "Статус сервера"
-msgstr "Server icon"
+msgstr "Server status"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:376
 #: templates/index.html:376
 msgid "Статус сервера:"
-msgstr "Server icon"
+msgstr "Server status:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:377
 #: templates/index.html:377
@@ -4360,7 +4360,7 @@ msgstr "Loading..."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:491
 #: templates/index.html:491
 msgid "Сохранить как PNG"
-msgstr "Save"
+msgstr "Save as PNG"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:546
 #: templates/index.html:546
@@ -4965,7 +4965,7 @@ msgstr "No hints yet."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:14
 #: templates/monitoring.html:14
 msgid "Расширенный мониторинг"
-msgstr "Audit and Monitoring"
+msgstr "Advanced monitoring"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:23
 #: templates/monitoring.html:23
@@ -5075,18 +5075,18 @@ msgstr "Network traffic"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:154
 #: templates/monitoring.html:154
 msgid "Загрузка:"
-msgstr "Loading..."
+msgstr "Download:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:156
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:161
 #: templates/monitoring.html:156 templates/monitoring.html:161
 msgid "Пик:"
-msgstr "Folder:"
+msgstr "Peak:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:159
 #: templates/monitoring.html:159
 msgid "Отдача:"
-msgstr "Recoil:"
+msgstr "Upload:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:165
 #: templates/monitoring.html:165
@@ -5106,7 +5106,7 @@ msgstr "Open ports:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
 #: templates/monitoring.html:180
 msgid "Заблокировано за 24ч:"
-msgstr "Suspended"
+msgstr "Blocked in 24h:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:180
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:467
@@ -5132,7 +5132,7 @@ msgstr "System services"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:204
 #: templates/monitoring.html:204
 msgid "События безопасности (24ч)"
-msgstr "Security Basics"
+msgstr "Security events (24h)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:210
 #: templates/monitoring.html:210
@@ -5142,7 +5142,7 @@ msgstr "Failed SSH attempts"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:218
 #: templates/monitoring.html:218
 msgid "Обновления безопасности"
-msgstr "Security Basics"
+msgstr "Security updates"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:226
 #: templates/monitoring.html:226
@@ -5157,7 +5157,7 @@ msgstr "Latest system update:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:236
 #: templates/monitoring.html:236
 msgid "дней назад"
-msgstr "Not specified"
+msgstr "days ago"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:244
 #: templates/monitoring.html:244
@@ -5167,7 +5167,7 @@ msgstr "Performance History (60 min)"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:247
 #: templates/monitoring.html:247
 msgid "Использование CPU"
-msgstr "User"
+msgstr "CPU usage"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:251
 #: templates/monitoring.html:251
@@ -5223,7 +5223,7 @@ msgstr "Completely remove the monitoring system from the server"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:310
 #: templates/monitoring.html:310
 msgid "Удалить мониторинг"
-msgstr "Audit and Monitoring"
+msgstr "Uninstall monitoring"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:318
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:576
@@ -8605,3 +8605,72 @@ msgstr "The server returned no data. Check manually: ssh -p %(port)s %(user)s@%(
 
 msgid "Подключение есть, но выполнить команду не удалось: сервер закрыл канал SSH или не ответил вовремя."
 msgstr "Connected, but the command could not be run: the server closed the SSH channel or did not answer in time."
+
+msgid "Разделы мониторинга"
+msgstr "Monitoring sections"
+
+msgid "Обзор"
+msgstr "Overview"
+
+msgid "Сеть"
+msgstr "Network"
+
+msgid "Сервисы"
+msgstr "Services"
+
+msgid "Безопасность"
+msgstr "Security"
+
+msgid "История"
+msgstr "History"
+
+msgid "Хранилище"
+msgstr "Storage"
+
+msgid "Сводка"
+msgstr "Summary"
+
+msgid "Процессы с высокой загрузкой CPU"
+msgstr "Top CPU processes"
+
+msgid "Контейнеры Docker"
+msgstr "Docker containers"
+
+msgid "Ядра:"
+msgstr "Cores:"
+
+msgid "Ядро:"
+msgstr "Kernel:"
+
+msgid "ОС:"
+msgstr "OS:"
+
+msgid "Использовано / всего:"
+msgstr "Used / total:"
+
+msgid "Средняя нагрузка:"
+msgstr "Load average:"
+
+msgid "Swap:"
+msgstr "Swap:"
+
+msgid "Статус файрвола"
+msgstr "Firewall status"
+
+msgid "Проблемные systemd unit'ы"
+msgstr "Failed systemd units"
+
+msgid "Последнее обновление пакетов:"
+msgstr "Last package update:"
+
+msgid "Остановлен"
+msgstr "Stopped"
+
+msgid "Не установлен"
+msgstr "Not installed"
+
+msgid "Задачи"
+msgstr "Tasks"
+
+msgid "CPU: 100%% = одно ядро. Память учитывает всю службу. Недоступные метрики обозначены прочерком."
+msgstr "CPU: 100%% = one core. Memory covers the entire service. Unavailable metrics are shown as a dash."

@@ -162,6 +162,7 @@ def test_unreadable_known_hosts_lines_do_not_hide_the_server_key(tmp_path, monke
         "[192.0.2.1]:22542 " + public + "\n"
     )
     monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     client = paramiko.SSHClient()
     routes._load_known_hosts(client)
     name = "[192.0.2.1]:22542"
