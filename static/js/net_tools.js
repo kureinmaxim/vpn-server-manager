@@ -5,7 +5,7 @@
         event.preventDefault();
         const button = document.getElementById('net-run');
         if (button.disabled) return;
-        const label = button.textContent;
+        const label = Array.from(button.childNodes);
         const error = document.getElementById('net-error');
         const result = document.getElementById('net-result');
         button.disabled = true;
@@ -32,7 +32,7 @@
         } finally {
             clearTimeout(timer);
             button.disabled = false;
-            button.textContent = label;
+            button.replaceChildren(...label);
             result.setAttribute('aria-busy', 'false');
         }
     });
