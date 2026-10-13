@@ -8456,6 +8456,9 @@ msgstr "⚠ Measured through exit node {name}: region latencies are distorted."
 msgid "Через этот регион пиры связываются с ПК, если нет прямого пути. Tailscale выбирает его сам, в обход exit node."
 msgstr "Peers reach this PC through this region when there is no direct path. Tailscale picks it itself, bypassing the exit node."
 
+msgid "netcheck не вернул задержек — так бывает сразу после смены exit node. Нажмите «Обновить» через несколько секунд."
+msgstr "netcheck returned no latencies. This happens right after switching exit nodes. Click Refresh in a few seconds."
+
 msgid "Регион с наименьшей задержкой в последнем замере netcheck."
 msgstr "The region with the lowest latency in the latest netcheck."
 

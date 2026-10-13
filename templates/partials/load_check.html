@@ -62,6 +62,7 @@ window.LOAD_CHECK_CONFIG = {
         derpLoading: {{ _('Проверка DERP…') | tojson }},
         derpUnavailable: {{ _('Данные DERP недоступны') | tojson }},
         derpCache: {{ _('DERP: замер {time}, кеш до 3 минут') | tojson }},
+        derpNoLatency: {{ _('netcheck не вернул задержек — так бывает сразу после смены exit node. Нажмите «Обновить» через несколько секунд.') | tojson }},
         exitWarning: {{ _('⚠ Замер через exit node {name}: задержки до регионов искажены.') | tojson }},
         homeDerpHint: {{ _('Через этот регион пиры связываются с ПК, если нет прямого пути. Tailscale выбирает его сам, в обход exit node.') | tojson }},
         preferredDerpHint: {{ _('Регион с наименьшей задержкой в последнем замере netcheck.') | tojson }},

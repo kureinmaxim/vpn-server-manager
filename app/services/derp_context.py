@@ -89,8 +89,12 @@ def local_derp():
                 except (OSError, ValueError, TypeError, subprocess.SubprocessError): report = {}
                 result = summarize_derp(status, report, derp_map, coordinator)
             except (OSError, ValueError, TypeError, AttributeError, subprocess.SubprocessError): pass
+        # Right after an exit node switch netcheck can return no latencies; retry such results soon.
+        measured = any(r['latency_ms'] is not None for r in result.get('regions', []))
+        ttl = 180 if result['state'] == 'ready' and measured else 15
+        if result['state'] == 'ready': result['cache_seconds'] = ttl
         _cache, _key = result, key
-        _expires = time.monotonic() + (180 if result['state'] == 'ready' else 15)
+        _expires = time.monotonic() + ttl
         return result
     finally:
         _lock.release()

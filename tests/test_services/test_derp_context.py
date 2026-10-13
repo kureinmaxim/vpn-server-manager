@@ -111,6 +111,18 @@ def test_local_cache_resets_when_exit_node_home_derp_or_state_changes(monkeypatc
         assert netchecks == 1 and second['state'] == 'unavailable'
 
 
+def test_measurement_without_latencies_is_retried_soon(monkeypatch):
+    monkeypatch.setattr(derp, '_cache', None)
+    monkeypatch.setattr(derp, '_expires', 0)
+    monkeypatch.setattr(derp, 'tailscale_executable', lambda: 'tailscale')
+    monkeypatch.setattr(derp, 'read_tailscale', Mock(side_effect=[STATUS, {}, MAP, {'UDP': False}]))
+    clock = iter([1000.0] * 4)
+    monkeypatch.setattr(derp.time, 'monotonic', lambda: next(clock, 1000.0))
+    result = derp.local_derp()
+    assert result['state'] == 'ready' and result['cache_seconds'] == 15
+    assert derp._expires == 1015.0
+
+
 def test_netcheck_timeout_keeps_own_regions_unknown(monkeypatch):
     monkeypatch.setattr(derp, '_cache', None)
     monkeypatch.setattr(derp, 'tailscale_executable', lambda: 'tailscale')
