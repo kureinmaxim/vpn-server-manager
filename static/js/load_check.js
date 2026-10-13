@@ -53,13 +53,25 @@
             return;
         }
         const home = mesh && mesh.state === 'ready' ? mesh.home_relay : derp.home_relay;
-        derpSummary.append(element('div', `${t.homeDerp}: ${home || '—'} · UDP: ${truth(derp.udp)} · ${t.preferredDerp}: ${derp.preferred || '—'}`));
+        const summary = element('div');
+        const hinted = (text, hint) => {
+            const span = element('span', text);
+            span.title = hint;
+            return span;
+        };
+        summary.append(hinted(`${t.homeDerp}: ${home || '—'}`, t.homeDerpHint), ' · ',
+            hinted(`UDP: ${truth(derp.udp)}`, t.udpHint), ' · ',
+            hinted(`${t.preferredDerp}: ${derp.preferred || '—'}`, t.preferredDerpHint));
+        derpSummary.append(summary);
         if (derp.exit_selected) derpSummary.append(element('div', t.exitWarning.replace('{name}', derp.exit_name || '—'), 'text-warning'));
         const regions = element('div', undefined, 'd-flex flex-wrap gap-2 mt-2');
         for (const region of derp.regions || []) {
             const latency = region.latency_ms === null ? t.unknown : region.latency_ms.toLocaleString(locale, {maximumFractionDigits: 1}) + ' ' + t.ms;
             const badge = element('span', `${region.own ? t.own + ' ' : ''}${region.code}: ${latency}`, region.own ? 'badge text-bg-info' : 'badge text-bg-secondary');
-            badge.title = `${region.name} (${region.id}) · ${region.hosts.join(', ')}`;
+            const target = `${region.name || region.code} (${region.hosts.join(', ') || region.id})`;
+            badge.title = derp.exit_selected
+                ? t.latencyExitHint.replace('{name}', derp.exit_name || '—').replace('{region}', target)
+                : t.latencyHint.replace('{region}', target);
             regions.append(badge);
         }
         derpSummary.append(regions);

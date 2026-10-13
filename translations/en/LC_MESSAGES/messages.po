@@ -8453,6 +8453,21 @@ msgstr "DERP: measured at {time}, cached for up to 3 minutes"
 msgid "⚠ Замер через exit node {name}: задержки до регионов искажены."
 msgstr "⚠ Measured through exit node {name}: region latencies are distorted."
 
+msgid "Через этот регион пиры связываются с ПК, если нет прямого пути. Tailscale выбирает его сам, в обход exit node."
+msgstr "Peers reach this PC through this region when there is no direct path. Tailscale picks it itself, bypassing the exit node."
+
+msgid "Регион с наименьшей задержкой в последнем замере netcheck."
+msgstr "The region with the lowest latency in the latest netcheck."
+
+msgid "Прошёл ли UDP-запрос STUN до серверов DERP при замере."
+msgstr "Whether a UDP STUN request reached the DERP servers during the check."
+
+msgid "Время туда-обратно: этот ПК ↔ DERP-сервер {region}."
+msgstr "Round trip: this PC ↔ DERP server {region}."
+
+msgid "Время туда-обратно: этот ПК → exit node {name} → DERP-сервер {region} и обратно."
+msgstr "Round trip: this PC → exit node {name} → DERP server {region} and back."
+
 msgid "да"
 msgstr "yes"
 

@@ -8121,6 +8121,21 @@ msgstr "DERP：测量时间 {time}，缓存最多 3 分钟"
 msgid "⚠ Замер через exit node {name}: задержки до регионов искажены."
 msgstr "⚠ 通过出口节点 {name} 测量：区域延迟会失真。"
 
+msgid "Через этот регион пиры связываются с ПК, если нет прямого пути. Tailscale выбирает его сам, в обход exit node."
+msgstr "没有直连路径时，对等节点通过此区域连接本机。该区域由 Tailscale 自行选择，不经过出口节点。"
+
+msgid "Регион с наименьшей задержкой в последнем замере netcheck."
+msgstr "最近一次 netcheck 中延迟最低的区域。"
+
+msgid "Прошёл ли UDP-запрос STUN до серверов DERP при замере."
+msgstr "检测时 UDP STUN 请求是否到达 DERP 服务器。"
+
+msgid "Время туда-обратно: этот ПК ↔ DERP-сервер {region}."
+msgstr "往返时间：本机 ↔ DERP 服务器 {region}。"
+
+msgid "Время туда-обратно: этот ПК → exit node {name} → DERP-сервер {region} и обратно."
+msgstr "往返时间：本机 → 出口节点 {name} → DERP 服务器 {region} 再返回。"
+
 msgid "да"
 msgstr "是"
 
