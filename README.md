@@ -26,17 +26,22 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest patch · 4.12.4:** Monitoring and Server Status now share the application's light and dark themes, with prominent resource readings, section navigation and expandable diagnostic details. [Changelog →](CHANGELOG.md#4124---2026-10-12)
+**Latest patch · 4.12.10:** Hover over a DERP latency to see which hops it covers, and switching exit nodes now triggers a fresh measurement instead of showing a cached one. Recent releases also added **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41210---2026-10-13)
 
 ## See your fleet at a glance
 
 Open **Server load** next to DNS to compare CPU, memory, disk space, load averages and network traffic across active servers. Filter by name or address and sort by the metric that matters.
 
-Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services and containers are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service and Docker container names.
+<p align="center">
+  <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency measured through the selected exit node" width="1100">
+  <br><sub>v4.12.10 · English interface · demonstration servers and addresses</sub>
+</p>
+
+Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services, containers and processes are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service, Docker container and process names.
 
 <p align="center">
-  <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency" width="1100">
-  <br><sub>v4.11.1 · English interface · demonstration servers and addresses</sub>
+  <img src="docs/images/09-projects.jpg" alt="Projects overview showing on which servers each tracked project runs and how many of its services, containers and processes are up" width="640">
+  <br><sub>v4.12.10 · demonstration servers</sub>
 </p>
 
 | What you want to know | Where to look |
@@ -44,7 +49,7 @@ Open **Projects** beside it to see which servers run your own projects, such as 
 | **Which server is under pressure?** | CPU, memory and disk meters; sortable load and traffic columns. |
 | **Is it in this PC's mesh?** | The mesh column matches visible Tailscale peers and shows regular nodes, available exits and the exit selected on the PC. |
 | **Where is the coordinator?** | The control endpoint is named above the table and marked on matching server cards. |
-| **Which relay is closest?** | The DERP summary shows measured region latencies, highlights custom regions and warns when netcheck runs through an exit node. |
+| **Which relay is closest?** | The DERP summary shows measured region latencies and highlights custom regions. Hover over a latency to see what it measures. With an exit node selected, netcheck runs through it, so each latency is PC → exit node → region; the home DERP is still chosen directly by Tailscale. |
 
 ## Understand the connection, not just the status
 

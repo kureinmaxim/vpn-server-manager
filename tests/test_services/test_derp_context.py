@@ -80,12 +80,35 @@ def test_local_cache_does_not_repeat_netcheck_or_expose_prefs(monkeypatch):
     monkeypatch.setattr(derp, '_expires', 0)
     monkeypatch.setattr(derp, 'tailscale_executable', lambda: 'tailscale')
     read = Mock(side_effect=[STATUS, {'ControlURL': 'https://control.example.com', 'key': 'secret-marker'},
-                             MAP, {'UDP': True, 'PreferredDERP': 1, 'RegionLatency': {'999': 50000000}}])
+                             MAP, {'UDP': True, 'PreferredDERP': 1, 'RegionLatency': {'999': 50000000}}, STATUS])
     monkeypatch.setattr(derp, 'read_tailscale', read)
     first = derp.local_derp()
-    assert first == derp.local_derp() and read.call_count == 4
-    assert 'secret-marker' not in json.dumps(first)
     assert 0 < read.call_args.kwargs['timeout'] <= 12
+    assert first == derp.local_derp() and read.call_count == 5
+    assert [call.args[1][0] for call in read.call_args_list].count('netcheck') == 1
+    assert 'secret-marker' not in json.dumps(first)
+
+
+@pytest.mark.parametrize('change', [
+    {'ExitNodeStatus': {'ID': 'other'}},
+    {'Self': {'ID': 'pc', 'Relay': 'waw'}},
+    {'BackendState': 'Stopped'},
+])
+def test_local_cache_resets_when_exit_node_home_derp_or_state_changes(monkeypatch, change):
+    monkeypatch.setattr(derp, '_cache', None)
+    monkeypatch.setattr(derp, '_expires', 0)
+    monkeypatch.setattr(derp, 'tailscale_executable', lambda: 'tailscale')
+    report = {'UDP': True, 'PreferredDERP': 1, 'RegionLatency': {'1': 1000000}}
+    changed = {**STATUS, **change}
+    read = Mock(side_effect=[STATUS, {}, MAP, report, changed, {}, MAP, report])
+    monkeypatch.setattr(derp, 'read_tailscale', read)
+    derp.local_derp()
+    second = derp.local_derp()
+    netchecks = [call.args[1][0] for call in read.call_args_list].count('netcheck')
+    if changed['BackendState'] == 'Running':
+        assert netchecks == 2 and second['state'] == 'ready'
+    else:
+        assert netchecks == 1 and second['state'] == 'unavailable'
 
 
 def test_netcheck_timeout_keeps_own_regions_unknown(monkeypatch):
