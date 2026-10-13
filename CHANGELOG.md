@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.10] - 2026-10-13
+
+### Added
+- Hovering over the DERP summary and region latencies in **Server load** explains what each value is. A region latency is the round trip from this PC to that DERP server; with an exit node selected, the tooltip shows the route through the exit node.
+
+### Fixed
+- The DERP measurement is repeated as soon as the exit node, the home DERP region or the Tailscale connection state changes. Before, the previous result stayed cached for up to 3 minutes, so switching exit nodes appeared to have no effect on latencies.
+
 ## [4.12.9] - 2026-10-12
 
 ### Changed

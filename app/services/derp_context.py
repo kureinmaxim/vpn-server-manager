@@ -12,6 +12,7 @@ from .mesh_context import read_tailscale, tailscale_executable
 _lock = threading.Lock()
 _cache = None
 _expires = 0
+_key = None
 
 
 def summarize_derp(status, report, derp_map, coordinator=''):
@@ -49,22 +50,35 @@ def summarize_derp(status, report, derp_map, coordinator=''):
             'checked_at': int(time.time()), 'cache_seconds': 180}
 
 
+def network_key(status):
+    peers = [node for node in (status.get('Peer') or {}).values() if isinstance(node, dict)]
+    exit_id = ((status.get('ExitNodeStatus') or {}).get('ID')
+               or next((p.get('ID') for p in peers if p.get('ExitNode') is True), None))
+    return status.get('BackendState'), exit_id, (status.get('Self') or {}).get('Relay')
+
+
 def local_derp():
-    global _cache, _expires
+    global _cache, _expires, _key
     # Serialize netcheck and coalesce concurrent viewers into the same cached result.
     if not _lock.acquire(timeout=12): return {'state': 'unavailable'}
     try:
-        if _cache is not None and time.monotonic() < _expires: return _cache
         executable = tailscale_executable()
         result = {'state': 'unavailable'}
         deadline = time.monotonic() + 12
+        status, key = None, None
+        def read(args, cap=3):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0: raise ValueError('timeout')
+            return read_tailscale(executable, args, timeout=min(cap, remaining))
         if executable:
-            def read(args, cap=3):
-                remaining = deadline - time.monotonic()
-                if remaining <= 0: raise ValueError('timeout')
-                return read_tailscale(executable, args, timeout=min(cap, remaining))
             try:
                 status = read(['status', '--json'])
+                key = network_key(status)
+            except (OSError, ValueError, TypeError, AttributeError, subprocess.SubprocessError): pass
+        # A cached netcheck describes the old route once the exit node or home DERP changes.
+        if _cache is not None and time.monotonic() < _expires and key == _key: return _cache
+        if status is not None:
+            try:
                 if status.get('BackendState') != 'Running': raise ValueError('disconnected')
                 try:
                     coordinator = urlsplit(read(['debug', 'prefs']).get('ControlURL', '')).hostname or ''
@@ -75,7 +89,7 @@ def local_derp():
                 except (OSError, ValueError, TypeError, subprocess.SubprocessError): report = {}
                 result = summarize_derp(status, report, derp_map, coordinator)
             except (OSError, ValueError, TypeError, AttributeError, subprocess.SubprocessError): pass
-        _cache = result
+        _cache, _key = result, key
         _expires = time.monotonic() + (180 if result['state'] == 'ready' else 15)
         return result
     finally:
