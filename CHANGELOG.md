@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.11] - 2026-10-13
+
+### Fixed
+- A DERP measurement taken right after switching exit nodes, while the new route is not ready yet, can return no latencies. Such a result is now kept for 15 seconds instead of 3 minutes, and **Server load** says to click **Refresh** in a few seconds instead of showing a 3-minute cache note.
+
 ## [4.12.10] - 2026-10-13
 
 ### Added

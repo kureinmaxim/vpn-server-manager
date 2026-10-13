@@ -1,4 +1,4 @@
-# VPN Server Manager v4.12.10
+# VPN Server Manager v4.12.11
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest patch · 4.12.10:** Hover over a DERP latency to see which hops it covers, and switching exit nodes now triggers a fresh measurement instead of showing a cached one. Recent releases also added **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41210---2026-10-13)
+**Latest patch · 4.12.11:** Hover over a DERP latency to see which hops it covers. Switching exit nodes triggers a fresh measurement, and an empty one taken while the new route comes up is retried within seconds. Recent releases also added **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41211---2026-10-13)
 
 ## See your fleet at a glance
 

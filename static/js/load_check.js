@@ -75,7 +75,10 @@
             regions.append(badge);
         }
         derpSummary.append(regions);
-        derpSummary.append(element('div', t.derpCache.replace('{time}', new Date(derp.checked_at * 1000).toLocaleTimeString(locale)), 'text-body-secondary mt-1'));
+        const measured = (derp.regions || []).some(region => region.latency_ms !== null);
+        derpSummary.append(measured
+            ? element('div', t.derpCache.replace('{time}', new Date(derp.checked_at * 1000).toLocaleTimeString(locale)), 'text-body-secondary mt-1')
+            : element('div', t.derpNoLatency, 'text-warning mt-1'));
     }
 
     function remoteDerpDetails(row, cell) {
