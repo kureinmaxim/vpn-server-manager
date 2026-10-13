@@ -19,27 +19,26 @@
         {% if selected %}<a href="{{ url_for('net_tools.index') }}">Net Tools</a>{% else %}<span>Net Tools</span>{% endif %}
     </nav>
     {% if not selected %}
-    <header class="net-intro mb-4">
-        <h1>{{ _('Сетевые инструменты') }}</h1>
-        <p class="text-body-secondary">{{ _('Выберите проверку: доступность сервера, DNS, сертификаты или сведения об IP. Внутри — параметры, пояснения и готовые команды.') }}</p>
+    <header class="mb-4">
+        <h1><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>{{ _('Сетевые инструменты') }}</h1>
+        <p class="text-body-secondary mb-0">{{ _('Выберите проверку: доступность сервера, DNS, сертификаты или сведения об IP. Внутри — параметры, пояснения и готовые команды.') }}</p>
     </header>
     <div class="net-grid">
         {% for tool in tools %}
         <a class="net-card net-accent-{{ loop.index }}" href="{{ url_for('net_tools.detail', tool_id=tool.id) }}">
-            <i class="bi bi-{{ tool.icon }} net-icon" aria-hidden="true"></i>
-            <h2>{{ tool.title }}</h2>
+            <h2><i class="bi bi-{{ tool.icon }} net-icon" aria-hidden="true"></i>{{ tool.title }}</h2>
             <p>{{ tool.description }}</p>
         </a>
         {% endfor %}
     </div>
     {% else %}
-    <header class="net-intro mb-4">
+    <header class="mb-4">
         <h1><i class="bi bi-{{ selected.icon }} me-2" aria-hidden="true"></i>{{ selected.title }}</h1>
-        <p class="text-body-secondary">{{ selected.description }}</p>
+        <p class="text-body-secondary mb-0">{{ selected.description }}</p>
     </header>
-    <div class="row g-4">
+    <div class="row g-3">
         <div class="col-lg-8">
-            <section class="card p-4 mb-4">
+            <section class="card p-3 mb-3">
                 <p class="small text-body-secondary">{{ _('Источник проверки') }}: <strong>{{ selected.source }}</strong></p>
                 {% if selected.id == 'reverse-ip' %}
                 <p>{{ selected.note }}</p>
@@ -65,7 +64,7 @@
                         {% for record in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'PTR', 'CAA'] %}<option>{{ record }}</option>{% endfor %}
                     </select>
                     {% endif %}
-                    <button class="btn btn-primary w-100" id="net-run" type="submit">{{ _('Запустить проверку') }}</button>
+                    <button class="btn btn-primary" id="net-run" type="submit"><i class="bi bi-play-fill" aria-hidden="true"></i> {{ _('Запустить проверку') }}</button>
                 </form>
                 <div id="net-error" class="alert alert-danger mt-3 mb-0" role="alert" hidden></div>
                 <section id="net-result" class="mt-4" aria-live="polite" aria-busy="false" hidden>
@@ -78,8 +77,8 @@
                 {% endif %}
             </section>
             {% if selected.command %}
-            <section class="card p-4">
-                <h2 class="h5">{{ _('Команды для терминала') }}</h2>
+            <section class="card p-3">
+                <h2>{{ _('Команды для терминала') }}</h2>
                 <p class="small text-body-secondary">{{ _('Замените адрес и параметры в примере своими. Команды запускаются вручную; могут потребоваться curl, dig, nc или OpenSSL.') }}</p>
                 {% if selected.command_note %}<p>{{ selected.command_note }}</p>{% endif %}
                 {% set command_examples = [('Linux / macOS / WSL' if selected.id == 'dns' else 'Linux / macOS', selected.command)] %}
@@ -95,8 +94,8 @@
         </div>
         <aside class="col-lg-4">
             {% if selected.id == 'port' %}
-            <section class="card p-4 mb-4">
-                <h2 class="h5">{{ _('Популярные порты') }}</h2>
+            <section class="card p-3 mb-3">
+                <h2>{{ _('Популярные порты') }}</h2>
                 <div class="net-ports">
                     {% for port, label in [(21, 'FTP'), (22, 'SSH'), (25, 'SMTP'), (53, 'DNS (TCP)'), (80, 'HTTP'), (443, 'HTTPS'), (465, 'SMTPS'), (587, 'SMTP'), (993, 'IMAPS'), (3306, 'MySQL'), (3389, 'RDP'), (5432, 'PostgreSQL'), (8080, 'HTTP alternate')] %}
                     <button class="btn btn-sm btn-outline-secondary text-start" type="button" data-port="{{ port }}">{{ port }} <span>{{ label }}</span></button>
@@ -104,14 +103,16 @@
                 </div>
             </section>
             {% endif %}
-            <section class="card p-4 mb-4">
-                <h2 class="h5">{{ _('Как читать результат') }}</h2>
-                <p class="mb-0">{{ selected.note }}</p>
+            <section class="card p-3 mb-3">
+                <h2>{{ _('Как читать результат') }}</h2>
+                <p class="small mb-0">{{ selected.note }}</p>
                 {% if selected.id in ['port', 'ping', 'tls', 'fetch', 'location'] %}<p class="small text-body-secondary mt-3 mb-0">{{ _('Проверяются только публичные адреса. Точка проверки — компьютер приложения; выбор региона не применяется.') }}</p>{% endif %}
             </section>
-            <nav class="card p-4" aria-label="{{ _('Другие инструменты') }}">
-                <h2 class="h5">{{ _('Другие инструменты') }}</h2>
-                {% for tool in tools if tool.id != selected.id %}<a class="py-1" href="{{ url_for('net_tools.detail', tool_id=tool.id) }}">{{ tool.title }}</a>{% endfor %}
+            <nav class="card p-3" aria-label="{{ _('Другие инструменты') }}">
+                <h2>{{ _('Другие инструменты') }}</h2>
+                <div class="net-other">
+                    {% for tool in tools if tool.id != selected.id %}<a href="{{ url_for('net_tools.detail', tool_id=tool.id) }}"><i class="bi bi-{{ tool.icon }} me-1" aria-hidden="true"></i>{{ tool.title }}</a>{% endfor %}
+                </div>
             </nav>
         </aside>
     </div>
