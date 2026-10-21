@@ -9099,3 +9099,18 @@ msgstr "Partially working"
 
 msgid "дней"
 msgstr "days"
+
+msgid "Свой DNS-сервер"
+msgstr "Own DNS server"
+
+msgid "Chatmail для Delta Chat"
+msgstr "Chatmail for Delta Chat"
+
+msgid "функциональная проверка ещё не выполнена — кнопка «Статус»"
+msgstr "functional check not run yet — use the Status button"
+
+msgid "результат устарел"
+msgstr "result is stale"
+
+msgid "Открыть диагностику DNS / Chatmail для этого сервера."
+msgstr "Open DNS / Chatmail diagnostics for this server."

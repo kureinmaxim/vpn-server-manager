@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.12] - 2026-10-21
+
+### Added
+- **Server load** shows the own DNS server (AdGuard Home) and the Chatmail relay for Delta Chat on the servers that run them. Each role has its own colour (purple for DNS, orange for Chatmail), a dot for the service state, and the result and time of the last functional check from the **Status** button; click the badge to open its diagnostics. Roles are discovered read-only over SSH, in parallel with the DERP probe.
+
 ## [4.12.11] - 2026-10-13
 
 ### Fixed

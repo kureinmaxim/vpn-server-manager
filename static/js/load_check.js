@@ -113,6 +113,33 @@
         cell.append(details);
     }
 
+    const roleStateClass = {running: 'is-running', partial: 'is-partial', stopped: 'is-stopped'};
+    const roleStateLabel = {running: t.roleRunning, partial: t.rolePartial, stopped: t.roleStopped};
+    const checkLabel = {healthy: t.roleHealthy, error: t.roleError, unavailable: t.roleUnavailable,
+        unconfigured: t.roleUnconfigured, partial: t.rolePartial};
+    const roleTitle = {adguard: t.roleAdguard, chatmail: t.roleChatmail};
+
+    function roleBlocks(row, cell) {
+        for (const role of row.roles || []) {
+            const core = (role.components || []).filter(part => !part.optional);
+            const active = core.filter(part => part.status === 'active').length;
+            const link = element('a', undefined, `badge d-block mt-1 text-decoration-none load-role load-role-${role.key}`);
+            link.append(element('span', undefined, 'load-role-dot ' + (roleStateClass[role.state] || 'is-unknown')),
+                `${roleTitle[role.key] || role.name} · ${roleStateLabel[role.state] || t.roleUnknown}` + (core.length ? ` ${active}/${core.length}` : ''));
+            link.href = config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(row.server.id)) + '?role=' + encodeURIComponent(role.key);
+            link.title = t.roleHint + '\n' + core.map(part => `${part.name}: ${part.status}`).join('\n');
+            cell.append(link);
+            const last = role.last_check;
+            let note = t.roleNotChecked;
+            if (last) {
+                note = `${t.roleFunctional}: ${checkLabel[last.state] || t.roleUnknown}`;
+                if (last.checked_at) note += ' · ' + new Date(last.checked_at).toLocaleTimeString(locale);
+                if (last.stale) note += ' · ' + t.roleStale;
+            }
+            cell.append(element('span', note, 'load-detail' + (last && last.state === 'healthy' && !last.stale ? ' text-success' : last && ['error', 'unavailable'].includes(last.state) ? ' text-warning' : '')));
+        }
+    }
+
     function meshCell(row) {
         const cell = element('td', undefined, 'load-mesh');
         const address = (row.server.ip_address || '').toLowerCase().replace(/\.$/, '');
@@ -149,6 +176,7 @@
             ping.addEventListener('click', () => checkPath(row, peer));
             cell.append(ping);
         }
+        roleBlocks(row, cell);
         remoteDerpDetails(row, cell);
         return cell;
     }
@@ -324,7 +352,24 @@
                     render();
                 }
             }
-            const remoteDerpRequest = Promise.all(Array.from({length: Math.min(2, rows.length)}, derpWorker));
+            let nextRoles = 0;
+            async function rolesWorker() {
+                while (run === pass && nextRoles < rows.length) {
+                    const row = rows[nextRoles++];
+                    try {
+                        const data = await getJSON(config.rolesUrl.replace('__SERVER__', encodeURIComponent(row.server.id)), pass, 22000);
+                        if (run !== pass) return;
+                        row.roles = data.stats;
+                    } catch (_) {
+                        if (run !== pass) return;
+                        row.roles = [];
+                    }
+                    render();
+                }
+            }
+            const remoteDerpRequest = Promise.all([
+                ...Array.from({length: Math.min(2, rows.length)}, derpWorker),
+                ...Array.from({length: Math.min(2, rows.length)}, rolesWorker)]);
             let next = 0;
             async function worker() {
                 while (run === pass && next < rows.length) {

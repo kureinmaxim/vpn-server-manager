@@ -1248,6 +1248,17 @@ class SSHService:
         projects = load_projects()
         return summarize_projects(self._collect_projects(client, projects), projects)
 
+    def get_roles_snapshot(
+        self, ip: str, user: str, password: Optional[str], port: int = 22,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
+    ) -> List[Dict]:
+        """Own DNS / Chatmail roles only (same discovery as the Status button)."""
+        from .dns_mail import discovery_rows
+        client = self.get_connection_pooled(
+            ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
+        )
+        return summarize_projects(discovery_rows(client), [])
+
     def get_services_stats(
         self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
         key: Optional[str] = None, key_passphrase: Optional[str] = None,

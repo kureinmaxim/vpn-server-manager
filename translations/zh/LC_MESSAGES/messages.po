@@ -8767,3 +8767,18 @@ msgstr "部分正常"
 
 msgid "дней"
 msgstr "天"
+
+msgid "Свой DNS-сервер"
+msgstr "自建 DNS 服务器"
+
+msgid "Chatmail для Delta Chat"
+msgstr "Delta Chat 的 Chatmail"
+
+msgid "функциональная проверка ещё не выполнена — кнопка «Статус»"
+msgstr "尚未执行功能检查 — 请使用“状态”按钮"
+
+msgid "результат устарел"
+msgstr "结果已过期"
+
+msgid "Открыть диагностику DNS / Chatmail для этого сервера."
+msgstr "打开此服务器的 DNS / Chatmail 诊断。"

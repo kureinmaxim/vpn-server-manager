@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest patch · 4.12.11:** Hover over a DERP latency to see which hops it covers. Switching exit nodes triggers a fresh measurement, and an empty one taken while the new route comes up is retried within seconds. Recent releases also added **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41211---2026-10-13)
+**Latest patch · 4.12.12:** **Server load** now shows your own DNS server (AdGuard Home) and Chatmail relay for Delta Chat on the servers that run them: a purple or orange badge with a state dot, and the result of the last **Status** check. Recent releases also added DERP latency tooltips, **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41212---2026-10-21)
 
 ## See your fleet at a glance
 
@@ -35,6 +35,13 @@ Open **Server load** next to DNS to compare CPU, memory, disk space, load averag
 <p align="center">
   <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency measured through the selected exit node" width="1100">
   <br><sub>v4.12.10 · English interface · demonstration servers and addresses</sub>
+</p>
+
+Servers that run your own DNS (AdGuard Home) or a Chatmail relay for Delta Chat get a purple or orange badge in the same table. The dot shows whether the services are up; the line below shows the last functional check from the **Status** button, so you can see at a glance which VPS carries which service. Click a badge to open its diagnostics.
+
+<p align="center">
+  <img src="docs/images/10-dns-chatmail-roles.jpg" alt="Server load with own DNS server and Chatmail badges, service state dots and the last functional check next to exit-node roles" width="900">
+  <br><sub>v4.12.12 · demonstration servers and addresses</sub>
 </p>
 
 Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services, containers and processes are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service, Docker container and process names.

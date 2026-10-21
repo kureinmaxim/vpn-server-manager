@@ -16,3 +16,11 @@
 #load-check-filter { max-width: 200px; }
 .load-check-table .load-mesh { min-width: 180px; max-width: 230px; font-size: .8rem; overflow-wrap: anywhere; }
 .load-check-table .load-mesh .badge { white-space: normal; }
+.load-check-table .load-role { color: #fff; text-align: left; }
+.load-check-table .load-role-adguard { background: var(--bs-purple, #6f42c1); }
+.load-check-table .load-role-chatmail { background: var(--bs-orange, #fd7e14); color: #1b1b1b; }
+.load-role-dot { display: inline-block; width: .6rem; height: .6rem; margin-right: .4rem; border-radius: 50%; border: 1px solid rgba(255,255,255,.85); vertical-align: baseline; }
+.load-role-dot.is-running { background: #20c997; }
+.load-role-dot.is-partial { background: #ffc107; }
+.load-role-dot.is-stopped { background: #dc3545; }
+.load-role-dot.is-unknown { background: #adb5bd; }

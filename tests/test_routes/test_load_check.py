@@ -172,6 +172,19 @@ def test_projects_snapshot_uses_saved_credentials_and_own_rate_limit(load_client
         assert anonymous.get("/api/monitoring/one/projects-snapshot").status_code == 401
 
 
+def test_roles_snapshot_returns_own_dns_and_chatmail_roles(load_client):
+    ssh = registry.get("ssh")
+    ssh.get_roles_snapshot.return_value = [{"key": "adguard", "name": "AdGuard Home / DNS", "state": "running", "components": []}]
+    response = load_client.get("/api/monitoring/one/roles-snapshot")
+    assert response.status_code == 200 and response.json["stats"][0]["key"] == "adguard"
+    ssh.get_roles_snapshot.assert_called_once_with(
+        ip="192.0.2.1", user="admin", port=2222, password="decrypted-secret"
+    )
+    assert load_client.get("/api/monitoring/archived/roles-snapshot").status_code == 409
+    response = load_client.get("/")
+    assert b"roles-snapshot" in response.data
+
+
 def client_get_ok(client, url):
     return client.get(url).status_code == 200
 

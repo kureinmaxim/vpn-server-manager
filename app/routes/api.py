@@ -670,6 +670,13 @@ def projects_snapshot(server_id):
     return _load_check_snapshot(server_id, kind='projects')
 
 
+@api_bp.route('/monitoring/<server_id>/roles-snapshot', methods=['GET'])
+@require_auth
+@require_pin
+def roles_snapshot(server_id):
+    return _load_check_snapshot(server_id, kind='roles')
+
+
 def _load_check_snapshot(server_id, derp=False, kind=None):
     kind = kind or ('derp' if derp else 'load')
     ssh_service = registry.get('ssh')
@@ -687,6 +694,7 @@ def _load_check_snapshot(server_id, derp=False, kind=None):
         if not load_check_limiter.is_allowed(('' if kind == 'load' else kind + ':') + str(server_id)):
             return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
         stats = {'derp': ssh_service.get_derp_snapshot, 'projects': ssh_service.get_projects_snapshot,
+                 'roles': ssh_service.get_roles_snapshot,
                  'load': ssh_service.get_load_snapshot}[kind](**creds)
         response = jsonify(stats=stats)
         response.headers['Cache-Control'] = 'no-store'
