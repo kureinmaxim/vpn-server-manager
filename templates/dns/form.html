@@ -2,7 +2,8 @@
 {% from "macros/credentials.html" import password_input, current_secret_row %}
 {% set v = values or item or {} %}
 {% set is_provider = form == 'provider' %}
-{% block title %}{{ (_('DNS-провайдер') if is_provider else _('Домен')) }} · DNS{% endblock %}
+{% set is_own = form == 'own' %}
+{% block title %}{{ (_('Свой DNS-сервер') if is_own else (_('DNS-провайдер') if is_provider else _('Домен'))) }} · DNS{% endblock %}
 {% block content %}
 <div class="container dns-page my-4">
     {% include "dns/_head.html" %}
@@ -12,12 +13,60 @@
         {% if not is_provider and item %}<span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.domain', domain_id=item.id) }}">{{ item.name }}</a>{% endif %}
     </nav>
     <h1 class="h3 mb-4">
-        {% if is_provider %}{{ _('Редактировать DNS-провайдера') if item else _('Новый DNS-провайдер') }}
+        {% if is_own %}{{ _('Редактировать свой DNS') if item else _('Новый свой DNS-сервер') }}
+        {% elif is_provider %}{{ _('Редактировать DNS-провайдера') if item else _('Новый DNS-провайдер') }}
         {% else %}{{ _('Редактировать домен') if item else _('Новый домен') }}{% endif %}
     </h1>
     <form method="post" class="card p-4 dns-form" autocomplete="off">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        {% if is_provider %}
+        {% if is_own %}
+        <p class="small text-body-secondary">{{ _('Карточка хранится вместе с доменами в зашифрованном файле. Пароль панели AdGuard и секретный DoH-адрес сюда не записываются.') }}</p>
+        <div class="row g-3">
+            <div class="col-sm-7">
+                <label class="form-label" for="name">{{ _('Название') }}</label>
+                <input class="form-control" id="name" name="name" maxlength="80" value="{{ v.get('name', '') }}" placeholder="{{ _('Например, AdGuard на VPS') }}">
+            </div>
+            <div class="col-sm-5">
+                <label class="form-label" for="server_id">{{ _('VPS в списке серверов') }}</label>
+                <select class="form-select" id="server_id" name="server_id">
+                    <option value="">{{ _('Не привязан') }}</option>
+                    {% for server in servers %}
+                    <option value="{{ server.id }}" {% if v.get('server_id')|string == server.id|string %}selected{% endif %}>{{ server.name or server.ip_address }}</option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">{{ _('Нужна для SSH-туннеля к панели и проверки по кнопке «Обновить».') }}</div>
+            </div>
+            <div class="col-sm-7">
+                <label class="form-label" for="exposure">{{ _('Как устройства обращаются к DNS') }}</label>
+                <select class="form-select" id="exposure" name="exposure">
+                    <option value="local" {% if v.get('exposure', 'local') == 'local' %}selected{% endif %}>{{ _('Только через DoH (порт 53 на localhost)') }}</option>
+                    <option value="tailnet" {% if v.get('exposure') == 'tailnet' %}selected{% endif %}>{{ _('Обычный DNS через Tailscale') }}</option>
+                    <option value="lan" {% if v.get('exposure') == 'lan' %}selected{% endif %}>{{ _('Обычный DNS по адресу сервера') }}</option>
+                    <option value="public" {% if v.get('exposure') == 'public' %}selected{% endif %}>{{ _('Порт 53 открыт на всех адресах') }}</option>
+                </select>
+            </div>
+            <div class="col-sm-5">
+                <label class="form-label" for="dns_ip">{{ _('IP для обычного DNS') }}</label>
+                <input class="form-control font-monospace" id="dns_ip" name="dns_ip" maxlength="80" value="{{ v.get('dns_ip', '') }}" placeholder="100.64.1.1" spellcheck="false">
+                <div class="form-text">{{ _('Для режима «только DoH» можно оставить пустым.') }}</div>
+            </div>
+            <div class="col-sm-5">
+                <label class="form-label" for="panel_port">{{ _('Порт панели AdGuard') }}</label>
+                <input class="form-control" id="panel_port" name="panel_port" type="number" min="1" max="65535" value="{{ v.get('panel_port', 3001) }}">
+            </div>
+            <div class="col-sm-7">
+                <label class="form-label" for="panel_via">{{ _('Как открывать панель') }}</label>
+                <select class="form-select" id="panel_via" name="panel_via">
+                    <option value="tunnel" {% if v.get('panel_via', 'tunnel') == 'tunnel' %}selected{% endif %}>{{ _('SSH-туннель на этом компьютере') }}</option>
+                    <option value="tailnet" {% if v.get('panel_via') == 'tailnet' %}selected{% endif %}>{{ _('Напрямую по Tailscale') }}</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label class="form-label" for="notes">{{ _('Заметки') }}</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3" maxlength="2000">{{ v.get('notes', '') }}</textarea>
+            </div>
+        </div>
+        {% elif is_provider %}
         <div class="row g-3">
             <div class="col-sm-5">
                 <label class="form-label" for="kind">{{ _('Тип') }}</label>
@@ -98,7 +147,7 @@
         </div>
         {% endif %}
         <div class="d-flex gap-2 justify-content-end mt-4">
-            <a class="btn btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=item.id) if item and not is_provider else url_for('dns.index') }}">{{ _('Отмена') }}</a>
+            <a class="btn btn-outline-secondary" href="{{ url_for('dns.domain', domain_id=item.id) if item and not is_provider and not is_own else url_for('dns.index') }}">{{ _('Отмена') }}</a>
             <button class="btn btn-dns-solid" type="submit">{{ _('Сохранить') }}</button>
         </div>
     </form>
@@ -124,7 +173,7 @@
     if (!name.value && !{{ 'true' if item else 'false' }}) name.value = previous.dataset.name;
 })();
 </script>
-{% else %}
+{% elif not is_own %}
 <script>
 (() => {
     const button = document.getElementById('rdap-fill');

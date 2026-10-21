@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.15] - 2026-10-21
+
+### Added
+- **Own DNS** cards are stored in the same encrypted file as domains: add a VPS by hand, or let **Refresh** write what SSH finds. If the server is unreachable, the last saved card and setup steps stay on the page. The panel password and DoH URL are still not stored.
+
 ## [4.12.13] - 2026-10-21
 
 ### Added

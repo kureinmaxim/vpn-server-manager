@@ -1,7 +1,7 @@
 """DNS registry: DNS-provider accounts, domains and their records.
 
 Stored inside the encrypted servers file under the "dns" key:
-{"providers": [...], "domains": [{..., "records": [...]}]}.
+{"providers": [...], "domains": [{..., "records": [...]}], "own_servers": [...]}.
 Provider logins and passwords are additionally Fernet-encrypted, as for servers.
 """
 import datetime
@@ -21,6 +21,8 @@ PRESETS = {
 RECORD_TYPES = ('A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SRV', 'CAA', 'PTR')
 SECRET_FIELDS = ('user', 'password')
 ROLES = ('auto', 'main', 'service')
+OWN_EXPOSURES = ('local', 'tailnet', 'lan', 'public', 'unknown')
+OWN_PANEL_VIA = ('tunnel', 'tailnet', 'unknown')
 # Hosts that cPanel and mail autoconfiguration create automatically
 SERVICE_HOSTS = {'autoconfig', 'autodiscover', 'cpanel', 'cpcalendars', 'cpcontacts', 'webdisk', 'webmail',
                  'whm', 'ftp', 'mail', 'imap', 'pop', 'smtp'}
@@ -78,11 +80,13 @@ def normalize(dns):
     domains = [d for d in dns.get('domains') or [] if isinstance(d, dict) and d.get('id')]
     for domain in domains:
         domain['records'] = [r for r in domain.get('records') or [] if isinstance(r, dict) and r.get('id')]
-    return {'providers': providers, 'domains': domains}
+    own_servers = [_own_server(item) for item in dns.get('own_servers') or []
+                   if isinstance(item, dict) and item.get('id')]
+    return {'providers': providers, 'domains': domains, 'own_servers': own_servers}
 
 
 def is_empty(dns):
-    return not (dns.get('providers') or dns.get('domains'))
+    return not (dns.get('providers') or dns.get('domains') or dns.get('own_servers'))
 
 
 def find(items, item_id):
@@ -112,6 +116,104 @@ def build_provider(form, current, encrypt):
         elif form.get('clear_' + field) or field not in provider:
             provider[field] = ''
     return provider
+
+
+def clean_ip(value):
+    value = (value or '').strip()
+    if not value:
+        return ''
+    try:
+        return str(ipaddress.ip_address(value))
+    except ValueError:
+        raise DnsError('ip')
+
+
+def clean_port(value, default=3001):
+    raw = (value if value is not None else default)
+    if raw == '':
+        raw = default
+    try:
+        port = int(raw)
+    except (TypeError, ValueError):
+        raise DnsError('port')
+    if not 1 <= port <= 65535:
+        raise DnsError('port')
+    return port
+
+
+def _own_server(item):
+    try:
+        panel_port = int(item.get('panel_port') or 3001)
+    except (TypeError, ValueError):
+        panel_port = 3001
+    if not 1 <= panel_port <= 65535:
+        panel_port = 3001
+    return {
+        'id': item['id'],
+        'name': str(item.get('name') or '').strip()[:80],
+        'server_id': str(item.get('server_id') or ''),
+        'notes': str(item.get('notes') or '').strip()[:2000],
+        'exposure': item.get('exposure') if item.get('exposure') in OWN_EXPOSURES else 'unknown',
+        'dns_ip': str(item.get('dns_ip') or '').strip()[:80],
+        'panel_port': panel_port,
+        'panel_via': item.get('panel_via') if item.get('panel_via') in OWN_PANEL_VIA else 'tunnel',
+        'last_seen': str(item.get('last_seen') or ''),
+        'last_state': str(item.get('last_state') or '')[:40],
+        'source': 'detected' if item.get('source') == 'detected' else 'manual',
+    }
+
+
+def _linked_server(server_id, servers):
+    return next((item for item in servers if str(item.get('id')) == str(server_id)), None)
+
+
+def build_own_server(form, current, servers):
+    server_id = str(form.get('server_id') or '')
+    linked = _linked_server(server_id, servers) if server_id else None
+    if server_id and linked is None:
+        raise DnsError('own_server')
+    name = (form.get('name') or '').strip()[:80] or (linked or {}).get('name') or ''
+    if not name:
+        raise DnsError('own_name')
+    exposure = form.get('exposure') if form.get('exposure') in OWN_EXPOSURES else 'local'
+    panel_via = form.get('panel_via') if form.get('panel_via') in OWN_PANEL_VIA else (
+        'tailnet' if exposure == 'tailnet' else 'tunnel')
+    item = dict(current or {'id': new_id(), 'source': 'manual', 'last_seen': '', 'last_state': ''})
+    item.update(
+        name=name, server_id=server_id, notes=(form.get('notes') or '').strip()[:2000],
+        exposure=exposure, dns_ip=clean_ip(form.get('dns_ip')),
+        panel_port=clean_port(form.get('panel_port'), 3001), panel_via=panel_via,
+        source=item.get('source') or 'manual')
+    return _own_server(item)
+
+
+def upsert_own_discovered(dns, data, servers):
+    """Create or refresh an own-DNS card from a successful SSH check. DoH URL is never stored."""
+    server_id = str(data.get('server_id') or '')
+    linked = _linked_server(server_id, servers)
+    if not server_id or linked is None:
+        raise DnsError('own_server')
+    current = next((item for item in dns['own_servers'] if item.get('server_id') == server_id), None)
+    live = {
+        'server_id': server_id,
+        'name': (data.get('name') or '').strip()[:80] or linked.get('name') or linked.get('ip_address') or 'DNS',
+        'exposure': data.get('exposure') if data.get('exposure') in OWN_EXPOSURES else 'unknown',
+        'dns_ip': clean_ip(data.get('dns_ip')),
+        'panel_port': clean_port(data.get('panel_port'), 3001),
+        'panel_via': data.get('panel_via') if data.get('panel_via') in OWN_PANEL_VIA else 'tunnel',
+        'last_state': str(data.get('last_state') or '')[:40],
+        'last_seen': datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat(),
+        'source': 'detected',
+    }
+    if current:
+        if current.get('source') == 'manual' and current.get('name'):
+            live['name'] = current['name']
+        updated = _own_server(dict(current, **live, notes=current.get('notes') or '', id=current['id']))
+        dns['own_servers'][dns['own_servers'].index(current)] = updated
+        return updated
+    created = _own_server(dict(id=new_id(), notes='', **live))
+    dns['own_servers'].append(created)
+    return created
 
 
 def build_domain(form, current, providers):
@@ -401,4 +503,15 @@ def merge(current, incoming, reencrypt):
         current['domains'].append(dict(domain, id=new_id(), provider_id=provider_ids.get(domain.get('provider_id'), '')))
         names.add(domain.get('name'))
         added += 1
+    seen_servers = {item.get('server_id') for item in current['own_servers'] if item.get('server_id')}
+    seen_own_names = {item.get('name', '').lower() for item in current['own_servers']}
+    for item in incoming['own_servers']:
+        if item.get('server_id') and item['server_id'] in seen_servers:
+            continue
+        if not item.get('server_id') and item.get('name', '').lower() in seen_own_names:
+            continue
+        current['own_servers'].append(_own_server(dict(item, id=new_id())))
+        if item.get('server_id'):
+            seen_servers.add(item['server_id'])
+        seen_own_names.add(item.get('name', '').lower())
     return current, added

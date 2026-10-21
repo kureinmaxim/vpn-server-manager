@@ -25,6 +25,11 @@ ERRORS = {
     'duplicate': _l('Такой домен уже есть в списке.'),
     'zone': _l('Не удалось распознать файл зоны. Загрузите файл из Cloudflare: DNS → Records → Export.'),
     'no_file': _l('Нет активного файла данных. Добавьте сервер или импортируйте файл данных.'),
+    'ip': _l('Укажите IPv4 или IPv6 адрес, либо оставьте поле пустым.'),
+    'port': _l('Порт панели — число от 1 до 65535.'),
+    'own_name': _l('Укажите название своего DNS-сервера.'),
+    'own_server': _l('Выбранный VPS не найден в списке серверов.'),
+    'own_duplicate': _l('Для этого VPS карточка своего DNS уже есть.'),
 }
 
 
@@ -91,10 +96,13 @@ def index():
     ssh = {str(s.get('id')): {'port': (s.get('ssh_credentials') or {}).get('port', 22),
                               'user': (s.get('ssh_credentials') or {}).get('user', 'root')}
            for s in servers if isinstance(s, dict)}
+    vps = [{'id': str(s.get('id')), 'name': s.get('name') or '', 'ip_address': s.get('ip_address') or ''}
+           for s in servers if isinstance(s, dict) and s.get('id') is not None]
     return render_template('dns/index.html', providers=list(providers.values()), provider_map=providers,
                            main_count=lambda d: sum(dns_reg.role(r) == 'main' for r in d['records']),
                            domains=domains, days_left=dns_reg.days_left, presets=dns_reg.PRESETS,
-                           own_dns_hosts=hosts, own_dns_ssh=ssh)
+                           own_dns_hosts=hosts, own_dns_ssh=ssh, own_dns_saved=dns['own_servers'],
+                           own_dns_vps=vps)
 
 
 @dns_bp.route('/providers/new', methods=['GET', 'POST'])
@@ -119,6 +127,69 @@ def provider_form(provider_id=None):
             _fail(exc)
     return render_template('dns/form.html', form='provider', item=_decrypted(current) if current else None,
                            presets=dns_reg.PRESETS, values=request.form if request.method == 'POST' else None)
+
+
+def _vps_list():
+    try:
+        servers = _manager().load_servers(current_app.config)
+    except (InvalidToken, ValueError, OSError):
+        servers = []
+    return [s for s in servers if isinstance(s, dict) and s.get('id') is not None]
+
+
+def _own_or_404(dns, own_id):
+    item = dns_reg.find(dns['own_servers'], own_id)
+    if item is None:
+        abort(404)
+    return item
+
+
+@dns_bp.route('/own/new', methods=['GET', 'POST'])
+@dns_bp.route('/own/<own_id>/edit', methods=['GET', 'POST'])
+@csrf_protect
+def own_form(own_id=None):
+    dns = _load()
+    current = _own_or_404(dns, own_id) if own_id else None
+    servers = _vps_list()
+    if request.method == 'POST':
+        try:
+            item = dns_reg.build_own_server(request.form, current, servers)
+            if item['server_id'] and any(row.get('server_id') == item['server_id'] and row is not current
+                                         for row in dns['own_servers']):
+                raise dns_reg.DnsError('own_duplicate')
+            if current:
+                dns['own_servers'][dns['own_servers'].index(current)] = item
+            else:
+                dns['own_servers'].append(item)
+            _save(dns)
+            flash(_('Карточка своего DNS сохранена.'), 'success')
+            return redirect(url_for('dns.index'))
+        except dns_reg.DnsError as exc:
+            _fail(exc)
+    return render_template('dns/form.html', form='own', item=current, servers=servers,
+                           exposures=dns_reg.OWN_EXPOSURES, values=request.form if request.method == 'POST' else None)
+
+
+@dns_bp.post('/own/<own_id>/delete')
+@csrf_protect
+def own_delete(own_id):
+    dns = _load()
+    dns['own_servers'].remove(_own_or_404(dns, own_id))
+    _save(dns)
+    flash(_('Карточка своего DNS удалена.'), 'success')
+    return redirect(url_for('dns.index'))
+
+
+@dns_bp.post('/own/discovered')
+@csrf_protect
+def own_discovered():
+    dns = _load()
+    try:
+        item = dns_reg.upsert_own_discovered(dns, request.get_json(silent=True) or {}, _vps_list())
+        _save(dns)
+    except dns_reg.DnsError as exc:
+        return jsonify(error=str(ERRORS.get(exc.code, exc.code))), 400
+    return jsonify(ok=True, item=item)
 
 
 @dns_bp.post('/providers/<provider_id>/delete')

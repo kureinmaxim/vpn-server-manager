@@ -9576,3 +9576,96 @@ msgstr "Zapret does not resolve DNS: it touches already established TCP/QUIC pac
 
 msgid "Не направляйте dnsmasq на Zapret и не ставьте https-dns-proxy «поверх» SSClash/Podkop. Если DNS отдаёт NXDOMAIN, Zapret сайт не откроет. После настройки DNS запрос должен появиться в журнале AdGuard; Zapret на этот журнал не влияет."
 msgstr "Do not point dnsmasq at Zapret, and do not put https-dns-proxy on top of SSClash/Podkop. If DNS returns NXDOMAIN, Zapret will not open the site. After DNS is set, the query should appear in the AdGuard log; Zapret does not affect that log."
+
+msgid "Укажите IPv4 или IPv6 адрес, либо оставьте поле пустым."
+msgstr "Enter an IPv4 or IPv6 address, or leave the field empty."
+
+msgid "Порт панели — число от 1 до 65535."
+msgstr "The panel port must be a number from 1 to 65535."
+
+msgid "Укажите название своего DNS-сервера."
+msgstr "Enter a name for your DNS server."
+
+msgid "Выбранный VPS не найден в списке серверов."
+msgstr "The selected VPS is not in the server list."
+
+msgid "Для этого VPS карточка своего DNS уже есть."
+msgstr "This VPS already has an own-DNS card."
+
+msgid "Карточка своего DNS сохранена."
+msgstr "Own DNS card saved."
+
+msgid "Карточка своего DNS удалена."
+msgstr "Own DNS card deleted."
+
+msgid "Редактировать свой DNS"
+msgstr "Edit own DNS"
+
+msgid "Новый свой DNS-сервер"
+msgstr "New own DNS server"
+
+msgid "Карточка хранится вместе с доменами в зашифрованном файле. Пароль панели AdGuard и секретный DoH-адрес сюда не записываются."
+msgstr "The card is stored with your domains in the encrypted file. The AdGuard panel password and the secret DoH address are not saved here."
+
+msgid "Например, AdGuard на VPS"
+msgstr "For example, AdGuard on the VPS"
+
+msgid "VPS в списке серверов"
+msgstr "VPS in the server list"
+
+msgid "Не привязан"
+msgstr "Not linked"
+
+msgid "Нужна для SSH-туннеля к панели и проверки по кнопке «Обновить»."
+msgstr "Needed for the SSH tunnel to the panel and for Refresh."
+
+msgid "Только через DoH (порт 53 на localhost)"
+msgstr "DoH only (port 53 on localhost)"
+
+msgid "Обычный DNS через Tailscale"
+msgstr "Plain DNS over Tailscale"
+
+msgid "Обычный DNS по адресу сервера"
+msgstr "Plain DNS at the server address"
+
+msgid "Порт 53 открыт на всех адресах"
+msgstr "Port 53 is open on every address"
+
+msgid "IP для обычного DNS"
+msgstr "IP for plain DNS"
+
+msgid "Для режима «только DoH» можно оставить пустым."
+msgstr "Leave empty for DoH-only mode."
+
+msgid "Порт панели AdGuard"
+msgstr "AdGuard panel port"
+
+msgid "Как открывать панель"
+msgstr "How to open the panel"
+
+msgid "SSH-туннель на этом компьютере"
+msgstr "SSH tunnel on this computer"
+
+msgid "Напрямую по Tailscale"
+msgstr "Directly on Tailscale"
+
+msgid "Добавить свой DNS"
+msgstr "Add own DNS"
+
+msgid "Карточки своего AdGuard Home хранятся в том же зашифрованном файле, что и домены. Добавьте VPS вручную или нажмите «Обновить»: удачная проверка по SSH создаст карточку сама. Если сервер сейчас не отвечает, остаётся последняя сохранённая карточка. Пароль панели и секретный DoH-адрес приложение не читает и не хранит."
+msgstr "Your AdGuard Home cards are stored in the same encrypted file as domains. Add a VPS by hand or click Refresh: a successful SSH check creates the card. If the server is down, the last saved card remains. The app neither reads nor stores the panel password or the secret DoH address."
+
+msgid "Нет активных серверов и сохранённых карточек. Добавьте свой DNS вручную."
+msgstr "No active servers and no saved cards. Add own DNS by hand."
+
+msgid "Сохранённых карточек нет, и AdGuard Home на активных серверах не найден. Добавьте свой DNS вручную или повторите проверку, когда VPS будет доступен по SSH."
+msgstr "No saved cards, and AdGuard Home was not found on the active servers. Add own DNS by hand, or check again when the VPS answers over SSH."
+
+msgid "Показаны сохранённые карточки. «Обновить» проверяет VPS по SSH и дописывает найденное в файл."
+msgstr "Showing saved cards. Refresh checks the VPS over SSH and writes what it finds into the file."
+
+msgid "Карточка из файла. Проверка сейчас не удалась."
+msgstr "Card from the file. The live check failed."
+
+msgid "Удалить карточку «{name}»? Шаги подключения пропадут, пока не добавите её снова."
+msgstr "Delete the “{name}” card? Setup steps go away until you add it again."

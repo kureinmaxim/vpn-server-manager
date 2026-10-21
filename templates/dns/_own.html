@@ -4,9 +4,12 @@
 <section class="own-dns mt-4" id="own-dns" aria-labelledby="own-dns-title">
     <div class="dns-section-head mt-0">
         <h2 id="own-dns-title">{{ _('Свой DNS-сервер') }}</h2>
-        <button id="own-dns-refresh" class="btn btn-outline-secondary btn-sm" type="button"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-dns-solid btn-sm" href="{{ url_for('dns.own_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить свой DNS') }}</a>
+            <button id="own-dns-refresh" class="btn btn-outline-secondary btn-sm" type="button"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+        </div>
     </div>
-    <p class="small text-body-secondary">{{ _('Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему устройства. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH приложение не читает и не хранит.') }}</p>
+    <p class="small text-body-secondary">{{ _('Карточки своего AdGuard Home хранятся в том же зашифрованном файле, что и домены. Добавьте VPS вручную или нажмите «Обновить»: удачная проверка по SSH создаст карточку сама. Если сервер сейчас не отвечает, остаётся последняя сохранённая карточка. Пароль панели и секретный DoH-адрес приложение не читает и не хранит.') }}</p>
     <p id="own-dns-status" class="small mb-2" role="status" aria-live="polite"></p>
     <div id="own-dns-cards" class="d-grid gap-3"></div>
 

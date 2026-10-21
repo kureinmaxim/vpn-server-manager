@@ -77,6 +77,23 @@ def test_index_has_dns_button(unlocked):
     assert 'btn-dns' in unlocked.get('/').text
 
 
+def test_own_dns_card_is_stored_with_domains(unlocked):
+    assert post(unlocked, '/dns/own/new', name='Home DNS', exposure='local', panel_port='3001').status_code == 302
+    stored = dns(unlocked)['own_servers']
+    assert stored[0]['name'] == 'Home DNS' and stored[0]['exposure'] == 'local'
+    page = unlocked.get('/dns/?lang=en').text
+    assert 'Add own DNS' in page and stored[0]['id'] in page
+    assert post(unlocked, f"/dns/own/{stored[0]['id']}/edit", name='AdGuard', exposure='tailnet',
+                dns_ip='100.64.1.2', server_id='1').status_code == 302
+    assert dns(unlocked)['own_servers'][0]['dns_ip'] == '100.64.1.2'
+    response = unlocked.post('/dns/own/discovered', json={
+        'server_id': '1', 'name': 'vps', 'exposure': 'local', 'panel_port': 3001, 'last_state': 'running',
+    }, headers={'X-CSRF-Token': 'token'})
+    assert response.status_code == 200 and response.get_json()['item']['id'] == stored[0]['id']
+    assert post(unlocked, f"/dns/own/{stored[0]['id']}/delete").status_code == 302
+    assert dns(unlocked).get('own_servers') in (None, [])
+
+
 def test_own_dns_guide_is_translated(unlocked):
     page = unlocked.get('/dns/?lang=en').text
     assert 'Own DNS server' in page and 'id="own-tab-openwrt"' in page
@@ -86,6 +103,7 @@ def test_own_dns_guide_is_translated(unlocked):
     assert 'data-own-wrt="forkop"' in page and 'data-own-wrt="zapret"' in page
     config = page.split('window.OWN_DNS = ')[1].split('</script>')[0]
     assert 'hosts: {}' in config
+    assert 'saved: []' in config
     assert 'password' not in config and 'private_key' not in config
     assert 'Devices connect through your DoH address' in config
     assert not re.search('[А-Яа-яЁё]', config)
@@ -97,7 +115,7 @@ def test_pages_localized(unlocked, lang):
     post(unlocked, '/dns/providers/new', kind='cloudflare')
     post(unlocked, '/dns/domains/new', name='example.com', expires_on='2020-01-01')
     domain_id = dns(unlocked)['domains'][0]['id']
-    for url in ('/dns/', '/dns/providers/new', '/dns/domains/new', f'/dns/domains/{domain_id}',
+    for url in ('/dns/', '/dns/providers/new', '/dns/domains/new', '/dns/own/new', f'/dns/domains/{domain_id}',
                 f"/dns/providers/{dns(unlocked)['providers'][0]['id']}/edit"):
         text = unlocked.get(url).text
         section = text.split('<div class="container dns-page')[1].split('</main>')[0]

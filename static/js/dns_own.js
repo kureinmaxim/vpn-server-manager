@@ -284,6 +284,60 @@
         setTimeout(() => { button.classList.remove('own-copied'); if (previous) button.setAttribute('title', previous); }, 1500);
     }
 
+    function fromSaved(row) {
+        const vps = (config.vps || []).find(server => String(server.id) === String(row.server_id)) || {};
+        const ip = row.dns_ip || vps.ip_address || '';
+        const port = Number(row.panel_port) || 3001;
+        const web = {
+            host: row.panel_via === 'tailnet' ? (row.dns_ip || ip || '100.64.0.1') : '127.0.0.1',
+            hostPort: port, port, proto: 'tcp'
+        };
+        return {
+            ownId: row.id,
+            live: false,
+            server: {id: row.server_id || '', name: row.name, ip_address: ip},
+            role: {
+                state: row.last_state || 'unknown',
+                components: [],
+                last_check: row.last_seen ? {state: row.last_state || 'unknown', checked_at: row.last_seen, stale: true} : null
+            },
+            address: row.exposure === 'tailnet' ? row.dns_ip : '',
+            info: {
+                exposure: row.exposure || 'unknown',
+                dnsIp: row.dns_ip || '',
+                dot: false,
+                web,
+                loop: row.exposure === 'local' ? {host: '127.0.0.1', hostPort: 53, port: 53} : null
+            }
+        };
+    }
+
+    function matchSaved(serverId, list) {
+        return (list || found).find(item => item.server.id && String(item.server.id) === String(serverId));
+    }
+
+    async function persist(item) {
+        if (!config.saveUrl || !item.server.id) return;
+        try {
+            const response = await fetch(config.saveUrl, {
+                method: 'POST',
+                cache: 'no-store',
+                headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'X-CSRF-Token': config.csrf},
+                body: JSON.stringify({
+                    server_id: item.server.id,
+                    name: item.server.name,
+                    exposure: item.info.exposure,
+                    dns_ip: item.info.dnsIp,
+                    panel_port: item.info.web ? item.info.web.hostPort : 3001,
+                    panel_via: item.info.web && isTailnet(item.info.web.host) ? 'tailnet' : 'tunnel',
+                    last_state: item.role.state
+                })
+            });
+            const data = await response.json().catch(() => ({}));
+            if (response.ok && data.item && data.item.id) item.ownId = data.item.id;
+        } catch (error) { /* keep the live card even if the file write fails */ }
+    }
+
     function card(item) {
         const article = document.createElement('article');
         article.className = 'dns-provider own-dns-card';
@@ -301,13 +355,19 @@
         article.append(header);
         const access = document.createElement('div');
         access.className = 'small';
-        access.textContent = `${t.access}: ${t['access_' + item.info.exposure]}`;
+        access.textContent = `${t.access}: ${t['access_' + item.info.exposure] || t.access_unknown}`;
         article.append(access);
         if (item.address) {
             const address = document.createElement('div');
             address.className = 'small text-body-secondary';
             address.textContent = `Tailscale: ${item.address}`;
             article.append(address);
+        }
+        if (!item.live && item.ownId) {
+            const stale = document.createElement('div');
+            stale.className = 'small text-body-secondary';
+            stale.textContent = t.savedStale;
+            article.append(stale);
         }
         (item.role.components || []).forEach(part => {
             const line = document.createElement('div');
@@ -330,21 +390,55 @@
         }
         const actions = document.createElement('div');
         actions.className = 'dns-actions';
-        const diagnostics = document.createElement('a');
-        diagnostics.className = 'btn btn-sm btn-outline-secondary';
-        diagnostics.href = config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(item.server.id)) + '?role=adguard';
-        diagnostics.textContent = t.diagnostics;
-        const monitoring = document.createElement('a');
-        monitoring.className = 'btn btn-sm btn-outline-secondary';
-        monitoring.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(item.server.id));
-        monitoring.textContent = t.monitoring;
-        actions.append(diagnostics, monitoring);
+        if (item.ownId && config.editUrl) {
+            const edit = document.createElement('a');
+            edit.className = 'btn btn-sm btn-outline-secondary';
+            edit.href = config.editUrl.replace('__OWN__', encodeURIComponent(item.ownId));
+            edit.setAttribute('aria-label', t.edit);
+            edit.title = t.edit;
+            edit.innerHTML = '<i class="bi bi-pencil" aria-hidden="true"></i>';
+            actions.append(edit);
+        }
+        if (item.server.id && (config.vps || []).some(server => String(server.id) === String(item.server.id))) {
+            const diagnostics = document.createElement('a');
+            diagnostics.className = 'btn btn-sm btn-outline-secondary';
+            diagnostics.href = config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(item.server.id)) + '?role=adguard';
+            diagnostics.textContent = t.diagnostics;
+            const monitoring = document.createElement('a');
+            monitoring.className = 'btn btn-sm btn-outline-secondary';
+            monitoring.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(item.server.id));
+            monitoring.textContent = t.monitoring;
+            actions.append(diagnostics, monitoring);
+        }
+        if (item.ownId && config.deleteUrl) {
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = config.deleteUrl.replace('__OWN__', encodeURIComponent(item.ownId));
+            form.className = 'd-inline';
+            form.addEventListener('submit', event => {
+                if (!confirm(t.removeConfirm.replace('{name}', item.server.name || item.server.ip_address || ''))) {
+                    event.preventDefault();
+                }
+            });
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrf_token';
+            csrf.value = config.csrf || '';
+            const button = document.createElement('button');
+            button.type = 'submit';
+            button.className = 'btn btn-sm btn-outline-danger';
+            button.title = t.remove;
+            button.setAttribute('aria-label', t.remove);
+            button.innerHTML = '<i class="bi bi-trash" aria-hidden="true"></i>';
+            form.append(csrf, button);
+            actions.append(form);
+        }
         article.append(actions);
         return article;
     }
 
     function render(text) {
-        found.forEach(item => { item.info = analyse(item); });
+        found.forEach(item => { if (item.live) item.info = analyse(item); });
         cards.replaceChildren(...found.map(card));
         guide.hidden = !found.length;
         $('own-dns-which-box').hidden = found.length < 2;
@@ -378,7 +472,7 @@
         run = pass;
         refresh.disabled = true;
         status.textContent = t.loading;
-        const next = [];
+        const next = found.slice();
         try {
             const inventory = await getJSON(config.serversUrl, pass);
             if (run !== pass) return;
@@ -389,7 +483,10 @@
                 if (mesh.state === 'ready') nodes = mesh.nodes || [];
             } catch (error) { nodes = []; }
             if (run !== pass) return;
-            if (!servers.length) { found = []; render(t.empty); return; }
+            if (!servers.length) {
+                render(next.length ? t.fromFile : t.empty);
+                return;
+            }
             const failed = [];
             let index = 0;
             let done = 0;
@@ -400,7 +497,21 @@
                         const data = await getJSON(config.rolesUrl.replace('__SERVER__', encodeURIComponent(server.id)), pass);
                         if (run !== pass) return;
                         const role = (data.stats || []).find(item => item.key === 'adguard' && item.detected);
-                        if (role) next.push({server, role, address: tailnetAddress(server, nodes)});
+                        if (role) {
+                            const address = tailnetAddress(server, nodes);
+                            let item = matchSaved(server.id, next);
+                            if (!item) {
+                                item = {server, role, address, ownId: '', live: true};
+                                next.push(item);
+                            } else {
+                                item.server = server;
+                                item.role = role;
+                                item.address = address;
+                                item.live = true;
+                            }
+                            item.info = analyse(item);
+                            await persist(item);
+                        }
                     } catch (error) {
                         if (run !== pass) return;
                         failed.push((server.name || server.ip_address) + (error.message ? ` (${error.message})` : ''));
@@ -417,7 +528,7 @@
                 : t.none;
             if (failed.length) text += ' ' + t.errors.replace('{names}', failed.join('; '));
             render(text);
-            if (!failed.length || found.length) save();
+            if (found.length) save();
         } catch (error) {
             if (run === pass) status.textContent = error.message;
         } finally {
@@ -484,9 +595,19 @@
     try { tab = localStorage.getItem('own-dns-tab'); } catch (error) { tab = null; }
     showTab(root.querySelector(`[data-own-tab="${tab}"]`) ? tab : defaultTab());
     applyMode();
-    const saved = cached();
-    if (saved) {
-        found = saved.found || [];
-        render(found.length ? t.fromCache.replace('{time}', new Date(saved.at).toLocaleTimeString(locale)) : t.none);
-    } else start();
+    found = (config.saved || []).map(fromSaved);
+    if (found.length) render(t.fromFile);
+    const cachedLive = cached();
+    if (cachedLive && cachedLive.found && cachedLive.found.length) {
+        cachedLive.found.forEach(live => {
+            const item = live.server && live.server.id ? matchSaved(live.server.id) : null;
+            if (item) {
+                item.role = live.role;
+                item.address = live.address;
+                item.live = true;
+            }
+        });
+        render(t.fromCache.replace('{time}', new Date(cachedLive.at).toLocaleTimeString(locale)));
+    }
+    start();
 })();

@@ -96,6 +96,29 @@ def test_host_choices_and_days_left():
     assert dns_reg.days_left({'expires_on': ''}, today) is None
 
 
+def test_own_server_round_trip_and_discovery(manager, tmp_path):
+    path = tmp_path / 'servers.enc'
+    config = {'active_data_file': str(path)}
+    servers = [{'id': 1, 'name': 'vps', 'ip_address': '192.0.2.10'}]
+    manager.save_servers(servers, str(path))
+    item = dns_reg.build_own_server({'name': 'Home DNS', 'server_id': '1', 'exposure': 'local'}, None, servers)
+    assert item['name'] == 'Home DNS' and item['server_id'] == '1' and item['panel_port'] == 3001
+    dns = dns_reg.normalize({'own_servers': [item]})
+    manager.save_dns(dns, str(path))
+    stored = manager.load_dns(config)
+    assert stored['own_servers'][0]['name'] == 'Home DNS'
+    assert not dns_reg.is_empty(stored)
+
+    live = dns_reg.upsert_own_discovered(dns, {
+        'server_id': '1', 'name': 'vps', 'exposure': 'tailnet', 'dns_ip': '100.64.1.2',
+        'panel_port': 3001, 'panel_via': 'tailnet', 'last_state': 'running',
+    }, servers)
+    assert live['dns_ip'] == '100.64.1.2' and live['id'] == item['id']
+    assert live['name'] == 'Home DNS'  # manual name kept
+    with pytest.raises(dns_reg.DnsError):
+        dns_reg.build_own_server({'name': 'x', 'dns_ip': 'not-an-ip'}, None, servers)
+
+
 def test_merge_reencrypts_and_remaps_providers():
     current = {'providers': [{'id': 'p1', 'name': 'Cloudflare'}], 'domains': [{'id': 'd1', 'name': 'a.com'}]}
     incoming = {'providers': [{'id': 'x1', 'name': 'cloudflare', 'password': 'old'},
