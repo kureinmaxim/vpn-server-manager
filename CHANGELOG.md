@@ -6,6 +6,7 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 
 ### Added
 - **Own DNS** cards are stored in the same encrypted file as domains: add a VPS by hand, or let **Refresh** write what SSH finds. If the server is unreachable, the last saved card and setup steps stay on the page. The panel password and DoH URL are still not stored.
+- **AdGuard Home / DNS** and **Chatmail relay** are in the editable tracked-projects list (they already appeared in the Projects window). A saved copy of the previous default list picks them up without wiping other custom projects.
 
 ## [4.12.13] - 2026-10-21
 

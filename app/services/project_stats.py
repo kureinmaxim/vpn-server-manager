@@ -6,6 +6,7 @@ import math
 import re
 import shlex
 
+from .dns_mail_probe import ROLE_NAMES
 from .ui_preferences import _config_path, _read_config, _write_config
 
 DEFAULT_PROJECTS = [
@@ -21,7 +22,17 @@ DEFAULT_PROJECTS = [
      'containers': ['ha_rns_bridge', 'reticulumpn', 'reticulum'], 'processes': ['rnsd', 'lxmd']},
     {'name': 'Dockhand', 'units': [], 'containers': ['dockhand']},
     {'name': 'Headscale / Headplane', 'units': ['headscale', 'headplane'], 'containers': ['headscale', 'headplane']},
+    {'name': ROLE_NAMES['adguard'],
+     'units': ['AdGuardHome', 'adguardhome', 'adguard-home'],
+     'containers': ['adguardhome', 'adguard-home']},
+    {'name': ROLE_NAMES['chatmail'],
+     'units': ['doveauth', 'chatmail-metadata', 'filtermail',
+               'filtermail-incoming', 'filtermail-transport'],
+     'containers': []},
 ]
+# Saved lists that still match the catalog before DNS/Chatmail were editable.
+_LEGACY_DEFAULT_NAMES = frozenset(p['name'] for p in DEFAULT_PROJECTS
+                                  if p['name'] not in ROLE_NAMES.values())
 CONFIG_KEY = 'tracked_projects'
 MAX_PROJECTS = 30
 MAX_ITEMS = 16
@@ -96,9 +107,14 @@ def load_projects(app=None):
         app = current_app
     stored = _read_config(_config_path(app)).get(CONFIG_KEY)
     try:
-        return clean_projects(stored) if stored is not None else clean_projects(DEFAULT_PROJECTS)
+        if stored is None:
+            return clean_projects(DEFAULT_PROJECTS)
+        projects = clean_projects(stored)
     except ProjectError:
         return clean_projects(DEFAULT_PROJECTS)
+    if {p['name'] for p in projects} == _LEGACY_DEFAULT_NAMES:
+        return clean_projects(DEFAULT_PROJECTS)
+    return projects
 
 
 def save_projects(app, projects):
@@ -237,7 +253,10 @@ def summarize(rows, projects):
     """Projects found on the server, each with its installed components."""
     result = [row['role_summary'] for row in rows if row.get('role_summary')
               and row['role_summary'].get('discovery') != 'not_found']
+    seen = {item['name'] for item in result}
     for project in projects:
+        if project['name'] in seen:
+            continue
         own = [row for row in rows if row['project'] == project['key']]
         found = [row for row in own if row['status'] not in ('not_installed', 'unknown')]
         services = {row['name'] for row in found if row['kind'] == 'unit' and row['status'] == 'active'}

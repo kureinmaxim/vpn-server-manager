@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from app.services.dns_mail_probe import ROLE_NAMES
 from app.services.project_stats import (DEFAULT_PROJECTS, ProjectError, build_command, clean_projects,
                                         load_projects, parse_sample, save_projects, summarize)
 
@@ -78,7 +79,8 @@ def test_summary_lists_only_found_projects_with_their_state():
 def test_default_catalog_and_read_only_probe():
     names = [p['name'] for p in PROJECTS]
     assert names[:3] == ['BotCriptoM', 'Rust File Manager', 'UGCTL (UDP gRPC COM Lite)']
-    assert {'Reticulum', 'Dockhand', 'Headscale / Headplane'} <= set(names)
+    assert {'Reticulum', 'Dockhand', 'Headscale / Headplane',
+            ROLE_NAMES['adguard'], ROLE_NAMES['chatmail']} <= set(names)
     assert not any(n in names for n in ('ApiAigRPC', 'ApiNgRPC', 'ApiXgRPC', 'TelegramHelper', 'PDF3MD'))
     units = [u for p in PROJECTS for u in p['units']]
     assert 'telegramonly' not in units and not any(u.startswith(('ha-stub', 'ha-adapter', 'shskm')) for u in units)
@@ -136,6 +138,31 @@ def test_custom_projects_are_validated_before_reaching_the_shell():
     with pytest.raises(ProjectError):
         clean_projects([{'name': 'no components', 'units': ''}])
     assert build_command([]).count('systemctl') == 0
+
+
+def test_role_discovery_is_not_listed_twice():
+    text = (sample(100, unit('AdGuardHome.service'))
+            + sample(101, unit('AdGuardHome.service')) + '\nDOCKER\nNO_DOCKER')
+    rows = parse_sample(text, PROJECTS)
+    rows.append({'name': ROLE_NAMES['adguard'], 'display_name': ROLE_NAMES['adguard'],
+                 'kind': 'role', 'group': 'project', 'project': 'adguard',
+                 'project_name': ROLE_NAMES['adguard'], 'status': 'unknown',
+                 'control_component': None,
+                 'role_summary': {'key': 'adguard', 'name': ROLE_NAMES['adguard'],
+                                  'discovery': 'detected', 'state': 'running',
+                                  'components': [{'name': 'adguard', 'status': 'active'}]}})
+    found = [p['name'] for p in summarize(rows, PROJECTS)]
+    assert found.count(ROLE_NAMES['adguard']) == 1
+    assert next(p for p in summarize(rows, PROJECTS) if p['name'] == ROLE_NAMES['adguard'])['discovery'] == 'detected'
+
+
+def test_legacy_default_list_gains_dns_and_chatmail(app):
+    old = [p for p in DEFAULT_PROJECTS if p['name'] not in ROLE_NAMES.values()]
+    assert {p['name'] for p in old} == {
+        'BotCriptoM', 'Rust File Manager', 'UGCTL (UDP gRPC COM Lite)',
+        'Reticulum', 'Dockhand', 'Headscale / Headplane'}
+    assert save_projects(app, old)
+    assert [p['name'] for p in load_projects(app)] == [p['name'] for p in PROJECTS]
 
 
 def test_saved_list_persists_next_to_ui_preferences_and_resets(app):

@@ -11,7 +11,10 @@ def test_page_lists_defaults_and_requires_login(app, client):
     login(client)
     html = client.get('/settings/projects').get_data(as_text=True)
     assert 'value="BotCriptoM"' in html and 'value="Dockhand"' in html
+    assert 'value="AdGuard Home / DNS"' in html and 'value="Chatmail relay"' in html
     assert 'value="botcriptom, botcriptom-dash' in html
+    assert 'value="AdGuardHome, adguardhome, adguard-home"' in html
+    assert 'value="doveauth, chatmail-metadata, filtermail' in html
 
 
 def test_save_add_remove_and_reset(app, client):
