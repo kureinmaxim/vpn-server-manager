@@ -14,6 +14,23 @@ def test_bad_hosts(host):
         host_value(host)
 
 
+@pytest.mark.parametrize('tool', ['dns-wire', 'doh', 'mail-tls'])
+def test_new_diagnostics_keep_ssrf_protection(tool):
+    entries = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', ('127.0.0.1', 443))]
+    with patch('socket.getaddrinfo', return_value=entries), patch('socket.create_connection') as connect:
+        with pytest.raises(ToolError, match='public'):
+            run_tool(tool, {'host': 'example.com'})
+        connect.assert_not_called()
+
+
+def test_mail_diagnostic_uses_pinned_ip_and_original_hostname():
+    with patch('app.services.net_tools.public_address', return_value='8.8.8.8'), \
+         patch('app.services.dns_mail_probe.mail_check', return_value={'state': 'healthy'}) as probe:
+        result = run_tool('mail-tls', {'host': 'mail.example.com', 'port': 587, 'mode': 'smtp'})
+        probe.assert_called_once_with('mail.example.com', '8.8.8.8', 587, 'smtp', False)
+        assert result['source'] == 'pc'
+
+
 def test_idn_and_ipv6():
     assert host_value('пример.рф') == 'xn--e1afmkfd.xn--p1ai'
     assert host_value('2606:4700:4700::1111') == '2606:4700:4700::1111'

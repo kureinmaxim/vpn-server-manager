@@ -859,7 +859,8 @@
     }
 
     function renderStats(stats) {
-        renderProjectStats(document.querySelector('#serverStatusModal [data-project-stats]'), stats.projects);
+        renderProjectStats(document.querySelector('#serverStatusModal [data-project-stats]'), stats.projects,
+            {{ url_for('dns_mail.detail', server_id='SERVER_ID')|tojson }}.replace('SERVER_ID', encodeURIComponent(currentServerId)));
         document.getElementById('statsLoading').classList.add('d-none');
         document.getElementById('statsContent').classList.remove('d-none');
 

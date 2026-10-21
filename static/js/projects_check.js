@@ -44,15 +44,23 @@
         const box = document.createElement('div');
         box.className = 'd-inline-flex flex-column align-items-start me-3 mb-2';
         const link = document.createElement('a');
-        const active = project.components.filter(row => row.status === 'active').length;
+        const core = project.components.filter(row => !row.optional);
+        const active = core.filter(row => row.status === 'active').length;
         link.className = 'badge text-decoration-none ' + (window.PROJECT_STATE_CLASSES[project.state] || '');
-        link.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(server.id));
-        link.textContent = `${server.name || server.ip_address} · ${active}/${project.components.length}`;
+        link.href = (project.discovery ? config.diagnosticsUrl : config.monitoringUrl).replace('__SERVER__', encodeURIComponent(server.id));
+        if (project.discovery) link.href += '?role=' + encodeURIComponent(project.key);
+        link.textContent = `${server.name || server.ip_address} · ${project.state === 'unknown' ? t.unknown : active + '/' + core.length}`;
         link.title = `${t[project.state] || t.unknown}\n` + project.components.map(row =>
             `${row.name}${t[row.kind] ? ' (' + t[row.kind] + ')' : ''}: ${t[row.status] || t.unknown}`).join('\n');
         const parts = document.createElement('small');
         parts.className = 'text-body-secondary mt-1';
-        parts.textContent = project.components.map(component).join(' · ');
+        parts.textContent = project.discovery ? (project.detected ? t.detected : t.unknown) : project.components.map(component).join(' · ');
+        if (project.last_check) {
+            const last = project.last_check;
+            parts.textContent = t.functional + ': ' + (t[last.state] || t.unknown) + ' · '
+                + t.source + ' · ' + new Date(last.checked_at).toLocaleString();
+            if (last.stale) parts.textContent += ' · ' + t.stale;
+        }
         box.append(link, parts);
         return box;
     }
@@ -61,7 +69,7 @@
         const done = servers.filter(server => server.projects || server.error);
         const placements = new Map(config.projects.map(name => [name, []]));
         done.forEach(server => (server.projects || []).forEach(project => {
-            if (project.state !== 'unknown' && placements.has(project.name)) placements.get(project.name).push([server, project]);
+            if (placements.has(project.name)) placements.get(project.name).push([server, project]);
         }));
         body.replaceChildren();
         const missing = [];

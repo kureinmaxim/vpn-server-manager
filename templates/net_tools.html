@@ -55,14 +55,25 @@
                     {{ saved_hosts('net-host') }}
                     <input class="form-control mb-3" id="net-host" name="host" placeholder="example.com" maxlength="253" spellcheck="false" required>
                     {% endif %}
-                    {% if selected.id in ['port', 'tls'] %}
+                    {% if selected.id in ['port', 'tls', 'dns-wire', 'doh', 'mail-tls'] %}
                     <label class="form-label" for="net-port">{{ _('Порт') }}</label>
-                    <input class="form-control mb-3" id="net-port" name="port" type="number" min="1" max="65535" value="443" required>
+                    <input class="form-control mb-3" id="net-port" name="port" type="number" min="1" max="65535" value="{{ 53 if selected.id == 'dns-wire' else 993 if selected.id == 'mail-tls' else 443 }}" required>
                     {% elif selected.id == 'dns' %}
                     <label class="form-label" for="net-record">{{ _('Тип записи') }}</label>
                     <select class="form-select mb-3" id="net-record" name="record">
                         {% for record in ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'PTR', 'CAA'] %}<option>{{ record }}</option>{% endfor %}
                     </select>
+                    {% endif %}
+                    {% if selected.id in ['dns-wire', 'doh'] %}
+                    <label class="form-label" for="net-query">{{ _('DNS-имя в тестовом запросе') }}</label>
+                    <input class="form-control mb-3" id="net-query" name="query" value="example.com" maxlength="253" required>
+                    <label class="form-label" for="net-expected">{{ _('Ожидаемый RCODE') }}</label>
+                    <select class="form-select mb-3" id="net-expected" name="expected"><option>NOERROR</option><option>NXDOMAIN</option></select>
+                    {% if selected.id == 'dns-wire' %}<label class="form-label" for="net-transport">{{ _('Протокол') }}</label>
+                    <select class="form-select mb-3" id="net-transport" name="transport"><option value="udp">UDP</option><option value="tcp">TCP</option></select>{% endif %}
+                    {% elif selected.id == 'mail-tls' %}
+                    <label class="form-label" for="net-mode">{{ _('Протокол') }}</label>
+                    <select class="form-select mb-3" id="net-mode" name="mode"><option value="imaps">IMAPS (993)</option><option value="imap">IMAP STARTTLS (143)</option><option value="smtp">SMTP STARTTLS (25 / 587)</option><option value="smtps">SMTPS (465)</option></select>
                     {% endif %}
                     <button class="btn btn-primary" id="net-run" type="submit"><i class="bi bi-play-fill" aria-hidden="true"></i> {{ _('Запустить проверку') }}</button>
                 </form>

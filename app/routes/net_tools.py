@@ -19,6 +19,18 @@ net_tools_bp = Blueprint('net_tools', __name__, url_prefix='/net-tools')
 _slots = threading.BoundedSemaphore(4)
 
 TOOLS = [
+    dict(id='dns-wire', icon='hdd-network', title='DNS UDP / TCP',
+         description=_l('Проверьте DNS-сервер: RCODE, ответ и время запроса.'),
+         note=_l('Запрос A к выбранному публичному DNS-серверу. NOERROR требует адрес в ответе; NXDOMAIN выбирайте только для ожидаемо отсутствующего имени.'),
+         source=_l('Компьютер приложения'), command='dig @1.1.1.1 example.com', windows='Resolve-DnsName example.com -Server 1.1.1.1'),
+    dict(id='doh', icon='shield-check', title='DNS over HTTPS',
+         description=_l('Проверьте стандартный /dns-query, TLS и содержимое DNS-ответа.'),
+         note=_l('HTML 200 не считается DoH. Секретные пути проверяются только через SSH из файла на VPS: откройте DNS / Chatmail в мониторинге.'),
+         source=_l('Компьютер приложения'), command=None, windows=None),
+    dict(id='mail-tls', icon='envelope-check', title='SMTP / IMAP TLS',
+         description=_l('Проверьте приветствие, TLS/STARTTLS и сертификат почтового сервера.'),
+         note=_l('Проверка без авторизации и отправки писем. Укажите имя из сертификата и порт выбранного протокола; доставка сообщений не проверяется.'),
+         source=_l('Компьютер приложения'), command='openssl s_client -connect mail.example.com:587 -starttls smtp -servername mail.example.com', windows=None),
     dict(id='port', icon='door-open', title=_l('Проверка портов'),
          description=_l('Проверьте доступность TCP-порта на сервере.'),
          note=_l('Успешное соединение означает, что TCP-порт доступен с компьютера приложения. Тайм-аут может означать фильтрацию трафика. UDP не проверяется.'),

@@ -76,6 +76,31 @@ def run_tool(tool, data):
     if tool == 'my-ip':
         return provider_json('https://ipinfo.io/json')
     host = host_value(data.get('host', '')) if tool != 'fetch' else None
+    if tool in ('dns-wire', 'doh', 'mail-tls'):
+        from .dns_mail_probe import checked, dns_check, doh_check, mail_check, domain, ProbeError
+        defaults = {'dns-wire': 53, 'doh': 443, 'mail-tls': 993}
+        port = port_value(data.get('port', defaults[tool]))
+        address = public_address(host, port)
+        if tool == 'mail-tls':
+            mode = data.get('mode', 'imaps')
+            if mode not in ('smtp', 'smtps', 'imap', 'imaps'):
+                raise ToolError('tool')
+            return checked('Mail TLS', lambda: mail_check(host, address, port,
+                           'smtp' if mode.startswith('smtp') else 'imap', mode in ('smtps', 'imaps')), 'pc')
+        try:
+            name = domain(data.get('query', 'example.com'))
+        except (ProbeError, UnicodeError):
+            raise ToolError('host') from None
+        expected = data.get('expected', 'NOERROR')
+        if expected not in ('NOERROR', 'NXDOMAIN'):
+            raise ToolError('record')
+        if tool == 'dns-wire':
+            return checked('DNS wire', lambda: dns_check(address, port, name, expected,
+                           data.get('transport') == 'tcp'), 'pc')
+        # Only the standard endpoint. Secret paths are read on the VPS via SSH;
+        # they never enter browser history, request logging or exported settings.
+        url_host = '[' + host + ']' if ':' in host else host
+        return checked('DoH', lambda: doh_check('https://%s:%d/dns-query' % (url_host, port), name, expected), 'pc')
     if tool == 'dns':
         record = data.get('record', 'A')
         if record not in ('A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SOA', 'PTR', 'CAA'):

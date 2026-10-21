@@ -48,7 +48,7 @@ def test_catalog_and_all_details_are_localized(unlocked, lang, title):
     response = unlocked.get('/net-tools/?lang=' + lang)
     assert response.status_code == 200
     assert title in response.text
-    assert response.text.count('class="net-card ') == 9
+    assert response.text.count('class="net-card ') == len(TOOLS)
     for tool in TOOLS:
         detail = unlocked.get('/net-tools/' + tool['id'])
         assert detail.status_code == 200

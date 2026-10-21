@@ -235,7 +235,8 @@ def _row(project, name, kind, status, cpu, memory, tasks):
 
 def summarize(rows, projects):
     """Projects found on the server, each with its installed components."""
-    result = []
+    result = [row['role_summary'] for row in rows if row.get('role_summary')
+              and row['role_summary'].get('discovery') != 'not_found']
     for project in projects:
         own = [row for row in rows if row['project'] == project['key']]
         found = [row for row in own if row['status'] not in ('not_installed', 'unknown')]

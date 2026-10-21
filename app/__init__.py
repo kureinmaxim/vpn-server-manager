@@ -227,9 +227,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.12.11'),
-            "release_date": "13.10.2026",
-            "last_updated": "2026-10-13",
+            "version": app.config.get('APP_VERSION', '4.12.12'),
+            "release_date": "21.10.2026",
+            "last_updated": "2026-10-21",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -244,9 +244,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.12.11",
-            "release_date": "13.10.2026",
-            "last_updated": "2026-10-13",
+            "version": "4.12.12",
+            "release_date": "21.10.2026",
+            "last_updated": "2026-10-21",
             "developer": "Куреин М.Н."
         }
 
@@ -337,6 +337,8 @@ def create_app(config_name='development'):
     app.register_blueprint(control_bp)
     from .routes.net_tools import net_tools_bp
     app.register_blueprint(net_tools_bp)
+    from .routes.dns_mail import dns_mail_bp
+    app.register_blueprint(dns_mail_bp)
     from .routes.dns import dns_bp
     app.register_blueprint(dns_bp)
     
@@ -395,9 +397,10 @@ def create_app(config_name='development'):
 
         ui_prefs = load_ui_preferences(app)
         projects = load_projects(app)
+        from .services.dns_mail_probe import ROLE_NAMES
         return {
             'app_info': app.config.get('app_info', {}),
-            'tracked_projects': [project['name'] for project in projects],
+            'tracked_projects': list(dict.fromkeys([project['name'] for project in projects] + list(ROLE_NAMES.values()))),
             'tracked_processes': list(dict.fromkeys(name for project in projects for name in project['processes'])),
             'developer_name': _('Куреин М.Н.'),
             'current_locale': str(babel_get_locale()),

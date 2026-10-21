@@ -15,6 +15,7 @@
             </p>
         </div>
         <div>
+            <a href="{{ url_for('dns_mail.detail', server_id=server.id) }}" class="btn btn-outline-info btn-sm">DNS / Chatmail</a>
             <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="bi bi-arrow-left"></i> {{ _('Назад к списку') }}
             </a>
@@ -692,7 +693,8 @@ async function updateServicesStatus() {
             const proxyServices = services.filter(service => service.group === 'proxy');
             const teloServices = services.filter(service => service.group === 'telegramonly');
             const systemServices = services.filter(service => !['proxy', 'telegramonly', 'project'].includes(service.group));
-            renderProjectStats(document.querySelector('[data-project-stats]'), data.projects);
+            renderProjectStats(document.querySelector('[data-project-stats]'), data.projects,
+                {{ url_for('dns_mail.detail', server_id=server.id)|tojson }});
 
             if (proxyServices.length) {
                 proxyServices.forEach(service => renderService(service, proxyContainer));

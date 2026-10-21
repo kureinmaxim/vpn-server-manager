@@ -1229,12 +1229,14 @@ class SSHService:
             }
 
     def _collect_projects(self, client, projects):
+        from .dns_mail import discovery_rows
         try:
             output = self._read_command_output(client, build_command(projects), timeout=8)
-            return parse_projects(output, projects)
+            rows = parse_projects(output, projects)
         except Exception:
             # Failure here must not discard the rest of the server snapshot.
-            return parse_projects('', projects)
+            rows = parse_projects('', projects)
+        return rows + discovery_rows(client)
 
     def get_projects_snapshot(
         self, ip: str, user: str, password: Optional[str], port: int = 22,
@@ -1244,8 +1246,7 @@ class SSHService:
             ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
         )
         projects = load_projects()
-        output = self._read_command_output(client, build_command(projects), timeout=8)
-        return summarize_projects(parse_projects(output, projects), projects)
+        return summarize_projects(self._collect_projects(client, projects), projects)
 
     def get_services_stats(
         self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,

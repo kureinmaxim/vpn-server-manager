@@ -8949,3 +8949,153 @@ msgstr "Processes %(names)s are shown only while they are running."
 #, python-format
 msgid "Отслеживаются: %(projects)s. Показаны только найденные на сервере службы, контейнеры и запущенные процессы."
 msgstr "Tracked: %(projects)s. Only services and containers found on the server and running processes are shown."
+
+msgid "DNS-имя в тестовом запросе"
+msgstr "DNS name to query"
+
+msgid "DNS-ответ соответствует выбранному тесту"
+msgstr "DNS response matches the selected test"
+
+msgid "DNS-ответ усечён; проверьте TCP"
+msgstr "DNS response is truncated; check TCP"
+
+msgid "DoH вернул HTTP-статус, отличный от 200; перенаправления запрещены"
+msgstr "DoH returned a non-200 HTTP status; redirects are disabled"
+
+msgid "HTML 200 не считается DoH. Секретные пути проверяются только через SSH из файла на VPS: откройте DNS / Chatmail в мониторинге."
+msgstr "HTML with status 200 is not DoH. Secret paths are checked over SSH using a file on the VPS: open DNS / Chatmail in Monitoring."
+
+msgid "RCODE или содержимое ответа не соответствует тесту"
+msgstr "RCODE or response content does not match the test"
+
+msgid "SSH-проверка недоступна. Проверьте подключение, права и Python 3 на VPS."
+msgstr "SSH check unavailable. Check connectivity, permissions and Python 3 on the VPS."
+
+msgid "STUN отвечает; выделение TURN и передача данных не проверялись"
+msgstr "STUN responds; TURN allocation and data relay were not tested"
+
+msgid "TCP доступен; обмен через iroh не проверялся"
+msgstr "TCP is reachable; data exchange through iroh was not tested"
+
+msgid "URL читается только на VPS и не передаётся приложению. Нужны права чтения файла; sudo автоматически не запускается."
+msgstr "The URL is read only on the VPS and is never sent to the app. File read permission is required; sudo is not run automatically."
+
+msgid "Адреса и порты проверки"
+msgstr "Check addresses and ports"
+
+msgid "Время ожидания истекло"
+msgstr "Request timed out"
+
+msgid "Данные неполные: часть проверок недоступна"
+msgstr "Incomplete data: some checks are unavailable"
+
+msgid "Запрос A к выбранному публичному DNS-серверу. NOERROR требует адрес в ответе; NXDOMAIN выбирайте только для ожидаемо отсутствующего имени."
+msgstr "An A query to the selected public DNS server. NOERROR requires an address in the answer; select NXDOMAIN only for a name expected not to exist."
+
+msgid "Исправно"
+msgstr "Healthy"
+
+msgid "Источник: VPS через SSH"
+msgstr "Source: VPS over SSH"
+
+msgid "Локальные проверки используют 127.0.0.1 на VPS. Для отключения дополнительного почтового порта укажите 0. Параметры сохраняются в зашифрованной карточке сервера."
+msgstr "Local checks use 127.0.0.1 on the VPS. Set an optional mail port to 0 to disable its check. Settings are saved in the encrypted server card."
+
+msgid "Не настроено"
+msgstr "Not configured"
+
+msgid "Недостаточно прав для проверки"
+msgstr "Insufficient permissions to run this check"
+
+msgid "Недоступно для проверки"
+msgstr "Unavailable for checking"
+
+msgid "Некорректный DNS-ответ"
+msgstr "Invalid DNS response"
+
+msgid "Обнаружен; функциональная проверка ещё не выполнена"
+msgstr "Detected; functional check has not run yet"
+
+msgid "Обнаружение недоступно: проверьте SSH, Python 3 и права Docker/systemd"
+msgstr "Discovery unavailable: check SSH, Python 3 and Docker/systemd permissions"
+
+msgid "Ожидаемый RCODE"
+msgstr "Expected RCODE"
+
+msgid "Ответ не является application/dns-message"
+msgstr "Response is not application/dns-message"
+
+msgid "Параметры изменены — повторите проверку"
+msgstr "Settings changed — run the check again"
+
+msgid "Параметры сохранены"
+msgstr "Settings saved"
+
+msgid "Почтовый домен для проверки сертификата"
+msgstr "Mail domain for certificate validation"
+
+msgid "Приветствие и TLS проверены; доставка писем не проверялась"
+msgstr "Greeting and TLS verified; mail delivery was not tested"
+
+msgid "Проверить DNS / Chatmail"
+msgstr "Check DNS / Chatmail"
+
+msgid "Проверка без авторизации и отправки писем. Укажите имя из сертификата и порт выбранного протокола; доставка сообщений не проверяется."
+msgstr "Checks run without authentication or sending mail. Enter the certificate hostname and the port for the selected protocol; message delivery is not tested."
+
+msgid "Проверки через SSH с выбранного VPS, только чтение. SMTP/IMAP не подтверждают доставку писем; STUN не подтверждает ретрансляцию TURN."
+msgstr "Read-only checks from the selected VPS over SSH. SMTP/IMAP checks do not prove mail delivery; STUN does not prove TURN relaying."
+
+msgid "Проверьте DNS-сервер: RCODE, ответ и время запроса."
+msgstr "Check a DNS server: RCODE, answer and query time."
+
+msgid "Проверьте параметры диагностики"
+msgstr "Check the diagnostic settings"
+
+msgid "Проверьте приветствие, TLS/STARTTLS и сертификат почтового сервера."
+msgstr "Check the mail server greeting, TLS/STARTTLS and certificate."
+
+msgid "Проверьте стандартный /dns-query, TLS и содержимое DNS-ответа."
+msgstr "Check the standard /dns-query endpoint, TLS and DNS response content."
+
+msgid "Проверяемый сервис"
+msgstr "Service to check"
+
+msgid "Протокол"
+msgstr "Protocol"
+
+msgid "Публичный DoH должен разрешаться только в публичные IP-адреса"
+msgstr "Public DoH must resolve only to public IP addresses"
+
+msgid "Результат устарел — повторите проверку"
+msgstr "Result is stale — run the check again"
+
+msgid "Сервис не подтвердил ожидаемый протокол"
+msgstr "Service did not confirm the expected protocol"
+
+msgid "Сертификат действителен до"
+msgstr "Certificate valid until"
+
+msgid "Соединение или проверка недоступны"
+msgstr "Connection or check unavailable"
+
+msgid "Сохранить параметры"
+msgstr "Save settings"
+
+msgid "Укажите почтовый домен для проверки сертификата"
+msgstr "Set the mail domain to validate the certificate"
+
+msgid "Файл DoH URL не найден на VPS"
+msgstr "DoH URL file was not found on the VPS"
+
+msgid "Файл с секретным DoH URL на VPS"
+msgstr "File containing the secret DoH URL on the VPS"
+
+msgid "Функциональная проверка"
+msgstr "Functional check"
+
+msgid "Частично работает"
+msgstr "Partially working"
+
+msgid "дней"
+msgstr "days"

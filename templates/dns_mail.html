@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container my-3" style="max-width: 1080px">
+    <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+        <div><h1 class="h3">DNS / Chatmail</h1><p class="small text-body-secondary mb-0">{{ server.name }}</p></div>
+        <a class="btn btn-sm btn-outline-secondary align-self-start" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Мониторинг') }}</a>
+    </div>
+    <p class="small text-body-secondary">{{ _('Проверки через SSH с выбранного VPS, только чтение. SMTP/IMAP не подтверждают доставку писем; STUN не подтверждает ретрансляцию TURN.') }}</p>
+    <form id="diagnostics-form" class="card p-3 mb-3" data-token="{{ token }}">
+        <div class="row g-3">
+            <div class="col-md-4"><label for="diag-role" class="form-label">{{ _('Проверяемый сервис') }}</label>
+                <select id="diag-role" name="role" class="form-select form-select-sm">
+                    <option value="adguard" {{ 'selected' if config.role == 'adguard' }}>AdGuard Home / DNS</option>
+                    <option value="chatmail" {{ 'selected' if config.role == 'chatmail' }}>Chatmail</option>
+                </select>
+            </div>
+            <div class="col-md-8" data-role="chatmail"><label class="form-label" for="diag-mail_domain">{{ _('Почтовый домен для проверки сертификата') }}</label>
+                <input id="diag-mail_domain" name="mail_domain" class="form-control form-control-sm" value="{{ config.mail_domain }}" placeholder="mail.example.com" maxlength="253">
+            </div>
+            <div class="col-md-4" data-role="adguard"><label class="form-label" for="diag-query">{{ _('DNS-имя в тестовом запросе') }}</label>
+                <input id="diag-query" name="query" class="form-control form-control-sm" value="{{ config.query }}" maxlength="253" required>
+            </div>
+            <div class="col-md-4" data-role="adguard"><label class="form-label" for="diag-expected">{{ _('Ожидаемый RCODE') }}</label>
+                <select id="diag-expected" name="expected" class="form-select form-select-sm">{% for code in ['NOERROR', 'NXDOMAIN'] %}<option {{ 'selected' if code == config.expected }}>{{ code }}</option>{% endfor %}</select>
+            </div>
+        </div>
+        <details class="mt-3">
+            <summary class="small">{{ _('Адреса и порты проверки') }}</summary>
+            <p class="small text-body-secondary mt-2">{{ _('Локальные проверки используют 127.0.0.1 на VPS. Для отключения дополнительного почтового порта укажите 0. Параметры сохраняются в зашифрованной карточке сервера.') }}</p>
+            <div class="row g-2">
+                {% for key, label in [('dns_port', 'DNS UDP/TCP'), ('doh_port', 'Local DoH'), ('smtp_port', 'SMTP STARTTLS'), ('submission_port', 'Submission STARTTLS'), ('smtps_port', 'SMTPS'), ('imap_port', 'IMAP STARTTLS'), ('imaps_port', 'IMAPS'), ('turn_port', 'TURN / STUN'), ('iroh_port', 'iroh TCP')] %}
+                <div class="col-6 col-md-3" data-role="{{ 'adguard' if key in ['dns_port', 'doh_port'] else 'chatmail' }}">
+                    <label class="form-label small" for="diag-{{ key }}">{{ label }}</label>
+                    <input id="diag-{{ key }}" name="{{ key }}" type="number" min="{{ 1 if key in ['dns_port', 'doh_port'] else 0 }}" max="65535" required class="form-control form-control-sm" value="{{ config[key] }}">
+                </div>{% endfor %}
+                <div class="col-12" data-role="adguard"><label class="form-label small" for="diag-doh_file">{{ _('Файл с секретным DoH URL на VPS') }}</label>
+                    <input id="diag-doh_file" name="doh_file" class="form-control form-control-sm" value="{{ config.doh_file }}" maxlength="256" required>
+                    <p class="small text-body-secondary mt-1 mb-0">{{ _('URL читается только на VPS и не передаётся приложению. Нужны права чтения файла; sudo автоматически не запускается.') }}</p>
+                </div>
+            </div>
+        </details>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            <button type="submit" class="btn btn-primary btn-sm" name="action" value="run">{{ _('Запустить проверку') }}</button>
+            <button type="submit" class="btn btn-outline-secondary btn-sm" name="action" value="save">{{ _('Сохранить параметры') }}</button>
+        </div>
+    </form>
+    <p id="diagnostics-message" class="small" role="status" aria-live="polite"></p>
+    <div id="diagnostics-results" class="row g-2" aria-live="polite"></div>
+</div>
+<script>
+window.DIAGNOSTICS_LABELS = {
+    healthy: {{ _('Исправно')|tojson }}, partial: {{ _('Частично работает')|tojson }},
+    error: {{ _('Ошибка')|tojson }}, unavailable: {{ _('Недоступно для проверки')|tojson }},
+    unconfigured: {{ _('Не настроено')|tojson }}, running: {{ _('Проверка…')|tojson }},
+    stale: {{ _('Результат устарел — повторите проверку')|tojson }}, saved: {{ _('Параметры сохранены')|tojson }},
+    changed: {{ _('Параметры изменены — повторите проверку')|tojson }},
+    failure: {{ _('Не удалось получить ответ. Проверьте подключение и повторите запрос.')|tojson }},
+    source: {{ _('Источник: VPS через SSH')|tojson }},
+    certificateLabel: {{ _('Сертификат действителен до')|tojson }}, days: {{ _('дней')|tojson }},
+    dns_ok: {{ _('DNS-ответ соответствует выбранному тесту')|tojson }},
+    dns_rcode: {{ _('RCODE или содержимое ответа не соответствует тесту')|tojson }},
+    dns_format: {{ _('Некорректный DNS-ответ')|tojson }},
+    dns_truncated: {{ _('DNS-ответ усечён; проверьте TCP')|tojson }},
+    certificate: {{ _('Сертификат не прошёл проверку доверия, имени или срока действия.')|tojson }},
+    permissions: {{ _('Недостаточно прав для проверки')|tojson }},
+    timeout: {{ _('Время ожидания истекло')|tojson }},
+    missing_file: {{ _('Файл DoH URL не найден на VPS')|tojson }},
+    configuration: {{ _('Проверьте параметры диагностики')|tojson }},
+    public_address: {{ _('Публичный DoH должен разрешаться только в публичные IP-адреса')|tojson }},
+    http_status: {{ _('DoH вернул HTTP-статус, отличный от 200; перенаправления запрещены')|tojson }},
+    doh_content_type: {{ _('Ответ не является application/dns-message')|tojson }},
+    connection: {{ _('Соединение или проверка недоступны')|tojson }},
+    protocol: {{ _('Сервис не подтвердил ожидаемый протокол')|tojson }},
+    mail_tls_ok: {{ _('Приветствие и TLS проверены; доставка писем не проверялась')|tojson }},
+    mail_domain: {{ _('Укажите почтовый домен для проверки сертификата')|tojson }},
+    stun_only: {{ _('STUN отвечает; выделение TURN и передача данных не проверялись')|tojson }},
+    tcp_only: {{ _('TCP доступен; обмен через iroh не проверялся')|tojson }}
+};
+</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/dns_mail.js') }}?v={{ app_info.get('version', '') }}"></script>{% endblock %}

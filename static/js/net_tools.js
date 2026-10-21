@@ -1,6 +1,9 @@
 (() => {
     'use strict';
     const form = document.getElementById('net-tool-form');
+    document.getElementById('net-mode')?.addEventListener('change', event => {
+        document.getElementById('net-port').value = {imap: 143, imaps: 993, smtp: 587, smtps: 465}[event.target.value];
+    });
     if (form) form.addEventListener('submit', async event => {
         event.preventDefault();
         const button = document.getElementById('net-run');
