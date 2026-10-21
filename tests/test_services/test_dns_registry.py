@@ -136,7 +136,7 @@ def test_manual_role_overrides_and_hides_from_host_choices():
 def test_records_for_ip_and_move():
     domain = {'id': 'd', 'name': 'example.net', 'records': []}
     for name, rtype, content in [('@', 'A', '192.0.2.10'), ('vpn', 'A', '192.0.2.10'),
-                                 ('hip', 'A', '192.0.2.1'), ('www', 'CNAME', 'example.net'),
+                                 ('api', 'A', '192.0.2.1'), ('www', 'CNAME', 'example.net'),
                                  ('_dmarc', 'TXT', '192.0.2.10')]:
         domain['records'].append(dns_reg.build_record({'name': name, 'type': rtype, 'content': content}, domain))
     dns = {'domains': [domain]}
@@ -208,7 +208,7 @@ RDAP_XYZ = {
                {'eventAction': 'last changed', 'eventDate': '2026-08-18T19:52:02.0Z'}],
     'entities': [{'roles': ['registrar'],
                   'vcardArray': ['vcard', [['version', {}, 'text', '4.0'], ['fn', {}, 'text', 'Example Registrar, Inc.']]],
-                  'links': [{'rel': 'self', 'href': 'https://rdap.centralnic.com/xyz/entity/4331'},
+                  'links': [{'rel': 'self', 'href': 'https://rdap.example/xyz/entity/1'},
                             {'rel': 'about', 'href': 'https://example.net'}]}],
 }
 
