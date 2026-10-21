@@ -115,6 +115,28 @@ def test_adguard_image_not_container_name_and_stopped_discovery():
     assert not discover(docker='adguard\tother/image\trunning\t\tadguard')[0]['detected']
 
 
+def test_dns_listeners_are_read_without_process_names():
+    output = ('udp UNCONN 0 0 127.0.0.53%lo:53 0.0.0.0:*\n'
+              'tcp LISTEN 0 4096 127.0.0.1:5300 0.0.0.0:*\n'
+              'tcp LISTEN 0 4096 [::]:53 [::]:*\n'
+              'udp UNCONN 0 0 100.64.1.1:53 0.0.0.0:*\n'
+              'tcp LISTEN 0 4096 0.0.0.0:853 0.0.0.0:* users:(("AdGuardHome",pid=7,fd=9))\n'
+              'tcp LISTEN 0 4096 0.0.0.0:443 0.0.0.0:*\n')
+    assert p.listeners(output) == [
+        {'proto': 'udp', 'address': '127.0.0.53', 'port': 53},
+        {'proto': 'tcp', 'address': '::', 'port': 53},
+        {'proto': 'udp', 'address': '100.64.1.1', 'port': 53},
+        {'proto': 'tcp', 'address': '0.0.0.0', 'port': 853}]
+    calls = []
+    def run(args):
+        calls.append(args[0])
+        return (0, output) if args[0] == 'ss' else (0, '')
+    role = p.discover(run)[0]
+    assert calls == ['systemctl', 'docker', 'ss'] and role['listeners_known']
+    assert role['listeners'][1]['address'] == '::'
+    assert not p.discover(lambda args: (127, '') if args[0] == 'ss' else (0, ''))[0]['listeners_known']
+
+
 def test_permissions_are_unknown_not_missing():
     roles = discover(unit_code=1, docker_code=1)
     assert all(r['discovery'] == 'unavailable' for r in roles)

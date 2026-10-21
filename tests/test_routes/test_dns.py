@@ -77,6 +77,20 @@ def test_index_has_dns_button(unlocked):
     assert 'btn-dns' in unlocked.get('/').text
 
 
+def test_own_dns_guide_is_translated(unlocked):
+    page = unlocked.get('/dns/?lang=en').text
+    assert 'Own DNS server' in page and 'id="own-tab-openwrt"' in page
+    assert 'roles-snapshot' in page and 'js/dns_own.js' in page
+    assert 'Never give guests the DoH address' in page and 'id="own-doh-url"' in page
+    assert 'data-own-wrt="ssclash"' in page and 'data-own-wrt="podkop"' in page
+    assert 'data-own-wrt="forkop"' in page and 'data-own-wrt="zapret"' in page
+    config = page.split('window.OWN_DNS = ')[1].split('</script>')[0]
+    assert 'hosts: {}' in config
+    assert 'password' not in config and 'private_key' not in config
+    assert 'Devices connect through your DoH address' in config
+    assert not re.search('[А-Яа-яЁё]', config)
+
+
 @pytest.mark.parametrize('lang', ['en', 'zh'])
 def test_pages_localized(unlocked, lang):
     unlocked.get('/dns/?lang=' + lang)

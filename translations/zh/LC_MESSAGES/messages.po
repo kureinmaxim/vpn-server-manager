@@ -8782,3 +8782,465 @@ msgstr "结果已过期"
 
 msgid "Открыть диагностику DNS / Chatmail для этого сервера."
 msgstr "打开此服务器的 DNS / Chatmail 诊断。"
+
+msgid "Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему рабочий компьютер. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH не показываются."
+msgstr "如果某台服务器运行 AdGuard Home，这里会显示其状态以及如何让电脑使用它。检查通过 SSH 只读进行。不会显示面板密码和秘密 DoH 地址。"
+
+msgid "Шаги ниже про этот сервер"
+msgstr "以下步骤针对这台服务器"
+
+msgid "Как подключить"
+msgstr "如何连接"
+
+msgid "Вся сеть Tailscale"
+msgstr "整个 Tailscale 网络"
+
+msgid "Панель AdGuard"
+msgstr "AdGuard 面板"
+
+msgid "Чтобы адрес получали все устройства с подключённым Tailscale, укажите его сервером имён в Headplane или в консоли Tailscale. Отдельные настройки Wi-Fi тогда не нужны. Устройства без Tailscale продолжат использовать DNS роутера или провайдера."
+msgstr "要让所有已连接 Tailscale 的设备使用该地址，请在 Headplane 或 Tailscale 控制台中把它设为域名服务器。这样就不必分别改 Wi-Fi。没有 Tailscale 的设备仍使用路由器或运营商的 DNS。"
+
+msgid "Адрес для клиентов"
+msgstr "客户端地址"
+
+msgid "адрес Tailscale"
+msgstr "Tailscale 地址"
+
+msgid "Панель AdGuard — это веб-страница, не порт DNS. Не открывайте её по публичному IP сервера."
+msgstr "AdGuard 面板是网页，不是 DNS 端口。不要通过服务器的公网 IP 打开它。"
+
+msgid "Если Tailscale на этом компьютере видит сервер, откройте в браузере http:// и адрес ниже, порт 3000. Это обычный порт панели. Если у контейнера опубликован другой веб-порт, возьмите его из карточки выше."
+msgstr "如果这台电脑上的 Tailscale 能看到该服务器，请在浏览器打开 http:// 和下面的地址，端口 3000。这是面板的常用端口。如果容器发布了别的网页端口，用上面卡片里的那个。"
+
+msgid "Если панель слушает только localhost, поднимите туннель и откройте http://127.0.0.1:3000. Порт SSH и пользователя возьмите из карточки сервера."
+msgstr "如果面板只监听 localhost，先建立隧道，再打开 http://127.0.0.1:3000。SSH 端口和用户名见服务器卡片。"
+
+msgid "Логин и пароль — те, что заданы при установке AdGuard. Приложение их не хранит."
+msgstr "用户名和密码是安装 AdGuard 时设置的。本应用不保存它们。"
+
+msgid "Только этот Mac. Если DNS уже задан для всей сети Tailscale, достаточно подключённого Tailscale."
+msgstr "仅这台 Mac。如果已经为整个 Tailscale 网络设置了 DNS，只要 Tailscale 处于连接状态即可。"
+
+msgid "Системные настройки → Сеть → Wi-Fi или Ethernet → Подробнее → DNS."
+msgstr "系统设置 → 网络 → Wi-Fi 或以太网 → 详细信息 → DNS。"
+
+msgid "Нажмите «+» и вставьте адрес. Первый в списке используется, когда он доступен."
+msgstr "点按 + 并粘贴地址。列表中的第一个在可达时会被使用。"
+
+msgid "Проверка в Терминале: в выводе должна быть эта строка. Чтобы вернуть как было, удалите добавленный адрес."
+msgstr "在终端中检查：输出里应有这个地址。要恢复原状，删掉刚添加的地址。"
+
+msgid "Только этот компьютер. Если DNS уже задан для всей сети Tailscale, достаточно подключённого Tailscale."
+msgstr "仅这台电脑。如果已经为整个 Tailscale 网络设置了 DNS，只要 Tailscale 处于连接状态即可。"
+
+msgid "Параметры → Сеть и Интернет → Wi-Fi или Ethernet → назначение DNS → Вручную → IPv4."
+msgstr "设置 → 网络和 Internet → Wi-Fi 或以太网 → DNS 服务器分配 → 手动 → IPv4。"
+
+msgid "Предпочитаемый DNS — адрес ниже. Запасной можно оставить пустым."
+msgstr "首选 DNS 用下面的地址。备用 DNS 可以留空。"
+
+msgid "Проверка в PowerShell. Вернуть: переключите назначение DNS на «Автоматически»."
+msgstr "在 PowerShell 中检查。要恢复，把 DNS 服务器分配改回“自动”。"
+
+msgid "Только этот компьютер. Публичный IP VPS в качестве DNS не указывайте."
+msgstr "仅这台电脑。不要把 VPS 的公网 IP 当作 DNS 服务器。"
+
+msgid "Параметры → Сеть → шестерёнка у соединения → IPv4 → DNS. Либо в терминале, подставив имя соединения и адрес."
+msgstr "设置 → 网络 → 连接旁的齿轮 → IPv4 → DNS。也可以在终端中代入连接名称和地址。"
+
+msgid "Адрес"
+msgstr "地址"
+
+msgid "Проверка"
+msgstr "检查"
+
+msgid "Wi-Fi: зажмите сеть → Изменить → Дополнительно → DNS 1. Действует только в этой сети."
+msgstr "Wi-Fi：长按该网络 → 修改 → 高级 → DNS 1。只对这个网络生效。"
+
+msgid "На мобильном интернете отдельного поля DNS нет. Подключите Tailscale: телефон возьмёт DNS хвостовой сети, если он задан в Headplane или консоли Tailscale."
+msgstr "移动数据没有单独的 DNS 栏。连接 Tailscale 后，如果在 Headplane 或 Tailscale 控制台中设置了 tailnet DNS，手机会使用它。"
+
+msgid "«Частный DNS» в Android — это DNS-over-TLS по имени хоста, не IP и не ссылка DoH. Пока отдельное имя для DoT не настроено, оставьте «Автоматически»."
+msgstr "Android 的“私人 DNS”是按主机名的 DNS-over-TLS，不是 IP，也不是 DoH 链接。在配置 DoT 名称之前，请保持“自动”。"
+
+msgid "Настройки → Wi-Fi → i → Настройка DNS → Вручную → добавьте адрес. Сотовая сеть так не настраивается."
+msgstr "设置 → Wi-Fi → i → 配置 DNS → 手动 → 添加地址。蜂窝数据不能这样设置。"
+
+msgid "Для сотовой сети подключите Tailscale и задайте DNS хвостовой сети. Профиль с секретным адресом DoH отсюда не скачать: этот адрес приложению не передаётся."
+msgstr "蜂窝数据请连接 Tailscale 并设置 tailnet DNS。这里不能下载带秘密 DoH 地址的描述文件：该地址不会传给本应用。"
+
+msgid "Роутер должен быть в той же сети Tailscale, иначе клиенты не достучатся до адреса ниже. Гостям и отдельным устройствам этот адрес лучше не выдавать."
+msgstr "路由器必须在同一个 Tailscale 网络里，否则客户端到不了下面的地址。不要把该地址发给访客或个别设备。"
+
+msgid "Клиенты OpenWrt"
+msgstr "OpenWrt 客户端"
+
+msgid "Все клиенты"
+msgstr "所有客户端"
+
+msgid "Один клиент"
+msgstr "单个客户端"
+
+msgid "Гостевая сеть"
+msgstr "访客网络"
+
+msgid "Обход"
+msgstr "绕过"
+
+msgid "Оставьте клиентам DNS роутера, а сам роутер направьте на AdGuard. LuCI → Сеть → Интерфейсы → LAN → Дополнительно → «Использовать собственные DNS» → адрес выше. DHCP по-прежнему выдаёт клиентам адрес роутера. Проверка с компьютера в LAN: nslookup example.com. Сервером должен быть роутер, а запрос — появиться в журнале AdGuard."
+msgstr "客户端继续使用路由器的 DNS，把路由器自己指到 AdGuard。LuCI → 网络 → 接口 → LAN → 高级 → 使用自定义 DNS → 上面的地址。DHCP 仍把路由器地址发给客户端。在局域网电脑上运行 nslookup example.com。服务器应是路由器，且这条查询应出现在 AdGuard 日志中。"
+
+msgid "LuCI → Сеть → DHCP и DNS → Статические аренды → устройство → Дополнительно → DHCP-опция ниже. Остальные клиенты не меняются. С этого устройства адрес должен открываться: Tailscale на роутере с маршрутом или Tailscale на самом устройстве."
+msgstr "LuCI → 网络 → DHCP 和 DNS → 静态租约 → 该设备 → 高级 → 下面的 DHCP 选项。其他客户端不变。这台设备必须能访问该地址：路由器上的 Tailscale 且有路由，或设备自己的 Tailscale。"
+
+msgid "Гостям не выдавайте адрес Tailscale и не открывайте панель. На гостевой сети оставьте DNS роутера. В файрволе зона guest не должна ходить в LAN и на порт панели. Upstream роутера — AdGuard, как для всех клиентов: гости фильтруются, но панель не видят."
+msgstr "不要把 Tailscale 地址发给访客，也不要让他们打开面板。访客网络继续使用路由器 DNS。防火墙中 guest 区域不能访问 LAN 和面板端口。路由器的上游与其他客户端一样是 AdGuard：访客会被过滤，但看不到面板。"
+
+msgid "Для телевизора или ноутбука, которому нужен DNS офиса: в статической аренде DHCP-опция 6 и адрес офиса или 1.1.1.1. Эти устройства не попадут в журнал AdGuard. Остальные клиенты остаются на роутере."
+msgstr "电视或需要公司 DNS 的笔记本：在其静态租约里把 DHCP 选项 6 设为公司地址或 1.1.1.1。这些设备不会出现在 AdGuard 日志中。其余客户端仍走路由器。"
+
+msgid "Опубликованные порты"
+msgstr "已发布端口"
+
+msgid "Диагностика"
+msgstr "诊断"
+
+msgid "Открыть мониторинг"
+msgstr "打开监控"
+
+msgid "Последняя проверка"
+msgstr "上次检查"
+
+msgid "исправен"
+msgstr "正常"
+
+msgid "ошибка проверки"
+msgstr "检查失败"
+
+msgid "недоступен для проверки"
+msgstr "无法检查"
+
+msgid "проверка ещё не запускалась"
+msgstr "尚未检查"
+
+msgid "Ищу AdGuard Home на активных серверах…"
+msgstr "正在活动服务器上查找 AdGuard Home…"
+
+msgid "Нет активных серверов. Свой DNS показать нечего."
+msgstr "没有活动服务器，因此没有可显示的自有 DNS。"
+
+msgid "AdGuard Home на активных серверах не найден. Подсказки появятся, когда свой DNS-сервер будет обнаружен."
+msgstr "在活动服务器上没有找到 AdGuard Home。检测到自有 DNS 服务器后才会显示设置步骤。"
+
+msgid "Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему устройства. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH приложение не читает и не хранит."
+msgstr "如果某台服务器运行 AdGuard Home，这里会显示其状态以及如何让设备使用它。检查通过 SSH 只读进行。本应用不读取也不保存面板密码和秘密 DoH 地址。"
+
+msgid "Как устройства обращаются к DNS"
+msgstr "设备如何访问 DNS"
+
+msgid "Через DoH-адрес"
+msgstr "通过 DoH 地址"
+
+msgid "Обычный DNS по IP"
+msgstr "按 IP 的普通 DNS"
+
+msgid "Ваш DoH-адрес (необязательно)"
+msgstr "你的 DoH 地址（可选）"
+
+msgid "Возьмите его на сервере командой ниже. Вставленный адрес подставляется в шаги и профиль только на этой странице: он не сохраняется и не отправляется приложению."
+msgstr "用下面的命令在服务器上获取。粘贴的地址只在本页面填入步骤和描述文件：不会保存，也不会发送给应用。"
+
+msgid "Нужен полный адрес, начинающийся с https://."
+msgstr "请输入以 https:// 开头的完整地址。"
+
+msgid "Браузер"
+msgstr "浏览器"
+
+msgid "Панель — веб-страница AdGuard, а не порт DNS. Открывайте её только через SSH-туннель или Tailscale, не по публичному IP сервера."
+msgstr "面板是 AdGuard 的网页，不是 DNS 端口。只通过 SSH 隧道或 Tailscale 打开，不要用服务器的公网 IP。"
+
+msgid "Запустите в терминале этого компьютера и не закрывайте окно, пока работаете с панелью:"
+msgstr "在这台电脑的终端中运行，使用面板期间不要关闭窗口："
+
+msgid "Откройте в браузере:"
+msgstr "在浏览器中打开："
+
+msgid "Логин и пароль — заданные в мастере AdGuard. Приложение их не хранит."
+msgstr "用户名和密码是在 AdGuard 设置向导中设定的。本应用不保存它们。"
+
+msgid "Панель доступна только устройствам в Tailscale. Откройте:"
+msgstr "面板只对 Tailscale 中的设备开放。打开："
+
+msgid "Порт панели не определён: AdGuard установлен как служба. Это порт, выбранный в мастере установки. Туннель с ним:"
+msgstr "无法确定面板端口：AdGuard 以服务方式安装。它是在设置向导中选择的端口。用它建立隧道："
+
+msgid "Найти, почему не открывается сайт: «Журнал» в панели → найти домен → ответ и сработавшее правило. После любой настройки ниже проверяйте там, что запросы устройства появились."
+msgstr "想知道网站为何打不开：面板中的“查询日志” → 找到域名 → 查看响应和命中的规则。完成下面任何设置后，都在那里确认设备的查询已出现。"
+
+msgid "Самый быстрый способ проверить DoH: действует только в этом браузере, система не меняется."
+msgstr "最快的 DoH 试用方式：只对此浏览器生效，不改动系统。"
+
+msgid "Chrome, Edge, Яндекс: Настройки → Конфиденциальность и безопасность → Безопасность → «Использовать безопасный DNS» → свой поставщик → адрес:"
+msgstr "Chrome、Edge、Yandex：设置 → 隐私和安全 → 安全 → 使用安全 DNS → 自定义提供商 → 地址："
+
+msgid "Firefox: Настройки → Приватность и защита → DNS через HTTPS → «Максимальная защита» → свой поставщик → тот же адрес."
+msgstr "Firefox：设置 → 隐私与安全 → 基于 HTTPS 的 DNS → 最大保护 → 自定义提供商 → 同一地址。"
+
+msgid "Safari своего DoH не имеет и берёт DNS системы — используйте профиль (вкладки macOS и iPhone)."
+msgstr "Safari 没有自己的 DoH 设置，使用系统 DNS——请用描述文件（macOS 和 iPhone 标签）。"
+
+msgid "Браузеры берут DNS системы. Если в браузере включён «Безопасный DNS» с другим поставщиком, он обходит ваш сервер: выключите его или укажите свой DoH-адрес."
+msgstr "浏览器使用系统 DNS。如果浏览器开启了其他提供商的“安全 DNS”，它会绕过你的服务器：请关闭它或填入你的 DoH 地址。"
+
+msgid "Вставьте DoH-адрес выше и скопируйте профиль. Затем сохраните и откройте его в Терминале:"
+msgstr "在上方粘贴 DoH 地址并复制描述文件。然后在终端中保存并打开它："
+
+msgid "Скопировать профиль"
+msgstr "复制描述文件"
+
+msgid "Скачать профиль"
+msgstr "下载描述文件"
+
+msgid "Системные настройки → Основные → Управление устройством (в старых версиях: Конфиденциальность и безопасность → Профили) → профиль «Own DNS» → Установить."
+msgstr "系统设置 → 通用 → 设备管理（旧版本：隐私与安全性 → 描述文件）→ “Own DNS” 描述文件 → 安装。"
+
+msgid "Профиль виден в Системные настройки → Сеть → Фильтры, там же его можно выключить или удалить. Сам файл после установки удалите: в нём ваш секретный адрес."
+msgstr "描述文件显示在 系统设置 → 网络 → 过滤器 中，可在那里关闭或删除。安装后请删除该文件：其中包含你的秘密地址。"
+
+msgid "Если в Tailscale включено «Использовать DNS Tailscale», он может перехватывать запросы — проверьте по журналу AdGuard."
+msgstr "如果 Tailscale 开启了“使用 Tailscale DNS”，它可能接管查询——请查看 AdGuard 日志确认。"
+
+msgid "Системные настройки → Сеть → Wi-Fi или Ethernet → Подробнее → DNS → «+» → адрес:"
+msgstr "系统设置 → 网络 → Wi-Fi 或以太网 → 详细信息 → DNS → + → 地址："
+
+msgid "Проверка: адрес должен быть в выводе. Вернуть как было — удалить добавленный адрес."
+msgstr "检查：输出中应有该地址。要恢复，删除添加的地址。"
+
+msgid "Windows 11: Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Изменить → Вручную → IPv4."
+msgstr "Windows 11：设置 → 网络和 Internet → Wi-Fi 或以太网 → DNS 服务器分配 → 编辑 → 手动 → IPv4。"
+
+msgid "Предпочитаемый DNS — IP сервера из DoH-адреса:"
+msgstr "首选 DNS 为 DoH 地址中服务器的 IP："
+
+msgid "«DNS по протоколу HTTPS» → «Вкл. (шаблон вручную)» → шаблон:"
+msgstr "“DNS over HTTPS” → “开（手动模板）” → 模板："
+
+msgid "«Возврат к открытому тексту» выключите: обычный порт 53 на сервере закрыт."
+msgstr "关闭“回退到纯文本”：服务器上的普通 53 端口是关闭的。"
+
+msgid "То же из PowerShell от администратора (имя адаптера — из Get-NetAdapter):"
+msgstr "在管理员 PowerShell 中同样操作（适配器名称见 Get-NetAdapter）："
+
+msgid "Проверка и откат: «Назначение DNS» → «Автоматически»."
+msgstr "检查；要恢复，把 DNS 服务器分配改回“自动”。"
+
+msgid "В Windows 10 системного DoH со своим адресом нет — используйте браузер."
+msgstr "Windows 10 不支持自定义地址的系统 DoH——请使用浏览器。"
+
+msgid "Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Вручную → IPv4 → Предпочитаемый DNS:"
+msgstr "设置 → 网络和 Internet → Wi-Fi 或以太网 → DNS 服务器分配 → 手动 → IPv4 → 首选 DNS："
+
+msgid "systemd-resolved умеет DNS-over-TLS, но не DoH. Проще всего — браузер. Для всей системы запустите локальный dnsproxy от AdGuard:"
+msgstr "systemd-resolved 支持 DNS-over-TLS，但不支持 DoH。最简单的是用浏览器。要对整个系统生效，在本地运行 AdGuard 的 dnsproxy："
+
+msgid "В /etc/systemd/resolved.conf в секции [Resolve] укажите DNS=127.0.0.1:5353, затем перезапустите службу:"
+msgstr "在 /etc/systemd/resolved.conf 的 [Resolve] 段设置 DNS=127.0.0.1:5353，然后重启服务："
+
+msgid "NetworkManager, подставив имя соединения из nmcli connection show:"
+msgstr "NetworkManager，代入 nmcli connection show 中的连接名称："
+
+msgid "Проверка:"
+msgstr "检查："
+
+msgid "«Частный DNS» в Android принимает только DNS-over-TLS (имя хоста, порт 853), а не адрес DoH. Не вписывайте туда DoH-адрес — интернет на телефоне перестанет работать."
+msgstr "Android 的“私人 DNS”只接受 DNS-over-TLS（主机名，853 端口），不接受 DoH 地址。不要把 DoH 地址填进去——否则手机会断网。"
+
+msgid "Для всего телефона — приложение со своим DoH-адресом, например Intra: настройки → сервер DNS-over-HTTPS → свой → адрес:"
+msgstr "要对整部手机生效，请用支持自定义 DoH 地址的应用，例如 Intra：设置 → DNS-over-HTTPS 服务器 → 自定义 → 地址："
+
+msgid "Только для Chrome — как во вкладке «Браузер»."
+msgstr "仅 Chrome——与“浏览器”标签相同。"
+
+msgid "На сервере слушается порт 853 (DoT). Если для него выпущен сертификат на имя DNS-домена, это имя можно указать в «Частном DNS»."
+msgstr "服务器上 853 端口（DoT）正在监听。如果它有针对 DNS 域名的证书，可以把该名称填入“私人 DNS”。"
+
+msgid "Wi-Fi: зажмите сеть → Изменить → Дополнительно → Настройки IP: «Статический» → DNS 1:"
+msgstr "Wi-Fi：长按网络 → 修改 → 高级 → IP 设置：“静态” → DNS 1："
+
+msgid "На мобильном интернете поля DNS нет: подключите Tailscale, и телефон возьмёт DNS сети Tailscale (вкладка «Вся сеть Tailscale»)."
+msgstr "移动数据没有 DNS 栏：连接 Tailscale 后，手机会使用 Tailscale 网络的 DNS（“整个 Tailscale 网络”标签）。"
+
+msgid "Соберите профиль на Mac (вкладка macOS) и отправьте файл own-dns.mobileconfig на iPhone через AirDrop."
+msgstr "在 Mac 上生成描述文件（macOS 标签），然后用 AirDrop 把 own-dns.mobileconfig 发到 iPhone。"
+
+msgid "Настройки → «Профиль загружен» → Установить. Включить или выключить: Настройки → Основные → VPN и управление устройством → DNS."
+msgstr "设置 → “已下载描述文件” → 安装。开关：设置 → 通用 → VPN 与设备管理 → DNS。"
+
+msgid "Профиль работает и в Wi-Fi, и на сотовой сети. Файл после установки удалите с обоих устройств."
+msgstr "描述文件在 Wi-Fi 和蜂窝网络下都有效。安装后请从两台设备上删除该文件。"
+
+msgid "Настройки → Wi-Fi → (i) → Настройка DNS → Вручную → добавить:"
+msgstr "设置 → Wi-Fi → (i) → 配置 DNS → 手动 → 添加："
+
+msgid "Сотовая сеть так не настраивается: подключите Tailscale с DNS сети Tailscale."
+msgstr "蜂窝网络不能这样设置：请连接 Tailscale 并使用 Tailscale 网络 DNS。"
+
+msgid "Команды выполняются по SSH на роутере. Клиенты по-прежнему получают DNS роутера, а он пересылает запросы дальше."
+msgstr "这些命令通过 SSH 在路由器上运行。客户端仍使用路由器作为 DNS，由路由器转发查询。"
+
+msgid "С Mihomo"
+msgstr "使用 Mihomo"
+
+msgid "Мимо AdGuard"
+msgstr "绕过 AdGuard"
+
+msgid "Установите https-dns-proxy (в OpenWrt 25 — apk add вместо opkg):"
+msgstr "安装 https-dns-proxy（OpenWrt 25 用 apk add 代替 opkg）："
+
+msgid "LuCI → Службы → HTTPS DNS Proxy: удалите стандартных провайдеров и добавьте свой адрес. Пакет сам направит dnsmasq на 127.0.0.1#5053. Bootstrap-DNS оставьте IP-адресами (9.9.9.9, 1.1.1.1): ими роутер найдёт имя вашего DNS-домена."
+msgstr "LuCI → 服务 → HTTPS DNS Proxy：删除默认提供商并添加你的地址。该软件包会自动把 dnsmasq 指向 127.0.0.1#5053。Bootstrap DNS 保持为 IP 地址（9.9.9.9、1.1.1.1）：路由器用它们解析你的 DNS 域名。"
+
+msgid "Роутер должен быть в той же сети Tailscale, иначе он не достучится до адреса. Направьте dnsmasq на AdGuard и перестаньте брать DNS провайдера:"
+msgstr "路由器必须在同一 Tailscale 网络中，否则无法访问该地址。把 dnsmasq 指向 AdGuard，并停止使用运营商 DNS："
+
+msgid "Проверка с компьютера в LAN: сервером в ответе должен быть роутер, а запрос — появиться в журнале AdGuard."
+msgstr "在局域网电脑上检查：应答服务器应是路由器，且查询应出现在 AdGuard 日志中。"
+
+msgid "Если DNS на роутере уже обслуживает Mihomo (dnsmasq пересылает на 127.0.0.1:7874), https-dns-proxy не ставьте и dnsmasq не трогайте. Добавьте адрес в nameserver Mihomo. В default-nameserver и proxy-server-nameserver оставьте IP-адреса: так имя DNS-домена и серверов прокси разрешается без самого DoH и не появляется петля при запуске."
+msgstr "如果路由器上的 DNS 已由 Mihomo 处理（dnsmasq 转发到 127.0.0.1:7874），不要安装 https-dns-proxy，也不要改 dnsmasq。把地址加到 Mihomo 的 nameserver。default-nameserver 和 proxy-server-nameserver 保留 IP 地址：这样 DNS 域名和代理服务器无需 DoH 本身即可解析，启动时不会形成循环。"
+
+msgid "dnsmasq не умеет выбирать сервер для отдельного клиента. Чтобы через AdGuard шло только одно устройство, настройте DoH на нём самом (вкладки систем), а роутер не меняйте."
+msgstr "dnsmasq 无法按客户端选择上游。要只让一台设备走 AdGuard，请在该设备上设置 DoH（各系统标签），路由器保持不变。"
+
+msgid "Выдайте одному устройству адрес AdGuard через DHCP-тег (MAC — этого устройства; затем переподключите его к Wi-Fi):"
+msgstr "通过 DHCP 标签把 AdGuard 地址只发给一台设备（用该设备的 MAC，然后让它重新连接 Wi-Fi）："
+
+msgid "Гостям не выдавайте ни DoH-адрес, ни адрес Tailscale, и не пускайте их к панели. Если гости должны обходить AdGuard, выдайте гостевой сети обычный DNS (имя интерфейса — guest):"
+msgstr "不要把 DoH 地址或 Tailscale 地址发给访客，也不要让他们访问面板。如果访客应绕过 AdGuard，给访客网络分配普通 DNS（接口名为 guest）："
+
+msgid "В файрволе зона guest не должна иметь доступа к LAN — так гости не увидят роутер и панель."
+msgstr "在防火墙中，guest 区域不能访问 LAN——这样访客就看不到路由器和面板。"
+
+msgid "Телевизору или рабочему ноутбуку, которым нужен другой DNS (например офисный), выдайте его через DHCP-тег. Эти устройства не попадут в журнал AdGuard:"
+msgstr "电视或需要其他 DNS（例如公司 DNS）的工作笔记本，通过 DHCP 标签分配该 DNS。这些设备不会出现在 AdGuard 日志中："
+
+msgid "Чтобы DNS получали все устройства с Tailscale, в Headplane → DNS добавьте адрес в глобальные серверы имён и включите «Переопределять локальный DNS». В конфиге Headscale это dns.nameservers.global и dns.override_local_dns: true."
+msgstr "要让所有 Tailscale 设备使用此 DNS，在 Headplane → DNS 中把地址加入全局域名服务器，并开启“覆盖本地 DNS”。在 Headscale 配置中即 dns.nameservers.global 和 dns.override_local_dns: true。"
+
+msgid "Устройства без Tailscale продолжают использовать DNS роутера или провайдера."
+msgstr "没有 Tailscale 的设备继续使用路由器或运营商的 DNS。"
+
+msgid "В dns.nameservers.global Headscale можно указать и DoH-адрес (https://…), тогда клиенты Tailscale будут ходить в ваш DoH. Но секретный адрес попадёт в настройки всех устройств сети. Если это не подходит, настраивайте DoH на каждом устройстве."
+msgstr "Headscale 的 dns.nameservers.global 也可以填 DoH 地址（https://…），这样 Tailscale 客户端会使用你的 DoH。但秘密地址会出现在网络中所有设备的设置里。如果不能接受，请在每台设备上单独设置 DoH。"
+
+msgid "На вашей сети этот вариант приложение не проверяло: после изменения посмотрите журнал AdGuard."
+msgstr "本应用未在你的网络上测试此方案：修改后请查看 AdGuard 日志。"
+
+msgid "адрес не определён"
+msgstr "地址未知"
+
+msgid "Доступ к DNS"
+msgstr "DNS 访问方式"
+
+msgid "только через DoH (порт 53 на localhost)"
+msgstr "仅 DoH（53 端口在 localhost）"
+
+msgid "обычный DNS через Tailscale"
+msgstr "通过 Tailscale 的普通 DNS"
+
+msgid "обычный DNS по адресу сервера"
+msgstr "服务器地址上的普通 DNS"
+
+msgid "порт 53 открыт на всех адресах"
+msgstr "53 端口在所有地址上开放"
+
+msgid "не определён"
+msgstr "未知"
+
+msgid "Порт DNS опубликован только на localhost сервера ({where}). Устройства подключаются через ваш DoH-адрес. Указывать IP сервера как DNS бесполезно: интернет перестанет открываться."
+msgstr "DNS 端口只发布在服务器的 localhost（{where}）。设备通过你的 DoH 地址连接。把服务器 IP 设为 DNS 不起作用：网站会打不开。"
+
+msgid "DNS слушает адрес Tailscale {address}:53. Устройства в Tailscale могут использовать этот адрес как обычный DNS."
+msgstr "DNS 监听 Tailscale 地址 {address}:53。Tailscale 中的设备可把它作为普通 DNS 使用。"
+
+msgid "DNS слушает {address}:53. Этот адрес подходит устройствам, которые до него достают."
+msgstr "DNS 监听 {address}:53。能访问该地址的设备可以使用它。"
+
+msgid "DNS слушает порт 53 на всех адресах сервера."
+msgstr "DNS 在服务器所有地址的 53 端口上监听。"
+
+msgid "Не удалось определить, где слушает DNS. Выберите вариант подключения сами."
+msgstr "无法确定 DNS 在哪里监听。请自行选择连接方式。"
+
+msgid "Если файрвол VPS не закрывает порт 53 от интернета, это открытый резолвер: его используют для DDoS-атак. Закройте порт снаружи или привяжите его к localhost или Tailscale."
+msgstr "除非 VPS 防火墙阻止了来自互联网的 53 端口访问，否则这是一个开放解析器，会被用于 DDoS 攻击。请从外部封锁该端口，或把它绑定到 localhost 或 Tailscale。"
+
+msgid "Панель опубликована не только на localhost (порт {port}). Привяжите её к 127.0.0.1 в compose.yaml, чтобы она не была видна из интернета."
+msgstr "面板不只发布在 localhost 上（端口 {port}）。请在 compose.yaml 中把它绑定到 127.0.0.1，使其在互联网上不可见。"
+
+msgid "<ваш DoH-адрес>"
+msgstr "<你的 DoH 地址>"
+
+msgid "IP появится после вставки DoH-адреса"
+msgstr "粘贴 DoH 地址后会显示 IP"
+
+msgid "IP домена {host} (Resolve-DnsName {host})"
+msgstr "{host} 的 IP（Resolve-DnsName {host}）"
+
+msgid "Не удалось скопировать"
+msgstr "无法复制"
+
+msgid "Данные проверки от {time}. Нажмите «Обновить», чтобы проверить заново."
+msgstr "检查结果来自 {time}。点击“刷新”重新检查。"
+
+msgid "Команду ниже выполните на VPS после входа по SSH (это Linux на сервере, не Windows). Результат вставьте сюда: адрес подставляется в шаги только на этой странице, не сохраняется и приложению не отправляется."
+msgstr "请先 SSH 登录 VPS，再在服务器上执行下面的命令（那是服务器上的 Linux，不是 Windows）。把结果粘贴到这里：它只用于本页步骤，不会保存，也不会发给应用。"
+
+msgid "На этом компьютере (Mac, Linux или Windows с OpenSSH) в Терминале или PowerShell запустите и не закрывайте окно, пока открыта панель:"
+msgstr "在这台电脑上（Mac、Linux 或带 OpenSSH 的 Windows）于终端或 PowerShell 中运行，并在面板打开期间不要关闭该窗口："
+
+msgid "Это не команда Windows. На Mac — приложение «Терминал», на Linux — терминал, на Windows 10/11 — PowerShell (OpenSSH уже есть). В PuTTY: Connection → SSH → Tunnels, Source 13001, Destination 127.0.0.1 и порт панели."
+msgstr "这不是 Windows 专用命令。Mac 用“终端”，Linux 用终端，Windows 10/11 用 PowerShell（已自带 OpenSSH）。PuTTY：Connection → SSH → Tunnels，Source 13001，Destination 127.0.0.1 和面板端口。"
+
+msgid "На роутере должен работать только один DNS-стек. SSClash/Mihomo, Podkop и Forkop не включают вместе и не ставят рядом https-dns-proxy."
+msgstr "路由器上只能运行一套 DNS。不要同时启用 SSClash/Mihomo、Podkop 和 Forkop，也不要在它们旁边再装 https-dns-proxy。"
+
+msgid "Без обхода"
+msgstr "无分流"
+
+msgid "Только если SSClash, Podkop и Forkop выключены. Иначе DNS заберёт один из них, а https-dns-proxy даст гонку ответов. Установите пакет (в OpenWrt 25 — apk add вместо opkg):"
+msgstr "仅当 SSClash、Podkop 和 Forkop 都关闭时。否则 DNS 会被其中之一接管，https-dns-proxy 会造成应答竞争。安装软件包（OpenWrt 25 用 apk add 而不是 opkg）："
+
+msgid "SSClash — это оболочка Mihomo. https-dns-proxy не ставьте, dnsmasq не трогайте: forwards должен быть только 127.0.0.1#7874. Podkop и Forkop выключите: два tproxy ломают DNS."
+msgstr "SSClash 是 Mihomo 的界面。不要安装 https-dns-proxy，也不要改 dnsmasq：forwards 只能是 127.0.0.1#7874。关闭 Podkop 和 Forkop：两套 tproxy 会弄坏 DNS。"
+
+msgid "LuCI → Службы → SSClash → конфигурация, блок dns. В nameserver — ваш DoH. В default-nameserver и proxy-server-nameserver оставьте IP (9.9.9.9, 1.1.1.1): имя DNS-домена и узлы прокси резолвятся без самого DoH, иначе при старте будет петля."
+msgstr "LuCI → 服务 → SSClash → 配置中的 dns。nameserver 填你的 DoH。default-nameserver 和 proxy-server-nameserver 保留 IP（9.9.9.9、1.1.1.1）：DNS 域名和代理节点不依赖 DoH 本身解析，否则启动会成环。"
+
+msgid "Обычный DNS по IP с SSClash не используйте: пропадёт fake-ip и маршрутизация по доменам. Нужен DoH в nameserver или вкладка «Без обхода» при выключенном SSClash."
+msgstr "不要在 SSClash 下用普通 IP DNS：fake-ip 和按域名路由会失效。把 DoH 放进 nameserver，或关闭 SSClash 后用“无分流”。"
+
+msgid "https-dns-proxy не ставьте: Podkop сам направляет dnsmasq на 127.0.0.42#53 (sing-box). SSClash и Forkop выключите."
+msgstr "不要安装 https-dns-proxy：Podkop 已经把 dnsmasq 指到 127.0.0.42#53（sing-box）。关闭 SSClash 和 Forkop。"
+
+msgid "LuCI → Службы → Podkop → Настройки: тип DNS — DoH, DNS-сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Сохраните и перезапустите Podkop. Проверка: uci show dhcp.@dnsmasq[0].server должен быть 127.0.0.42#53."
+msgstr "LuCI → 服务 → Podkop → 设置：DNS 类型为 DoH，DNS 服务器为你的地址，bootstrap 为 9.9.9.9 和 1.1.1.1。保存并重启 Podkop。检查：uci show dhcp.@dnsmasq[0].server 应为 127.0.0.42#53。"
+
+msgid "Обычный DNS по IP Podkop заменяет своей цепочкой. Чтобы клиенты ходили на AdGuard по IP, остановите Podkop и откройте вкладку «Без обхода»."
+msgstr "Podkop 会用自己的链路替换普通 IP DNS。若要客户端按 IP 使用 AdGuard，请停止 Podkop 并打开“无分流”。"
+
+msgid "Forkop — бывший Podkop Plus, тот же sing-box на 127.0.0.42#53. https-dns-proxy не ставьте. Podkop и SSClash выключите: два стека сразу нельзя."
+msgstr "Forkop 即原来的 Podkop Plus，同样是 127.0.0.42#53 上的 sing-box。不要安装 https-dns-proxy。关闭 Podkop 和 SSClash：两套不能同时跑。"
+
+msgid "LuCI → Службы → Forkop → DNS: протокол DoH, основной сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Если в Forkop включена маршрутизация DNS через прокси, bootstrap всё равно должен остаться IP, иначе имя DNS-домена не резолвится при старте."
+msgstr "LuCI → 服务 → Forkop → DNS：协议 DoH，主服务器为你的地址，bootstrap 为 9.9.9.9 和 1.1.1.1。若 Forkop 把 DNS 走代理，bootstrap 仍必须是 IP，否则启动时解析不了 DNS 域名。"
+
+msgid "Как у Podkop: обычный DNS по IP задаётся не здесь. Остановите Forkop и откройте вкладку «Без обхода»."
+msgstr "与 Podkop 一样：普通 IP DNS 不在这里设置。停止 Forkop 并打开“无分流”。"
+
+msgid "Zapret DNS не резолвит: он трогает уже установленные TCP/QUIC-пакеты (ClientHello), а не порт 53. Сначала честный DNS во вкладке SSClash, Podkop, Forkop или «Без обхода», потом при необходимости включите службу Zapret."
+msgstr "Zapret 不解析 DNS：它处理的是已经建立的 TCP/QUIC 包（ClientHello），不是 53 端口。先在 SSClash、Podkop、Forkop 或“无分流”里配好真实 DNS，需要时再启动 Zapret 服务。"
+
+msgid "Не направляйте dnsmasq на Zapret и не ставьте https-dns-proxy «поверх» SSClash/Podkop. Если DNS отдаёт NXDOMAIN, Zapret сайт не откроет. После настройки DNS запрос должен появиться в журнале AdGuard; Zapret на этот журнал не влияет."
+msgstr "不要把 dnsmasq 指到 Zapret，也不要在 SSClash/Podkop 之上再装 https-dns-proxy。若 DNS 返回 NXDOMAIN，Zapret 打不开网站。DNS 配好后，查询应出现在 AdGuard 日志中；Zapret 不影响该日志。"

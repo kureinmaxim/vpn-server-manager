@@ -14,6 +14,8 @@
         <p class="text-body-secondary mb-0">{{ _('Учётные записи DNS-провайдеров, домены, регистраторы, сроки действия и поддомены. Данные хранятся в зашифрованном файле вместе с серверами и попадают в экспорт.') }}</p>
     </header>
 
+    {% include "dns/_own.html" %}
+
     <div class="dns-section-head">
         <h2>{{ _('DNS-провайдеры') }}</h2>
         <a class="btn btn-dns-solid btn-sm" href="{{ url_for('dns.provider_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить провайдера') }}</a>
@@ -125,4 +127,63 @@
     <p class="dns-empty mb-0">{{ _('Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода.') }}</p>
     {% endif %}
 </div>
+{% endblock %}
+{% block scripts %}
+<script>
+window.OWN_DNS = {
+    serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    meshUrl: {{ url_for('api.load_check_mesh') | tojson }},
+    rolesUrl: {{ url_for('api.roles_snapshot', server_id='__SERVER__') | tojson }},
+    diagnosticsUrl: {{ url_for('dns_mail.detail', server_id='__SERVER__') | tojson }},
+    monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
+    ssh: {{ own_dns_ssh | default({}) | tojson }},
+    hosts: {{ own_dns_hosts | default({}) | tojson }},
+    i18n: {
+        running: {{ _('Работает') | tojson }},
+        partial: {{ _('Работает частично') | tojson }},
+        stopped: {{ _('Остановлен') | tojson }},
+        unknown: {{ _('Нет данных') | tojson }},
+        ports: {{ _('Опубликованные порты') | tojson }},
+        diagnostics: {{ _('Диагностика') | tojson }},
+        monitoring: {{ _('Открыть мониторинг') | tojson }},
+        addressMissing: {{ _('адрес не определён') | tojson }},
+        access: {{ _('Доступ к DNS') | tojson }},
+        access_local: {{ _('только через DoH (порт 53 на localhost)') | tojson }},
+        access_tailnet: {{ _('обычный DNS через Tailscale') | tojson }},
+        access_lan: {{ _('обычный DNS по адресу сервера') | tojson }},
+        access_public: {{ _('порт 53 открыт на всех адресах') | tojson }},
+        access_unknown: {{ _('не определён') | tojson }},
+        modeLocal: {{ _('Порт DNS опубликован только на localhost сервера ({where}). Устройства подключаются через ваш DoH-адрес. Указывать IP сервера как DNS бесполезно: интернет перестанет открываться.') | tojson }},
+        modeTailnet: {{ _('DNS слушает адрес Tailscale {address}:53. Устройства в Tailscale могут использовать этот адрес как обычный DNS.') | tojson }},
+        modeLan: {{ _('DNS слушает {address}:53. Этот адрес подходит устройствам, которые до него достают.') | tojson }},
+        modePublic: {{ _('DNS слушает порт 53 на всех адресах сервера.') | tojson }},
+        modeUnknown: {{ _('Не удалось определить, где слушает DNS. Выберите вариант подключения сами.') | tojson }},
+        openResolver: {{ _('Если файрвол VPS не закрывает порт 53 от интернета, это открытый резолвер: его используют для DDoS-атак. Закройте порт снаружи или привяжите его к localhost или Tailscale.') | tojson }},
+        panelExposed: {{ _('Панель опубликована не только на localhost (порт {port}). Привяжите её к 127.0.0.1 в compose.yaml, чтобы она не была видна из интернета.') | tojson }},
+        dohPlaceholder: {{ _('<ваш DoH-адрес>') | tojson }},
+        dohIpHint: {{ _('IP появится после вставки DoH-адреса') | tojson }},
+        dohIpUnknown: {{ _('IP домена {host} (Resolve-DnsName {host})') | tojson }},
+        copied: {{ _('Скопировано') | tojson }},
+        copyFailed: {{ _('Не удалось скопировать') | tojson }},
+        fromCache: {{ _('Данные проверки от {time}. Нажмите «Обновить», чтобы проверить заново.') | tojson }},
+        lastCheck: {{ _('Последняя проверка') | tojson }},
+        healthy: {{ _('исправен') | tojson }},
+        error: {{ _('ошибка проверки') | tojson }},
+        unavailable: {{ _('недоступен для проверки') | tojson }},
+        unconfigured: {{ _('проверка ещё не запускалась') | tojson }},
+        stale: {{ _('результат устарел') | tojson }},
+        checking: {{ _('Проверка…') | tojson }},
+        loading: {{ _('Ищу AdGuard Home на активных серверах…') | tojson }},
+        progress: {{ _('Проверено серверов: {done} / {total}') | tojson }},
+        completed: {{ _('Завершено: {time}') | tojson }},
+        empty: {{ _('Нет активных серверов. Свой DNS показать нечего.') | tojson }},
+        none: {{ _('AdGuard Home на активных серверах не найден. Подсказки появятся, когда свой DNS-сервер будет обнаружен.') | tojson }},
+        errors: {{ _('Не удалось проверить: {names}') | tojson }},
+        requestError: {{ _('Не удалось получить ответ приложения.') | tojson }},
+        timeout: {{ _('Время ожидания истекло. Повторите проверку.') | tojson }},
+        auth: {{ _('Разблокируйте приложение и повторите проверку.') | tojson }}
+    }
+};
+</script>
+<script src="{{ url_for('static', filename='js/dns_own.js') }}?v={{ app_info.get('version', '') }}"></script>
 {% endblock %}

@@ -1,0 +1,227 @@
+{% macro code(text, cls='') -%}
+<span class="own-code"><code class="{{ cls }}">{{ text }}</code><button type="button" class="btn btn-link btn-sm own-copy" title="{{ _('Копировать') }}" aria-label="{{ _('Копировать') }}"><i class="bi bi-clipboard" aria-hidden="true"></i></button></span>
+{%- endmacro %}
+<section class="own-dns mt-4" id="own-dns" aria-labelledby="own-dns-title">
+    <div class="dns-section-head mt-0">
+        <h2 id="own-dns-title">{{ _('Свой DNS-сервер') }}</h2>
+        <button id="own-dns-refresh" class="btn btn-outline-secondary btn-sm" type="button"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+    </div>
+    <p class="small text-body-secondary">{{ _('Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему устройства. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH приложение не читает и не хранит.') }}</p>
+    <p id="own-dns-status" class="small mb-2" role="status" aria-live="polite"></p>
+    <div id="own-dns-cards" class="d-grid gap-3"></div>
+
+    <div id="own-dns-guide" class="own-dns-guide" hidden>
+        <div class="row g-3 align-items-end mb-2">
+            <div class="col-md-5" id="own-dns-which-box" hidden>
+                <label class="form-label small" for="own-dns-which">{{ _('Шаги ниже про этот сервер') }}</label>
+                <select id="own-dns-which" class="form-select form-select-sm"></select>
+            </div>
+            <fieldset class="col-md-7">
+                <legend class="form-label small mb-1">{{ _('Как устройства обращаются к DNS') }}</legend>
+                <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" name="own-mode" id="own-mode-doh" value="doh" checked>
+                    <label class="btn btn-outline-secondary" for="own-mode-doh">{{ _('Через DoH-адрес') }}</label>
+                    <input type="radio" class="btn-check" name="own-mode" id="own-mode-ip" value="ip">
+                    <label class="btn btn-outline-secondary" for="own-mode-ip">{{ _('Обычный DNS по IP') }}</label>
+                </div>
+            </fieldset>
+        </div>
+        <p id="own-dns-mode-note" class="small mb-1"></p>
+        <p id="own-dns-mode-warn" class="small text-warning-emphasis mb-1" hidden></p>
+
+        <div data-mode="doh" class="mt-3">
+            <label class="form-label small" for="own-doh-url">{{ _('Ваш DoH-адрес (необязательно)') }}</label>
+            <input id="own-doh-url" class="form-control form-control-sm font-monospace" type="url" autocomplete="off" spellcheck="false" placeholder="https://dns.example.com/…" aria-describedby="own-doh-help">
+            <div id="own-doh-help" class="form-text">{{ _('Команду ниже выполните на VPS после входа по SSH (это Linux на сервере, не Windows). Результат вставьте сюда: адрес подставляется в шаги только на этой странице, не сохраняется и приложению не отправляется.') }} {{ code('cat /root/dns-doh-url') }}</div>
+            <div id="own-doh-invalid" class="form-text text-warning-emphasis" hidden>{{ _('Нужен полный адрес, начинающийся с https://.') }}</div>
+        </div>
+
+        <div class="own-dns-tabs my-3" role="tablist" aria-label="{{ _('Как подключить') }}">
+            {% for key, label in [('panel', _('Панель AdGuard')), ('browser', _('Браузер')), ('macos', 'macOS'), ('windows', 'Windows'), ('linux', 'Linux'), ('android', 'Android'), ('ios', 'iPhone'), ('openwrt', 'OpenWrt'), ('tailnet', _('Вся сеть Tailscale'))] %}
+            <button type="button" class="btn btn-sm btn-outline-secondary" role="tab" id="own-tabbtn-{{ key }}" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="own-tab-{{ key }}" data-own-tab="{{ key }}">{{ label }}</button>
+            {% endfor %}
+        </div>
+
+        <div id="own-tab-panel" role="tabpanel" aria-labelledby="own-tabbtn-panel">
+            <p>{{ _('Панель — веб-страница AdGuard, а не порт DNS. Открывайте её только через SSH-туннель или Tailscale, не по публичному IP сервера.') }}</p>
+            <p id="own-panel-warn" class="text-warning-emphasis" hidden></p>
+            <ol data-panel="tunnel">
+                <li>{{ _('На этом компьютере (Mac, Linux или Windows с OpenSSH) в Терминале или PowerShell запустите и не закрывайте окно, пока открыта панель:') }} {{ code('ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:13001:127.0.0.1:3001 root@server', 'own-ssh') }}</li>
+                <li>{{ _('Откройте в браузере:') }} {{ code('http://127.0.0.1:13001', 'own-panel-url') }}</li>
+                <li>{{ _('Логин и пароль — заданные в мастере AdGuard. Приложение их не хранит.') }}</li>
+            </ol>
+            <p class="small text-body-secondary" data-panel="tunnel">{{ _('Это не команда Windows. На Mac — приложение «Терминал», на Linux — терминал, на Windows 10/11 — PowerShell (OpenSSH уже есть). В PuTTY: Connection → SSH → Tunnels, Source 13001, Destination 127.0.0.1 и порт панели.') }}</p>
+            <ol data-panel="tailnet" hidden>
+                <li>{{ _('Панель доступна только устройствам в Tailscale. Откройте:') }} {{ code('http://100.64.0.1:3000', 'own-panel-direct') }}</li>
+                <li>{{ _('Логин и пароль — заданные в мастере AdGuard. Приложение их не хранит.') }}</li>
+            </ol>
+            <ol data-panel="unknown" hidden>
+                <li>{{ _('Порт панели не определён: AdGuard установлен как служба. Это порт, выбранный в мастере установки. Туннель с ним:') }} {{ code('ssh -N -L 127.0.0.1:13001:127.0.0.1:PORT root@server', 'own-ssh-generic') }}</li>
+                <li>{{ _('Откройте в браузере:') }} {{ code('http://127.0.0.1:13001') }}</li>
+            </ol>
+            <p class="small text-body-secondary mb-0">{{ _('Найти, почему не открывается сайт: «Журнал» в панели → найти домен → ответ и сработавшее правило. После любой настройки ниже проверяйте там, что запросы устройства появились.') }}</p>
+        </div>
+
+        <div id="own-tab-browser" role="tabpanel" aria-labelledby="own-tabbtn-browser" hidden>
+            <div data-mode="doh">
+                <p>{{ _('Самый быстрый способ проверить DoH: действует только в этом браузере, система не меняется.') }}</p>
+                <ul>
+                    <li>{{ _('Chrome, Edge, Яндекс: Настройки → Конфиденциальность и безопасность → Безопасность → «Использовать безопасный DNS» → свой поставщик → адрес:') }} {{ code('<DoH>', 'own-doh') }}</li>
+                    <li>{{ _('Firefox: Настройки → Приватность и защита → DNS через HTTPS → «Максимальная защита» → свой поставщик → тот же адрес.') }}</li>
+                    <li>{{ _('Safari своего DoH не имеет и берёт DNS системы — используйте профиль (вкладки macOS и iPhone).') }}</li>
+                </ul>
+            </div>
+            <p data-mode="ip" hidden>{{ _('Браузеры берут DNS системы. Если в браузере включён «Безопасный DNS» с другим поставщиком, он обходит ваш сервер: выключите его или укажите свой DoH-адрес.') }}</p>
+        </div>
+
+        <div id="own-tab-macos" role="tabpanel" aria-labelledby="own-tabbtn-macos" hidden>
+            <ol data-mode="doh">
+                <li>{{ _('Вставьте DoH-адрес выше и скопируйте профиль. Затем сохраните и откройте его в Терминале:') }}
+                    <div class="d-flex flex-wrap gap-2 my-1">
+                        <button type="button" class="btn btn-sm btn-outline-secondary own-profile-copy" disabled><i class="bi bi-clipboard" aria-hidden="true"></i> {{ _('Скопировать профиль') }}</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary own-profile-download" disabled hidden><i class="bi bi-download" aria-hidden="true"></i> {{ _('Скачать профиль') }}</button>
+                    </div>
+                    {{ code('pbpaste > ~/Downloads/own-dns.mobileconfig && open ~/Downloads/own-dns.mobileconfig') }}</li>
+                <li>{{ _('Системные настройки → Основные → Управление устройством (в старых версиях: Конфиденциальность и безопасность → Профили) → профиль «Own DNS» → Установить.') }}</li>
+                <li>{{ _('Профиль виден в Системные настройки → Сеть → Фильтры, там же его можно выключить или удалить. Сам файл после установки удалите: в нём ваш секретный адрес.') }} {{ code('rm ~/Downloads/own-dns.mobileconfig') }}</li>
+                <li>{{ _('Если в Tailscale включено «Использовать DNS Tailscale», он может перехватывать запросы — проверьте по журналу AdGuard.') }}</li>
+            </ol>
+            <ol data-mode="ip" hidden>
+                <li>{{ _('Системные настройки → Сеть → Wi-Fi или Ethernet → Подробнее → DNS → «+» → адрес:') }} {{ code('—', 'own-ip') }}</li>
+                <li>{{ _('Проверка: адрес должен быть в выводе. Вернуть как было — удалить добавленный адрес.') }} {{ code('scutil --dns | grep nameserver') }}</li>
+            </ol>
+        </div>
+
+        <div id="own-tab-windows" role="tabpanel" aria-labelledby="own-tabbtn-windows" hidden>
+            <ol data-mode="doh">
+                <li>{{ _('Windows 11: Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Изменить → Вручную → IPv4.') }}</li>
+                <li>{{ _('Предпочитаемый DNS — IP сервера из DoH-адреса:') }} {{ code('—', 'own-doh-ip') }}</li>
+                <li>{{ _('«DNS по протоколу HTTPS» → «Вкл. (шаблон вручную)» → шаблон:') }} {{ code('<DoH>', 'own-doh') }} {{ _('«Возврат к открытому тексту» выключите: обычный порт 53 на сервере закрыт.') }}</li>
+                <li>{{ _('То же из PowerShell от администратора (имя адаптера — из Get-NetAdapter):') }}
+                    {{ code('Add-DnsClientDohServerAddress -ServerAddress IP -DohTemplate URL -AllowFallbackToUdp $False -AutoUpgrade $True', 'own-win-doh') }}
+                    {{ code('Set-DnsClientServerAddress -InterfaceAlias "Wi-Fi" -ServerAddresses IP', 'own-win-set') }}</li>
+                <li>{{ _('Проверка и откат: «Назначение DNS» → «Автоматически».') }} {{ code('Clear-DnsClientCache; Resolve-DnsName example.com') }}</li>
+                <li>{{ _('В Windows 10 системного DoH со своим адресом нет — используйте браузер.') }}</li>
+            </ol>
+            <ol data-mode="ip" hidden>
+                <li>{{ _('Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Вручную → IPv4 → Предпочитаемый DNS:') }} {{ code('—', 'own-ip') }}</li>
+                <li>{{ _('Проверка и откат: «Назначение DNS» → «Автоматически».') }} {{ code('Clear-DnsClientCache; Resolve-DnsName example.com') }}</li>
+            </ol>
+        </div>
+
+        <div id="own-tab-linux" role="tabpanel" aria-labelledby="own-tabbtn-linux" hidden>
+            <ol data-mode="doh">
+                <li>{{ _('systemd-resolved умеет DNS-over-TLS, но не DoH. Проще всего — браузер. Для всей системы запустите локальный dnsproxy от AdGuard:') }} {{ code("dnsproxy -l 127.0.0.1 -p 5353 -u 'URL' -b 9.9.9.9:53", 'own-linux-proxy') }}</li>
+                <li>{{ _('В /etc/systemd/resolved.conf в секции [Resolve] укажите DNS=127.0.0.1:5353, затем перезапустите службу:') }} {{ code('sudo systemctl restart systemd-resolved && resolvectl query example.com') }}</li>
+            </ol>
+            <ol data-mode="ip" hidden>
+                <li>{{ _('NetworkManager, подставив имя соединения из nmcli connection show:') }} {{ code('nmcli connection modify NAME ipv4.dns IP ipv4.ignore-auto-dns yes && nmcli connection up NAME', 'own-linux-ip') }}</li>
+                <li>{{ _('Проверка:') }} {{ code('resolvectl status') }}</li>
+            </ol>
+        </div>
+
+        <div id="own-tab-android" role="tabpanel" aria-labelledby="own-tabbtn-android" hidden>
+            <ul data-mode="doh">
+                <li>{{ _('«Частный DNS» в Android принимает только DNS-over-TLS (имя хоста, порт 853), а не адрес DoH. Не вписывайте туда DoH-адрес — интернет на телефоне перестанет работать.') }}</li>
+                <li>{{ _('Для всего телефона — приложение со своим DoH-адресом, например Intra: настройки → сервер DNS-over-HTTPS → свой → адрес:') }} {{ code('<DoH>', 'own-doh') }}</li>
+                <li>{{ _('Только для Chrome — как во вкладке «Браузер».') }}</li>
+                <li id="own-android-dot" hidden>{{ _('На сервере слушается порт 853 (DoT). Если для него выпущен сертификат на имя DNS-домена, это имя можно указать в «Частном DNS».') }}</li>
+            </ul>
+            <ol data-mode="ip" hidden>
+                <li>{{ _('Wi-Fi: зажмите сеть → Изменить → Дополнительно → Настройки IP: «Статический» → DNS 1:') }} {{ code('—', 'own-ip') }}</li>
+                <li>{{ _('На мобильном интернете поля DNS нет: подключите Tailscale, и телефон возьмёт DNS сети Tailscale (вкладка «Вся сеть Tailscale»).') }}</li>
+            </ol>
+        </div>
+
+        <div id="own-tab-ios" role="tabpanel" aria-labelledby="own-tabbtn-ios" hidden>
+            <ol data-mode="doh">
+                <li>{{ _('Соберите профиль на Mac (вкладка macOS) и отправьте файл own-dns.mobileconfig на iPhone через AirDrop.') }}</li>
+                <li>{{ _('Настройки → «Профиль загружен» → Установить. Включить или выключить: Настройки → Основные → VPN и управление устройством → DNS.') }}</li>
+                <li>{{ _('Профиль работает и в Wi-Fi, и на сотовой сети. Файл после установки удалите с обоих устройств.') }}</li>
+            </ol>
+            <ol data-mode="ip" hidden>
+                <li>{{ _('Настройки → Wi-Fi → (i) → Настройка DNS → Вручную → добавить:') }} {{ code('—', 'own-ip') }}</li>
+                <li>{{ _('Сотовая сеть так не настраивается: подключите Tailscale с DNS сети Tailscale.') }}</li>
+            </ol>
+        </div>
+
+        <div id="own-tab-openwrt" role="tabpanel" aria-labelledby="own-tabbtn-openwrt" hidden>
+            <p>{{ _('Команды выполняются по SSH на роутере. Клиенты по-прежнему получают DNS роутера, а он пересылает запросы дальше.') }}</p>
+            <p class="small text-body-secondary">{{ _('На роутере должен работать только один DNS-стек. SSClash/Mihomo, Podkop и Forkop не включают вместе и не ставят рядом https-dns-proxy.') }}</p>
+            <div class="own-dns-tabs mb-3" role="group" aria-label="{{ _('Клиенты OpenWrt') }}">
+                {% for key, label in [('all', _('Без обхода')), ('ssclash', 'SSClash'), ('podkop', 'Podkop'), ('forkop', 'Forkop'), ('zapret', 'Zapret'), ('one', _('Один клиент')), ('guest', _('Гостевая сеть')), ('bypass', _('Мимо AdGuard'))] %}
+                <button type="button" class="btn btn-sm btn-outline-secondary" aria-pressed="{{ 'true' if loop.first else 'false' }}" data-own-wrt="{{ key }}">{{ label }}</button>
+                {% endfor %}
+            </div>
+            <div data-wrt-panel="all">
+                <div data-mode="doh">
+                    <p>{{ _('Только если SSClash, Podkop и Forkop выключены. Иначе DNS заберёт один из них, а https-dns-proxy даст гонку ответов. Установите пакет (в OpenWrt 25 — apk add вместо opkg):') }} {{ code('opkg update && opkg install https-dns-proxy luci-app-https-dns-proxy') }}</p>
+                    <p>{{ _('LuCI → Службы → HTTPS DNS Proxy: удалите стандартных провайдеров и добавьте свой адрес. Пакет сам направит dnsmasq на 127.0.0.1#5053. Bootstrap-DNS оставьте IP-адресами (9.9.9.9, 1.1.1.1): ими роутер найдёт имя вашего DNS-домена.') }} {{ code('<DoH>', 'own-doh') }}</p>
+                </div>
+                <div data-mode="ip" hidden>
+                    <p>{{ _('Роутер должен быть в той же сети Tailscale, иначе он не достучится до адреса. Направьте dnsmasq на AdGuard и перестаньте брать DNS провайдера:') }}</p>
+                    {{ code("uci add_list dhcp.@dnsmasq[0].server='IP' && uci set dhcp.@dnsmasq[0].noresolv='1' && uci commit dhcp && service dnsmasq restart", 'own-wrt-ip') }}
+                </div>
+            </div>
+            <div data-wrt-panel="ssclash" hidden>
+                <div data-mode="doh">
+                    <p>{{ _('SSClash — это оболочка Mihomo. https-dns-proxy не ставьте, dnsmasq не трогайте: forwards должен быть только 127.0.0.1#7874. Podkop и Forkop выключите: два tproxy ломают DNS.') }}</p>
+                    <p>{{ _('LuCI → Службы → SSClash → конфигурация, блок dns. В nameserver — ваш DoH. В default-nameserver и proxy-server-nameserver оставьте IP (9.9.9.9, 1.1.1.1): имя DNS-домена и узлы прокси резолвятся без самого DoH, иначе при старте будет петля.') }} {{ code('<DoH>', 'own-doh') }}</p>
+                    <pre class="own-pre mb-1"><code class="own-mihomo">dns:
+  listen: 0.0.0.0:7874
+  default-nameserver: [9.9.9.9, 1.1.1.1]
+  proxy-server-nameserver: [9.9.9.9, 1.1.1.1]
+  nameserver: ['URL']</code></pre>
+                    <button type="button" class="btn btn-link btn-sm px-0 own-copy-pre">{{ _('Копировать') }}</button>
+                </div>
+                <p data-mode="ip" hidden>{{ _('Обычный DNS по IP с SSClash не используйте: пропадёт fake-ip и маршрутизация по доменам. Нужен DoH в nameserver или вкладка «Без обхода» при выключенном SSClash.') }}</p>
+            </div>
+            <div data-wrt-panel="podkop" hidden>
+                <div data-mode="doh">
+                    <p>{{ _('https-dns-proxy не ставьте: Podkop сам направляет dnsmasq на 127.0.0.42#53 (sing-box). SSClash и Forkop выключите.') }}</p>
+                    <p>{{ _('LuCI → Службы → Podkop → Настройки: тип DNS — DoH, DNS-сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Сохраните и перезапустите Podkop. Проверка: uci show dhcp.@dnsmasq[0].server должен быть 127.0.0.42#53.') }} {{ code('<DoH>', 'own-doh') }}</p>
+                </div>
+                <p data-mode="ip" hidden>{{ _('Обычный DNS по IP Podkop заменяет своей цепочкой. Чтобы клиенты ходили на AdGuard по IP, остановите Podkop и откройте вкладку «Без обхода».') }}</p>
+            </div>
+            <div data-wrt-panel="forkop" hidden>
+                <div data-mode="doh">
+                    <p>{{ _('Forkop — бывший Podkop Plus, тот же sing-box на 127.0.0.42#53. https-dns-proxy не ставьте. Podkop и SSClash выключите: два стека сразу нельзя.') }}</p>
+                    <p>{{ _('LuCI → Службы → Forkop → DNS: протокол DoH, основной сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Если в Forkop включена маршрутизация DNS через прокси, bootstrap всё равно должен остаться IP, иначе имя DNS-домена не резолвится при старте.') }} {{ code('<DoH>', 'own-doh') }}</p>
+                </div>
+                <p data-mode="ip" hidden>{{ _('Как у Podkop: обычный DNS по IP задаётся не здесь. Остановите Forkop и откройте вкладку «Без обхода».') }}</p>
+            </div>
+            <div data-wrt-panel="zapret" hidden>
+                <p>{{ _('Zapret DNS не резолвит: он трогает уже установленные TCP/QUIC-пакеты (ClientHello), а не порт 53. Сначала честный DNS во вкладке SSClash, Podkop, Forkop или «Без обхода», потом при необходимости включите службу Zapret.') }}</p>
+                <p>{{ _('Не направляйте dnsmasq на Zapret и не ставьте https-dns-proxy «поверх» SSClash/Podkop. Если DNS отдаёт NXDOMAIN, Zapret сайт не откроет. После настройки DNS запрос должен появиться в журнале AdGuard; Zapret на этот журнал не влияет.') }}</p>
+            </div>
+            <div data-wrt-panel="one" hidden>
+                <p data-mode="doh">{{ _('dnsmasq не умеет выбирать сервер для отдельного клиента. Чтобы через AdGuard шло только одно устройство, настройте DoH на нём самом (вкладки систем), а роутер не меняйте.') }}</p>
+                <div data-mode="ip" hidden>
+                    <p>{{ _('Выдайте одному устройству адрес AdGuard через DHCP-тег (MAC — этого устройства; затем переподключите его к Wi-Fi):') }}</p>
+                    {{ code("uci add dhcp host && uci set dhcp.@host[-1].mac='AA:BB:CC:DD:EE:FF' && uci set dhcp.@host[-1].tag='owndns' && uci set dhcp.owndns=tag && uci add_list dhcp.owndns.dhcp_option='6,IP' && uci commit dhcp && service dnsmasq restart", 'own-wrt-one') }}
+                </div>
+            </div>
+            <div data-wrt-panel="guest" hidden>
+                <p>{{ _('Гостям не выдавайте ни DoH-адрес, ни адрес Tailscale, и не пускайте их к панели. Если гости должны обходить AdGuard, выдайте гостевой сети обычный DNS (имя интерфейса — guest):') }}</p>
+                {{ code("uci add_list dhcp.guest.dhcp_option='6,1.1.1.1' && uci commit dhcp && service dnsmasq restart") }}
+                <p class="small text-body-secondary mt-1 mb-0">{{ _('В файрволе зона guest не должна иметь доступа к LAN — так гости не увидят роутер и панель.') }}</p>
+            </div>
+            <div data-wrt-panel="bypass" hidden>
+                <p>{{ _('Телевизору или рабочему ноутбуку, которым нужен другой DNS (например офисный), выдайте его через DHCP-тег. Эти устройства не попадут в журнал AdGuard:') }}</p>
+                {{ code("uci add dhcp host && uci set dhcp.@host[-1].mac='AA:BB:CC:DD:EE:FF' && uci set dhcp.@host[-1].tag='bypass' && uci set dhcp.bypass=tag && uci add_list dhcp.bypass.dhcp_option='6,1.1.1.1' && uci commit dhcp && service dnsmasq restart") }}
+            </div>
+            <p class="small text-body-secondary mt-3 mb-0">{{ _('Проверка с компьютера в LAN: сервером в ответе должен быть роутер, а запрос — появиться в журнале AdGuard.') }} {{ code('nslookup example.com') }}</p>
+        </div>
+
+        <div id="own-tab-tailnet" role="tabpanel" aria-labelledby="own-tabbtn-tailnet" hidden>
+            <div data-mode="ip" hidden>
+                <p>{{ _('Чтобы DNS получали все устройства с Tailscale, в Headplane → DNS добавьте адрес в глобальные серверы имён и включите «Переопределять локальный DNS». В конфиге Headscale это dns.nameservers.global и dns.override_local_dns: true.') }} {{ code('—', 'own-ip') }}</p>
+                <p class="mb-0">{{ _('Устройства без Tailscale продолжают использовать DNS роутера или провайдера.') }}</p>
+            </div>
+            <div data-mode="doh">
+                <p>{{ _('В dns.nameservers.global Headscale можно указать и DoH-адрес (https://…), тогда клиенты Tailscale будут ходить в ваш DoH. Но секретный адрес попадёт в настройки всех устройств сети. Если это не подходит, настраивайте DoH на каждом устройстве.') }} {{ code('<DoH>', 'own-doh') }}</p>
+                <p class="small text-body-secondary mb-0">{{ _('На вашей сети этот вариант приложение не проверяло: после изменения посмотрите журнал AdGuard.') }}</p>
+            </div>
+        </div>
+    </div>
+</section>

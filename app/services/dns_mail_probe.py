@@ -77,6 +77,8 @@ def discover(run=command):
                     'version': image.split(':')[-1][:64] if ':' in image else None,
                     'ports': ports[:1024], 'compose_service': service[:64], 'optional': False})
     dns = containers + [component(n, units[n]) for n in UNITS[:3] if n in units]
+    ss_code, output = run(['ss', '-H', '-lntu'])
+    sockets = listeners(output) if ss_code == 0 else []
     markers = [n for n in CORE[3:] if n in units]
     mail_found = len(markers) >= 2 and ('postfix@-' in units or 'postfix' in units) and 'dovecot' in units
     results = []
@@ -94,7 +96,25 @@ def discover(run=command):
                         'discovery': 'detected' if found else 'not_found' if accessible else 'unavailable',
                         'coverage': 'complete' if accessible else 'partial',
                         'functional': 'unconfigured', 'checked_at': timestamp(), 'source': 'ssh'})
+    results[0].update(listeners=sockets, listeners_known=ss_code == 0)
     return results
+
+
+def listeners(output):
+    """Local addresses listening on DNS (53) and DoT (853); no process names."""
+    found = []
+    for line in output.splitlines()[:2048]:
+        parts = line.split()
+        if len(parts) < 5 or parts[0] not in ('tcp', 'udp') or ':' not in parts[4]:
+            continue
+        host, _, port = parts[4].rpartition(':')
+        if port not in ('53', '853'):
+            continue
+        host = host.strip('[]').split('%')[0]
+        item = {'proto': parts[0], 'address': host[:64], 'port': int(port)}
+        if item not in found:
+            found.append(item)
+    return found[:32]
 
 
 def component(name, state, optional=False):

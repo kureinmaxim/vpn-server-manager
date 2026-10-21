@@ -9114,3 +9114,465 @@ msgstr "result is stale"
 
 msgid "Открыть диагностику DNS / Chatmail для этого сервера."
 msgstr "Open DNS / Chatmail diagnostics for this server."
+
+msgid "Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему рабочий компьютер. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH не показываются."
+msgstr "If a server runs AdGuard Home, its state is shown here, with steps for connecting a computer to it. The check is read-only over SSH. The panel password and the secret DoH address are not shown."
+
+msgid "Шаги ниже про этот сервер"
+msgstr "The steps below are for this server"
+
+msgid "Как подключить"
+msgstr "How to connect"
+
+msgid "Вся сеть Tailscale"
+msgstr "Whole Tailscale network"
+
+msgid "Панель AdGuard"
+msgstr "AdGuard panel"
+
+msgid "Чтобы адрес получали все устройства с подключённым Tailscale, укажите его сервером имён в Headplane или в консоли Tailscale. Отдельные настройки Wi-Fi тогда не нужны. Устройства без Tailscale продолжат использовать DNS роутера или провайдера."
+msgstr "To give this address to every device with Tailscale connected, set it as a nameserver in Headplane or the Tailscale console. Separate Wi-Fi settings are then unnecessary. Devices without Tailscale keep using the router or provider DNS."
+
+msgid "Адрес для клиентов"
+msgstr "Address for clients"
+
+msgid "адрес Tailscale"
+msgstr "Tailscale address"
+
+msgid "Панель AdGuard — это веб-страница, не порт DNS. Не открывайте её по публичному IP сервера."
+msgstr "The AdGuard panel is a web page, not the DNS port. Do not open it on the server’s public IP."
+
+msgid "Если Tailscale на этом компьютере видит сервер, откройте в браузере http:// и адрес ниже, порт 3000. Это обычный порт панели. Если у контейнера опубликован другой веб-порт, возьмите его из карточки выше."
+msgstr "If Tailscale on this computer can see the server, open http:// and the address below, port 3000. That is the usual panel port. If the container publishes a different web port, use the one on the card above."
+
+msgid "Если панель слушает только localhost, поднимите туннель и откройте http://127.0.0.1:3000. Порт SSH и пользователя возьмите из карточки сервера."
+msgstr "If the panel listens only on localhost, open a tunnel and then http://127.0.0.1:3000. Take the SSH port and user from the server card."
+
+msgid "Логин и пароль — те, что заданы при установке AdGuard. Приложение их не хранит."
+msgstr "The username and password are the ones set when AdGuard was installed. This app does not store them."
+
+msgid "Только этот Mac. Если DNS уже задан для всей сети Tailscale, достаточно подключённого Tailscale."
+msgstr "This Mac only. If DNS is already set for the whole Tailscale network, a connected Tailscale is enough."
+
+msgid "Системные настройки → Сеть → Wi-Fi или Ethernet → Подробнее → DNS."
+msgstr "System Settings → Network → Wi-Fi or Ethernet → Details → DNS."
+
+msgid "Нажмите «+» и вставьте адрес. Первый в списке используется, когда он доступен."
+msgstr "Click + and paste the address. The first entry in the list is used when it is reachable."
+
+msgid "Проверка в Терминале: в выводе должна быть эта строка. Чтобы вернуть как было, удалите добавленный адрес."
+msgstr "Check in Terminal: the output should contain this address. To undo, delete the address you added."
+
+msgid "Только этот компьютер. Если DNS уже задан для всей сети Tailscale, достаточно подключённого Tailscale."
+msgstr "This computer only. If DNS is already set for the whole Tailscale network, a connected Tailscale is enough."
+
+msgid "Параметры → Сеть и Интернет → Wi-Fi или Ethernet → назначение DNS → Вручную → IPv4."
+msgstr "Settings → Network & internet → Wi-Fi or Ethernet → DNS server assignment → Manual → IPv4."
+
+msgid "Предпочитаемый DNS — адрес ниже. Запасной можно оставить пустым."
+msgstr "Preferred DNS is the address below. Alternate DNS can stay empty."
+
+msgid "Проверка в PowerShell. Вернуть: переключите назначение DNS на «Автоматически»."
+msgstr "Check in PowerShell. To undo, set DNS server assignment back to Automatic."
+
+msgid "Только этот компьютер. Публичный IP VPS в качестве DNS не указывайте."
+msgstr "This computer only. Do not use the VPS public IP as the DNS server."
+
+msgid "Параметры → Сеть → шестерёнка у соединения → IPv4 → DNS. Либо в терминале, подставив имя соединения и адрес."
+msgstr "Settings → Network → the connection’s gear → IPv4 → DNS. Or use the terminal, with the connection name and the address."
+
+msgid "Адрес"
+msgstr "Address"
+
+msgid "Проверка"
+msgstr "Check"
+
+msgid "Wi-Fi: зажмите сеть → Изменить → Дополнительно → DNS 1. Действует только в этой сети."
+msgstr "Wi-Fi: press and hold the network → Modify → Advanced → DNS 1. This applies only to that network."
+
+msgid "На мобильном интернете отдельного поля DNS нет. Подключите Tailscale: телефон возьмёт DNS хвостовой сети, если он задан в Headplane или консоли Tailscale."
+msgstr "Mobile data has no separate DNS field. Connect Tailscale: the phone uses the tailnet DNS when it is set in Headplane or the Tailscale console."
+
+msgid "«Частный DNS» в Android — это DNS-over-TLS по имени хоста, не IP и не ссылка DoH. Пока отдельное имя для DoT не настроено, оставьте «Автоматически»."
+msgstr "Android Private DNS is DNS-over-TLS by hostname, not an IP and not a DoH link. Until a DoT name is set up, leave it on Automatic."
+
+msgid "Настройки → Wi-Fi → i → Настройка DNS → Вручную → добавьте адрес. Сотовая сеть так не настраивается."
+msgstr "Settings → Wi-Fi → i → Configure DNS → Manual → add the address. Cellular data cannot be set this way."
+
+msgid "Для сотовой сети подключите Tailscale и задайте DNS хвостовой сети. Профиль с секретным адресом DoH отсюда не скачать: этот адрес приложению не передаётся."
+msgstr "For cellular data, connect Tailscale and set the tailnet DNS. A profile with the secret DoH address cannot be downloaded here: that address is not sent to the app."
+
+msgid "Роутер должен быть в той же сети Tailscale, иначе клиенты не достучатся до адреса ниже. Гостям и отдельным устройствам этот адрес лучше не выдавать."
+msgstr "The router has to be on the same Tailscale network, or clients cannot reach the address below. Do not hand that address to guests or to selected devices."
+
+msgid "Клиенты OpenWrt"
+msgstr "OpenWrt clients"
+
+msgid "Все клиенты"
+msgstr "All clients"
+
+msgid "Один клиент"
+msgstr "One client"
+
+msgid "Гостевая сеть"
+msgstr "Guest network"
+
+msgid "Обход"
+msgstr "Bypass"
+
+msgid "Оставьте клиентам DNS роутера, а сам роутер направьте на AdGuard. LuCI → Сеть → Интерфейсы → LAN → Дополнительно → «Использовать собственные DNS» → адрес выше. DHCP по-прежнему выдаёт клиентам адрес роутера. Проверка с компьютера в LAN: nslookup example.com. Сервером должен быть роутер, а запрос — появиться в журнале AdGuard."
+msgstr "Leave clients on the router’s DNS, and point the router itself at AdGuard. LuCI → Network → Interfaces → LAN → Advanced → Use custom DNS servers → the address above. DHCP still gives clients the router’s address. From a LAN computer, run nslookup example.com. The server should be the router, and the query should appear in the AdGuard log."
+
+msgid "LuCI → Сеть → DHCP и DNS → Статические аренды → устройство → Дополнительно → DHCP-опция ниже. Остальные клиенты не меняются. С этого устройства адрес должен открываться: Tailscale на роутере с маршрутом или Tailscale на самом устройстве."
+msgstr "LuCI → Network → DHCP and DNS → Static Leases → the device → Advanced → the DHCP option below. Other clients stay unchanged. That device must be able to reach the address: Tailscale on the router, with a route, or Tailscale on the device itself."
+
+msgid "Гостям не выдавайте адрес Tailscale и не открывайте панель. На гостевой сети оставьте DNS роутера. В файрволе зона guest не должна ходить в LAN и на порт панели. Upstream роутера — AdGuard, как для всех клиентов: гости фильтруются, но панель не видят."
+msgstr "Guests do not get the Tailscale address and cannot open the panel. Leave the router DNS on the guest network. In the firewall, the guest zone must not reach the LAN or the panel port. The router’s upstream is AdGuard, as for everyone else: guests are filtered, but they do not see the panel."
+
+msgid "Для телевизора или ноутбука, которому нужен DNS офиса: в статической аренде DHCP-опция 6 и адрес офиса или 1.1.1.1. Эти устройства не попадут в журнал AdGuard. Остальные клиенты остаются на роутере."
+msgstr "For a TV or laptop that needs the office DNS: on its static lease set DHCP option 6 to the office address or 1.1.1.1. Those devices will not appear in the AdGuard log. Everyone else stays on the router."
+
+msgid "Опубликованные порты"
+msgstr "Published ports"
+
+msgid "Диагностика"
+msgstr "Diagnostics"
+
+msgid "Открыть мониторинг"
+msgstr "Open monitoring"
+
+msgid "Последняя проверка"
+msgstr "Last check"
+
+msgid "исправен"
+msgstr "healthy"
+
+msgid "ошибка проверки"
+msgstr "check failed"
+
+msgid "недоступен для проверки"
+msgstr "could not be checked"
+
+msgid "проверка ещё не запускалась"
+msgstr "not checked yet"
+
+msgid "Ищу AdGuard Home на активных серверах…"
+msgstr "Looking for AdGuard Home on active servers…"
+
+msgid "Нет активных серверов. Свой DNS показать нечего."
+msgstr "There are no active servers, so there is no own DNS to show."
+
+msgid "AdGuard Home на активных серверах не найден. Подсказки появятся, когда свой DNS-сервер будет обнаружен."
+msgstr "AdGuard Home was not found on the active servers. The setup steps appear when your own DNS server is detected."
+
+msgid "Если на сервере запущен AdGuard Home, здесь его состояние и как подключить к нему устройства. Проверка только на чтение, по SSH. Пароль панели и секретный адрес DoH приложение не читает и не хранит."
+msgstr "If a server runs AdGuard Home, its state is shown here, with steps for connecting devices to it. The check is read-only over SSH. The app neither reads nor stores the panel password or the secret DoH address."
+
+msgid "Как устройства обращаются к DNS"
+msgstr "How devices reach the DNS server"
+
+msgid "Через DoH-адрес"
+msgstr "Through the DoH address"
+
+msgid "Обычный DNS по IP"
+msgstr "Plain DNS by IP"
+
+msgid "Ваш DoH-адрес (необязательно)"
+msgstr "Your DoH address (optional)"
+
+msgid "Возьмите его на сервере командой ниже. Вставленный адрес подставляется в шаги и профиль только на этой странице: он не сохраняется и не отправляется приложению."
+msgstr "Get it on the server with the command below. The pasted address fills in the steps and the profile on this page only: it is not saved and not sent to the app."
+
+msgid "Нужен полный адрес, начинающийся с https://."
+msgstr "Enter the full address, starting with https://."
+
+msgid "Браузер"
+msgstr "Browser"
+
+msgid "Панель — веб-страница AdGuard, а не порт DNS. Открывайте её только через SSH-туннель или Tailscale, не по публичному IP сервера."
+msgstr "The panel is the AdGuard web page, not the DNS port. Open it only through an SSH tunnel or Tailscale, never on the server’s public IP."
+
+msgid "Запустите в терминале этого компьютера и не закрывайте окно, пока работаете с панелью:"
+msgstr "Run this in a terminal on this computer and keep the window open while you use the panel:"
+
+msgid "Откройте в браузере:"
+msgstr "Open in the browser:"
+
+msgid "Логин и пароль — заданные в мастере AdGuard. Приложение их не хранит."
+msgstr "The username and password are the ones set in the AdGuard setup wizard. The app does not store them."
+
+msgid "Панель доступна только устройствам в Tailscale. Откройте:"
+msgstr "The panel is reachable only from Tailscale devices. Open:"
+
+msgid "Порт панели не определён: AdGuard установлен как служба. Это порт, выбранный в мастере установки. Туннель с ним:"
+msgstr "The panel port is unknown because AdGuard runs as a service. It is the port chosen in the setup wizard. Tunnel to it with:"
+
+msgid "Найти, почему не открывается сайт: «Журнал» в панели → найти домен → ответ и сработавшее правило. После любой настройки ниже проверяйте там, что запросы устройства появились."
+msgstr "To find out why a site does not open: Query Log in the panel → find the domain → see the answer and the matching rule. After any setup below, check there that the device’s queries appear."
+
+msgid "Самый быстрый способ проверить DoH: действует только в этом браузере, система не меняется."
+msgstr "The quickest way to try DoH: it applies only to this browser and does not change the system."
+
+msgid "Chrome, Edge, Яндекс: Настройки → Конфиденциальность и безопасность → Безопасность → «Использовать безопасный DNS» → свой поставщик → адрес:"
+msgstr "Chrome, Edge, Yandex: Settings → Privacy and security → Security → Use secure DNS → custom provider → address:"
+
+msgid "Firefox: Настройки → Приватность и защита → DNS через HTTPS → «Максимальная защита» → свой поставщик → тот же адрес."
+msgstr "Firefox: Settings → Privacy & Security → DNS over HTTPS → Max Protection → custom provider → the same address."
+
+msgid "Safari своего DoH не имеет и берёт DNS системы — используйте профиль (вкладки macOS и iPhone)."
+msgstr "Safari has no DoH setting of its own and uses the system DNS — use the profile (macOS and iPhone tabs)."
+
+msgid "Браузеры берут DNS системы. Если в браузере включён «Безопасный DNS» с другим поставщиком, он обходит ваш сервер: выключите его или укажите свой DoH-адрес."
+msgstr "Browsers use the system DNS. If secure DNS is turned on in the browser with another provider, it bypasses your server: turn it off or enter your DoH address."
+
+msgid "Вставьте DoH-адрес выше и скопируйте профиль. Затем сохраните и откройте его в Терминале:"
+msgstr "Paste the DoH address above and copy the profile. Then save and open it in Terminal:"
+
+msgid "Скопировать профиль"
+msgstr "Copy profile"
+
+msgid "Скачать профиль"
+msgstr "Download profile"
+
+msgid "Системные настройки → Основные → Управление устройством (в старых версиях: Конфиденциальность и безопасность → Профили) → профиль «Own DNS» → Установить."
+msgstr "System Settings → General → Device Management (in older versions: Privacy & Security → Profiles) → the Own DNS profile → Install."
+
+msgid "Профиль виден в Системные настройки → Сеть → Фильтры, там же его можно выключить или удалить. Сам файл после установки удалите: в нём ваш секретный адрес."
+msgstr "The profile appears in System Settings → Network → Filters, where you can turn it off or remove it. Delete the file after installing: it contains your secret address."
+
+msgid "Если в Tailscale включено «Использовать DNS Tailscale», он может перехватывать запросы — проверьте по журналу AdGuard."
+msgstr "If Use Tailscale DNS is on, Tailscale may take over queries — check the AdGuard log."
+
+msgid "Системные настройки → Сеть → Wi-Fi или Ethernet → Подробнее → DNS → «+» → адрес:"
+msgstr "System Settings → Network → Wi-Fi or Ethernet → Details → DNS → + → address:"
+
+msgid "Проверка: адрес должен быть в выводе. Вернуть как было — удалить добавленный адрес."
+msgstr "Check: the address should be in the output. To undo, remove the address you added."
+
+msgid "Windows 11: Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Изменить → Вручную → IPv4."
+msgstr "Windows 11: Settings → Network & internet → Wi-Fi or Ethernet → DNS server assignment → Edit → Manual → IPv4."
+
+msgid "Предпочитаемый DNS — IP сервера из DoH-адреса:"
+msgstr "Preferred DNS is the IP of the server in the DoH address:"
+
+msgid "«DNS по протоколу HTTPS» → «Вкл. (шаблон вручную)» → шаблон:"
+msgstr "DNS over HTTPS → On (manual template) → template:"
+
+msgid "«Возврат к открытому тексту» выключите: обычный порт 53 на сервере закрыт."
+msgstr "Turn Fallback to plaintext off: the plain port 53 on the server is closed."
+
+msgid "То же из PowerShell от администратора (имя адаптера — из Get-NetAdapter):"
+msgstr "The same from an administrator PowerShell (the adapter name comes from Get-NetAdapter):"
+
+msgid "Проверка и откат: «Назначение DNS» → «Автоматически»."
+msgstr "Check, and to undo set DNS server assignment back to Automatic."
+
+msgid "В Windows 10 системного DoH со своим адресом нет — используйте браузер."
+msgstr "Windows 10 has no system DoH with a custom address — use the browser."
+
+msgid "Параметры → Сеть и Интернет → Wi-Fi или Ethernet → Назначение DNS-сервера → Вручную → IPv4 → Предпочитаемый DNS:"
+msgstr "Settings → Network & internet → Wi-Fi or Ethernet → DNS server assignment → Manual → IPv4 → Preferred DNS:"
+
+msgid "systemd-resolved умеет DNS-over-TLS, но не DoH. Проще всего — браузер. Для всей системы запустите локальный dnsproxy от AdGuard:"
+msgstr "systemd-resolved supports DNS-over-TLS but not DoH. The browser is the simplest option. For the whole system, run AdGuard’s dnsproxy locally:"
+
+msgid "В /etc/systemd/resolved.conf в секции [Resolve] укажите DNS=127.0.0.1:5353, затем перезапустите службу:"
+msgstr "In /etc/systemd/resolved.conf, set DNS=127.0.0.1:5353 in the [Resolve] section, then restart the service:"
+
+msgid "NetworkManager, подставив имя соединения из nmcli connection show:"
+msgstr "NetworkManager, with the connection name from nmcli connection show:"
+
+msgid "Проверка:"
+msgstr "Check:"
+
+msgid "«Частный DNS» в Android принимает только DNS-over-TLS (имя хоста, порт 853), а не адрес DoH. Не вписывайте туда DoH-адрес — интернет на телефоне перестанет работать."
+msgstr "Android Private DNS accepts only DNS-over-TLS (a hostname, port 853), not a DoH address. Do not enter the DoH address there — the phone will lose internet access."
+
+msgid "Для всего телефона — приложение со своим DoH-адресом, например Intra: настройки → сервер DNS-over-HTTPS → свой → адрес:"
+msgstr "For the whole phone, use an app that accepts a custom DoH address, such as Intra: settings → DNS-over-HTTPS server → custom → address:"
+
+msgid "Только для Chrome — как во вкладке «Браузер»."
+msgstr "For Chrome only — as on the Browser tab."
+
+msgid "На сервере слушается порт 853 (DoT). Если для него выпущен сертификат на имя DNS-домена, это имя можно указать в «Частном DNS»."
+msgstr "Port 853 (DoT) is listening on the server. If it has a certificate for the DNS domain name, you can enter that name in Private DNS."
+
+msgid "Wi-Fi: зажмите сеть → Изменить → Дополнительно → Настройки IP: «Статический» → DNS 1:"
+msgstr "Wi-Fi: press and hold the network → Modify → Advanced → IP settings: Static → DNS 1:"
+
+msgid "На мобильном интернете поля DNS нет: подключите Tailscale, и телефон возьмёт DNS сети Tailscale (вкладка «Вся сеть Tailscale»)."
+msgstr "Mobile data has no DNS field: connect Tailscale, and the phone uses the Tailscale network DNS (Whole Tailscale network tab)."
+
+msgid "Соберите профиль на Mac (вкладка macOS) и отправьте файл own-dns.mobileconfig на iPhone через AirDrop."
+msgstr "Build the profile on the Mac (macOS tab) and send own-dns.mobileconfig to the iPhone with AirDrop."
+
+msgid "Настройки → «Профиль загружен» → Установить. Включить или выключить: Настройки → Основные → VPN и управление устройством → DNS."
+msgstr "Settings → Profile Downloaded → Install. To turn it on or off: Settings → General → VPN & Device Management → DNS."
+
+msgid "Профиль работает и в Wi-Fi, и на сотовой сети. Файл после установки удалите с обоих устройств."
+msgstr "The profile works on both Wi-Fi and cellular. Delete the file from both devices after installing."
+
+msgid "Настройки → Wi-Fi → (i) → Настройка DNS → Вручную → добавить:"
+msgstr "Settings → Wi-Fi → (i) → Configure DNS → Manual → add:"
+
+msgid "Сотовая сеть так не настраивается: подключите Tailscale с DNS сети Tailscale."
+msgstr "Cellular cannot be set this way: connect Tailscale with the Tailscale network DNS."
+
+msgid "Команды выполняются по SSH на роутере. Клиенты по-прежнему получают DNS роутера, а он пересылает запросы дальше."
+msgstr "Run the commands over SSH on the router. Clients still get the router as their DNS, and the router forwards queries."
+
+msgid "С Mihomo"
+msgstr "With Mihomo"
+
+msgid "Мимо AdGuard"
+msgstr "Bypass AdGuard"
+
+msgid "Установите https-dns-proxy (в OpenWrt 25 — apk add вместо opkg):"
+msgstr "Install https-dns-proxy (on OpenWrt 25 use apk add instead of opkg):"
+
+msgid "LuCI → Службы → HTTPS DNS Proxy: удалите стандартных провайдеров и добавьте свой адрес. Пакет сам направит dnsmasq на 127.0.0.1#5053. Bootstrap-DNS оставьте IP-адресами (9.9.9.9, 1.1.1.1): ими роутер найдёт имя вашего DNS-домена."
+msgstr "LuCI → Services → HTTPS DNS Proxy: remove the default providers and add your address. The package points dnsmasq at 127.0.0.1#5053 itself. Keep the bootstrap DNS as IP addresses (9.9.9.9, 1.1.1.1): the router uses them to resolve your DNS domain name."
+
+msgid "Роутер должен быть в той же сети Tailscale, иначе он не достучится до адреса. Направьте dnsmasq на AdGuard и перестаньте брать DNS провайдера:"
+msgstr "The router must be on the same Tailscale network, or it cannot reach the address. Point dnsmasq at AdGuard and stop using the provider DNS:"
+
+msgid "Проверка с компьютера в LAN: сервером в ответе должен быть роутер, а запрос — появиться в журнале AdGuard."
+msgstr "Check from a LAN computer: the answering server should be the router, and the query should appear in the AdGuard log."
+
+msgid "Если DNS на роутере уже обслуживает Mihomo (dnsmasq пересылает на 127.0.0.1:7874), https-dns-proxy не ставьте и dnsmasq не трогайте. Добавьте адрес в nameserver Mihomo. В default-nameserver и proxy-server-nameserver оставьте IP-адреса: так имя DNS-домена и серверов прокси разрешается без самого DoH и не появляется петля при запуске."
+msgstr "If Mihomo already handles DNS on the router (dnsmasq forwards to 127.0.0.1:7874), do not install https-dns-proxy and leave dnsmasq alone. Add the address to Mihomo’s nameserver. Keep IP addresses in default-nameserver and proxy-server-nameserver: then the DNS domain and the proxy servers resolve without the DoH itself, and there is no loop at startup."
+
+msgid "dnsmasq не умеет выбирать сервер для отдельного клиента. Чтобы через AdGuard шло только одно устройство, настройте DoH на нём самом (вкладки систем), а роутер не меняйте."
+msgstr "dnsmasq cannot choose an upstream per client. To send only one device through AdGuard, set up DoH on that device (system tabs) and leave the router unchanged."
+
+msgid "Выдайте одному устройству адрес AdGuard через DHCP-тег (MAC — этого устройства; затем переподключите его к Wi-Fi):"
+msgstr "Give one device the AdGuard address with a DHCP tag (use that device’s MAC, then reconnect it to Wi-Fi):"
+
+msgid "Гостям не выдавайте ни DoH-адрес, ни адрес Tailscale, и не пускайте их к панели. Если гости должны обходить AdGuard, выдайте гостевой сети обычный DNS (имя интерфейса — guest):"
+msgstr "Never give guests the DoH address or the Tailscale address, and keep them away from the panel. If guests should bypass AdGuard, give the guest network a regular DNS (interface name guest):"
+
+msgid "В файрволе зона guest не должна иметь доступа к LAN — так гости не увидят роутер и панель."
+msgstr "In the firewall, the guest zone must not reach the LAN — then guests cannot see the router or the panel."
+
+msgid "Телевизору или рабочему ноутбуку, которым нужен другой DNS (например офисный), выдайте его через DHCP-тег. Эти устройства не попадут в журнал AdGuard:"
+msgstr "Give a TV or a work laptop that needs a different DNS (an office one, for example) that DNS through a DHCP tag. Those devices will not appear in the AdGuard log:"
+
+msgid "Чтобы DNS получали все устройства с Tailscale, в Headplane → DNS добавьте адрес в глобальные серверы имён и включите «Переопределять локальный DNS». В конфиге Headscale это dns.nameservers.global и dns.override_local_dns: true."
+msgstr "To give this DNS to every Tailscale device, in Headplane → DNS add the address to the global nameservers and turn on Override local DNS. In the Headscale config that is dns.nameservers.global and dns.override_local_dns: true."
+
+msgid "Устройства без Tailscale продолжают использовать DNS роутера или провайдера."
+msgstr "Devices without Tailscale keep using the router or provider DNS."
+
+msgid "В dns.nameservers.global Headscale можно указать и DoH-адрес (https://…), тогда клиенты Tailscale будут ходить в ваш DoH. Но секретный адрес попадёт в настройки всех устройств сети. Если это не подходит, настраивайте DoH на каждом устройстве."
+msgstr "Headscale’s dns.nameservers.global also accepts a DoH address (https://…), and Tailscale clients will then use your DoH. But the secret address ends up in the settings of every device on the network. If that is not acceptable, set up DoH on each device."
+
+msgid "На вашей сети этот вариант приложение не проверяло: после изменения посмотрите журнал AdGuard."
+msgstr "The app has not tested this option on your network: check the AdGuard log after the change."
+
+msgid "адрес не определён"
+msgstr "address unknown"
+
+msgid "Доступ к DNS"
+msgstr "DNS access"
+
+msgid "только через DoH (порт 53 на localhost)"
+msgstr "DoH only (port 53 on localhost)"
+
+msgid "обычный DNS через Tailscale"
+msgstr "plain DNS over Tailscale"
+
+msgid "обычный DNS по адресу сервера"
+msgstr "plain DNS on the server address"
+
+msgid "порт 53 открыт на всех адресах"
+msgstr "port 53 open on all addresses"
+
+msgid "не определён"
+msgstr "unknown"
+
+msgid "Порт DNS опубликован только на localhost сервера ({where}). Устройства подключаются через ваш DoH-адрес. Указывать IP сервера как DNS бесполезно: интернет перестанет открываться."
+msgstr "The DNS port is published only on the server’s localhost ({where}). Devices connect through your DoH address. Setting the server IP as DNS will not work: sites will stop opening."
+
+msgid "DNS слушает адрес Tailscale {address}:53. Устройства в Tailscale могут использовать этот адрес как обычный DNS."
+msgstr "DNS listens on the Tailscale address {address}:53. Tailscale devices can use it as a regular DNS server."
+
+msgid "DNS слушает {address}:53. Этот адрес подходит устройствам, которые до него достают."
+msgstr "DNS listens on {address}:53. Devices that can reach that address can use it."
+
+msgid "DNS слушает порт 53 на всех адресах сервера."
+msgstr "DNS listens on port 53 on every server address."
+
+msgid "Не удалось определить, где слушает DNS. Выберите вариант подключения сами."
+msgstr "Could not tell where DNS listens. Choose the connection option yourself."
+
+msgid "Если файрвол VPS не закрывает порт 53 от интернета, это открытый резолвер: его используют для DDoS-атак. Закройте порт снаружи или привяжите его к localhost или Tailscale."
+msgstr "Unless the VPS firewall blocks port 53 from the internet, this is an open resolver, which is used in DDoS attacks. Block the port from outside or bind it to localhost or Tailscale."
+
+msgid "Панель опубликована не только на localhost (порт {port}). Привяжите её к 127.0.0.1 в compose.yaml, чтобы она не была видна из интернета."
+msgstr "The panel is published beyond localhost (port {port}). Bind it to 127.0.0.1 in compose.yaml so it is not visible from the internet."
+
+msgid "<ваш DoH-адрес>"
+msgstr "<your DoH address>"
+
+msgid "IP появится после вставки DoH-адреса"
+msgstr "The IP appears after you paste the DoH address"
+
+msgid "IP домена {host} (Resolve-DnsName {host})"
+msgstr "IP of {host} (Resolve-DnsName {host})"
+
+msgid "Не удалось скопировать"
+msgstr "Could not copy"
+
+msgid "Данные проверки от {time}. Нажмите «Обновить», чтобы проверить заново."
+msgstr "Results from {time}. Click Refresh to check again."
+
+msgid "Команду ниже выполните на VPS после входа по SSH (это Linux на сервере, не Windows). Результат вставьте сюда: адрес подставляется в шаги только на этой странице, не сохраняется и приложению не отправляется."
+msgstr "Run the command below on the VPS after you SSH in (that is Linux on the server, not Windows). Paste the result here: it fills in the steps on this page only, is not saved and is not sent to the app."
+
+msgid "На этом компьютере (Mac, Linux или Windows с OpenSSH) в Терминале или PowerShell запустите и не закрывайте окно, пока открыта панель:"
+msgstr "On this computer (Mac, Linux, or Windows with OpenSSH), run this in Terminal or PowerShell and keep the window open while the panel is open:"
+
+msgid "Это не команда Windows. На Mac — приложение «Терминал», на Linux — терминал, на Windows 10/11 — PowerShell (OpenSSH уже есть). В PuTTY: Connection → SSH → Tunnels, Source 13001, Destination 127.0.0.1 и порт панели."
+msgstr "This is not a Windows-only command. On a Mac use the Terminal app, on Linux a terminal, on Windows 10/11 PowerShell (OpenSSH is already there). In PuTTY: Connection → SSH → Tunnels, Source 13001, Destination 127.0.0.1 and the panel port."
+
+msgid "На роутере должен работать только один DNS-стек. SSClash/Mihomo, Podkop и Forkop не включают вместе и не ставят рядом https-dns-proxy."
+msgstr "The router should run only one DNS stack. Do not enable SSClash/Mihomo, Podkop and Forkop together, and do not install https-dns-proxy beside them."
+
+msgid "Без обхода"
+msgstr "No bypass"
+
+msgid "Только если SSClash, Podkop и Forkop выключены. Иначе DNS заберёт один из них, а https-dns-proxy даст гонку ответов. Установите пакет (в OpenWrt 25 — apk add вместо opkg):"
+msgstr "Only if SSClash, Podkop and Forkop are off. Otherwise one of them takes DNS, and https-dns-proxy races answers. Install the package (on OpenWrt 25 use apk add instead of opkg):"
+
+msgid "SSClash — это оболочка Mihomo. https-dns-proxy не ставьте, dnsmasq не трогайте: forwards должен быть только 127.0.0.1#7874. Podkop и Forkop выключите: два tproxy ломают DNS."
+msgstr "SSClash is a Mihomo shell. Do not install https-dns-proxy, and do not edit dnsmasq: forwards must be only 127.0.0.1#7874. Turn Podkop and Forkop off: two tproxy instances break DNS."
+
+msgid "LuCI → Службы → SSClash → конфигурация, блок dns. В nameserver — ваш DoH. В default-nameserver и proxy-server-nameserver оставьте IP (9.9.9.9, 1.1.1.1): имя DNS-домена и узлы прокси резолвятся без самого DoH, иначе при старте будет петля."
+msgstr "LuCI → Services → SSClash → configuration, the dns block. Put your DoH in nameserver. Leave IP addresses (9.9.9.9, 1.1.1.1) in default-nameserver and proxy-server-nameserver: the DNS domain name and proxy nodes resolve without DoH itself, or startup loops."
+
+msgid "Обычный DNS по IP с SSClash не используйте: пропадёт fake-ip и маршрутизация по доменам. Нужен DoH в nameserver или вкладка «Без обхода» при выключенном SSClash."
+msgstr "Do not use plain DNS by IP with SSClash: fake-ip and domain routing will stop. Use DoH in nameserver, or the No bypass tab with SSClash off."
+
+msgid "https-dns-proxy не ставьте: Podkop сам направляет dnsmasq на 127.0.0.42#53 (sing-box). SSClash и Forkop выключите."
+msgstr "Do not install https-dns-proxy: Podkop already points dnsmasq at 127.0.0.42#53 (sing-box). Turn SSClash and Forkop off."
+
+msgid "LuCI → Службы → Podkop → Настройки: тип DNS — DoH, DNS-сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Сохраните и перезапустите Podkop. Проверка: uci show dhcp.@dnsmasq[0].server должен быть 127.0.0.42#53."
+msgstr "LuCI → Services → Podkop → Settings: DNS type DoH, DNS server your address, bootstrap IPs 9.9.9.9 and 1.1.1.1. Save and restart Podkop. Check: uci show dhcp.@dnsmasq[0].server should be 127.0.0.42#53."
+
+msgid "Обычный DNS по IP Podkop заменяет своей цепочкой. Чтобы клиенты ходили на AdGuard по IP, остановите Podkop и откройте вкладку «Без обхода»."
+msgstr "Podkop replaces plain DNS by IP with its own chain. For clients to use AdGuard by IP, stop Podkop and open the No bypass tab."
+
+msgid "Forkop — бывший Podkop Plus, тот же sing-box на 127.0.0.42#53. https-dns-proxy не ставьте. Podkop и SSClash выключите: два стека сразу нельзя."
+msgstr "Forkop is the former Podkop Plus, the same sing-box on 127.0.0.42#53. Do not install https-dns-proxy. Turn Podkop and SSClash off: two stacks at once will not work."
+
+msgid "LuCI → Службы → Forkop → DNS: протокол DoH, основной сервер — ваш адрес, bootstrap — IP 9.9.9.9 и 1.1.1.1. Если в Forkop включена маршрутизация DNS через прокси, bootstrap всё равно должен остаться IP, иначе имя DNS-домена не резолвится при старте."
+msgstr "LuCI → Services → Forkop → DNS: protocol DoH, primary server your address, bootstrap IPs 9.9.9.9 and 1.1.1.1. If Forkop routes DNS through the proxy, bootstrap must still be IPs, or the DNS domain name will not resolve at startup."
+
+msgid "Как у Podkop: обычный DNS по IP задаётся не здесь. Остановите Forkop и откройте вкладку «Без обхода»."
+msgstr "As with Podkop: plain DNS by IP is not set here. Stop Forkop and open the No bypass tab."
+
+msgid "Zapret DNS не резолвит: он трогает уже установленные TCP/QUIC-пакеты (ClientHello), а не порт 53. Сначала честный DNS во вкладке SSClash, Podkop, Forkop или «Без обхода», потом при необходимости включите службу Zapret."
+msgstr "Zapret does not resolve DNS: it touches already established TCP/QUIC packets (ClientHello), not port 53. Set honest DNS in the SSClash, Podkop, Forkop or No bypass tab first, then start the Zapret service if you need it."
+
+msgid "Не направляйте dnsmasq на Zapret и не ставьте https-dns-proxy «поверх» SSClash/Podkop. Если DNS отдаёт NXDOMAIN, Zapret сайт не откроет. После настройки DNS запрос должен появиться в журнале AdGuard; Zapret на этот журнал не влияет."
+msgstr "Do not point dnsmasq at Zapret, and do not put https-dns-proxy on top of SSClash/Podkop. If DNS returns NXDOMAIN, Zapret will not open the site. After DNS is set, the query should appear in the AdGuard log; Zapret does not affect that log."

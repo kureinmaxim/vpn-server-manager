@@ -79,9 +79,22 @@ def index():
     dns = _load()
     providers = {p['id']: _decrypted(p) for p in dns['providers']}
     domains = sorted(dns['domains'], key=lambda d: d['name'])
+    hosts = {}
+    for domain in domains:
+        for record in domain['records']:
+            if record['type'] in ('A', 'AAAA'):
+                hosts.setdefault(dns_reg.record_fqdn(record, domain), []).append(record['content'])
+    try:
+        servers = _manager().load_servers(current_app.config)
+    except (InvalidToken, ValueError, OSError):
+        servers = []
+    ssh = {str(s.get('id')): {'port': (s.get('ssh_credentials') or {}).get('port', 22),
+                              'user': (s.get('ssh_credentials') or {}).get('user', 'root')}
+           for s in servers if isinstance(s, dict)}
     return render_template('dns/index.html', providers=list(providers.values()), provider_map=providers,
                            main_count=lambda d: sum(dns_reg.role(r) == 'main' for r in d['records']),
-                           domains=domains, days_left=dns_reg.days_left, presets=dns_reg.PRESETS)
+                           domains=domains, days_left=dns_reg.days_left, presets=dns_reg.PRESETS,
+                           own_dns_hosts=hosts, own_dns_ssh=ssh)
 
 
 @dns_bp.route('/providers/new', methods=['GET', 'POST'])

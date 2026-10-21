@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.12.13] - 2026-10-21
+
+### Added
+- **DNS** shows your own AdGuard Home server when one is found on an active server: whether clients can reach it by DoH only, by a Tailscale address or on an open port 53, plus setup steps for the panel, browser, macOS, Windows, Linux, Android, iPhone, OpenWrt (https-dns-proxy, SSClash, Podkop, Forkop or Zapret — one stack at a time) and the whole tailnet. The panel password is not shown; a DoH address typed on the page stays in that tab only.
+
 ## [4.12.12] - 2026-10-21
 
 ### Added
