@@ -33,6 +33,7 @@ DEFAULT_PROJECTS = [
 # Saved lists that still match the catalog before DNS/Chatmail were editable.
 _LEGACY_DEFAULT_NAMES = frozenset(p['name'] for p in DEFAULT_PROJECTS
                                   if p['name'] not in ROLE_NAMES.values())
+FILE_MANAGER = next(p for p in DEFAULT_PROJECTS if 'rust-file-manager' in p['units'])
 CONFIG_KEY = 'tracked_projects'
 MAX_PROJECTS = 30
 MAX_ITEMS = 16

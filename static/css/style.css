@@ -354,6 +354,33 @@ body:has(.server-form) .navbar.mb-4 {
     flex-wrap: nowrap;
 }
 
+.server-mesh-marks {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    flex-shrink: 0;
+}
+.server-mesh-marks[hidden] { display: none !important; }
+.server-mesh-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 0;
+    font-size: 0.72rem;
+    line-height: 1;
+}
+.server-mesh-mark.is-mesh { background: #0aa2c0; color: #fff; }
+.server-mesh-mark.is-mesh.is-offline { background: #6c757d; }
+.server-mesh-mark.is-exit { background: #198754; color: #fff; }
+.server-mesh-mark.is-exit-ready { background: #6c757d; color: #fff; }
+.server-mesh-mark.is-coord { background: #0d6efd; color: #fff; }
+.server-mesh-mark.is-derp { background: #6f42c1; color: #fff; }
+.server-mesh-mark.is-files { background: #b45309; color: #fff; }
+.server-mesh-mark.is-files.is-partial { background: #ca8a04; }
+.server-mesh-mark.is-files.is-down { background: #78716c; }
+
 .server-preview-title {
     min-width: 0;
     flex: 1 1 auto;

@@ -8432,6 +8432,9 @@ msgstr "Exit node (selected on PC)"
 msgid "Узел офлайн"
 msgstr "Node offline"
 
+msgid "Файловый обменник"
+msgstr "File exchange"
+
 msgid "Завершено: {time}"
 msgstr "Completed: {time}"
 

@@ -106,6 +106,28 @@ class TestMainRoutes:
             # Может быть 200 или 404 (если шаблон не найден)
             assert response.status_code in [200, 404]
 
+    def test_cheatsheet_matches_net_tools_layout(self, client):
+        """Шпаргалка использует ту же сетку карточек и копирование, что и Net Tools."""
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+            sess['language'] = 'ru'
+
+        html = client.get('/cheatsheet').get_data(as_text=True)
+        assert 'css/net_tools.css' in html
+        assert 'js/net_tools.js' in html
+        assert 'class="container net-tools' in html
+        assert html.count('class="net-card ') == 12
+        assert 'copy-btn' not in html
+        assert 'list-group' not in html
+        assert 'data-copy="cheat-1"' in html
+        assert 'id="cheat-1"' in html
+        assert 'id="net-copy-status"' in html
+        assert 'href="/"' in html
+        assert '>Шпаргалка<' in html
+        assert 'sudo apt-get install -y htop' in html
+        assert html.count('data-copy="cheat-') == 66
+
     def test_settings_shows_export_actions_when_data_file_attached(self, client, app):
         """Страница настроек должна показывать экспорт при наличии active_data_file."""
         app.config['active_data_file'] = '/tmp/test_servers.enc'
@@ -121,6 +143,7 @@ class TestMainRoutes:
         assert 'Экспортировать данные'.encode('utf-8') in response.data
         assert 'Экспортировать ключ'.encode('utf-8') in response.data
         assert 'Полный экспорт'.encode('utf-8') in response.data
+        assert b'manage_hints' in response.data
     
     def test_upload_icon_no_file(self, client):
         """Тест загрузки иконки без файла"""
@@ -469,6 +492,15 @@ class TestMainRoutes:
         assert 'is-archived' in html
         assert 'accordion-' in html
         assert 'js/server_board.js' in html
+        assert 'js/server_mesh_marks.js' in html
+        assert 'js/server_file_mark.js' in html
+        assert 'server-mesh-marks' in html and 'server-file-mark' in html
+        assert 'data-ip="10.0.0.1"' in html and 'data-name="Alpha"' in html
+        assert 'Rust File Manager' in html
+        assert 'Справка по использованию' not in html
+        assert 'nav-link dropdown-toggle' in html  # zoom / language / theme remain
+        nav = html.split('<nav', 1)[1].split('</nav>', 1)[0]
+        assert '>Справка<' not in nav and '>Help<' not in nav
 
 
 def test_stale_geolocation_is_replaced_when_ip_changes():

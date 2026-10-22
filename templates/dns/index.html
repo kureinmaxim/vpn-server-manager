@@ -14,8 +14,6 @@
         <p class="text-body-secondary mb-0">{{ _('Учётные записи DNS-провайдеров, домены, регистраторы, сроки действия и поддомены. Данные хранятся в зашифрованном файле вместе с серверами и попадают в экспорт.') }}</p>
     </header>
 
-    {% include "dns/_own.html" %}
-
     <div class="dns-section-head">
         <h2>{{ _('DNS-провайдеры') }}</h2>
         <a class="btn btn-dns-solid btn-sm" href="{{ url_for('dns.provider_form') }}"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить провайдера') }}</a>
@@ -126,6 +124,8 @@
     {% else %}
     <p class="dns-empty mb-0">{{ _('Доменов пока нет. Добавленные домены и поддомены можно выбирать в Net Tools вместо ручного ввода.') }}</p>
     {% endif %}
+
+    {% include "dns/_own.html" %}
 </div>
 {% endblock %}
 {% block scripts %}

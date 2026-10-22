@@ -94,6 +94,12 @@ def test_own_dns_card_is_stored_with_domains(unlocked):
     assert dns(unlocked).get('own_servers') in (None, [])
 
 
+def test_index_shows_providers_then_domains_then_own_dns(unlocked):
+    page = unlocked.get('/dns/?lang=en').text
+    body = page.split('</header>', 1)[1]
+    assert body.find('DNS providers') < body.find('>Domains<') < body.find('id="own-dns"')
+
+
 def test_own_dns_guide_is_translated(unlocked):
     page = unlocked.get('/dns/?lang=en').text
     assert 'Own DNS server' in page and 'id="own-tab-openwrt"' in page
@@ -146,7 +152,10 @@ def test_server_card_lists_dns_and_moves_records(unlocked):
     for name, rtype, content in [('@', 'A', '192.0.2.10'), ('vpn', 'A', '192.0.2.10'), ('www', 'CNAME', 'example.net')]:
         post(unlocked, f'/dns/domains/{domain_id}/records', name=name, type=rtype, content=content)
     index = unlocked.get('/').text
-    assert 'collapse-dns-1' in index and 'vpn.example.net' in index and 'collapse-dns-2' not in index
+    compact, full = index.split('server-preview-head', 1)[1].split('server-card-full', 1)
+    assert 'dns-count' not in compact
+    assert 'dns-count' in full and 'collapse-dns-1' in full and 'vpn.example.net' in full
+    assert 'collapse-dns-2' not in index
 
     page = unlocked.get('/dns/move/1?to=2').text
     assert '203.0.113.9' in page and 'www.example.net' in page

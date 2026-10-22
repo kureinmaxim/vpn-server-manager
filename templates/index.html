@@ -88,7 +88,7 @@
     <div class="row g-2" id="server-board">
         {% for server in servers %}
         {% set dns_items = dns_links.get(server.id, []) if dns_links is defined else [] %}
-        <div class="col-sm-6 col-lg-4 col-xl-3 server-board-item" data-server-id="{{ server.id }}">
+        <div class="col-sm-6 col-lg-4 col-xl-3 server-board-item" data-server-id="{{ server.id }}" data-ip="{{ server.ip_address }}" data-name="{{ server.name }}">
             <div class="card server-preview-card h-100{% if server.get('archived') %} is-archived{% endif %}">
                 <div class="server-card-compact">
                 <div class="card-header force-dark-text py-2 px-2" style="--card-bg-color: {{ server.get('card_color', '#ffc107') }}; background-color: var(--card-bg-color)">
@@ -109,7 +109,8 @@
                             <div class="fw-semibold text-truncate lh-sm">{{ server.name }}</div>
                             <div class="small text-truncate lh-sm">{{ server.ip_address }}{% if server.provider %} · {{ server.provider }}{% endif %}</div>
                         </div>
-                        {% set extra = '' %}{% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0{{ extra }}" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
+                        <span class="server-mesh-marks" hidden></span>
+                        <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
                         <button type="button"
                                 class="btn btn-sm p-0 border-0 bg-transparent js-archive-toggle flex-shrink-0"
                                 data-server-id="{{ server.id }}"
@@ -157,7 +158,9 @@
                             <i class="bi {{ server.os_icon }} me-2" style="font-size: 32px;"></i>
                         {% endif %}
                         {{ server.name }}
-                        {% set extra = ' ms-auto fs-6' %}{% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0{{ extra }}" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
+                        {% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0 ms-auto fs-6" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
+                        <span class="server-mesh-marks{% if not dns_items %} ms-auto{% endif %}" hidden></span>
+                        <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
                     </h5>
                     <div class="d-flex justify-content-between align-items-center js-server-subtitle" data-ip="{{ server.ip_address }}">
                         <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
@@ -585,6 +588,37 @@
 </script>
 <script src="{{ url_for('static', filename='js/Sortable.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/server_board.js') }}?v={{ app_info.get('version', '') }}"></script>
+<script>
+    window.SERVER_MESH_MARKS = {
+        url: {{ url_for('api.load_check_mesh') | tojson }},
+        i18n: {
+            coordinator: {{ _('Координатор (адрес управления)') | tojson }},
+            coordinatorHint: {{ _('Адрес карточки совпадает с адресом управления сетью. При reverse proxy/NAT это может быть входной узел, а не сам Headscale.') | tojson }},
+            meshMember: {{ _('В mesh этого ПК') | tojson }},
+            meshExit: {{ _('Exit node (доступен)') | tojson }},
+            meshSelected: {{ _('Exit node (выбран на ПК)') | tojson }},
+            meshOffline: {{ _('Узел офлайн') | tojson }},
+            peerHome: {{ _('Домашний DERP пира: {region}') | tojson }}
+        }
+    };
+</script>
+<script src="{{ url_for('static', filename='js/server_mesh_marks.js') }}?v={{ app_info.get('version', '') }}"></script>
+<script>
+    window.SERVER_FILE_MARK = {
+        serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+        snapshotUrl: {{ url_for('api.projects_snapshot', server_id='__SERVER__') | tojson }},
+        monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
+        name: {{ file_manager_name | default('Rust File Manager') | tojson }},
+        hints: {{ file_manager_hints | default(['rust-file-manager', 'rfm-internal-bridge']) | tojson }},
+        i18n: {
+            files: {{ _('Файловый обменник') | tojson }},
+            running: {{ _('Работает') | tojson }},
+            partial: {{ _('Работает частично') | tojson }},
+            stopped: {{ _('Остановлен') | tojson }}
+        }
+    };
+</script>
+<script src="{{ url_for('static', filename='js/server_file_mark.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script>
     // Инициализация tooltips при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {

@@ -11,6 +11,8 @@
 .net-accent-5 .net-icon, .net-accent-8 .net-icon { color: #ad80d5; }
 .net-card p { font-size: .875rem; color: var(--bs-secondary-color); line-height: 1.5; margin: 0; }
 .net-tools .card h2 { font-size: 1.05rem; }
+.net-tools .cheat-section { scroll-margin-top: .75rem; }
+.net-tools .cheat-section + .cheat-section { margin-top: 1rem; }
 .net-tools pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .875rem; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: .4rem; padding: .6rem .75rem; max-height: 32rem; overflow-y: auto; }
 .net-ports { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); gap: .35rem; }
 .net-ports .btn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

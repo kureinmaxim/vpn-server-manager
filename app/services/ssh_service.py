@@ -1230,13 +1230,20 @@ class SSHService:
 
     def _collect_projects(self, client, projects):
         from .dns_mail import discovery_rows
+        from .remote_derp import discovery_rows as derp_discovery_rows
         try:
             output = self._read_command_output(client, build_command(projects), timeout=8)
             rows = parse_projects(output, projects)
         except Exception:
             # Failure here must not discard the rest of the server snapshot.
             rows = parse_projects('', projects)
-        return rows + discovery_rows(client)
+        extra = discovery_rows(client)
+        names = {str(row.get('name') or '').split('.')[0] for row in rows}
+        if names & {'headscale', 'headplane'} and any(
+                row.get('status') not in ('not_installed', 'unknown') for row in rows
+                if str(row.get('name') or '').split('.')[0] in ('headscale', 'headplane')):
+            extra = extra + derp_discovery_rows(client)
+        return rows + extra
 
     def get_projects_snapshot(
         self, ip: str, user: str, password: Optional[str], port: int = 22,

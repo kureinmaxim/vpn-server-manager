@@ -8,7 +8,7 @@ import pytest
 from app.services import derp_context as derp
 from app.services import derp_probe as probe
 from app.services.mesh_context import public_node, read_tailscale
-from app.services.remote_derp import parse_remote_derp
+from app.services.remote_derp import parse_remote_derp, role_summary
 from app.services.ssh_service import SSHService
 
 
@@ -181,6 +181,21 @@ def test_collector_read_only_probe_and_port_owner(monkeypatch, tmp_path):
     curl = next(args for args in calls if args[0] == 'curl')
     assert '--resolve' in curl and 'control.example.com:443:127.0.0.1' in curl
     assert '-k' not in curl and '--insecure' not in curl
+
+
+def test_enabled_headscale_derp_becomes_a_project_role():
+    ready = parse_remote_derp(
+        'VPN_DERP_BEGIN\n' + json.dumps({
+            'state': 'ready', 'headscale': True, 'probe_code': 200, 'stun_listening': True,
+            'stun_port': 3478, 'config': {'enabled': True, 'region_code': 'custom', 'region_id': 999},
+        }) + '\nVPN_DERP_END')
+    role = role_summary(ready)
+    assert role['key'] == 'derp' and role['state'] == 'running' and role['discovery'] == 'detected'
+    assert role['last_check']['state'] == 'healthy'
+    assert [c['name'] for c in role['components']] == ['derp:custom', 'stun:3478']
+    assert role_summary({'state': 'ready', 'config': {'enabled': False}}) is None
+    assert role_summary({'state': 'unavailable'}) is None
+    assert role_summary(parse_remote_derp('VPN_DERP_BEGIN\n{"state":"ready"}\nVPN_DERP_END')) is None
 
 
 def test_remote_probe_has_own_timeout_and_closes_channel(monkeypatch):

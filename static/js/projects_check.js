@@ -47,8 +47,9 @@
         const core = project.components.filter(row => !row.optional);
         const active = core.filter(row => row.status === 'active').length;
         link.className = 'badge text-decoration-none ' + (window.PROJECT_STATE_CLASSES[project.state] || '');
-        link.href = (project.discovery ? config.diagnosticsUrl : config.monitoringUrl).replace('__SERVER__', encodeURIComponent(server.id));
-        if (project.discovery) link.href += '?role=' + encodeURIComponent(project.key);
+        const diagnose = project.discovery && (project.key === 'adguard' || project.key === 'chatmail');
+        link.href = (diagnose ? config.diagnosticsUrl : config.monitoringUrl).replace('__SERVER__', encodeURIComponent(server.id));
+        if (diagnose) link.href += '?role=' + encodeURIComponent(project.key);
         link.textContent = `${server.name || server.ip_address} · ${project.state === 'unknown' ? t.unknown : active + '/' + core.length}`;
         link.title = `${t[project.state] || t.unknown}\n` + project.components.map(row =>
             `${row.name}${t[row.kind] ? ' (' + t[row.kind] + ')' : ''}: ${t[row.status] || t.unknown}`).join('\n');

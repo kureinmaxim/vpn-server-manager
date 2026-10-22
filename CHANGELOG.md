@@ -2,6 +2,18 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.0] - 2026-10-22
+
+### Added
+- **Server cards** show small icons from this PC’s Tailscale mesh: in the mesh, the selected exit node, the coordinator, and the peer’s home DERP. A rust-coloured folder appears where **Rust File Manager** is installed; click it to open monitoring. Hover for the name. Mesh icons stay hidden if Tailscale is not connected.
+- **Projects** lists **Own DERP** next to Chatmail and AdGuard when Headscale has an embedded DERP server enabled.
+
+### Changed
+- **DNS** page order is DNS providers, then Domains, then Own DNS server.
+- Compact **server cards** no longer show the orange DNS-record cloud. The expanded card still has the cloud, the record list and the move action; the **DNS** page keeps the full domain panel.
+- The **Help** menu is gone from the top bar. Hint editing is under **Settings**.
+- **Cheatsheet** uses the same layout as Network tools: breadcrumb, card grid, and a copy button above each command.
+
 ## [4.12.15] - 2026-10-21
 
 ### Added
