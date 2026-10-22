@@ -12,7 +12,7 @@
 {%- endmacro %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
-<div class="container net-tools my-4">
+<div class="container net-tools my-4{% if selected %} net-detail{% endif %}">
     <nav aria-label="{{ _('Навигация') }}" class="mb-4">
         <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
         <span aria-hidden="true" class="mx-2">/</span>
@@ -95,10 +95,12 @@
                 {% set command_examples = [('Linux / macOS / WSL' if selected.id == 'dns' else 'Linux / macOS', selected.command)] %}
                 {% if selected.extra_command %}{% set command_examples = command_examples + [('dig +short · Cloudflare (1.1.1.1)', selected.extra_command)] %}{% endif %}
                 {% for label, command in command_examples + [('Windows PowerShell', selected.windows)] %}
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="small">{{ label }}</span><button class="btn btn-sm btn-outline-secondary" type="button" data-copy="net-command-{{ loop.index }}">{{ _('Копировать') }}</button>
+                <div class="cheat-cmd">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small">{{ label }}</span><button class="btn btn-sm btn-outline-secondary" type="button" data-copy="net-command-{{ loop.index }}">{{ _('Копировать') }}</button>
+                    </div>
+                    <pre id="net-command-{{ loop.index }}" tabindex="0">{{ command }}</pre>
                 </div>
-                <pre id="net-command-{{ loop.index }}" tabindex="0">{{ command }}</pre>
                 {% endfor %}
             </section>
             {% endif %}

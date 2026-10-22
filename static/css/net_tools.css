@@ -18,3 +18,30 @@
 .net-ports .btn { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .net-ports span { margin-left: .35rem; color: var(--bs-secondary-color); }
 .net-other { display: flex; flex-direction: column; gap: .2rem; font-size: .875rem; }
+.net-detail { font-size: .9rem; }
+.net-detail > nav { margin-bottom: .85rem !important; }
+.net-detail > header { margin-bottom: .85rem !important; }
+.net-detail h1 { font-size: 1.35rem; margin-bottom: .25rem; }
+.net-detail h1 i { font-size: 1.15rem; }
+.net-detail > header p { font-size: .8125rem; line-height: 1.4; }
+.net-detail .row.g-3 { --bs-gutter-x: .7rem; --bs-gutter-y: .7rem; }
+.net-detail .card { padding: .7rem .85rem !important; }
+.net-detail .card h2 { font-size: .95rem; margin-bottom: .35rem; }
+.net-detail .card .small { font-size: .75rem; line-height: 1.4; }
+.net-detail .card p { margin-bottom: .45rem; }
+.net-detail .form-label { font-size: .8125rem; margin-bottom: .2rem; }
+.net-detail .form-control,
+.net-detail .form-select { font-size: .8125rem; padding: .3rem .55rem; }
+.net-detail .form-control.mb-3,
+.net-detail .form-select.mb-3,
+.net-detail .form-select.mb-2 { margin-bottom: .5rem !important; }
+.net-detail .btn-sm { --bs-btn-font-size: .75rem; --bs-btn-padding-y: .12rem; --bs-btn-padding-x: .45rem; }
+.net-detail .cheat-cmd { margin-bottom: .5rem; }
+.net-detail .cheat-cmd:last-child { margin-bottom: 0; }
+.net-detail .cheat-cmd .d-flex { margin-bottom: .2rem !important; }
+.net-detail pre { font-size: .78rem; padding: .35rem .5rem; line-height: 1.4; margin-bottom: 0; }
+.net-detail .net-other { font-size: .8125rem; gap: .08rem; }
+.net-detail #net-result { margin-top: .85rem !important; }
+.net-detail .alert { margin-top: .65rem !important; padding: .5rem .7rem; font-size: .8125rem; }
+.net-detail .mb-3.card,
+.net-detail .card.mb-3 { margin-bottom: .7rem !important; }

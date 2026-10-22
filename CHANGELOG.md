@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.1] - 2026-10-22
+
+### Changed
+- **Cheatsheet** opens one section when you click a card, same as Network tools. The index is only the card grid.
+- Opened **Cheatsheet** and **Network tools** pages use a tighter type and spacing.
+
 ## [4.13.0] - 2026-10-22
 
 ### Added

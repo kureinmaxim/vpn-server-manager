@@ -1,8 +1,10 @@
 import copy
+import re
 
 import pytest
 from flask import session
 
+from app.routes.main import CHEAT_SECTIONS
 from app.services import registry
 from app.services.crypto_service import CryptoService
 
@@ -80,6 +82,7 @@ class TestMainRoutes:
             '/edit_server/test-id',
             '/settings',
             '/cheatsheet',
+            '/cheatsheet/htop-btop',
             '/manage_hints'
         ]
         
@@ -98,6 +101,7 @@ class TestMainRoutes:
             '/add_server',
             '/settings',
             '/cheatsheet',
+            '/cheatsheet/htop-btop',
             '/manage_hints'
         ]
         
@@ -115,18 +119,43 @@ class TestMainRoutes:
 
         html = client.get('/cheatsheet').get_data(as_text=True)
         assert 'css/net_tools.css' in html
-        assert 'js/net_tools.js' in html
         assert 'class="container net-tools' in html
         assert html.count('class="net-card ') == 12
+        assert 'net-detail' not in html
         assert 'copy-btn' not in html
         assert 'list-group' not in html
-        assert 'data-copy="cheat-1"' in html
-        assert 'id="cheat-1"' in html
-        assert 'id="net-copy-status"' in html
-        assert 'href="/"' in html
+        assert 'data-copy=' not in html
+        assert 'sudo apt-get install -y htop' not in html
+        assert 'href="/cheatsheet/htop-btop"' in html
+        assert 'href="/cheatsheet/docker-commands"' in html
         assert '>Шпаргалка<' in html
-        assert 'sudo apt-get install -y htop' in html
-        assert html.count('data-copy="cheat-') == 66
+
+        detail = client.get('/cheatsheet/htop-btop').get_data(as_text=True)
+        assert 'net-detail' in detail
+        assert 'js/net_tools.js' in detail
+        assert 'data-copy="cheat-1"' in detail
+        assert 'sudo apt-get install -y htop' in detail
+        assert 'docker ps' not in detail
+        assert detail.count('data-copy="cheat-') == 4
+        assert 'href="/cheatsheet"' in detail
+        assert client.get('/cheatsheet/missing').status_code == 404
+
+    @pytest.mark.parametrize('lang,title', [('ru', 'Шпаргалка'), ('en', 'Cheatsheet'), ('zh', '备忘单')])
+    def test_cheatsheet_is_localized(self, client, lang, title):
+        """Каталог и разделы шпаргалки переводятся; en/zh не оставляют русский текст."""
+        with client.session_transaction() as sess:
+            sess['authenticated'] = True
+            sess['pin_verified'] = True
+        catalog = client.get('/cheatsheet?lang=' + lang).get_data(as_text=True)
+        assert title in catalog
+        body = catalog.split('<div class="container net-tools', 1)[1].split('</main>', 1)[0]
+        if lang != 'ru':
+            assert not re.search('[А-Яа-яЁё]', body)
+        for section in CHEAT_SECTIONS:
+            detail = client.get('/cheatsheet/' + section['id'] + '?lang=' + lang).get_data(as_text=True)
+            page = detail.split('<div class="container net-tools', 1)[1].split('</main>', 1)[0]
+            if lang != 'ru':
+                assert not re.search('[А-Яа-яЁё]', page)
 
     def test_settings_shows_export_actions_when_data_file_attached(self, client, app):
         """Страница настроек должна показывать экспорт при наличии active_data_file."""

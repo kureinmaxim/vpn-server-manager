@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, current_app
-from flask_babel import gettext as _
+from flask import Blueprint, abort, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, current_app
+from flask_babel import gettext as _, lazy_gettext as _l
 from werkzeug.utils import secure_filename
 import logging
 import os
@@ -1207,13 +1207,41 @@ def about():
     """Страница о приложении"""
     return render_template('about.html')
 
+CHEAT_SECTIONS = [
+    dict(id='htop-btop', icon='speedometer2', accent=1, title=_l('Интерактивный обзор (htop / btop)'), hint='htop / btop'),
+    dict(id='quick-summary', icon='clipboard-data', accent=2, title=_l('Быстрая сводка'), hint='OS, CPU, RAM'),
+    dict(id='installed-software', icon='box-seam', accent=5, title=_l('Установленное ПО'), hint='dpkg'),
+    dict(id='key-utilities', icon='cpu', accent=4, title=_l('Ключевые утилиты'), hint='uname, lscpu, ss'),
+    dict(id='disk-usage', icon='device-hdd', accent=7, title=_l('Диск'), hint='df'),
+    dict(id='security', icon='shield-lock', accent=8, title=_l('Основы безопасности'), hint='ufw, Fail2Ban'),
+    dict(id='process-management', icon='list-task', accent=1, title=_l('Управление процессами'), hint='ps, top'),
+    dict(id='systemd-services', icon='gear', accent=2, title=_l('Управление службами (systemd)'), hint='systemctl nginx'),
+    dict(id='package-management', icon='download', accent=5, title=_l('Управление пакетами (apt)'), hint='apt'),
+    dict(id='nginx-commands', icon='globe', accent=4, title=_l('NGINX - Основные команды'), hint='nginx'),
+    dict(id='docker-commands', icon='box', accent=7, title=_l('Docker - Основные команды'), hint='docker'),
+    dict(id='systemd-management', icon='journal-text', accent=8, title=_l('Systemd - Управление службами'), hint='journalctl'),
+]
+
+
 @main_bp.route('/cheatsheet')
 @require_auth
 @require_pin
 @log_request
 def cheatsheet():
-    """Страница шпаргалки"""
-    return render_template('cheatsheet.html')
+    """Каталог шпаргалки: только карточки разделов."""
+    return render_template('cheatsheet.html', sections=CHEAT_SECTIONS, selected=None)
+
+
+@main_bp.route('/cheatsheet/<section_id>')
+@require_auth
+@require_pin
+@log_request
+def cheatsheet_section(section_id):
+    """Команды одного раздела шпаргалки."""
+    selected = next((section for section in CHEAT_SECTIONS if section['id'] == section_id), None)
+    if selected is None:
+        abort(404)
+    return render_template('cheatsheet.html', sections=CHEAT_SECTIONS, selected=selected)
 
 @main_bp.route('/manage_hints')
 @require_auth

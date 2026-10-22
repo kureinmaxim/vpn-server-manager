@@ -43,6 +43,19 @@ def test_legacy_pin_session(client):
     assert client.get('/net-tools/').status_code == 200
 
 
+def test_catalog_opens_one_tool_on_card_click(unlocked):
+    catalog = unlocked.get('/net-tools/').text
+    assert 'id="net-tool-form"' not in catalog
+    assert 'data-copy=' not in catalog
+    assert 'net-detail' not in catalog
+    assert 'href="/net-tools/ping"' in catalog
+    ping = unlocked.get('/net-tools/ping').text
+    assert 'net-detail' in ping
+    assert 'id="net-tool-form"' in ping
+    assert 'ping -c 4 example.com' in ping
+    assert 'dig example.com' not in ping
+
+
 @pytest.mark.parametrize('lang,title', [('ru', 'Сетевые инструменты'), ('en', 'Network tools'), ('zh', '网络工具')])
 def test_catalog_and_all_details_are_localized(unlocked, lang, title):
     response = unlocked.get('/net-tools/?lang=' + lang)

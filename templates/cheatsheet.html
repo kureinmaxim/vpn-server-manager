@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
-{% block title %}{{ _('Шпаргалка по командам') }}{% endblock %}
+{% block title %}{{ selected.title if selected else _('Шпаргалка по командам') }}{% endblock %}
 {% set ns = namespace(i=0) %}
 {% macro cmd(label, command) -%}
 {% set ns.i = ns.i + 1 %}
-<div class="mb-3">
+<div class="cheat-cmd">
     <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
         <span class="small">{{ label }}</span>
         <button class="btn btn-sm btn-outline-secondary flex-shrink-0" type="button" data-copy="cheat-{{ ns.i }}">{{ _('Копировать') }}</button>
@@ -13,151 +13,157 @@
 {%- endmacro %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
-<div class="container net-tools my-4">
+<div class="container net-tools my-4{% if selected %} net-detail{% endif %}">
     <nav aria-label="{{ _('Навигация') }}" class="mb-4">
         <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span><span>{{ _('Шпаргалка') }}</span>
+        <span aria-hidden="true" class="mx-2">/</span>
+        {% if selected %}<a href="{{ url_for('main.cheatsheet') }}">{{ _('Шпаргалка') }}</a>
+        <span aria-hidden="true" class="mx-2">/</span><span>{{ selected.title }}</span>
+        {% else %}<span>{{ _('Шпаргалка') }}</span>{% endif %}
     </nav>
+    {% if not selected %}
     <header class="mb-4">
         <h1><i class="bi bi-terminal me-2" aria-hidden="true"></i>{{ _('Шпаргалка') }}</h1>
         <p class="text-body-secondary mb-0">{{ _('Краткая шпаргалка по диагностике сервера (Debian/Ubuntu)') }}. {{ _('Этот раздел объединяет наиболее полезные команды для быстрой оценки состояния сервера.') }}</p>
     </header>
-    <div class="net-grid mb-4">
-        <a class="net-card net-accent-1" href="#htop-btop"><h2><i class="bi bi-speedometer2 net-icon" aria-hidden="true"></i>{{ _('Интерактивный обзор (htop / btop)') }}</h2><p>htop / btop</p></a>
-        <a class="net-card net-accent-2" href="#quick-summary"><h2><i class="bi bi-clipboard-data net-icon" aria-hidden="true"></i>{{ _('Быстрая сводка') }}</h2><p>OS, CPU, RAM</p></a>
-        <a class="net-card net-accent-5" href="#installed-software"><h2><i class="bi bi-box-seam net-icon" aria-hidden="true"></i>{{ _('Установленное ПО') }}</h2><p>dpkg</p></a>
-        <a class="net-card net-accent-4" href="#key-utilities"><h2><i class="bi bi-cpu net-icon" aria-hidden="true"></i>{{ _('Ключевые утилиты') }}</h2><p>uname, lscpu, ss</p></a>
-        <a class="net-card net-accent-7" href="#disk-usage"><h2><i class="bi bi-device-hdd net-icon" aria-hidden="true"></i>{{ _('Диск') }}</h2><p>df</p></a>
-        <a class="net-card net-accent-8" href="#security"><h2><i class="bi bi-shield-lock net-icon" aria-hidden="true"></i>{{ _('Основы безопасности') }}</h2><p>ufw, Fail2Ban</p></a>
-        <a class="net-card net-accent-1" href="#process-management"><h2><i class="bi bi-list-task net-icon" aria-hidden="true"></i>{{ _('Управление процессами') }}</h2><p>ps, top</p></a>
-        <a class="net-card net-accent-2" href="#systemd-services"><h2><i class="bi bi-gear net-icon" aria-hidden="true"></i>{{ _('Управление службами (systemd)') }}</h2><p>systemctl nginx</p></a>
-        <a class="net-card net-accent-5" href="#package-management"><h2><i class="bi bi-download net-icon" aria-hidden="true"></i>{{ _('Управление пакетами (apt)') }}</h2><p>apt</p></a>
-        <a class="net-card net-accent-4" href="#nginx-commands"><h2><i class="bi bi-globe net-icon" aria-hidden="true"></i>{{ _('NGINX - Основные команды') }}</h2><p>nginx</p></a>
-        <a class="net-card net-accent-7" href="#docker-commands"><h2><i class="bi bi-box net-icon" aria-hidden="true"></i>{{ _('Docker - Основные команды') }}</h2><p>docker</p></a>
-        <a class="net-card net-accent-8" href="#systemd-management"><h2><i class="bi bi-journal-text net-icon" aria-hidden="true"></i>{{ _('Systemd - Управление службами') }}</h2><p>journalctl</p></a>
+    <div class="net-grid">
+        {% for section in sections %}
+        <a class="net-card net-accent-{{ section.accent }}" href="{{ url_for('main.cheatsheet_section', section_id=section.id) }}">
+            <h2><i class="bi bi-{{ section.icon }} net-icon" aria-hidden="true"></i>{{ section.title }}</h2>
+            <p>{{ section.hint }}</p>
+        </a>
+        {% endfor %}
     </div>
-
-    <section class="card p-3 cheat-section" id="htop-btop">
-        <h2>{{ _('Интерактивный обзор (htop / btop)') }}</h2>
-        <p class="small text-body-secondary">{{ _('htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q.') }}</p>
-        {{ cmd(_('Запустить htop') + ' (' + _('легче, хватает на 1 ГБ RAM') + ')', 'htop') }}
-        {{ cmd(_('Запустить btop') + ' (' + _('нагляднее, но тяжелее') + ')', 'btop') }}
-        {{ cmd(_('Установить htop'), 'sudo apt-get update && sudo apt-get install -y htop') }}
-        {{ cmd(_('Установить btop'), 'sudo apt-get update && sudo apt-get install -y btop') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="quick-summary">
-        <h2>{{ _('Быстрая сводка') }}</h2>
-        {% set os_cmd %}echo "=== System ===" && cat /etc/os-release | head -2 && \
+    {% else %}
+    <header class="mb-4">
+        <h1><i class="bi bi-{{ selected.icon }} me-2" aria-hidden="true"></i>{{ selected.title }}</h1>
+        <p class="text-body-secondary mb-0">{{ selected.hint }}</p>
+    </header>
+    <div class="row g-3">
+        <div class="col-lg-8">
+            {% if selected.id == 'htop-btop' %}
+            <section class="card p-3 cheat-section">
+                <p class="small text-body-secondary">{{ _('htop и btop показывают CPU, память, нагрузку и процессы на одном экране — быстрее, чем набор отдельных команд. На слабом VPS лучше htop: он легче. Выход — клавиша q.') }}</p>
+                {{ cmd(_('Запустить htop') + ' (' + _('легче, хватает на 1 ГБ RAM') + ')', 'htop') }}
+                {{ cmd(_('Запустить btop') + ' (' + _('нагляднее, но тяжелее') + ')', 'btop') }}
+                {{ cmd(_('Установить htop'), 'sudo apt-get update && sudo apt-get install -y htop') }}
+                {{ cmd(_('Установить btop'), 'sudo apt-get update && sudo apt-get install -y btop') }}
+            </section>
+            {% elif selected.id == 'quick-summary' %}
+            <section class="card p-3 cheat-section">
+                {% set os_cmd %}echo "=== System ===" && cat /etc/os-release | head -2 && \
 echo "=== CPU ===" && cat /proc/cpuinfo | grep "model name" | head -1 && \
 echo "=== Memory ===" && cat /proc/meminfo | grep MemTotal{% endset %}
-        {{ cmd(_('Команда'), os_cmd|trim) }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="installed-software">
-        <h2>{{ _('Установленное ПО') }}</h2>
-        {{ cmd(_('Показать все установленные пакеты:'), 'dpkg -l | grep ii | cat') }}
-        {{ cmd(_('Найти конкретный пакет') + ' (' + _('замените') + ' nginx)', 'dpkg -l | grep nginx') }}
-        {{ cmd(_('Показать файлы, установленные пакетом') + ' (' + _('замените') + ' nginx)', 'dpkg -L nginx | cat') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="key-utilities">
-        <h2>{{ _('Ключевые утилиты') }}</h2>
-        {{ cmd(_('Информация о ядре и системе'), 'uname -a') }}
-        {{ cmd(_('Информация о процессоре'), 'lscpu | cat') }}
-        {{ cmd(_('Использование оперативной памяти'), 'free -h') }}
-        {{ cmd(_('Использование дискового пространства'), 'df -h') }}
-        {{ cmd(_('Просмотр сетевых интерфейсов'), 'ip a') }}
-        {{ cmd(_('Просмотр активных сетевых портов'), 'ss -tulnp | cat') }}
-        {{ cmd(_('Кто сейчас в системе'), 'w') }}
-        {{ cmd(_('Системный журнал в реальном времени'), 'tail -f /var/log/syslog') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="disk-usage">
-        <h2>{{ _('Подробнее о `df` (использование дискового пространства)') }}</h2>
-        {{ cmd(_('Показать тип файловой системы') + ' (' + _('например') + ', ext4, xfs)', 'df -hT') }}
-        {{ cmd(_('Показать итоговую строку с суммой по всем разделам'), 'df -h --total') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="security">
-        <h2>{{ _('Основы безопасности') }}</h2>
-        <p class="small mb-2">{{ _('Управление файрволом (ufw)') }}</p>
-        {{ cmd(_('Проверить статус и правила:'), 'sudo ufw status verbose') }}
-        {{ cmd(_('Разрешить стандартный порт SSH (22):'), 'sudo ufw allow ssh') }}
-        {{ cmd(_('Пример: разрешить нестандартный порт SSH (например, 2222):'), 'sudo ufw allow 2222/tcp') }}
-        {{ cmd(_('Пример: разрешить порт для веб-сервера (HTTPS):'), 'sudo ufw allow 443/tcp') }}
-        {{ cmd(_('Пример: удалить правило:'), 'sudo ufw delete allow 443/tcp') }}
-        <p class="small mb-2">{{ _('Проверка Fail2Ban') }}</p>
-        {{ cmd(_('Статус службы Fail2Ban:'), 'sudo systemctl status fail2ban') }}
-        {{ cmd(_('Статус защиты SSH и список забаненных IP:'), 'sudo fail2ban-client status sshd') }}
-        {{ cmd(_('Разбанить IP-адрес (замените 1.2.3.4):'), 'sudo fail2ban-client set sshd unbanip 1.2.3.4') }}
-        <p class="small mb-2">{{ _('Аудит и мониторинг') }}</p>
-        {{ cmd(_('Показать последних вошедших пользователей:'), 'last | cat') }}
-        {{ cmd(_('Показать неудачные попытки входа (требует root):'), 'sudo lastb | cat') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="process-management">
-        <h2>{{ _('Управление процессами') }}</h2>
-        {{ cmd(_('Показать все запущенные процессы'), 'ps aux | cat') }}
-        {{ cmd(_('Интерактивный монитор процессов') + ' (' + _('htop более удобен, если установлен') + ')', 'top') }}
-        {{ cmd(_('Найти процесс по имени') + ' (' + _('замените') + ' nginx)', 'ps aux | grep nginx') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="systemd-services">
-        <h2>{{ _('Управление службами (systemd)') }}</h2>
-        {{ cmd(_('Проверить статус службы') + ' (' + _('замените') + ' nginx)', 'sudo systemctl status nginx') }}
-        {{ cmd(_('Перезапустить службу:'), 'sudo systemctl restart nginx') }}
-        {{ cmd(_('Включить автозапуск службы:'), 'sudo systemctl enable nginx') }}
-        {{ cmd(_('Выключить автозапуск службы:'), 'sudo systemctl disable nginx') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="package-management">
-        <h2>{{ _('Управление пакетами (apt)') }}</h2>
-        {{ cmd(_('Обновить список пакетов:'), 'sudo apt update') }}
-        {{ cmd(_('Обновить установленные пакеты:'), 'sudo apt upgrade') }}
-        {{ cmd(_('Установить пакет') + ' (' + _('замените') + ' htop)', 'sudo apt install htop') }}
-        {{ cmd(_('Удалить пакет:'), 'sudo apt remove htop') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="nginx-commands">
-        <h2>{{ _('NGINX - Основные команды') }}</h2>
-        {{ cmd(_('Проверить статус NGINX:'), 'sudo systemctl status nginx') }}
-        {{ cmd(_('Запустить NGINX:'), 'sudo systemctl start nginx') }}
-        {{ cmd(_('Остановить NGINX:'), 'sudo systemctl stop nginx') }}
-        {{ cmd(_('Перезапустить NGINX:'), 'sudo systemctl restart nginx') }}
-        {{ cmd(_('Перезагрузить конфигурацию NGINX:'), 'sudo nginx -s reload') }}
-        {{ cmd(_('Проверить конфигурацию NGINX:'), 'sudo nginx -t') }}
-        {{ cmd(_('Просмотр логов NGINX:'), 'sudo tail -f /var/log/nginx/access.log') }}
-        {{ cmd(_('Просмотр логов ошибок NGINX:'), 'sudo tail -f /var/log/nginx/error.log') }}
-        {{ cmd(_('Проверить активные соединения NGINX:'), 'sudo netstat -tulpn | grep nginx') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="docker-commands">
-        <h2>{{ _('Docker - Основные команды') }}</h2>
-        {{ cmd(_('Проверить статус Docker:'), 'sudo systemctl status docker') }}
-        {{ cmd(_('Список запущенных контейнеров:'), 'docker ps') }}
-        {{ cmd(_('Список всех контейнеров (включая остановленные):'), 'docker ps -a') }}
-        {{ cmd(_('Список образов Docker:'), 'docker images') }}
-        {{ cmd(_('Запустить контейнер:'), 'docker run -d --name my-container nginx') }}
-        {{ cmd(_('Остановить контейнер:'), 'docker stop my-container') }}
-        {{ cmd(_('Удалить контейнер:'), 'docker rm my-container') }}
-        {{ cmd(_('Просмотр логов контейнера:'), 'docker logs my-container') }}
-        {{ cmd(_('Выполнить команду в контейнере:'), 'docker exec -it my-container bash') }}
-    </section>
-
-    <section class="card p-3 cheat-section" id="systemd-management">
-        <h2>{{ _('Systemd - Управление службами') }}</h2>
-        {{ cmd(_('Проверить статус службы:'), 'sudo systemctl status service-name') }}
-        {{ cmd(_('Запустить службу:'), 'sudo systemctl start service-name') }}
-        {{ cmd(_('Остановить службу:'), 'sudo systemctl stop service-name') }}
-        {{ cmd(_('Перезапустить службу:'), 'sudo systemctl restart service-name') }}
-        {{ cmd(_('Включить автозапуск службы:'), 'sudo systemctl enable service-name') }}
-        {{ cmd(_('Отключить автозапуск службы:'), 'sudo systemctl disable service-name') }}
-        {{ cmd(_('Перезагрузить конфигурацию systemd:'), 'sudo systemctl daemon-reload') }}
-        {{ cmd(_('Просмотр логов службы:'), 'sudo journalctl -u service-name -f') }}
-        {{ cmd(_('Список всех служб:'), 'sudo systemctl list-units --type=service') }}
-    </section>
-
+                {{ cmd(_('Команда'), os_cmd|trim) }}
+            </section>
+            {% elif selected.id == 'installed-software' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Показать все установленные пакеты:'), 'dpkg -l | grep ii | cat') }}
+                {{ cmd(_('Найти конкретный пакет') + ' (' + _('замените') + ' nginx)', 'dpkg -l | grep nginx') }}
+                {{ cmd(_('Показать файлы, установленные пакетом') + ' (' + _('замените') + ' nginx)', 'dpkg -L nginx | cat') }}
+            </section>
+            {% elif selected.id == 'key-utilities' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Информация о ядре и системе'), 'uname -a') }}
+                {{ cmd(_('Информация о процессоре'), 'lscpu | cat') }}
+                {{ cmd(_('Использование оперативной памяти'), 'free -h') }}
+                {{ cmd(_('Использование дискового пространства'), 'df -h') }}
+                {{ cmd(_('Просмотр сетевых интерфейсов'), 'ip a') }}
+                {{ cmd(_('Просмотр активных сетевых портов'), 'ss -tulnp | cat') }}
+                {{ cmd(_('Кто сейчас в системе'), 'w') }}
+                {{ cmd(_('Системный журнал в реальном времени'), 'tail -f /var/log/syslog') }}
+            </section>
+            {% elif selected.id == 'disk-usage' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Показать тип файловой системы') + ' (' + _('например') + ', ext4, xfs)', 'df -hT') }}
+                {{ cmd(_('Показать итоговую строку с суммой по всем разделам'), 'df -h --total') }}
+            </section>
+            {% elif selected.id == 'security' %}
+            <section class="card p-3 cheat-section">
+                <p class="small mb-2">{{ _('Управление файрволом (ufw)') }}</p>
+                {{ cmd(_('Проверить статус и правила:'), 'sudo ufw status verbose') }}
+                {{ cmd(_('Разрешить стандартный порт SSH (22):'), 'sudo ufw allow ssh') }}
+                {{ cmd(_('Пример: разрешить нестандартный порт SSH (например, 2222):'), 'sudo ufw allow 2222/tcp') }}
+                {{ cmd(_('Пример: разрешить порт для веб-сервера (HTTPS):'), 'sudo ufw allow 443/tcp') }}
+                {{ cmd(_('Пример: удалить правило:'), 'sudo ufw delete allow 443/tcp') }}
+                <p class="small mb-2">{{ _('Проверка Fail2Ban') }}</p>
+                {{ cmd(_('Статус службы Fail2Ban:'), 'sudo systemctl status fail2ban') }}
+                {{ cmd(_('Статус защиты SSH и список забаненных IP:'), 'sudo fail2ban-client status sshd') }}
+                {{ cmd(_('Разбанить IP-адрес (замените 1.2.3.4):'), 'sudo fail2ban-client set sshd unbanip 1.2.3.4') }}
+                <p class="small mb-2">{{ _('Аудит и мониторинг') }}</p>
+                {{ cmd(_('Показать последних вошедших пользователей:'), 'last | cat') }}
+                {{ cmd(_('Показать неудачные попытки входа (требует root):'), 'sudo lastb | cat') }}
+            </section>
+            {% elif selected.id == 'process-management' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Показать все запущенные процессы'), 'ps aux | cat') }}
+                {{ cmd(_('Интерактивный монитор процессов') + ' (' + _('htop более удобен, если установлен') + ')', 'top') }}
+                {{ cmd(_('Найти процесс по имени') + ' (' + _('замените') + ' nginx)', 'ps aux | grep nginx') }}
+            </section>
+            {% elif selected.id == 'systemd-services' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Проверить статус службы') + ' (' + _('замените') + ' nginx)', 'sudo systemctl status nginx') }}
+                {{ cmd(_('Перезапустить службу:'), 'sudo systemctl restart nginx') }}
+                {{ cmd(_('Включить автозапуск службы:'), 'sudo systemctl enable nginx') }}
+                {{ cmd(_('Выключить автозапуск службы:'), 'sudo systemctl disable nginx') }}
+            </section>
+            {% elif selected.id == 'package-management' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Обновить список пакетов:'), 'sudo apt update') }}
+                {{ cmd(_('Обновить установленные пакеты:'), 'sudo apt upgrade') }}
+                {{ cmd(_('Установить пакет') + ' (' + _('замените') + ' htop)', 'sudo apt install htop') }}
+                {{ cmd(_('Удалить пакет:'), 'sudo apt remove htop') }}
+            </section>
+            {% elif selected.id == 'nginx-commands' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Проверить статус NGINX:'), 'sudo systemctl status nginx') }}
+                {{ cmd(_('Запустить NGINX:'), 'sudo systemctl start nginx') }}
+                {{ cmd(_('Остановить NGINX:'), 'sudo systemctl stop nginx') }}
+                {{ cmd(_('Перезапустить NGINX:'), 'sudo systemctl restart nginx') }}
+                {{ cmd(_('Перезагрузить конфигурацию NGINX:'), 'sudo nginx -s reload') }}
+                {{ cmd(_('Проверить конфигурацию NGINX:'), 'sudo nginx -t') }}
+                {{ cmd(_('Просмотр логов NGINX:'), 'sudo tail -f /var/log/nginx/access.log') }}
+                {{ cmd(_('Просмотр логов ошибок NGINX:'), 'sudo tail -f /var/log/nginx/error.log') }}
+                {{ cmd(_('Проверить активные соединения NGINX:'), 'sudo netstat -tulpn | grep nginx') }}
+            </section>
+            {% elif selected.id == 'docker-commands' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Проверить статус Docker:'), 'sudo systemctl status docker') }}
+                {{ cmd(_('Список запущенных контейнеров:'), 'docker ps') }}
+                {{ cmd(_('Список всех контейнеров (включая остановленные):'), 'docker ps -a') }}
+                {{ cmd(_('Список образов Docker:'), 'docker images') }}
+                {{ cmd(_('Запустить контейнер:'), 'docker run -d --name my-container nginx') }}
+                {{ cmd(_('Остановить контейнер:'), 'docker stop my-container') }}
+                {{ cmd(_('Удалить контейнер:'), 'docker rm my-container') }}
+                {{ cmd(_('Просмотр логов контейнера:'), 'docker logs my-container') }}
+                {{ cmd(_('Выполнить команду в контейнере:'), 'docker exec -it my-container bash') }}
+            </section>
+            {% elif selected.id == 'systemd-management' %}
+            <section class="card p-3 cheat-section">
+                {{ cmd(_('Проверить статус службы:'), 'sudo systemctl status service-name') }}
+                {{ cmd(_('Запустить службу:'), 'sudo systemctl start service-name') }}
+                {{ cmd(_('Остановить службу:'), 'sudo systemctl stop service-name') }}
+                {{ cmd(_('Перезапустить службу:'), 'sudo systemctl restart service-name') }}
+                {{ cmd(_('Включить автозапуск службы:'), 'sudo systemctl enable service-name') }}
+                {{ cmd(_('Отключить автозапуск службы:'), 'sudo systemctl disable service-name') }}
+                {{ cmd(_('Перезагрузить конфигурацию systemd:'), 'sudo systemctl daemon-reload') }}
+                {{ cmd(_('Просмотр логов службы:'), 'sudo journalctl -u service-name -f') }}
+                {{ cmd(_('Список всех служб:'), 'sudo systemctl list-units --type=service') }}
+            </section>
+            {% endif %}
+        </div>
+        <aside class="col-lg-4">
+            <nav class="card p-3" aria-label="{{ _('Другие инструменты') }}">
+                <h2>{{ _('Другие инструменты') }}</h2>
+                <div class="net-other">
+                    {% for section in sections if section.id != selected.id %}
+                    <a href="{{ url_for('main.cheatsheet_section', section_id=section.id) }}"><i class="bi bi-{{ section.icon }} me-1" aria-hidden="true"></i>{{ section.title }}</a>
+                    {% endfor %}
+                </div>
+            </nav>
+        </aside>
+    </div>
+    {% endif %}
     <div id="net-copy-status" class="small mt-3" role="status" data-copied="{{ _('Скопировано') }}" data-failed="{{ _('Не удалось скопировать. Выделите текст и скопируйте вручную.') }}"></div>
 </div>
 {% endblock %}
