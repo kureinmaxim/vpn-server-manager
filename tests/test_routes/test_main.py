@@ -59,6 +59,9 @@ class TestMainRoutes:
         """Тест страницы о приложении"""
         response = client.get('/about')
         assert response.status_code == 200
+        html = response.get_data(as_text=True)
+        assert 'https://github.com/kureinmaxim/vpn-server-manager' in html
+        assert 'bi-github' in html
     
     def test_change_language(self, client):
         """Тест смены языка"""
@@ -524,12 +527,17 @@ class TestMainRoutes:
         assert 'js/server_mesh_marks.js' in html
         assert 'js/server_file_mark.js' in html
         assert 'server-mesh-marks' in html and 'server-file-mark' in html
+        assert 'server-chatmail-mark' in html and 'is-chatmail' in html
+        assert 'bi-envelope-fill' in html
         assert 'data-ip="10.0.0.1"' in html and 'data-name="Alpha"' in html
         assert 'Rust File Manager' in html
+        assert 'Chatmail relay' in html
+        assert 'chatmailName' in html and 'chatmailHints' in html
         assert 'Справка по использованию' not in html
         assert 'nav-link dropdown-toggle' in html  # zoom / language / theme remain
         nav = html.split('<nav', 1)[1].split('</nav>', 1)[0]
         assert '>Справка<' not in nav and '>Help<' not in nav
+        assert nav.rfind('bi-box-arrow-right') > nav.rfind('bi-circle-half')
 
 
 def test_stale_geolocation_is_replaced_when_ip_changes():

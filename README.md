@@ -1,4 +1,4 @@
-# VPN Server Manager v4.13.1
+# VPN Server Manager v4.13.2
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest patch · 4.12.12:** **Server load** now shows your own DNS server (AdGuard Home) and Chatmail relay for Delta Chat on the servers that run them: a purple or orange badge with a state dot, and the result of the last **Status** check. Recent releases also added DERP latency tooltips, **Projects**, RDAP registrar lookup and the redesigned Monitoring. [Changelog →](CHANGELOG.md#41212---2026-10-21)
+**Latest patch · 4.13.2:** compact **server cards** show this PC’s Tailscale mesh (member, exit, coordinator, home DERP), a rust folder where **Rust File Manager** is installed, and an orange envelope for **Chatmail**. **Cheatsheet** and **Network tools** open one topic per card. **About** links to the GitHub repo; logout sits at the right end of the top bar. [Changelog →](CHANGELOG.md#4132---2026-10-22)
 
 ## See your fleet at a glance
 
@@ -34,21 +34,21 @@ Open **Server load** next to DNS to compare CPU, memory, disk space, load averag
 
 <p align="center">
   <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency measured through the selected exit node" width="1100">
-  <br><sub>v4.12.10 · English interface · demonstration servers and addresses</sub>
+  <br><sub>English interface · demonstration servers and addresses</sub>
 </p>
 
 Servers that run your own DNS (AdGuard Home) or a Chatmail relay for Delta Chat get a purple or orange badge in the same table. The dot shows whether the services are up; the line below shows the last functional check from the **Status** button, so you can see at a glance which VPS carries which service. Click a badge to open its diagnostics.
 
 <p align="center">
   <img src="docs/images/10-dns-chatmail-roles.jpg" alt="Server load with own DNS server and Chatmail badges, service state dots and the last functional check next to exit-node roles" width="900">
-  <br><sub>v4.12.12 · demonstration servers and addresses</sub>
+  <br><sub>Demonstration servers and addresses</sub>
 </p>
 
-Open **Projects** beside it to see which servers run your own projects, such as BotCriptoM, Rust File Manager or UGCTL, and how many of each project's services, containers and processes are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service, Docker container and process names.
+Open **Projects** beside it to see which servers run your own projects — BotCriptoM, Rust File Manager, UGCTL, AdGuard Home, Chatmail and Own DERP when Headscale has an embedded relay — and how many of each project's services, containers and processes are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service, Docker container and process names.
 
 <p align="center">
   <img src="docs/images/09-projects.jpg" alt="Projects overview showing on which servers each tracked project runs and how many of its services, containers and processes are up" width="640">
-  <br><sub>v4.12.10 · demonstration servers</sub>
+  <br><sub>Demonstration servers · AdGuard, Chatmail and Own DERP appear when SSH finds them</sub>
 </p>
 
 | What you want to know | Where to look |
@@ -72,7 +72,8 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 ## Keep everyday operations together
 
 <p align="center">
-  <img src="docs/images/03-server-board.png" alt="Server board — compact cards, drag to reorder, archive" width="900">
+  <img src="docs/images/03-server-board.png" alt="Server board — compact cards with mesh, file-manager and Chatmail marks; drag to reorder, archive" width="900">
+  <br><sub>Compact cards · mesh / file-manager / Chatmail icons · demonstration servers</sub>
 </p>
 
 ## What you get
@@ -104,6 +105,10 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 
 <p align="center">
   <img src="docs/images/05-settings.png" alt="Application settings, encryption and import or export" width="720">
+</p>
+
+<p align="center">
+  <img src="docs/images/06-about.png" alt="About page with version, developer and GitHub repository link" width="720">
 </p>
 
 </details>

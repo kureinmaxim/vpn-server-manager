@@ -3,9 +3,10 @@
     const board = document.getElementById('server-board');
     if (!config || !board) return;
     const t = config.i18n || {};
-    const CACHE_KEY = 'server-rfm-v1';
+    const CACHE_KEY = 'server-role-marks-v1';
     const TTL = 180000;
-    const hints = (config.hints || []).map(name => name.toLowerCase());
+    const filesHints = (config.hints || []).map(name => name.toLowerCase());
+    const chatmailHints = (config.chatmailHints || []).map(name => name.toLowerCase());
 
     function cache() {
         try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || '{}'); } catch (error) { return {}; }
@@ -15,33 +16,65 @@
         try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (error) { /* private mode */ }
     }
 
-    function filesProject(projects) {
+    function matchProject(projects, spec) {
+        const keys = spec.keys || [];
+        const hints = spec.hints || [];
         return (projects || []).find(project => {
-            if (project.name === config.name || project.key === 'rust_file_manager') return true;
+            if (spec.name && project.name === spec.name) return true;
+            if (keys.includes(project.key)) return true;
             return (project.components || []).some(row =>
                 hints.some(hint => String(row.name || '').toLowerCase().includes(hint)));
         });
     }
 
-    function paint(id, project) {
-        const items = board.querySelectorAll('.server-board-item[data-server-id="' + CSS.escape(String(id)) + '"]');
+    function filesProject(projects) {
+        return matchProject(projects, {
+            name: config.name,
+            keys: ['rust_file_manager'],
+            hints: filesHints,
+        });
+    }
+
+    function chatmailProject(projects) {
+        return matchProject(projects, {
+            name: config.chatmailName,
+            keys: ['chatmail_relay', 'chatmail'],
+            hints: chatmailHints,
+        }) || (projects || []).find(project => {
+            const key = String(project.key || '').toLowerCase();
+            const name = String(project.name || '').toLowerCase();
+            return key.includes('chatmail') || name.includes('chatmail');
+        });
+    }
+
+    function paintMark(items, selector, project, label, href) {
         const show = project && project.state && project.state !== 'unknown';
         const title = show
-            ? [t.files, project.name || config.name, t[project.state] || project.state].filter(Boolean).join(' · ')
+            ? [label, project.name, t[project.state] || project.state].filter(Boolean).join(' · ')
             : '';
         items.forEach(item => {
-            item.querySelectorAll('.server-file-mark').forEach(holder => {
+            item.querySelectorAll(selector).forEach(holder => {
                 holder.hidden = !show;
                 holder.title = title;
                 holder.setAttribute('aria-label', title);
                 holder.classList.toggle('is-up', project && project.state === 'running');
                 holder.classList.toggle('is-partial', project && project.state === 'partial');
                 holder.classList.toggle('is-down', project && project.state === 'stopped');
-                if (config.monitoringUrl) {
-                    holder.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(id));
-                }
+                if (href) holder.href = href;
             });
         });
+    }
+
+    function paint(id, marks) {
+        const items = board.querySelectorAll('.server-board-item[data-server-id="' + CSS.escape(String(id)) + '"]');
+        const filesHref = config.monitoringUrl
+            ? config.monitoringUrl.replace('__SERVER__', encodeURIComponent(id))
+            : '';
+        const chatmailHref = config.diagnosticsUrl
+            ? config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(id)) + '?role=chatmail'
+            : '';
+        paintMark(items, '.server-file-mark', marks && marks.files, t.files, filesHref);
+        paintMark(items, '.server-chatmail-mark', marks && marks.chatmail, t.chatmail, chatmailHref);
     }
 
     async function getJSON(url) {
@@ -53,7 +86,7 @@
     const stored = cache();
     const now = Date.now();
     Object.keys(stored).forEach(id => {
-        if (stored[id] && now - stored[id].at < TTL) paint(id, stored[id].project);
+        if (stored[id] && now - stored[id].at < TTL) paint(id, stored[id]);
     });
 
     (async () => {
@@ -70,10 +103,13 @@
                 if (fresh && now - fresh.at < TTL) continue;
                 try {
                     const data = await getJSON(config.snapshotUrl.replace('__SERVER__', encodeURIComponent(server.id)));
-                    const project = filesProject(data.stats) || null;
-                    stored[server.id] = {project, at: Date.now()};
+                    const marks = {
+                        files: filesProject(data.stats) || null,
+                        chatmail: chatmailProject(data.stats) || null,
+                    };
+                    stored[server.id] = {files: marks.files, chatmail: marks.chatmail, at: Date.now()};
                     saveCache(stored);
-                    paint(server.id, project);
+                    paint(server.id, marks);
                 } catch (error) { /* SSH miss: leave the card unmarked. */ }
             }
         }

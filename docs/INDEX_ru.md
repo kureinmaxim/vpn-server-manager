@@ -20,6 +20,8 @@
 - [DOCKER_GUIDE_ru.md](DOCKER_GUIDE_ru.md) — Docker
 - [SECRET_KEY_ru.md](SECRET_KEY_ru.md) — шифрование
 - [DNS_CARD_ru.md](DNS_CARD_ru.md) — карточка DNS: импорт файла зоны (добавить или заменить), Cloudflare «Proxied» или «DNS only»
+- [DNS_CHATMAIL_ru.md](DNS_CHATMAIL_ru.md) — свой AdGuard Home / DNS и Chatmail relay: обнаружение, диагностика по SSH
+- [NET_TOOLS_ru.md](NET_TOOLS_ru.md) — Network tools и Cheatsheet: каталог карточек и проверки с компьютера приложения
 - [BACKUP_RESTORE_ru.md](BACKUP_RESTORE_ru.md) — резервная копия, перенос и восстановление (серверы + DNS)
 - [DATA_STORAGE_GUIDE_ru.md](DATA_STORAGE_GUIDE_ru.md) — хранение данных
 - [SECURITY_BEST_PRACTICES_ru.md](SECURITY_BEST_PRACTICES_ru.md) — безопасность

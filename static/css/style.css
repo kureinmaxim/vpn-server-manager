@@ -348,16 +348,17 @@ body:has(.server-form) .navbar.mb-4 {
 .server-preview-head {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.2rem;
     min-width: 0;
     width: 100%;
     flex-wrap: nowrap;
 }
 
+.server-card-marks,
 .server-mesh-marks {
     display: inline-flex;
     align-items: center;
-    gap: 0.2rem;
+    gap: 0.15rem;
     flex-shrink: 0;
 }
 .server-mesh-marks[hidden] { display: none !important; }
@@ -365,11 +366,16 @@ body:has(.server-form) .navbar.mb-4 {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    padding: 0;
+    font-size: 0.65rem;
+    line-height: 1;
+}
+.server-card-full .server-mesh-mark {
     width: 1.35rem;
     height: 1.35rem;
-    padding: 0;
     font-size: 0.72rem;
-    line-height: 1;
 }
 .server-mesh-mark.is-mesh { background: #0aa2c0; color: #fff; }
 .server-mesh-mark.is-mesh.is-offline { background: #6c757d; }
@@ -380,10 +386,13 @@ body:has(.server-form) .navbar.mb-4 {
 .server-mesh-mark.is-files { background: #b45309; color: #fff; }
 .server-mesh-mark.is-files.is-partial { background: #ca8a04; }
 .server-mesh-mark.is-files.is-down { background: #78716c; }
+.server-mesh-mark.is-chatmail { background: #fd7e14; color: #1b1b1b; }
+.server-mesh-mark.is-chatmail.is-partial { background: #e8590c; color: #fff; }
+.server-mesh-mark.is-chatmail.is-down { background: #78716c; color: #fff; }
 
 .server-preview-title {
     min-width: 0;
-    flex: 1 1 auto;
+    flex: 1 1 0;
     overflow: hidden;
 }
 

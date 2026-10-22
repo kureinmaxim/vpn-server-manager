@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.2] - 2026-10-22
+
+### Added
+- Compact and expanded **server cards** show an orange envelope when **Chatmail relay** is found; click it to open Chatmail diagnostics.
+- **About** links to the GitHub repository.
+
+### Changed
+- Compact **server card** headers shrink the name first, so mesh and **Rust File Manager** icons stay visible.
+- The **logout** icon sits at the right end of the top bar, after zoom, language and theme.
+- README screenshots and the “latest patch” blurb match 4.13.x: no Help menu, role icons on cards, GitHub link on About.
+
 ## [4.13.1] - 2026-10-22
 
 ### Changed

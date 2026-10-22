@@ -109,8 +109,11 @@
                             <div class="fw-semibold text-truncate lh-sm">{{ server.name }}</div>
                             <div class="small text-truncate lh-sm">{{ server.ip_address }}{% if server.provider %} · {{ server.provider }}{% endif %}</div>
                         </div>
-                        <span class="server-mesh-marks" hidden></span>
-                        <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                        <span class="server-card-marks">
+                            <span class="server-mesh-marks" hidden></span>
+                            <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                            <a class="badge rounded-pill server-chatmail-mark server-mesh-mark is-chatmail text-decoration-none" hidden title="{{ _('Chatmail для Delta Chat') }}" aria-label="{{ _('Chatmail для Delta Chat') }}"><i class="bi bi-envelope-fill" aria-hidden="true"></i></a>
+                        </span>
                         <button type="button"
                                 class="btn btn-sm p-0 border-0 bg-transparent js-archive-toggle flex-shrink-0"
                                 data-server-id="{{ server.id }}"
@@ -159,8 +162,11 @@
                         {% endif %}
                         {{ server.name }}
                         {% if dns_items %}<a href="{{ url_for('dns.move', server_id=server.id) }}" class="badge rounded-pill dns-count text-decoration-none flex-shrink-0 ms-auto fs-6" title="{{ _('DNS-записей указывает на этот сервер: %(count)s. Открыть перенос.', count=dns_items|length) }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> {{ dns_items|length }}</a>{% endif %}
-                        <span class="server-mesh-marks{% if not dns_items %} ms-auto{% endif %}" hidden></span>
-                        <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                        <span class="server-card-marks{% if not dns_items %} ms-auto{% endif %}">
+                            <span class="server-mesh-marks" hidden></span>
+                            <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                            <a class="badge rounded-pill server-chatmail-mark server-mesh-mark is-chatmail text-decoration-none" hidden title="{{ _('Chatmail для Delta Chat') }}" aria-label="{{ _('Chatmail для Delta Chat') }}"><i class="bi bi-envelope-fill" aria-hidden="true"></i></a>
+                        </span>
                     </h5>
                     <div class="d-flex justify-content-between align-items-center js-server-subtitle" data-ip="{{ server.ip_address }}">
                         <small>{{ server.provider }} - {{ server.ip_address }} {% if server.os %}({{ server.os }}){% endif %}</small>
@@ -610,8 +616,12 @@
         monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
         name: {{ file_manager_name | default('Rust File Manager') | tojson }},
         hints: {{ file_manager_hints | default(['rust-file-manager', 'rfm-internal-bridge']) | tojson }},
+        chatmailName: {{ chatmail_name | default('Chatmail relay') | tojson }},
+        chatmailHints: {{ chatmail_hints | default(['doveauth', 'chatmail-metadata', 'filtermail']) | tojson }},
+        diagnosticsUrl: {{ url_for('dns_mail.detail', server_id='__SERVER__') | tojson }},
         i18n: {
             files: {{ _('Файловый обменник') | tojson }},
+            chatmail: {{ _('Chatmail для Delta Chat') | tojson }},
             running: {{ _('Работает') | tojson }},
             partial: {{ _('Работает частично') | tojson }},
             stopped: {{ _('Остановлен') | tojson }}

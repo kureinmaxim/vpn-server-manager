@@ -5,7 +5,7 @@ from unittest.mock import Mock
 import pytest
 
 from app.services.dns_mail_probe import ROLE_NAMES
-from app.services.project_stats import (DEFAULT_PROJECTS, FILE_MANAGER, ProjectError, build_command,
+from app.services.project_stats import (CHATMAIL, DEFAULT_PROJECTS, FILE_MANAGER, ProjectError, build_command,
                                         clean_projects, load_projects, parse_sample, save_projects, summarize)
 
 PROJECTS = clean_projects(DEFAULT_PROJECTS)
@@ -82,6 +82,8 @@ def test_default_catalog_and_read_only_probe():
     assert {'Reticulum', 'Dockhand', 'Headscale / Headplane',
             ROLE_NAMES['adguard'], ROLE_NAMES['chatmail']} <= set(names)
     assert FILE_MANAGER['name'] == 'Rust File Manager' and 'rust-file-manager' in FILE_MANAGER['units']
+    assert CHATMAIL['name'] == ROLE_NAMES['chatmail'] and 'doveauth' in CHATMAIL['units']
+    assert 'chatmail_relay' in {p['key'] for p in clean_projects(DEFAULT_PROJECTS)}
     assert not any(n in names for n in ('ApiAigRPC', 'ApiNgRPC', 'ApiXgRPC', 'TelegramHelper', 'PDF3MD'))
     units = [u for p in PROJECTS for u in p['units']]
     assert 'telegramonly' not in units and not any(u.startswith(('ha-stub', 'ha-adapter', 'shskm')) for u in units)

@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.13.1'),
+            "version": app.config.get('APP_VERSION', '4.13.2'),
             "release_date": "22.10.2026",
             "last_updated": "2026-10-22",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.13.1",
+            "version": "4.13.2",
             "release_date": "22.10.2026",
             "last_updated": "2026-10-22",
             "developer": "Куреин М.Н."
@@ -393,7 +393,7 @@ def create_app(config_name='development'):
         from flask_babel import get_locale as babel_get_locale
         from .services.ui_preferences import load_ui_preferences
 
-        from .services.project_stats import FILE_MANAGER, load_projects
+        from .services.project_stats import CHATMAIL, FILE_MANAGER, load_projects
 
         ui_prefs = load_ui_preferences(app)
         projects = load_projects(app)
@@ -403,6 +403,8 @@ def create_app(config_name='development'):
             'app_info': app.config.get('app_info', {}),
             'file_manager_name': FILE_MANAGER['name'],
             'file_manager_hints': FILE_MANAGER['units'],
+            'chatmail_name': CHATMAIL['name'],
+            'chatmail_hints': CHATMAIL['units'],
             'tracked_projects': list(dict.fromkeys(
                 [project['name'] for project in projects] + list(ROLE_NAMES.values()) + [derp_display_name()])),
             'tracked_processes': list(dict.fromkeys(name for project in projects for name in project['processes'])),

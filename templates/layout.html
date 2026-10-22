@@ -64,13 +64,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('main.about') }}">{{ _('О программе') }}</a>
                     </li>
-                    {% if session.get('pin_authenticated') %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}">
-                            <i class="bi bi-box-arrow-right"></i>
-                        </a>
-                    </li>
-                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-search"></i>
@@ -101,6 +94,13 @@
                             <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
                         </ul>
                     </li>
+                    {% if session.get('pin_authenticated') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
