@@ -66,7 +66,7 @@
                 bits.push(mark('is-exit-ready', 'bi-box-arrow-right', t.meshExit));
             }
             if (peer.relay) {
-                bits.push(mark('is-derp', 'bi-broadcast-pin', (t.peerHome || '').replace('{region}', peer.relay)));
+                bits.push(mark('is-derp', 'bi-broadcast-pin', (t.peerHome || '').replace('{region}', peer.relay) + (t.peerHomeHint ? '. ' + t.peerHomeHint : '')));
             }
         }
         holder.replaceChildren(...bits);

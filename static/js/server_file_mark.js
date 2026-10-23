@@ -3,9 +3,10 @@
     const board = document.getElementById('server-board');
     if (!config || !board) return;
     const t = config.i18n || {};
-    const CACHE_KEY = 'server-role-marks-v1';
+    const CACHE_KEY = 'server-role-marks-v2';
     const TTL = 180000;
     const filesHints = (config.hints || []).map(name => name.toLowerCase());
+    const dnsHints = (config.dnsHints || []).map(name => name.toLowerCase());
     const chatmailHints = (config.chatmailHints || []).map(name => name.toLowerCase());
 
     function cache() {
@@ -32,6 +33,14 @@
             name: config.name,
             keys: ['rust_file_manager'],
             hints: filesHints,
+        });
+    }
+
+    function dnsProject(projects) {
+        return matchProject(projects, {
+            name: config.dnsName,
+            keys: ['adguard'],
+            hints: dnsHints,
         });
     }
 
@@ -70,10 +79,14 @@
         const filesHref = config.monitoringUrl
             ? config.monitoringUrl.replace('__SERVER__', encodeURIComponent(id))
             : '';
+        const dnsHref = config.diagnosticsUrl
+            ? config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(id)) + '?role=adguard'
+            : '';
         const chatmailHref = config.diagnosticsUrl
             ? config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(id)) + '?role=chatmail'
             : '';
         paintMark(items, '.server-file-mark', marks && marks.files, t.files, filesHref);
+        paintMark(items, '.server-dns-mark', marks && marks.dns, t.dns, dnsHref);
         paintMark(items, '.server-chatmail-mark', marks && marks.chatmail, t.chatmail, chatmailHref);
     }
 
@@ -105,9 +118,10 @@
                     const data = await getJSON(config.snapshotUrl.replace('__SERVER__', encodeURIComponent(server.id)));
                     const marks = {
                         files: filesProject(data.stats) || null,
+                        dns: dnsProject(data.stats) || null,
                         chatmail: chatmailProject(data.stats) || null,
                     };
-                    stored[server.id] = {files: marks.files, chatmail: marks.chatmail, at: Date.now()};
+                    stored[server.id] = {files: marks.files, dns: marks.dns, chatmail: marks.chatmail, at: Date.now()};
                     saveCache(stored);
                     paint(server.id, marks);
                 } catch (error) { /* SSH miss: leave the card unmarked. */ }

@@ -9681,3 +9681,9 @@ msgstr "AdGuard panel port on the VPS"
 
 msgid "Туннель с этим портом:"
 msgstr "Tunnel with this port:"
+
+msgid "Домашний DERP — ретранслятор, который сам сервер выбрал как ближайший. Через него до сервера достучатся, если прямого соединения нет. Это не путь вашего трафика и не доказательство, что сейчас идёт ретрансляция. Свой DERP (из вашей карты DERP) подписан «свой»."
+msgstr "Home DERP is the relay the server itself picked as its nearest. Other devices reach the server through it when there is no direct connection. It is not the path of your traffic and not proof that relaying is happening now. A relay from your own DERP map is marked "custom"."
+
+msgid "Домашний DERP — ретранслятор, который сам сервер выбрал как ближайший. Через него до сервера достучатся, если прямого соединения нет. Это не путь вашего трафика и не доказательство, что сейчас идёт ретрансляция."
+msgstr "Home DERP is the relay the server itself picked as its nearest. Other devices reach the server through it when there is no direct connection. It is not the path of your traffic and not proof that relaying is happening now."

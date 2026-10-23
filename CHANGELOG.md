@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.4] - 2026-10-23
+
+### Added
+- **Server cards** show a purple globe when your own **AdGuard Home** DNS server is found; click it to open its diagnostics. The colour follows the service state, as for the Chatmail envelope.
+- A tooltip on **Peer home DERP** in **Server load** and on the DERP mark of a server card explains what a home DERP is and that it is neither the path of your traffic nor proof of relaying. A relay from your own DERP map is marked *(custom)* in **Server load**.
+- [DERP_GUIDE.md](DERP_GUIDE.md) and [ADGUARD.md](ADGUARD.md): guides on reading the DERP information, checking your own relay, and opening, checking and using your own AdGuard Home. Examples use placeholder names and documentation IP ranges only.
+
 ## [4.13.3] - 2026-10-23
 
 ### Fixed

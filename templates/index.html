@@ -112,6 +112,7 @@
                         <span class="server-card-marks">
                             <span class="server-mesh-marks" hidden></span>
                             <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                            <a class="badge rounded-pill server-dns-mark server-mesh-mark is-dns text-decoration-none" hidden title="{{ _('Свой DNS-сервер') }}" aria-label="{{ _('Свой DNS-сервер') }}"><i class="bi bi-globe2" aria-hidden="true"></i></a>
                             <a class="badge rounded-pill server-chatmail-mark server-mesh-mark is-chatmail text-decoration-none" hidden title="{{ _('Chatmail для Delta Chat') }}" aria-label="{{ _('Chatmail для Delta Chat') }}"><i class="bi bi-envelope-fill" aria-hidden="true"></i></a>
                         </span>
                         <button type="button"
@@ -165,6 +166,7 @@
                         <span class="server-card-marks{% if not dns_items %} ms-auto{% endif %}">
                             <span class="server-mesh-marks" hidden></span>
                             <a class="badge rounded-pill server-file-mark server-mesh-mark is-files text-decoration-none" hidden title="{{ _('Файловый обменник') }}" aria-label="{{ _('Файловый обменник') }}"><i class="bi bi-folder-symlink-fill" aria-hidden="true"></i></a>
+                            <a class="badge rounded-pill server-dns-mark server-mesh-mark is-dns text-decoration-none" hidden title="{{ _('Свой DNS-сервер') }}" aria-label="{{ _('Свой DNS-сервер') }}"><i class="bi bi-globe2" aria-hidden="true"></i></a>
                             <a class="badge rounded-pill server-chatmail-mark server-mesh-mark is-chatmail text-decoration-none" hidden title="{{ _('Chatmail для Delta Chat') }}" aria-label="{{ _('Chatmail для Delta Chat') }}"><i class="bi bi-envelope-fill" aria-hidden="true"></i></a>
                         </span>
                     </h5>
@@ -604,7 +606,8 @@
             meshExit: {{ _('Exit node (доступен)') | tojson }},
             meshSelected: {{ _('Exit node (выбран на ПК)') | tojson }},
             meshOffline: {{ _('Узел офлайн') | tojson }},
-            peerHome: {{ _('Домашний DERP пира: {region}') | tojson }}
+            peerHome: {{ _('Домашний DERP пира: {region}') | tojson }},
+            peerHomeHint: {{ _('Домашний DERP — ретранслятор, который сам сервер выбрал как ближайший. Через него до сервера достучатся, если прямого соединения нет. Это не путь вашего трафика и не доказательство, что сейчас идёт ретрансляция.') | tojson }}
         }
     };
 </script>
@@ -616,11 +619,14 @@
         monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
         name: {{ file_manager_name | default('Rust File Manager') | tojson }},
         hints: {{ file_manager_hints | default(['rust-file-manager', 'rfm-internal-bridge']) | tojson }},
+        dnsName: {{ dns_name | default('AdGuard Home / DNS') | tojson }},
+        dnsHints: {{ dns_hints | default(['AdGuardHome', 'adguardhome']) | tojson }},
         chatmailName: {{ chatmail_name | default('Chatmail relay') | tojson }},
         chatmailHints: {{ chatmail_hints | default(['doveauth', 'chatmail-metadata', 'filtermail']) | tojson }},
         diagnosticsUrl: {{ url_for('dns_mail.detail', server_id='__SERVER__') | tojson }},
         i18n: {
             files: {{ _('Файловый обменник') | tojson }},
+            dns: {{ _('Свой DNS-сервер') | tojson }},
             chatmail: {{ _('Chatmail для Delta Chat') | tojson }},
             running: {{ _('Работает') | tojson }},
             partial: {{ _('Работает частично') | tojson }},

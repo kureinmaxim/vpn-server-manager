@@ -163,7 +163,12 @@
             if (!row.path || !['direct', 'relay'].includes(row.path.state)) {
                 cell.append(element('span', peer.cur_addr ? t.statusAddress.replace('{address}', peer.cur_addr) : t.pathUnconfirmed, 'load-detail'));
             }
-            if (peer.relay) cell.append(element('span', t.peerHome.replace('{region}', peer.relay), 'load-detail'));
+            if (peer.relay) {
+                const own = (derp && derp.regions || []).some(region => region.own && region.code === peer.relay);
+                const home = element('span', t.peerHome.replace('{region}', peer.relay) + (own ? ` (${t.ownRegion})` : ''), 'load-detail');
+                home.title = t.peerHomeHint;
+                cell.append(home);
+            }
             if (row.path) {
                 const path = row.path;
                 cell.append(element('span', path.state === 'direct' ? t.directPath.replace('{address}', path.address)

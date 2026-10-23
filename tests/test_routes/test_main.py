@@ -529,6 +529,8 @@ class TestMainRoutes:
         assert 'server-mesh-marks' in html and 'server-file-mark' in html
         assert 'server-chatmail-mark' in html and 'is-chatmail' in html
         assert 'bi-envelope-fill' in html
+        assert 'server-dns-mark' in html and 'is-dns' in html and 'bi-globe2' in html
+        assert 'dnsName' in html and 'dnsHints' in html
         assert 'data-ip="10.0.0.1"' in html and 'data-name="Alpha"' in html
         assert 'Rust File Manager' in html
         assert 'Chatmail relay' in html

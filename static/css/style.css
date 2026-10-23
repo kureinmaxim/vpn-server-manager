@@ -386,6 +386,9 @@ body:has(.server-form) .navbar.mb-4 {
 .server-mesh-mark.is-files { background: #b45309; color: #fff; }
 .server-mesh-mark.is-files.is-partial { background: #ca8a04; }
 .server-mesh-mark.is-files.is-down { background: #78716c; }
+.server-mesh-mark.is-dns { background: #6f42c1; color: #fff; }
+.server-mesh-mark.is-dns.is-partial { background: #a370f7; color: #1b1b1b; }
+.server-mesh-mark.is-dns.is-down { background: #78716c; color: #fff; }
 .server-mesh-mark.is-chatmail { background: #fd7e14; color: #1b1b1b; }
 .server-mesh-mark.is-chatmail.is-partial { background: #e8590c; color: #fff; }
 .server-mesh-mark.is-chatmail.is-down { background: #78716c; color: #fff; }
