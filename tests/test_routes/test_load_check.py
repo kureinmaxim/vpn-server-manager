@@ -1,9 +1,10 @@
 import json
 import re
+import socket
 from unittest.mock import Mock
 
 import pytest
-from paramiko.ssh_exception import AuthenticationException
+from paramiko.ssh_exception import AuthenticationException, NoValidConnectionsError, SSHException
 
 from app.routes.api import load_check_limiter
 from app.services import registry
@@ -129,6 +130,26 @@ def test_failure_isolated_and_does_not_leak_details(load_client, error):
     assert "error" in response.json
     assert b"private-secret" not in response.data
     assert load_client.get("/api/monitoring/one/load-snapshot").status_code == 200
+
+
+@pytest.mark.parametrize(
+    "error, text",
+    [
+        (ConnectionRefusedError("private-secret"), "порт SSH закрыт"),
+        (socket.gaierror("private-secret"), "найти адрес"),
+        (TimeoutError("private-secret"), "за отведённое время"),
+        (SSHException("private-secret"), "сессия не открылась"),
+        (NoValidConnectionsError({("192.0.2.1", 22): ConnectionRefusedError()}), "порт SSH закрыт"),
+        (AuthenticationException("private-secret"), "логин и пароль"),
+        (RuntimeError("private-secret"), "Сервер не ответил."),
+    ],
+)
+def test_failure_reason_is_specific_without_details(load_client, error, text):
+    registry.get("ssh").get_load_snapshot.side_effect = [error]
+    response = load_client.get("/api/monitoring/one/load-snapshot")
+    assert response.status_code == 502
+    assert text in response.json["error"]
+    assert b"private-secret" not in response.data
 
 
 def test_repeated_snapshots_are_rate_limited(load_client):

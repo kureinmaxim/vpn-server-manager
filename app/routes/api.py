@@ -677,6 +677,30 @@ def roles_snapshot(server_id):
     return _load_check_snapshot(server_id, kind='roles')
 
 
+def _ssh_failure_message(exc):
+    """Fixed, translated reason for an SSH failure; never the exception text."""
+    import socket
+    from paramiko.ssh_exception import AuthenticationException, NoValidConnectionsError, SSHException
+    if isinstance(exc, (AuthenticationException, AuthenticationError)):
+        return _('SSH: проверьте логин и пароль.')
+    if isinstance(exc, ValueError):
+        return _('Не удалось прочитать метрики Linux.')
+    if isinstance(exc, NoValidConnectionsError):
+        refused = any(isinstance(error, ConnectionRefusedError) for error in exc.errors.values())
+        if refused:
+            return _('Сервер не ответил: порт SSH закрыт или отклоняет соединение. Проверьте порт в карточке и файрвол.')
+        return _('Сервер не ответил. Проверьте доступность и порт SSH.')
+    if isinstance(exc, ConnectionRefusedError):
+        return _('Сервер не ответил: порт SSH закрыт или отклоняет соединение. Проверьте порт в карточке и файрвол.')
+    if isinstance(exc, socket.gaierror):
+        return _('Не удалось найти адрес сервера. Проверьте IP или имя в карточке.')
+    if isinstance(exc, TimeoutError):
+        return _('Сервер не ответил за отведённое время. Проверьте доступность, порт SSH и файрвол.')
+    if isinstance(exc, (SSHException, EOFError)):
+        return _('Сервер ответил, но SSH-сессия не открылась. Проверьте порт SSH и ограничения подключений (fail2ban, лимиты).')
+    return _('Сервер не ответил. Проверьте доступность и порт SSH.')
+
+
 def _load_check_snapshot(server_id, derp=False, kind=None):
     kind = kind or ('derp' if derp else 'load')
     ssh_service = registry.get('ssh')
@@ -702,12 +726,7 @@ def _load_check_snapshot(server_id, derp=False, kind=None):
     except Exception as exc:
         # Do not expose SSH internals, addresses or credentials in error text.
         logger.warning('Load snapshot failed (%s)', type(exc).__name__)
-        from paramiko.ssh_exception import AuthenticationException
-        if isinstance(exc, (AuthenticationException, AuthenticationError)):
-            return jsonify(error=_('SSH: проверьте логин и пароль.')), 502
-        if isinstance(exc, ValueError):
-            return jsonify(error=_('Не удалось прочитать метрики Linux.')), 502
-        return jsonify(error=_('Сервер не ответил. Проверьте доступность и порт SSH.')), 502
+        return jsonify(error=_ssh_failure_message(exc)), 502
 
 
 def _ssh_auth(ssh_creds, data_manager):

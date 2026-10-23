@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.5] - 2026-10-23
+
+### Changed
+- **Server load** names the reason when SSH to a server fails instead of one generic message: wrong login or password, closed or refusing SSH port, address not found, timeout, or an SSH session that did not open (fail2ban or connection limits). The text never includes remote error details.
+- When SSH to a server is unavailable, **Server load** still matches it to your Tailscale network by server name, as the server cards do, and says so, instead of showing *Mesh unknown*.
+
 ## [4.13.4] - 2026-10-23
 
 ### Added

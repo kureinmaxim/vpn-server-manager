@@ -9687,3 +9687,18 @@ msgstr "Home DERP is the relay the server itself picked as its nearest. Other de
 
 msgid "Домашний DERP — ретранслятор, который сам сервер выбрал как ближайший. Через него до сервера достучатся, если прямого соединения нет. Это не путь вашего трафика и не доказательство, что сейчас идёт ретрансляция."
 msgstr "Home DERP is the relay the server itself picked as its nearest. Other devices reach the server through it when there is no direct connection. It is not the path of your traffic and not proof that relaying is happening now."
+
+msgid "Сервер не ответил: порт SSH закрыт или отклоняет соединение. Проверьте порт в карточке и файрвол."
+msgstr "The server did not answer: the SSH port is closed or refuses the connection. Check the port in the card and the firewall."
+
+msgid "Не удалось найти адрес сервера. Проверьте IP или имя в карточке."
+msgstr "The server address could not be resolved. Check the IP or name in the card."
+
+msgid "Сервер не ответил за отведённое время. Проверьте доступность, порт SSH и файрвол."
+msgstr "The server did not answer in time. Check availability, the SSH port and the firewall."
+
+msgid "Сервер ответил, но SSH-сессия не открылась. Проверьте порт SSH и ограничения подключений (fail2ban, лимиты)."
+msgstr "The server answered, but the SSH session did not open. Check the SSH port and connection limits (fail2ban, rate limits)."
+
+msgid "Определено по имени сервера: SSH недоступен."
+msgstr "Matched by server name: SSH is unavailable."

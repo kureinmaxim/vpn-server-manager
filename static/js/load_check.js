@@ -149,7 +149,13 @@
         const matches = nodes.filter(node => identity && identity.id
             ? node.id === identity.id
             : node.ips.includes(address) || (node.dns && node.dns.toLowerCase() === address));
-        const peer = matches.length === 1 ? matches[0] : null;
+        // SSH unreachable: fall back to the server name, as the server cards do.
+        const label = (row.server.name || '').toLowerCase();
+        const labels = [label, label.split('.')[0]].filter(Boolean);
+        const byName = !identity && !matches.length
+            ? nodes.filter(node => [node.name, (node.dns || '').split('.')[0]].some(value => value && labels.includes(value.toLowerCase())))
+            : [];
+        const peer = matches.length === 1 ? matches[0] : byName.length === 1 ? byName[0] : null;
         if (mesh && mesh.coordinator && (address === mesh.coordinator.toLowerCase() || (mesh.coordinator_ips || []).includes(address))) {
             const badge = element('span', t.coordinator, 'badge text-bg-primary d-block mb-1');
             badge.title = t.coordinatorHint; cell.append(badge);
@@ -158,6 +164,7 @@
         if (peer) {
             cell.append(element('span', peer.exit_selected ? t.meshSelected : peer.exit_available ? t.meshExit : t.meshNode,
                 'badge d-block mt-1 ' + (peer.exit_selected ? 'text-bg-success' : peer.exit_available ? 'text-bg-info' : 'text-bg-secondary')));
+            if (byName.length === 1 && !matches.length) cell.append(element('span', t.matchedByName, 'load-detail'));
             cell.append(element('span', peer.ips.join(', '), 'load-detail'));
             if (!peer.online) cell.append(element('span', t.meshOffline, 'load-detail text-warning'));
             if (!row.path || !['direct', 'relay'].includes(row.path.state)) {
