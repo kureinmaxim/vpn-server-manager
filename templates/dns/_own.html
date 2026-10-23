@@ -59,7 +59,9 @@
                 <li>{{ _('Логин и пароль — заданные в мастере AdGuard. Приложение их не хранит.') }}</li>
             </ol>
             <ol data-panel="unknown" hidden>
-                <li>{{ _('Порт панели не определён: AdGuard установлен как служба. Это порт, выбранный в мастере установки. Туннель с ним:') }} {{ code('ssh -N -L 127.0.0.1:13001:127.0.0.1:PORT root@server', 'own-ssh-generic') }}</li>
+                <li>{{ _('Порт панели не определён: AdGuard установлен как служба. Введите порт, выбранный в мастере установки (по умолчанию 3000; узнать: ss -ltnp | grep -i adguard на VPS):') }}
+                    <input type="number" id="own-panel-port" class="form-control form-control-sm d-inline-block w-auto" min="1" max="65535" value="3000" aria-label="{{ _('Порт панели AdGuard на VPS') }}">
+                    {{ _('Туннель с этим портом:') }} {{ code('ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:13001:127.0.0.1:3000 root@server', 'own-ssh-generic') }}</li>
                 <li>{{ _('Откройте в браузере:') }} {{ code('http://127.0.0.1:13001') }}</li>
             </ol>
             <p class="small text-body-secondary mb-0">{{ _('Найти, почему не открывается сайт: «Журнал» в панели → найти домен → ответ и сработавшее правило. После любой настройки ниже проверяйте там, что запросы устройства появились.') }}</p>

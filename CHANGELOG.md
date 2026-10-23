@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.13.3] - 2026-10-23
+
+### Fixed
+- **Own DNS server → Panel**: when the AdGuard panel port cannot be detected (AdGuard installed as a service), the SSH tunnel command no longer contains the literal `PORT`. A port field (3000 by default) fills it in, and the copy button copies the finished command.
+
 ## [4.13.2] - 2026-10-22
 
 ### Added

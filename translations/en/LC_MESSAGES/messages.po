@@ -9672,3 +9672,12 @@ msgstr "Card from the file. The live check failed."
 
 msgid "Удалить карточку «{name}»? Шаги подключения пропадут, пока не добавите её снова."
 msgstr "Delete the “{name}” card? Setup steps go away until you add it again."
+
+msgid "Порт панели не определён: AdGuard установлен как служба. Введите порт, выбранный в мастере установки (по умолчанию 3000; узнать: ss -ltnp | grep -i adguard на VPS):"
+msgstr "The panel port is unknown because AdGuard runs as a service. Enter the port chosen in the setup wizard (3000 by default; to find it, run ss -ltnp | grep -i adguard on the VPS):"
+
+msgid "Порт панели AdGuard на VPS"
+msgstr "AdGuard panel port on the VPS"
+
+msgid "Туннель с этим портом:"
+msgstr "Tunnel with this port:"

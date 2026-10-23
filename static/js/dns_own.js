@@ -161,10 +161,20 @@
                 }
             }
         }
-        setText('.own-ssh-generic', `ssh -N -o ExitOnForwardFailure=yes ${portArg}-L 127.0.0.1:13001:127.0.0.1:PORT ${target}`);
+        genericTunnel = {prefix: `ssh -N -o ExitOnForwardFailure=yes ${portArg}-L 127.0.0.1:13001:127.0.0.1:`, target};
+        applyGenericTunnel();
         root.querySelectorAll('[data-panel]').forEach(node => { node.hidden = node.dataset.panel !== panel; });
         applyDoh(item);
         applyIp(ip);
+    }
+
+    let genericTunnel = null;
+
+    function applyGenericTunnel() {
+        if (!genericTunnel) return;
+        const field = $('own-panel-port');
+        const port = Number(field && field.value);
+        setText('.own-ssh-generic', `${genericTunnel.prefix}${Number.isInteger(port) && port >= 1 && port <= 65535 ? port : 3000} ${genericTunnel.target}`);
     }
 
     function applyIp(ip) {
@@ -587,6 +597,8 @@
         });
     });
     dohInput.addEventListener('input', () => applyDoh());
+    const panelPort = $('own-panel-port');
+    if (panelPort) panelPort.addEventListener('input', applyGenericTunnel);
     which.addEventListener('change', applyItem);
     refresh.addEventListener('click', start);
     window.addEventListener('pagehide', () => { dohInput.value = ''; if (run) run.abort(); });
