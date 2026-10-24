@@ -44,7 +44,7 @@
 </div>
 <script>
 window.LOAD_CHECK_CONFIG = {
-    serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    serversUrl: {{ url_for('api.load_check_servers', kind='vps') | tojson }},
     meshUrl: {{ url_for('api.load_check_mesh') | tojson }},
     derpUrl: {{ url_for('api.load_check_derp') | tojson }},
     derpSnapshotUrl: {{ url_for('api.derp_snapshot', server_id='__SERVER__') | tojson }},

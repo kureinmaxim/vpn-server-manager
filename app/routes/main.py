@@ -9,7 +9,7 @@ import shutil
 import zipfile
 import signal
 from ..services import registry, dns_registry
-from ..services.data_manager_service import DataManagerService
+from ..services.data_manager_service import DataManagerService, server_kind
 from ..utils.decorators import require_auth, require_pin, handle_errors, log_request, csrf_protect
 from ..utils.credentials import sanitize_secret, sanitize_private_key
 from ..services.ssh_auth import SshKeyError, fingerprint, is_key_text, load_private_key
@@ -288,6 +288,7 @@ def add_server():
             "ip_address": request.form.get('ip_address', ''),
             "os": request.form.get('os', ''),
             "status": request.form.get('status', 'Active'),
+            "kind": server_kind({'kind': request.form.get('kind')}),
             "card_color": request.form.get('card_color', '#ffc107'),
             "icon_filename": None,
             "archived": False,
@@ -423,6 +424,7 @@ def edit_server(server_id):
                 _apply_fresh_geolocation(server)
                 server['os'] = request.form.get('os', server.get('os'))
                 server['status'] = request.form.get('status', server.get('status'))
+                server['kind'] = server_kind({'kind': request.form.get('kind', server.get('kind'))})
                 server['notes'] = request.form.get('notes', server.get('notes', ''))
                 server['docker_info'] = request.form.get('docker_info', server.get('docker_info', ''))
                 server['software_info'] = request.form.get('software_info', server.get('software_info', ''))
@@ -550,6 +552,42 @@ def tracked_projects():
         return redirect(url_for('main.tracked_projects'))
     return render_template('tracked_projects.html', projects=load_projects(current_app),
                            defaults=clean_projects(DEFAULT_PROJECTS))
+
+
+@main_bp.route('/settings/bots', methods=['GET', 'POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def tracked_bots():
+    """Telegram bots shown in the Bots overview."""
+    import secrets
+    from ..services.bot_stats import DEFAULT_BOTS, BotError, clean_bots, load_bots, save_bots
+    session.setdefault('csrf_token', secrets.token_urlsafe(32))
+    if request.method == 'POST':
+        if request.form.get('action') == 'reset':
+            bots = None
+        else:
+            fields = ('name', 'units', 'containers', 'processes', 'health_url', 'health_word', 'role')
+            bots = [dict(zip(fields, values)) for values in zip(*(request.form.getlist(f) for f in fields))]
+            for bot in bots:
+                bot['service'] = bot.pop('role') == 'service'
+        try:
+            saved = save_bots(current_app, bots)
+        except BotError as error:
+            flash({'incomplete': _('У каждого бота должны быть название и хотя бы одна служба, контейнер или процесс.'),
+                   'processes': _('Имена процессов: латиница, цифры и символы . _ - (до 15 знаков, как в ps; не больше 16 на проект).'),
+                   'units': _('Имена служб: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
+                   'containers': _('Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
+                   'health_url': _('Адрес проверки: только http://127.0.0.1:порт/путь (латиница, цифры и / _ . -).'),
+                   'health_word': _('Ожидаемое слово: латиница, цифры, _ и - (до 32 знаков), вместе с адресом проверки.'),
+                   }.get(str(error), _('Слишком много ботов.')), 'danger')
+            return render_template('tracked_bots.html', bots=bots or [], defaults=clean_bots(DEFAULT_BOTS)), 400
+        if saved:
+            flash(_('Список ботов сохранён.') if bots is not None else _('Восстановлен стандартный список ботов.'), 'success')
+        else:
+            flash(_('Не удалось сохранить список ботов.'), 'danger')
+        return redirect(url_for('main.tracked_bots'))
+    return render_template('tracked_bots.html', bots=load_bots(current_app), defaults=clean_bots(DEFAULT_BOTS))
 
 
 @main_bp.route('/settings')

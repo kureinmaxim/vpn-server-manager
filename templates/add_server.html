@@ -39,6 +39,15 @@
                             <option value="Suspended">{{ _('Заблокирован') }}</option>
                         </select>
                     </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="kind" class="form-label">{{ _('Тип узла') }}</label>
+                        <select class="form-select" id="kind" name="kind">
+                            <option value="vps" selected>VPS</option>
+                            <option value="nas">NAS</option>
+                            <option value="pc">{{ _('ПК') }}</option>
+                        </select>
+                        <div class="form-text">{{ _('NAS и ПК не попадают в «Загрузку серверов» и не показывают оплату.') }}</div>
+                    </div>
                 </div>
 
                 <div class="mb-3">

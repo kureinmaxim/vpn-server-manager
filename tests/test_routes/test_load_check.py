@@ -56,9 +56,18 @@ def test_inventory_filters_inactive_and_archived_without_exposing_secrets(load_c
     response = load_client.get("/api/monitoring/load-check/servers")
     assert response.status_code == 200
     assert [server["id"] for server in response.json["servers"]] == ["one", "legacy"]
-    assert set(response.json["servers"][0]) == {"id", "name", "ip_address"}
+    assert set(response.json["servers"][0]) == {"id", "name", "ip_address", "kind"}
     assert response.headers["Cache-Control"] == "no-store"
     registry.get("ssh").get_load_snapshot.assert_not_called()
+
+
+def test_inventory_kind_filter_keeps_nas_out_of_server_load(load_client):
+    servers = registry.get("data_manager").load_servers.return_value
+    servers.append({"id": "nas", "name": "tnas2", "ip_address": "198.51.100.6", "kind": "nas"})
+    every = load_client.get("/api/monitoring/load-check/servers").json["servers"]
+    assert [(s["id"], s["kind"]) for s in every] == [("one", "vps"), ("legacy", "vps"), ("nas", "nas")]
+    vps = load_client.get("/api/monitoring/load-check/servers?kind=vps").json["servers"]
+    assert [s["id"] for s in vps] == ["one", "legacy"]
 
 
 def test_mesh_context_is_local_and_not_cached(load_client, monkeypatch):

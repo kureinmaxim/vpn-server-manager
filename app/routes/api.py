@@ -11,6 +11,7 @@ from ..utils.rate_limiter import RateLimiter
 from ..exceptions import ValidationError, AuthenticationError, APIError
 from ..models.server import Server
 from ..services.ssh_auth import connect_kwargs, has_ssh_auth
+from ..services.data_manager_service import server_kind
 
 logger = logging.getLogger(__name__)
 
@@ -608,10 +609,12 @@ def load_check_servers():
     if not data_manager:
         return jsonify(error=_('Сервис данных недоступен.')), 503
     servers = data_manager.load_servers(current_app.config)
+    # ?kind=vps keeps NAS and PC cards out of Server load; Projects and Bots ask for every node.
+    kinds = set(request.args.getlist('kind'))
     response = jsonify(servers=[
         {'id': str(server['id']), 'name': server.get('name', ''),
-         'ip_address': server.get('ip_address', '')}
-        for server in servers if _is_load_check_server(server)
+         'ip_address': server.get('ip_address', ''), 'kind': server_kind(server)}
+        for server in servers if _is_load_check_server(server) and (not kinds or server_kind(server) in kinds)
     ])
     response.headers['Cache-Control'] = 'no-store'
     return response
@@ -670,6 +673,32 @@ def projects_snapshot(server_id):
     return _load_check_snapshot(server_id, kind='projects')
 
 
+@api_bp.route('/monitoring/<server_id>/bots-snapshot', methods=['GET'])
+@require_auth
+@require_pin
+def bots_snapshot(server_id):
+    return _load_check_snapshot(server_id, kind='bots')
+
+
+@api_bp.route('/monitoring/bots/mesh-only', methods=['GET'])
+@require_auth
+@require_pin
+def bots_mesh_only():
+    """Tailscale peers of this PC without an active card: listed, never polled."""
+    from ..services.mesh_context import local_mesh, node_matches
+    data_manager = registry.get('data_manager')
+    servers = [server for server in (data_manager.load_servers(current_app.config) if data_manager else [])
+               if _is_load_check_server(server)]
+    mesh = local_mesh()
+    nodes = [{'name': node.get('name', ''), 'ip': (node.get('ips') or [''])[0], 'online': node.get('online') is True,
+              'self': node.get('name') == mesh.get('host')}
+             for node in mesh.get('nodes') or []
+             if not any(node_matches(server.get('ip_address'), server.get('name'), node) for server in servers)]
+    response = jsonify(state=mesh.get('state', 'unavailable'), nodes=nodes)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
 @api_bp.route('/monitoring/<server_id>/roles-snapshot', methods=['GET'])
 @require_auth
 @require_pin
@@ -718,7 +747,7 @@ def _load_check_snapshot(server_id, derp=False, kind=None):
         if not load_check_limiter.is_allowed(('' if kind == 'load' else kind + ':') + str(server_id)):
             return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
         stats = {'derp': ssh_service.get_derp_snapshot, 'projects': ssh_service.get_projects_snapshot,
-                 'roles': ssh_service.get_roles_snapshot,
+                 'roles': ssh_service.get_roles_snapshot, 'bots': ssh_service.get_bots_snapshot,
                  'load': ssh_service.get_load_snapshot}[kind](**creds)
         response = jsonify(stats=stats)
         response.headers['Cache-Control'] = 'no-store'

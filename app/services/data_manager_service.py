@@ -15,6 +15,14 @@ from cryptography.fernet import Fernet, InvalidToken
 
 from ..utils.credentials import sanitize_secret
 
+# Тип узла карточки: арендованный VPS, домашний NAS или ПК в mesh. Старые карточки — VPS.
+SERVER_KINDS = ('vps', 'nas', 'pc')
+
+
+def server_kind(server: Dict[str, Any]) -> str:
+    kind = server.get('kind') if isinstance(server, dict) else None
+    return kind if kind in SERVER_KINDS else 'vps'
+
 
 class DataManagerService:
     """Сервис для управления данными приложения"""
@@ -138,6 +146,7 @@ class DataManagerService:
             'docker_info': server.get('docker_info', ''),
             'software_info': server.get('software_info', ''),
             'archived': bool(server.get('archived', False)),
+            'kind': server_kind(server),
         }
         
         # Вложенные объекты с дефолтными значениями

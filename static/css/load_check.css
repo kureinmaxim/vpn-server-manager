@@ -24,3 +24,10 @@
 .load-role-dot.is-partial { background: #ffc107; }
 .load-role-dot.is-stopped { background: #dc3545; }
 .load-role-dot.is-unknown { background: #adb5bd; }
+
+/* Bots overview: one block per node, readable in light and dark themes. */
+.bots-check-node { background: var(--bs-body-bg); }
+.bots-check-table { font-size: .875rem; }
+.bots-check-table th { color: var(--bs-secondary-color); white-space: nowrap; }
+.bots-check-table tbody th { color: var(--bs-body-color); }
+.bots-check-component { overflow-wrap: anywhere; }

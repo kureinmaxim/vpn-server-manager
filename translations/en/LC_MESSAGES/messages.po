@@ -9702,3 +9702,140 @@ msgstr "The server answered, but the SSH session did not open. Check the SSH por
 
 msgid "Определено по имени сервера: SSH недоступен."
 msgstr "Matched by server name: SSH is unavailable."
+msgid "У каждого бота должны быть название и хотя бы одна служба, контейнер или процесс."
+msgstr "Each bot needs a name and at least one service, container or process."
+
+msgid "Адрес проверки: только http://127.0.0.1:порт/путь (латиница, цифры и / _ . -)."
+msgstr "Health URL: only http://127.0.0.1:port/path (Latin letters, digits and / _ . -)."
+
+msgid "Ожидаемое слово: латиница, цифры, _ и - (до 32 знаков), вместе с адресом проверки."
+msgstr "Expected word: Latin letters, digits, _ and - (up to 32 characters), together with a health URL."
+
+msgid "Слишком много ботов."
+msgstr "Too many bots."
+
+msgid "Список ботов сохранён."
+msgstr "Bot list saved."
+
+msgid "Восстановлен стандартный список ботов."
+msgstr "Default bot list restored."
+
+msgid "Не удалось сохранить список ботов."
+msgstr "Could not save the bot list."
+
+msgid "Тип узла"
+msgstr "Node type"
+
+msgid "ПК"
+msgstr "PC"
+
+msgid "NAS и ПК не попадают в «Загрузку серверов» и не показывают оплату."
+msgstr "NAS and PC nodes are left out of Server load and show no payment."
+
+msgid "Какие Telegram-боты запущены на узлах"
+msgstr "Which Telegram bots run on your nodes"
+
+msgid "Боты"
+msgstr "Bots"
+
+msgid "Отслеживаемые боты"
+msgstr "Tracked bots"
+
+msgid "Адрес проверки"
+msgstr "Health URL"
+
+msgid "Ожидаемое слово"
+msgstr "Expected word"
+
+msgid "Бот"
+msgstr "Bot"
+
+msgid "Эти боты ищутся на узлах в окне «Боты». Укажите службы systemd (без .service), контейнеры Docker и процессы через запятую. Адрес проверки и ожидаемое слово необязательны: узел сам запрашивает адрес на 127.0.0.1 и сообщает только, найдено ли слово."
+msgstr "The Bots window looks for these bots on your nodes. List systemd services (without .service), Docker containers and processes, separated by commas. The health URL and expected word are optional: the node requests the URL on 127.0.0.1 itself and reports only whether the word was found."
+
+msgid "Добавить бота"
+msgstr "Add bot"
+
+msgid "Вернуть стандартный список ботов? Ваши изменения будут потеряны."
+msgstr "Restore the default bot list? Your changes will be lost."
+
+msgid "«Служебная» — задачи по таймеру (oneshot), а не боты: они показываются отдельным блоком с временем и результатом последнего запуска. Oneshot-службы внутри бота попадают туда же автоматически."
+msgstr "“Helper” means timer jobs (oneshot), not bots: they appear in a separate block with the time and result of the last run. Oneshot services inside a bot go there automatically."
+
+msgid "Telegram-боты на узлах"
+msgstr "Telegram bots on nodes"
+
+msgid "Разовая проверка по SSH, только чтение: состояние служб, контейнеров и процессов. Токены и настройки ботов не читаются."
+msgstr "One-off read-only check over SSH: state of services, containers and processes. Bot tokens and settings are not read."
+
+msgid "Бот тревог (Uptime Kuma, Beszel, сторож) шлёт сообщения напрямую в Bot API: процесса у него нет, поэтому его состояние здесь не определяется."
+msgstr "The alert bot (Uptime Kuma, Beszel, watchdog) sends messages straight to the Bot API. It has no process, so its state cannot be shown here."
+
+msgid "Сбой"
+msgstr "Failed"
+
+msgid "Перезапускается"
+msgstr "Restarting"
+
+msgid "Ожидает запуска"
+msgstr "Waiting for next run"
+
+msgid "служба"
+msgstr "service"
+
+msgid "с {time}"
+msgstr "since {time}"
+
+msgid "последний запуск {time}"
+msgstr "last run {time}"
+
+msgid "перезапусков: {count}"
+msgstr "restarts: {count}"
+
+msgid "память {value}"
+msgstr "memory {value}"
+
+msgid "health: ответ получен"
+msgstr "health: expected reply received"
+
+msgid "health: нет ожидаемого ответа"
+msgstr "health: expected reply not received"
+
+msgid "Подробности"
+msgstr "Details"
+
+msgid "Ботов из списка не найдено."
+msgstr "No bots from the list found."
+
+msgid "Служебные задачи: {count}"
+msgstr "Helper jobs: {count}"
+
+msgid "Похоже на бота, но нет в списке: {names}"
+msgstr "Looks like a bot but not in the list: {names}"
+
+msgid "systemd нет — службы не проверены"
+msgstr "No systemd, services not checked"
+
+msgid "Контейнеры недоступны (TOS)"
+msgstr "Containers unavailable (TOS)"
+
+msgid "Docker не ответил — контейнеры не проверены"
+msgstr "Docker did not answer, containers not checked"
+
+msgid "В mesh без SSH-карточки (не проверяются): {names}"
+msgstr "In the mesh without an SSH card (not checked): {names}"
+
+msgid "этот ПК"
+msgstr "this PC"
+
+msgid "офлайн"
+msgstr "offline"
+
+msgid "Получаю список узлов…"
+msgstr "Loading nodes…"
+
+msgid "Нет активных узлов вне архива."
+msgstr "No active nodes outside the archive."
+
+msgid "Проверено узлов: {done} / {total}"
+msgstr "Nodes checked: {done} / {total}"

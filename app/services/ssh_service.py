@@ -1255,6 +1255,25 @@ class SSHService:
         projects = load_projects()
         return summarize_projects(self._collect_projects(client, projects), projects)
 
+    def get_bots_snapshot(
+        self, ip: str, user: str, password: Optional[str], port: int = 22,
+        key: Optional[str] = None, key_passphrase: Optional[str] = None,
+    ) -> Dict:
+        """Telegram bots from the catalog: read-only systemctl/docker/pgrep and a loopback health word."""
+        from .bot_stats import build_command as build_bots_command, load_bots, parse as parse_bots
+        client = self.get_connection_pooled(
+            ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
+        )
+        bots = load_bots()
+        _, stdout, _ = client.exec_command(build_bots_command(bots), timeout=15)
+        try:
+            output = stdout.read(262145).decode("utf-8", errors="replace")
+        finally:
+            stdout.channel.close()
+        if 'END' not in output.splitlines():
+            raise ValueError('incomplete bots snapshot')
+        return parse_bots(output, bots)
+
     def get_roles_snapshot(
         self, ip: str, user: str, password: Optional[str], port: int = 22,
         key: Optional[str] = None, key_passphrase: Optional[str] = None,

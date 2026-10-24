@@ -1,0 +1,72 @@
+<div class="modal fade" id="botsCheckModal" tabindex="-1" aria-labelledby="botsCheckTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="botsCheckTitle"><i class="bi bi-robot me-2" aria-hidden="true"></i>{{ _('Telegram-боты на узлах') }}</h5>
+                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Разовая проверка по SSH, только чтение: состояние служб, контейнеров и процессов. Токены и настройки ботов не читаются.') }}</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                    <div id="bots-check-progress" class="small" role="status" aria-live="polite"></div>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('main.tracked_bots') }}" class="btn btn-sm btn-outline-secondary text-nowrap"><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Настроить список') }}</a>
+                        <button id="bots-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                    </div>
+                </div>
+                <div id="bots-check-nodes" class="bots-check-nodes" aria-busy="false"></div>
+                <p id="bots-check-mesh" class="small text-body-secondary mt-3 mb-0"></p>
+                <p class="small text-body-secondary mt-2 mb-0">{{ _('Бот тревог (Uptime Kuma, Beszel, сторож) шлёт сообщения напрямую в Bot API: процесса у него нет, поэтому его состояние здесь не определяется.') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+window.BOTS_CHECK_CONFIG = {
+    serversUrl: {{ url_for('api.load_check_servers') | tojson }},
+    meshUrl: {{ url_for('api.bots_mesh_only') | tojson }},
+    snapshotUrl: {{ url_for('api.bots_snapshot', server_id='__SERVER__') | tojson }},
+    monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
+    i18n: {
+        running: {{ _('Работает') | tojson }},
+        stopped: {{ _('Остановлен') | tojson }},
+        failed: {{ _('Сбой') | tojson }},
+        restarting: {{ _('Перезапускается') | tojson }},
+        partial: {{ _('Работает частично') | tojson }},
+        idle: {{ _('Ожидает запуска') | tojson }},
+        unknown: {{ _('Нет данных') | tojson }},
+        unit: {{ _('служба') | tojson }},
+        container: {{ _('контейнер') | tojson }},
+        process: {{ _('процесс') | tojson }},
+        since: {{ _('с {time}') | tojson }},
+        lastRun: {{ _('последний запуск {time}') | tojson }},
+        restarts: {{ _('перезапусков: {count}') | tojson }},
+        memory: {{ _('память {value}') | tojson }},
+        healthOk: {{ _('health: ответ получен') | tojson }},
+        healthFail: {{ _('health: нет ожидаемого ответа') | tojson }},
+        bot: {{ _('Бот') | tojson }},
+        state: {{ _('Состояние') | tojson }},
+        details: {{ _('Подробности') | tojson }},
+        noBots: {{ _('Ботов из списка не найдено.') | tojson }},
+        helpers: {{ _('Служебные задачи: {count}') | tojson }},
+        suspects: {{ _('Похоже на бота, но нет в списке: {names}') | tojson }},
+        noSystemd: {{ _('systemd нет — службы не проверены') | tojson }},
+        dockerTos: {{ _('Контейнеры недоступны (TOS)') | tojson }},
+        dockerUnavailable: {{ _('Docker не ответил — контейнеры не проверены') | tojson }},
+        meshOnly: {{ _('В mesh без SSH-карточки (не проверяются): {names}') | tojson }},
+        thisPc: {{ _('этот ПК') | tojson }},
+        offline: {{ _('офлайн') | tojson }},
+        checking: {{ _('Проверка…') | tojson }},
+        loading: {{ _('Получаю список узлов…') | tojson }},
+        empty: {{ _('Нет активных узлов вне архива.') | tojson }},
+        progress: {{ _('Проверено узлов: {done} / {total}') | tojson }},
+        completed: {{ _('Завершено: {time}') | tojson }},
+        requestError: {{ _('Не удалось получить ответ приложения.') | tojson }},
+        timeout: {{ _('Время ожидания истекло. Повторите проверку.') | tojson }},
+        auth: {{ _('Разблокируйте приложение и повторите проверку.') | tojson }},
+        kinds: {vps: 'VPS', nas: 'NAS', pc: {{ _('ПК') | tojson }}}
+    }
+};
+</script>

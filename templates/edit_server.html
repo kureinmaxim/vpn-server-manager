@@ -31,9 +31,17 @@
                             <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
                             <input type="text" class="form-control form-control-sm" id="ip_address" name="ip_address" value="{{ server.ip_address }}" required>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-3">
                             <label for="os" class="form-label">{{ _('ОС') }}</label>
                             <input type="text" class="form-control form-control-sm" id="os" name="os" value="{{ server.os }}" placeholder="{{ _('Например, Ubuntu 22.04') }}">
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="kind" class="form-label">{{ _('Тип узла') }}</label>
+                            <select class="form-select form-select-sm" id="kind" name="kind">
+                                <option value="vps" {% if server.get('kind', 'vps') == 'vps' %}selected{% endif %}>VPS</option>
+                                <option value="nas" {% if server.get('kind') == 'nas' %}selected{% endif %}>NAS</option>
+                                <option value="pc" {% if server.get('kind') == 'pc' %}selected{% endif %}>{{ _('ПК') }}</option>
+                            </select>
                         </div>
                         <div class="col-sm-4">
                             <label for="status" class="form-label">{{ _('Статус') }}</label>

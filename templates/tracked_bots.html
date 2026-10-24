@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ _('Отслеживаемые боты') }}{% endblock %}
+
+{% macro list_value(value) %}{{ (value or []) if (value or []) is string else (value or [])|join(', ') }}{% endmacro %}
+
+{% macro bot_row(bot, hint=False) %}
+<tr data-bot-row>
+    <td><input class="form-control form-control-sm" name="name" maxlength="60" value="{{ bot.name }}" aria-label="{{ _('Название') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ list_value(bot.units) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ list_value(bot.containers) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="processes" value="{{ list_value(bot.processes) }}" aria-label="{{ _('Процессы') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="health_url" value="{{ bot.health_url or '' }}"{% if hint %} placeholder="http://127.0.0.1:8000/health"{% endif %} aria-label="{{ _('Адрес проверки') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="health_word" value="{{ bot.health_word or '' }}"{% if hint %} placeholder="healthy"{% endif %} aria-label="{{ _('Ожидаемое слово') }}"></td>
+    <td>
+        <select class="form-select form-select-sm" name="role" aria-label="{{ _('Тип') }}">
+            <option value="bot" {% if not bot.service %}selected{% endif %}>{{ _('Бот') }}</option>
+            <option value="service" {% if bot.service %}selected{% endif %}>{{ _('Служебная') }}</option>
+        </select>
+    </td>
+    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" data-remove-bot title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
+</tr>
+{% endmacro %}
+
+{% block content %}
+<div class="container mt-4" style="max-width: 1280px">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Отслеживаемые боты') }}</li>
+        </ol>
+    </nav>
+    <h2><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Отслеживаемые боты') }}</h2>
+    <p class="text-body-secondary">{{ _('Эти боты ищутся на узлах в окне «Боты». Укажите службы systemd (без .service), контейнеры Docker и процессы через запятую. Адрес проверки и ожидаемое слово необязательны: узел сам запрашивает адрес на 127.0.0.1 и сообщает только, найдено ли слово.') }}</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+        {% endfor %}
+    {% endwith %}
+
+    <form method="post" id="tracked-bots-form">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col" style="width: 14%">{{ _('Название') }}</th>
+                        <th scope="col">{{ _('Службы systemd') }}</th>
+                        <th scope="col" style="width: 13%">{{ _('Контейнеры Docker') }}</th>
+                        <th scope="col" style="width: 9%">{{ _('Процессы') }}</th>
+                        <th scope="col" style="width: 16%">{{ _('Адрес проверки') }}</th>
+                        <th scope="col" style="width: 9%">{{ _('Ожидаемое слово') }}</th>
+                        <th scope="col" style="width: 9%">{{ _('Тип') }}</th>
+                        <th scope="col" style="width: 3rem"><span class="visually-hidden">{{ _('Действия') }}</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tracked-bots-rows">
+                    {% for bot in bots %}{{ bot_row(bot) }}{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <template id="tracked-bot-template">{{ bot_row({'name': '', 'units': [], 'containers': [], 'processes': [], 'health_url': '', 'health_word': '', 'service': False}, hint=True) }}</template>
+        <div class="d-flex flex-wrap gap-2">
+            <button type="button" class="btn btn-outline-info" id="add-bot"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить бота') }}</button>
+            <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
+            <button type="submit" class="btn btn-outline-secondary ms-auto" name="action" value="reset"
+                    formnovalidate onclick="return confirm({{ _('Вернуть стандартный список ботов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
+        </div>
+    </form>
+    <p class="small text-body-secondary mt-3 mb-1">{{ _('«Служебная» — задачи по таймеру (oneshot), а не боты: они показываются отдельным блоком с временем и результатом последнего запуска. Oneshot-службы внутри бота попадают туда же автоматически.') }}</p>
+    <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
+</div>
+<script>
+(function () {
+    const rows = document.getElementById('tracked-bots-rows');
+    const template = document.getElementById('tracked-bot-template');
+    document.getElementById('add-bot').addEventListener('click', () => {
+        rows.append(template.content.cloneNode(true));
+        rows.lastElementChild.querySelector('input').focus();
+    });
+    rows.addEventListener('click', event => {
+        const button = event.target.closest('[data-remove-bot]');
+        if (button) button.closest('[data-bot-row]').remove();
+    });
+})();
+</script>
+{% endblock %}

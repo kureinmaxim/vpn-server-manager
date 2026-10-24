@@ -2,6 +2,18 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.14.0] - 2026-10-24
+
+### Added
+- **Bots** button on the main screen, next to Projects. It opens a summary of the Telegram bots on every active card: running, stopped, failed or restarting, since when, restart count, memory, and the result of an optional local health check. Nodes are checked in parallel, each with its own progress and error, and **Refresh** runs the check again.
+- The bot list is edited under **Settings → Bots** (`/settings/bots`). Defaults: TelegramOnly with a health check on `127.0.0.1:8000/health`, BotCriptoM, telegram-helper-lite, plus the timer jobs TelegramOnly maintenance and Weekly monitoring report.
+- Timer (oneshot) jobs, including oneshot services inside a bot, are shown in a separate **Helper jobs** block with the time and result of the last run. They do not count towards a bot's state.
+- Services and containers with *bot* or *telegram* in their name that are not in the list are shown as **Looks like a bot**.
+- Server cards have a **Node type**: VPS, NAS or PC. NAS and PC cards show no payment and stay out of **Server load**, while Projects and Bots still check them. A TerraMaster NAS without Docker access shows “Containers unavailable (TOS)” instead of an error, and Docker installed under `/Volume*/@apps/DockerEngine` is found.
+- Tailscale peers of this PC that have no card are listed in the Bots window. They are not checked.
+
+### Security
+- The Bots check is read-only. It only runs `systemctl show` with a fixed property list, `systemctl list-units` filtered by name, `docker ps`/`docker inspect` with fixed fields, `pgrep -x`, and `curl` on `127.0.0.1`. The node checks the health reply itself, and only ok/fail leaves it. Environment, env files, container `Config.Env`, `/proc/*/environ`, bot configs and logs are never read. Bot names, health URLs and expected words are validated before they reach the shell.
 ## [4.13.5] - 2026-10-23
 
 ### Changed
