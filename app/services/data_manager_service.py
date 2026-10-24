@@ -24,6 +24,15 @@ def server_kind(server: Dict[str, Any]) -> str:
     return kind if kind in SERVER_KINDS else 'vps'
 
 
+def _extra_addresses(server: Dict[str, Any]) -> List[Dict[str, str]]:
+    """Дополнительные адреса SSH (mesh, LAN, прямой). Повреждённый список не ломает загрузку."""
+    from .ssh_address import AddressError, clean_addresses
+    try:
+        return clean_addresses(server.get('extra_addresses') or [], server.get('ip_address'))
+    except AddressError:
+        return []
+
+
 class DataManagerService:
     """Сервис для управления данными приложения"""
     
@@ -147,6 +156,7 @@ class DataManagerService:
             'software_info': server.get('software_info', ''),
             'archived': bool(server.get('archived', False)),
             'kind': server_kind(server),
+            'extra_addresses': _extra_addresses(server),
         }
         
         # Вложенные объекты с дефолтными значениями

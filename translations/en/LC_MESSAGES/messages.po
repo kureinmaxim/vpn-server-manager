@@ -64,7 +64,7 @@ msgstr "Settings updated successfully"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1502
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/main.py:82
 msgid "PIN is required"
-msgstr "required"
+msgstr "PIN is required"
 
 #: app/routes/api.py:1489
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1532
@@ -95,7 +95,7 @@ msgstr "PIN changed successfully"
 #: app/routes/api.py:1545
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1588
 msgid "Invalid old PIN"
-msgstr "Invalid PIN"
+msgstr "Invalid old PIN"
 
 #: app/routes/api.py:1564 app/routes/main.py:101
 #: dist/VPNServerManager-Clean.app/Contents/Resources/app/routes/api.py:1607
@@ -554,7 +554,7 @@ msgstr "Server name"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:16
 #: templates/add_server.html:16
 msgid "Например, VPS-1"
-msgstr "for example"
+msgstr "For example, VPS-1"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:19
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:19
@@ -565,7 +565,7 @@ msgstr "Hosting provider"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:20
 #: templates/add_server.html:20
 msgid "Например, Hetzner"
-msgstr "for example"
+msgstr "For example, Hetzner"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:24
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:24
@@ -576,7 +576,7 @@ msgstr "IP Address"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:25
 #: templates/add_server.html:25
 msgid "Например, 1.2.3.4"
-msgstr "For example, Ubuntu 22.04"
+msgstr "For example, 1.2.3.4"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:28
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:28
@@ -620,7 +620,7 @@ msgstr "Suspended"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:133
 #: templates/add_server.html:44 templates/add_server.html:133
 msgid "URL панели управления"
-msgstr "VPS Control Panel"
+msgstr "Control panel URL"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:45
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:134
@@ -1020,7 +1020,7 @@ msgstr "Package Management (apt)"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:270
 #: templates/add_server.html:270
 msgid "Безопасность (ufw / fail2ban)"
-msgstr "PIN Code Security"
+msgstr "Security (ufw / fail2ban)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:302
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:327
@@ -1329,7 +1329,7 @@ msgstr "Remove package:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:367
 #: templates/cheatsheet.html:367
 msgid "Проверить статус NGINX:"
-msgstr "Check service status"
+msgstr "Check NGINX status:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:374
 #: templates/cheatsheet.html:374
@@ -1339,12 +1339,12 @@ msgstr "Launch NGINX:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:381
 #: templates/cheatsheet.html:381
 msgid "Остановить NGINX:"
-msgstr "Install package"
+msgstr "Stop NGINX:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:388
 #: templates/cheatsheet.html:388
 msgid "Перезапустить NGINX:"
-msgstr "Restart service:"
+msgstr "Restart NGINX:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:395
 #: templates/cheatsheet.html:395
@@ -1374,7 +1374,7 @@ msgstr "Check active NGINX connections:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:438
 #: templates/cheatsheet.html:438
 msgid "Проверить статус Docker:"
-msgstr "Check service status"
+msgstr "Check Docker status:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:445
 #: templates/cheatsheet.html:445
@@ -1526,7 +1526,7 @@ msgstr "Hint Management"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:136
 #: templates/edit_server.html:136
 msgid "Новый пароль SSH"
-msgstr "New password ssh"
+msgstr "New SSH password"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:138
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:149
@@ -1540,12 +1540,12 @@ msgstr "Leave empty so as not to change."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:147
 #: templates/edit_server.html:147
 msgid "Новый пароль root"
-msgstr "New password Root"
+msgstr "New root password"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:163
 #: templates/edit_server.html:163
 msgid "URL панели"
-msgstr "VPS Control Panel"
+msgstr "Panel URL"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:172
 #: templates/edit_server.html:172
@@ -3851,7 +3851,7 @@ msgstr "The PIN is stored in encrypted form in the configuration file"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:651
 #: templates/help.html:651
 msgid "Экспорт и импорт с PIN"
-msgstr "Export Key"
+msgstr "Export and import with PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:652
 #: templates/help.html:652
@@ -4698,7 +4698,7 @@ msgstr "PIN-Code from the archive"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
 msgid "PIN-код найден!"
-msgstr "Pin-code is found!"
+msgstr "PIN code found!"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
@@ -4769,7 +4769,7 @@ msgstr "New PIN codes do not match"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:592
 #: templates/index_locked.html:592
 msgid "PIN успешно изменён!"
-msgstr "Pin is successfully changed!"
+msgstr "PIN changed successfully!"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:600
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:745
@@ -4795,7 +4795,7 @@ msgstr "There was an error when checking the archive"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:721
 #: templates/index_locked.html:721
 msgid "PIN-коды не совпадают"
-msgstr "Pin codes do not match"
+msgstr "PIN codes do not match"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:727
 #: templates/index_locked.html:727
@@ -4805,7 +4805,7 @@ msgstr "Creation..."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:740
 #: templates/index_locked.html:740
 msgid "PIN успешно создан!"
-msgstr "Pin has been successfully created!"
+msgstr "PIN created successfully!"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:740
 #: templates/index_locked.html:740
@@ -5579,7 +5579,7 @@ msgstr "Select encrypted data file from another installation"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:184
 #: templates/settings.html:184
 msgid ".env файл с SECRET_KEY"
-msgstr ".env file with secret_key"
+msgstr ".env file with SECRET_KEY"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:186
 #: templates/settings.html:186
@@ -5591,9 +5591,7 @@ msgstr "Encryption Key Management"
 msgid ""
 "Вставьте сюда ключ шифрования из файла .env другой установки (например: "
 "REDACTED_ROTATE_KEY)"
-msgstr ""
-"Insert the encryption key from the .env file of another installation (for"
-" example: K-IGKHDDBZXQWR5OABNKZCJD71I2N3VCTHIFOA663W =)"
+msgstr "Insert the encryption key from the .env file of another installation (for example: REDACTED_ROTATE_KEY)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:189
 #: templates/settings.html:189
@@ -5676,7 +5674,7 @@ msgstr "Data file (.enc)"
 #: templates/settings.html:275 templates/settings.html:348
 #: templates/settings.html:407
 msgid "Ключ шифрования (.env)"
-msgstr "Encryption Key Management"
+msgstr "Encryption key (.env)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:279
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:411
@@ -5707,7 +5705,7 @@ msgstr "Encrypted server data"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:349
 #: templates/settings.html:349
 msgid "PIN-код для входа (PIN.txt)"
-msgstr "Change PIN code for login"
+msgstr "Login PIN (PIN.txt)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:350
 #: templates/settings.html:350
@@ -5717,7 +5715,7 @@ msgstr "Uploaded files (uploads/)"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:351
 #: templates/settings.html:351
 msgid "Инструкции по импорту (README.txt)"
-msgstr "Import Instructions (Readme.txt)"
+msgstr "Import instructions (README.txt)"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:358
 #: templates/settings.html:358
@@ -5747,7 +5745,7 @@ msgstr "Continue export"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:427
 #: templates/settings.html:427
 msgid "Управление PIN-кодом"
-msgstr "Hint Management"
+msgstr "PIN management"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:432
 #: templates/settings.html:432
@@ -5860,7 +5858,7 @@ msgstr ""
 #: venv/lib/python3.13/site-packages/click/core.py:2807
 #, python-brace-format
 msgid "env var: {var}"
-msgstr "Env was: {was}"
+msgstr "env var: {var}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
 #, python-brace-format
@@ -6564,7 +6562,7 @@ msgid "Действия с сервером"
 msgstr "Server actions"
 
 msgid "Мониторинг VPS"
-msgstr "Monitoring"
+msgstr "VPS monitoring"
 
 msgid "Очистить стек"
 msgstr "Clean up stack"
@@ -9839,3 +9837,33 @@ msgstr "No active nodes outside the archive."
 
 msgid "Проверено узлов: {done} / {total}"
 msgstr "Nodes checked: {done} / {total}"
+
+msgid "Дополнительные адреса"
+msgstr "Extra addresses"
+
+msgid "Тип адреса"
+msgstr "Address type"
+
+msgid "Прямой"
+msgstr "Direct"
+
+msgid "прямой"
+msgstr "direct"
+
+msgid "Для SSH: сначала основной IP, потом эти адреса по порядку; используется первый, что отвечает. Порт и доступ — из блока SSH. Пустые строки не сохраняются."
+msgstr "For SSH: the main IP first, then these addresses in order; the first one that answers is used. Port and login come from the SSH block. Empty rows are not saved."
+
+msgid "Часть дополнительных адресов не сохранена: допустимы IP или имя узла (латиница, цифры, . : -), не больше %(count)s."
+msgstr "Some extra addresses were not saved: use an IP or host name (Latin letters, digits, . : -), at most %(count)s."
+
+msgid "SSH-ключ сохранён"
+msgstr "SSH key saved"
+
+msgid "Заменить SSH-ключ"
+msgstr "Replace SSH key"
+
+msgid "Пусто — оставить сохранённый ключ"
+msgstr "Leave empty to keep the saved key"
+
+msgid "IP или имя узла"
+msgstr "IP or host name"

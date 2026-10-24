@@ -488,3 +488,6 @@ body:has(.server-form) .navbar.mb-4 {
     color: var(--bs-secondary-color);
     font-size: 1.5rem;
 }
+
+/* Server form: VPS-only blocks hidden for NAS/PC must win over d-flex and similar utilities. */
+[data-node-kinds][hidden] { display: none !important; }

@@ -1,3 +1,4 @@
+import re
 from unittest.mock import Mock
 
 import pytest
@@ -130,3 +131,61 @@ def test_modal_is_translated_to_english(app, client):
     html = client.get("/?lang=en").get_data(as_text=True)
     assert "Telegram bots on nodes" in html and ">Bots<" in html.replace(" ", "").replace("</i>", ">")
     assert "Telegram-боты на узлах" not in html
+
+
+def test_snapshot_uses_first_answering_extra_address(bots_client, monkeypatch):
+    from app.services import ssh_address
+    ssh_address.forget()
+    servers = registry.get("data_manager").load_servers.return_value
+    servers[1]["extra_addresses"] = [{"address": "192.168.1.223", "label": "lan"}]
+    monkeypatch.setattr(ssh_address, "_reachable", lambda address, port, timeout: address == "192.168.1.223")
+    assert bots_client.get("/api/monitoring/nas/bots-snapshot").status_code == 200
+    assert registry.get("ssh").get_bots_snapshot.call_args.kwargs["ip"] == "192.168.1.223"
+    inventory = bots_client.get("/api/monitoring/load-check/servers").json["servers"]
+    assert inventory[1]["addresses"] == ["198.51.100.6", "192.168.1.223"]
+    ssh_address.forget()
+
+
+def test_edit_form_saves_extra_addresses_and_drops_invalid(app, client):
+    import os
+    import re
+    import tempfile
+    from cryptography.fernet import Fernet
+    from app.services.data_manager_service import DataManagerService
+    login(client)
+    folder = tempfile.mkdtemp()
+    manager = DataManagerService(Fernet.generate_key().decode(), folder)
+    path = os.path.join(folder, "servers.json.enc")
+    app.config["active_data_file"] = path
+    manager.save_servers([{"id": 1, "name": "tnas", "ip_address": "100.64.0.12", "kind": "nas",
+                           "ssh_credentials": {"user": "mxm", "port": 9222}}], path)
+    registry.register("data_manager", manager)
+    page = client.get("/edit_server/1").get_data(as_text=True)
+    assert page.count('name="extra_address"') == 2
+    form = dict(re.findall(r'<input[^>]*name="([^"]+)"[^>]*value="([^"]*)"', page))
+    form.update(name="tnas", ip_address="100.64.0.12", kind="nas", ssh_user="mxm", ssh_port="9222",
+                extra_address=["192.168.1.222", "bad; host"], extra_label=["lan", "direct"])
+    response = client.post("/edit_server/1", data=form)
+    assert response.status_code == 302
+    with client.session_transaction() as session:
+        categories = [category for category, _ in session.get("_flashes", [])]
+    assert "warning" in categories
+    assert manager.load_servers(app.config)[0]["extra_addresses"] == [{"address": "192.168.1.222", "label": "lan"}]
+    html = client.get("/").get_data(as_text=True)
+    assert 'data-ips="100.64.0.12 192.168.1.222"' in html
+
+
+@pytest.mark.parametrize("kind,hidden", [("nas", True), ("pc", True), ("vps", False)])
+def test_edit_form_hides_vps_only_sections_for_nas_and_pc(app, client, kind, hidden):
+    login(client)
+    manager = Mock()
+    manager.load_servers.return_value = [{
+        "id": 1, "name": "node", "ip_address": "192.0.2.5", "kind": kind, "specs": {}, "payment_info": {},
+        "ssh_credentials": {"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": "~/.ssh/k"},
+        "panel_credentials": {}, "hoster_credentials": {}, "checks": {}}]
+    registry.register("data_manager", manager)
+    html = client.get("/edit_server/1").get_data(as_text=True)
+    blocks = re.findall(r'data-node-kinds="vps"( hidden)?', html)
+    assert len(blocks) == 4 and all(bool(b) == hidden for b in blocks)
+    assert "node_kind.js" in html
+    assert "SSH key saved" in html and "Replace SSH key" in html

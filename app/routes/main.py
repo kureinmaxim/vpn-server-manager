@@ -131,6 +131,24 @@ def _apply_ssh_key(ssh, form, data_manager):
     return None
 
 
+def _extra_addresses_from_form(form, main):
+    """Дополнительные адреса из формы карточки. Неверные строки отбрасываются с предупреждением."""
+    from ..services.ssh_address import MAX_EXTRA, AddressError, clean_addresses
+    rows = [{'address': a, 'label': l} for a, l in zip(form.getlist('extra_address'), form.getlist('extra_label'))]
+    try:
+        return clean_addresses(rows, main), None
+    except AddressError:
+        kept = []
+        for row in rows:
+            try:
+                kept += clean_addresses([row], main)
+            except AddressError:
+                continue
+        return clean_addresses(kept[:MAX_EXTRA], main), _(
+            'Часть дополнительных адресов не сохранена: допустимы IP или имя узла (латиница, цифры, . : -), не больше %(count)s.',
+            count=MAX_EXTRA)
+
+
 def get_secret_pin():
     """Получает текущий PIN из config.json"""
     try:
@@ -289,6 +307,7 @@ def add_server():
             "os": request.form.get('os', ''),
             "status": request.form.get('status', 'Active'),
             "kind": server_kind({'kind': request.form.get('kind')}),
+            "extra_addresses": [],
             "card_color": request.form.get('card_color', '#ffc107'),
             "icon_filename": None,
             "archived": False,
@@ -336,6 +355,9 @@ def add_server():
         }
 
         _apply_fresh_geolocation(new_server)
+        new_server['extra_addresses'], address_error = _extra_addresses_from_form(request.form, new_server['ip_address'])
+        if address_error:
+            flash(address_error, 'warning')
 
         # Ошибка ключа не теряет остальную карточку: сервер сохраняется без ключа
         key_error = _apply_ssh_key(new_server['ssh_credentials'], request.form, data_manager)
@@ -425,6 +447,13 @@ def edit_server(server_id):
                 server['os'] = request.form.get('os', server.get('os'))
                 server['status'] = request.form.get('status', server.get('status'))
                 server['kind'] = server_kind({'kind': request.form.get('kind', server.get('kind'))})
+                if 'extra_address' in request.form:
+                    server['extra_addresses'], address_error = _extra_addresses_from_form(
+                        request.form, server['ip_address'])
+                    if address_error:
+                        flash(address_error, 'warning')
+                    from ..services.ssh_address import forget
+                    forget(server.get('id'))
                 server['notes'] = request.form.get('notes', server.get('notes', ''))
                 server['docker_info'] = request.form.get('docker_info', server.get('docker_info', ''))
                 server['software_info'] = request.form.get('software_info', server.get('software_info', ''))

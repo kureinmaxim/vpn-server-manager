@@ -12,6 +12,7 @@ from ..exceptions import ValidationError, AuthenticationError, APIError
 from ..models.server import Server
 from ..services.ssh_auth import connect_kwargs, has_ssh_auth
 from ..services.data_manager_service import server_kind
+from ..services.ssh_address import card_addresses, ssh_address
 
 logger = logging.getLogger(__name__)
 
@@ -432,7 +433,7 @@ def get_server_stats(server_id):
         
         # Получаем статистику через SSH
         stats = ssh_service.get_server_stats(
-            ip=server.get('ip_address', server.get('ip', '')),
+            ip=ssh_address(server, ssh_port),
             user=ssh_user,
             password=auth['password'],
             port=ssh_port,  # Передаем SSH порт
@@ -613,7 +614,8 @@ def load_check_servers():
     kinds = set(request.args.getlist('kind'))
     response = jsonify(servers=[
         {'id': str(server['id']), 'name': server.get('name', ''),
-         'ip_address': server.get('ip_address', ''), 'kind': server_kind(server)}
+         'ip_address': server.get('ip_address', ''), 'kind': server_kind(server),
+         'addresses': card_addresses(server)}
         for server in servers if _is_load_check_server(server) and (not kinds or server_kind(server) in kinds)
     ])
     response.headers['Cache-Control'] = 'no-store'
@@ -693,7 +695,8 @@ def bots_mesh_only():
     nodes = [{'name': node.get('name', ''), 'ip': (node.get('ips') or [''])[0], 'online': node.get('online') is True,
               'self': node.get('name') == mesh.get('host')}
              for node in mesh.get('nodes') or []
-             if not any(node_matches(server.get('ip_address'), server.get('name'), node) for server in servers)]
+             if not any(node_matches(address, server.get('name'), node)
+                        for server in servers for address in card_addresses(server) or [''])]
     response = jsonify(state=mesh.get('state', 'unavailable'), nodes=nodes)
     response.headers['Cache-Control'] = 'no-store'
     return response
@@ -794,7 +797,8 @@ def _get_server_ssh_credentials(server_id, data_manager):
         return None, None
     
     creds = {
-        'ip': server.get('ip_address'),
+        # Main address or the first extra address (mesh, LAN) that answers on the SSH port
+        'ip': ssh_address(server, ssh_creds.get('port', 22)),
         'user': ssh_creds.get('user', 'root'),
         'password': auth['password'],
         'port': ssh_creds.get('port', 22),
@@ -1297,7 +1301,7 @@ def check_monitoring_installed(server_id):
         # Проверяем существование главного скрипта с коротким таймаутом (быстрая проверка)
         check_cmd = "[ -f /usr/local/bin/monitoring/get-all-stats.sh ] && echo 'EXISTS' || echo 'NOT_FOUND'"
         result = ssh_service.execute_remote_command(
-            ip=server.get('ip_address'),
+            ip=ssh_address(server, ssh_creds.get('port', 22)),
             user=ssh_creds.get('user', 'root'),
             password=auth['password'],
             command=check_cmd,
@@ -1384,10 +1388,10 @@ def install_monitoring(server_id):
                 return
             
             # Получаем credentials
-            ip = server.get('ip_address')
             ssh_creds = server.get('ssh_credentials', {})
             user = ssh_creds.get('user', 'root')
             port = ssh_creds.get('port', 22)
+            ip = ssh_address(server, port)
             
             # Пароль и/или ключ из карточки (как в get_server_stats)
             try:
@@ -1687,10 +1691,10 @@ def uninstall_monitoring(server_id):
                 return
             
             # Получаем credentials
-            ip = server.get('ip_address')
             ssh_creds = server.get('ssh_credentials', {})
             user = ssh_creds.get('user', 'root')
             port = ssh_creds.get('port', 22)
+            ip = ssh_address(server, port)
             
             # Пароль и/или ключ из карточки (как в get_server_stats)
             try:

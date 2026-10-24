@@ -16,7 +16,7 @@
                         <label for="name" class="form-label">{{ _('Название сервера') }}</label>
                         <input type="text" class="form-control" id="name" name="name" required placeholder="{{ _('Например, VPS-1') }}">
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3" data-node-kinds="vps">
                         <label for="provider" class="form-label">{{ _('Хостинг-провайдер') }}</label>
                         <input type="text" class="form-control" id="provider" name="provider" placeholder="{{ _('Например, Hetzner') }}">
                     </div>
@@ -25,6 +25,7 @@
                     <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
                     <input type="text" class="form-control" id="ip_address" name="ip_address" required placeholder="{{ _('Например, 1.2.3.4') }}">
                 </div>
+                {% with extra_addresses=[], small=False %}{% include 'partials/extra_addresses.html' %}{% endwith %}
                 <div class="mb-3">
                     <label for="os" class="form-label">{{ _('Операционная система') }}</label>
                     <input type="text" class="form-control" id="os" name="os" placeholder="{{ _('Например, Ubuntu 22.04') }}">
@@ -83,6 +84,7 @@
                     </div>
                 </div>
 
+                <div data-node-kinds="vps">
                 <h5 class="mt-4">{{ _('Платёжная информация') }}</h5>
                 <div class="row">
                     <div class="col-md-4 mb-3">
@@ -106,6 +108,8 @@
                             <option value="Perpetual">{{ _('Бессрочно') }}</option>
                         </select>
                     </div>
+                </div>
+
                 </div>
 
                 <h5 class="mt-4">{{ _('SSH-доступ') }}</h5>
@@ -182,6 +186,7 @@
                     </div>
                 </div>
 
+                <div data-node-kinds="vps">
                 <h5 class="mt-4">{{ _('Кабинет хостера') }}</h5>
                 <div class="mb-3">
                     <label for="hoster_url" class="form-label">{{ _('URL кабинета') }}</label>
@@ -237,6 +242,8 @@
                     {{ file_picker('receipt', 'receipt') }}
                 </div>
 
+
+                </div>
 
                 <h5 class="mt-4">{{ _('Дополнительная информация') }}</h5>
                  <div class="mb-3">
@@ -376,6 +383,7 @@ function copyHint(button) {
     });
 }
 </script>
+<script src="{{ url_for('static', filename='js/node_kind.js') }}?v={{ app_info.get('version', '') }}"></script>
 {% endblock %}
 
 {% block body_attrs %}{% endblock %}

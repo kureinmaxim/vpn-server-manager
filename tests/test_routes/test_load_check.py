@@ -56,7 +56,7 @@ def test_inventory_filters_inactive_and_archived_without_exposing_secrets(load_c
     response = load_client.get("/api/monitoring/load-check/servers")
     assert response.status_code == 200
     assert [server["id"] for server in response.json["servers"]] == ["one", "legacy"]
-    assert set(response.json["servers"][0]) == {"id", "name", "ip_address", "kind"}
+    assert set(response.json["servers"][0]) == {"id", "name", "ip_address", "kind", "addresses"}
     assert response.headers["Cache-Control"] == "no-store"
     registry.get("ssh").get_load_snapshot.assert_not_called()
 

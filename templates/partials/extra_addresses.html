@@ -1,0 +1,18 @@
+{# Extra SSH addresses of a card. Needs `extra_addresses` (list of {address, label}) and `small` (bool). #}
+{% set rows = (extra_addresses or []) | list %}
+<div class="mb-3">
+    <label class="form-label">{{ _('Дополнительные адреса') }}</label>
+    {% for index in range([rows|length + 1, 2]|max if rows|length < 4 else 4) %}
+    {% set row = rows[index] if index < rows|length else {'address': '', 'label': 'mesh' if index == 0 else 'lan'} %}
+    <div class="input-group{% if small %} input-group-sm{% endif %} mb-1">
+        <input type="text" class="form-control font-monospace" name="extra_address" maxlength="253" value="{{ row.address }}"
+               placeholder="{{ _('IP или имя узла') }}" aria-label="{{ _('Адрес') }}">
+        <select class="form-select flex-grow-0 w-auto" name="extra_label" aria-label="{{ _('Тип адреса') }}">
+            <option value="mesh" {% if row.label == 'mesh' %}selected{% endif %}>Mesh</option>
+            <option value="lan" {% if row.label == 'lan' %}selected{% endif %}>LAN</option>
+            <option value="direct" {% if row.label == 'direct' %}selected{% endif %}>{{ _('Прямой') }}</option>
+        </select>
+    </div>
+    {% endfor %}
+    <div class="form-text">{{ _('Для SSH: сначала основной IP, потом эти адреса по порядку; используется первый, что отвечает. Порт и доступ — из блока SSH. Пустые строки не сохраняются.') }}</div>
+</div>

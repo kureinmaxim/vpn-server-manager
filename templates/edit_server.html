@@ -23,13 +23,16 @@
                             <label for="name" class="form-label">{{ _('Название сервера') }}</label>
                             <input type="text" class="form-control form-control-sm" id="name" name="name" value="{{ server.name }}" required>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-6" data-node-kinds="vps"{% if server.get('kind', 'vps') != 'vps' %} hidden{% endif %}>
                             <label for="provider" class="form-label">{{ _('Хостинг-провайдер') }}</label>
                             <input type="text" class="form-control form-control-sm" id="provider" name="provider" value="{{ server.provider }}">
                         </div>
                         <div class="col-sm-6">
                             <label for="ip_address" class="form-label">{{ _('IP-адрес') }}</label>
                             <input type="text" class="form-control form-control-sm" id="ip_address" name="ip_address" value="{{ server.ip_address }}" required>
+                        </div>
+                        <div class="col-12">
+                            {% with extra_addresses=server.get('extra_addresses') or [], small=True %}{% include 'partials/extra_addresses.html' %}{% endwith %}
                         </div>
                         <div class="col-sm-3">
                             <label for="os" class="form-label">{{ _('ОС') }}</label>
@@ -81,7 +84,7 @@
                             <label for="disk" class="form-label">{{ _('Диск') }}</label>
                             <input type="text" class="form-control form-control-sm" id="disk" name="disk" value="{{ server.specs.disk }}">
                         </div>
-                        <div class="col-12 d-flex flex-wrap gap-3 pt-1">
+                        <div class="col-12 d-flex flex-wrap gap-3 pt-1" data-node-kinds="vps"{% if server.get('kind', 'vps') != 'vps' %} hidden{% endif %}>
                             <div class="form-check mb-0">
                                 <input class="form-check-input" type="checkbox" id="check_dns_ok" name="check_dns_ok" {% if server.checks.get('dns_ok') %}checked{% endif %}>
                                 <label class="form-check-label" for="check_dns_ok">{{ _('DNS без утечек') }}</label>
@@ -94,7 +97,7 @@
                     </div>
                 </section>
 
-                <section class="server-form-section">
+                <section class="server-form-section" data-node-kinds="vps"{% if server.get('kind', 'vps') != 'vps' %} hidden{% endif %}>
                     <h5>{{ _('Платёжная информация') }}</h5>
                     <div class="row g-2">
                         <div class="col-6 col-md-3">
@@ -176,7 +179,7 @@
                         <div class="col-12">
                             {% if server.ssh_credentials.key_hint %}
                             <div class="current-secret mb-2">
-                                <div class="form-label text-muted mb-1">{{ _('Текущий SSH-ключ') }}</div>
+                                <div class="form-label text-success mb-1"><i class="bi bi-check-circle-fill" aria-hidden="true"></i> {{ _('SSH-ключ сохранён') }}</div>
                                 <div class="d-flex align-items-center gap-1 min-w-0">
                                     <code class="flex-grow-1 min-w-0 text-truncate" title="{{ server.ssh_credentials.key_hint }}">{{ server.ssh_credentials.key_hint }}{% if server.ssh_credentials.key_path %} · {{ server.ssh_credentials.key_path }}{% endif %}</code>
                                     <button type="button"
@@ -190,9 +193,9 @@
                                 <div class="form-text text-warning d-none js-clear-note">{{ _('Будет удалён при сохранении. Нажмите корзину ещё раз, чтобы отменить.') }}</div>
                             </div>
                             {% endif %}
-                            <label for="ssh_key" class="form-label">{{ _('Новый SSH-ключ') }}</label>
+                            <label for="ssh_key" class="form-label">{{ _('Заменить SSH-ключ') if server.ssh_credentials.key_hint else _('Новый SSH-ключ') }}</label>
                             <textarea class="form-control form-control-sm font-monospace mb-1" id="ssh_key" name="ssh_key" rows="3"
-                                      spellcheck="false" autocomplete="off" placeholder="~/.ssh/id_ed25519"
+                                      spellcheck="false" autocomplete="off" placeholder="{{ _('Пусто — оставить сохранённый ключ') if server.ssh_credentials.key_hint else '~/.ssh/id_ed25519' }}"
                                       aria-describedby="ssh_keyHelp"></textarea>
                             <div id="ssh_keyHelp" class="form-text mb-2">{{ _('Путь к приватному ключу на этом компьютере или его текст. Если заданы и ключ, и пароль, сначала пробуется ключ. Оставьте пустым, чтобы не менять.') }}</div>
                             {{ password_input(
@@ -240,7 +243,7 @@
                     </div>
                 </section>
 
-                <section class="server-form-section">
+                <section class="server-form-section" data-node-kinds="vps"{% if server.get('kind', 'vps') != 'vps' %} hidden{% endif %}>
                     <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
                         <h5 class="mb-0 flex-grow-1">{{ _('Кабинет хостера') }}</h5>
                         <button type="button" class="btn btn-sm btn-outline-danger flex-shrink-0" onclick="clearFormSection(this)" data-confirm="{{ _('Очистить URL, логин и пароль кабинета? Изменения запишутся после «Сохранить».') }}">
@@ -551,4 +554,5 @@ function copyHint(element) {
     });
 }
 </script>
+<script src="{{ url_for('static', filename='js/node_kind.js') }}?v={{ app_info.get('version', '') }}"></script>
 {% endblock %}

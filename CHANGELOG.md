@@ -2,6 +2,19 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.14.1] - 2026-10-24
+
+### Added
+- A card can have **extra addresses** (mesh, LAN, direct) next to the main IP. SSH tries the main IP first, then the extra addresses in order. The first one that answers on the card's SSH port is used and remembered until the app restarts, and every SSH feature (status, monitoring, load, projects, bots, reset, service control) uses it. For example, a NAS that accepts SSH only from the home LAN is still reached at home through its LAN address. Mesh marks and Server load also match the card to Tailscale peers by any of its addresses.
+
+### Changed
+- For **NAS** and **PC** cards the server form hides what only a rented VPS needs: hosting provider, payment, hoster account, receipts, and the DNS-leak and streaming checks. The card hides them too. The values are kept, so switching the node type back to VPS loses nothing.
+- When a card already has an SSH key, the form shows “SSH key saved” in green and names the field “Replace SSH key”. An empty field reads as “keep the saved key” instead of looking as if the key was lost.
+
+### Fixed
+- English hints in the server form: the IP field said “For example, Ubuntu 22.04”, and the name and provider fields only said “for example”. About 20 other wrong English translations were also corrected, for example “Stop NGINX” shown as “Install package” and “PIN management” shown as “Hint Management”.
+- Chinese translations of command-line messages lost their `{…}` placeholders, so a message could fail when it was shown. A test now checks that examples and placeholders survive translation.
+
 ## [4.14.0] - 2026-10-24
 
 ### Added

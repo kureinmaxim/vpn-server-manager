@@ -142,13 +142,14 @@
 
     function meshCell(row) {
         const cell = element('td', undefined, 'load-mesh');
-        const address = (row.server.ip_address || '').toLowerCase().replace(/\.$/, '');
+        const addresses = (row.server.addresses || [row.server.ip_address || '']).map(value => String(value).toLowerCase().replace(/\.$/, ''));
+        const address = addresses[0] || '';
         const remote = row.stats && row.stats.mesh;
         const identity = remote && remote.state === 'ready' && remote.self;
         const nodes = mesh && mesh.state === 'ready' ? mesh.nodes : [];
         const matches = nodes.filter(node => identity && identity.id
             ? node.id === identity.id
-            : node.ips.includes(address) || (node.dns && node.dns.toLowerCase() === address));
+            : addresses.some(value => node.ips.includes(value) || (node.dns && node.dns.toLowerCase() === value)));
         // SSH unreachable: fall back to the server name, as the server cards do.
         const label = (row.server.name || '').toLowerCase();
         const labels = [label, label.split('.')[0]].filter(Boolean);

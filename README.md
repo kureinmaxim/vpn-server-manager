@@ -1,4 +1,4 @@
-# VPN Server Manager v4.14.0
+# VPN Server Manager v4.14.1
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest release · 4.14.0:** a new **Bots** window shows which Telegram bots run on each VPS, NAS or PC card: their state, since when, restarts, memory and a local health check. The check is read-only and never reads tokens. Cards have a node type (VPS / NAS / PC), and NAS and PC cards stay out of **Server load**. [Changelog →](CHANGELOG.md#4140---2026-10-24)
+**Latest release · 4.14.1:** a card can hold **extra addresses** (mesh, LAN, direct), and SSH uses the first one that answers. For example, a NAS that accepts SSH only from the home LAN is still reached at home. **NAS** and **PC** cards hide payment, hoster and VPN checks. The form now shows clearly when an SSH key is saved, and wrong English hints in the server form are fixed. 4.14.0 added the **Bots** window. [Changelog →](CHANGELOG.md#4141---2026-10-24)
 
 ## See your fleet at a glance
 

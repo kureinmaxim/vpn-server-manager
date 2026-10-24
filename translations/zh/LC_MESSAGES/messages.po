@@ -5550,7 +5550,7 @@ msgstr "{editor}：编辑失败：{e}"
 #: venv/lib/python3.13/site-packages/click/core.py:1121
 #, python-brace-format
 msgid "{text} {deprecated_message}"
-msgstr "{text} {drevecated_message}"
+msgstr "{text} {deprecated_message}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:1140
 msgid "Options"
@@ -5604,14 +5604,12 @@ msgstr "debrecationwarning：{param_type} {name！r}已弃用。{extra_message}"
 #: venv/lib/python3.13/site-packages/click/core.py:2807
 #, python-brace-format
 msgid "env var: {var}"
-msgstr ""
-"Error 500 (Server Error)!!1500.That's an error.There was an error. Please"
-" try again later.That's all we know."
+msgstr "环境变量：{var}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2810
 #, python-brace-format
 msgid "default: {default}"
-msgstr "默认值：{默认}"
+msgstr "默认值：{default}"
 
 #: venv/lib/python3.13/site-packages/click/core.py:2814
 msgid "required"
@@ -5624,7 +5622,7 @@ msgstr "（动态的）"
 #: venv/lib/python3.13/site-packages/click/decorators.py:465
 #, python-format
 msgid "%(prog)s, version %(version)s"
-msgstr "__ph_0__，版本__ph_1__"
+msgstr "%(prog)s，版本 %(version)s"
 
 #: venv/lib/python3.13/site-packages/click/decorators.py:522
 msgid "Show the version and exit."
@@ -5638,22 +5636,22 @@ msgstr "显示此消息并退出。"
 #: venv/lib/python3.13/site-packages/click/exceptions.py:89
 #, python-brace-format
 msgid "Error: {message}"
-msgstr "错误信息}"
+msgstr "错误：{message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:81
 #, python-brace-format
 msgid "Try '{command} {option}' for help."
-msgstr "尝试'{命令} {option}'寻求帮助。"
+msgstr "尝试 '{command} {option}' 获取帮助。"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:130
 #, python-brace-format
 msgid "Invalid value: {message}"
-msgstr "无效的值：{消息}"
+msgstr "无效的值：{message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:132
 #, python-brace-format
 msgid "Invalid value for {param_hint}: {message}"
-msgstr "{param_hint}的无效值：{messages}"
+msgstr "{param_hint} 的值无效：{message}"
 
 #: venv/lib/python3.13/site-packages/click/exceptions.py:190
 msgid "Missing argument"
@@ -5695,7 +5693,7 @@ msgstr "未知错误"
 #: venv/lib/python3.13/site-packages/click/exceptions.py:289
 #, python-brace-format
 msgid "Could not open file {filename!r}: {message}"
-msgstr "无法打开文件{filename！r}：{messages}"
+msgstr "无法打开文件 {filename!r}：{message}"
 
 #: venv/lib/python3.13/site-packages/click/formatting.py:156
 msgid "Usage:"
@@ -5755,9 +5753,7 @@ msgstr "按任何键继续..."
 msgid ""
 "Choose from:\n"
 "\t{choices}"
-msgstr ""
-"选择：\n"
-"\t{选择}"
+msgstr "可选：\n\t{choices}"
 
 #: venv/lib/python3.13/site-packages/click/types.py:371
 #, python-brace-format
@@ -9507,3 +9503,33 @@ msgstr "归档之外没有活动节点。"
 
 msgid "Проверено узлов: {done} / {total}"
 msgstr "已检查节点：{done} / {total}"
+
+msgid "Дополнительные адреса"
+msgstr "其他地址"
+
+msgid "Тип адреса"
+msgstr "地址类型"
+
+msgid "Прямой"
+msgstr "直连"
+
+msgid "прямой"
+msgstr "直连"
+
+msgid "Для SSH: сначала основной IP, потом эти адреса по порядку; используется первый, что отвечает. Порт и доступ — из блока SSH. Пустые строки не сохраняются."
+msgstr "SSH：先尝试主 IP，再按顺序尝试这些地址，使用第一个响应的地址。端口和登录信息取自 SSH 区块。空行不会保存。"
+
+msgid "Часть дополнительных адресов не сохранена: допустимы IP или имя узла (латиница, цифры, . : -), не больше %(count)s."
+msgstr "部分其他地址未保存：请使用 IP 或主机名（拉丁字母、数字、. : -），最多 %(count)s 个。"
+
+msgid "SSH-ключ сохранён"
+msgstr "SSH 密钥已保存"
+
+msgid "Заменить SSH-ключ"
+msgstr "替换 SSH 密钥"
+
+msgid "Пусто — оставить сохранённый ключ"
+msgstr "留空则保留已保存的密钥"
+
+msgid "IP или имя узла"
+msgstr "IP 或主机名"

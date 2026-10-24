@@ -48,11 +48,13 @@
         return el;
     }
 
-    function fill(holder, ip, name, mesh) {
+    function fill(holder, ips, name, mesh) {
+        // Any card address (main, mesh, LAN) may be the peer; the name is the last resort.
+        const ip = ips.find(address => (mesh.nodes || []).some(node => nodeMatches(address, '', node))) || ips[0] || '';
         const matches = (mesh.nodes || []).filter(node => nodeMatches(ip, name, node));
         const peer = matches.length === 1 ? matches[0] : null;
         const bits = [];
-        if (isCoordinator(ip, mesh)) {
+        if (ips.some(address => isCoordinator(address, mesh))) {
             bits.push(mark('is-coord', 'bi-hdd-network-fill', t.coordinator + '. ' + t.coordinatorHint));
         }
         if (peer) {
@@ -81,9 +83,9 @@
         .then(mesh => {
             if (!mesh || mesh.state !== 'ready') return;
             board.querySelectorAll('.server-board-item').forEach(item => {
-                const ip = item.getAttribute('data-ip') || '';
+                const ips = (item.getAttribute('data-ips') || item.getAttribute('data-ip') || '').split(/\s+/).filter(Boolean);
                 const name = item.getAttribute('data-name') || '';
-                item.querySelectorAll('.server-mesh-marks').forEach(holder => fill(holder, ip, name, mesh));
+                item.querySelectorAll('.server-mesh-marks').forEach(holder => fill(holder, ips, name, mesh));
             });
         })
         .catch(() => { /* Tailscale missing: cards stay without marks. */ });
