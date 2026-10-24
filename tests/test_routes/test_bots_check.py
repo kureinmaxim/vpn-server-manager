@@ -189,3 +189,29 @@ def test_edit_form_hides_vps_only_sections_for_nas_and_pc(app, client, kind, hid
     assert len(blocks) == 4 and all(bool(b) == hidden for b in blocks)
     assert "node_kind.js" in html
     assert "SSH key saved" in html and "Replace SSH key" in html
+
+
+@pytest.mark.parametrize("ssh,command,hint", [
+    ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": "~/.ssh/id_ed25519_maximkurein"},
+     "ssh -i ~/.ssh/id_ed25519_maximkurein -p 9222 mxm@100.64.0.6", "no password needed"),
+    ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": "~/My Keys/nas"},
+     'ssh -i &#34;$HOME/My Keys/nas&#34; -p 9222 mxm@100.64.0.6', "no password needed"),
+    ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": ""},
+     "ssh -p 9222 mxm@100.64.0.6", "saved in the card as text"),
+    ({"user": "root", "port": 22}, "ssh -p 22 root@100.64.0.6", "Login password"),
+])
+def test_card_ssh_command_uses_saved_key_path(app, client, ssh, command, hint):
+    import os
+    import tempfile
+    from cryptography.fernet import Fernet
+    from app.services.data_manager_service import DataManagerService
+    login(client)
+    folder = tempfile.mkdtemp()
+    manager = DataManagerService(Fernet.generate_key().decode(), folder)
+    path = os.path.join(folder, "servers.json.enc")
+    app.config["active_data_file"] = path
+    manager.save_servers([{"id": 1, "name": "tnas2", "ip_address": "100.64.0.6", "kind": "nas",
+                           "ssh_credentials": ssh}], path)
+    registry.register("data_manager", manager)
+    html = client.get("/?lang=en").get_data(as_text=True)
+    assert command in html and hint in html

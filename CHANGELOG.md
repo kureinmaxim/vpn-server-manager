@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.14.3] - 2026-10-24
+
+### Fixed
+- The SSH command on a card includes the saved key, for example `ssh -i ~/.ssh/id_ed25519 -p 9222 mxm@100.64.0.6`, and says that no password is needed. Before, the copied command asked for a password even though the app itself logs in with the key. A key pasted as text is not a file, so for that case the card explains how to add `-i`.
+
 ## [4.14.2] - 2026-10-24
 
 ### Fixed

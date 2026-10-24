@@ -9918,3 +9918,12 @@ msgstr "Status"
 
 msgid "Удалить сохранённый пароль"
 msgstr "Delete the saved password"
+
+msgid "Вход по SSH-ключу из карточки, пароль не нужен."
+msgstr "Logs in with the SSH key from the card, no password needed."
+
+msgid "Ключ сохранён в карточке как текст: для терминала добавьте -i с путём к файлу ключа."
+msgstr "The key is saved in the card as text: for a terminal, add -i with the path to the key file."
+
+msgid "Команда входа как %(user)s по SSH-ключу."
+msgstr "Login command as %(user)s with the SSH key."
