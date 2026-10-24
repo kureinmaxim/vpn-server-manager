@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.14.2] - 2026-10-24
+
+### Fixed
+- In the server form, the dropdown arrow no longer covers the text of narrow lists such as the address type (Mesh / LAN).
+- The English and Chinese interface no longer shows Russian text in the server form (SSH password hints, “Root only”, clearing the panel and hoster), on the PIN screen and in the monitoring summary.
+
 ## [4.14.1] - 2026-10-24
 
 ### Added

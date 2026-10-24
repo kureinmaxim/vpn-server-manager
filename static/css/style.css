@@ -247,6 +247,11 @@ input.secret-input.has-secret-value {
     font-size: 0.875rem;
 }
 
+/* Keep room for the dropdown arrow, or narrow selects (address type) draw it over the text. */
+.server-form .form-select {
+    padding-right: 2rem;
+}
+
 .server-form .form-control-color {
     width: 2.5rem;
     height: 2rem;

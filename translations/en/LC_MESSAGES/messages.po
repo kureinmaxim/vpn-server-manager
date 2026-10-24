@@ -9867,3 +9867,54 @@ msgstr "Leave empty to keep the saved key"
 
 msgid "IP или имя узла"
 msgstr "IP or host name"
+
+msgid "First setup is not available"
+msgstr "First setup is not available"
+
+msgid "PIN configured successfully"
+msgstr "PIN configured successfully"
+
+msgid "При вставке пароля лишние пробелы, переносы и невидимые символы удаляются автоматически."
+msgstr "Extra spaces, line breaks and invisible characters are removed automatically when you paste a password."
+
+msgid "Пустое поле нового пароля — не менять. Чтобы стереть сохранённый пароль, нажмите корзину. Если на сервере только root — кнопка «Только root»."
+msgstr "Leave a new password empty to keep the current one. To erase a saved password, click the trash icon. If the server only has root, use “Root only”."
+
+msgid "Логин станет root. Справочный пароль root, если он есть, перенесётся в пароль входа и будет удалён."
+msgstr "The login becomes root. The reference root password, if any, moves into the login password and is removed from the reference."
+
+msgid "Только root"
+msgstr "Root only"
+
+msgid "Очистить URL, логин и пароль панели? Изменения запишутся после «Сохранить»."
+msgstr "Clear the panel URL, login and password? Changes are written when you click Save."
+
+msgid "Очистить"
+msgstr "Clear"
+
+msgid "Очистить логин. Пустое поле сохранится."
+msgstr "Clear the login. The empty field will be saved."
+
+msgid "Очистить URL, логин и пароль кабинета? Изменения запишутся после «Сохранить»."
+msgstr "Clear the hoster account URL, login and password? Changes are written when you click Save."
+
+msgid "Вы можете задать свой PIN-код, использовать PIN по умолчанию 1234 или импортировать существующие данные."
+msgstr "You can set your own PIN, use the default PIN 1234, or import existing data."
+
+msgid "Использовать PIN 1234"
+msgstr "Use PIN 1234"
+
+msgid "Будет использован PIN 1234. Приложение будет перезагружено."
+msgstr "PIN 1234 will be used. The app will reload."
+
+msgid "Собираю разбор..."
+msgstr "Building the summary..."
+
+msgid "Не удалось собрать разбор"
+msgstr "Could not build the summary"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Удалить сохранённый пароль"
+msgstr "Delete the saved password"
