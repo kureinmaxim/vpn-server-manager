@@ -1,4 +1,4 @@
-# VPN Server Manager v4.15.9
+# VPN Server Manager v4.15.10
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**Latest release · 4.15.9:** a **Back** button and section trail on every page, and card editors for tracked bots and projects that show long lists in full. **4.15.8:** a redesigned **Settings** page in the same style as the rest of the app, with working key generation and PIN change. **4.15.7:** Settings can hide or show the DNS, Server load, Projects and Bots buttons; Projects and Bots are off in a new installation. **4.15.6:** the Monitoring page shows the exchange with the server step by step, with progress, data received and time left, instead of a frozen page. **4.15.5:** the security analysis no longer advises turning off password login on servers the app reaches by password. **4.15.4:** the Monitoring page loads service status in seconds instead of hanging on «Loading...». **4.15.3:** **Analyse the situation** on the Monitoring page no longer hits the rate limit, so the LLM prompt is built again. **4.15.2:** the **Monitoring** page shows one row of status chips, correct CPU, SSH-failure and firewall numbers on root servers without sudo, and offers to update an old CPU history script. **4.15.1:** a more compact **Bots** window: sending-only bots first, then one table of bots with a process. **4.15.0:** the **Bots** window also finds **sending-only bots** (timers, Uptime Kuma) by bot ID and @username without taking tokens off the servers, and finds bots on **macOS** nodes and this computer by command line. **4.14.3:** the SSH command on a card includes the saved key (`ssh -i …`). **4.14.2:** form fixes for the address type list and the remaining untranslated hints. **4.14.1:** a card can hold **extra addresses** (mesh, LAN, direct), and SSH uses the first one that answers. For example, a NAS that accepts SSH only from the home LAN is still reached at home. **NAS** and **PC** cards hide payment, hoster and VPN checks. The form now shows clearly when an SSH key is saved, and wrong English hints in the server form are fixed. 4.14.0 added the **Bots** window. [Changelog →](CHANGELOG.md#4159---2026-10-25)
+**Latest release · 4.15.10:** the Tracked bots page explains that sending-only bots are found automatically, and the README screenshots show the current board, Settings, server form and About page. **4.15.9:** a **Back** button and section trail on every page, and card editors for tracked bots and projects that show long lists in full. **4.15.8:** a redesigned **Settings** page in the same style as the rest of the app, with working key generation and PIN change. **4.15.7:** Settings can hide or show the DNS, Server load, Projects and Bots buttons; Projects and Bots are off in a new installation. **4.15.6:** the Monitoring page shows the exchange with the server step by step, with progress, data received and time left, instead of a frozen page. **4.15.5:** the security analysis no longer advises turning off password login on servers the app reaches by password. **4.15.4:** the Monitoring page loads service status in seconds instead of hanging on «Loading...». **4.15.3:** **Analyse the situation** on the Monitoring page no longer hits the rate limit, so the LLM prompt is built again. **4.15.2:** the **Monitoring** page shows one row of status chips, correct CPU, SSH-failure and firewall numbers on root servers without sudo, and offers to update an old CPU history script. **4.15.1:** a more compact **Bots** window: sending-only bots first, then one table of bots with a process. **4.15.0:** the **Bots** window also finds **sending-only bots** (timers, Uptime Kuma) by bot ID and @username without taking tokens off the servers, and finds bots on **macOS** nodes and this computer by command line. **4.14.3:** the SSH command on a card includes the saved key (`ssh -i …`). **4.14.2:** form fixes for the address type list and the remaining untranslated hints. **4.14.1:** a card can hold **extra addresses** (mesh, LAN, direct), and SSH uses the first one that answers. For example, a NAS that accepts SSH only from the home LAN is still reached at home. **NAS** and **PC** cards hide payment, hoster and VPN checks. The form now shows clearly when an SSH key is saved, and wrong English hints in the server form are fixed. 4.14.0 added the **Bots** window. [Changelog →](CHANGELOG.md#41510---2026-10-25)
 
 ## See your fleet at a glance
 
@@ -72,7 +72,7 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 ## Keep everyday operations together
 
 <p align="center">
-  <img src="docs/images/03-server-board.png" alt="Server board — compact cards with mesh, file-manager and Chatmail marks; drag to reorder, archive" width="900">
+  <img src="docs/images/03-server-board.png" alt="Server board — compact cards with price, payment date, checks and node type, the toolbar with DNS, Server load, Projects and Bots; drag to reorder, archive" width="900">
   <br><sub>Compact cards · mesh / file-manager / Chatmail icons · demonstration servers</sub>
 </p>
 
@@ -100,11 +100,11 @@ Expand **DERP and port availability** to inspect an existing Headscale relay or 
 </p>
 
 <p align="center">
-  <img src="docs/images/04-add-server.png" alt="Edit a server and its SSH connection details" width="720">
+  <img src="docs/images/04-add-server.png" alt="Edit a server: basic information, extra mesh and LAN addresses, node type and payment, with a Back button and section trail" width="720">
 </p>
 
 <p align="center">
-  <img src="docs/images/05-settings.png" alt="Application settings, encryption and import or export" width="720">
+  <img src="docs/images/05-settings.png" alt="Settings: home page button switches, data file, import and export, encryption key and PIN" width="720">
 </p>
 
 <p align="center">

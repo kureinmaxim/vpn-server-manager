@@ -265,3 +265,9 @@ def test_card_ssh_command_uses_saved_key_path(app, client, ssh, command, hint):
     registry.register("data_manager", manager)
     html = client.get("/?lang=en").get_data(as_text=True)
     assert command in html and hint in html
+
+
+def test_settings_page_explains_sending_only_bots(app, client):
+    login(client)
+    html = client.get("/settings/bots?lang=en").get_data(as_text=True)
+    assert "don&#39;t need to be added here" in html or "don't need to be added here" in html

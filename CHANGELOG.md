@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.10] - 2026-10-25
+
+### Added
+- The **Tracked bots** page explains that bots which only send messages and keep no process (timers, Uptime Kuma notifications, containers with TELEGRAM_* variables) don't need a catalog entry: the Bots window finds them by bot number or @username and shows them at the top.
+
+### Changed
+- README screenshots of the server board, Settings, the server form and About show the current interface, with demo servers on documentation addresses.
+
 ## [4.15.9] - 2026-10-25
 
 ### Added

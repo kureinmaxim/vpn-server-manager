@@ -10333,3 +10333,6 @@ msgstr "Could not change the PIN"
 
 msgid "Редактирование"
 msgstr "Editing"
+
+msgid "Боты, которые только отправляют сообщения и не держат процесс (таймеры, уведомления Uptime Kuma, контейнеры с переменными TELEGRAM_*), добавлять сюда не нужно: окно «Боты» находит их само по номеру бота или @имени и показывает вверху. Токен при этом не покидает сервер."
+msgstr "Bots that only send messages and keep no running process (timers, Uptime Kuma notifications, containers with TELEGRAM_* variables) don't need to be added here: the Bots window finds them by bot number or @username and shows them at the top. The token never leaves the server."
