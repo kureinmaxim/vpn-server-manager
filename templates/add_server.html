@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% from "macros/credentials.html" import password_input, file_picker, icon_picker %}
 
 {% block title %}{{ _('Добавить сервер') }}{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1>{{ _('Добавить новый сервер') }}</h1>
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Добавить новый сервер'), None)]) }}
+    <h1>{ _('Добавить новый сервер') }</h1>
     <hr>
     <div class="row">
         <div class="col-md-8">

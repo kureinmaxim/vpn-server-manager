@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 
 {% block title %}{{ _('О программе') }} - {{ super() }}{% endblock %}
 
 {% block content %}
+<div class="container mt-4">{{ crumbs([(_('Список серверов'), url_for('main.index')), (_('О программе'), None)]) }}</div>
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
         <div class="card bg-dark text-white border-secondary">

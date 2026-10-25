@@ -1,13 +1,10 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% block title %}{{ _('Перенос DNS-записей') }} · {{ source.name }}{% endblock %}
 {% block content %}
 <div class="container dns-page my-4">
     {% include "dns/_head.html" %}
-    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
-        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.index') }}">DNS</a>
-        <span aria-hidden="true" class="mx-2">/</span><span>{{ _('Перенос') }}</span>
-    </nav>
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), ('DNS', url_for('dns.index')), (_('Перенос'), None)]) }}
     <header class="mb-4">
         <h1 class="h3"><i class="bi bi-arrow-left-right me-2" aria-hidden="true"></i>{{ _('Перенос DNS-записей на другой VPS') }}</h1>
         <p class="text-body-secondary mb-0">{{ _('Сервер') }} <strong>{{ source.name }}</strong> · <span class="font-monospace">{{ source.ip_address }}</span></p>

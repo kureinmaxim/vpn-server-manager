@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui2">
 {% set ssh_port = server.get('ssh_credentials', {}).get('port', 22) %}
 <div class="container-fluid mt-3 monitoring-page">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name + ' · ' + _('Мониторинг'), None)]) }}
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <h1>
@@ -16,9 +18,6 @@
         </div>
         <div>
             <a href="{{ url_for('dns_mail.detail', server_id=server.id) }}" class="btn btn-outline-info btn-sm">DNS / Chatmail</a>
-            <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-arrow-left"></i> {{ _('Назад к списку') }}
-            </a>
         </div>
     </div>
 

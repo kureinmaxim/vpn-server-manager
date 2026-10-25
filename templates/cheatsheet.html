@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% block title %}{{ selected.title if selected else _('Шпаргалка по командам') }}{% endblock %}
 {% set ns = namespace(i=0) %}
 {% macro cmd(label, command) -%}
@@ -14,13 +15,8 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
 <div class="container net-tools my-4{% if selected %} net-detail{% endif %}">
-    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
-        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span>
-        {% if selected %}<a href="{{ url_for('main.cheatsheet') }}">{{ _('Шпаргалка') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span><span>{{ selected.title }}</span>
-        {% else %}<span>{{ _('Шпаргалка') }}</span>{% endif %}
-    </nav>
+    {% if selected %}{{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Шпаргалка'), url_for('main.cheatsheet')), (selected.title, None)]) }}
+    {% else %}{{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Шпаргалка'), None)]) }}{% endif %}
     {% if not selected %}
     <header class="mb-4">
         <h1><i class="bi bi-terminal me-2" aria-hidden="true"></i>{{ _('Шпаргалка') }}</h1>

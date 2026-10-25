@@ -10330,3 +10330,6 @@ msgstr "Data file"
 
 msgid "Не удалось сменить PIN"
 msgstr "Could not change the PIN"
+
+msgid "Редактирование"
+msgstr "Editing"

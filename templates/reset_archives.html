@@ -1,8 +1,9 @@
 {% extends 'layout.html' %}
+{% from "macros/nav.html" import crumbs %}
 {% block content %}
 <div class="container py-4" id="archive-page" data-list="{{ url_for('reset.archive_list', server_id=server.id) }}" data-delete="{{ url_for('reset.archive_delete', server_id=server.id) }}" data-csrf="{{ session.csrf_token }}">
-<a href="{{ url_for('reset.reset_page', server_id=server.id) }}">← {{ _('Очистка TelegramOnly') }}</a>
-<h1 class="h3 mt-3">{{ _('Архивы очистки') }} · {{ server.name }}</h1>
+{{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name, None), (_('Очистка TelegramOnly'), url_for('reset.reset_page', server_id=server.id)), (_('Архивы очистки'), None)]) }}
+<h1 class="h3">{{ _('Архивы очистки') }} · {{ server.name }}</h1>
 <p>{{ server.ip_address }}</p>
 <div class="alert alert-warning">{{ _('Удаление архива необратимо: сохранённые настройки и данные восстановить из него уже не получится. Удаляйте архив после успешной повторной установки.') }}</div>
 <p>{{ _('Показаны только архивы завершённых операций из /var/backups/telegramonly-reset. Архивы незавершённых операций защищены.') }}</p>

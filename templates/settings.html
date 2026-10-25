@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% from "macros/credentials.html" import file_picker %}
 
 {% block title %}{{ _('Настройки') }}{% endblock %}
@@ -6,6 +7,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}?v={{ app_info.get('version', '') }}">
 <div class="container mt-4 settings-page">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), None)]) }}
     <header class="settings-head">
         <h1><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Настройки') }}</h1>
         <p class="text-body-secondary mb-0">{{ _('Кнопки главной страницы, файл данных с серверами, ключ шифрования и PIN.') }}</p>

@@ -3,9 +3,9 @@ from .test_reset import reset_client
 
 
 @pytest.mark.parametrize('lang,expected,back', [
-    ('en', ['TelegramOnly cleanup', 'Cleanup archives', 'Disk usage'], 'Servers'),
-    ('zh', ['清理 TelegramOnly', '清理备份', '磁盘用量'], '服务器'),
-    ('ru', ['Очистка TelegramOnly', 'Архивы очистки', 'Место на диске'], 'Серверы'),
+    ('en', ['TelegramOnly cleanup', 'Cleanup archives', 'Disk usage'], 'Back'),
+    ('zh', ['清理 TelegramOnly', '清理备份', '磁盘用量'], '后退'),
+    ('ru', ['Очистка TelegramOnly', 'Архивы очистки', 'Место на диске'], 'Назад'),
 ])
 def test_new_page_locales(reset_client, lang, expected, back):
     pages = ['/servers/one/reset', '/servers/one/reset/archives', '/servers/one/disk-usage']

@@ -1,15 +1,12 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% from "macros/credentials.html" import password_display, text_copy_display %}
 {% from "dns/_macros.html" import expiry_badge, confirm_delete %}
 {% block title %}{{ domain.name }} · DNS{% endblock %}
 {% block content %}
 <div class="container dns-page my-4">
     {% include "dns/_head.html" %}
-    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
-        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span><a href="{{ url_for('dns.index') }}">DNS</a>
-        <span aria-hidden="true" class="mx-2">/</span><span>{{ domain.name }}</span>
-    </nav>
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), ('DNS', url_for('dns.index')), (domain.name, None)]) }}
     <header class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
         <h1 class="h2 mb-0 font-monospace text-break"><i class="bi bi-globe2 me-2" aria-hidden="true"></i>{{ domain.name }}</h1>
         <div class="d-flex gap-2">

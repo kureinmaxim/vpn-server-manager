@@ -1,6 +1,8 @@
 {% extends 'layout.html' %}
+{% from "macros/nav.html" import crumbs %}
 {% block content %}
 <div class="container my-3" style="max-width: 1080px">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name + ' · ' + _('Мониторинг'), url_for('main.monitoring', server_id=server.id)), ('DNS / Chatmail', None)]) }}
     <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
         <div><h1 class="h3">DNS / Chatmail</h1><p class="small text-body-secondary mb-0">{{ server.name }}</p></div>
         <a class="btn btn-sm btn-outline-secondary align-self-start" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Мониторинг') }}</a>

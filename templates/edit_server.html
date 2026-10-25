@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% from "macros/credentials.html" import password_input, current_secret_row, file_picker, icon_picker %}
 
 {% block title %}{{ _('Редактировать сервер') }}{% endblock %}
@@ -6,6 +7,7 @@
 {% block content %}
 <div class="container-fluid px-4 pb-3 server-form">
     <form action="{{ url_for('main.edit_server', server_id=server.id) }}" method="post" enctype="multipart/form-data" id="edit-server-form">
+        {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name, None)]) }}
         <div class="server-form-bar">
             <h1 class="h5 mb-0 text-truncate">{{ _('Редактировать:') }} {{ server.name }}</h1>
             <div class="d-flex gap-2 flex-shrink-0">

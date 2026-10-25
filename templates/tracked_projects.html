@@ -1,26 +1,35 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 
 {% block title %}{{ _('Отслеживаемые проекты') }}{% endblock %}
 
+{% macro list_value(value) %}{{ (value or []) if (value or []) is string else (value or [])|join(', ') }}{% endmacro %}
+
+{% macro field(label, name, value, hint='', wide=False) %}
+<label class="editor-field{% if wide %} editor-field-wide{% endif %}">
+    <span>{{ label }}</span>
+    <textarea class="form-control form-control-sm font-monospace editor-grow" name="{{ name }}" rows="1"{% if hint %} placeholder="{{ hint }}"{% endif %}>{{ value }}</textarea>
+</label>
+{% endmacro %}
+
 {% macro project_row(project, hint=False) %}
-<tr data-project-row>
-    <td><input class="form-control form-control-sm" name="name" maxlength="60" value="{{ project.name }}" aria-label="{{ _('Название') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ project.units if project.units is string else project.units|join(', ') }}"{% if hint %} placeholder="myapp, myapp-worker"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ project.containers if project.containers is string else project.containers|join(', ') }}"{% if hint %} placeholder="myapp"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="processes" value="{{ (project.processes or []) if (project.processes or []) is string else (project.processes or [])|join(', ') }}"{% if hint %} placeholder="myapp"{% endif %} aria-label="{{ _('Процессы') }}"></td>
-    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" data-remove-project title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
-</tr>
+<article class="editor-card" data-project-row>
+    <div class="editor-card-head">
+        <input class="form-control fw-semibold" name="name" maxlength="60" value="{{ project.name }}" aria-label="{{ _('Название') }}" placeholder="{{ _('Название') }}">
+        <button type="button" class="btn btn-sm btn-outline-danger" data-remove-project title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button>
+    </div>
+    <div class="editor-fields">
+        {{ field(_('Службы systemd'), 'units', list_value(project.units), 'myapp, myapp-worker' if hint else '', wide=True) }}
+        {{ field(_('Контейнеры Docker'), 'containers', list_value(project.containers), 'myapp' if hint else '') }}
+        {{ field(_('Процессы'), 'processes', list_value(project.processes), 'myapp' if hint else '') }}
+    </div>
+</article>
 {% endmacro %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 1100px">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ _('Отслеживаемые проекты') }}</li>
-        </ol>
-    </nav>
-    <h2><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Отслеживаемые проекты') }}</h2>
+<div class="container mt-4 editor-page">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), url_for('main.settings')), (_('Отслеживаемые проекты'), None)]) }}
+    <h1 class="editor-title"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Отслеживаемые проекты') }}</h1>
     <p class="text-body-secondary">{{ _('Эти проекты ищутся на серверах в окне «Проекты», в статусе сервера и в мониторинге. TelegramOnly показан в своём разделе. Укажите имена служб systemd (без .service) и контейнеров Docker через запятую — проект считается найденным, если на сервере есть хотя бы одна из них.') }}</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -34,24 +43,11 @@
 
     <form method="post" id="tracked-projects-form">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col" style="width: 20%">{{ _('Название') }}</th>
-                        <th scope="col">{{ _('Службы systemd') }}</th>
-                        <th scope="col" style="width: 24%">{{ _('Контейнеры Docker') }}</th>
-                        <th scope="col" style="width: 16%">{{ _('Процессы') }}</th>
-                        <th scope="col" style="width: 3rem"><span class="visually-hidden">{{ _('Действия') }}</span></th>
-                    </tr>
-                </thead>
-                <tbody id="tracked-projects-rows">
-                    {% for project in projects %}{{ project_row(project) }}{% endfor %}
-                </tbody>
-            </table>
+        <div class="editor-cards" id="tracked-projects-rows">
+            {% for project in projects %}{{ project_row(project) }}{% endfor %}
         </div>
         <template id="tracked-project-template">{{ project_row({'name': '', 'units': [], 'containers': [], 'processes': []}, hint=True) }}</template>
-        <div class="d-flex flex-wrap gap-2">
+        <div class="d-flex flex-wrap gap-2 mt-3">
             <button type="button" class="btn btn-outline-info" id="add-project"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить проект') }}</button>
             <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
             <button type="submit" class="btn btn-outline-secondary ms-auto" name="action" value="reset"
@@ -66,9 +62,17 @@
 (function () {
     const rows = document.getElementById('tracked-projects-rows');
     const template = document.getElementById('tracked-project-template');
+    // Поле растёт по тексту: длинный список виден целиком, а не обрезается краем
+    const grow = el => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 2 + 'px'; };
+    const growAll = root => root.querySelectorAll('textarea.editor-grow').forEach(grow);
+    rows.addEventListener('input', event => { if (event.target.matches('textarea.editor-grow')) grow(event.target); });
+    window.addEventListener('resize', () => growAll(rows));
+    growAll(rows);
     document.getElementById('add-project').addEventListener('click', () => {
         rows.append(template.content.cloneNode(true));
+        growAll(rows.lastElementChild);
         rows.lastElementChild.querySelector('input').focus();
+        rows.lastElementChild.scrollIntoView({behavior: 'smooth', block: 'center'});
     });
     rows.addEventListener('click', event => {
         const button = event.target.closest('[data-remove-project]');

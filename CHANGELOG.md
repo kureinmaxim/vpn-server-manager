@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.9] - 2026-10-25
+
+### Added
+- Every inner page has the same navigation: a **Back** button to the page it belongs to, and the section trail. For example, Tracked bots shows «Back · Server list / Settings / Tracked bots», and Back returns to Settings rather than to the server list. Back follows the trail, not the browser history, because the app window has no browser buttons. Pages that had no way back now have one: Settings, Tracked bots and projects, Hint management, About, Help, Add server, Edit server, Monitoring, DNS / Chatmail, Server management, Disk usage, TelegramOnly cleanup and archives. Net Tools, Cheatsheet and DNS use the same component instead of their own links.
+
+### Changed
+- Tracked bots and Tracked projects are cards, one per entry, with labelled fields instead of a cramped table. List fields grow with their text, so long lists of services and containers are fully visible instead of cut at the edge of the field.
+
 ## [4.15.8] - 2026-10-25
 
 ### Changed

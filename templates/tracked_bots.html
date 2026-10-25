@@ -1,38 +1,44 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 
 {% block title %}{{ _('Отслеживаемые боты') }}{% endblock %}
 
 {% macro list_value(value) %}{{ (value or []) if (value or []) is string else (value or [])|join(', ') }}{% endmacro %}
 
+{% macro field(label, name, value, hint='', wide=False, multiline=True) %}
+<label class="editor-field{% if wide %} editor-field-wide{% endif %}">
+    <span>{{ label }}</span>
+    {% if multiline %}<textarea class="form-control form-control-sm font-monospace editor-grow" name="{{ name }}" rows="1"{% if hint %} placeholder="{{ hint }}"{% endif %}>{{ value }}</textarea>
+    {% else %}<input class="form-control form-control-sm font-monospace" name="{{ name }}" value="{{ value }}"{% if hint %} placeholder="{{ hint }}"{% endif %}>{% endif %}
+</label>
+{% endmacro %}
+
 {% macro bot_row(bot, hint=False) %}
-<tr data-bot-row>
-    <td><input class="form-control form-control-sm" name="name" maxlength="60" value="{{ bot.name }}" aria-label="{{ _('Название') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ list_value(bot.units) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ list_value(bot.containers) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="processes" value="{{ list_value(bot.processes) }}" aria-label="{{ _('Процессы') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="commands" value="{{ list_value(bot.commands) }}"{% if hint %} placeholder="hermes gateway run"{% endif %} aria-label="{{ _('Командная строка') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="tasks" value="{{ list_value(bot.tasks) }}"{% if hint %} placeholder="lesson-report"{% endif %} aria-label="{{ _('Задачи бота') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="health_url" value="{{ bot.health_url or '' }}"{% if hint %} placeholder="http://127.0.0.1:8000/health"{% endif %} aria-label="{{ _('Адрес проверки') }}"></td>
-    <td><input class="form-control form-control-sm font-monospace" name="health_word" value="{{ bot.health_word or '' }}"{% if hint %} placeholder="healthy"{% endif %} aria-label="{{ _('Ожидаемое слово') }}"></td>
-    <td>
-        <select class="form-select form-select-sm" name="role" aria-label="{{ _('Тип') }}">
+<article class="editor-card" data-bot-row>
+    <div class="editor-card-head">
+        <input class="form-control fw-semibold" name="name" maxlength="60" value="{{ bot.name }}" aria-label="{{ _('Название') }}" placeholder="{{ _('Название') }}">
+        <select class="form-select form-select-sm editor-type" name="role" aria-label="{{ _('Тип') }}">
             <option value="bot" {% if not bot.service %}selected{% endif %}>{{ _('Бот') }}</option>
             <option value="service" {% if bot.service %}selected{% endif %}>{{ _('Служебная') }}</option>
         </select>
-    </td>
-    <td class="text-end"><button type="button" class="btn btn-sm btn-outline-danger" data-remove-bot title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button></td>
-</tr>
+        <button type="button" class="btn btn-sm btn-outline-danger" data-remove-bot title="{{ _('Удалить') }}" aria-label="{{ _('Удалить') }}"><i class="bi bi-trash" aria-hidden="true"></i></button>
+    </div>
+    <div class="editor-fields">
+        {{ field(_('Службы systemd'), 'units', list_value(bot.units), 'mybot' if hint else '') }}
+        {{ field(_('Контейнеры Docker'), 'containers', list_value(bot.containers), 'mybot' if hint else '') }}
+        {{ field(_('Процессы'), 'processes', list_value(bot.processes)) }}
+        {{ field(_('Командная строка'), 'commands', list_value(bot.commands), 'hermes gateway run' if hint else '') }}
+        {{ field(_('Задачи бота'), 'tasks', list_value(bot.tasks), 'lesson-report' if hint else '', wide=True) }}
+        {{ field(_('Адрес проверки'), 'health_url', bot.health_url or '', 'http://127.0.0.1:8000/health' if hint else '', multiline=False) }}
+        {{ field(_('Ожидаемое слово'), 'health_word', bot.health_word or '', 'healthy' if hint else '', multiline=False) }}
+    </div>
+</article>
 {% endmacro %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 1280px">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ _('Отслеживаемые боты') }}</li>
-        </ol>
-    </nav>
-    <h2><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Отслеживаемые боты') }}</h2>
+<div class="container mt-4 editor-page">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), url_for('main.settings')), (_('Отслеживаемые боты'), None)]) }}
+    <h1 class="editor-title"><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Отслеживаемые боты') }}</h1>
     <p class="text-body-secondary">{{ _('Эти боты ищутся на узлах в окне «Боты». Укажите службы systemd (без .service), контейнеры Docker и процессы через запятую. Адрес проверки и ожидаемое слово необязательны: узел сам запрашивает адрес на 127.0.0.1 и сообщает только, найдено ли слово.') }}</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -46,28 +52,10 @@
 
     <form method="post" id="tracked-bots-form">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-        <div class="table-responsive">
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col" style="width: 14%">{{ _('Название') }}</th>
-                        <th scope="col">{{ _('Службы systemd') }}</th>
-                        <th scope="col" style="width: 13%">{{ _('Контейнеры Docker') }}</th>
-                        <th scope="col" style="width: 9%">{{ _('Процессы') }}</th>
-                        <th scope="col" style="width: 12%">{{ _('Командная строка') }}</th>
-                        <th scope="col" style="width: 9%">{{ _('Задачи бота') }}</th>
-                        <th scope="col" style="width: 16%">{{ _('Адрес проверки') }}</th>
-                        <th scope="col" style="width: 9%">{{ _('Ожидаемое слово') }}</th>
-                        <th scope="col" style="width: 9%">{{ _('Тип') }}</th>
-                        <th scope="col" style="width: 3rem"><span class="visually-hidden">{{ _('Действия') }}</span></th>
-                    </tr>
-                </thead>
-                <tbody id="tracked-bots-rows">
-                    {% for bot in bots %}{{ bot_row(bot) }}{% endfor %}
-                </tbody>
-            </table>
+        <div class="editor-cards" id="tracked-bots-rows">
+            {% for bot in bots %}{{ bot_row(bot) }}{% endfor %}
         </div>
-        <div class="form-check mb-3">
+        <div class="form-check my-3">
             <input class="form-check-input" type="checkbox" name="getme" value="1" id="bots-getme"{% if getme %} checked{% endif %}>
             <label class="form-check-label" for="bots-getme">{{ _('Узнавать @username отправляющих ботов (getMe)') }}</label>
             <div class="form-text">{{ _('Запрос getMe выполняется на сервере, токен с него не уходит: в приложение приходит только имя бота. Без этого показывается числовой ID бота.') }}</div>
@@ -88,9 +76,17 @@
 (function () {
     const rows = document.getElementById('tracked-bots-rows');
     const template = document.getElementById('tracked-bot-template');
+    // Поле растёт по тексту: длинный список виден целиком, а не обрезается краем
+    const grow = el => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 2 + 'px'; };
+    const growAll = root => root.querySelectorAll('textarea.editor-grow').forEach(grow);
+    rows.addEventListener('input', event => { if (event.target.matches('textarea.editor-grow')) grow(event.target); });
+    window.addEventListener('resize', () => growAll(rows));
+    growAll(rows);
     document.getElementById('add-bot').addEventListener('click', () => {
         rows.append(template.content.cloneNode(true));
+        growAll(rows.lastElementChild);
         rows.lastElementChild.querySelector('input').focus();
+        rows.lastElementChild.scrollIntoView({behavior: 'smooth', block: 'center'});
     });
     rows.addEventListener('click', event => {
         const button = event.target.closest('[data-remove-bot]');

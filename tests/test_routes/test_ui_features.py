@@ -50,3 +50,12 @@ def test_settings_page_has_working_actions_only(app, client):
     assert 'class="modal fade" id="exportInfoModal"' in page
     for anchor in ('id="ui-features"', 'id="settings-data"', 'id="settings-security"'):
         assert anchor in page
+
+
+def test_inner_pages_lead_back_to_their_parent(app, client):
+    _login(client)
+    for path, parent in (('/settings/bots', '/settings'), ('/settings/projects', '/settings'),
+                         ('/manage_hints', '/settings'), ('/settings', '/'), ('/net-tools/', '/')):
+        page = client.get(path).get_data(as_text=True)
+        assert 'class="page-crumbs"' in page, path
+        assert f'class="btn btn-sm btn-outline-secondary page-back" href="{parent}"' in page, path

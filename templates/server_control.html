@@ -1,9 +1,10 @@
 {% extends 'layout.html' %}
+{% from "macros/nav.html" import crumbs %}
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/server-control.css') }}">
 <div class="container py-2" id="server-control" data-csrf="{{ session.csrf_token }}">
-    <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
-    <div class="d-flex justify-content-between flex-wrap gap-3 mt-3">
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name, None), (_('Управление сервером'), None)]) }}
+    <div class="d-flex justify-content-between flex-wrap gap-3">
         <div><h1 class="h3">{{ _('Управление сервером') }}</h1><p class="text-muted">{{ server.name }} · {{ server.ip_address }}</p></div>
         <div class="d-flex gap-2 align-items-start"><a class="btn btn-outline-secondary" href="{{ url_for('main.monitoring', server_id=server.id) }}">{{ _('Мониторинг VPS') }}</a><button class="btn btn-primary" id="control-refresh">{{ _('Проверить по SSH') }}</button></div>
     </div>

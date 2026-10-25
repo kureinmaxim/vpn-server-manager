@@ -496,3 +496,30 @@ body:has(.server-form) .navbar.mb-4 {
 
 /* Server form: VPS-only blocks hidden for NAS/PC must win over d-flex and similar utilities. */
 [data-node-kinds][hidden] { display: none !important; }
+
+/* Navigation on inner pages: «Back» to the parent and the section trail */
+.page-crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .75rem; margin-bottom: 1.25rem; font-size: .9rem; }
+.page-crumbs .page-back { border-radius: 999px; padding-inline: .8rem; }
+.page-trail { display: flex; flex-wrap: wrap; align-items: center; list-style: none; margin: 0; padding: 0; min-width: 0; }
+.page-trail li { display: inline-flex; align-items: center; min-width: 0; }
+.page-trail li + li::before { content: '/'; margin: 0 .5rem; color: var(--bs-secondary-color); }
+.page-trail a { color: var(--bs-secondary-color); text-decoration: none; }
+.page-trail a:hover, .page-trail a:focus-visible { color: var(--bs-link-hover-color); text-decoration: underline; }
+.page-trail [aria-current] { color: var(--bs-body-color); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* List editors (tracked bots, tracked projects): one card per entry, every value fully visible */
+.editor-page { max-width: 1240px; padding-bottom: 2rem; }
+.editor-title { font-size: 2rem; }
+.editor-title i { color: var(--bs-info); }
+.editor-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 520px), 1fr)); gap: 1rem; margin-top: 1rem; }
+.editor-card { border: 1px solid var(--bs-border-color); border-radius: .75rem; background: var(--bs-tertiary-bg); padding: .9rem 1rem; min-width: 0; }
+.editor-card-head { display: flex; align-items: center; gap: .5rem; margin-bottom: .75rem; }
+.editor-card-head .form-control { flex: 1; min-width: 0; }
+.editor-card-head .editor-type { width: auto; flex: none; }
+.editor-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem .75rem; }
+.editor-field { display: flex; flex-direction: column; gap: .2rem; min-width: 0; margin: 0; }
+.editor-field > span { font-size: .78rem; color: var(--bs-secondary-color); }
+.editor-field-wide { grid-column: 1 / -1; }
+.editor-field .form-control::placeholder { color: var(--bs-secondary-color); opacity: .6; }
+@media (max-width: 575.98px) { .editor-fields { grid-template-columns: minmax(0, 1fr); } }
+.editor-field textarea.editor-grow { resize: none; overflow: hidden; min-height: calc(1.5em + .5rem + 2px); line-height: 1.5; overflow-wrap: anywhere; }

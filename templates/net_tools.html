@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% block title %}{{ selected.title if selected else _('Сетевые инструменты') }} · Net Tools{% endblock %}
 {% macro saved_hosts(target, prefix='') -%}
 {% if hosts %}
@@ -13,11 +14,8 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/net_tools.css') }}?v={{ app_info.get('version', '') }}">
 <div class="container net-tools my-4{% if selected %} net-detail{% endif %}">
-    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
-        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span>
-        {% if selected %}<a href="{{ url_for('net_tools.index') }}">Net Tools</a>{% else %}<span>Net Tools</span>{% endif %}
-    </nav>
+    {% if selected %}{{ crumbs([(_('Список серверов'), url_for('main.index')), ('Net Tools', url_for('net_tools.index')), (selected.title, None)]) }}
+    {% else %}{{ crumbs([(_('Список серверов'), url_for('main.index')), ('Net Tools', None)]) }}{% endif %}
     {% if not selected %}
     <header class="mb-4">
         <h1><i class="bi bi-hdd-network me-2" aria-hidden="true"></i>{{ _('Сетевые инструменты') }}</h1>

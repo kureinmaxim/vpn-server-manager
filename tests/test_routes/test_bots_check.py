@@ -106,7 +106,7 @@ def test_settings_save_reject_and_reset(app, client):
     assert [(b["name"], b["service"]) for b in load_bots(app)] == [("News bot", False), ("Nightly", True)]
     bad = dict(form, units=["x; reboot", "nightly-job"])
     response = client.post("/settings/bots", data=bad)
-    assert response.status_code == 400 and 'value="x; reboot"' in response.get_data(as_text=True)
+    assert response.status_code == 400 and '>x; reboot</textarea>' in response.get_data(as_text=True)
     assert [b["name"] for b in load_bots(app)] == ["News bot", "Nightly"]
     client.post("/settings/bots", data={"csrf_token": "token", "action": "reset"})
     assert "TelegramOnly" in [b["name"] for b in load_bots(app)]
@@ -141,7 +141,7 @@ def test_settings_save_command_bot(app, client):
     [bot] = load_bots(app)
     assert bot["commands"] == ["hermes gateway run"] and bot["tasks"] == ["lesson-report", "lesson-report-test"]
     html = client.get("/settings/bots").get_data(as_text=True)
-    assert 'value="hermes gateway run"' in html and 'value="lesson-report, lesson-report-test"' in html
+    assert '>hermes gateway run</textarea>' in html and '>lesson-report, lesson-report-test</textarea>' in html
     bad = client.post("/settings/bots", data=dict(form, commands=["x; reboot"]))
     assert bad.status_code == 400
 

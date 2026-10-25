@@ -1,8 +1,9 @@
 {% extends 'layout.html' %}
+{% from "macros/nav.html" import crumbs %}
 {% block content %}
 <div class="container py-4" style="max-width: 960px" id="disk-check" data-url="{{ url_for('reset.disk_run', server_id=server.id) }}" data-csrf="{{ session.csrf_token }}">
-    <a href="{{ url_for('main.index') }}">← {{ _('Серверы') }}</a>
-    <h1 class="h3 mt-3">{{ _('Место на диске') }}</h1>
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name, None), (_('Место на диске'), None)]) }}
+    <h1 class="h3">{{ _('Место на диске') }}</h1>
     <p class="text-muted">{{ server.name }} · {{ server.ip_address }}</p>
     <p>{{ _('Проверка покажет размеры каталогов, архивов очистки, кэша пакетов и системного журнала. Файлы не изменяются.') }}</p>
     <label for="disk-commands" class="form-label">{{ _('Команды для Tabby') }}</label>

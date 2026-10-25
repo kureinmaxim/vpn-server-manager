@@ -1,0 +1,14 @@
+{# Одна навигация для всех внутренних страниц: «Назад» к родителю и цепочка разделов.
+   trail — список (подпись, адрес); у последнего пункта (текущая страница) адреса нет.
+   «Назад» ведёт на последний пункт с адресом, а не в историю браузера: в окне
+   приложения кнопок браузера нет, и переход должен быть предсказуемым. #}
+{% macro crumbs(trail, back=None) -%}
+{%- set ns = namespace(parent=back) -%}
+{%- if not ns.parent -%}{%- for label, url in trail[:-1] -%}{%- if url -%}{%- set ns.parent = url -%}{%- endif -%}{%- endfor -%}{%- endif -%}
+<nav class="page-crumbs" aria-label="{{ _('Навигация') }}">
+    {% if ns.parent %}<a class="btn btn-sm btn-outline-secondary page-back" href="{{ ns.parent }}"><i class="bi bi-arrow-left" aria-hidden="true"></i> {{ _('Назад') }}</a>{% endif %}
+    <ol class="page-trail">
+        {% for label, url in trail %}<li>{% if url and not loop.last %}<a href="{{ url }}">{{ label }}</a>{% else %}<span aria-current="page">{{ label }}</span>{% endif %}</li>{% endfor %}
+    </ol>
+</nav>
+{%- endmacro %}

@@ -9996,3 +9996,6 @@ msgstr "数据文件"
 
 msgid "Не удалось сменить PIN"
 msgstr "无法更改 PIN"
+
+msgid "Редактирование"
+msgstr "编辑"

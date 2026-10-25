@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 
 {% block title %}{{ _('Справка') }} - {{ super() }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-10">
-        <h1 class="mb-4">{{ _('Справка по использованию') }}</h1>
+        {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Справка по использованию'), None)]) }}
+        <h1 class="mb-4">{ _('Справка по использованию') }</h1>
         <div class="accordion" id="helpAccordion">
 
             <div class="accordion-item">

@@ -1,14 +1,12 @@
 {% extends "layout.html" %}
+{% from "macros/nav.html" import crumbs %}
 {% from "macros/credentials.html" import password_display, text_copy_display %}
 {% from "dns/_macros.html" import expiry_badge, confirm_delete %}
 {% block title %}DNS · {{ _('Домены и DNS-провайдеры') }}{% endblock %}
 {% block content %}
 <div class="container dns-page my-4">
     {% include "dns/_head.html" %}
-    <nav aria-label="{{ _('Навигация') }}" class="mb-4">
-        <a href="{{ url_for('main.index') }}">{{ _('Список серверов') }}</a>
-        <span aria-hidden="true" class="mx-2">/</span><span>DNS</span>
-    </nav>
+    {{ crumbs([(_('Список серверов'), url_for('main.index')), ('DNS', None)]) }}
     <header class="mb-2">
         <h1><i class="bi bi-cloud-fill me-2" aria-hidden="true"></i>{{ _('Домены и DNS-провайдеры') }}</h1>
         <p class="text-body-secondary mb-0">{{ _('Учётные записи DNS-провайдеров, домены, регистраторы, сроки действия и поддомены. Данные хранятся в зашифрованном файле вместе с серверами и попадают в экспорт.') }}</p>
