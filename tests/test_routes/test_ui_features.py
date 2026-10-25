@@ -36,3 +36,17 @@ def test_settings_page_lists_switches(app, client):
         assert f'id="feature-{name}"' in page
     save_ui_features(app, ['projects'])
     assert 'id="feature-projects" checked' in client.get('/settings').get_data(as_text=True)
+
+
+def test_settings_page_has_working_actions_only(app, client):
+    app.config['active_data_file'] = '/tmp/test_servers.enc'
+    _login(client)
+    page = client.get('/settings').get_data(as_text=True)
+    # Ключ создаётся в браузере, PIN меняется через /pin/change_ajax; несуществующих адресов нет
+    assert '/settings/generate-key' not in page and '/pin/reset_block' not in page
+    assert 'crypto.getRandomValues' in page and '/pin/change_ajax' in page
+    # Одна проверка совпадения ключей и настоящее окно Bootstrap для экспорта
+    assert page.count('function confirmKeyChange') == 0 and "getElementById('changeKeyForm')" in page
+    assert 'class="modal fade" id="exportInfoModal"' in page
+    for anchor in ('id="ui-features"', 'id="settings-data"', 'id="settings-security"'):
+        assert anchor in page

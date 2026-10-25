@@ -10291,3 +10291,42 @@ msgstr "Where your projects run: services, containers and processes from your ow
 
 msgid "Какие Telegram-боты запущены на узлах, по своему каталогу."
 msgstr "Which Telegram bots run on your nodes, from your own catalog."
+
+msgid "PIN открывает приложение. Новый PIN — минимум 4 символа."
+msgstr "The PIN unlocks the app. A new PIN needs at least 4 characters."
+
+msgid "Ключ — строка SECRET_KEY= в файле .env в папке другой установки, значение после знака равенства."
+msgstr "The key is the SECRET_KEY= line in the .env file of the other installation: the value after the equals sign."
+
+msgid "Ключ и PIN открывают все пароли серверов: храните файл отдельно от данных и никому не пересылайте."
+msgstr "The key and PIN unlock every server password: keep this file apart from the data and never send it to anyone."
+
+msgid "PIN изменён"
+msgstr "PIN changed"
+
+msgid "Текущий PIN"
+msgstr "Current PIN"
+
+msgid "Данные"
+msgstr "Data"
+
+msgid "Кнопки главной страницы, файл данных с серверами, ключ шифрования и PIN."
+msgstr "Home page buttons, the server data file, the encryption key and the PIN."
+
+msgid "Значение SECRET_KEY из файла .env другой установки"
+msgstr "SECRET_KEY value from the other installation's .env file"
+
+msgid "Интерфейс"
+msgstr "Interface"
+
+msgid "Разделы настроек"
+msgstr "Settings sections"
+
+msgid "Ключ шифрования и PIN"
+msgstr "Encryption key and PIN"
+
+msgid "Файл данных"
+msgstr "Data file"
+
+msgid "Не удалось сменить PIN"
+msgstr "Could not change the PIN"

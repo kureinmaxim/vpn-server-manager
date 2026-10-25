@@ -1,376 +1,187 @@
 {% extends "layout.html" %}
 {% from "macros/credentials.html" import file_picker %}
 
-{% block title %}{{ _('Управление данными') }}{% endblock %}
+{% block title %}{{ _('Настройки') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">{{ _('Управление данными') }}</h2>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}?v={{ app_info.get('version', '') }}">
+<div class="container mt-4 settings-page">
+    <header class="settings-head">
+        <h1><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Настройки') }}</h1>
+        <p class="text-body-secondary mb-0">{{ _('Кнопки главной страницы, файл данных с серверами, ключ шифрования и PIN.') }}</p>
+        <nav class="settings-nav" aria-label="{{ _('Разделы настроек') }}">
+            <a class="settings-chip" href="#ui-features"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Интерфейс') }}</a>
+            <a class="settings-chip" href="#settings-data"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Данные') }}</a>
+            <a class="settings-chip" href="#settings-security"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Безопасность') }}</a>
+        </nav>
+    </header>
 
-    <!-- Блок для вывода flash-сообщений -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+        {% endfor %}
     {% endwith %}
 
-    <!-- Необязательные инструменты главной страницы -->
-    <div class="card mb-4" id="ui-features">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Кнопки на главной') }}</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-body-secondary small">{{ _('Тест IP, Тест DNS и Net Tools видны всегда. Остальное включается, если вам это нужно: выключенный инструмент пропадает с главной и из окон серверов, данные и списки сохраняются.') }}</p>
-            <form action="{{ url_for('main.save_features') }}" method="post">
-                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-                {% set feature_rows = [
-                    ('dns', 'bi-cloud-fill', _('DNS'), _('Домены и DNS-провайдеры, записи и свой DNS.')),
-                    ('load', 'bi-speedometer2', _('Загрузка серверов'), _('Быстрая проверка CPU, памяти и диска всех активных серверов.')),
-                    ('projects', 'bi-boxes', _('Проекты'), _('Где запущены ваши проекты: службы, контейнеры и процессы из своего списка. Блок «Мои проекты» в мониторинге и в окне статуса сервера.')),
-                    ('bots', 'bi-robot', _('Боты'), _('Какие Telegram-боты запущены на узлах, по своему каталогу.'))] %}
-                {% for name, icon, label, hint in feature_rows %}
-                <div class="form-check form-switch mb-2">
-                    <input class="form-check-input" type="checkbox" role="switch" name="features" value="{{ name }}" id="feature-{{ name }}"{% if ui_features[name] %} checked{% endif %}>
-                    <label class="form-check-label" for="feature-{{ name }}"><i class="bi {{ icon }}" aria-hidden="true"></i> {{ label }}</label>
-                    <div class="form-text mt-0">{{ hint }}</div>
+    {# ───────────── Интерфейс ───────────── #}
+    <section class="settings-section" id="ui-features">
+        <h2 class="settings-section-title"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Кнопки на главной') }}</h2>
+        <p class="settings-lead">{{ _('Тест IP, Тест DNS и Net Tools видны всегда. Остальное включается, если вам это нужно: выключенный инструмент пропадает с главной и из окон серверов, данные и списки сохраняются.') }}</p>
+        <form action="{{ url_for('main.save_features') }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            {% set feature_rows = [
+                ('dns', 'bi-cloud-fill', _('DNS'), _('Домены и DNS-провайдеры, записи и свой DNS.'), None),
+                ('load', 'bi-speedometer2', _('Загрузка серверов'), _('Быстрая проверка CPU, памяти и диска всех активных серверов.'), None),
+                ('projects', 'bi-boxes', _('Проекты'), _('Где запущены ваши проекты: службы, контейнеры и процессы из своего списка. Блок «Мои проекты» в мониторинге и в окне статуса сервера.'), url_for('main.tracked_projects')),
+                ('bots', 'bi-robot', _('Боты'), _('Какие Telegram-боты запущены на узлах, по своему каталогу.'), url_for('main.tracked_bots'))] %}
+            <div class="settings-grid">
+                {% for name, icon, label, hint, list_url in feature_rows %}
+                <div class="settings-tile">
+                    <div class="form-check form-switch m-0">
+                        <input class="form-check-input" type="checkbox" role="switch" name="features" value="{{ name }}" id="feature-{{ name }}"{% if ui_features[name] %} checked{% endif %}>
+                        <label class="form-check-label fw-semibold" for="feature-{{ name }}"><i class="bi {{ icon }}" aria-hidden="true"></i> {{ label }}</label>
+                    </div>
+                    <p class="settings-hint">{{ hint }}</p>
+                    {% if list_url %}<a class="small mt-auto" href="{{ list_url }}"><i class="bi bi-list-ul" aria-hidden="true"></i> {{ _('Настроить список') }}</a>{% endif %}
                 </div>
                 {% endfor %}
-                <button type="submit" class="btn btn-primary mt-2">{{ _('Сохранить') }}</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Управление ключом шифрования -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-key"></i> {{ _('Управление ключом шифрования') }}</h5>
-        </div>
-        <div class="card-body">
-            
-            <!-- Смена ключа -->
-            <div class="row mb-4">
-                <div class="col-lg-6">
-                    <h6 class="text-primary"><i class="bi bi-arrow-repeat"></i> {{ _('Смена главного ключа') }}</h6>
-                    <p class="small text-muted">{{ _('При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.') }}</p>
-                    
-                    <form action="{{ url_for('main.change_main_key') }}" method="post" onsubmit="return confirmKeyChange()">
-                        <div class="mb-3">
-                            <label for="newKey" class="form-label">{{ _('Новый ключ') }}</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="new_key" id="newKey" required placeholder="{{ _('Введите новый ключ Fernet') }}">
-                                <button type="button" class="btn btn-outline-secondary" onclick="generateRandomKey()">
-                                    <i class="bi bi-dice-3"></i> {{ _('Сгенерировать') }}
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirmKey" class="form-label">{{ _('Подтверждение ключа') }}</label>
-                            <input type="text" class="form-control" name="confirm_key" id="confirmKey" required placeholder="{{ _('Повторите новый ключ') }}">
-                        </div>
-                        <button type="submit" class="btn btn-warning">
-                            <i class="bi bi-arrow-repeat"></i> {{ _('Сменить ключ') }}
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Проверка соответствия ключ-данные -->
-                <div class="col-lg-6">
-                    <h6 class="text-primary"><i class="bi bi-search"></i> {{ _('Проверка соответствия ключ-данные') }}</h6>
-                    <p class="small text-muted">{{ _('Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение.') }}</p>
-                    
-                    <form action="{{ url_for('main.verify_key_data') }}" method="post" enctype="multipart/form-data">
-                        <div class="mb-3">
-                            <label for="verifyFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
-                            {{ file_picker('verifyFile', 'verify_file', accept='.enc', required=True) }}
-                        </div>
-                        <div class="mb-3">
-                            <label for="verifyKey" class="form-label">{{ _('Ключ для проверки') }}</label>
-                            <textarea class="form-control" name="verify_key" id="verifyKey" rows="3" required placeholder="{{ _('Вставьте ключ шифрования для проверки') }}"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-info">
-                            <i class="bi bi-search"></i> {{ _('Проверить соответствие') }}
-                        </button>
-                    </form>
-                </div>
             </div>
-        </div>
-    </div>
+            <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('main.manage_hints') }}"><i class="bi bi-lightbulb" aria-hidden="true"></i> {{ _('Управление подсказками') }}</a>
+            </div>
+        </form>
+    </section>
 
-    <!-- Статус файла данных -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-database"></i> {{ _('Статус файла данных') }}</h5>
-        </div>
-        <div class="card-body">
+    {# ───────────── Данные ───────────── #}
+    <section class="settings-section" id="settings-data">
+        <h2 class="settings-section-title"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Файл данных') }}</h2>
+        <div class="settings-panel">
             {% if active_data_file %}
-                <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle-fill"></i> 
-                    <strong>{{ _('Активный файл:') }}</strong> <code>{{ active_data_file }}</code>
+                <div class="settings-status settings-status-ok">
+                    <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                    <span>{{ _('Активный файл:') }}</span>
+                    <code class="settings-path">{{ active_data_file }}</code>
                 </div>
-                <p class="text-muted">{{ _('Все данные о серверах загружаются из этого зашифрованного файла.') }}</p>
-                
-                <!-- Кнопки экспорта -->
-                <div class="row">
-                    <div class="col-md-4 mb-2">
-                        <button class="btn btn-primary w-100" onclick="showExportInfo('data')">
-                            <i class="bi bi-download"></i> {{ _('Экспортировать данные') }}
-                        </button>
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <button class="btn btn-warning w-100" onclick="showExportInfo('key')">
-                            <i class="bi bi-key"></i> {{ _('Экспортировать ключ') }}
-                        </button>
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <button class="btn btn-success w-100" onclick="showExportInfo('package')">
-                            <i class="bi bi-archive"></i> {{ _('Полный экспорт') }}
-                        </button>
-                        <small class="text-muted d-block mt-1">
-                            <i class="bi bi-key"></i> {{ _('Включает PIN-код') }}
-                        </small>
-                    </div>
-                </div>
-                
-                <!-- Уведомление об экспорте -->
-                <div id="exportNotification" class="alert alert-info mt-3" style="display: none;">
-                    <i class="bi bi-info-circle"></i> 
-                    <strong>{{ _('Экспорт запущен!') }}</strong> 
-                    <span id="exportMessage"></span>
-                    <br><small>📁 {{ _('Файл сохранится в папку с приложением VPN Server Manager.') }}</small>
-                </div>
-                
-                <div class="mt-3">
-                    <form action="{{ url_for('main.detach_data') }}" method="post" class="d-inline" data-confirm-message="{{ _('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.') }}" onsubmit="return confirm(this.getAttribute('data-confirm-message'));">
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="bi bi-unlock"></i> {{ _('Открепить файл') }}
-                        </button>
+                <p class="settings-hint">{{ _('Все данные о серверах загружаются из этого зашифрованного файла.') }}</p>
+                <div class="settings-actions">
+                    <button type="button" class="btn btn-primary" data-export="data"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Экспортировать данные') }}</button>
+                    <button type="button" class="btn btn-outline-warning" data-export="key"><i class="bi bi-key" aria-hidden="true"></i> {{ _('Экспортировать ключ') }}</button>
+                    <button type="button" class="btn btn-outline-warning" data-export="package" title="{{ _('Включает PIN-код') }}"><i class="bi bi-archive" aria-hidden="true"></i> {{ _('Полный экспорт') }}</button>
+                    <form action="{{ url_for('main.detach_data') }}" method="post" class="ms-auto" data-confirm-message="{{ _('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.') }}" onsubmit="return confirm(this.dataset.confirmMessage);">
+                        <button type="submit" class="btn btn-outline-danger"><i class="bi bi-unlock" aria-hidden="true"></i> {{ _('Открепить файл') }}</button>
                     </form>
                 </div>
             {% else %}
-                <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <strong>{{ _('Файл данных не прикреплен.') }}</strong>
+                <div class="settings-status settings-status-warn">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ _('Файл данных не прикреплен.') }}</span>
                 </div>
-                <p class="text-muted">{{ _('Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.') }}</p>
+                <p class="settings-hint mb-0">{{ _('Приложение в данный момент не работает с каким-либо файлом данных. Вы можете импортировать существующий файл, чтобы восстановить свои записи.') }}</p>
             {% endif %}
         </div>
-    </div>
 
-    <!-- Импорт файла данных -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h5 class="mb-0"><i class="bi bi-upload"></i> {{ _('Импорт файла данных') }}</h5>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">{{ _('Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.') }}</p>
-            <form action="{{ url_for('main.import_data') }}" method="post" enctype="multipart/form-data">
-                <div class="mb-3">
+        <div class="settings-grid settings-grid-2">
+            <div class="settings-panel">
+                <h3><i class="bi bi-upload" aria-hidden="true"></i> {{ _('Импорт файла данных') }}</h3>
+                <p class="settings-hint">{{ _('Загрузите зашифрованный файл данных (<code>.enc</code>), чтобы прикрепить его и работать с ним. Текущий прикрепленный файл (если он есть) будет заменен.') }}</p>
+                <form action="{{ url_for('main.import_data') }}" method="post" enctype="multipart/form-data" class="settings-form">
                     <label for="dataFile" class="form-label">{{ _('Выбор файла данных') }}</label>
                     {{ file_picker('dataFile', 'data_file', accept='.enc', required=True) }}
-                    <div class="form-text">{{ _('Пожалуйста, выберите файл с расширением <code>.enc</code>, ранее экспортированный из этого приложения.') }}</div>
-                </div>
-                <div class="d-grid">
-                    <button class="btn btn-success" type="submit">
-                        <i class="bi bi-upload"></i> {{ _('Импортировать и прикрепить') }}
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Импорт из другой установки -->
-    <div class="card">
-        <div class="card-header d-flex align-items-center">
-            <i class="bi bi-plus-circle me-2"></i>
-            <h5 class="mb-0">{{ _('Импорт серверов из другой установки') }}</h5>
-        </div>
-        <div class="card-body">
-            <div class="alert alert-light border" role="alert">
-                <i class="bi bi-info-circle"></i> <strong>{{ _('Что нужно:') }}</strong> {{ _('файл <code>.env</code> и <code>servers.json.enc</code> из другой установки приложения.') }}
+                    <div class="settings-actions">
+                        <button class="btn btn-primary" type="submit"><i class="bi bi-upload" aria-hidden="true"></i> {{ _('Импортировать и прикрепить') }}</button>
+                    </div>
+                </form>
             </div>
 
-            <form action="{{ url_for('main.import_external_data') }}" method="post" enctype="multipart/form-data">
-                <div class="row">
-                    <!-- Левая колонка: servers.json.enc файл -->
-                    <div class="col-md-6">
-                        <h6 class="text-primary">{{ _('servers.json.enc файл') }}</h6>
-                <div class="mb-3">
-                            <label for="envFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
-                            {{ file_picker('envFile', 'external_file', accept='.enc', required=True) }}
-                    <div class="form-text">{{ _('Выберите зашифрованный файл данных из другой установки') }}</div>
-                </div>
+            <div class="settings-panel">
+                <h3><i class="bi bi-plus-circle" aria-hidden="true"></i> {{ _('Импорт серверов из другой установки') }}</h3>
+                <p class="settings-hint">{{ _('Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку.') }}</p>
+                <form action="{{ url_for('main.import_external_data') }}" method="post" enctype="multipart/form-data" class="settings-form">
+                    <label for="envFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
+                    {{ file_picker('envFile', 'external_file', accept='.enc', required=True) }}
+                    <label for="externalKey" class="form-label mt-3">{{ _('Внешний ключ шифрования') }}</label>
+                    <textarea class="form-control font-monospace" name="external_key" id="externalKey" rows="2" required
+                              placeholder="{{ _('Значение SECRET_KEY из файла .env другой установки') }}"></textarea>
+                    <div class="form-text">{{ _('Ключ — строка SECRET_KEY= в файле .env в папке другой установки, значение после знака равенства.') }}</div>
+                    <div class="settings-actions">
+                        <button class="btn btn-outline-primary" type="submit"><i class="bi bi-arrow-down-circle" aria-hidden="true"></i> {{ _('Импортировать и объединить сервера') }}</button>
                     </div>
-
-                    <!-- Правая колонка: .env файл с SECRET_KEY -->
-                    <div class="col-md-6">
-                        <h6 class="text-primary">{{ _('.env файл с SECRET_KEY') }}</h6>
-                <div class="mb-3">
-                    <label for="externalKey" class="form-label">{{ _('Внешний ключ шифрования') }}</label>
-                            <textarea class="form-control" name="external_key" id="externalKey" rows="4" placeholder="{{ _('Вставьте сюда ключ шифрования из файла .env другой установки (например: REDACTED_ROTATE_KEY)') }}" required></textarea>
-                    <div class="form-text">
-                        <strong>{{ _('Где найти ключ:') }}</strong><br>
-                        • {{ _('В файле') }} <code>.env</code> {{ _('в папке с другой установкой') }}<br>
-                        • {{ _('Ищите строку') }} <code>SECRET_KEY=</code><br>
-                        • {{ _('Скопируйте значение после знака равенства') }}
-                    </div>
-                </div>
-                    </div>
-                </div>
-
-                <div class="alert alert-warning" role="alert">
-                    <strong>{{ _('Примечание:') }}</strong> {{ _('Дублирующиеся сервера (по IP или имени) будут пропущены. Импортированные сервера получат новые уникальные ID и будут добавлены к вашему списку.') }}
-                </div>
-
-                <div class="d-grid">
-                    <button class="btn btn-warning" type="submit">
-                        <i class="bi bi-arrow-down-circle"></i> {{ _('Импортировать и объединить сервера') }}
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
+    </section>
+
+    {# ───────────── Безопасность ───────────── #}
+    <section class="settings-section" id="settings-security">
+        <h2 class="settings-section-title"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Ключ шифрования и PIN') }}</h2>
+        <div class="settings-grid settings-grid-3">
+            <div class="settings-panel">
+                <h3><i class="bi bi-arrow-repeat" aria-hidden="true"></i> {{ _('Смена главного ключа') }}</h3>
+                <p class="settings-hint">{{ _('При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.') }}</p>
+                <form action="{{ url_for('main.change_main_key') }}" method="post" id="changeKeyForm" class="settings-form">
+                    <label for="newKey" class="form-label">{{ _('Новый ключ') }}</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace" name="new_key" id="newKey" required autocomplete="off" placeholder="{{ _('Введите новый ключ Fernet') }}">
+                        <button type="button" class="btn btn-outline-secondary" id="generateKeyBtn" title="{{ _('Сгенерировать') }}" aria-label="{{ _('Сгенерировать') }}"><i class="bi bi-dice-3" aria-hidden="true"></i></button>
+                    </div>
+                    <label for="confirmKey" class="form-label mt-3">{{ _('Подтверждение ключа') }}</label>
+                    <input type="text" class="form-control font-monospace" name="confirm_key" id="confirmKey" required autocomplete="off" placeholder="{{ _('Повторите новый ключ') }}">
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-outline-warning"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> {{ _('Сменить ключ') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-panel">
+                <h3><i class="bi bi-search" aria-hidden="true"></i> {{ _('Проверка соответствия ключ-данные') }}</h3>
+                <p class="settings-hint">{{ _('Быстро проверить, подходит ли ключ к файлу данных, без импорта в приложение.') }}</p>
+                <form action="{{ url_for('main.verify_key_data') }}" method="post" enctype="multipart/form-data" class="settings-form">
+                    <label for="verifyFile" class="form-label">{{ _('Файл данных (.enc)') }}</label>
+                    {{ file_picker('verifyFile', 'verify_file', accept='.enc', required=True) }}
+                    <label for="verifyKey" class="form-label mt-3">{{ _('Ключ для проверки') }}</label>
+                    <textarea class="form-control font-monospace" name="verify_key" id="verifyKey" rows="2" required placeholder="{{ _('Вставьте ключ шифрования для проверки') }}"></textarea>
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search" aria-hidden="true"></i> {{ _('Проверить соответствие') }}</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="settings-panel">
+                <h3><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</h3>
+                <p class="settings-hint">{{ _('PIN открывает приложение. Новый PIN — минимум 4 символа.') }}</p>
+                <form id="changePinSettingsForm" class="settings-form">
+                    <label for="oldPin" class="form-label">{{ _('Текущий PIN') }}</label>
+                    <input type="password" class="form-control" id="oldPin" autocomplete="current-password" required>
+                    <label for="newPin" class="form-label mt-3">{{ _('Новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin" autocomplete="new-password" minlength="4" required>
+                    <label for="newPin2" class="form-label mt-3">{{ _('Повторите новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin2" autocomplete="new-password" minlength="4" required>
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</button>
+                    </div>
+                    <div id="changePinSettingsMessage" class="settings-status mt-3" hidden></div>
+                </form>
+            </div>
+        </div>
+    </section>
 </div>
 
-<script>
-// @ts-nocheck - Jinja2 template syntax
-function showExportMessage(fileType) {
-    const notification = document.getElementById('exportNotification');
-    const message = document.getElementById('exportMessage');
-    
-    message.textContent = `{{ _('Экспортируются') }} ${fileType}`;
-    notification.style.display = 'block';
-    
-    // Автоматически скрыть уведомление через 5 секунд
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 5000);
-}
-
-function confirmKeyChange() {
-    const newKey = document.getElementById('newKey').value;
-    const confirmKey = document.getElementById('confirmKey').value;
-    
-    if (newKey !== confirmKey) {
-        alert('{{ _("Ключи не совпадают!") }}');
-        return false;
-    }
-    
-    return confirm('{{ _("Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл данных и сохранит резервную копию старого.") }}');
-}
-
-async function generateRandomKey() {
-    try {
-        const response = await fetch('/settings/generate-key', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            document.getElementById('newKey').value = data.key;
-            document.getElementById('confirmKey').value = data.key;
-        } else {
-            alert('{{ _("Ошибка при генерации ключа:") }} ' + data.error);
-        }
-    } catch (error) {
-        alert('{{ _("Ошибка при генерации ключа:") }} ' + error.message);
-    }
-}
-
-// Функция для показа информации об экспорте
-function showExportInfo(exportType) {
-    const modal = document.getElementById('exportInfoModal');
-    const exportTypeElement = document.getElementById('exportTypeText');
-    const exportLocationElement = document.getElementById('exportLocationText');
-    
-    // Определяем тип экспорта и файлы
-    let typeText, locationText;
-    switch(exportType) {
-        case 'data':
-            typeText = '{{ _("Файл данных серверов (.enc)") }}';
-            locationText = 'servers_export_[дата_время].enc';
-            break;
-        case 'key':
-            typeText = '{{ _("Ключ шифрования (.env)") }}';
-            locationText = 'SECRET_KEY_[дата_время].env';
-            break;
-        case 'package':
-            typeText = '{{ _("Полный архив (.zip)") }}';
-            locationText = 'vpn_servers_backup_[дата_время].zip';
-            break;
-    }
-    
-    exportTypeElement.textContent = typeText;
-    exportLocationElement.textContent = locationText;
-    
-    // Показываем дополнительную информацию для полного экспорта
-    const packageInfo = document.getElementById('packageInfo');
-    if (exportType === 'package') {
-        packageInfo.style.display = 'block';
-    } else {
-        packageInfo.style.display = 'none';
-    }
-    
-    // Показываем модальное окно
-    modal.style.display = 'block';
-}
-
-// Функция для подтверждения экспорта
-function confirmExport(exportType) {
-    const modal = document.getElementById('exportInfoModal');
-    modal.style.display = 'none';
-    
-    // Перенаправляем на соответствующий URL экспорта
-    switch(exportType) {
-        case 'data':
-            window.location.href = '{{ url_for("main.export_data") }}';
-            break;
-        case 'key':
-            window.location.href = '{{ url_for("main.export_key") }}';
-            break;
-        case 'package':
-            window.location.href = '{{ url_for("main.export_package") }}';
-            break;
-    }
-}
-
-// Функция для закрытия модального окна
-function closeExportModal() {
-    document.getElementById('exportInfoModal').style.display = 'none';
-}
-
-// Закрытие модального окна при клике вне его
-window.onclick = function(event) {
-    const modal = document.getElementById('exportInfoModal');
-    if (event.target == modal) {
-        modal.style.display = 'none';
-    }
-}
-</script>
-
-<!-- Модальное окно информации об экспорте -->
-<div id="exportInfoModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-    <div class="modal-content" style="background-color: #2c3e50; margin: 15% auto; padding: 20px; border: none; border-radius: 10px; width: 80%; max-width: 500px; color: white;">
-        <div class="modal-header" style="border-bottom: 1px solid #34495e; padding-bottom: 10px; margin-bottom: 20px;">
-            <h4 style="margin: 0; color: #3498db;">
-                <i class="bi bi-info-circle"></i> {{ _('Информация об экспорте') }}
-            </h4>
-            <span class="close" onclick="closeExportModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1;">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="alert alert-info" style="background-color: #1f2937; border: 1px solid #3498db; color: #3498db; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-                <strong>{{ _('Экспортируется:') }}</strong> <span id="exportTypeText"></span>
-                <div id="packageInfo" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #3498db;">
-                    <i class="bi bi-key"></i> <strong>{{ _('Содержимое архива:') }}</strong>
-                    <ul style="margin: 5px 0 0 20px; color: #bdc3c7;">
+<!-- Что и куда экспортируется -->
+<div class="modal fade" id="exportInfoModal" tabindex="-1" aria-labelledby="exportInfoTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportInfoTitle"><i class="bi bi-info-circle" aria-hidden="true"></i> {{ _('Информация об экспорте') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-2"><strong>{{ _('Экспортируется:') }}</strong> <span id="exportTypeText"></span></p>
+                <div id="packageInfo" class="settings-panel settings-panel-flat mb-3" hidden>
+                    <strong>{{ _('Содержимое архива:') }}</strong>
+                    <ul class="mb-0 mt-1 small">
                         <li>{{ _('Зашифрованные данные серверов') }}</li>
                         <li>{{ _('Ключ шифрования (.env)') }}</li>
                         <li>{{ _('PIN-код для входа (PIN.txt)') }}</li>
@@ -378,180 +189,98 @@ window.onclick = function(event) {
                         <li>{{ _('Инструкции по импорту (README.txt)') }}</li>
                     </ul>
                 </div>
+                <p class="mb-1"><strong><i class="bi bi-folder" aria-hidden="true"></i> {{ _('Место сохранения:') }}</strong></p>
+                <code class="settings-path d-block">~/Downloads/<span id="exportLocationText"></span></code>
+                <p class="settings-hint mt-3 mb-0">{{ _('Файл будет автоматически загружен в браузере') }}. {{ _('Проверьте папку Downloads после завершения') }}.</p>
+                <p id="exportKeyWarning" class="settings-status settings-status-warn mt-3 mb-0" hidden>
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ _('Ключ и PIN открывают все пароли серверов: храните файл отдельно от данных и никому не пересылайте.') }}</span>
+                </p>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-                <h6 style="color: #2ecc71; margin-bottom: 10px;">
-                    <i class="bi bi-folder"></i> {{ _('Место сохранения:') }}
-                </h6>
-                <div style="background-color: #1f2937; padding: 10px; border-radius: 5px; font-family: monospace; word-break: break-all;">
-                    <strong>📁 ~/Downloads/</strong><br>
-                    <span id="exportLocationText" style="color: #f39c12;"></span>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
+                <a class="btn btn-primary" id="confirmExportBtn" href="#"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Продолжить экспорт') }}</a>
             </div>
-            
-            <div style="margin-bottom: 20px;">
-                <h6 style="color: #e74c3c; margin-bottom: 10px;">
-                    <i class="bi bi-exclamation-triangle"></i> {{ _('Важно:') }}
-                </h6>
-                <ul style="margin: 0; padding-left: 20px; color: #bdc3c7;">
-                    <li>{{ _('Файл будет автоматически загружен в браузере') }}</li>
-                    <li>{{ _('Также сохранится в папку') }} <strong>Downloads</strong></li>
-                    <li>{{ _('Проверьте папку Downloads после завершения') }}</li>
-                </ul>
-            </div>
-        </div>
-        <div class="modal-footer" style="border-top: 1px solid #34495e; padding-top: 15px; text-align: right;">
-            <button type="button" class="btn btn-secondary" onclick="closeExportModal()" style="margin-right: 10px;">
-                {{ _('Отмена') }}
-            </button>
-            <button type="button" class="btn btn-success" onclick="confirmExport(currentExportType)" id="confirmExportBtn">
-                <i class="bi bi-download"></i> {{ _('Продолжить экспорт') }}
-            </button>
         </div>
     </div>
 </div>
-
-<script>
-// Глобальная переменная для хранения типа экспорта
-let currentExportType = '';
-
-// Переопределяем функцию confirmExport для сохранения типа
-function showExportInfo(exportType) {
-    currentExportType = exportType;
-    const modal = document.getElementById('exportInfoModal');
-    const exportTypeElement = document.getElementById('exportTypeText');
-    const exportLocationElement = document.getElementById('exportLocationText');
-    
-    // Определяем тип экспорта и файлы
-    let typeText, locationText;
-    switch(exportType) {
-        case 'data':
-            typeText = '{{ _("Файл данных серверов (.enc)") }}';
-            locationText = 'servers_export_[дата_время].enc';
-            break;
-        case 'key':
-            typeText = '{{ _("Ключ шифрования (.env)") }}';
-            locationText = 'SECRET_KEY_[дата_время].env';
-            break;
-        case 'package':
-            typeText = '{{ _("Полный архив (.zip)") }}';
-            locationText = 'vpn_servers_backup_[дата_время].zip';
-            break;
-    }
-    
-    exportTypeElement.textContent = typeText;
-    exportLocationElement.textContent = locationText;
-    
-    // Показываем модальное окно
-    modal.style.display = 'block';
-}
-</script>
-
-<!-- Управление PIN-кодом -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-shield-lock"></i> {{ _('Управление PIN-кодом') }}</h5>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-lg-6">
-                <h6 class="text-primary"><i class="bi bi-unlock"></i> {{ _('Сброс блокировки PIN') }}</h6>
-                <p class="small text-muted">{{ _('Если PIN-код был заблокирован из-за неверных попыток входа, вы можете сбросить блокировку здесь.') }}</p>
-                
-                <button type="button" class="btn btn-warning" onclick="resetPinBlock()">
-                    <i class="bi bi-unlock"></i> {{ _('Сбросить блокировку PIN') }}
-                </button>
-                <div id="resetPinMessage" class="alert mt-3" style="display: none;"></div>
-            </div>
-        </div>
-        <p class="small text-body-secondary mb-0 mt-3">
-            <a href="{{ url_for('main.manage_hints') }}">{{ _('Управление подсказками') }}</a>
-        </p>
-    </div>
-</div>
-
-{% endblock %} 
+{% endblock %}
 
 {% block scripts %}
 <script>
-    // Функция для сброса блокировки PIN
-    function resetPinBlock() {
-        const messageDiv = document.getElementById('resetPinMessage');
-        const resetButton = document.querySelector('button[onclick="resetPinBlock()"]');
-        
-        // Показываем индикатор загрузки
-        resetButton.disabled = true;
-        resetButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> {{ _("Сброс...") }}';
-        
-        // Отправляем запрос на сброс блокировки
-        fetch('/pin/reset_block', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                messageDiv.className = 'alert alert-success mt-3';
-                messageDiv.innerHTML = '<i class="bi bi-check-circle"></i> ' + data.message;
-            } else {
-                messageDiv.className = 'alert alert-danger mt-3';
-                messageDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> ' + data.message;
-            }
-            messageDiv.style.display = 'block';
-            
-            // Восстанавливаем кнопку
-            resetButton.disabled = false;
-            resetButton.innerHTML = '<i class="bi bi-unlock"></i> {{ _("Сбросить блокировку PIN") }}';
-        })
-        .catch(error => {
-            messageDiv.className = 'alert alert-danger mt-3';
-            messageDiv.innerHTML = '<i class="bi bi-exclamation-triangle"></i> {{ _("Ошибка соединения с сервером") }}';
-            messageDiv.style.display = 'block';
-            
-            // Восстанавливаем кнопку
-            resetButton.disabled = false;
-            resetButton.innerHTML = '<i class="bi bi-unlock"></i> {{ _("Сбросить блокировку PIN") }}';
-        });
-    }
+(() => {
+    const t = {
+        mismatch: {{ _('Ключи не совпадают!')|tojson }},
+        confirmKey: {{ _('Вы уверены, что хотите сменить ключ шифрования? Это создаст новый файл данных и сохранит резервную копию старого.')|tojson }},
+        pinMismatch: {{ _('Новые PIN-коды не совпадают')|tojson }},
+        pinChanged: {{ _('PIN изменён')|tojson }},
+        pinFailed: {{ _('Не удалось сменить PIN')|tojson }},
+        noConnection: {{ _('Ошибка соединения с сервером')|tojson }},
+    };
+    const exportsInfo = {
+        data: [{{ _('Файл данных серверов (.enc)')|tojson }}, 'servers_export_YYYYMMDD_HHMMSS.enc', {{ url_for('main.export_data')|tojson }}],
+        key: [{{ _('Ключ шифрования (.env)')|tojson }}, 'SECRET_KEY_YYYYMMDD_HHMMSS.env', {{ url_for('main.export_key')|tojson }}],
+        package: [{{ _('Полный архив (.zip)')|tojson }}, 'vpn_servers_backup_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
+    };
 
-    // Функция для генерации случайного ключа
-    function generateRandomKey() {
-        fetch('/settings/generate-key', {
-            method: 'POST'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('newKey').value = data.key;
-                document.getElementById('confirmKey').value = data.key;
-            } else {
-                alert('{{ _("Ошибка генерации ключа:") }} ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('{{ _("Ошибка:") }} ', error);
-            alert('{{ _("Ошибка соединения с сервером") }}');
-        });
-    }
-    
-    // Функция для подтверждения смены ключа
-    function confirmKeyChange() {
-        return confirm('{{ _("Вы уверены, что хотите сменить ключ шифрования? Это действие нельзя отменить.") }}');
-    }
-    
-    // Функция для показа информации об экспорте
-    function showExportInfo(type) {
-        if (type === 'data') {
-            window.location.href = '{{ url_for("main.export_data") }}';
-        } else if (type === 'key') {
-            window.location.href = '{{ url_for("main.export_key") }}';
-        } else if (type === 'package') {
-            window.location.href = '{{ url_for("main.export_package") }}';
+    // Экспорт: сначала окно «что и куда», потом загрузка
+    const exportModal = document.getElementById('exportInfoModal');
+    document.querySelectorAll('[data-export]').forEach(button => button.addEventListener('click', () => {
+        const [label, file, url] = exportsInfo[button.dataset.export];
+        document.getElementById('exportTypeText').textContent = label;
+        document.getElementById('exportLocationText').textContent = file;
+        document.getElementById('packageInfo').hidden = button.dataset.export !== 'package';
+        document.getElementById('exportKeyWarning').hidden = button.dataset.export === 'data';
+        document.getElementById('confirmExportBtn').href = url;
+        bootstrap.Modal.getOrCreateInstance(exportModal).show();
+    }));
+    document.getElementById('confirmExportBtn').addEventListener('click', () => bootstrap.Modal.getOrCreateInstance(exportModal).hide());
+
+    // Ключ Fernet — 32 случайных байта в base64url; создаётся в браузере и на сервер уходит только при смене
+    document.getElementById('generateKeyBtn').addEventListener('click', () => {
+        const bytes = crypto.getRandomValues(new Uint8Array(32));
+        const key = btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_');
+        document.getElementById('newKey').value = key;
+        document.getElementById('confirmKey').value = key;
+    });
+    document.getElementById('changeKeyForm').addEventListener('submit', event => {
+        if (document.getElementById('newKey').value !== document.getElementById('confirmKey').value) {
+            event.preventDefault();
+            alert(t.mismatch);
+        } else if (!confirm(t.confirmKey)) {
+            event.preventDefault();
         }
-    }
-</script>
+    });
 
-{% endblock %} 
+    // Смена PIN через тот же /pin/change_ajax, что и окно входа
+    const pinForm = document.getElementById('changePinSettingsForm');
+    const pinMessage = document.getElementById('changePinSettingsMessage');
+    const showPin = (ok, text) => {
+        pinMessage.className = 'settings-status mt-3 ' + (ok ? 'settings-status-ok' : 'settings-status-danger');
+        pinMessage.textContent = text;
+        pinMessage.hidden = false;
+    };
+    pinForm.addEventListener('submit', async event => {
+        event.preventDefault();
+        const oldPin = document.getElementById('oldPin').value.trim();
+        const newPin = document.getElementById('newPin').value.trim();
+        if (newPin !== document.getElementById('newPin2').value.trim()) return showPin(false, t.pinMismatch);
+        const button = pinForm.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+            const response = await fetch('/pin/change_ajax', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({old_pin: oldPin, new_pin: newPin}),
+            });
+            const data = await response.json().catch(() => ({}));
+            if (data.success) { showPin(true, t.pinChanged); pinForm.reset(); }
+            else showPin(false, data.message || data.error || t.pinFailed);
+        } catch (error) {
+            showPin(false, t.noConnection);
+        } finally {
+            button.disabled = false;
+        }
+    });
+})();
+</script>
+{% endblock %}

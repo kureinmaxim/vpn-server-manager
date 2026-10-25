@@ -1,0 +1,37 @@
+/* Settings: the same panels, chips and buttons as the DNS and monitoring pages */
+.settings-page { max-width: 1120px; padding-bottom: 3rem; }
+.settings-head h1 { font-size: 2rem; margin-bottom: .25rem; }
+.settings-head h1 i { color: var(--bs-info); }
+.settings-nav { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0 .5rem; }
+.settings-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .3em .85em; border-radius: 999px; font-size: .9rem;
+    border: 1px solid var(--bs-border-color); color: var(--bs-body-color); text-decoration: none; background: var(--bs-tertiary-bg); }
+.settings-chip:hover, .settings-chip:focus-visible { border-color: var(--bs-info); color: var(--bs-info-text-emphasis); }
+.settings-section { margin-top: 2rem; scroll-margin-top: 1rem; }
+.settings-section-title { font-size: 1.3rem; display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+.settings-section-title i { color: var(--bs-secondary-color); }
+.settings-lead { color: var(--bs-secondary-color); font-size: .9rem; max-width: 60rem; }
+.settings-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); margin-top: 1rem; }
+.settings-grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.settings-grid-3 { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+.settings-panel, .settings-tile { border: 1px solid var(--bs-border-color); border-radius: .75rem; background: var(--bs-tertiary-bg);
+    padding: 1.1rem 1.25rem; min-width: 0; display: flex; flex-direction: column; }
+.settings-section > .settings-panel + .settings-grid { margin-top: 1rem; }
+.settings-page .font-monospace::placeholder { font-family: var(--bs-body-font-family); }
+.settings-panel h3 { font-size: 1.05rem; margin: 0 0 .4rem; display: flex; align-items: center; gap: .45rem; }
+.settings-panel h3 i { color: var(--bs-secondary-color); }
+.settings-panel-flat { background: transparent; padding: .75rem 1rem; }
+.settings-tile { gap: .4rem; }
+.settings-tile .form-check-label i { color: var(--bs-secondary-color); margin-right: .2rem; }
+.settings-hint { color: var(--bs-secondary-color); font-size: .85rem; margin-bottom: .75rem; }
+.settings-tile .settings-hint { margin-bottom: 0; }
+.settings-form { display: flex; flex-direction: column; flex: 1; }
+.settings-form .settings-actions { margin-top: auto; padding-top: 1rem; }
+.settings-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-top: 1rem; }
+.settings-status { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; padding: .5rem .8rem; border-radius: .6rem; font-size: .9rem;
+    border: 1px solid var(--bs-border-color); }
+.settings-status-ok { border-color: var(--bs-success-border-subtle); background: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
+.settings-status-warn { border-color: var(--bs-warning-border-subtle); background: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
+.settings-status-danger { border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
+.settings-path { font-size: .82rem; overflow-wrap: anywhere; color: inherit; }
+.settings-status + .settings-hint { margin-top: .6rem; }
+@media (max-width: 575.98px) { .settings-actions form.ms-auto { margin-left: 0 !important; } }

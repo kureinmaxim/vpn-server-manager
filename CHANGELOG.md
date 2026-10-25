@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.8] - 2026-10-25
+
+### Changed
+- The **Settings** page has the same look as the DNS and Monitoring pages. A header with section chips leads to Interface, Data and Security. The home page buttons are tiles with switches and links to their lists. The data file, import, key and PIN are uniform panels with consistent buttons: the main action is solid, key and full exports are amber, and «Detach file» is red. The page works in light and dark themes and at phone width. The export window is a real dialog and warns that the key and PIN unlock every server password.
+- The PIN panel now changes the PIN, through the same check as the lock screen, instead of «Reset PIN lock». The lock only applies on the lock screen, which you must pass before you can open Settings.
+
+### Fixed
+- «Generate» next to the new encryption key called a missing address and did nothing. The Fernet key is now generated in the browser.
+- Duplicate scripts at the bottom of the page replaced the real handlers. Changing the key skipped the check that both fields match (the server still checked), and export downloaded right away without the info window.
+
 ## [4.15.7] - 2026-10-25
 
 ### Added
