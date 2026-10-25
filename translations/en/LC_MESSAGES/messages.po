@@ -10201,3 +10201,6 @@ msgstr "Could not update the history script. Root or sudo -n is required."
 
 msgid "Не удалось обновить скрипт истории."
 msgstr "Could not update the history script."
+
+msgid "Слишком много разборов подряд. Подождите минуту."
+msgstr "Too many analyses in a row. Wait a minute."

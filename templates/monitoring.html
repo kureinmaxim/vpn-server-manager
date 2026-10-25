@@ -109,7 +109,7 @@
                 <h4>{{ _('Разбор') }}</h4>
                 <pre id="security-brief-summary" class="security-brief-text"></pre>
             </section>
-            <section class="security-brief-block">
+            <section class="security-brief-block" id="security-brief-prompt-block">
                 <div class="security-brief-head">
                     <h4>{{ _('Промпт для LLM') }}</h4>
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-security-prompt">
@@ -909,12 +909,14 @@ document.getElementById('security-brief-btn').addEventListener('click', async fu
             summaryEl.textContent = data.data.summary || '';
             promptEl.textContent = data.data.prompt || '';
         }
-        panel.classList.remove('d-none');
     } catch (error) {
         summaryEl.textContent = '{{ _("Не удалось собрать разбор") }}';
         promptEl.textContent = '';
-        panel.classList.remove('d-none');
     } finally {
+        // Без промпта (ошибка, лимит) блок с кнопкой «Копировать» не нужен.
+        document.getElementById('security-brief-prompt-block').classList.toggle('d-none', !promptEl.textContent);
+        document.getElementById('copy-security-prompt').innerHTML = '<i class="bi bi-clipboard"></i> {{ _("Копировать") }}';
+        panel.classList.remove('d-none');
         button.disabled = false;
         button.innerHTML = '<i class="bi bi-chat-left-text"></i> {{ _("Разобрать ситуацию") }}';
     }

@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.3] - 2026-10-25
+
+### Fixed
+- **Analyse the situation** on the Monitoring page answered «Rate limit exceeded» and showed an empty LLM prompt. All monitoring requests shared a limit of 10 per minute per server, and the page's own polling already used about that much. Now the shared limit is 30 per minute and the analysis has its own limit, so polling no longer blocks the button. The rate-limit message is translated, and the LLM prompt block with its Copy button is hidden when there is no prompt.
+
 ## [4.15.2] - 2026-10-25
 
 ### Changed

@@ -17,7 +17,10 @@ from ..services.ssh_address import card_addresses, ssh_address
 logger = logging.getLogger(__name__)
 
 # Создать лимитер (макс 10 запросов в минуту на сервер)
-rate_limiter = RateLimiter(max_requests=10, time_window=60)
+# Страница мониторинга сама опрашивает ~11 раз в минуту и ещё ~9 запросов при открытии:
+# при лимите 10 срезались и опросы, и нажатия. Разбор по кнопке считается отдельно.
+rate_limiter = RateLimiter(max_requests=30, time_window=60)
+brief_limiter = RateLimiter(max_requests=4, time_window=60)
 load_check_limiter = RateLimiter(max_requests=6, time_window=60)
 
 # Cron-скрипт истории CPU/памяти (каждые 5 минут). Старые копии на серверах считали CPU по
@@ -1166,10 +1169,10 @@ def get_security_events(server_id):
 @require_pin
 def get_security_brief(server_id):
     """Разбор атак и сбоев плюс промпт для LLM. Секреты в текст не попадают."""
-    if not rate_limiter.is_allowed(f"server_{server_id}"):
+    if not brief_limiter.is_allowed(f"server_{server_id}"):
         return jsonify({
             'success': False,
-            'error': 'Rate limit exceeded. Please wait a moment.'
+            'error': _('Слишком много разборов подряд. Подождите минуту.')
         }), 429
 
     try:
