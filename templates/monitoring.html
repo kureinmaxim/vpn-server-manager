@@ -27,14 +27,37 @@
         <button type="button" id="retry-installation-check" class="btn btn-outline-primary">{{ _('Повторить') }}</button>
     </div>
 
-    <!-- Loading Indicator (показывается сразу, скрывается через JS) -->
-    <div id="initial-loading" class="text-center py-5">
-        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">{{ _('Загрузка...') }}</span>
+    <!-- Обмен с сервером: шаги, время, объём; после загрузки — одна строка «обновлено N с назад» -->
+    {% set sync_steps = [
+        ['check-installed', _('Подключение')], ['metrics-history', _('CPU и память')],
+        ['check-tools', _('Утилиты')], ['network-stats', _('Сеть')], ['firewall-stats', 'Firewall'],
+        ['services-stats', _('Службы')], ['reticulum-status', _('HA-стек')],
+        ['webpanels', _('Веб-панели')], ['security-events', _('Безопасность')]] %}
+    {% set sync_i18n = {
+        'title': _('Получаю данные с сервера'), 'done': _('Данные получены за {time}'),
+        'count': _('{done} из {total}'), 'left': _('осталось ~{time}'), 'slower': _('дольше обычного…'),
+        'doneErrors': _('ошибок: {count}, повтор при следующем опросе'), 'sec': _('с'),
+        'running': _('идёт запрос'), 'waiting': _('в очереди'), 'failed': _('нет ответа'),
+        'polling': _('обновляю: {list}'), 'justNow': _('данные только что обновлены'),
+        'ago': _('обновлено {time} назад')} %}
+    <section id="mon-sync" class="mon-sync mb-3" aria-live="polite" hidden
+             data-server="{{ server.id }}" data-steps="{{ sync_steps|tojson|forceescape }}" data-i18n="{{ sync_i18n|tojson|forceescape }}">
+        <div class="mon-sync-head">
+            <span class="mon-sync-pulse" aria-hidden="true"></span>
+            <strong class="mon-sync-title">{{ _('Получаю данные с сервера') }}</strong>
+            <span class="mon-sync-meta">
+                <span class="mon-sync-count"></span> · <span class="mon-sync-time"></span> · <span class="mon-sync-size"></span>
+                <span class="mon-sync-eta"></span>
+            </span>
+            <span class="mon-sync-live"><span class="mon-sync-live-text"></span></span>
+            <button type="button" class="btn btn-link btn-sm mon-sync-toggle" hidden aria-label="{{ _('Подробнее') }}" title="{{ _('Подробнее') }}">
+                <i class="bi bi-list-check" aria-hidden="true"></i>
+            </button>
         </div>
-        <h5 class="text-muted">{{ _('Проверка системы мониторинга...') }}</h5>
-        <p class="small text-muted">{{ _('Подключение к серверу...') }}</p>
-    </div>
+        <div class="mon-sync-bar" aria-hidden="true"><div class="mon-sync-fill"></div></div>
+        <div class="mon-sync-steps"></div>
+    </section>
+    <div id="initial-loading" hidden></div>
 
     <!-- Installation Panel (показывается если не установлено) -->
     <div id="installation-panel" class="installation-panel" style="display: none;">
@@ -509,6 +532,7 @@
 <!-- Styles moved to static/css/monitoring.css -->
 
 <script src="{{ url_for('static', filename='js/project_stats.js') }}?v={{ app_info.get('version', '') }}"></script>
+<script src="{{ url_for('static', filename='js/monitoring_sync.js') }}?v={{ app_info.get('version', '') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 // Debug output - проверка загрузки
@@ -1364,8 +1388,8 @@ async function checkRequiredTools() {
             }
         }
     } catch (error) {
+        // Сбой одного запроса виден в панели обмена; баннер «нет SSH» здесь пугал зря.
         console.error('Error checking required tools:', error);
-        showConnectionError('timeout', error.message);
     }
 }
 
@@ -1835,7 +1859,9 @@ function initMonitoring() {
     console.log('⏱️ Starting initial data load...');
     // CPU is sampled first and alone: on a 1-vCPU VPS the other checks running in the same
     // second would be measured as server load (100 % on an idle server).
-    updateCharts().finally(() => {
+    // Not longer than 4 s: the 1 s sample is the first command of the request, the rest
+    // (history file, diagnosis) need not hold back the other checks.
+    Promise.race([updateCharts(), new Promise(resolve => setTimeout(resolve, 4000))]).finally(() => {
         checkRequiredTools();
         updateNetworkStats();
         updateFirewallStatus();

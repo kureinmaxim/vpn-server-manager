@@ -2,6 +2,17 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.6] - 2026-10-25
+
+### Added
+- The Monitoring page shows the exchange with the server while it loads. Each request (connection, CPU and memory, tools, network, firewall, services, HA stack, web panels, security) is a step that turns from queued to running to done with its time, or to failed with the reason in the tooltip. A bar, a «N of 9» counter, elapsed time, data received and an estimate of the time left are based on this server's previous load. After loading, the panel folds into one line, «Data received in 27 s · updated N s ago». It pulses and names what it is refreshing during background polls, and the details reopen with one click.
+
+### Changed
+- The other checks start at most 4 s after the CPU sample instead of waiting for the whole history request, about 3 s sooner on slow servers.
+
+### Fixed
+- A single failed request (the tools check) no longer shows the «Cannot connect over SSH, timeout» banner. The failed step is shown in the exchange panel and retried on the next poll.
+
 ## [4.15.5] - 2026-10-25
 
 ### Fixed

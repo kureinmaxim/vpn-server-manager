@@ -103,3 +103,39 @@
 .monitoring-page .mon-chip-warn { border-color: var(--bs-warning-border-subtle); background: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
 .monitoring-page .mon-chip-danger { border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
 .monitoring-page .mon-status-brief { border-radius: 999px; }
+
+/* Exchange with the server: steps, bar, estimate; folds to one line after the first load */
+.monitoring-page .mon-sync { border: 1px solid var(--bs-border-color); border-radius: .75rem; padding: .6rem .9rem; background: var(--bs-tertiary-bg); }
+.monitoring-page .mon-sync-head { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; font-size: .9rem; }
+.monitoring-page .mon-sync-meta { color: var(--bs-secondary-color); font-variant-numeric: tabular-nums; }
+.monitoring-page .mon-sync-eta { margin-left: .35rem; }
+.monitoring-page .mon-sync-live { margin-left: auto; color: var(--bs-secondary-color); font-size: .85rem; display: none; }
+.monitoring-page .mon-sync-toggle { padding: 0 .25rem; color: var(--bs-secondary-color); }
+.monitoring-page .mon-sync-pulse { width: .6rem; height: .6rem; border-radius: 50%; background: var(--bs-info); flex: none; animation: mon-pulse 1.2s ease-in-out infinite; }
+.monitoring-page .mon-sync.is-done .mon-sync-pulse { background: var(--bs-success); animation: none; }
+.monitoring-page .mon-sync.is-done.has-errors .mon-sync-pulse { background: var(--bs-warning); }
+.monitoring-page .mon-sync.is-done.is-polling .mon-sync-pulse { background: var(--bs-info); animation: mon-pulse 1.2s ease-in-out infinite; }
+.monitoring-page .mon-sync-bar { height: 4px; border-radius: 2px; background: var(--bs-border-color); margin: .5rem 0; overflow: hidden; }
+.monitoring-page .mon-sync-fill { height: 100%; width: 0; border-radius: 2px; transition: width .5s ease;
+    background: linear-gradient(90deg, var(--bs-info), var(--bs-success)); background-size: 200% 100%; animation: mon-flow 1.6s linear infinite; }
+.monitoring-page .mon-sync.is-done .mon-sync-fill { animation: none; background: var(--bs-success); }
+.monitoring-page .mon-sync.is-done.has-errors .mon-sync-fill { background: var(--bs-warning); }
+.monitoring-page .mon-sync-steps { display: flex; flex-wrap: wrap; gap: .3rem; }
+.monitoring-page .mon-step { display: inline-flex; align-items: center; gap: .3rem; padding: .15em .6em; border-radius: 999px; font-size: .8rem;
+    border: 1px solid var(--bs-border-color); color: var(--bs-secondary-color); font-variant-numeric: tabular-nums; transition: background .3s, color .3s; }
+.monitoring-page .mon-step-run { color: var(--bs-info-text-emphasis); border-color: var(--bs-info-border-subtle); background: var(--bs-info-bg-subtle); }
+.monitoring-page .mon-step-ok { color: var(--bs-success-text-emphasis); border-color: var(--bs-success-border-subtle); background: var(--bs-success-bg-subtle); }
+.monitoring-page .mon-step-err { color: var(--bs-danger-text-emphasis); border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); }
+.monitoring-page .mon-step-spin { width: .7rem; height: .7rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: mon-spin .8s linear infinite; }
+.monitoring-page .mon-sync.is-compact { padding-block: .35rem; }
+.monitoring-page .mon-sync.is-compact .mon-sync-bar,
+.monitoring-page .mon-sync.is-compact .mon-sync-steps,
+.monitoring-page .mon-sync.is-compact .mon-sync-meta { display: none; }
+.monitoring-page .mon-sync.is-done .mon-sync-live { display: inline; }
+.monitoring-page .mon-sync.is-compact .mon-sync-title { font-weight: 500; }
+@keyframes mon-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
+@keyframes mon-flow { from { background-position: 200% 0; } to { background-position: 0 0; } }
+@keyframes mon-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+    .monitoring-page .mon-sync-pulse, .monitoring-page .mon-sync-fill, .monitoring-page .mon-step-spin { animation: none !important; }
+}

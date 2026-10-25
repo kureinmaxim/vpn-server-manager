@@ -10207,3 +10207,63 @@ msgstr "Too many analyses in a row. Wait a minute."
 
 msgid "Не удалось получить статус служб, повтор через 30 с."
 msgstr "Could not get the service status, retrying in 30 s."
+
+msgid "Подключение"
+msgstr "Connection"
+
+msgid "CPU и память"
+msgstr "CPU and memory"
+
+msgid "Утилиты"
+msgstr "Tools"
+
+msgid "Службы"
+msgstr "Services"
+
+msgid "HA-стек"
+msgstr "HA stack"
+
+msgid "Веб-панели"
+msgstr "Web panels"
+
+msgid "Получаю данные с сервера"
+msgstr "Getting data from the server"
+
+msgid "Данные получены за {time}"
+msgstr "Data received in {time}"
+
+msgid "{done} из {total}"
+msgstr "{done} of {total}"
+
+msgid "осталось ~{time}"
+msgstr "~{time} left"
+
+msgid "дольше обычного…"
+msgstr "taking longer than usual…"
+
+msgid "ошибок: {count}, повтор при следующем опросе"
+msgstr "errors: {count}, retrying on the next poll"
+
+msgid "с"
+msgstr "s"
+
+msgid "идёт запрос"
+msgstr "request in progress"
+
+msgid "в очереди"
+msgstr "queued"
+
+msgid "нет ответа"
+msgstr "no answer"
+
+msgid "обновляю: {list}"
+msgstr "updating: {list}"
+
+msgid "данные только что обновлены"
+msgstr "data just updated"
+
+msgid "обновлено {time} назад"
+msgstr "updated {time} ago"
+
+msgid "Подробнее"
+msgstr "Details"

@@ -9873,3 +9873,63 @@ msgstr "连续分析次数过多，请等待一分钟。"
 
 msgid "Не удалось получить статус служб, повтор через 30 с."
 msgstr "无法获取服务状态，30 秒后重试。"
+
+msgid "Подключение"
+msgstr "连接"
+
+msgid "CPU и память"
+msgstr "CPU 和内存"
+
+msgid "Утилиты"
+msgstr "工具"
+
+msgid "Службы"
+msgstr "服务"
+
+msgid "HA-стек"
+msgstr "HA 栈"
+
+msgid "Веб-панели"
+msgstr "Web 面板"
+
+msgid "Получаю данные с сервера"
+msgstr "正在从服务器获取数据"
+
+msgid "Данные получены за {time}"
+msgstr "数据获取用时 {time}"
+
+msgid "{done} из {total}"
+msgstr "{done} / {total}"
+
+msgid "осталось ~{time}"
+msgstr "剩余约 {time}"
+
+msgid "дольше обычного…"
+msgstr "比平时更久…"
+
+msgid "ошибок: {count}, повтор при следующем опросе"
+msgstr "错误：{count}，下次轮询时重试"
+
+msgid "с"
+msgstr "秒"
+
+msgid "идёт запрос"
+msgstr "请求中"
+
+msgid "в очереди"
+msgstr "排队中"
+
+msgid "нет ответа"
+msgstr "无响应"
+
+msgid "обновляю: {list}"
+msgstr "正在更新：{list}"
+
+msgid "данные только что обновлены"
+msgstr "数据刚刚更新"
+
+msgid "обновлено {time} назад"
+msgstr "{time} 前更新"
+
+msgid "Подробнее"
+msgstr "详情"
