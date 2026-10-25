@@ -199,84 +199,79 @@ class SSHService:
     def _label_ports(cls, ports: List[str]) -> List[str]:
         return [cls._label_port(port) for port in ports]
 
-    def _probe_service(self, client, descriptor: Dict) -> Dict:
-        """Проверить наличие и статус systemd unit по набору candidate names."""
-        matched_name = None
-        for candidate in descriptor.get("unit_candidates", []):
+    @staticmethod
+    def _format_uptime(seconds: int) -> str:
+        days, hours, mins = seconds // 86400, (seconds % 86400) // 3600, (seconds % 3600) // 60
+        if days > 0:
+            return f"{days}d {hours}h"
+        return f"{hours}h {mins}m" if hours > 0 else f"{mins}m"
+
+    def _probe_services(self, client, descriptors: List[Dict]) -> List[Dict]:
+        """Статус systemd unit'ов каталога одной командой.
+
+        Раньше на каждый unit уходило 2–5 SSH-команд (около 60 на сервер): на медленном VPS
+        это почти две минуты, опрос раз в 30 с накладывался и каналы SSH не открывались.
+        """
+        units = []
+        for descriptor in descriptors:
+            for candidate in descriptor.get("unit_candidates", []):
+                if candidate not in units:
+                    units.append(candidate)
+        states, uptime = {}, None
+        if units:
             output = self._read_command_output(
                 client,
-                f'systemctl list-unit-files --type=service 2>/dev/null | grep -E "^{candidate}\\.service\\s"',
-                timeout=10,
+                "cut -d' ' -f1 /proc/uptime | sed 's/^/UPTIME=/'; echo; "
+                "systemctl show -p Id -p LoadState -p ActiveState -p UnitFileState "
+                "-p ActiveEnterTimestampMonotonic -- " + " ".join(unit + ".service" for unit in units),
+                timeout=20,
             )
-            if output:
-                matched_name = candidate
-                break
+            block = {}
+            for line in (output or "").splitlines() + [""]:
+                if not line.strip():
+                    if block.get("UPTIME"):
+                        try:
+                            uptime = float(block["UPTIME"])
+                        except ValueError:
+                            pass
+                    if block.get("Id"):
+                        states[block["Id"].replace(".service", "")] = block
+                    block = {}
+                elif "=" in line:
+                    key, value = line.split("=", 1)
+                    block[key] = value.strip()
 
-        if not matched_name:
-            return {
+        results = []
+        for descriptor in descriptors:
+            matched = next(
+                (c for c in descriptor.get("unit_candidates", [])
+                 if states.get(c, {}).get("LoadState") not in (None, "", "not-found")),
+                None,
+            )
+            base = {
                 "name": descriptor["name"],
                 "display_name": self._translate(descriptor["display_name"]),
                 "group": descriptor["group"],
-                "status": "not_installed",
-                "enabled": "not-found",
-                "uptime": "-",
-                "unit_name": None,
                 "hint": self._translate(descriptor.get("hint", "")),
             }
-
-        status = (
-            self._read_command_output(
-                client, f"systemctl is-active {matched_name} 2>/dev/null", timeout=10
-            )
-            or "unknown"
-        )
-        enabled = (
-            self._read_command_output(
-                client, f"systemctl is-enabled {matched_name} 2>/dev/null", timeout=10
-            )
-            or "unknown"
-        )
-        uptime_str = "stopped"
-
-        if status == "active":
-            try:
-                import time
-
-                timestamp_line = self._read_command_output(
-                    client,
-                    f"systemctl show {matched_name} --property=ActiveEnterTimestamp",
-                    timeout=10,
-                )
-                if timestamp_line and "=" in timestamp_line:
-                    timestamp_str = timestamp_line.split("=", 1)[1].strip()
-                    if timestamp_str:
-                        start_time = self._read_command_output(
-                            client, f'date -d "{timestamp_str}" +%s', timeout=10
-                        )
-                        if start_time.isdigit():
-                            seconds = int(time.time()) - int(start_time)
-                            days = seconds // 86400
-                            hours = (seconds % 86400) // 3600
-                            mins = (seconds % 3600) // 60
-                            if days > 0:
-                                uptime_str = f"{days}d {hours}h"
-                            elif hours > 0:
-                                uptime_str = f"{hours}h {mins}m"
-                            else:
-                                uptime_str = f"{mins}m"
-            except Exception:
+            if not matched:
+                results.append(dict(base, status="not_installed", enabled="not-found", uptime="-", unit_name=None))
+                continue
+            state = states[matched]
+            status = state.get("ActiveState") or "unknown"
+            uptime_str = "stopped"
+            if status == "active":
                 uptime_str = "active"
+                entered = state.get("ActiveEnterTimestampMonotonic", "")
+                if uptime is not None and entered.isdigit() and int(entered) > 0:
+                    uptime_str = self._format_uptime(max(0, int(uptime - int(entered) / 1_000_000)))
+            results.append(dict(base, status=status, enabled=state.get("UnitFileState") or "unknown",
+                                uptime=uptime_str, unit_name=matched))
+        return results
 
-        return {
-            "name": descriptor["name"],
-            "display_name": self._translate(descriptor["display_name"]),
-            "group": descriptor["group"],
-            "status": status,
-            "enabled": enabled,
-            "uptime": uptime_str,
-            "unit_name": matched_name,
-            "hint": self._translate(descriptor.get("hint", "")),
-        }
+    def _probe_service(self, client, descriptor: Dict) -> Dict:
+        """Проверить наличие и статус одного systemd unit по набору candidate names."""
+        return self._probe_services(client, [descriptor])[0]
 
     def _collect_stack_status(self, client, docker_names: List[str]) -> List[Dict]:
         """Весь стек TelegramOnly: транспорты, бот, HA и ожидаемые контейнеры.
@@ -1375,11 +1370,9 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         try:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
-            services = []
-            for descriptor in self._service_catalog:
-                service = self._probe_service(client, descriptor)
+            services = self._probe_services(client, list(self._service_catalog))
+            for service, descriptor in zip(services, self._service_catalog):
                 service["control_component"] = descriptor.get("control_component")
-                services.append(service)
 
             services.extend(self._collect_projects(client, load_projects()))
             return services

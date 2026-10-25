@@ -10204,3 +10204,6 @@ msgstr "Could not update the history script."
 
 msgid "Слишком много разборов подряд. Подождите минуту."
 msgstr "Too many analyses in a row. Wait a minute."
+
+msgid "Не удалось получить статус служб, повтор через 30 с."
+msgstr "Could not get the service status, retrying in 30 s."

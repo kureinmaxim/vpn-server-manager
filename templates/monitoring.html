@@ -668,12 +668,26 @@ async function updateFirewallStatus() {
 }
 
 // Services Status Update
+// A failed poll must not leave «Loading...» forever; lists already filled keep their last data.
+function servicesUnavailable() {
+    ['services-list', 'proxy-services-list', 'telegramonly-services-list'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.querySelector('.service-item')) return;
+        const note = document.createElement('div');
+        note.className = 'text-muted';
+        note.textContent = {{ _('Не удалось получить статус служб, повтор через 30 с.')|tojson }};
+        el.replaceChildren(note);
+    });
+}
+
 async function updateServicesStatus() {
     try {
         const response = await fetch(`/api/monitoring/${serverId}/services-stats`);
         const data = await response.json();
-        
-        if (data.success) {
+        const broken = !data.success || !Array.isArray(data.data)
+            || (data.data.length === 1 && data.data[0].name === 'error');
+        if (broken) servicesUnavailable();
+        else {
             const services = data.data;
             const container = document.getElementById('services-list');
             const proxyContainer = document.getElementById('proxy-services-list');
@@ -746,6 +760,7 @@ async function updateServicesStatus() {
         }
     } catch (error) {
         console.error('Error fetching services stats:', error);
+        servicesUnavailable();
     }
 }
 

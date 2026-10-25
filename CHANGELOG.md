@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.4] - 2026-10-25
+
+### Fixed
+- **System services**, **VPN / Proxy services** and **TelegramOnly stack** on the Monitoring page could stay on «Loading...» for good. Each unit was checked with 2–5 separate SSH commands, about 60 per server. On a slow 1-vCPU VPS that took almost two minutes, the 30-second poll overlapped with itself, and SSH channels stopped opening («Timeout opening channel»). All units are now read with one `systemctl show` command, so the check takes seconds instead of about 110 s on srv015890413. If the request still fails, the lists say so and retry instead of showing «Loading...».
+
 ## [4.15.3] - 2026-10-25
 
 ### Fixed

@@ -107,7 +107,7 @@ def test_shared_monitoring_catalog(monkeypatch):
     from app.services.ssh_service import SSHService
     service = SSHService()
     monkeypatch.setattr(service, 'get_connection_pooled', lambda *a: object())
-    monkeypatch.setattr(service, '_probe_service', lambda client, descriptor: {'name': descriptor['name'], 'status': 'active'})
+    monkeypatch.setattr(service, '_probe_services', lambda client, descriptors: [{'name': d['name'], 'status': 'active'} for d in descriptors])
     data = service.get_services_stats('192.0.2.1', 'root', 'fixture')
     assert next(item for item in data if item['name'] == 'xray')['control_component'] == 'vless'
     assert next(item for item in data if item['name'] == 'ssh')['control_component'] is None

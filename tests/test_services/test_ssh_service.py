@@ -525,3 +525,24 @@ def test_history_script_state(output, state):
 def test_repo_history_script_uses_proc_stat():
     from app.routes.api import METRICS_HISTORY_SCRIPT
     assert '/proc/stat' in METRICS_HISTORY_SCRIPT and 'CPU_USAGE=$(top' not in METRICS_HISTORY_SCRIPT
+
+
+def test_services_are_probed_in_one_command():
+    descriptors = [
+        {'name': 'xray', 'display_name': 'Xray', 'group': 'proxy', 'unit_candidates': ['xray', 'xray-core']},
+        {'name': 'nginx', 'display_name': 'Nginx', 'group': 'system', 'unit_candidates': ['nginx']},
+        {'name': 'gone', 'display_name': 'Gone', 'group': 'system', 'unit_candidates': ['gone']},
+    ]
+    output = ('UPTIME=90000.50\n\n'
+              'Id=xray.service\nLoadState=not-found\nActiveState=inactive\nUnitFileState=\nActiveEnterTimestampMonotonic=0\n\n'
+              'Id=xray-core.service\nLoadState=loaded\nActiveState=active\nUnitFileState=enabled\nActiveEnterTimestampMonotonic=500000000\n\n'
+              'Id=nginx.service\nLoadState=loaded\nActiveState=failed\nUnitFileState=disabled\nActiveEnterTimestampMonotonic=0\n\n'
+              'Id=gone.service\nLoadState=not-found\nActiveState=inactive\nUnitFileState=\nActiveEnterTimestampMonotonic=0\n')
+    client = _output_client([('id -u', '0'), ('systemctl show', output)])
+    xray, nginx, gone = SSHService()._probe_services(client, descriptors)
+    # 90000 − 500 с = 89500 с = 1 д 0 ч
+    assert (xray['status'], xray['unit_name'], xray['enabled'], xray['uptime']) == ('active', 'xray-core', 'enabled', '1d 0h')
+    assert (nginx['status'], nginx['enabled'], nginx['uptime']) == ('failed', 'disabled', 'stopped')
+    assert gone['status'] == 'not_installed' and gone['unit_name'] is None
+    commands = [call.args[0] for call in client.exec_command.call_args_list if 'systemctl' in call.args[0]]
+    assert len(commands) == 1
