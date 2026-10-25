@@ -1727,13 +1727,14 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
                 "permit_root_login": "unknown",
                 "port": "unknown",
             }
+            # Не key: это имя аргумента с SSH-ключом карточки, по нему решается совет про пароль
             for line in sshd_raw.splitlines():
-                key, _, value = line.partition(" ")
-                if key == "passwordauthentication":
+                option, _, value = line.partition(" ")
+                if option == "passwordauthentication":
                     sshd["password_authentication"] = value.strip() or "unknown"
-                elif key == "permitrootlogin":
+                elif option == "permitrootlogin":
                     sshd["permit_root_login"] = value.strip() or "unknown"
-                elif key == "port":
+                elif option == "port":
                     sshd["port"] = value.strip() or "unknown"
             facts["sshd"] = sshd
             fail2ban_bin = self._read_command_output(

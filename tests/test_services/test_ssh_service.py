@@ -546,3 +546,15 @@ def test_services_are_probed_in_one_command():
     assert gone['status'] == 'not_installed' and gone['unit_name'] is None
     commands = [call.args[0] for call in client.exec_command.call_args_list if 'systemctl' in call.args[0]]
     assert len(commands) == 1
+
+
+def test_security_brief_keeps_password_login_advice_for_password_cards():
+    # Разбор sshd -T не должен затирать аргумент key: иначе совет «можно выключить пароль» отрежет приложение
+    service = SSHService()
+    client = _output_client([('id -u', '0'), ('sshd -T', 'passwordauthentication yes\npermitrootlogin yes\nport 22542'),
+                             ('fail2ban-client', 'no')])
+    with patch.object(service, 'get_security_events', return_value={}), \
+            patch.object(service, 'get_connection_pooled', return_value=client):
+        brief = service.get_security_brief('192.0.2.4', 'root', 'fixture', port=22542)
+    assert 'можно выключить' not in brief['prompt']
+    assert 'приложение сейчас входит паролем' in brief['prompt']

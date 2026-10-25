@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.5] - 2026-10-25
+
+### Fixed
+- **Analyse the situation** told you to turn off `PasswordAuthentication` because «the app logs in with the card's SSH key», even on cards with only a password. Following that advice would cut the app off from the server. The loop that reads `sshd -T` overwrote the key argument, so the app always looked as if it used a key. Password-only cards now get the safe advice: add a key to the card and check that it works first.
+
 ## [4.15.4] - 2026-10-25
 
 ### Fixed
