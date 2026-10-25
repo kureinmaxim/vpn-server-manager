@@ -19,6 +19,32 @@
         {% endif %}
     {% endwith %}
 
+    <!-- Необязательные инструменты главной страницы -->
+    <div class="card mb-4" id="ui-features">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Кнопки на главной') }}</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-body-secondary small">{{ _('Тест IP, Тест DNS и Net Tools видны всегда. Остальное включается, если вам это нужно: выключенный инструмент пропадает с главной и из окон серверов, данные и списки сохраняются.') }}</p>
+            <form action="{{ url_for('main.save_features') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                {% set feature_rows = [
+                    ('dns', 'bi-cloud-fill', _('DNS'), _('Домены и DNS-провайдеры, записи и свой DNS.')),
+                    ('load', 'bi-speedometer2', _('Загрузка серверов'), _('Быстрая проверка CPU, памяти и диска всех активных серверов.')),
+                    ('projects', 'bi-boxes', _('Проекты'), _('Где запущены ваши проекты: службы, контейнеры и процессы из своего списка. Блок «Мои проекты» в мониторинге и в окне статуса сервера.')),
+                    ('bots', 'bi-robot', _('Боты'), _('Какие Telegram-боты запущены на узлах, по своему каталогу.'))] %}
+                {% for name, icon, label, hint in feature_rows %}
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" role="switch" name="features" value="{{ name }}" id="feature-{{ name }}"{% if ui_features[name] %} checked{% endif %}>
+                    <label class="form-check-label" for="feature-{{ name }}"><i class="bi {{ icon }}" aria-hidden="true"></i> {{ label }}</label>
+                    <div class="form-text mt-0">{{ hint }}</div>
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mt-2">{{ _('Сохранить') }}</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Управление ключом шифрования -->
     <div class="card mb-4">
         <div class="card-header">

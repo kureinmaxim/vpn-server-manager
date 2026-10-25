@@ -17,7 +17,7 @@ def test_page_lists_defaults_and_requires_login(app, client):
     assert 'value="doveauth, chatmail-metadata, filtermail' in html
 
 
-def test_save_add_remove_and_reset(app, client):
+def test_save_add_remove_and_reset(app, client, all_features):
     login(client)
     form = {'csrf_token': 'token', 'name': ['BotCriptoM', 'Blog', 'Manual RNS'],
             'units': ['botcriptom', 'ghost.service', ''], 'containers': ['', 'ghost-db', ''],

@@ -44,10 +44,10 @@
                 <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
                 <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
                 <a href="{{ url_for('net_tools.index') }}" class="btn btn-sm btn-outline-info" title="{{ _('Сетевые инструменты') }}">Net Tools</a>
-                <a href="{{ url_for('dns.index') }}" class="btn btn-sm btn-dns" title="{{ _('Домены и DNS-провайдеры') }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> DNS</a>
-                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#loadCheckModal" title="{{ _('Быстрая проверка загрузки активных серверов') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> {{ _('Загрузка серверов') }}</button>
-                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#projectsCheckModal" title="{{ _('Где запущены ваши проекты, кроме TelegramOnly') }}"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Проекты') }}</button>
-                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#botsCheckModal" title="{{ _('Какие Telegram-боты запущены на узлах') }}"><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Боты') }}</button>
+                {% if ui_features.dns %}<a href="{{ url_for('dns.index') }}" class="btn btn-sm btn-dns" title="{{ _('Домены и DNS-провайдеры') }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> DNS</a>{% endif %}
+                {% if ui_features.load %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#loadCheckModal" title="{{ _('Быстрая проверка загрузки активных серверов') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> {{ _('Загрузка серверов') }}</button>{% endif %}
+                {% if ui_features.projects %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#projectsCheckModal" title="{{ _('Где запущены ваши проекты, кроме TelegramOnly') }}"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Проекты') }}</button>{% endif %}
+                {% if ui_features.bots %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#botsCheckModal" title="{{ _('Какие Telegram-боты запущены на узлах') }}"><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Боты') }}</button>{% endif %}
             </div>
         </div>
         <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
@@ -550,6 +550,7 @@
             </div>
 
             <!-- Full-width rows -->
+            {% if ui_features.projects %}
             <div class="col-12 mb-3">
               <details class="card status-detail" open>
                 <summary>{{ _('Мои проекты') }}</summary>
@@ -558,6 +559,7 @@
                 </div>
               </details>
             </div>
+            {% endif %}
             <div class="col-12 mb-3">
               <details class="card status-detail">
                   <summary>{{ _('Процессы с высокой загрузкой CPU') }}</summary>
@@ -607,12 +609,18 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/project_stats.js') }}?v={{ app_info.get('version', '') }}"></script>
+{% if ui_features.load %}
 {% include 'partials/load_check.html' %}
 <script src="{{ url_for('static', filename='js/load_check.js') }}?v={{ app_info.get('version', '') }}"></script>
+{% endif %}
+{% if ui_features.projects %}
 {% include 'partials/projects_check.html' %}
 <script src="{{ url_for('static', filename='js/projects_check.js') }}?v={{ app_info.get('version', '') }}"></script>
+{% endif %}
+{% if ui_features.bots %}
 {% include 'partials/bots_check.html' %}
 <script src="{{ url_for('static', filename='js/bots_check.js') }}?v={{ app_info.get('version', '') }}"></script>
+{% endif %}
 <script>
     window.SERVER_BOARD_I18N = {
         archive: {{ _('В архив') | tojson }},

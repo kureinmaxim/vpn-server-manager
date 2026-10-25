@@ -74,3 +74,11 @@ def clear_registry():
     registry.clear()
     yield
     registry.clear()
+
+
+@pytest.fixture
+def all_features(app):
+    """Все необязательные кнопки главной включены (в новой установке «Проекты» и «Боты» скрыты)."""
+    from app.services.ui_preferences import DEFAULT_FEATURES, save_ui_features
+    save_ui_features(app, DEFAULT_FEATURES)
+    return app

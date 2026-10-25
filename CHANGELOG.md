@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.7] - 2026-10-25
+
+### Added
+- Settings → **Home page buttons**: switches for **DNS**, **Server load**, **Projects** and **Bots**. A tool that is off disappears from the home page and its window is not loaded. With Projects off, the «My projects» block also leaves the monitoring page and the server status window. Saved lists and data are kept. IP Test, DNS Test and Net Tools are always shown.
+
+### Changed
+- In a new installation **Projects** and **Bots** are off, because they come with catalogs for the author's own projects and Telegram bots. DNS and Server load stay on. Saving the language or zoom no longer drops other UI settings.
+
 ## [4.15.6] - 2026-10-25
 
 ### Added

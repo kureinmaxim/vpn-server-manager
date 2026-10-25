@@ -125,7 +125,7 @@ def test_settings_getme_checkbox(app, client):
     assert load_getme(app) is True
 
 
-def test_modal_has_senders_section_in_english(app, client):
+def test_modal_has_senders_section_in_english(app, client, all_features):
     login(client)
     html = client.get("/?lang=en").get_data(as_text=True)
     assert 'id="bots-check-senders"' in html and "Sending-only bots (no process)" in html
@@ -169,14 +169,14 @@ def test_settings_csrf_required(app, client):
     assert "X" not in [b["name"] for b in load_bots(app)]
 
 
-def test_index_has_bots_button_and_modal(app, client):
+def test_index_has_bots_button_and_modal(app, client, all_features):
     login(client)
     html = client.get("/").get_data(as_text=True)
     assert 'data-bs-target="#botsCheckModal"' in html and 'bi-robot' in html
     assert "BOTS_CHECK_CONFIG" in html and "bots_check.js" in html
 
 
-def test_modal_is_translated_to_english(app, client):
+def test_modal_is_translated_to_english(app, client, all_features):
     login(client)
     html = client.get("/?lang=en").get_data(as_text=True)
     assert "Telegram bots on nodes" in html and ">Bots<" in html.replace(" ", "").replace("</i>", ">")

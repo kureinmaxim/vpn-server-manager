@@ -628,12 +628,26 @@ def tracked_bots():
                            getme=load_getme(current_app))
 
 
+@main_bp.route('/settings/features', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def save_features():
+    """Какие инструменты показывать на главной: DNS, загрузка серверов, проекты, боты."""
+    from ..services.ui_preferences import save_ui_features
+    save_ui_features(current_app, request.form.getlist('features'))
+    flash(_('Набор кнопок на главной сохранён.'), 'success')
+    return redirect(url_for('main.settings') + '#ui-features')
+
+
 @main_bp.route('/settings')
 @require_auth
 @require_pin
 @log_request
 def settings():
     """Страница настроек"""
+    import secrets
+    session.setdefault('csrf_token', secrets.token_urlsafe(32))
     return render_template(
         'settings.html',
         active_data_file=current_app.config.get('active_data_file')

@@ -10267,3 +10267,27 @@ msgstr "updated {time} ago"
 
 msgid "Подробнее"
 msgstr "Details"
+
+msgid "Набор кнопок на главной сохранён."
+msgstr "Home page buttons saved."
+
+msgid "Кнопки на главной"
+msgstr "Home page buttons"
+
+msgid "Тест IP, Тест DNS и Net Tools видны всегда. Остальное включается, если вам это нужно: выключенный инструмент пропадает с главной и из окон серверов, данные и списки сохраняются."
+msgstr "IP Test, DNS Test and Net Tools are always shown. Turn on the rest if you need it: a tool that is off disappears from the home page and the server windows, and its data and lists are kept."
+
+msgid "DNS"
+msgstr "DNS"
+
+msgid "Домены и DNS-провайдеры, записи и свой DNS."
+msgstr "Domains and DNS providers, records and your own DNS."
+
+msgid "Быстрая проверка CPU, памяти и диска всех активных серверов."
+msgstr "A quick check of CPU, memory and disk on all active servers."
+
+msgid "Где запущены ваши проекты: службы, контейнеры и процессы из своего списка. Блок «Мои проекты» в мониторинге и в окне статуса сервера."
+msgstr "Where your projects run: services, containers and processes from your own list. Also the «My projects» block in monitoring and in the server status window."
+
+msgid "Какие Telegram-боты запущены на узлах, по своему каталогу."
+msgstr "Which Telegram bots run on your nodes, from your own catalog."

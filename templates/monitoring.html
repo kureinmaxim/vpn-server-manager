@@ -345,12 +345,14 @@
             </div>
         </div>
         <div class="col-12 col-xl-5">
+            {% if ui_features.projects %}
             <div class="project-status card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-boxes"></i> {{ _('Мои проекты') }}</h3>
                     {% include 'partials/project_stats.html' %}
                 </div>
             </div>
+            {% endif %}
             <div id="monitoring-services" tabindex="-1" class="active-services card monitoring-card mb-3">
                 <div class="card-body">
                     <h3><i class="bi bi-router"></i> {{ _('VPN / Proxy сервисы') }}</h3>

@@ -14,6 +14,9 @@ ALLOWED_ZOOMS = frozenset({'60', '80', '100'})
 DEFAULT_LANGUAGE = 'en'
 DEFAULT_ZOOM = '80'
 UI_CONFIG_KEY = 'ui'
+# Кнопки главной страницы. «Проекты» и «Боты» — каталоги под свои проекты и Telegram-ботов:
+# в новой установке они скрыты, включаются в настройках.
+DEFAULT_FEATURES = {'dns': True, 'load': True, 'projects': False, 'bots': False}
 
 
 def _config_path(app) -> str:
@@ -88,10 +91,9 @@ def save_ui_preferences(app, *, language: Optional[str] = None, zoom: Optional[s
     if zoom is not None:
         current['zoom'] = normalize_zoom(zoom, current['zoom'])
 
-    config_data[UI_CONFIG_KEY] = {
-        'language': current['language'],
-        'zoom': current['zoom'],
-    }
+    stored = config_data.get(UI_CONFIG_KEY)
+    config_data[UI_CONFIG_KEY] = dict(stored if isinstance(stored, dict) else {},
+                                      language=current['language'], zoom=current['zoom'])
     if not _write_config(path, config_data):
         return current
 
@@ -102,3 +104,25 @@ def save_ui_preferences(app, *, language: Optional[str] = None, zoom: Optional[s
         path,
     )
     return current
+
+
+def load_ui_features(app) -> Dict[str, bool]:
+    """Which optional home-page tools are shown (DNS, server load, projects, bots)."""
+    features = dict(DEFAULT_FEATURES)
+    stored = _read_config(_config_path(app)).get(UI_CONFIG_KEY)
+    saved = stored.get('features') if isinstance(stored, dict) else None
+    if isinstance(saved, dict):
+        features.update({name: bool(saved[name]) for name in DEFAULT_FEATURES if name in saved})
+    return features
+
+
+def save_ui_features(app, enabled) -> Dict[str, bool]:
+    """Store the shown tools; names outside DEFAULT_FEATURES are ignored."""
+    enabled = set(enabled or ())
+    features = {name: name in enabled for name in DEFAULT_FEATURES}
+    path = _config_path(app)
+    config_data = _read_config(path)
+    stored = config_data.get(UI_CONFIG_KEY)
+    config_data[UI_CONFIG_KEY] = dict(stored if isinstance(stored, dict) else {}, features=features)
+    _write_config(path, config_data)
+    return features

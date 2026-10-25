@@ -173,7 +173,7 @@ def test_empty_inventory(load_client):
     assert load_client.get("/api/monitoring/load-check/servers").json == {"servers": []}
 
 
-def test_main_page_includes_load_check_in_offline_mode(load_client):
+def test_main_page_includes_load_check_in_offline_mode(load_client, all_features):
     registry.get("data_manager").load_servers.return_value = []
     response = load_client.get("/")
     assert response.status_code == 200
