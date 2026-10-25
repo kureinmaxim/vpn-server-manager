@@ -1544,6 +1544,8 @@ def monitoring(server_id):
             flash(_('Сервер с ID %(server_id)s не найден.', server_id=server_id), 'error')
             return redirect(url_for('main.index'))
         
+        import secrets
+        session.setdefault('csrf_token', secrets.token_urlsafe(32))
         return render_template('monitoring.html', server=server)
         
     except Exception as e:

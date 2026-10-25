@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui2">
 {% set ssh_port = server.get('ssh_credentials', {}).get('port', 22) %}
 <div class="container-fluid mt-3 monitoring-page">
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
@@ -98,14 +98,11 @@
 
     <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
     <div id="stats-container" style="display: none;">
-        <div id="priority-strip" class="priority-strip d-none">
-            <section id="priority-security" class="priority-card d-none">
-                <h3><i class="bi bi-shield-exclamation"></i> {{ _('Атаки и сбои') }}</h3>
-                <p id="priority-security-text" class="mb-2"></p>
-                <button type="button" class="btn btn-outline-warning btn-sm" id="security-brief-btn">
-                    <i class="bi bi-chat-left-text"></i> {{ _('Разобрать ситуацию') }}
-                </button>
-            </section>
+        <div id="mon-status" class="mon-status d-flex flex-wrap align-items-center gap-1 mb-3" aria-live="polite">
+            <span id="mon-status-chips" class="d-contents"></span>
+            <button type="button" class="btn btn-outline-warning btn-sm mon-status-brief d-none" id="security-brief-btn">
+                <i class="bi bi-chat-left-text"></i> {{ _('Разобрать ситуацию') }}
+            </button>
         </div>
         <div id="security-brief" class="security-brief d-none">
             <section class="security-brief-block">
@@ -149,7 +146,7 @@
         <section class="btop-box">
             <header>
                 <span>{{ _('Сеть') }}</span>
-                <strong id="btop-net-val">MB/s</strong>
+                <strong id="btop-net-val"></strong>
             </header>
             <div class="btop-net-row">
                 <span>↓</span>
@@ -522,6 +519,7 @@ console.log('📡 Server IP:', '{{ server.ip_address }}');
 
 const serverId = '{{ server.id }}';
 const sshPort = {{ ssh_port }};
+const csrfToken = {{ (session.csrf_token or '') | tojson }};
 const monI18n = {
     monitoring: {{ _('Мониторинг:') | tojson }},
     interfaceOne: {{ _('интерфейс') | tojson }},
@@ -531,8 +529,35 @@ const monI18n = {
     cpuSpike: {{ _('Процент высокий, а очередь почти пустая: это короткий всплеск, не постоянная перегрузка.') | tojson }},
     topNow: {{ _('Сейчас в топе:') | tojson }},
     htopBtopTitle: {{ _('Команды htop и btop') | tojson }},
-    htopBtopInstalled: {{ _('htop и btop уже стоят. Команды установки:') | tojson }}
+    htopBtopInstalled: {{ _('htop и btop уже стоят. Команды установки:') | tojson }},
+    steal: {{ _('steal {value} — время, отнятое гипервизором, в загрузку не входит') | tojson }},
+    topQuiet: {{ _('Заметных процессов сейчас нет.') | tojson }},
+    fwNone: {{ _('Firewall не найден') | tojson }},
+    fwOff: {{ _('{name} выключен') | tojson }},
+    fwOn: {{ _('{name} включён') | tojson }},
+    sshAllowed: {{ _('SSH {port} разрешён') | tojson }},
+    fwNoSsh: {{ _('{name} включён, правила для SSH {port} нет') | tojson }},
+    sshFails: {{ _('SSH: {count} неудачных входов за 24 ч') | tojson }},
+    sshNoFails: {{ _('SSH: неудачных входов нет') | tojson }},
+    topIps: {{ _('Чаще всего: {list}') | tojson }},
+    banned: {{ _('Fail2Ban: заблокировано {count}') | tojson }},
+    failedUnits: {{ _('Сбой служб: {names}') | tojson }},
+    noFailedUnits: {{ _('Сбойных служб нет') | tojson }},
+    journalErrors: {{ _('Ошибок в журнале: {count}') | tojson }},
+    journalHint: {{ _('За 24 часа, без sshd: его ошибки — обрывы соединений сканеров, они в счётчике SSH.') | tojson }},
+    secUpdates: {{ _('Обновлений безопасности: {count}') | tojson }},
+    toolsMissing: {{ _('Нет утилит: {names}') | tojson }},
+    today: {{ _('сегодня') | tojson }},
+    daysAgo: {{ _('{count} д назад') | tojson }},
+    upgraded: {{ _('пакеты обновлены {date}') | tojson }},
+    historyOld: {{ _('История CPU: старый скрипт, точки 0 или 100') | tojson }},
+    historyOldHint: {{ _('Скрипт cron считает CPU через top и пишет нули и сотни. Кнопка заменит только файл /usr/local/bin/monitoring/update-metrics-history.sh; новые точки появятся через 5 минут.') | tojson }},
+    historyUpdate: {{ _('Обновить скрипт истории') | tojson }},
+    historyUpdated: {{ _('Скрипт истории обновлён') | tojson }},
+    kbs: 'KB/s',
+    mbs: 'MB/s'
 };
+const monStatus = {firewall: null, tools: null, security: null, historyScript: null};
 let rxPeak = 0;
 let txPeak = 0;
 let cpuChart, memoryChart;
@@ -567,7 +592,8 @@ async function updateNetworkStats() {
                 txPeak = parseFloat(stats.current.upload);
                 document.getElementById('tx-peak').textContent = txPeak.toFixed(2);
             }
-            paintNetMeters(parseFloat(stats.current.download) || 0, parseFloat(stats.current.upload) || 0);
+            paintNetMeters(parseFloat(stats.current.download) || 0, parseFloat(stats.current.upload) || 0,
+                Number(stats.current.download_kbs), Number(stats.current.upload_kbs));
             
             document.getElementById('daily-rx').textContent = stats.daily.download;
             document.getElementById('daily-tx').textContent = stats.daily.upload;
@@ -616,6 +642,8 @@ async function updateFirewallStatus() {
             }
             
             backendElement.textContent = stats.backend || 'none';
+            monStatus.firewall = stats;
+            renderStatus();
             document.getElementById('summary-fw-backend').textContent = stats.backend || 'none';
             document.getElementById('summary-fw-status').textContent =
                 stats.status && stats.status.toLowerCase() === 'active' ? 'Active' : 'Inactive';
@@ -831,26 +859,19 @@ async function updateSecurityEvents() {
                 if (updateLine) {
                     updateLine.textContent = '{{ _("Последнее обновление пакетов:") }} ' + stats.days_since_update + ' {{ _("дней назад") }}';
                 }
-                if (updateSummary) updateSummary.textContent = stats.days_since_update + ' {{ _("дней назад") }}';
+                if (updateSummary) {
+                    updateSummary.textContent = 'apt update: ' + (stats.days_since_update === 0 ? monI18n.today
+                        : monI18n.daysAgo.replace('{count}', stats.days_since_update));
+                    updateSummary.title = stats.last_upgrade ? monI18n.upgraded.replace('{date}', stats.last_upgrade) : '';
+                }
             } else {
                 if (updateLine) updateLine.textContent = '{{ _("Последнее обновление пакетов: нет данных") }}';
                 if (updateSummary) updateSummary.textContent = '-';
             }
 
-            var hasIncident = (stats.ssh_failures_24h || 0) > 0
-                || (stats.failed_services || 0) > 0
-                || (stats.error_events_24h || 0) > 0
-                || (stats.top_failed_ips && stats.top_failed_ips.length > 0);
-            var securityCard = document.getElementById('priority-security');
-            var securityText = document.getElementById('priority-security-text');
-            if (securityCard) securityCard.classList.toggle('d-none', !hasIncident);
-            if (securityText && hasIncident) {
-                securityText.textContent = 'SSH: ' + (stats.ssh_failures_24h || 0)
-                    + ', journal: ' + (stats.error_events_24h || 0)
-                    + ', failed unit: ' + (stats.failed_services || 0) + '.';
-            }
-            syncPriorityStrip();
-            
+            monStatus.security = stats;
+            renderStatus();
+
             const sshCard = document.getElementById('ssh-failures-card');
             const updatesCard = document.getElementById('security-updates-card');
             const newPortsCard = document.getElementById('new-ports-card');
@@ -858,12 +879,12 @@ async function updateSecurityEvents() {
             const failedServicesCard = document.getElementById('failed-services-card');
             const journalErrorsCard = document.getElementById('journal-errors-card');
 
-            sshCard.classList.toggle('warning', (stats.ssh_failures_24h || 0) > 50);
+            sshCard.classList.toggle('warning', (stats.ssh_failures_24h || 0) >= 500);
             updatesCard.classList.toggle('warning', (stats.security_updates_available || 0) > 0);
             newPortsCard.classList.toggle('warning', (stats.new_open_ports || 0) > 0);
             fail2banCard.classList.toggle('warning', (stats.fail2ban_banned || 0) > 0);
             failedServicesCard.classList.toggle('warning', (stats.failed_services || 0) > 0);
-            journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) > 0);
+            journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) >= 50);
             
         }
     } catch (error) {
@@ -972,6 +993,10 @@ async function updateCharts() {
         if (data.success) {
             const history = Array.isArray(data.data) ? data.data : (data.data.points || []);
             paintLoadDiagnosis(data.diagnosis || {});
+            if (monStatus.historyScript !== 'updated') {
+                monStatus.historyScript = data.history_script || null;
+                renderStatus();
+            }
             const labels = history.map((point, index) => {
                 if (index % 10 === 0) {
                     const date = new Date(point.timestamp * 1000);
@@ -1017,20 +1042,102 @@ function paintSpark(id, values) {
     if (!el) return;
     const pts = (values || []).slice(-36).map(v => Number(v) || 0);
     el.replaceChildren();
-    const max = Math.max(1, ...pts);
+    // Absolute 0–100 %: a steady 60 % is a row of 60 % bars, not a full-height wall.
     pts.forEach(n => {
         const bar = document.createElement('span');
-        bar.style.height = Math.max(8, (n / max) * 100) + '%';
+        bar.style.height = Math.max(6, Math.min(100, n)) + '%';
         bar.style.background = meterColor(n);
         el.appendChild(bar);
     });
 }
 
-function syncPriorityStrip() {
-    const strip = document.getElementById('priority-strip');
-    const security = document.getElementById('priority-security');
-    if (!strip || !security) return;
-    strip.classList.toggle('d-none', security.classList.contains('d-none'));
+// One strip of chips: firewall, SSH attempts, bans, failed units, journal, updates, tools.
+// Colour by severity: ok (green), info (grey), warn (yellow), danger (red); details in the tooltip.
+function statusChip(level, icon, text, title, onClick) {
+    const chip = document.createElement(onClick ? 'button' : 'span');
+    if (onClick) { chip.type = 'button'; chip.addEventListener('click', onClick); }
+    chip.className = 'mon-chip mon-chip-' + level;
+    const i = document.createElement('i');
+    i.className = 'bi ' + icon;
+    i.setAttribute('aria-hidden', 'true');
+    chip.append(i, document.createTextNode(' ' + text));
+    if (title) chip.title = title;
+    return chip;
+}
+
+function renderStatus() {
+    const list = document.getElementById('mon-status-chips');
+    if (!list) return;
+    const chips = [];
+    const fw = monStatus.firewall, tools = monStatus.tools, sec = monStatus.security;
+    if (fw) {
+        const name = fw.backend && fw.backend !== 'none' ? fw.backend : '';
+        const active = (fw.status || '').toLowerCase() === 'active';
+        const ufw = tools && tools.tools ? tools.tools.ufw : null;
+        if (!name) chips.push(statusChip('info', 'bi-shield', monI18n.fwNone));
+        else if (!active) chips.push(statusChip('info', 'bi-shield', monI18n.fwOff.replace('{name}', name)));
+        else if (name === 'ufw' && ufw && ufw.ssh_allowed === false) {
+            chips.push(statusChip('danger', 'bi-shield-x', monI18n.fwNoSsh.replace('{name}', name).replace('{port}', sshPort)));
+        } else {
+            const allowed = name === 'ufw' && ufw && ufw.ssh_allowed ? ' · ' + monI18n.sshAllowed.replace('{port}', sshPort) : '';
+            chips.push(statusChip('ok', 'bi-shield-check', monI18n.fwOn.replace('{name}', name) + allowed));
+        }
+    }
+    if (sec) {
+        const ssh = sec.ssh_failures_24h || 0;
+        const ips = (sec.top_failed_ips || []).map(item => item.ip + ' ×' + item.count).join(', ');
+        chips.push(statusChip(ssh >= 500 ? 'warn' : ssh ? 'info' : 'ok', 'bi-key',
+            ssh ? monI18n.sshFails.replace('{count}', ssh) : monI18n.sshNoFails, ips ? monI18n.topIps.replace('{list}', ips) : ''));
+        if (sec.fail2ban_banned) chips.push(statusChip('info', 'bi-slash-circle', monI18n.banned.replace('{count}', sec.fail2ban_banned)));
+        const units = sec.failed_units || [];
+        const failed = units.length || sec.failed_services || 0;
+        chips.push(failed
+            ? statusChip('danger', 'bi-x-octagon', monI18n.failedUnits.replace('{names}', units.join(', ') || failed))
+            : statusChip('ok', 'bi-check2-circle', monI18n.noFailedUnits));
+        if (sec.error_events_24h) {
+            chips.push(statusChip(sec.error_events_24h >= 50 ? 'warn' : 'info', 'bi-journal-x',
+                monI18n.journalErrors.replace('{count}', sec.error_events_24h), monI18n.journalHint));
+        }
+        if (sec.security_updates_available) {
+            chips.push(statusChip('warn', 'bi-arrow-repeat', monI18n.secUpdates.replace('{count}', sec.security_updates_available)));
+        }
+    }
+    if (tools && (tools.missing_count || (tools.warnings || []).length)) {
+        const names = (tools.missing || []).map(tool => tool.name).concat((tools.warnings || []).map(tool => tool.name));
+        chips.push(statusChip('warn', 'bi-tools', monI18n.toolsMissing.replace('{names}', names.join(', ')), '', () => {
+            const alert = document.getElementById('tools-alert');
+            if (alert) { alert.classList.remove('d-none'); alert.scrollIntoView({behavior: 'smooth', block: 'center'}); }
+        }));
+    }
+    if (monStatus.historyScript === 'outdated') {
+        chips.push(statusChip('warn', 'bi-graph-down', monI18n.historyOld + ' · ' + monI18n.historyUpdate,
+            monI18n.historyOldHint, updateHistoryScript));
+    } else if (monStatus.historyScript === 'updated') {
+        chips.push(statusChip('ok', 'bi-graph-up', monI18n.historyUpdated));
+    }
+    // The brief is about security: the history-script chip alone does not call for it.
+    const alarming = chips.some(chip => /mon-chip-(warn|danger)/.test(chip.className) && !chip.querySelector('.bi-graph-down'));
+    list.replaceChildren(...chips);
+    const brief = document.getElementById('security-brief-btn');
+    if (brief) brief.classList.toggle('d-none', !alarming
+        && !(sec && sec.ssh_failures_24h));
+}
+
+async function updateHistoryScript(event) {
+    const chip = event.currentTarget;
+    chip.disabled = true;
+    try {
+        const response = await fetch(`/api/monitoring/${serverId}/history-script`, {
+            method: 'POST', headers: {'X-CSRF-Token': csrfToken}
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!data.success) throw new Error(data.error || response.statusText);
+        monStatus.historyScript = 'updated';
+        renderStatus();
+    } catch (error) {
+        chip.disabled = false;
+        alert(error.message);
+    }
 }
 
 function paintLoadDiagnosis(diagnosis) {
@@ -1044,11 +1151,13 @@ function paintLoadDiagnosis(diagnosis) {
         return item.cmd + ' ' + item.cpu + '%';
     }).join(', ');
     let line = 'CPU ' + (Number.isFinite(cpu) ? cpu.toFixed(1) + '%' : '—')
-        + ' ' + monI18n.cpuSample + '. ' + monI18n.loadAverage + ' ' + loadText + '.';
+        + ' ' + monI18n.cpuSample + (Number(diagnosis.steal) >= 2 ? ' (' + monI18n.steal.replace('{value}', diagnosis.steal + '%') + ')' : '')
+        + '. ' + monI18n.loadAverage + ' ' + loadText + (diagnosis.nproc ? ' / ' + diagnosis.nproc + ' CPU' : '') + '.';
     if (Number.isFinite(cpu) && cpu >= 75 && load.length && Number(load[0]) < 0.7) {
         line += ' ' + monI18n.cpuSpike;
     }
     if (procs) line += ' ' + monI18n.topNow + ' ' + procs + '.';
+    else if (diagnosis.top_now) line += ' ' + monI18n.topQuiet;
     text.textContent = line;
     if (tools) {
         var bothInstalled = diagnosis.htop && diagnosis.btop;
@@ -1079,8 +1188,13 @@ function paintLoadMeters(history) {
     paintPriorityLoad(last.cpu, last.memory);
 }
 
-function paintNetMeters(down, up) {
-    const scale = Math.max(rxPeak, txPeak, down, up, 0.01);
+function speedText(kbs) {
+    return kbs >= 1024 ? (kbs / 1024).toFixed(2) + ' ' + monI18n.mbs : (kbs >= 10 ? kbs.toFixed(0) : kbs.toFixed(1)) + ' ' + monI18n.kbs;
+}
+
+function paintNetMeters(down, up, downKbs, upKbs) {
+    // At least 1 MB/s full scale: a few KB/s must not fill the bar.
+    const scale = Math.max(rxPeak, txPeak, down, up, 1);
     const rx = document.getElementById('btop-rx-fill');
     const tx = document.getElementById('btop-tx-fill');
     const rxVal = document.getElementById('btop-rx-val');
@@ -1093,8 +1207,8 @@ function paintNetMeters(down, up) {
         tx.style.width = Math.min(100, (up / scale) * 100) + '%';
         tx.style.background = '#9ece6a';
     }
-    if (rxVal) rxVal.textContent = down.toFixed(2);
-    if (txVal) txVal.textContent = up.toFixed(2);
+    if (rxVal) rxVal.textContent = speedText(Number.isFinite(downKbs) ? downKbs : down * 1024);
+    if (txVal) txVal.textContent = speedText(Number.isFinite(upKbs) ? upKbs : up * 1024);
 }
 
 // Show connection error
@@ -1161,14 +1275,15 @@ async function checkRequiredTools() {
         if (data.success && data.data) {
             const toolsData = data.data;
             
+            monStatus.tools = toolsData;
+            renderStatus();
             // Если все в порядке, скрываем алерт
             if (toolsData.all_ok) {
                 document.getElementById('tools-alert').classList.add('d-none');
                 return;
             }
             
-            // Показываем алерт
-            document.getElementById('tools-alert').classList.remove('d-none');
+            // Алерт раскрывается по чипу «Нет утилит» в полосе состояния, сам не выскакивает
             
             // Обновляем summary
             const summary = `{{ _('Установлено:') }} ${toolsData.installed}/${toolsData.total}. ` +
@@ -1701,14 +1816,17 @@ function initMonitoring() {
     
     // Initial updates
     console.log('⏱️ Starting initial data load...');
-    checkRequiredTools(); // Check tools first
-    updateNetworkStats();
-    updateFirewallStatus();
-    updateServicesStatus();
-    updateReticulumStatus();
-    updateWebpanels();
-    updateSecurityEvents();
-    updateCharts();
+    // CPU is sampled first and alone: on a 1-vCPU VPS the other checks running in the same
+    // second would be measured as server load (100 % on an idle server).
+    updateCharts().finally(() => {
+        checkRequiredTools();
+        updateNetworkStats();
+        updateFirewallStatus();
+        updateServicesStatus();
+        updateReticulumStatus();
+        updateWebpanels();
+        updateSecurityEvents();
+    });
     
     // Set up intervals (увеличены для безопасности) и сохраняем их
     console.log('⏰ Setting up auto-refresh intervals (safe mode: 30s) with error handling');
@@ -1718,7 +1836,8 @@ function initMonitoring() {
     intervals.push(setInterval(updateReticulumStatus, 30000));   // 30 seconds — Reticulum/HA
     intervals.push(setInterval(updateWebpanels, 60000));         // 60 seconds — веб-панели
     intervals.push(setInterval(updateSecurityEvents, 60000));    // 60 seconds (было 30)
-    intervals.push(setInterval(updateCharts, 120000));           // 120 seconds (было 60)
+    // 120 s is a multiple of 30 s: start 15 s later so the CPU sample never meets the 30 s checks.
+    setTimeout(() => intervals.push(setInterval(updateCharts, 120000)), 15000);
     console.log(`✅ Created ${intervals.length} monitoring intervals with auto-stop on errors`)
     
     console.log('✅ Monitoring fully initialized');

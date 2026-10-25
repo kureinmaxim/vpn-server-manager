@@ -5093,7 +5093,7 @@ msgstr "缺少实用程序："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:680
 #: templates/monitoring.html:680
 msgid "Исправить"
-msgstr "保存"
+msgstr "修复"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:749
 #: templates/monitoring.html:749
@@ -9782,3 +9782,88 @@ msgstr "{count} 分钟"
 
 msgid "Время работы"
 msgstr "运行时长"
+
+msgid "steal {value} — время, отнятое гипервизором, в загрузку не входит"
+msgstr "steal {value}：被虚拟机管理程序占用的时间，不计入负载"
+
+msgid "Заметных процессов сейчас нет."
+msgstr "当前没有明显占用的进程。"
+
+msgid "Firewall не найден"
+msgstr "未找到防火墙"
+
+msgid "{name} выключен"
+msgstr "{name} 已关闭"
+
+msgid "{name} включён"
+msgstr "{name} 已开启"
+
+msgid "SSH {port} разрешён"
+msgstr "SSH {port} 已放行"
+
+msgid "{name} включён, правила для SSH {port} нет"
+msgstr "{name} 已开启，但没有 SSH {port} 的规则"
+
+msgid "SSH: {count} неудачных входов за 24 ч"
+msgstr "SSH：24 小时内 {count} 次登录失败"
+
+msgid "SSH: неудачных входов нет"
+msgstr "SSH：没有登录失败"
+
+msgid "Чаще всего: {list}"
+msgstr "最常见：{list}"
+
+msgid "Fail2Ban: заблокировано {count}"
+msgstr "Fail2Ban：已封禁 {count}"
+
+msgid "Сбой служб: {names}"
+msgstr "失败的服务：{names}"
+
+msgid "Сбойных служб нет"
+msgstr "没有失败的服务"
+
+msgid "Ошибок в журнале: {count}"
+msgstr "日志错误：{count}"
+
+msgid "За 24 часа, без sshd: его ошибки — обрывы соединений сканеров, они в счётчике SSH."
+msgstr "24 小时内，不含 sshd：它的错误是扫描器断开的连接，已计入 SSH。"
+
+msgid "Обновлений безопасности: {count}"
+msgstr "安全更新：{count}"
+
+msgid "Нет утилит: {names}"
+msgstr "缺少工具：{names}"
+
+msgid "сегодня"
+msgstr "今天"
+
+msgid "{count} д назад"
+msgstr "{count} 天前"
+
+msgid "пакеты обновлены {date}"
+msgstr "软件包更新于 {date}"
+
+#, python-format
+msgid "UFW включён, а правила ALLOW для SSH-порта %(port)s нет"
+msgstr "UFW 已开启，但没有 SSH 端口 %(port)s 的 ALLOW 规则"
+
+msgid "Брандмауэр: статус и правила на вкладке «Безопасность»"
+msgstr "防火墙：状态和规则见“安全”标签页"
+
+msgid "История CPU: старый скрипт, точки 0 или 100"
+msgstr "CPU 历史：旧脚本，数据点只有 0 或 100"
+
+msgid "Скрипт cron считает CPU через top и пишет нули и сотни. Кнопка заменит только файл /usr/local/bin/monitoring/update-metrics-history.sh; новые точки появятся через 5 минут."
+msgstr "cron 脚本用 top 计算 CPU，只写入 0 和 100。此按钮只替换 /usr/local/bin/monitoring/update-metrics-history.sh 文件；新数据点将在 5 分钟内出现。"
+
+msgid "Обновить скрипт истории"
+msgstr "更新历史脚本"
+
+msgid "Скрипт истории обновлён"
+msgstr "历史脚本已更新"
+
+msgid "Не удалось обновить скрипт истории. Нужен root или sudo -n."
+msgstr "无法更新历史脚本。需要 root 或 sudo -n。"
+
+msgid "Не удалось обновить скрипт истории."
+msgstr "无法更新历史脚本。"

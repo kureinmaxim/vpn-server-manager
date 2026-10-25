@@ -22,8 +22,8 @@
 .monitoring-page .btop-bar > i { display: block; height: 100%; width: 0; border-radius: inherit; }
 .monitoring-page .btop-spark { display: flex; align-items: flex-end; gap: 2px; height: 18px; margin-top: .5rem; }
 .monitoring-page .btop-spark span { flex: 1; min-width: 0; border-radius: 2px; }
-.monitoring-page .btop-net-row { display: grid; grid-template-columns: 1rem minmax(0, 1fr) 3.5rem; align-items: center; gap: .5rem; margin-top: .6rem; }
-.monitoring-page .btop-net-row em { font-style: normal; text-align: right; font-size: .875rem; }
+.monitoring-page .btop-net-row { display: grid; grid-template-columns: 1rem minmax(0, 1fr) 5.5rem; align-items: center; gap: .5rem; margin-top: .6rem; }
+.monitoring-page .btop-net-row em { font-style: normal; text-align: right; font-size: .875rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .monitoring-page .overview-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-bottom: 1rem; }
 .monitoring-page .overview-title { margin: 0; }
 .monitoring-page .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
@@ -92,3 +92,14 @@
     .monitoring-page .monitoring-nav { gap: .3rem; }
     .monitoring-page .monitoring-nav a { font-size: .85rem; padding: .4rem .65rem; }
 }
+
+/* Status strip: one row of chips instead of alarm boxes */
+.monitoring-page .d-contents { display: contents; }
+.monitoring-page .mon-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .3em .75em; border-radius: 999px;
+    font-size: .85rem; font-weight: 500; border: 1px solid var(--bs-border-color); background: var(--bs-body-bg); color: var(--bs-body-color); line-height: 1.4; }
+.monitoring-page button.mon-chip { cursor: pointer; }
+.monitoring-page .mon-chip-ok { border-color: var(--bs-success-border-subtle); background: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
+.monitoring-page .mon-chip-info { color: var(--bs-secondary-color); }
+.monitoring-page .mon-chip-warn { border-color: var(--bs-warning-border-subtle); background: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
+.monitoring-page .mon-chip-danger { border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
+.monitoring-page .mon-status-brief { border-radius: 999px; }

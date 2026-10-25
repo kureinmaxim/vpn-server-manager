@@ -5319,7 +5319,7 @@ msgstr "Missing utilities:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:680
 #: templates/monitoring.html:680
 msgid "Исправить"
-msgstr "Save"
+msgstr "Fix"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:749
 #: templates/monitoring.html:749
@@ -10116,3 +10116,88 @@ msgstr "{count} min"
 
 msgid "Время работы"
 msgstr "Uptime"
+
+msgid "steal {value} — время, отнятое гипервизором, в загрузку не входит"
+msgstr "steal {value}: time taken by the hypervisor, not counted as load"
+
+msgid "Заметных процессов сейчас нет."
+msgstr "No noticeable processes right now."
+
+msgid "Firewall не найден"
+msgstr "No firewall found"
+
+msgid "{name} выключен"
+msgstr "{name} is off"
+
+msgid "{name} включён"
+msgstr "{name} is on"
+
+msgid "SSH {port} разрешён"
+msgstr "SSH {port} allowed"
+
+msgid "{name} включён, правила для SSH {port} нет"
+msgstr "{name} is on, no rule for SSH {port}"
+
+msgid "SSH: {count} неудачных входов за 24 ч"
+msgstr "SSH: {count} failed logins in 24 h"
+
+msgid "SSH: неудачных входов нет"
+msgstr "SSH: no failed logins"
+
+msgid "Чаще всего: {list}"
+msgstr "Most often: {list}"
+
+msgid "Fail2Ban: заблокировано {count}"
+msgstr "Fail2Ban: {count} banned"
+
+msgid "Сбой служб: {names}"
+msgstr "Failed units: {names}"
+
+msgid "Сбойных служб нет"
+msgstr "No failed units"
+
+msgid "Ошибок в журнале: {count}"
+msgstr "Journal errors: {count}"
+
+msgid "За 24 часа, без sshd: его ошибки — обрывы соединений сканеров, они в счётчике SSH."
+msgstr "In 24 hours, without sshd: its errors are dropped scanner connections, counted under SSH."
+
+msgid "Обновлений безопасности: {count}"
+msgstr "Security updates: {count}"
+
+msgid "Нет утилит: {names}"
+msgstr "Missing tools: {names}"
+
+msgid "сегодня"
+msgstr "today"
+
+msgid "{count} д назад"
+msgstr "{count} d ago"
+
+msgid "пакеты обновлены {date}"
+msgstr "packages upgraded {date}"
+
+#, python-format
+msgid "UFW включён, а правила ALLOW для SSH-порта %(port)s нет"
+msgstr "UFW is on, but there is no ALLOW rule for SSH port %(port)s"
+
+msgid "Брандмауэр: статус и правила на вкладке «Безопасность»"
+msgstr "Firewall: status and rules on the Security tab"
+
+msgid "История CPU: старый скрипт, точки 0 или 100"
+msgstr "CPU history: old script, points are 0 or 100"
+
+msgid "Скрипт cron считает CPU через top и пишет нули и сотни. Кнопка заменит только файл /usr/local/bin/monitoring/update-metrics-history.sh; новые точки появятся через 5 минут."
+msgstr "The cron script measures CPU with top and writes zeros and hundreds. The button replaces only /usr/local/bin/monitoring/update-metrics-history.sh; new points appear within 5 minutes."
+
+msgid "Обновить скрипт истории"
+msgstr "Update history script"
+
+msgid "Скрипт истории обновлён"
+msgstr "History script updated"
+
+msgid "Не удалось обновить скрипт истории. Нужен root или sudo -n."
+msgstr "Could not update the history script. Root or sudo -n is required."
+
+msgid "Не удалось обновить скрипт истории."
+msgstr "Could not update the history script."

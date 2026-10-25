@@ -149,8 +149,45 @@ class SSHService:
 
         return processes
 
+    _SUDO = re.compile(r"(?<![\w-])sudo (?!-)")
+
+    @staticmethod
+    def ufw_allows_port(status: str, port) -> bool:
+        """Есть ли в выводе `ufw status` правило ALLOW для порта (или для всего трафика)."""
+        port = str(port)
+        for line in (status or "").splitlines():
+            match = re.match(r"^(\S+(?: \(v6\))?)\s+ALLOW(?: IN)?\s+(\S+)", line.strip())
+            if not match:
+                continue
+            target = match.group(1).replace(" (v6)", "")
+            if target in (port, f"{port}/tcp", "Anywhere", "OpenSSH"):
+                return True
+            if re.fullmatch(r"(\d+):(\d+)/tcp", target):
+                low, high = map(int, target[:-4].split(":"))
+                if port.isdigit() and low <= int(port) <= high:
+                    return True
+        return False
+
+    def _sudo_prefix(self, client) -> str:
+        """'' для root (на многих VPS sudo нет вовсе), иначе 'sudo -n ': без ожидания пароля."""
+        cached = getattr(client, "_vsm_sudo", None)
+        if not isinstance(cached, str):
+            try:
+                _, stdout, _ = client.exec_command("id -u", timeout=10)
+                cached = "" if stdout.read().decode("utf-8").strip() == "0" else "sudo -n "
+            except Exception:
+                cached = "sudo -n "
+            try:
+                client._vsm_sudo = cached
+            except AttributeError:
+                pass
+        return cached
+
+    def _as_root(self, client, command: str) -> str:
+        return self._SUDO.sub(self._sudo_prefix(client), command) if "sudo " in command else command
+
     def _read_command_output(self, client, command: str, timeout: int = 30) -> str:
-        _, stdout, _ = client.exec_command(command, timeout=timeout)
+        _, stdout, _ = client.exec_command(self._as_root(client, command), timeout=timeout)
         return stdout.read().decode("utf-8").strip()
 
     @classmethod
@@ -335,6 +372,44 @@ class SSHService:
 
         idle_pct = float(match.group(1))
         return round(max(0.0, min(100.0, 100.0 - idle_pct)), 1)
+
+    # Загрузка за 1 с и процессы «сейчас»: /proc/stat и /proc/<pid>/stat читаются дважды.
+    # steal (время, отнятое гипервизором) — не нагрузка сервера, он показывается отдельно.
+    # Свой shell, его дети и sshd-сессия проверки в топ не попадают.
+    _CPU_SAMPLE = r"""
+snap() { for f in /proc/[0-9]*/stat; do read -r l < "$f" 2>/dev/null && printf '%s\n' "$l"; done \
+  | sed -E 's/^([0-9]+) \((.*)\) [A-Za-z] ([0-9-]+) (([^ ]+ ){9})([0-9]+) ([0-9]+) .*/\1 \3 \6 \7 \2/'; }
+read c u n s i io irq sirq st rest < /proc/stat
+A=$(snap)
+sleep 1
+read c u2 n2 s2 i2 io2 irq2 sirq2 st2 rest < /proc/stat
+B=$(snap)
+T=$(( (u2+n2+s2+i2+io2+irq2+sirq2+st2) - (u+n+s+i+io+irq+sirq+st) ))
+echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st))"
+{ printf '%s\n' "$A" | sed 's/^/A /'; printf '%s\n' "$B" | sed 's/^/B /'; } | awk -v self=$$ -v parent=$PPID -v total=$T '
+  $2 == self || $3 == self || $2 == parent { next }
+  $1 == "A" { was[$2] = $4 + $5; next }
+  ($2 in was) { d = $4 + $5 - was[$2]; if (d > 0) { name = $6; for (k = 7; k <= NF; k++) name = name " " $k; busy[name] += d } }
+  END { if (total > 0) for (name in busy) printf "PROC %.1f %s\n", 100 * busy[name] / total, name }' | sort -k2 -rn | head -n 3
+"""
+
+    def _sample_cpu(self, client, timeout: int = 15) -> Optional[Dict]:
+        """{'used', 'steal', 'top': [{'cmd', 'cpu'}]} или None, если /proc недоступен."""
+        raw = self._read_command_output(client, "/bin/sh -c " + shlex.quote(self._CPU_SAMPLE), timeout=timeout)
+        used = steal = None
+        top = []
+        for line in (raw or "").splitlines():
+            parts = line.split()
+            if parts[:1] == ["CPU"] and len(parts) == 6 and all(p.lstrip("-").isdigit() for p in parts[1:]):
+                total, user, system, _iowait, stolen = (int(p) for p in parts[1:])
+                if total > 0:
+                    used = round(max(0.0, min(100.0, 100.0 * (user + system) / total)), 1)
+                    steal = round(max(0.0, min(100.0, 100.0 * stolen / total)), 1)
+            elif parts[:1] == ["PROC"] and len(parts) >= 3:
+                top.append({"cmd": " ".join(parts[2:])[:40], "cpu": parts[1]})
+        if used is None:
+            return None
+        return {"used": used, "steal": steal, "top": top}
 
     def _get_cpu_used_pct(self, client, timeout: int = 30) -> float:
         proc_stat_used = self._read_command_output(
@@ -1081,6 +1156,9 @@ class SSHService:
                 "current": {
                     "download": f"{rx_speed:.2f}",
                     "upload": f"{tx_speed:.2f}",
+                    # KB/s для малых скоростей: в MB/s с двумя знаками 5 KB/s выглядят как 0.00
+                    "download_kbs": round(rx_speed * 1024, 1),
+                    "upload_kbs": round(tx_speed * 1024, 1),
                     "unit": "MB/s",
                 },
                 "daily": {"download": daily_rx, "upload": daily_tx},
@@ -1433,32 +1511,23 @@ class SSHService:
             # Используем connection pooling
             client = self.get_connection_pooled(ip, port, user, password, **_key_kwargs(key, key_passphrase))
 
-            ssh_failures_output = self._read_command_output(
-                client,
-                'sudo journalctl --since "24 hours ago" --no-pager 2>/dev/null | grep -E "Failed password|authentication failure" | wc -l',
-                timeout=15,
+            # Одна попытка — одна строка «Failed password/publickey/…» от sshd. PAM пишет ту же попытку
+            # ещё раз, а в журнале sudo видна и сама команда проверки, поэтому берём только _COMM=sshd.
+            ssh_lines_cmd = (
+                '{ sudo journalctl _COMM=sshd --since "24 hours ago" --no-pager -o cat 2>/dev/null'
+                ' || sudo grep -h "sshd\\[" /var/log/auth.log /var/log/secure 2>/dev/null | tail -20000; }'
+                ' | grep -E "Failed (password|publickey|none|keyboard-interactive)"'
             )
-            if not ssh_failures_output.isdigit():
-                ssh_failures_output = self._read_command_output(
-                    client,
-                    'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | tail -1000 | wc -l',
-                    timeout=15,
-                )
+            ssh_failures_output = self._read_command_output(client, ssh_lines_cmd + " | wc -l", timeout=20)
             ssh_failures = (
                 int(ssh_failures_output) if ssh_failures_output.isdigit() else 0
             )
 
             top_failed_output = self._read_command_output(
                 client,
-                'sudo journalctl --since "24 hours ago" --no-pager 2>/dev/null | grep -E "Failed password|authentication failure" | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk \'{print $2}\' | sort | uniq -c | sort -rn | head -3',
-                timeout=15,
+                ssh_lines_cmd + ' | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk \'{print $2}\' | sort | uniq -c | sort -rn | head -3',
+                timeout=20,
             )
-            if not top_failed_output:
-                top_failed_output = self._read_command_output(
-                    client,
-                    'sudo grep "Failed password" /var/log/auth.log 2>/dev/null | tail -1000 | grep -oE "from [0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+" | awk \'{print $2}\' | sort | uniq -c | sort -rn | head -3',
-                    timeout=15,
-                )
 
             top_ips_output = top_failed_output.split("\n")
             top_failed_ips = []
@@ -1478,10 +1547,18 @@ class SSHService:
             )
 
             # Последнее обновление системы
-            _, stdout, _ = client.exec_command(
-                "stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null"
+            last_update_timestamp = self._read_command_output(
+                client,
+                "t=$(stat -c %Y /var/lib/apt/periodic/update-success-stamp 2>/dev/null); "
+                "[ -n \"$t\" ] || t=$(ls -t /var/lib/apt/lists/*Release 2>/dev/null | head -n 1 | xargs -r stat -c %Y 2>/dev/null); "
+                "echo \"$t\"",
+                timeout=10,
             )
-            last_update_timestamp = stdout.read().decode("utf-8").strip()
+            last_upgrade = self._read_command_output(
+                client,
+                "grep '^Start-Date:' /var/log/apt/history.log 2>/dev/null | tail -n 1 | cut -d' ' -f2-",
+                timeout=10,
+            )
             apt_update_known = False
             days_since_update = None
             if last_update_timestamp.isdigit():
@@ -1497,19 +1574,23 @@ class SSHService:
             )
             fail2ban_banned = int(fail2ban_output) if fail2ban_output.isdigit() else 0
 
-            failed_services_output = self._read_command_output(
+            failed_raw = self._read_command_output(
                 client,
-                "systemctl --failed --no-legend --plain 2>/dev/null | wc -l",
+                "systemctl --failed --no-legend --plain --no-pager 2>/dev/null | awk '{print $1}' | head -15",
                 timeout=10,
             )
-            failed_services = (
-                int(failed_services_output) if failed_services_output.isdigit() else 0
-            )
+            failed_units = [
+                name for name in failed_raw.split()
+                if re.match(r"^[\w@.+-]+\.(service|socket|mount|timer|path|target)$", name)
+            ]
+            failed_services = len(failed_units)
 
+            # Ошибки журнала без sshd: у него это обрывы соединений сканеров, они уже в счётчике SSH.
             error_events_output = self._read_command_output(
                 client,
-                'sudo journalctl --since "24 hours ago" -p err..alert --no-pager 2>/dev/null | wc -l',
-                timeout=15,
+                'sudo journalctl --since "24 hours ago" -p err..alert --no-pager -o json 2>/dev/null'
+                ' | grep -vc \'"_COMM":"sshd"\'',
+                timeout=20,
             )
             error_events_24h = (
                 int(error_events_output) if error_events_output.isdigit() else 0
@@ -1549,7 +1630,10 @@ class SSHService:
                 "new_open_ports": new_open_ports,
                 "fail2ban_banned": fail2ban_banned,
                 "failed_services": failed_services,
+                "failed_units": failed_units,
                 "error_events_24h": error_events_24h,
+                "last_upgrade": " ".join((last_upgrade or "").split())[:16]
+                if re.match(r"^\d{4}-\d{2}-\d{2}", last_upgrade or "") else "",
                 "timestamp": int(time.time()),
             }
 
@@ -1564,6 +1648,7 @@ class SSHService:
                 "new_open_ports": 0,
                 "fail2ban_banned": 0,
                 "failed_services": 0,
+                "failed_units": [],
                 "error_events_24h": 0,
                 "timestamp": int(time.time()),
                 "error": str(e),
@@ -1834,6 +1919,16 @@ class SSHService:
             },
         }
 
+    def _history_script_state(self, client) -> str:
+        """absent / ok / outdated: старый cron-скрипт считал CPU по top -bn1 и писал 0 или 100."""
+        state = self._read_command_output(
+            client,
+            "f=/usr/local/bin/monitoring/update-metrics-history.sh; "
+            "if [ ! -f $f ]; then echo absent; elif grep -q /proc/stat $f; then echo ok; else echo outdated; fi",
+            timeout=10,
+        )
+        return state if state in ("absent", "ok", "outdated") else "unknown"
+
     def get_metrics_history(
         self, ip: str, user: str, password: Optional[str], port: int = 22, timeout: int = 30,
         key: Optional[str] = None, key_passphrase: Optional[str] = None,
@@ -1849,7 +1944,8 @@ class SSHService:
             max_points = 60
 
             # Получаем текущие метрики
-            cpu_usage = self._get_cpu_used_pct(client, timeout=timeout)
+            sample = self._sample_cpu(client)
+            cpu_usage = sample["used"] if sample else self._get_cpu_used_pct(client, timeout=timeout)
 
             _, stdout, _ = client.exec_command(
                 "free | grep Mem | awk '{printf \"%.1f\", $3/$2 * 100}'"
@@ -1903,7 +1999,8 @@ class SSHService:
 
             return {
                 "points": history,
-                "diagnosis": self._read_load_diagnosis(client, cpu_usage),
+                "history_script": self._history_script_state(client),
+                "diagnosis": self._read_load_diagnosis(client, cpu_usage, sample),
             }
 
         except Exception as e:
@@ -1922,17 +2019,22 @@ class SSHService:
                 "diagnosis": {},
             }
 
-    def _read_load_diagnosis(self, client, cpu_usage: float) -> Dict:
-        """Load average и топ процессов. Процент CPU без очереди — не перегрузка."""
+    def _read_load_diagnosis(self, client, cpu_usage: float, sample: Optional[Dict] = None) -> Dict:
+        """Load average и топ процессов. Процент CPU без очереди — не перегрузка.
+
+        Топ берётся из той же секунды, что и CPU (sample); ps %cpu — среднее за всю жизнь
+        процесса, оно остаётся только запасным вариантом."""
         raw = self._read_command_output(
             client,
             "echo LOAD $(cut -d' ' -f1-3 /proc/loadavg); "
+            "echo NPROC $(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null); "
             "command -v htop >/dev/null && echo TOOL htop; "
             "command -v btop >/dev/null && echo TOOL btop; "
             "ps -eo comm,%cpu --sort=-%cpu | awk 'NR>1 && NR<=4 {printf \"PROC %s %s\\n\", $1, $2}'",
             timeout=10,
         )
         load = []
+        nproc = None
         tools = set()
         top = []
         for line in (raw or "").splitlines():
@@ -1941,13 +2043,20 @@ class SSHService:
                 continue
             if parts[0] == "LOAD":
                 load = parts[1:4]
+            elif parts[0] == "NPROC" and len(parts) > 1 and parts[1].isdigit():
+                nproc = int(parts[1])
             elif parts[0] == "TOOL" and len(parts) > 1:
                 tools.add(parts[1])
             elif parts[0] == "PROC" and len(parts) >= 3:
                 top.append({"cmd": parts[1], "cpu": parts[2]})
+        if sample is not None:
+            top = sample["top"]
         return {
             "cpu": cpu_usage,
+            "steal": sample["steal"] if sample else None,
+            "top_now": sample is not None,
             "load": load,
+            "nproc": nproc,
             "top": top,
             "htop": "htop" in tools,
             "btop": "btop" in tools,
@@ -1981,11 +2090,10 @@ class SSHService:
                 },
                 "ufw": {
                     "name": "ufw",
-                    "description": "Брандмауэр для мониторинга безопасности (НЕ РЕКОМЕНДУЕТСЯ включать)",
+                    "description": "Брандмауэр: статус и правила на вкладке «Безопасность»",
                     "install_cmd": "sudo apt-get install -y ufw",
                     "category": "optional",
                     "installed": False,
-                    "warning": "⚠️ НЕ включайте UFW! Мониторинг работает и без него. Включение UFW без правильной настройки заблокирует SSH доступ!",
                 },
                 "netstat": {
                     "name": "netstat",
@@ -2028,23 +2136,14 @@ class SSHService:
                         "sudo systemctl enable vnstat && sudo systemctl start vnstat"
                     )
 
-            # Проверяем, включен ли UFW
+            # UFW: предупреждаем только если он включён, а правила ALLOW для SSH-порта нет.
             if tools["ufw"]["installed"]:
-                _, stdout, _ = client.exec_command(
-                    "sudo ufw status 2>/dev/null | grep \"Status:\" | awk '{print $2}'"
-                )
-                ufw_status = stdout.read().decode("utf-8").strip()
-                tools["ufw"]["enabled"] = ufw_status.lower() == "active"
-                if ufw_status.lower() != "active":
-                    tools["ufw"]["warning"] = (
-                        "⚠️ UFW выключен (это ПРАВИЛЬНО! Оставьте выключенным)"
-                    )
-                    tools["ufw"]["fix_cmd"] = (
-                        "# НЕ включайте UFW! Команда: sudo ufw disable"
-                    )
-                else:
+                ufw_raw = self._read_command_output(client, "sudo ufw status 2>/dev/null", timeout=10)
+                tools["ufw"]["enabled"] = "Status: active" in ufw_raw
+                tools["ufw"]["ssh_allowed"] = self.ufw_allows_port(ufw_raw, port)
+                if tools["ufw"]["enabled"] and not tools["ufw"]["ssh_allowed"]:
                     tools["ufw"]["_warning_tmpl"] = (
-                        "⚠️ UFW включен! Убедитесь что SSH-порт %(port)s разрешен!"
+                        "UFW включён, а правила ALLOW для SSH-порта %(port)s нет"
                     )
                     tools["ufw"]["_warning_port"] = port
                     tools["ufw"]["fix_cmd"] = (
@@ -2070,9 +2169,16 @@ class SSHService:
             missing = [t for t in tools.values() if not t["installed"]]
             warnings = [t for t in tools.values() if t.get("warning")]
 
+            # Команды для копирования: root на сервере работает без sudo (его там может и не быть)
+            if not self._sudo_prefix(client):
+                for tool_info in tools.values():
+                    for field in ("install_cmd", "fix_cmd"):
+                        if tool_info.get(field):
+                            tool_info[field] = tool_info[field].replace("sudo ", "")
+
             # Генерируем команду для установки всех недостающих
             if missing:
-                install_all_cmd = "sudo apt-get update && " + " && ".join(
+                install_all_cmd = ("sudo " if self._sudo_prefix(client) else "") + "apt-get update && " + " && ".join(
                     [t["install_cmd"] for t in missing]
                 )
             else:

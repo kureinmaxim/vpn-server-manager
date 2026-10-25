@@ -5,7 +5,7 @@ import json
 import logging
 import os
 from ..services import registry
-from ..utils.decorators import require_auth, require_pin, validate_json, handle_errors
+from ..utils.decorators import require_auth, require_pin, validate_json, handle_errors, csrf_protect
 from ..utils.validators import Validators
 from ..utils.rate_limiter import RateLimiter
 from ..exceptions import ValidationError, AuthenticationError, APIError
@@ -19,6 +19,43 @@ logger = logging.getLogger(__name__)
 # Создать лимитер (макс 10 запросов в минуту на сервер)
 rate_limiter = RateLimiter(max_requests=10, time_window=60)
 load_check_limiter = RateLimiter(max_requests=6, time_window=60)
+
+# Cron-скрипт истории CPU/памяти (каждые 5 минут). Старые копии на серверах считали CPU по
+# top -bn1 и писали 0 или 100: такой скрипт мониторинг находит и предлагает заменить этим.
+METRICS_HISTORY_SCRIPT = '''#!/bin/bash
+# VPN Server Manager - Metrics Collection Script
+HISTORY_FILE="/var/tmp/metrics_history.json"
+MAX_POINTS=288  # 24 часа истории (288 точек × 5 минут)
+
+# Дельта /proc/stat за 1 с; steal (время, отнятое гипервизором) в загрузку не входит.
+read cpu u n s i io irq sirq st rest < /proc/stat
+total1=$((u+n+s+i+io+irq+sirq+st)); idle1=$((i+io+st))
+sleep 1
+read cpu u n s i io irq sirq st rest < /proc/stat
+total2=$((u+n+s+i+io+irq+sirq+st)); idle2=$((i+io+st))
+dt=$((total2-total1)); di=$((idle2-idle1))
+if [ "$dt" -gt 0 ]; then
+  CPU_USAGE=$(awk -v dt="$dt" -v di="$di" 'BEGIN { printf "%.1f", (100*(dt-di)/dt) }')
+else
+  CPU_USAGE=0
+fi
+MEM_USAGE=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100}')
+TIMESTAMP=$(date +%s)
+
+# Проверяем наличие jq
+if ! command -v jq &> /dev/null; then
+    echo "[]" > "$HISTORY_FILE"
+    exit 0
+fi
+
+# Читаем существующую историю или создаем новую
+if [ ! -f "$HISTORY_FILE" ]; then
+    echo "[]" > "$HISTORY_FILE"
+fi
+
+# Добавляем новую точку и ограничиваем до MAX_POINTS
+jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USAGE}] | .[-$MAX_POINTS:]" "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
+'''
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -1210,14 +1247,17 @@ def get_metrics_history(server_id):
             timeout=30
         )
         diagnosis = {}
+        history_script = 'unknown'
         if isinstance(history, dict):
             diagnosis = history.get('diagnosis') or {}
+            history_script = history.get('history_script') or 'unknown'
             history = history.get('points') or []
 
         return jsonify({
             'success': True,
             'data': history,
-            'diagnosis': diagnosis
+            'diagnosis': diagnosis,
+            'history_script': history_script
         })
         
     except Exception as e:
@@ -1359,6 +1399,45 @@ def check_monitoring_installed(server_id):
 
 # Глобальная переменная для отслеживания отмены установки
 installation_cancelled = {}
+
+@api_bp.route('/monitoring/<server_id>/history-script', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def update_history_script(server_id):
+    """Заменить устаревший скрипт истории метрик (только этот файл, по нажатию пользователя).
+
+    Запись на сервер, поэтому подключение строгое: known_hosts и RejectPolicy, как у сброса.
+    """
+    import base64
+    import paramiko
+    from .reset import _connect, _load_known_hosts, RejectUnknownHost, describe_failure, failure_code
+    data_manager = registry.get('data_manager')
+    if not data_manager:
+        return jsonify(success=False, error=_('Сервис мониторинга недоступен.')), 503
+    server, creds = _get_server_ssh_credentials(server_id, data_manager)
+    if server is None or not creds:
+        return jsonify(success=False, error=_('Сервер не найден или SSH-данные недоступны.')), 404
+    path = '/usr/local/bin/monitoring/update-metrics-history.sh'
+    sudo = '' if creds['user'] == 'root' else 'sudo -n '
+    encoded = base64.b64encode(METRICS_HISTORY_SCRIPT.encode()).decode()
+    client = paramiko.SSHClient()
+    _load_known_hosts(client)
+    client.set_missing_host_key_policy(RejectUnknownHost())
+    try:
+        _connect(client, creds)
+        stdout = client.exec_command(
+            f'test -f {path} && echo {encoded} | base64 -d | {sudo}tee {path} > /dev/null && {sudo}chmod +x {path}'
+            f' && grep -q /proc/stat {path} && echo OK', timeout=20)[1]
+        if stdout.read().decode('utf-8', 'replace').strip() != 'OK':
+            return jsonify(success=False, error=_('Не удалось обновить скрипт истории. Нужен root или sudo -n.')), 502
+        return jsonify(success=True)
+    except Exception as exc:
+        return jsonify(success=False, error=describe_failure(exc, creds, may_have_run=True)
+                       or _('Не удалось обновить скрипт истории.') + failure_code(exc)), 502
+    finally:
+        client.close()
+
 
 @api_bp.route('/monitoring/<server_id>/cancel-install', methods=['POST'])
 @require_auth
@@ -1592,40 +1671,7 @@ exit 0
                 stdout.channel.recv_exit_status()
                 
                 # 2. Скрипт сбора метрик update-metrics-history.sh
-                script_content = '''#!/bin/bash
-# VPN Server Manager - Metrics Collection Script
-HISTORY_FILE="/var/tmp/metrics_history.json"
-MAX_POINTS=288  # 24 часа истории (288 точек × 5 минут)
-
-# Один замер top -bn1 врёт: это среднее с загрузки, не текущая секунда.
-read cpu u n s i io irq sirq st rest < /proc/stat
-total1=$((u+n+s+i+io+irq+sirq+st)); idle1=$((i+io))
-sleep 1
-read cpu u n s i io irq sirq st rest < /proc/stat
-total2=$((u+n+s+i+io+irq+sirq+st)); idle2=$((i+io))
-dt=$((total2-total1)); di=$((idle2-idle1))
-if [ "$dt" -gt 0 ]; then
-  CPU_USAGE=$(awk -v dt="$dt" -v di="$di" 'BEGIN { printf "%.1f", (100*(dt-di)/dt) }')
-else
-  CPU_USAGE=0
-fi
-MEM_USAGE=$(free | grep Mem | awk '{printf "%.1f", $3/$2 * 100}')
-TIMESTAMP=$(date +%s)
-
-# Проверяем наличие jq
-if ! command -v jq &> /dev/null; then
-    echo "[]" > "$HISTORY_FILE"
-    exit 0
-fi
-
-# Читаем существующую историю или создаем новую
-if [ ! -f "$HISTORY_FILE" ]; then
-    echo "[]" > "$HISTORY_FILE"
-fi
-
-# Добавляем новую точку и ограничиваем до MAX_POINTS
-jq ". += [{\\"timestamp\\":$TIMESTAMP,\\"cpu\\":$CPU_USAGE,\\"memory\\":$MEM_USAGE}] | .[-$MAX_POINTS:]" "$HISTORY_FILE" > "$HISTORY_FILE.tmp" && mv "$HISTORY_FILE.tmp" "$HISTORY_FILE"
-'''
+                script_content = METRICS_HISTORY_SCRIPT
                 
                 # Записываем скрипт сбора метрик
                 script_b64 = base64.b64encode(script_content.encode()).decode()

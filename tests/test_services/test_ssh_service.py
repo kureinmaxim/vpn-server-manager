@@ -280,24 +280,23 @@ class TestSSHService:
             {'pid': '15727', 'cmd': 'xray', 'cpu': '0.1', 'mem': '3.9'},
         ]
 
-    def test_check_required_tools_uses_server_ssh_port_in_ufw_warning(self):
-        """UFW warning must reference actual server SSH port."""
-        service = SSHService()
-        client = Mock()
+    @staticmethod
+    def _tools_client(ufw_status, uid='0'):
+        client = Mock(spec=['exec_command'])
 
         def make_result(output: str):
-            stdin = Mock()
             stdout = Mock()
-            stderr = Mock()
             stdout.read.return_value = output.encode('utf-8')
-            return stdin, stdout, stderr
+            return Mock(), stdout, Mock()
 
         # Матчим по подстроке, а не по точной команде: код детекта утилит уже
         # переезжал с `which` на `command -v` с явным PATH, и точное сравнение
         # молча превращало тест в проверку ветки «утилита не установлена».
-        def exec_side_effect(command):
+        def exec_side_effect(command, timeout=None):
+            if command == 'id -u':
+                return make_result(uid + '\n')
             if 'ufw status' in command:
-                return make_result('active\n')
+                return make_result(ufw_status)
             if 'systemctl is-active vnstat' in command:
                 return make_result('active\n')
             for name, path in (
@@ -311,22 +310,53 @@ class TestSSHService:
             return make_result('')
 
         client.exec_command.side_effect = exec_side_effect
+        return client
 
+    def _check_tools(self, client, port=2222):
+        service = SSHService()
         with patch.object(service, 'get_connection_pooled', return_value=client):
-            result = service.check_required_tools(
-                ip='127.0.0.1',
-                user='root',
-                password='secret',
-                port=2222,
-            )
+            return service.check_required_tools(ip='127.0.0.1', user='root', password='secret', port=port)
 
+    def test_ufw_warns_only_when_the_ssh_port_has_no_allow_rule(self):
+        """UFW включён, а правила для SSH-порта карточки нет — предупреждение с этим портом."""
+        result = self._check_tools(self._tools_client('Status: active\n\n443/tcp  ALLOW  Anywhere\n'))
         ufw_tool = result['tools']['ufw']
         # Страховка от тихой деградации: если детект утилиты снова разъедется с
         # моком, тест должен падать здесь, а не проверять не ту ветку кода.
-        assert ufw_tool['installed'] is True
-        assert ufw_tool['enabled'] is True
-        assert ufw_tool['warning'] == '⚠️ UFW включен! Убедитесь что SSH-порт 2222 разрешен!'
-        assert ufw_tool['fix_cmd'] == 'sudo ufw allow 2222/tcp && sudo ufw status numbered'
+        assert ufw_tool['installed'] is True and ufw_tool['enabled'] is True
+        assert ufw_tool['ssh_allowed'] is False
+        assert '2222' in ufw_tool['warning']
+        # root: команда без sudo (на многих VPS его нет)
+        assert ufw_tool['fix_cmd'] == 'ufw allow 2222/tcp && ufw status numbered'
+        assert result['all_ok'] is False
+
+    def test_ufw_with_ssh_rule_or_disabled_is_not_a_warning(self):
+        allowed = self._check_tools(self._tools_client('Status: active\n\n2222/tcp  ALLOW  Anywhere  # SSH\n'))
+        assert allowed['tools']['ufw']['ssh_allowed'] is True and 'warning' not in allowed['tools']['ufw']
+        assert allowed['all_ok'] is True
+        disabled = self._check_tools(self._tools_client('Status: inactive\n'))
+        assert disabled['tools']['ufw']['enabled'] is False and 'warning' not in disabled['tools']['ufw']
+
+    def test_non_root_commands_keep_sudo_and_never_wait_for_a_password(self):
+        client = self._tools_client('Status: active\n', uid='1000')
+        service = SSHService()
+        assert service._as_root(client, 'sudo ufw status') == 'sudo -n ufw status'
+        root = self._tools_client('', uid='0')
+        assert service._as_root(root, 'sudo journalctl -u x | sudo grep y') == 'journalctl -u x | grep y'
+        assert service._as_root(root, 'echo pw | sudo -S true') == 'echo pw | sudo -S true'
+
+    @pytest.mark.parametrize('status,port,expected', [
+        ('22542/tcp                  ALLOW       Anywhere                   # SSH', 22542, True),
+        ('22542/tcp (v6)             ALLOW       Anywhere (v6)', 22542, True),
+        ('Anywhere on tailscale0     ALLOW       Anywhere', 22, False),
+        ('22/tcp                     ALLOW IN    Anywhere', 22, True),
+        ('OpenSSH                    ALLOW       Anywhere', 22, True),
+        ('20000:30000/tcp            ALLOW       Anywhere', 22542, True),
+        ('Anywhere                   REJECT      116.177.172.108', 22, False),
+        ('22/tcp                     DENY        Anywhere', 22, False),
+    ])
+    def test_ufw_allows_port(self, status, port, expected):
+        assert SSHService.ufw_allows_port('Status: active\n\n' + status, port) is expected
 
     def test_parse_cpu_used_pct_handles_decimal_comma(self):
         """Парсер CPU должен корректно работать с локалями, где дроби идут через запятую."""
@@ -435,3 +465,63 @@ class TestSSHService:
             diagnosis = service._read_load_diagnosis(Mock(), 12.0)
         assert diagnosis["need_tools"] is False
         assert diagnosis["btop"] is True
+
+
+def _output_client(outputs):
+    """Mock SSH client: the first matching substring decides the output."""
+    client = Mock(spec=['exec_command'])
+
+    def run(command, timeout=None):
+        stdout = Mock()
+        text = next((out for key, out in outputs if key in command), '')
+        stdout.read.return_value = text.encode('utf-8')
+        return Mock(), stdout, Mock()
+
+    client.exec_command.side_effect = run
+    return client
+
+
+def test_cpu_sample_excludes_steal_and_reports_processes_now():
+    # 200 jiffies in total: user 10 + system 10 = 10 %, steal 40 = 20 % shown apart, not as load.
+    client = _output_client([('id -u', '0'), ('/proc/stat', 'CPU 200 10 10 0 40\nPROC 4.5 xray\nPROC 1.0 tailscaled\n')])
+    sample = SSHService()._sample_cpu(client)
+    assert sample == {'used': 10.0, 'steal': 20.0, 'top': [{'cmd': 'xray', 'cpu': '4.5'}, {'cmd': 'tailscaled', 'cpu': '1.0'}]}
+    assert SSHService()._sample_cpu(_output_client([('id -u', '0')])) is None
+
+
+def test_cpu_sample_script_skips_its_own_processes():
+    script = SSHService._CPU_SAMPLE
+    assert '$2 == self || $3 == self || $2 == parent { next }' in script
+    assert script.count('/proc/stat') == 2 and 'sleep 1' in script
+
+
+def test_security_events_count_each_ssh_attempt_once():
+    commands = []
+    client = _output_client([('id -u', '0'), ('wc -l', '14'), ('uniq -c', '     14 45.198.224.51'),
+                             ('systemctl --failed', 'ifup@ens3.service\n'), ('grep -vc', '3'),
+                             ('Start-Date', '2026-10-24  17:24:20')])
+    original = client.exec_command.side_effect
+    client.exec_command.side_effect = lambda command, timeout=None: (commands.append(command), original(command))[1]
+    service = SSHService()
+    with patch.object(service, 'get_connection_pooled', return_value=client), \
+            patch.object(service, '_get_listening_ports', return_value=[]):
+        events = service.get_security_events('127.0.0.1', 'root', 'x')
+    assert events['ssh_failures_24h'] == 14 and events['top_failed_ips'] == [{'ip': '45.198.224.51', 'count': 14}]
+    assert events['failed_units'] == ['ifup@ens3.service'] and events['failed_services'] == 1
+    assert events['last_upgrade'] == '2026-10-24 17:24'
+    ssh_commands = [c for c in commands if 'Failed (password' in c]
+    # sshd lines only: PAM repeats every attempt, and the journal records our own sudo command line.
+    assert ssh_commands and all('_COMM=sshd' in c and 'authentication failure' not in c for c in ssh_commands)
+    # root: no sudo at all (vps45379 has none, every command used to fail silently)
+    assert not any(c.startswith('sudo ') or ' sudo ' in c for c in commands)
+
+
+@pytest.mark.parametrize('output, state', [('ok', 'ok'), ('outdated', 'outdated'), ('absent', 'absent'), ('', 'unknown')])
+def test_history_script_state(output, state):
+    client = _output_client([('id -u', '0'), ('update-metrics-history.sh', output)])
+    assert SSHService()._history_script_state(client) == state
+
+
+def test_repo_history_script_uses_proc_stat():
+    from app.routes.api import METRICS_HISTORY_SCRIPT
+    assert '/proc/stat' in METRICS_HISTORY_SCRIPT and 'CPU_USAGE=$(top' not in METRICS_HISTORY_SCRIPT

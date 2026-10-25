@@ -2,6 +2,21 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.2] - 2026-10-25
+
+### Changed
+- Monitoring page: the priority strip is now one row of status chips in the same style as the Bots window: firewall (and whether the SSH port is allowed), failed SSH logins with the most frequent IPs in the tooltip, Fail2Ban bans, failed units by name, journal errors, security updates and missing tools. Green means fine, grey is information, yellow needs attention and red is a problem. The security brief button appears only when something needs attention.
+- The memory sparkline uses an absolute 0–100 % scale, and network bars show KB/s or MB/s with a 1 MB/s floor, so a quiet link no longer looks full.
+- «System update» shows when the package lists were last refreshed (today or N days ago) and when packages were last upgraded.
+- The UFW check warns only when UFW is on and the SSH port has no ALLOW rule. The tools alert no longer opens by itself when all tools are installed.
+
+### Fixed
+- On servers where the SSH user is root without sudo, every `sudo` check failed silently: UFW looked inactive and SSH failures, bans and updates showed 0. Commands now run without sudo for root and with `sudo -n` otherwise.
+- Failed SSH logins were counted twice (sshd and PAM lines) and included the check's own command. Now only sshd «Failed …» lines count, and the journal error count leaves sshd out.
+- CPU showed 100 % on 1-vCPU servers because the monitoring probes measured themselves, «top now» was a lifetime average, and hypervisor steal counted as load. CPU is now a 1-second /proc/stat sample without the app's own processes, steal is shown separately, and «top now» is the same second.
+- The CPU history jumped between 0 and 100 when the server's cron script was an old version that parsed `top`. The page detects it and offers **Update history script**, which replaces only `/usr/local/bin/monitoring/update-metrics-history.sh` over a verified (known_hosts) SSH connection. The new script also leaves steal out.
+- The «Fix» button in the tools alert was translated as «Save».
+
 ## [4.15.1] - 2026-10-25
 
 ### Changed
