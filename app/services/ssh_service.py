@@ -1,5 +1,6 @@
 import logging
 import re
+import shlex
 import threading
 from typing import Dict, List, Optional
 
@@ -1259,13 +1260,16 @@ class SSHService:
         self, ip: str, user: str, password: Optional[str], port: int = 22,
         key: Optional[str] = None, key_passphrase: Optional[str] = None,
     ) -> Dict:
-        """Telegram bots from the catalog: read-only systemctl/docker/pgrep and a loopback health word."""
-        from .bot_stats import build_command as build_bots_command, load_bots, parse as parse_bots
+        """Telegram bots from the catalog plus sending-only bots; read-only, tokens stay on the node."""
+        from flask import current_app, has_app_context
+        from .bot_stats import build_command as build_bots_command, load_bots, load_getme, parse as parse_bots
         client = self.get_connection_pooled(
             ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
         )
         bots = load_bots()
-        _, stdout, _ = client.exec_command(build_bots_command(bots), timeout=15)
+        getme = load_getme(current_app) if has_app_context() else True
+        # /bin/sh, not the login shell: zsh on macOS splits words differently.
+        _, stdout, _ = client.exec_command('/bin/sh -c ' + shlex.quote(build_bots_command(bots, getme)), timeout=40)
         try:
             output = stdout.read(262145).decode("utf-8", errors="replace")
         finally:

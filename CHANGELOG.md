@@ -2,6 +2,20 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.0] - 2026-10-25
+
+### Added
+- Bots window: a **Sending-only bots (no process)** section. These bots have a token in settings while a timer, Uptime Kuma or another program sends the messages. The window finds systemd timers whose script mentions `api.telegram.org` or `sendMessage`, or whose EnvironmentFile has `TELEGRAM_BOT_TOKEN`, Uptime Kuma Telegram notifications, and containers or TOS Docker stacks with `TELEGRAM_*` / `*BOT_TOKEN` variables (names only). Each bot is shown by its numeric ID, the part of the token before the colon, which the server cuts out. Optionally getMe runs on the server to show the bot's @username, and a setting turns this off. The same ID in several places is one bot. Each place shows the schedule, the next and last run with its result, or whether the Kuma notification is on.
+- Bots on macOS: the catalog has **Command line** fragments (matched in `/bin/ps` as whole words) and **Bot tasks** (shown as rows under the bot). Defaults add Hermes (`hermes gateway run`, with the lesson-report tasks) and «Проверка уроков». Only the pid, user, uptime and memory of a match leave the node, never the command line. A process started by launchd is marked as a launchd agent, with its label when the plist is readable.
+- The Bots window also checks the computer the app runs on, locally and without SSH.
+
+### Changed
+- «bot» marks a suspect only as a word or a name prefix, so certbot and robot are no longer flagged.
+- The bots check runs under `/bin/sh` on every node, whatever the login shell (zsh on macOS), and skips its own shell and that shell's ancestors when matching processes.
+
+### Security
+- Tokens and chat_id never leave the node: the ID is cut on the server, getMe gets the token through curl's stdin (not argv), and sendMessage is never called. Anything that looks like a token in the output is masked again as `bot***`.
+
 ## [4.14.3] - 2026-10-24
 
 ### Fixed

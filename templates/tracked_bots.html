@@ -10,6 +10,8 @@
     <td><input class="form-control form-control-sm font-monospace" name="units" value="{{ list_value(bot.units) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Службы systemd') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="containers" value="{{ list_value(bot.containers) }}"{% if hint %} placeholder="mybot"{% endif %} aria-label="{{ _('Контейнеры Docker') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="processes" value="{{ list_value(bot.processes) }}" aria-label="{{ _('Процессы') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="commands" value="{{ list_value(bot.commands) }}"{% if hint %} placeholder="hermes gateway run"{% endif %} aria-label="{{ _('Командная строка') }}"></td>
+    <td><input class="form-control form-control-sm font-monospace" name="tasks" value="{{ list_value(bot.tasks) }}"{% if hint %} placeholder="lesson-report"{% endif %} aria-label="{{ _('Задачи бота') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="health_url" value="{{ bot.health_url or '' }}"{% if hint %} placeholder="http://127.0.0.1:8000/health"{% endif %} aria-label="{{ _('Адрес проверки') }}"></td>
     <td><input class="form-control form-control-sm font-monospace" name="health_word" value="{{ bot.health_word or '' }}"{% if hint %} placeholder="healthy"{% endif %} aria-label="{{ _('Ожидаемое слово') }}"></td>
     <td>
@@ -52,6 +54,8 @@
                         <th scope="col">{{ _('Службы systemd') }}</th>
                         <th scope="col" style="width: 13%">{{ _('Контейнеры Docker') }}</th>
                         <th scope="col" style="width: 9%">{{ _('Процессы') }}</th>
+                        <th scope="col" style="width: 12%">{{ _('Командная строка') }}</th>
+                        <th scope="col" style="width: 9%">{{ _('Задачи бота') }}</th>
                         <th scope="col" style="width: 16%">{{ _('Адрес проверки') }}</th>
                         <th scope="col" style="width: 9%">{{ _('Ожидаемое слово') }}</th>
                         <th scope="col" style="width: 9%">{{ _('Тип') }}</th>
@@ -63,7 +67,12 @@
                 </tbody>
             </table>
         </div>
-        <template id="tracked-bot-template">{{ bot_row({'name': '', 'units': [], 'containers': [], 'processes': [], 'health_url': '', 'health_word': '', 'service': False}, hint=True) }}</template>
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="getme" value="1" id="bots-getme"{% if getme %} checked{% endif %}>
+            <label class="form-check-label" for="bots-getme">{{ _('Узнавать @username отправляющих ботов (getMe)') }}</label>
+            <div class="form-text">{{ _('Запрос getMe выполняется на сервере, токен с него не уходит: в приложение приходит только имя бота. Без этого показывается числовой ID бота.') }}</div>
+        </div>
+        <template id="tracked-bot-template">{{ bot_row({'name': '', 'units': [], 'containers': [], 'processes': [], 'commands': [], 'tasks': [], 'health_url': '', 'health_word': '', 'service': False}, hint=True) }}</template>
         <div class="d-flex flex-wrap gap-2">
             <button type="button" class="btn btn-outline-info" id="add-bot"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить бота') }}</button>
             <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
@@ -71,7 +80,8 @@
                     formnovalidate onclick="return confirm({{ _('Вернуть стандартный список ботов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
         </div>
     </form>
-    <p class="small text-body-secondary mt-3 mb-1">{{ _('«Служебная» — задачи по таймеру (oneshot), а не боты: они показываются отдельным блоком с временем и результатом последнего запуска. Oneshot-службы внутри бота попадают туда же автоматически.') }}</p>
+    <p class="small text-body-secondary mt-3 mb-1">{{ _('«Командная строка» — часть команды процесса, через запятую (для macOS и агентов launchd): совпадение ищется как целое слово, сама команда в приложение не передаётся. «Задачи бота» — команды задач, которые шлют через этого бота; они показываются строками под ним.') }}</p>
+    <p class="small text-body-secondary mb-1">{{ _('«Служебная» — задачи по таймеру (oneshot), а не боты: они показываются отдельным блоком с временем и результатом последнего запуска. Oneshot-службы внутри бота попадают туда же автоматически.') }}</p>
     <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
 </div>
 <script>

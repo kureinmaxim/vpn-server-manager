@@ -702,6 +702,28 @@ def bots_mesh_only():
     return response
 
 
+@api_bp.route('/monitoring/bots/local', methods=['GET'])
+@require_auth
+@require_pin
+def bots_local():
+    """Bots on the computer the app runs on: the same read-only script, run locally without SSH."""
+    import socket
+    import sys
+    from ..services.bot_stats import load_bots, load_getme, run_local
+    if sys.platform not in ('darwin', 'linux'):
+        return jsonify(error=_('Проверка этого компьютера доступна на macOS и Linux.')), 501
+    if not load_check_limiter.is_allowed('bots:local'):
+        return jsonify(error=_('Слишком частые проверки. Повторите через минуту.')), 429
+    try:
+        stats = run_local(load_bots(), load_getme(current_app))
+    except Exception as exc:
+        logger.warning('Local bots snapshot failed (%s)', type(exc).__name__)
+        return jsonify(error=_('Не удалось проверить этот компьютер.')), 502
+    response = jsonify(stats=stats, name=socket.gethostname().split('.')[0][:64])
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
 @api_bp.route('/monitoring/<server_id>/roles-snapshot', methods=['GET'])
 @require_auth
 @require_pin

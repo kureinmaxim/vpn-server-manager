@@ -112,6 +112,56 @@ def test_settings_save_reject_and_reset(app, client):
     assert "TelegramOnly" in [b["name"] for b in load_bots(app)]
 
 
+def test_settings_getme_checkbox(app, client):
+    from app.services.bot_stats import load_getme
+    login(client)
+    form = {"csrf_token": "token", "name": ["News bot"], "units": ["newsbot"], "containers": [""],
+            "processes": [""], "health_url": [""], "health_word": [""], "role": ["bot"]}
+    assert 'name="getme" value="1" id="bots-getme" checked' in client.get("/settings/bots").get_data(as_text=True)
+    client.post("/settings/bots", data=form)
+    assert load_getme(app) is False
+    assert 'id="bots-getme" checked' not in client.get("/settings/bots").get_data(as_text=True)
+    client.post("/settings/bots", data=dict(form, getme="1"))
+    assert load_getme(app) is True
+
+
+def test_modal_has_senders_section_in_english(app, client):
+    login(client)
+    html = client.get("/?lang=en").get_data(as_text=True)
+    assert 'id="bots-check-senders"' in html and "Sending-only bots (no process)" in html
+    assert "Tokens never leave the servers" in html
+
+
+def test_settings_save_command_bot(app, client):
+    login(client)
+    form = {"csrf_token": "token", "name": ["Hermes"], "units": [""], "containers": [""], "processes": [""],
+            "commands": ["hermes gateway run"], "tasks": ["lesson-report, lesson-report-test"],
+            "health_url": [""], "health_word": [""], "role": ["bot"]}
+    assert client.post("/settings/bots", data=form).status_code == 302
+    [bot] = load_bots(app)
+    assert bot["commands"] == ["hermes gateway run"] and bot["tasks"] == ["lesson-report", "lesson-report-test"]
+    html = client.get("/settings/bots").get_data(as_text=True)
+    assert 'value="hermes gateway run"' in html and 'value="lesson-report, lesson-report-test"' in html
+    bad = client.post("/settings/bots", data=dict(form, commands=["x; reboot"]))
+    assert bad.status_code == 400
+
+
+def test_local_check_route(app, client, monkeypatch):
+    import app.services.bot_stats as bot_stats
+    assert client.get("/api/monitoring/bots/local").status_code == 401
+    login(client)
+    monkeypatch.setattr(bot_stats, "run_local", lambda bots, getme: {"node": {}, "bots": [], "senders": []})
+    response = client.get("/api/monitoring/bots/local")
+    assert response.status_code == 200 and response.headers["Cache-Control"] == "no-store"
+    assert response.get_json()["stats"]["bots"] == [] and response.get_json()["name"]
+
+    def broken(bots, getme):
+        raise OSError("/Users/secret path")
+    monkeypatch.setattr(bot_stats, "run_local", broken)
+    failed = client.get("/api/monitoring/bots/local")
+    assert failed.status_code == 502 and "secret" not in failed.get_data(as_text=True)
+
+
 def test_settings_csrf_required(app, client):
     login(client)
     client.post("/settings/bots", data={"name": ["X"], "units": ["x"], "containers": [""], "processes": [""],

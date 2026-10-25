@@ -227,9 +227,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.14.3'),
-            "release_date": "24.10.2026",
-            "last_updated": "2026-10-24",
+            "version": app.config.get('APP_VERSION', '4.15.0'),
+            "release_date": "25.10.2026",
+            "last_updated": "2026-10-25",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -244,9 +244,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.14.3",
-            "release_date": "24.10.2026",
-            "last_updated": "2026-10-24",
+            "version": "4.15.0",
+            "release_date": "25.10.2026",
+            "last_updated": "2026-10-25",
             "developer": "Куреин М.Н."
         }
 
@@ -378,6 +378,9 @@ def create_app(config_name='development'):
     # Загрузка app_info из config.json
     load_app_info(app)
     
+    # Окно «Боты» проверяет и этот компьютер (локально, без SSH) там, где есть /bin/sh и ps
+    app.jinja_env.globals['bots_local_check'] = sys.platform in ('darwin', 'linux')
+
     # Контекстный процессор для app_info
     @app.context_processor
     def inject_app_info():

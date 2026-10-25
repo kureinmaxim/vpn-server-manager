@@ -41,7 +41,8 @@ ULTRAHOST = output(
 
 def test_telegramonly_running_with_health_and_helper_block():
     result = parse(ULTRAHOST, BOTS)
-    assert result['node'] == {'systemd': True, 'docker': 'absent', 'tos': False, 'processes': False}
+    assert {k: result['node'][k] for k in ('systemd', 'docker', 'tos', 'processes')} == {
+        'systemd': True, 'docker': 'absent', 'tos': False, 'processes': False}
     [bot] = result['bots']
     assert (bot['name'], bot['state'], bot['health']) == ('TelegramOnly', 'running', 'ok')
     [component] = bot['components']
@@ -110,6 +111,11 @@ def test_docker_container_with_health_and_suspects():
                                   {'kind': 'container', 'name': 'my-telegram-bot'}]
 
 
+def test_certbot_and_robot_are_not_suspects():
+    result = parse(output(suspects='S=certbot.service\nS=robot-vacuum.service\nS=my_bot.service'), BOTS)
+    assert result['suspects'] == [{'kind': 'unit', 'name': 'my_bot.service'}]
+
+
 @pytest.mark.parametrize('status,health,code,expected', [
     ('running', 'unhealthy', '0', 'failed'), ('restarting', '', '1', 'restarting'),
     ('exited', '', '137', 'failed'), ('exited', '', '0', 'stopped')])
@@ -122,7 +128,8 @@ def test_container_states(status, health, code, expected):
 def test_tos_without_docker_api_is_explicit_not_an_error():
     text = output(docker='DOCKER_FAIL', node_extra='TOS_APPS=1').replace('SYSTEMD=1\n', '')
     result = parse(text, BOTS)
-    assert result['node'] == {'systemd': False, 'docker': 'unavailable', 'tos': True, 'processes': False}
+    assert {k: result['node'][k] for k in ('systemd', 'docker', 'tos', 'processes')} == {
+        'systemd': False, 'docker': 'unavailable', 'tos': True, 'processes': False}
     assert result['bots'] == []
 
 
@@ -140,7 +147,8 @@ def test_processes_counted():
 
 
 def test_command_is_read_only_and_never_reads_secrets():
-    command = build_command(BOTS)
+    # The senders section has its own rules (tests/test_services/test_bot_senders.py).
+    command = build_command(BOTS).split("printf 'SENDERS")[0]
     assert not re.search(r'systemctl\s+(start|stop|restart|reload|enable|disable|kill)\b', command)
     assert not re.search(r'docker"?\s+(start|stop|restart|exec|kill|rm|logs)\b', command)
     for forbidden in ('Environment', 'Config.Env', 'environ', 'journalctl', 'cat ', '.env', 'sudo'):

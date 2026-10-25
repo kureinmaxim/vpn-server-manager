@@ -590,33 +590,42 @@ def tracked_projects():
 def tracked_bots():
     """Telegram bots shown in the Bots overview."""
     import secrets
-    from ..services.bot_stats import DEFAULT_BOTS, BotError, clean_bots, load_bots, save_bots
+    from ..services.bot_stats import (DEFAULT_BOTS, BotError, clean_bots, load_bots, load_getme, save_bots,
+                                      save_getme)
     session.setdefault('csrf_token', secrets.token_urlsafe(32))
     if request.method == 'POST':
         if request.form.get('action') == 'reset':
             bots = None
         else:
-            fields = ('name', 'units', 'containers', 'processes', 'health_url', 'health_word', 'role')
-            bots = [dict(zip(fields, values)) for values in zip(*(request.form.getlist(f) for f in fields))]
+            fields = ('name', 'units', 'containers', 'processes', 'commands', 'tasks', 'health_url', 'health_word',
+                      'role')
+            rows = len(request.form.getlist('name'))
+            columns = {f: request.form.getlist(f) + [''] * (rows - len(request.form.getlist(f))) for f in fields}
+            bots = [{f: columns[f][i] for f in fields} for i in range(rows)]
             for bot in bots:
                 bot['service'] = bot.pop('role') == 'service'
+        getme = bots is None or request.form.get('getme') == '1'
         try:
-            saved = save_bots(current_app, bots)
+            saved = save_bots(current_app, bots) and save_getme(current_app, getme)
         except BotError as error:
-            flash({'incomplete': _('У каждого бота должны быть название и хотя бы одна служба, контейнер или процесс.'),
+            flash({'incomplete': _('У каждого бота должны быть название и хотя бы одна служба, контейнер, процесс или командная строка.'),
+                   'commands': _('Командная строка и задачи: латиница, цифры, пробел и символы / . _ @ : + - (от 3 до 100 знаков, через запятую).'),
+                   'tasks': _('Командная строка и задачи: латиница, цифры, пробел и символы / . _ @ : + - (от 3 до 100 знаков, через запятую).'),
                    'processes': _('Имена процессов: латиница, цифры и символы . _ - (до 15 знаков, как в ps; не больше 16 на проект).'),
                    'units': _('Имена служб: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
                    'containers': _('Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
                    'health_url': _('Адрес проверки: только http://127.0.0.1:порт/путь (латиница, цифры и / _ . -).'),
                    'health_word': _('Ожидаемое слово: латиница, цифры, _ и - (до 32 знаков), вместе с адресом проверки.'),
                    }.get(str(error), _('Слишком много ботов.')), 'danger')
-            return render_template('tracked_bots.html', bots=bots or [], defaults=clean_bots(DEFAULT_BOTS)), 400
+            return render_template('tracked_bots.html', bots=bots or [], defaults=clean_bots(DEFAULT_BOTS),
+                                   getme=getme), 400
         if saved:
             flash(_('Список ботов сохранён.') if bots is not None else _('Восстановлен стандартный список ботов.'), 'success')
         else:
             flash(_('Не удалось сохранить список ботов.'), 'danger')
         return redirect(url_for('main.tracked_bots'))
-    return render_template('tracked_bots.html', bots=load_bots(current_app), defaults=clean_bots(DEFAULT_BOTS))
+    return render_template('tracked_bots.html', bots=load_bots(current_app), defaults=clean_bots(DEFAULT_BOTS),
+                           getme=load_getme(current_app))
 
 
 @main_bp.route('/settings')

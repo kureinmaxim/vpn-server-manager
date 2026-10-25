@@ -9927,3 +9927,135 @@ msgstr "The key is saved in the card as text: for a terminal, add -i with the pa
 
 msgid "Команда входа как %(user)s по SSH-ключу."
 msgstr "Login command as %(user)s with the SSH key."
+
+msgid "Разовая проверка по SSH, только чтение: состояние служб, контейнеров и процессов. Токены с серверов не передаются: видны только ID бота и @username."
+msgstr "One-off read-only check over SSH: the state of services, containers and processes. Tokens never leave the servers: only the bot ID and @username are shown."
+
+msgid "Отправляющие боты (без процесса)"
+msgstr "Sending-only bots (no process)"
+
+msgid "Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот."
+msgstr "The token sits in settings, and a timer, Uptime Kuma or another program sends the messages. A bot is recognised by its ID, the part of the token before the colon, which the server cuts out. The same ID in several places is one bot."
+
+msgid "Отправляющих ботов не найдено."
+msgstr "No sending-only bots found."
+
+msgid "Ищу на проверенных узлах…"
+msgstr "Searching the checked nodes…"
+
+msgid "Отправляющих ботов: {count} — см. раздел ниже"
+msgstr "Sending-only bots: {count}, see the section below"
+
+msgid "ID {id}"
+msgstr "ID {id}"
+
+msgid "Бот не опознан"
+msgstr "Bot not identified"
+
+msgid "токен берётся из Uptime Kuma, ID не прочитан"
+msgstr "the token comes from Uptime Kuma, the ID was not read"
+
+msgid "ID не найден: токен не в EnvironmentFile и не в скрипте"
+msgstr "ID not found: the token is neither in the EnvironmentFile nor in the script"
+
+msgid "таймер"
+msgstr "timer"
+
+msgid "каждые {value}"
+msgstr "every {value}"
+
+msgid "через {value} после загрузки"
+msgstr "{value} after boot"
+
+msgid "следующий {time}"
+msgstr "next {time}"
+
+msgid "Ещё не запускался"
+msgstr "Not run yet"
+
+msgid "Успешно"
+msgstr "Succeeded"
+
+msgid "Ошибка, код {code}"
+msgstr "Failed, code {code}"
+
+msgid "Выполняется"
+msgstr "Running"
+
+msgid "Уведомление включено"
+msgstr "Notification on"
+
+msgid "Уведомление выключено"
+msgstr "Notification off"
+
+msgid "переменные: {names}"
+msgstr "variables: {names}"
+
+msgid "Uptime Kuma: база не найдена — уведомления не проверены"
+msgstr "Uptime Kuma: database not found, notifications not checked"
+
+msgid "Uptime Kuma: нет доступа к базе — уведомления не проверены"
+msgstr "Uptime Kuma: no access to the database, notifications not checked"
+
+msgid "Uptime Kuma: внешняя база (MariaDB) — уведомления не проверены"
+msgstr "Uptime Kuma: external database (MariaDB), notifications not checked"
+
+msgid "Uptime Kuma: на сервере нет sqlite3 — уведомления не проверены"
+msgstr "Uptime Kuma: sqlite3 is not installed on the server, notifications not checked"
+
+msgid "Узнавать @username отправляющих ботов (getMe)"
+msgstr "Look up the @username of sending-only bots (getMe)"
+
+msgid "Запрос getMe выполняется на сервере, токен с него не уходит: в приложение приходит только имя бота. Без этого показывается числовой ID бота."
+msgstr "The getMe request runs on the server and the token never leaves it: only the bot name reaches the app. Without it, the numeric bot ID is shown."
+
+msgid "процесс по командной строке"
+msgstr "process by command line"
+
+msgid "задача"
+msgstr "task"
+
+msgid "сейчас не выполняется, шлёт через этого бота"
+msgstr "not running now, sends through this bot"
+
+msgid "пользователь {name}"
+msgstr "user {name}"
+
+msgid "агент launchd"
+msgstr "launchd agent"
+
+msgid "стек Docker"
+msgstr "Docker stack"
+
+msgid "Этот компьютер"
+msgstr "This computer"
+
+msgid "macOS: systemd и Docker нет — проверены процессы и агенты launchd"
+msgstr "macOS: no systemd or Docker, processes and launchd agents were checked"
+
+msgid "Стеки Docker (файлов: {count}): переменных ботов нет"
+msgstr "Docker stacks ({count} files): no bot variables"
+
+msgid "Стеки Docker без доступа на чтение: {names}"
+msgstr "Docker stacks without read access: {names}"
+
+msgid "Командная строка"
+msgstr "Command line"
+
+msgid "Задачи бота"
+msgstr "Bot tasks"
+
+msgid "«Командная строка» — часть команды процесса, через запятую (для macOS и агентов launchd): совпадение ищется как целое слово, сама команда в приложение не передаётся. «Задачи бота» — команды задач, которые шлют через этого бота; они показываются строками под ним."
+msgstr "“Command line” is part of a process command, comma-separated (for macOS and launchd agents): it is matched as a whole word, and the command itself is never sent to the app. “Bot tasks” are commands of tasks that send through this bot; they are shown as rows under it."
+
+msgid "У каждого бота должны быть название и хотя бы одна служба, контейнер, процесс или командная строка."
+msgstr "Each bot needs a name and at least one service, container, process or command line."
+
+msgid "Командная строка и задачи: латиница, цифры, пробел и символы / . _ @ : + - (от 3 до 100 знаков, через запятую)."
+msgstr "Command line and tasks: Latin letters, digits, space and / . _ @ : + - (3 to 100 characters, comma-separated)."
+
+msgid "Проверка этого компьютера доступна на macOS и Linux."
+msgstr "Checking this computer is available on macOS and Linux."
+
+msgid "Не удалось проверить этот компьютер."
+msgstr "Could not check this computer."
