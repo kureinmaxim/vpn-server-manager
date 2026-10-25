@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title" id="botsCheckTitle"><i class="bi bi-robot me-2" aria-hidden="true"></i>{{ _('Telegram-боты на узлах') }}</h5>
-                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Разовая проверка по SSH, только чтение: состояние служб, контейнеров и процессов. Токены с серверов не передаются: видны только ID бота и @username.') }}</p>
+                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Только чтение по SSH. Токены не покидают серверы: видны только ID бота и @username.') }}</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
@@ -16,13 +16,23 @@
                         <button id="bots-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
                     </div>
                 </div>
-                <div id="bots-check-nodes" class="bots-check-nodes" aria-busy="false"></div>
-                <p id="bots-check-mesh" class="small text-body-secondary mt-3 mb-0"></p>
-                <section class="mt-3" aria-labelledby="bots-check-senders-title">
-                    <h6 id="bots-check-senders-title" class="mb-1"><i class="bi bi-send me-2" aria-hidden="true"></i>{{ _('Отправляющие боты (без процесса)') }}</h6>
-                    <p class="small text-body-secondary mb-2">{{ _('Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот.') }}</p>
+                <div id="bots-check-nodes" class="d-flex flex-wrap gap-1 mb-2" aria-busy="false" aria-label="{{ _('Узлы') }}"></div>
+                <div id="bots-check-errors" class="small text-warning-emphasis mb-2"></div>
+                <section class="mb-3" aria-labelledby="bots-check-senders-title">
+                    <h6 id="bots-check-senders-title" class="mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-send" aria-hidden="true"></i>{{ _('Отправляющие боты (без процесса)') }}
+                        <i class="bi bi-info-circle text-body-secondary small" tabindex="0"
+                           title="{{ _('Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот.') }}"
+                           aria-label="{{ _('Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот.') }}"></i>
+                    </h6>
                     <div id="bots-check-senders" aria-live="polite"></div>
                 </section>
+                <section class="mb-3" aria-labelledby="bots-check-process-title">
+                    <h6 id="bots-check-process-title" class="mb-2"><i class="bi bi-cpu me-2" aria-hidden="true"></i>{{ _('Боты с процессом') }}</h6>
+                    <div id="bots-check-process" aria-live="polite"></div>
+                </section>
+                <div id="bots-check-extra" class="small"></div>
+                <p id="bots-check-mesh" class="small text-body-secondary mt-2 mb-0"></p>
             </div>
         </div>
     </div>
@@ -81,9 +91,25 @@ window.BOTS_CHECK_CONFIG = {
         requestError: {{ _('Не удалось получить ответ приложения.') | tojson }},
         timeout: {{ _('Время ожидания истекло. Повторите проверку.') | tojson }},
         auth: {{ _('Разблокируйте приложение и повторите проверку.') | tojson }},
+        node: {{ _('Узел') | tojson }},
+        uptime: {{ _('Время работы') | tojson }},
+        memoryCol: {{ _('Память') | tojson }},
+        components: {{ _('Из чего состоит') | tojson }},
+        where: {{ _('Где') | tojson }},
+        scheduleCol: {{ _('Расписание') | tojson }},
+        lastRunCol: {{ _('Последний запуск') | tojson }},
+        resultCol: {{ _('Результат') | tojson }},
+        processNone: {{ _('Ботов с процессом не найдено.') | tojson }},
+        withoutBots: {{ _('Без ботов: {names}') | tojson }},
+        kumaWhen: {{ _('при срабатывании монитора') | tojson }},
+        helpersAll: {{ _('Служебные задачи ({count})') | tojson }},
+        suspectsAll: {{ _('Похоже на бота, но нет в списке ({count})') | tojson }},
+        notesAll: {{ _('Заметки по узлам ({count})') | tojson }},
+        days: {{ _('{count} д') | tojson }},
+        hours: {{ _('{count} ч') | tojson }},
+        minutes: {{ _('{count} мин') | tojson }},
         sendersNone: {{ _('Отправляющих ботов не найдено.') | tojson }},
         sendersWait: {{ _('Ищу на проверенных узлах…') | tojson }},
-        sendersOnNode: {{ _('Отправляющих ботов: {count} — см. раздел ниже') | tojson }},
         botId: {{ _('ID {id}') | tojson }},
         unidentified: {{ _('Бот не опознан') | tojson }},
         tokenInKuma: {{ _('токен берётся из Uptime Kuma, ID не прочитан') | tojson }},

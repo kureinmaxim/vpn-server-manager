@@ -9725,3 +9725,60 @@ msgstr "仅在 macOS 和 Linux 上可以检查本机。"
 
 msgid "Не удалось проверить этот компьютер."
 msgstr "无法检查本机。"
+
+msgid "Только чтение по SSH. Токены не покидают серверы: видны только ID бота и @username."
+msgstr "通过 SSH 只读。令牌不会离开服务器：只显示机器人 ID 和 @username。"
+
+msgid "Узлы"
+msgstr "节点"
+
+msgid "Боты с процессом"
+msgstr "有进程的机器人"
+
+msgid "Узел"
+msgstr "节点"
+
+msgid "Из чего состоит"
+msgstr "组成"
+
+msgid "Где"
+msgstr "位置"
+
+msgid "Расписание"
+msgstr "计划"
+
+msgid "Последний запуск"
+msgstr "上次运行"
+
+msgid "Ботов с процессом не найдено."
+msgstr "未找到有进程的机器人。"
+
+msgid "Без ботов: {names}"
+msgstr "无机器人：{names}"
+
+msgid "при срабатывании монитора"
+msgstr "监控触发时"
+
+msgid "Служебные задачи ({count})"
+msgstr "辅助任务（{count}）"
+
+msgid "Похоже на бота, но нет в списке ({count})"
+msgstr "看起来像机器人，但不在列表中（{count}）"
+
+msgid "Заметки по узлам ({count})"
+msgstr "节点备注（{count}）"
+
+msgid "{count} шт."
+msgstr "{count} 个"
+
+msgid "{count} д"
+msgstr "{count} 天"
+
+msgid "{count} ч"
+msgstr "{count} 小时"
+
+msgid "{count} мин"
+msgstr "{count} 分钟"
+
+msgid "Время работы"
+msgstr "运行时长"

@@ -10059,3 +10059,60 @@ msgstr "Checking this computer is available on macOS and Linux."
 
 msgid "Не удалось проверить этот компьютер."
 msgstr "Could not check this computer."
+
+msgid "Только чтение по SSH. Токены не покидают серверы: видны только ID бота и @username."
+msgstr "Read-only over SSH. Tokens never leave the servers: only the bot ID and @username are shown."
+
+msgid "Узлы"
+msgstr "Nodes"
+
+msgid "Боты с процессом"
+msgstr "Bots with a process"
+
+msgid "Узел"
+msgstr "Node"
+
+msgid "Из чего состоит"
+msgstr "Made of"
+
+msgid "Где"
+msgstr "Where"
+
+msgid "Расписание"
+msgstr "Schedule"
+
+msgid "Последний запуск"
+msgstr "Last run"
+
+msgid "Ботов с процессом не найдено."
+msgstr "No bots with a process found."
+
+msgid "Без ботов: {names}"
+msgstr "No bots: {names}"
+
+msgid "при срабатывании монитора"
+msgstr "when a monitor fires"
+
+msgid "Служебные задачи ({count})"
+msgstr "Helper jobs ({count})"
+
+msgid "Похоже на бота, но нет в списке ({count})"
+msgstr "Looks like a bot, not in the list ({count})"
+
+msgid "Заметки по узлам ({count})"
+msgstr "Node notes ({count})"
+
+msgid "{count} шт."
+msgstr "{count} ×"
+
+msgid "{count} д"
+msgstr "{count} d"
+
+msgid "{count} ч"
+msgstr "{count} h"
+
+msgid "{count} мин"
+msgstr "{count} min"
+
+msgid "Время работы"
+msgstr "Uptime"

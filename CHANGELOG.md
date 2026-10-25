@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.1] - 2026-10-25
+
+### Changed
+- The Bots window is easier to scan. Sending-only bots come first, one card per bot (@username and ID), with their places in aligned columns: node, where, schedule, last run and result. Bots with a process are one table across all nodes (bot, node, state, uptime, memory, components). The components of a bot fold into one line, and its tasks show underneath. Nodes are a row of chips with their state, and node notes appear in the chip tooltip. Nodes without bots, helper jobs, suspects and node notes are folded at the bottom. SSH errors stay visible under the chips.
+
 ## [4.15.0] - 2026-10-25
 
 ### Added

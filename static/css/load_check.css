@@ -31,3 +31,10 @@
 .bots-check-table th { color: var(--bs-secondary-color); white-space: nowrap; }
 .bots-check-table tbody th { color: var(--bs-body-color); }
 .bots-check-component { overflow-wrap: anywhere; }
+.bots-check-chip { font-weight: 500; font-size: .8rem; color: var(--bs-body-color); background: var(--bs-body-bg); padding: .35em .7em; }
+.bots-check-chip:hover { border-color: var(--bs-info) !important; }
+.bots-check-chip-error { border-color: var(--bs-warning) !important; }
+.bots-check-card { background: var(--bs-body-bg); }
+.bots-check-card .bots-check-table { margin: 0 .5rem .25rem; width: calc(100% - 1rem); }
+.bots-check-table summary { cursor: pointer; }
+.bots-check-table td, .bots-check-table th { padding-top: .3rem; padding-bottom: .3rem; }
