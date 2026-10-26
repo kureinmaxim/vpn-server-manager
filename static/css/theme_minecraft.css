@@ -1,0 +1,215 @@
+/* Minecraft: третья тема поверх тёмной темы Bootstrap (data-bs-theme="dark").
+   Включается только атрибутом data-skin="minecraft" на <html>; светлую и тёмную темы не затрагивает.
+   Палитра и приёмы (квадратные углы, фаска, жёсткая тень) — из ApiHA. */
+
+html[data-skin="minecraft"] {
+    --mc-bg: #1e1610;
+    --mc-panel: #3a2f24;
+    --mc-panel-dark: #2e241c;
+    --mc-border: #1a120c;
+    --mc-text: #f0e6c8;
+    --mc-muted: #b8a888;
+    --mc-accent: #5b8c3e;
+    --mc-accent-hover: #79a84e;
+    --mc-accent-dark: #2d4a1c;
+    --mc-bevel-light: rgba(255, 255, 255, 0.14);
+    --mc-bevel-dark: rgba(0, 0, 0, 0.45);
+    --mc-shadow: 4px 4px 0 #0c0906;
+
+    --bs-body-bg: var(--mc-bg);
+    --bs-body-bg-rgb: 30, 22, 16;
+    --bs-body-color: var(--mc-text);
+    --bs-body-color-rgb: 240, 230, 200;
+    --bs-emphasis-color: #fff8de;
+    --bs-secondary-color: var(--mc-muted);
+    --bs-tertiary-bg: var(--mc-panel);
+    --bs-secondary-bg: var(--mc-panel-dark);
+    --bs-border-color: var(--mc-border);
+    --bs-primary: var(--mc-accent);
+    --bs-primary-rgb: 91, 140, 62;
+    --bs-link-color: #8bc34a;
+    --bs-link-color-rgb: 139, 195, 74;
+    --bs-link-hover-color: #a5d65f;
+    --bs-border-radius: 0;
+    --bs-border-radius-sm: 0;
+    --bs-border-radius-lg: 0;
+    --bs-border-radius-xl: 0;
+    --bs-border-radius-xxl: 0;
+    --bs-border-radius-pill: 0;
+    image-rendering: pixelated;
+}
+
+/* Квадратные углы везде, включая свои компоненты страниц с жёстко заданными скруглениями. */
+html[data-skin="minecraft"] *,
+html[data-skin="minecraft"] *::before,
+html[data-skin="minecraft"] *::after {
+    border-radius: 0 !important;
+}
+
+/* Панели: рамка, внутренняя фаска и жёсткая тень без размытия. */
+html[data-skin="minecraft"] .card,
+html[data-skin="minecraft"] .modal-content,
+html[data-skin="minecraft"] .dropdown-menu,
+html[data-skin="minecraft"] .settings-tile,
+html[data-skin="minecraft"] .dns-provider,
+html[data-skin="minecraft"] .own-dns,
+html[data-skin="minecraft"] .dns-service,
+html[data-skin="minecraft"] .server-board-item .card {
+    border: 2px solid var(--mc-border);
+    box-shadow:
+        inset 2px 2px 0 var(--mc-bevel-light),
+        inset -2px -2px 0 var(--mc-bevel-dark),
+        var(--mc-shadow);
+}
+
+html[data-skin="minecraft"] .dropdown-menu {
+    background-color: var(--mc-panel);
+}
+
+/* Кнопки: фаска, при нажатии «вдавливаются». */
+html[data-skin="minecraft"] .btn {
+    border-width: 2px;
+    box-shadow:
+        inset 2px 2px 0 var(--mc-bevel-light),
+        inset -2px -2px 0 var(--mc-bevel-dark);
+    font-weight: 600;
+}
+
+html[data-skin="minecraft"] .btn:hover:not(:disabled):not(.disabled) {
+    filter: brightness(1.1);
+}
+
+html[data-skin="minecraft"] .btn:active:not(:disabled):not(.disabled) {
+    box-shadow:
+        inset -2px -2px 0 var(--mc-bevel-light),
+        inset 2px 2px 0 var(--mc-bevel-dark);
+}
+
+html[data-skin="minecraft"] .btn-primary {
+    --bs-btn-bg: var(--mc-accent);
+    --bs-btn-border-color: var(--mc-accent-dark);
+    --bs-btn-color: #f4f0d8;
+    --bs-btn-hover-bg: var(--mc-accent-hover);
+    --bs-btn-hover-border-color: var(--mc-accent-dark);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: var(--mc-accent-dark);
+    --bs-btn-active-border-color: var(--mc-border);
+    --bs-btn-disabled-bg: var(--mc-accent);
+    --bs-btn-disabled-border-color: var(--mc-accent-dark);
+}
+
+/* Поля ввода: тёмные, «утопленные». */
+html[data-skin="minecraft"] .form-control,
+html[data-skin="minecraft"] .form-select,
+html[data-skin="minecraft"] textarea {
+    background-color: #17110c;
+    color: var(--mc-text);
+    border: 2px solid var(--mc-border);
+    box-shadow: inset 2px 2px 0 var(--mc-bevel-dark), inset -2px -2px 0 var(--mc-bevel-light);
+}
+
+html[data-skin="minecraft"] .form-control:focus,
+html[data-skin="minecraft"] .form-select:focus {
+    border-color: var(--mc-accent-hover);
+    box-shadow: inset 2px 2px 0 var(--mc-bevel-dark), 0 0 0 2px rgba(121, 168, 78, 0.45);
+}
+
+html[data-skin="minecraft"] .form-check-input {
+    background-color: #17110c;
+    border: 2px solid var(--mc-border);
+}
+
+html[data-skin="minecraft"] .form-check-input:checked {
+    background-color: var(--mc-accent);
+    border-color: var(--mc-accent-dark);
+}
+
+/* Верхняя панель: «доски» с тёмной нижней кромкой. */
+html[data-skin="minecraft"] .navbar {
+    background: linear-gradient(180deg, #4a3b2c 0%, #3a2f24 45%, #2e241c 100%) !important;
+    border-bottom: 3px solid var(--mc-border);
+}
+
+html[data-skin="minecraft"] .navbar .nav-link,
+html[data-skin="minecraft"] .navbar .navbar-brand {
+    color: var(--mc-text);
+}
+
+html[data-skin="minecraft"] .navbar .nav-link:hover {
+    color: #fff;
+}
+
+html[data-skin="minecraft"] .dropdown-item:hover,
+html[data-skin="minecraft"] .dropdown-item:focus {
+    background-color: var(--mc-accent-dark);
+    color: #fff;
+}
+
+/* Подвал в тон верхней панели. */
+html[data-skin="minecraft"] .footer {
+    background: linear-gradient(180deg, #2e241c 0%, #231a13 100%) !important;
+    border-top: 3px solid var(--mc-border);
+}
+
+/* Заголовки с жёсткой тенью. */
+html[data-skin="minecraft"] h1,
+html[data-skin="minecraft"] h2,
+html[data-skin="minecraft"] .modal-title {
+    text-shadow: 2px 2px 0 #0c0906;
+    letter-spacing: 0.02em;
+}
+
+/* Таблицы, списки, вкладки. */
+html[data-skin="minecraft"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--mc-text);
+    --bs-table-border-color: #54432f;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+}
+
+html[data-skin="minecraft"] .list-group-item,
+html[data-skin="minecraft"] .accordion-item {
+    background-color: var(--mc-panel);
+    border: 2px solid var(--mc-border);
+    color: var(--mc-text);
+}
+
+html[data-skin="minecraft"] .nav-tabs .nav-link.active,
+html[data-skin="minecraft"] .nav-pills .nav-link.active {
+    background-color: var(--mc-accent-dark);
+    border: 2px solid var(--mc-accent-dark);
+    color: #fff;
+}
+
+/* Значки и предупреждения. */
+html[data-skin="minecraft"] .badge {
+    border: 1px solid var(--mc-border);
+    box-shadow: inset 1px 1px 0 var(--mc-bevel-light), inset -1px -1px 0 var(--mc-bevel-dark);
+}
+
+html[data-skin="minecraft"] .alert {
+    border: 2px solid var(--mc-border);
+    box-shadow: inset 2px 2px 0 var(--mc-bevel-light), inset -2px -2px 0 var(--mc-bevel-dark);
+}
+
+/* Индикаторы загрузки и прогресс: блочные. */
+html[data-skin="minecraft"] .progress,
+html[data-skin="minecraft"] .load-check-meter {
+    background-color: #17110c;
+    border: 1px solid var(--mc-border);
+}
+
+html[data-skin="minecraft"] .modal-backdrop.show {
+    opacity: 0.7;
+}
+
+html[data-skin="minecraft"] hr {
+    border-color: #54432f;
+    opacity: 1;
+}
+
+html[data-skin="minecraft"] ::selection {
+    background: var(--mc-accent);
+    color: #fff;
+}

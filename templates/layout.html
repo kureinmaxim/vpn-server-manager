@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ current_locale }}" data-bs-theme="{{ request.cookies.get('theme', 'dark') }}">
+{% set ui_theme = request.cookies.get('theme', 'dark') %}
+<html lang="{{ current_locale }}" data-bs-theme="{{ 'dark' if ui_theme == 'minecraft' else ui_theme }}"{% if ui_theme == 'minecraft' %} data-skin="minecraft"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ app_info.get('version', '') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme_minecraft.css') }}?v={{ app_info.get('version', '') }}">
     <style>
         html, body {
             height: 100%;
@@ -92,6 +94,7 @@
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
                             <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('minecraft', event); return false;"><i class="bi bi-bricks me-2"></i>Minecraft</a></li>
                         </ul>
                     </li>
                     {% if session.get('pin_authenticated') %}
@@ -279,7 +282,11 @@
                 event.preventDefault();
                 event.stopPropagation();
             }
-            document.documentElement.setAttribute('data-bs-theme', theme);
+            // Minecraft — отдельный вид поверх тёмной темы Bootstrap; светлая и тёмная не меняются.
+            const root = document.documentElement;
+            root.setAttribute('data-bs-theme', theme === 'minecraft' ? 'dark' : theme);
+            if (theme === 'minecraft') root.setAttribute('data-skin', 'minecraft');
+            else root.removeAttribute('data-skin');
             document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
             return false;
         }

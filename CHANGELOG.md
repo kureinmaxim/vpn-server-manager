@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.16.0] - 2026-10-26
+
+### Added
+- A third theme, **Minecraft**, in the theme menu next to Light and Dark: a dirt-brown palette with green accents, square corners, bevelled 2 px borders and hard shadows, as in ApiHA. It is a separate skin on top of the dark theme (`data-skin="minecraft"`) with its own stylesheet, `static/css/theme_minecraft.css`; the Light and Dark themes are unchanged. The choice is remembered like the other themes.
+
 ## [4.15.11] - 2026-10-26
 
 ### Fixed
