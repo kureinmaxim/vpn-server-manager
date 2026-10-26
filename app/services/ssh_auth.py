@@ -81,3 +81,13 @@ def connect_kwargs(password: Optional[str] = None, key: Optional[str] = None,
 def has_ssh_auth(creds: Optional[Dict[str, Any]]) -> bool:
     """В карточке есть чем войти: пароль или ключ."""
     return bool(creds and (creds.get('password') or creds.get('key')))
+
+
+def terminal_command(username, hostname, port=22, key_path=''):
+    """POSIX command: every value is an argument, never executable shell text."""
+    import shlex
+    args = ['ssh']
+    if key_path and not is_key_text(key_path):
+        args += ['-i', os.path.expanduser(key_path)]
+    args += ['-p', str(int(port)), '--', str(username) + '@' + str(hostname)]
+    return shlex.join(args)

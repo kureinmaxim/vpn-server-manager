@@ -512,9 +512,9 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
                 f"🔌 Creating new SSH connection to {hostname} (timeout: {connection_timeout}s)"
             )
             ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
             try:
+                ssh.load_system_host_keys()
+                ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
                 # Для быстрых проверок используем короткие таймауты
                 banner_timeout = min(connection_timeout * 2, 60)
                 auth_timeout = min(connection_timeout, 30)
@@ -598,7 +598,8 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         """Установка SSH соединения"""
         try:
             self.client = paramiko.SSHClient()
-            self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            self.client.load_system_host_keys()
+            self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
             logger.info(f"Connecting to {hostname}:{port} as {username}")
             auth = connect_kwargs(password, key, key_passphrase)
@@ -1340,7 +1341,7 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             ip, port, user, password, connection_timeout=5, **_key_kwargs(key, key_passphrase)
         )
         bots = load_bots()
-        getme = load_getme(current_app) if has_app_context() else True
+        getme = load_getme(current_app) if has_app_context() else False
         # /bin/sh, not the login shell: zsh on macOS splits words differently.
         _, stdout, _ = client.exec_command('/bin/sh -c ' + shlex.quote(build_bots_command(bots, getme)), timeout=40)
         try:

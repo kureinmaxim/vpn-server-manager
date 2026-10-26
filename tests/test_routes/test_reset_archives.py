@@ -29,8 +29,8 @@ def test_archive_requires_auth(client):
 
 
 def test_archive_requires_csrf(reset_client):
-    assert reset_client.post('/api/servers/one/reset/archives', json={}).status_code == 403
-    assert reset_client.post('/api/servers/one/reset/archives/delete', json={}).status_code == 403
+    assert reset_client.post('/api/servers/one/reset/archives', json={}, csrf=False).status_code == 403
+    assert reset_client.post('/api/servers/one/reset/archives/delete', json={}, csrf=False).status_code == 403
 
 
 @pytest.mark.parametrize('change', ['host', 'server', 'owner', 'expired'])

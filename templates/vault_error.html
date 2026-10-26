@@ -1,0 +1,7 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container py-4">
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+    <a class="btn btn-outline-primary" href="{{ url_for('main.settings') }}">{{ _('Настройки') }}</a>
+</div>
+{% endblock %}

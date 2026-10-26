@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <div>
                     <h5 class="modal-title" id="botsCheckTitle"><i class="bi bi-robot me-2" aria-hidden="true"></i>{{ _('Telegram-боты на узлах') }}</h5>
-                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Только чтение по SSH. Токены не покидают серверы: видны только ID бота и @username.') }}</p>
+                    <p class="small text-body-secondary mb-0 mt-1">{{ _('Только метаданные по SSH. Токены и настройки ботов не читаются.') }}</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
@@ -18,15 +18,8 @@
                 </div>
                 <div id="bots-check-nodes" class="d-flex flex-wrap gap-1 mb-2" aria-busy="false" aria-label="{{ _('Узлы') }}"></div>
                 <div id="bots-check-errors" class="small text-warning-emphasis mb-2"></div>
-                <section class="mb-3" aria-labelledby="bots-check-senders-title">
-                    <h6 id="bots-check-senders-title" class="mb-2 d-flex align-items-center gap-2">
-                        <i class="bi bi-send" aria-hidden="true"></i>{{ _('Отправляющие боты (без процесса)') }}
-                        <i class="bi bi-info-circle text-body-secondary small" tabindex="0"
-                           title="{{ _('Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот.') }}"
-                           aria-label="{{ _('Токен лежит в настройках, а сообщения шлёт таймер, Uptime Kuma или другая программа. Бот узнаётся по ID — части токена до двоеточия, её вырезает сервер. Один ID в разных местах — один бот.') }}"></i>
-                    </h6>
-                    <div id="bots-check-senders" aria-live="polite"></div>
-                </section>
+                <div id="bots-check-senders" hidden></div>
+                <p class="small text-body-secondary">{{ _('Боты без процесса не обнаруживаются: для них нельзя определить состояние запуска.') }}</p>
                 <section class="mb-3" aria-labelledby="bots-check-process-title">
                     <h6 id="bots-check-process-title" class="mb-2"><i class="bi bi-cpu me-2" aria-hidden="true"></i>{{ _('Боты с процессом') }}</h6>
                     <div id="bots-check-process" aria-live="polite"></div>

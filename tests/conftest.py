@@ -34,7 +34,24 @@ def app():
 @pytest.fixture
 def client(app):
     """Тестовый клиент"""
-    return app.test_client()
+    from flask.testing import FlaskClient
+    from werkzeug.datastructures import Headers
+    import secrets
+
+    class BrowserClient(FlaskClient):
+        """Emulate the shared form/fetch CSRF layer; csrf=False tests raw requests."""
+        def open(self, *args, **kwargs):
+            protect = kwargs.pop('csrf', True)
+            if protect and kwargs.get('method', 'GET').upper() in ('POST', 'PUT', 'PATCH', 'DELETE'):
+                with self.session_transaction() as state:
+                    token = state.setdefault('csrf_token', secrets.token_urlsafe(32))
+                headers = Headers(kwargs.get('headers'))
+                if 'X-CSRF-Token' not in headers:
+                    headers['X-CSRF-Token'] = token
+                kwargs['headers'] = headers
+            return super().open(*args, **kwargs)
+
+    return BrowserClient(app)
 
 @pytest.fixture
 def runner(app):

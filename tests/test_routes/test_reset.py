@@ -34,7 +34,7 @@ def test_reset_requires_login(client):
 
 
 def test_reset_requires_csrf(reset_client):
-    assert reset_client.post("/api/servers/one/reset/plan", json={"components": ["bot"]}).status_code == 403
+    assert reset_client.post("/api/servers/one/reset/plan", json={"components": ["bot"]}, csrf=False).status_code == 403
 
 
 def test_reset_rejects_unknown_components(reset_client):

@@ -10340,3 +10340,36 @@ msgstr "Bots that only send messages and keep no running process (timers, Uptime
 #, python-format
 msgid "Не удалось сохранить набор кнопок: нет доступа к файлу %(path)s. Проверьте права на запись."
 msgstr "Could not save the home page buttons: no access to the file %(path)s. Check write permissions."
+
+msgid "Запрос отклонён: другой источник."
+msgstr "Request rejected: different origin."
+
+msgid "Защитный токен устарел. Обновите страницу."
+msgstr "Security token expired. Reload the page."
+
+msgid "Хранилище не прочитано. Проверьте ключ или восстановите резервную копию. Запись запрещена."
+msgstr "Cannot read the vault. Check the key or restore a backup. Writing is disabled."
+
+msgid "Пустой или повреждённый файл хранилища. Запись запрещена."
+msgstr "Empty or damaged vault. Writing is disabled."
+
+msgid "Хранилище изменилось. Обновите страницу и повторите изменения."
+msgstr "The vault changed. Reload the page and retry your changes."
+
+msgid "Используется SSH-ключ из карточки. Может потребоваться пароль ключа или сервера."
+msgstr "Uses the SSH key from the card. A key passphrase or server password may be required."
+
+msgid "Проверяются только метаданные служб, контейнеров и имена процессов. Поиск по командной строке и токенам отключён."
+msgstr "Only service and container metadata and process names are checked. Command-line and token scanning is disabled."
+
+msgid "Только метаданные по SSH. Токены и настройки ботов не читаются."
+msgstr "Metadata only over SSH. Bot tokens and settings are not read."
+
+msgid "Боты без процесса не обнаруживаются: для них нельзя определить состояние запуска."
+msgstr "Bots without a process are not detected: their running state cannot be determined."
+
+msgid "Поля команд и задач сохранены для совместимости, но не используются при проверке."
+msgstr "Command and task fields are retained for compatibility but are not used by checks."
+
+msgid "Закройте приложение через его окно."
+msgstr "Close the application using its window."

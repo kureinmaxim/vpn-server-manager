@@ -155,7 +155,7 @@ def test_command_is_read_only_and_never_reads_secrets():
         assert forbidden not in command
     assert 'systemctl show --no-pager -p Id' in command
     assert "-- telegramonly.service botcriptom.service" in command
-    assert "curl -s -m 3 http://127.0.0.1:8000/health" in command and 'grep -qw -- healthy' in command
+    assert "curl -s --noproxy '*' -m 3 http://127.0.0.1:8000/health" in command and 'grep -qw -- healthy' in command
     assert '/Volume*/@apps/DockerEngine/dockerd/bin/docker' in command
 
 

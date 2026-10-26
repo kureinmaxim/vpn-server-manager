@@ -140,8 +140,8 @@ def save_bots(app, bots):
 
 
 def load_getme(app):
-    """Whether getMe may run on the node to show @username (default on)."""
-    return _read_config(_config_path(app)).get(bot_senders.CONFIG_KEY) is not False
+    """Token discovery is disabled in the metadata-only security baseline."""
+    return False
 
 
 def save_getme(app, enabled):
@@ -154,7 +154,7 @@ def save_getme(app, enabled):
     return _write_config(path, data)
 
 
-def run_local(bots, getme=True, timeout=40):
+def run_local(bots, getme=False, timeout=40):
     """The same read-only script on this computer (the PC the app runs on), without SSH."""
     import subprocess
     done = subprocess.run(['/bin/sh', '-c', build_command(bots, getme)], capture_output=True, timeout=timeout,
@@ -165,10 +165,9 @@ def run_local(bots, getme=True, timeout=40):
     return parse(output, bots)
 
 
-def build_command(bots, getme=True):
+def build_command(bots, getme=False):
     """One read-only script: fixed systemctl properties, Docker state fields, pgrep counts,
-    a loopback health word matched on the node (the response body never leaves it), then
-    sending-only bots (see bot_senders)."""
+    and a loopback health word matched on the node; no token or command-line scanning."""
     units = ' '.join(unit_id(unit) for b in bots for unit in b['units'])
     containers = ' '.join(name for b in bots for name in b['containers'])
     script = [
@@ -206,17 +205,17 @@ def build_command(bots, getme=True):
                    'if command -v pgrep >/dev/null 2>&1; then for p in ' + names
                    + '; do printf \'P=%s=%s\\n\' "$p" "$(pgrep -x -- "$p" | wc -l | tr -d \' \')"; done;'
                    ' echo PROC_OK; else echo NO_PGREP; fi']
-    script += _command_scan(bots)
+    # Command lines, launchd plists and token sources are deliberately not read.
     checks = [b for b in bots if b['health_url']]
     if checks:
         script += ["printf 'HEALTH\\n'",
                    'if command -v curl >/dev/null 2>&1; then '
-                   + ' '.join("if curl -s -m 3 %s 2>/dev/null | head -c 65536 | grep -qw -- %s;"
+                   + ' '.join("if curl -s --noproxy '*' -m 3 %s 2>/dev/null | head -c 65536 | grep -qw -- %s;"
                               " then echo H=%s=ok; else echo H=%s=fail; fi;"
                               % (shlex.quote(b['health_url']), shlex.quote(b['health_word']), b['key'], b['key'])
                               for b in checks)
                    + ' echo HEALTH_OK; else echo NO_CURL; fi']
-    script.append(bot_senders.build_section(getme))
+    # Sending-only Bot API identities have no observable process state.
     script.append("printf 'END\\n'")
     return '\n'.join(script)
 

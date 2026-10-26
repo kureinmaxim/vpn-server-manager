@@ -129,7 +129,7 @@ def test_local_run_skips_its_own_shell():
     # The fragment exists only inside the script itself: the scan must not report its own shell.
     bots = clean_bots([{'name': 'Ghost', 'commands': ['zz-ghost-fragment-q7'], 'tasks': ['zz-ghost-task-q7']}])
     result = run_local(bots, getme=False)
-    assert result['bots'] == [] and result['node']['commands'] is True
+    assert result['bots'] == [] and result['node']['commands'] is False
     assert not any('zz-ghost' in str(item) for item in result['suspects'])
 
 

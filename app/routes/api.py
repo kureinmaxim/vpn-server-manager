@@ -79,47 +79,20 @@ def _get_runtime_config_path():
 
 
 def _load_runtime_config():
-    config_path = _get_runtime_config_path()
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    template_candidates = [
-        os.path.join(project_root, 'config.json'),
-        os.path.join(project_root, 'config', 'config.json.template'),
-    ]
-
-    config = {}
-
-    for template_path in template_candidates:
-        if os.path.exists(template_path):
-            try:
-                with open(template_path, 'r', encoding='utf-8') as f:
-                    config = json.load(f)
-                break
-            except Exception as e:
-                logger.warning(f"Could not load template config: {e}")
-
-    if os.path.exists(config_path):
-        try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                runtime_config = json.load(f)
-            config.update(runtime_config)
-        except Exception as e:
-            logger.warning(f"Could not load runtime config: {e}")
-
+    from ..services.config_io import read_config
+    config = read_config(_get_runtime_config_path())
     secret_pin = config.setdefault('secret_pin', {})
     default_pin = _get_default_pin()
     secret_pin.setdefault('default_pin', default_pin)
     secret_pin.setdefault('current_pin', secret_pin.get('default_pin', default_pin))
     secret_pin.setdefault('last_changed', '')
     secret_pin.setdefault('setup_completed', False)
-
     return config
 
 
 def _save_runtime_config(config):
-    config_path = _get_runtime_config_path()
-    os.makedirs(os.path.dirname(config_path), exist_ok=True)
-    with open(config_path, 'w', encoding='utf-8') as f:
-        json.dump(config, f, indent=2, ensure_ascii=False)
+    from ..services.config_io import write_config
+    write_config(_get_runtime_config_path(), config)
 
 
 def _get_current_pin():
@@ -1455,7 +1428,7 @@ def cancel_installation(server_id):
         'message': 'Отмена установки...'
     })
 
-@api_bp.route('/monitoring/<server_id>/install', methods=['GET'])  # EventSource использует GET!
+@api_bp.route('/monitoring/<server_id>/install', methods=['POST'])  # Изменения запускаются только защищённым POST.
 @require_auth
 @require_pin
 def install_monitoring(server_id):
@@ -1522,7 +1495,8 @@ def install_monitoring(server_id):
             check_client = None
             try:
                 check_client = paramiko.SSHClient()
-                check_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                check_client.load_system_host_keys()
+                check_client.set_missing_host_key_policy(paramiko.RejectPolicy())
                 check_client.connect(hostname=ip, username=user, port=port, timeout=30,
                                      banner_timeout=60, auth_timeout=30,
                                      **connect_kwargs(password, auth['key'], auth['key_passphrase']))
@@ -1553,7 +1527,8 @@ def install_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.load_system_host_keys()
+                client.set_missing_host_key_policy(paramiko.RejectPolicy())
                 # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
                 client.connect(hostname=ip, username=user, port=port, timeout=30,
                                **connect_kwargs(password, auth['key'], auth['key_passphrase'],
@@ -1734,7 +1709,7 @@ exit 0
     
     return Response(stream_with_context(generate_progress()), mimetype='text/event-stream')
 
-@api_bp.route('/monitoring/<server_id>/uninstall', methods=['GET'])  # EventSource использует GET!
+@api_bp.route('/monitoring/<server_id>/uninstall', methods=['POST'])  # Изменения запускаются только защищённым POST.
 @require_auth
 @require_pin
 def uninstall_monitoring(server_id):
@@ -1788,7 +1763,8 @@ def uninstall_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                client.load_system_host_keys()
+                client.set_missing_host_key_policy(paramiko.RejectPolicy())
                 # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
                 client.connect(hostname=ip, username=user, port=port, timeout=30,
                                **connect_kwargs(password, auth['key'], auth['key_passphrase'],
@@ -2187,8 +2163,6 @@ def login_ajax():
         # Логируем для отладки
         logger.info(f"Request method: {request.method}")
         logger.info(f"Request content type: {request.content_type}")
-        logger.info(f"Request data: {request.get_data()}")
-        logger.info(f"Request JSON: {request.get_json(silent=True)}")
         
         # Поддерживаем как JSON, так и form-data
         if request.is_json:
@@ -2202,7 +2176,6 @@ def login_ajax():
                 logger.error(f"Error getting form data: {e}")
                 pin = ''
             
-        logger.info(f"Extracted PIN: '{pin}'")
         
         if not pin:
             return jsonify({
@@ -2215,7 +2188,6 @@ def login_ajax():
         # Проверяем PIN
         if pin == current_pin:
             _set_authenticated_session()
-            logger.info(f"PIN authenticated successfully. Session: {dict(session)}")
             return jsonify({
                 'success': True,
                 'message': _('Login successful')
@@ -2332,6 +2304,8 @@ def check_auth():
         })
 
 @pin_bp.route('/exit_app', methods=['POST'])
+@require_auth
+@require_pin
 def exit_app():
     """Закрытие приложения (только для desktop mode)"""
     try:

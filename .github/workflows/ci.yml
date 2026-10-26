@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 'codex/5.0-security-foundation' ]
   pull_request:
     branches: [ main ]
   # Позволяет запускать вручную
@@ -40,6 +40,13 @@ jobs:
         python generate_key.py
       env:
         PYTHONIOENCODING: utf-8
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+
+    - name: HTTP security browser-layer tests
+      run: node --test tests/js/http_security.test.cjs
 
     - name: Tests
       run: |

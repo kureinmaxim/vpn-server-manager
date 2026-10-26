@@ -1651,7 +1651,7 @@ async function startInstallation() {
     try {
         // Создаем EventSource для получения прогресса через SSE
         const selectedTools = Array.from(document.querySelectorAll('.install-tool:checked')).map(c => c.value).join(',');
-        currentEventSource = new EventSource(`/api/monitoring/${serverId}/install?tools=${encodeURIComponent(selectedTools)}`);
+        currentEventSource = new PostEventSource(`/api/monitoring/${serverId}/install?tools=${encodeURIComponent(selectedTools)}`);
         
         currentEventSource.onmessage = function(event) {
             const data = JSON.parse(event.data);
@@ -1794,7 +1794,7 @@ async function startUninstallation() {
     console.log('📡 Connecting to uninstall endpoint...');
     
     try {
-        const eventSource = new EventSource(`/api/monitoring/${serverId}/uninstall`);
+        const eventSource = new PostEventSource(`/api/monitoring/${serverId}/uninstall`);
         
         eventSource.onmessage = function(event) {
             const data = JSON.parse(event.data);

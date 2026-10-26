@@ -2,6 +2,21 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.0] - 2026-10-26
+
+### Changed
+- **Security foundation (major-version branch):** all SSH connections now require a trusted host key in the local OpenSSH `known_hosts`. Verify a new host fingerprint independently before connecting; changed or unknown keys are rejected, including monitoring installation.
+- All modifying HTTP requests require a session CSRF token and same-origin checks. Monitoring install/uninstall use POST streams without automatic retries; HTTP GET no longer closes the app. Local hosts are restricted to loopback/localhost unless explicitly configured.
+- **Bots:** checks read service/container metadata and process names only. Token discovery, Telegram getMe and command-line/plist scans are disabled, including profiles with previously enabled settings. Legacy catalog fields remain preserved but are not probed.
+
+### Fixed
+- Vault saves use a same-directory temporary file, fsync, atomic replacement and a previous encrypted snapshot (`.backup.enc`). Cross-process locking and snapshot revision checks reject stale changes instead of overwriting them. Unreadable, missing active or malformed vaults cannot silently become an empty inventory.
+- Profile settings use atomic writes and reject stale versions or corrupt input; invalid PIN configuration no longer falls back to a default. Legacy form login uses the configured PIN and shares a server-side attempt limiter with AJAX login and PIN changes.
+- Removed authentication bodies, session dumps and partial encryption keys from diagnostic logging. Copied SSH commands quote every shell argument and accurately describe possible password prompts.
+
+### Notes
+- This is the start of the 5.0 line, not a signed macOS release. See [migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) for scope, recovery and remaining release gates.
+
 ## [4.16.0] - 2026-10-26
 
 ### Added

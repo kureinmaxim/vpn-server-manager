@@ -42,5 +42,5 @@ def test_invalid_input_is_rejected_and_kept_in_the_form(app, client):
 
 def test_csrf_is_required(app, client):
     login(client)
-    client.post('/settings/projects', data={'name': ['Blog'], 'units': ['ghost'], 'containers': [''], 'processes': ['']})
+    client.post('/settings/projects', data={'name': ['Blog'], 'units': ['ghost'], 'containers': [''], 'processes': ['']}, csrf=False)
     assert 'Blog' not in [p['name'] for p in load_projects(app)]

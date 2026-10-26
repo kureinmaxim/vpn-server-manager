@@ -1,3 +1,5 @@
+import uuid
+from ..services.vault_io import VaultError
 from flask import Blueprint, abort, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory, current_app
 from flask_babel import gettext as _, lazy_gettext as _l
 from werkzeug.utils import secure_filename
@@ -150,22 +152,16 @@ def _extra_addresses_from_form(form, main):
 
 
 def get_secret_pin():
-    """Получает текущий PIN из config.json"""
-    try:
-        config_path = os.path.join(current_app.config.get('APP_DATA_DIR', '.'), 'config.json')
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        return config.get('secret_pin', {}).get('current_pin', '1234')
-    except Exception as e:
-        logger.error(f"Error loading PIN from config: {e}")
-        return '1234'
+    """Единый источник PIN: повреждение профиля не включает стандартный PIN."""
+    from .api import _get_current_pin
+    return _get_current_pin()
 
 @main_bp.route('/')
 @log_request
 def index():
     """Главная страница"""
     # Проверяем PIN авторизацию
-    logger.info(f"Index route accessed. Session: {dict(session)}")
+    logger.debug("Index route accessed")
     if not (session.get('pin_authenticated') or (session.get('authenticated') and session.get('pin_verified'))):
         logger.warning("Not authenticated, redirecting to locked page")
         return redirect(url_for('main.index_locked'))
@@ -195,6 +191,8 @@ def index():
             except Exception as e:
                 logger.warning(f"Could not load DNS records: {e}")
         return render_template('index.html', servers=servers, service_urls=service_urls, dns_links=dns_links)
+    except VaultError as error:
+        return render_template('vault_error.html', error=str(error)), 409
     except Exception as e:
         logger.error(f"Error loading main page: {str(e)}")
         flash(_('Error loading servers'), 'error')
@@ -222,9 +220,7 @@ def verify_pin():
         flash(_('PIN is required'), 'error')
         return redirect(url_for('main.index_locked'))
     
-    # Здесь должна быть логика проверки PIN
-    # Временно используем простую проверку
-    if pin == '1234':  # Это должно быть из конфигурации
+    if pin == get_secret_pin():
         session['authenticated'] = True
         session['pin_verified'] = True
         flash(_('PIN verified successfully'), 'success')
@@ -772,15 +768,11 @@ def change_main_key():
         
         # Сохраняем конфигурацию
         config_path = os.path.join(app_data_dir, 'config.json')
-        try:
-            with open(config_path, 'r', encoding='utf-8') as f:
-                config_data = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            config_data = {}
+        from ..services.config_io import read_config, write_config
+        config_data = read_config(config_path)
         
         config_data['active_data_file'] = new_file_path
-        with open(config_path, 'w', encoding='utf-8') as f:
-            json.dump(config_data, f, ensure_ascii=False, indent=2)
+        write_config(config_path, config_data)
         
         # Обновляем data_manager в реестре с новым ключом
         registry.register('data_manager', new_data_manager)
@@ -861,15 +853,11 @@ def detach_data():
             # Сохраняем конфигурацию
             app_data_dir = current_app.config.get('APP_DATA_DIR')
             config_path = os.path.join(app_data_dir, 'config.json')
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config_data = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                config_data = {}
+            from ..services.config_io import read_config, write_config
+            config_data = read_config(config_path)
             
             config_data['active_data_file'] = None
-            with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(config_data, f, ensure_ascii=False, indent=2)
+            write_config(config_path, config_data)
             
             flash(_('Файл данных успешно откреплен.'), 'info')
     except Exception as e:
@@ -894,7 +882,7 @@ def import_data():
         if uploaded_file and data_manager.allowed_file(uploaded_file.filename, current_app.config.get('ALLOWED_EXTENSIONS')) and uploaded_file.filename.endswith('.enc'):
             # Создаем уникальное имя файла с временной меткой
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"imported_{timestamp}_{secure_filename(uploaded_file.filename)}"
+            filename = f"imported_{timestamp}_{uuid.uuid4().hex}_{secure_filename(uploaded_file.filename)}"
             
             # Получаем директорию для хранения данных
             app_data_dir = current_app.config.get('APP_DATA_DIR')
@@ -910,7 +898,7 @@ def import_data():
             try:
                 with open(file_path, 'rb') as f:
                     encrypted_content = f.read()
-                # read_payload() raises on a wrong key; load_servers() would silently return []
+                # Validate the imported snapshot before attaching it.
                 servers, _dns = data_manager.read_payload(file_path)
                 
                 server_count = len(servers)
@@ -1079,15 +1067,11 @@ def import_external_data():
             
             # Сохраняем конфигурацию
             config_path = os.path.join(app_data_dir, 'config.json')
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config_data = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                config_data = {}
+            from ..services.config_io import read_config, write_config
+            config_data = read_config(config_path)
             
             config_data['active_data_file'] = file_path
-            with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(config_data, f, ensure_ascii=False, indent=2)
+            write_config(config_path, config_data)
             
             imported_ok = True
             # Информируем пользователя о результате
@@ -1640,12 +1624,10 @@ def favicon():
     import os
     return send_from_directory(os.path.join(main_bp.root_path, '..', '..', 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-@main_bp.route('/shutdown')
+@main_bp.route('/shutdown', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
 def shutdown():
-    """Эндпоинт для корректного завершения сервера"""
-    logger.info("Shutdown request received")
-    
-    # Отправляем сигнал завершения процессу
-    os.kill(os.getpid(), signal.SIGINT)
-    
-    return 'Сервер выключается...', 200
+    # Завершение процесса принадлежит native lifecycle; HTTP не должен посылать сигналы.
+    return jsonify(error=_('Закройте приложение через его окно.')), 410

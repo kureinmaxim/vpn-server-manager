@@ -12,7 +12,7 @@ def test_disk_page_shows_commands(reset_client):
 
 
 def test_disk_auth_and_csrf(client, reset_client):
-    assert reset_client.post('/api/servers/one/disk-usage', json={}).status_code == 403
+    assert reset_client.post('/api/servers/one/disk-usage', json={}, csrf=False).status_code == 403
 
 
 def test_disk_rejects_unauthenticated(client):

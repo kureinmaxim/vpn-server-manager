@@ -79,7 +79,7 @@ def test_home_button(unlocked):
 
 def test_token_required(unlocked):
     with patch('app.routes.net_tools.run_tool') as execute:
-        assert unlocked.post('/net-tools/port/run', json={}).status_code == 403
+        assert unlocked.post('/net-tools/port/run', json={}, csrf=False).status_code == 403
         unlocked.get('/net-tools/port')
         assert unlocked.post('/net-tools/port/run', json={}, headers={'X-Net-Tools-Token': 'wrong'}).status_code == 403
         execute.assert_not_called()

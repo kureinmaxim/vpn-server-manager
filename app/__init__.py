@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '4.16.0'),
+            "version": app.config.get('APP_VERSION', '5.0.0'),
             "release_date": "26.10.2026",
             "last_updated": "2026-10-26",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "4.16.0",
+            "version": "5.0.0",
             "release_date": "26.10.2026",
             "last_updated": "2026-10-26",
             "developer": "Куреин М.Н."
@@ -283,7 +283,6 @@ def register_services(app):
             # Если ключ невалидный, логируем предупреждение но не падаем
             logger.error(f"❌ Cannot initialize DataManagerService: {e}")
             logger.error(f"   SECRET_KEY type: {type(secret_key)}")
-            logger.error(f"   SECRET_KEY preview: {secret_key[:20] if secret_key else 'None'}...")
     else:
         logger.error(f"❌ DataManagerService NOT registered: missing SECRET_KEY or APP_DATA_DIR")
         if not secret_key:
@@ -325,6 +324,9 @@ def create_app(config_name='development'):
     # Регистрация сервисов
     register_services(app)
     
+    from .services.http_security import install as install_http_security
+    install_http_security(app)
+
     # Регистрация blueprints
     from .routes import main_bp, api_bp, pin_bp, vendor_bp
     app.register_blueprint(main_bp)
@@ -382,6 +384,9 @@ def create_app(config_name='development'):
     app.jinja_env.globals['bots_local_check'] = sys.platform in ('darwin', 'linux')
 
     # Контекстный процессор для app_info
+    from .services.ssh_auth import terminal_command
+    app.jinja_env.globals['ssh_terminal_command'] = terminal_command
+
     @app.context_processor
     def inject_app_info():
         """Инжектирует информацию о приложении во все шаблоны."""

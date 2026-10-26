@@ -281,9 +281,7 @@
                                     {% set ssh_user = server.ssh_credentials.user or '' %}
                                     {% set ssh_port = server.ssh_credentials.get('port', 22) %}
                                     {% set key_path = server.ssh_credentials.get('key_path') or '' %}
-                                    {# ~ must stay unquoted for the shell; a path with spaces is quoted with $HOME instead. #}
-                                    {% set key_arg = ('"' ~ key_path.replace('~/', '$HOME/', 1) ~ '"') if ' ' in key_path else key_path %}
-                                    {% set ssh_login_cmd = 'ssh ' ~ ('-i ' ~ key_arg ~ ' ' if key_path else '') ~ '-p ' ~ ssh_port ~ ' ' ~ ssh_user ~ '@' ~ server.ip_address %}
+                                    {% set ssh_login_cmd = ssh_terminal_command(ssh_user, server.ip_address, ssh_port, key_path) %}
                                     {% set login_is_root = ssh_user|lower == 'root' %}
                                     <div class="mb-2">
                                         <button class="btn btn-sm btn-outline-success w-100"
@@ -294,7 +292,7 @@
                                         </button>
                                         <div class="small font-monospace text-break mt-1">{{ ssh_login_cmd }}</div>
                                         {% if key_path %}
-                                        <div class="form-text">{{ _('Вход по SSH-ключу из карточки, пароль не нужен.') }}</div>
+                                        <div class="form-text">{{ _('Используется SSH-ключ из карточки. Может потребоваться пароль ключа или сервера.') }}</div>
                                         {% elif server.ssh_credentials.key_hint %}
                                         <div class="form-text">{{ _('Ключ сохранён в карточке как текст: для терминала добавьте -i с путём к файлу ключа.') }}</div>
                                         {% else %}
@@ -302,7 +300,7 @@
                                         {% endif %}
                                     </div>
                                     {% if server.ssh_credentials.get('root_login_allowed') and not login_is_root %}
-                                    {% set ssh_root_cmd = 'ssh -p ' ~ ssh_port ~ ' root@' ~ server.ip_address %}
+                                    {% set ssh_root_cmd = ssh_terminal_command('root', server.ip_address, ssh_port) %}
                                     <div class="mb-2">
                                         <button class="btn btn-sm btn-outline-secondary w-100"
                                                 data-copy-value="{{ ssh_root_cmd }}"

@@ -32,7 +32,7 @@ def _reply(ssh, text):
 
 
 def test_requires_login_and_csrf(client, history_client):
-    assert history_client.post(URL, json={}).status_code == 403
+    assert history_client.post(URL, json={}, csrf=False).status_code == 403
     with client.session_transaction() as state:
         state.clear()
     assert client.post(URL, headers={'X-CSRF-Token': 'test-csrf'}).status_code == 401

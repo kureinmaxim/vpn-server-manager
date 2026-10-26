@@ -117,19 +117,19 @@ def test_settings_getme_checkbox(app, client):
     login(client)
     form = {"csrf_token": "token", "name": ["News bot"], "units": ["newsbot"], "containers": [""],
             "processes": [""], "health_url": [""], "health_word": [""], "role": ["bot"]}
-    assert 'name="getme" value="1" id="bots-getme" checked' in client.get("/settings/bots").get_data(as_text=True)
+    assert 'id="bots-getme"' not in client.get("/settings/bots").get_data(as_text=True)
     client.post("/settings/bots", data=form)
     assert load_getme(app) is False
     assert 'id="bots-getme" checked' not in client.get("/settings/bots").get_data(as_text=True)
     client.post("/settings/bots", data=dict(form, getme="1"))
-    assert load_getme(app) is True
+    assert load_getme(app) is False
 
 
 def test_modal_has_senders_section_in_english(app, client, all_features):
     login(client)
     html = client.get("/?lang=en").get_data(as_text=True)
-    assert 'id="bots-check-senders"' in html and "Sending-only bots (no process)" in html
-    assert "Tokens never leave the servers" in html
+    assert 'id="bots-check-senders" hidden' in html
+    assert "Bot tokens and settings are not read" in html
 
 
 def test_settings_save_command_bot(app, client):
@@ -165,7 +165,7 @@ def test_local_check_route(app, client, monkeypatch):
 def test_settings_csrf_required(app, client):
     login(client)
     client.post("/settings/bots", data={"name": ["X"], "units": ["x"], "containers": [""], "processes": [""],
-                                        "health_url": [""], "health_word": [""], "role": ["bot"]})
+                                        "health_url": [""], "health_word": [""], "role": ["bot"]}, csrf=False)
     assert "X" not in [b["name"] for b in load_bots(app)]
 
 
@@ -243,12 +243,12 @@ def test_edit_form_hides_vps_only_sections_for_nas_and_pc(app, client, kind, hid
 
 @pytest.mark.parametrize("ssh,command,hint", [
     ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": "~/.ssh/id_ed25519_maximkurein"},
-     "ssh -i ~/.ssh/id_ed25519_maximkurein -p 9222 mxm@100.64.0.6", "no password needed"),
+     "ssh -i {HOME}/.ssh/id_ed25519_maximkurein -p 9222 -- mxm@100.64.0.6", "A key passphrase or server password may be required"),
     ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": "~/My Keys/nas"},
-     'ssh -i &#34;$HOME/My Keys/nas&#34; -p 9222 mxm@100.64.0.6', "no password needed"),
+     'ssh -i &#39;{HOME}/My Keys/nas&#39; -p 9222 -- mxm@100.64.0.6', "A key passphrase or server password may be required"),
     ({"user": "mxm", "port": 9222, "key_hint": "ssh-ed25519 SHA256:abc", "key_path": ""},
-     "ssh -p 9222 mxm@100.64.0.6", "saved in the card as text"),
-    ({"user": "root", "port": 22}, "ssh -p 22 root@100.64.0.6", "Login password"),
+     "ssh -p 9222 -- mxm@100.64.0.6", "saved in the card as text"),
+    ({"user": "root", "port": 22}, "ssh -p 22 -- root@100.64.0.6", "Login password"),
 ])
 def test_card_ssh_command_uses_saved_key_path(app, client, ssh, command, hint):
     import os
@@ -264,10 +264,10 @@ def test_card_ssh_command_uses_saved_key_path(app, client, ssh, command, hint):
                            "ssh_credentials": ssh}], path)
     registry.register("data_manager", manager)
     html = client.get("/?lang=en").get_data(as_text=True)
-    assert command in html and hint in html
+    assert command.replace('{HOME}', os.path.expanduser('~')) in html and hint in html
 
 
 def test_settings_page_explains_sending_only_bots(app, client):
     login(client)
     html = client.get("/settings/bots?lang=en").get_data(as_text=True)
-    assert "don&#39;t need to be added here" in html or "don't need to be added here" in html
+    assert "their running state cannot be determined" in html

@@ -181,3 +181,78 @@ class TestSecurityAdvice:
 def test_supported_key_types_exclude_dsa():
     assert paramiko.Ed25519Key in ssh_auth.KEY_CLASSES
     assert all(cls.__name__ != "DSSKey" for cls in ssh_auth.KEY_CLASSES)
+
+
+def test_monitoring_requires_known_host_before_connect(monkeypatch):
+    client = Mock()
+    monkeypatch.setattr(SSHService, '_connection_pool', {})
+    monkeypatch.setattr(paramiko, 'SSHClient', lambda: client)
+    SSHService.get_connection_pooled('192.0.2.10', 2222, 'operator', 'fixture')
+    client.load_system_host_keys.assert_called_once_with()
+    assert isinstance(client.set_missing_host_key_policy.call_args.args[0], paramiko.RejectPolicy)
+    names = [call[0] for call in client.method_calls]
+    assert names.index('load_system_host_keys') < names.index('connect')
+    assert names.index('set_missing_host_key_policy') < names.index('connect')
+
+
+@pytest.mark.parametrize('value', ['x; touch /tmp/unwanted', '$(whoami)', '`id`', 'a b', "a'b", 'a\nb'])
+def test_terminal_command_quotes_every_argument(value):
+    import shlex
+    from app.services.ssh_auth import terminal_command
+    command = terminal_command(value, '192.0.2.1', 2222, '/tmp/' + value)
+    assert shlex.split(command) == ['ssh', '-i', '/tmp/' + value, '-p', '2222', '--', value + '@192.0.2.1']
+
+
+@pytest.mark.parametrize('trust', ['unknown', 'changed', 'known'])
+def test_host_identity_checked_before_password_over_socketpair(monkeypatch, tmp_path, trust):
+    """Real Paramiko handshake over local sockets; no server/network infrastructure."""
+    import socket
+    import threading
+    left, right = socket.socketpair()
+    host_key = paramiko.RSAKey.generate(2048)
+    remote = paramiko.Transport(right)
+    remote.add_server_key(host_key)
+    authentications = []
+
+    class Server(paramiko.ServerInterface):
+        def check_auth_password(self, username, password):
+            authentications.append(username)
+            return paramiko.AUTH_SUCCESSFUL
+
+    errors = []
+    def serve():
+        try:
+            remote.start_server(server=Server())
+        except (EOFError, paramiko.SSHException) as error:
+            errors.append(type(error).__name__)
+
+    thread = threading.Thread(target=serve, daemon=True)
+    known = tmp_path / 'known_hosts'
+    keys = paramiko.HostKeys()
+    if trust != 'unknown':
+        expected = host_key if trust == 'known' else paramiko.RSAKey.generate(2048)
+        keys.add('[192.0.2.10]:2222', expected.get_name(), expected)
+    keys.save(str(known))
+    client = paramiko.SSHClient()
+    original_connect = client.connect
+    monkeypatch.setattr(client, 'load_system_host_keys', lambda: client.load_host_keys(str(known)))
+    monkeypatch.setattr(client, 'connect', lambda *args, **kwargs: original_connect(*args, sock=left, **kwargs))
+    monkeypatch.setattr(SSHService, '_connection_pool', {})
+    monkeypatch.setattr(paramiko, 'SSHClient', lambda: client)
+    thread.start()
+    try:
+        if trust == 'known':
+            assert SSHService.get_connection_pooled('192.0.2.10', 2222, 'operator', 'fixture') is client
+            assert authentications == ['operator']
+        else:
+            exception = paramiko.BadHostKeyException if trust == 'changed' else paramiko.SSHException
+            with pytest.raises(exception):
+                SSHService.get_connection_pooled('192.0.2.10', 2222, 'operator', 'fixture')
+            assert authentications == []
+            assert not SSHService._connection_pool
+    finally:
+        client.close()
+        remote.close()
+        left.close()
+        right.close()
+        thread.join(timeout=5)

@@ -35,7 +35,7 @@ def test_locked(client):
 
 
 def test_csrf_required(unlocked):
-    unlocked.post('/dns/domains/new', data={'name': 'example.com'})
+    unlocked.post('/dns/domains/new', data={'name': 'example.com'}, csrf=False)
     assert dns(unlocked) == {}
 
 
@@ -266,7 +266,7 @@ def test_rdap_button_in_list_updates_domain(unlocked, monkeypatch):
     page = unlocked.get('/dns/').text
     assert f'/dns/domains/{domain_id}/rdap' in page and '0 main' in page
 
-    assert unlocked.post(f'/dns/domains/{domain_id}/rdap').status_code == 302
+    assert unlocked.post(f'/dns/domains/{domain_id}/rdap', csrf=False).status_code == 403
     assert dns(unlocked)['domains'][0]['expires_on'] == ''
 
     response = post(unlocked, f'/dns/domains/{domain_id}/rdap')

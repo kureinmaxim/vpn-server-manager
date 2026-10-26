@@ -24,26 +24,21 @@ def _config_path(app) -> str:
 
 
 def _read_config(path: str) -> Dict[str, Any]:
+    from .config_io import read_config
     try:
-        with open(path, 'r', encoding='utf-8') as handle:
-            data = json.load(handle)
-        return data if isinstance(data, dict) else {}
-    except FileNotFoundError:
-        return {}
-    except (OSError, json.JSONDecodeError) as exc:
-        logger.warning('Failed to read UI preferences from %s: %s', path, exc)
+        return read_config(path)
+    except (OSError, ValueError):
+        # Defaults remain usable for rendering; an unversioned dict cannot be saved.
+        logger.warning('UI configuration is unreadable; changes are disabled')
         return {}
 
 
 def _write_config(path: str, data: Dict[str, Any]) -> bool:
+    from .config_io import write_config
     try:
-        os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
-        with open(path, 'w', encoding='utf-8') as handle:
-            json.dump(data, handle, ensure_ascii=False, indent=2)
-            handle.write('\n')
-        return True
-    except OSError as exc:
-        logger.error('Failed to write UI preferences to %s: %s', path, exc)
+        return write_config(path, data)
+    except (OSError, ValueError):
+        logger.error('Configuration was not saved; reload or recover the profile')
         return False
 
 

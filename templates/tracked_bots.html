@@ -8,7 +8,7 @@
 {% macro field(label, name, value, hint='', wide=False, multiline=True) %}
 <label class="editor-field{% if wide %} editor-field-wide{% endif %}">
     <span>{{ label }}</span>
-    {% if multiline %}<textarea class="form-control form-control-sm font-monospace editor-grow" name="{{ name }}" rows="1"{% if hint %} placeholder="{{ hint }}"{% endif %}>{{ value }}</textarea>
+    {% if multiline %}<textarea class="form-control form-control-sm font-monospace editor-grow" name="{{ name }}" rows="1"{% if name in ('commands', 'tasks') %} readonly aria-readonly="true"{% endif %}{% if hint %} placeholder="{{ hint }}"{% endif %}>{{ value }}</textarea>
     {% else %}<input class="form-control form-control-sm font-monospace" name="{{ name }}" value="{{ value }}"{% if hint %} placeholder="{{ hint }}"{% endif %}>{% endif %}
 </label>
 {% endmacro %}
@@ -55,11 +55,7 @@
         <div class="editor-cards" id="tracked-bots-rows">
             {% for bot in bots %}{{ bot_row(bot) }}{% endfor %}
         </div>
-        <div class="form-check my-3">
-            <input class="form-check-input" type="checkbox" name="getme" value="1" id="bots-getme"{% if getme %} checked{% endif %}>
-            <label class="form-check-label" for="bots-getme">{{ _('Узнавать @username отправляющих ботов (getMe)') }}</label>
-            <div class="form-text">{{ _('Запрос getMe выполняется на сервере, токен с него не уходит: в приложение приходит только имя бота. Без этого показывается числовой ID бота.') }}</div>
-        </div>
+        <p class="form-text">{{ _('Проверяются только метаданные служб, контейнеров и имена процессов. Поиск по командной строке и токенам отключён.') }}</p>
         <template id="tracked-bot-template">{{ bot_row({'name': '', 'units': [], 'containers': [], 'processes': [], 'commands': [], 'tasks': [], 'health_url': '', 'health_word': '', 'service': False}, hint=True) }}</template>
         <div class="d-flex flex-wrap gap-2">
             <button type="button" class="btn btn-outline-info" id="add-bot"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить бота') }}</button>
@@ -68,9 +64,9 @@
                     formnovalidate onclick="return confirm({{ _('Вернуть стандартный список ботов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
         </div>
     </form>
-    <p class="small text-body-secondary mt-3 mb-1">{{ _('«Командная строка» — часть команды процесса, через запятую (для macOS и агентов launchd): совпадение ищется как целое слово, сама команда в приложение не передаётся. «Задачи бота» — команды задач, которые шлют через этого бота; они показываются строками под ним.') }}</p>
+    <p class="small text-body-secondary mt-3 mb-1">{{ _('Поля команд и задач сохранены для совместимости, но не используются при проверке.') }}</p>
     <p class="small text-body-secondary mb-1">{{ _('«Служебная» — задачи по таймеру (oneshot), а не боты: они показываются отдельным блоком с временем и результатом последнего запуска. Oneshot-службы внутри бота попадают туда же автоматически.') }}</p>
-    <p class="small text-body-secondary mb-1">{{ _('Боты, которые только отправляют сообщения и не держат процесс (таймеры, уведомления Uptime Kuma, контейнеры с переменными TELEGRAM_*), добавлять сюда не нужно: окно «Боты» находит их само по номеру бота или @имени и показывает вверху. Токен при этом не покидает сервер.') }}</p>
+    <p class="small text-body-secondary mb-1">{{ _('Боты без процесса не обнаруживаются: для них нельзя определить состояние запуска.') }}</p>
     <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
 </div>
 <script>

@@ -33,6 +33,7 @@ def require_auth(f: Callable) -> Callable:
             else:
                 return redirect(url_for('main.index_locked'))
         return f(*args, **kwargs)
+    decorated_function.requires_auth = True
     return decorated_function
 
 def require_pin(f: Callable) -> Callable:
@@ -45,6 +46,7 @@ def require_pin(f: Callable) -> Callable:
             else:
                 return redirect(url_for('main.index_locked'))
         return f(*args, **kwargs)
+    decorated_function.requires_pin = True
     return decorated_function
 
 def validate_json(f: Callable) -> Callable:
@@ -96,7 +98,7 @@ def log_request(f: Callable) -> Callable:
     """Декоратор для логирования запросов"""
     @functools.wraps(f)
     def decorated_function(*args, **kwargs):
-        logger.info(f"Request: {request.method} {request.url} from {request.remote_addr}")
+        logger.info(f"Request: {request.method} {request.path} from {request.remote_addr}")
         response = f(*args, **kwargs)
         logger.info(f"Response: {response[1] if isinstance(response, tuple) else '200'}")
         return response

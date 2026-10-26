@@ -39,7 +39,7 @@ def test_auth_and_token_before_any_ssh(client, diagnostic_client):
     assert diagnostic_client.post('/diagnostics/demo', json={}).status_code == 401
     with diagnostic_client.session_transaction() as session:
         session.update(authenticated=True, pin_verified=True)
-    assert diagnostic_client.post('/diagnostics/demo', json={}).status_code == 403
+    assert diagnostic_client.post('/diagnostics/demo', json={}, csrf=False).status_code == 403
     registry.get('ssh').get_connection_pooled.assert_not_called()
 
 

@@ -75,20 +75,11 @@ def test_tokens_and_garbage_never_reach_the_response():
     assert result['node']['kuma'] == []
 
 
-def test_section_never_sends_or_prints_secrets():
-    section = build_command(BOTS).split("printf 'SENDERS")[1]
-    assert 'GETME=1' in section and 'GETME=0' in build_command(BOTS, getme=False)
-    # getMe only: the URL with the token goes to curl on stdin (-K -), never as an argument.
-    assert re.findall(r'api\.telegram\.org/bot%s/(\w+)', section) == ['getMe']
-    assert 'curl -s -m 4 -K -' in section and not re.search(r'curl[^|\n]*api\.telegram', section)
-    assert 'chat_id' not in section.lower() and 'select config' not in section
-    assert '{{range .Config.Env}}{{index (split . "=") 0}},{{end}}' in section and 'println' not in section
-    for forbidden in ('journalctl', 'cat ', '/proc/', 'environ', 'sudo', 'docker exec', 'docker logs'):
-        assert forbidden not in section
-    assert not re.search(r'systemctl\s+(start|stop|restart|reload|enable|disable|kill)\b', section)
-    # Env files: presence check and the ID cut on the node.
-    assert "grep -Eq '^[[:space:]]*(export[[:space:]]+)?TELEGRAM_BOT_TOKEN='" in section
-    assert 'BOT_TOKEN|TELEGRAM_TOKEN)=' in section
+def test_metadata_probe_never_reads_token_sources():
+    for getme in (False, True):
+        script = build_command(BOTS, getme=getme)
+        for forbidden in ('SENDERS', 'Config.Env', 'Environment', 'getMe', '.env', '/bin/ps', '.plist'):
+            assert forbidden not in script
 
 
 @pytest.mark.skipif(not shutil.which('sh'), reason='needs a POSIX shell')
@@ -109,9 +100,9 @@ def test_tg_cuts_the_id_and_keeps_the_token_out_of_argv(tmp_path):
     assert without.stdout == '123456789:'
 
 
-def test_getme_setting_defaults_on(app):
-    assert load_getme(app) is True
+def test_getme_setting_cannot_enable_secret_scanning(app):
+    assert load_getme(app) is False
     save_getme(app, False)
     assert load_getme(app) is False
     save_getme(app, True)
-    assert load_getme(app) is True
+    assert load_getme(app) is False

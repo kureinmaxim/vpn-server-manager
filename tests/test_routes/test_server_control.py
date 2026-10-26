@@ -25,7 +25,7 @@ def make_plan(client, monkeypatch):
 
 
 def test_auth_and_csrf(client, control_client):
-    assert control_client.post('/api/servers/one/control/discover', json={}).status_code == 403
+    assert control_client.post('/api/servers/one/control/discover', json={}, csrf=False).status_code == 403
     with client.session_transaction() as state:
         state.clear()
     assert post(client, "discover", {}).status_code == 401
@@ -85,14 +85,14 @@ def test_protocols_read_only_and_no_store(control_client, monkeypatch):
     assert response.status_code == 200
     assert response.headers['Cache-Control'] == 'no-store'
     assert run.call_args.args[1] == {'operation': 'protocols'}
-    assert control_client.post('/api/servers/one/control/protocols', json={}).status_code == 403
+    assert control_client.post('/api/servers/one/control/protocols', json={}, csrf=False).status_code == 403
 
 
 def test_client_export_requires_csrf_and_no_store(control_client, monkeypatch):
     body = {'component':'anytls','source_id':'a'*64,'revision':'b'*64,'index':0}
     run = MagicMock(return_value={'profile':'anytls://fixture@example.com:443','format':'uri'})
     monkeypatch.setattr(routes, 'invoke', run)
-    assert control_client.post('/api/servers/one/control/clients/export', json=body).status_code == 403
+    assert control_client.post('/api/servers/one/control/clients/export', json=body, csrf=False).status_code == 403
     run.assert_not_called()
     response = post(control_client, 'clients/export', body)
     assert response.status_code == 200

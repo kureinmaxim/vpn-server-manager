@@ -9,6 +9,10 @@ import json
 import shutil
 import copy
 import datetime
+import threading
+from flask import g, has_request_context
+from flask_babel import gettext as _
+from .vault_io import (VaultError, VaultConflict, ServersSnapshot, DnsSnapshot, canonical, revision, file_lock, atomic_write)
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from cryptography.fernet import Fernet, InvalidToken
@@ -50,6 +54,7 @@ class DataManagerService:
         self.secret_key = secret_key
         self.app_data_dir = app_data_dir
         self.fernet = Fernet(secret_key.encode())
+        self._observations = threading.local()
         logger.info(f"DataManagerService initialized. APP_DATA_DIR: '{self.app_data_dir}'")
         
     def get_export_dir(self) -> str:
@@ -304,11 +309,9 @@ class DataManagerService:
         if not active_file:
             return []
         
-        if not os.path.exists(active_file):
-            return []
-
         try:
-            servers, _ = self.read_payload(active_file)
+            servers, _dns = self.read_payload(active_file)
+            source = servers
             
             # Нормализуем каждый сервер
             if isinstance(servers, list):
@@ -346,10 +349,9 @@ class DataManagerService:
                             self.decrypt_data(hoster.get('password', ''))
                         )
             
-            return servers if isinstance(servers, list) else []
-        except Exception as e:
-            print(f"Ошибка загрузки серверов: {e}")
-            return []
+            return ServersSnapshot(servers, source.vault_path, source.vault_revision)
+        except (OSError, InvalidToken, ValueError, TypeError, KeyError) as exc:
+            raise VaultError(_('Хранилище не прочитано. Проверьте ключ или восстановите резервную копию. Запись запрещена.')) from exc
 
     @staticmethod
     def split_payload(data: Any):
@@ -358,32 +360,48 @@ class DataManagerService:
         Старый формат — JSON-список серверов; новый — {"servers": [...], "dns": {...}}.
         """
         if isinstance(data, dict) and isinstance(data.get('servers'), list):
-            dns = data.get('dns')
-            return data['servers'], dns if isinstance(dns, dict) else {}
-        if isinstance(data, list):
+            dns = data.get('dns', {})
+            if not isinstance(dns, dict) or not all(isinstance(row, dict) for row in data['servers']):
+                raise ValueError('Invalid data structure')
+            return data['servers'], dns
+        if isinstance(data, list) and all(isinstance(row, dict) for row in data):
             return data, {}
         raise ValueError("Invalid data structure")
 
+    def _versions(self):
+        # В запросе baseline не меняется при вспомогательных чтениях DNS/карточек.
+        if has_request_context():
+            if not hasattr(g, '_vault_versions'):
+                g._vault_versions = {}
+            return g._vault_versions
+        if not hasattr(self._observations, 'versions'):
+            self._observations.versions = {}
+        return self._observations.versions
+
     def read_payload(self, file_path: str, fernet: Optional[Fernet] = None):
-        """Читает зашифрованный файл и возвращает (серверы, DNS-реестр) без нормализации."""
-        with open(file_path, 'rb') as f:
-            encrypted_data = f.read()
-        if not encrypted_data:
-            return [], {}
-        decrypted = (fernet or self.fernet).decrypt(encrypted_data)
-        return self.split_payload(json.loads(decrypted.decode('utf-8')))
+        path = canonical(file_path)
+        with open(path, 'rb') as stream:
+            raw = stream.read()
+        if not raw:
+            raise VaultError(_('Пустой или повреждённый файл хранилища. Запись запрещена.'))
+        servers, dns = self.split_payload(json.loads((fernet or self.fernet).decrypt(raw).decode('utf-8')))
+        rev = revision(raw)
+        versions = self._versions()
+        if has_request_context():
+            versions.setdefault(path, rev)
+        else:
+            versions[path] = rev
+        return ServersSnapshot(servers, path, rev), DnsSnapshot(dns, path, rev)
 
     def load_dns(self, config: Dict[str, Any]) -> Dict[str, Any]:
-        """Возвращает DNS-реестр активного файла (секреты остаются зашифрованными)."""
-        active_file = self.get_active_data_path(config)
-        if not active_file or not os.path.exists(active_file):
+        path = self.get_active_data_path(config)
+        if not path:
             return {}
-        return self.read_payload(active_file)[1]
+        return self.read_payload(path)[1]
 
     def save_dns(self, dns: Dict[str, Any], file_path: str) -> None:
-        """Сохраняет DNS-реестр, сохраняя серверы файла без изменений."""
-        servers = self.read_payload(file_path)[0] if os.path.exists(file_path) else []
-        self.save_servers(servers, file_path, dns=dns)
+        # Не делаем новое публичное чтение: оно скрыло бы старую revision DNS.
+        self._save(None, file_path, dns)
 
     @staticmethod
     def _strip_runtime_secrets(servers: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -401,37 +419,37 @@ class DataManagerService:
     
     def save_servers(self, servers: List[Dict[str, Any]], file_path: str,
                      dns: Optional[Dict[str, Any]] = None) -> None:
-        """
-        Сохраняет серверы в зашифрованный файл.
-        
-        Args:
-            servers: Список серверов для сохранения
-            file_path: Путь к файлу для сохранения
-            dns: DNS-реестр; None — сохранить реестр, уже записанный в file_path
-        """
-        if dns is None:
-            try:
-                dns = self.read_payload(file_path)[1] if os.path.exists(file_path) else {}
-            except (InvalidToken, ValueError):
-                dns = {}
-        # Создаем директорию если нужно
-        parent = os.path.dirname(file_path)
-        if parent:
-            os.makedirs(parent, exist_ok=True)
+        self._save(servers, file_path, dns)
 
-        # Не храним plaintext-поля внутри зашифрованного JSON
-        servers_to_store = self._strip_runtime_secrets(servers)
-        # Без DNS-данных пишем прежний формат-список, совместимый со старыми версиями
-        payload = {'servers': servers_to_store, 'dns': dns} if dns else servers_to_store
-        
-        # Шифруем данные
-        json_string = json.dumps(payload, ensure_ascii=False, indent=2)
-        encrypted_data = self.fernet.encrypt(json_string.encode('utf-8'))
-        
-        # Сохраняем
-        with open(file_path, 'wb') as f:
-            f.write(encrypted_data)
-    
+    def _save(self, servers, file_path, dns):
+        path = canonical(file_path)
+        versions = self._versions()
+        snapshot = dns if isinstance(dns, DnsSnapshot) else servers
+        expected = (snapshot.vault_revision if isinstance(snapshot, (ServersSnapshot, DnsSnapshot))
+                    and snapshot.vault_path == path else versions.get(path))
+        with file_lock(path):
+            raw = Path(path).read_bytes() if os.path.exists(path) else None
+            actual = revision(raw)
+            # Проверяем целостность ДО записи. Неверный ключ не превращается в пустой DNS.
+            if raw is not None:
+                try:
+                    old_servers, old_dns = self.split_payload(json.loads(self.fernet.decrypt(raw).decode('utf-8')))
+                except (InvalidToken, ValueError, TypeError) as exc:
+                    raise VaultError(_('Хранилище не прочитано. Проверьте ключ или восстановите резервную копию. Запись запрещена.')) from exc
+            else:
+                old_servers, old_dns = [], {}
+            if actual != expected:
+                raise VaultConflict(_('Хранилище изменилось. Обновите страницу и повторите изменения.'))
+            clean = self._strip_runtime_secrets(old_servers if servers is None else servers)
+            dns = old_dns if dns is None else dns
+            payload = {'servers': clean, 'dns': dns} if dns else clean
+            self.split_payload(payload)
+            encrypted = self.fernet.encrypt(json.dumps(payload, ensure_ascii=False, indent=2).encode('utf-8'))
+            if raw is not None:
+                atomic_write(path + '.backup.enc', raw)
+            atomic_write(path, encrypted)
+            versions[path] = revision(encrypted)
+
     def create_backup(self, source_file: str, backup_dir: str, prefix: str = "backup") -> str:
         """
         Создает резервную копию файла с временной меткой.
@@ -616,20 +634,11 @@ class DataManagerService:
         config_path = os.path.join(self.app_data_dir, 'config.json')
         
         try:
-            # Читаем существующую конфигурацию
-            try:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    config_data = json.load(f)
-            except (FileNotFoundError, json.JSONDecodeError):
-                config_data = {}
-
-            # Обновляем данные
+            from .config_io import read_config, write_config
+            config_data = read_config(config_path)
             config_data.update(new_settings)
+            write_config(config_path, config_data)
 
-            # Записываем обратно в файл
-            with open(config_path, 'w', encoding='utf-8') as f:
-                json.dump(config_data, f, ensure_ascii=False, indent=2)
-            
             logger.info(f"User config updated at {config_path} with keys: {list(new_settings.keys())}")
             return True
         except Exception as e:
