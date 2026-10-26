@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+from .services.profile_transaction import recover_profile
 
 # Явным образом находим и загружаем .env, особенно для собранных приложений
 is_frozen = getattr(sys, 'frozen', False)
@@ -28,6 +29,7 @@ if is_frozen:
         )
     
     os.makedirs(app_data_dir, exist_ok=True)
+    recovered_profile = recover_profile(app_data_dir)
     dotenv_path = os.path.join(app_data_dir, '.env')
     
     # Если .env не существует, создаем его с новым ключом
@@ -54,14 +56,16 @@ if is_frozen:
             # Создаем минимальный .env
             with open(dotenv_path, 'w') as f:
                 f.write(f"SECRET_KEY={secret_key}\n")
-                f.write("APP_VERSION=5.0.0\n")
+                f.write("APP_VERSION=5.0.1\n")
                 f.write("BABEL_DEFAULT_LOCALE=en\n")
             print(f"✅ Created minimal .env at {dotenv_path}")
     
-    load_dotenv(dotenv_path=dotenv_path)
+    load_dotenv(dotenv_path=dotenv_path, override=recovered_profile)
 else:
     # В режиме разработки ищем .env в корне проекта
-    load_dotenv()
+    profile_dir = Path(__file__).resolve().parent.parent
+    recovered_profile = recover_profile(profile_dir)
+    load_dotenv(profile_dir / '.env', override=recovered_profile)
 
 
 def get_app_data_dir():
@@ -112,7 +116,7 @@ class Config:
     BABEL_SUPPORTED_LOCALES = ['ru', 'en', 'zh']
     
     # Настройки приложения
-    APP_VERSION = os.getenv('APP_VERSION', '5.0.0')
+    APP_VERSION = os.getenv('APP_VERSION', '5.0.1')
     APP_NAME = 'VPNServerManager-Clean'
     APP_DATA_DIR = get_app_data_dir()
     

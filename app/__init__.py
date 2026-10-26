@@ -227,9 +227,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '5.0.0'),
-            "release_date": "26.10.2026",
-            "last_updated": "2026-10-26",
+            "version": app.config.get('APP_VERSION', '5.0.1'),
+            "release_date": "27.10.2026",
+            "last_updated": "2026-10-27",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -244,9 +244,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "5.0.0",
-            "release_date": "26.10.2026",
-            "last_updated": "2026-10-26",
+            "version": "5.0.1",
+            "release_date": "27.10.2026",
+            "last_updated": "2026-10-27",
             "developer": "Куреин М.Н."
         }
 
@@ -307,8 +307,6 @@ def create_app(config_name='development'):
     app.config.from_object(config_by_name[config_name])
     app.config['IS_DESKTOP_APP'] = '--desktop' in sys.argv or os.environ.get('DESKTOP_MODE') == '1'
 
-    # Управление пользовательским config.json (только для frozen-режима)
-    manage_user_config(app)
     
     # Настройка переводов
     app.config['BABEL_TRANSLATION_DIRECTORIES'] = get_translations_path()
@@ -321,8 +319,21 @@ def create_app(config_name='development'):
     # Настройка логирования
     setup_logging(app)
     
-    # Регистрация сервисов
-    register_services(app)
+    # Read a coherent profile generation before exposing services to any request.
+    from .services.profile_transaction import profile_lock, recover_profile, generation
+    from dotenv import dotenv_values
+    profile_dir = app.config['APP_DATA_DIR']
+    with profile_lock(profile_dir, allow_pending=True):
+        recovered = recover_profile(profile_dir)
+        manage_user_config(app)
+        if recovered or generation(profile_dir):
+            profile_key = dotenv_values(os.path.join(profile_dir, '.env')).get('SECRET_KEY')
+            if not profile_key:
+                from .services.vault_io import VaultError
+                raise VaultError('Profile key is missing after rotation; startup stopped.')
+            app.config['SECRET_KEY'] = profile_key
+        load_app_info(app)
+        register_services(app)
     
     from .services.http_security import install as install_http_security
     install_http_security(app)
@@ -377,8 +388,6 @@ def create_app(config_name='development'):
     if not getattr(sys, 'frozen', False):
         os.makedirs('logs', exist_ok=True)
     
-    # Загрузка app_info из config.json
-    load_app_info(app)
     
     # Окно «Боты» проверяет и этот компьютер (локально, без SSH) там, где есть /bin/sh и ps
     app.jinja_env.globals['bots_local_check'] = sys.platform in ('darwin', 'linux')

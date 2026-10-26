@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.1] - 2026-10-27
+
+### Fixed
+- **Key rotation:** write and verify a new encrypted vault before switching the profile. A private recovery journal restores the old environment/configuration after an interrupted switch; a committed switch retains the new generation. Startup recovers before registering data services.
+- A shared profile lock and generation checks prevent stale application instances from writing after key rotation. Missing active vaults, mismatched profile keys and undecryptable inner credentials abort rotation instead of creating empty or mixed-key data.
+- Recovery state is excluded from Git and rejected by the packaging privacy check. Tests include fault injection at each commit stage, interrupted rollback and abrupt termination of a separate process.
+
 ## [5.0.0] - 2026-10-26
 
 ### Changed

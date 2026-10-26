@@ -654,15 +654,12 @@ def settings():
         active_data_file=current_app.config.get('active_data_file')
     )
 
-# TODO: Implement these routes (moved from old app.py)
 @main_bp.route('/change_main_key', methods=['POST'])
 @require_auth
 @require_pin
 def change_main_key():
     """Смена главного ключа с перешифровкой всех данных."""
     from cryptography.fernet import Fernet
-    import sys
-    from pathlib import Path
     
     try:
         data_manager = registry.get('data_manager')
@@ -681,109 +678,27 @@ def change_main_key():
             
         try:
             # Проверяем, что новый ключ корректный для Fernet
-            test_fernet = Fernet(new_key.encode())
+            Fernet(new_key.encode())
         except Exception:
             flash(_('Ошибка: некорректный формат ключа. Ключ должен быть в формате Fernet.'), 'danger')
             return redirect(url_for('main.settings'))
         
-        # Загружаем текущие данные с существующим ключом
-        # Читаем файл напрямую: load_servers() при ошибке вернул бы [] и мы записали бы пустой файл
+        if not data_manager:
+            raise VaultError(_('Сервис данных не инициализирован.'))
+        from ..services.key_rotation import rotate_key
         active_file = data_manager.get_active_data_path(current_app.config)
-        if active_file and os.path.exists(active_file):
-            current_servers, dns = data_manager.read_payload(active_file)
-        else:
-            current_servers, dns = [], {}
-        dns = dns_registry.normalize(dns)
-        
-        # Создаем резервную копию
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        app_data_dir = current_app.config.get('APP_DATA_DIR')
-        data_dir = os.path.join(app_data_dir, "data")
-        os.makedirs(data_dir, exist_ok=True)
-        
-        if active_file and os.path.exists(active_file):
-            backup_path = data_manager.create_backup(
-                active_file,
-                data_dir,
-                prefix=f"backup_before_key_change_{timestamp}"
-            )
-        
-        # Сначала создаем файл с новым ключом: .env меняем только после успешной записи
-        new_filename = f"servers_reencrypted_{timestamp}.enc"
-        new_file_path = os.path.join(data_dir, new_filename)
-        new_data_manager = DataManagerService(new_key, app_data_dir)
-        old_key = data_manager.secret_key
-
-        def reencrypt(section, fields):
-            for field in fields:
-                if section.get(field):
-                    section[field] = new_data_manager.re_encrypt_password(section[field], old_key, new_key)
-
-        # Пароли внутри файла зашифрованы отдельно — перешифровываем их тоже
-        for server in current_servers:
-            reencrypt(server.get('ssh_credentials') or {}, ('password', 'root_password', 'private_key', 'key_passphrase'))
-            reencrypt(server.get('panel_credentials') or {}, ('user', 'password'))
-            reencrypt(server.get('hoster_credentials') or {}, ('user', 'password'))
-        for provider in dns['providers']:
-            reencrypt(provider, dns_registry.SECRET_FIELDS)
-        new_data_manager.save_servers(current_servers, new_file_path,
-                                      dns={} if dns_registry.is_empty(dns) else dns)
-        
-        # Обновляем конфигурацию с новым ключом
+        replacement, new_file = rotate_key(data_manager, active_file, new_key,
+                                           current_app.config.get('DATA_DIR'))
+        # Registry/runtime only follow a durable commit. In-flight old managers are fenced.
+        registry.register('data_manager', replacement)
         current_app.config['SECRET_KEY'] = new_key
-        
-        # Определяем правильный путь к .env файлу
-        is_frozen = getattr(sys, 'frozen', False)
-        if is_frozen:
-            # Для упакованного приложения сохраняем .env в пользовательскую директорию
-            env_file = os.path.join(app_data_dir, '.env')
-        else:
-            # Для разработки используем локальный .env
-            env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
-        
-        env_lines = []
-        if os.path.exists(env_file):
-            with open(env_file, 'r') as f:
-                env_lines = f.readlines()
-        
-        # Обновляем или добавляем SECRET_KEY
-        key_updated = False
-        for i, line in enumerate(env_lines):
-            if line.startswith('SECRET_KEY='):
-                env_lines[i] = f'SECRET_KEY={new_key}\n'
-                key_updated = True
-                break
-        
-        if not key_updated:
-            env_lines.append(f'SECRET_KEY={new_key}\n')
-        
-        # Создаем директорию если нужно
-        os.makedirs(os.path.dirname(env_file) if os.path.dirname(env_file) else '.', exist_ok=True)
-        
-        with open(env_file, 'w') as f:
-            f.writelines(env_lines)
-        
-        # Обновляем конфигурацию приложения
-        current_app.config['active_data_file'] = new_file_path
-        
-        # Сохраняем конфигурацию
-        config_path = os.path.join(app_data_dir, 'config.json')
-        from ..services.config_io import read_config, write_config
-        config_data = read_config(config_path)
-        
-        config_data['active_data_file'] = new_file_path
-        write_config(config_path, config_data)
-        
-        # Обновляем data_manager в реестре с новым ключом
-        registry.register('data_manager', new_data_manager)
-        
-        flash(f'✅ Ключ успешно изменен! Создан новый файл данных: {new_filename}. Резервная копия сохранена.', 'success')
-        flash('⚠️ Перезапустите приложение для применения изменений.', 'warning')
-            
-    except Exception as e:
-        logger.error(f"Error changing key: {str(e)}")
-        flash(f'Ошибка при смене ключа: {str(e)}', 'danger')
-    
+        current_app.config['active_data_file'] = new_file
+        flash(_('Ключ изменён. Исходный файл сохранён; новый файл проверен. Перезапустите приложение.'), 'success')
+    except Exception as error:
+        # Exception messages from crypto/filesystem code may contain user input or paths.
+        logger.error('Key rotation failed (%s)', type(error).__name__)
+        flash(_('Ключ не изменён или требуется восстановление профиля. Перезапустите приложение; исходные файлы сохранены.'), 'danger')
+
     return redirect(url_for('main.settings'))
 
 @main_bp.route('/verify_key_data', methods=['POST'])

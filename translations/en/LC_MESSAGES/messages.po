@@ -10373,3 +10373,12 @@ msgstr "Command and task fields are retained for compatibility but are not used 
 
 msgid "Закройте приложение через его окно."
 msgstr "Close the application using its window."
+
+msgid "Ключ профиля изменился. Перезапустите приложение."
+msgstr "The profile key changed. Restart the application."
+
+msgid "Ключ изменён. Исходный файл сохранён; новый файл проверен. Перезапустите приложение."
+msgstr "Key changed. The original file is retained and the new file was verified. Restart the application."
+
+msgid "Ключ не изменён или требуется восстановление профиля. Перезапустите приложение; исходные файлы сохранены."
+msgstr "The key was not changed or profile recovery is required. Restart the application; original files are retained."

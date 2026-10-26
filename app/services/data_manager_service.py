@@ -55,6 +55,8 @@ class DataManagerService:
         self.app_data_dir = app_data_dir
         self.fernet = Fernet(secret_key.encode())
         self._observations = threading.local()
+        from .profile_transaction import generation
+        self.profile_generation = generation(app_data_dir)
         logger.info(f"DataManagerService initialized. APP_DATA_DIR: '{self.app_data_dir}'")
         
     def get_export_dir(self) -> str:
@@ -378,10 +380,18 @@ class DataManagerService:
             self._observations.versions = {}
         return self._observations.versions
 
+    def _check_profile_generation(self):
+        from .profile_transaction import generation
+        if generation(self.app_data_dir) != self.profile_generation:
+            raise VaultConflict(_('Ключ профиля изменился. Перезапустите приложение.'))
+
     def read_payload(self, file_path: str, fernet: Optional[Fernet] = None):
         path = canonical(file_path)
-        with open(path, 'rb') as stream:
-            raw = stream.read()
+        from .profile_transaction import profile_lock
+        with profile_lock(self.app_data_dir):
+            self._check_profile_generation()
+            with open(path, 'rb') as stream:
+                raw = stream.read()
         if not raw:
             raise VaultError(_('Пустой или повреждённый файл хранилища. Запись запрещена.'))
         servers, dns = self.split_payload(json.loads((fernet or self.fernet).decrypt(raw).decode('utf-8')))
@@ -427,7 +437,9 @@ class DataManagerService:
         snapshot = dns if isinstance(dns, DnsSnapshot) else servers
         expected = (snapshot.vault_revision if isinstance(snapshot, (ServersSnapshot, DnsSnapshot))
                     and snapshot.vault_path == path else versions.get(path))
-        with file_lock(path):
+        from .profile_transaction import profile_lock
+        with profile_lock(self.app_data_dir), file_lock(path):
+            self._check_profile_generation()
             raw = Path(path).read_bytes() if os.path.exists(path) else None
             actual = revision(raw)
             # Проверяем целостность ДО записи. Неверный ключ не превращается в пустой DNS.

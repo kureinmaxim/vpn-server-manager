@@ -24,6 +24,7 @@ class ServersSnapshot(list):
 
 _locks_guard = threading.Lock()
 _locks = {}
+_held = threading.local()
 
 
 def canonical(path):
@@ -42,6 +43,12 @@ def file_lock(path):
     with _locks_guard:
         lock = _locks.setdefault(path, threading.RLock())
     with lock:
+        held = getattr(_held, 'paths', None)
+        if held is None:
+            held = _held.paths = set()
+        if path in held:
+            yield
+            return
         fd = os.open(path + '.lock', os.O_CREAT | os.O_RDWR, 0o600)
         try:
             if os.name == 'nt':
@@ -53,8 +60,10 @@ def file_lock(path):
             else:
                 import fcntl
                 fcntl.flock(fd, fcntl.LOCK_EX)
+            held.add(path)
             yield
         finally:
+            held.discard(path)
             # Закрытие fd освобождает блокировку и при исключении.
             os.close(fd)
 

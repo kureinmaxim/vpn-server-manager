@@ -175,3 +175,8 @@ data/servers.json.enc
 data/hints.json
 pin_block_state.json
 config.json
+
+# Private key-rotation recovery state (never package or publish)
+.key-rotation*
+.profile-generation
+.profile.lock

@@ -16,6 +16,8 @@ def is_private(path):
     path = Path(path)
     if path.name in ('.env.example', 'env.example'):
         return False
+    if any(part.startswith('.key-rotation') or part == '.profile-generation' for part in path.parts):
+        return True
     return (any(fnmatch.fnmatch(path.name.lower(), pattern) for pattern in PRIVATE_NAMES)
             or path.as_posix().lower() in ('config.json', 'data/hints.json')
             or (path.parts and path.parts[0] == 'data' and path.suffix == '.json'))

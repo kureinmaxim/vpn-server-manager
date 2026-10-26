@@ -29,7 +29,9 @@ def write_config(path, data):
     path = canonical(path)
     if not isinstance(data, ConfigSnapshot) or data.path != path:
         raise VaultConflict('Read configuration before changing it.')
-    with file_lock(path):
+    from .profile_transaction import profile_lock
+    import os
+    with profile_lock(os.path.dirname(path)), file_lock(path):
         current = read_config(path)
         if current.revision != data.revision:
             raise VaultConflict('Configuration changed; reload and retry.')
