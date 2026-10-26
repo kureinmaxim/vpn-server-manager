@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [4.15.11] - 2026-10-26
+
+### Fixed
+- **Settings → Home page buttons** no longer says "saved" when `config.json` cannot be written (for example, no write access to the app folder). It now shows an error with the file path, and the buttons keep their previous state.
+
 ## [4.15.10] - 2026-10-25
 
 ### Added

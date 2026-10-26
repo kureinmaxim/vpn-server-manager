@@ -117,12 +117,16 @@ def load_ui_features(app) -> Dict[str, bool]:
 
 
 def save_ui_features(app, enabled) -> Dict[str, bool]:
-    """Store the shown tools; names outside DEFAULT_FEATURES are ignored."""
+    """Store the shown tools; names outside DEFAULT_FEATURES are ignored.
+
+    Raises OSError (with the config path) when config.json cannot be written.
+    """
     enabled = set(enabled or ())
     features = {name: name in enabled for name in DEFAULT_FEATURES}
     path = _config_path(app)
     config_data = _read_config(path)
     stored = config_data.get(UI_CONFIG_KEY)
     config_data[UI_CONFIG_KEY] = dict(stored if isinstance(stored, dict) else {}, features=features)
-    _write_config(path, config_data)
+    if not _write_config(path, config_data):
+        raise OSError(path)
     return features

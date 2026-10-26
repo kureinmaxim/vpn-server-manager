@@ -635,7 +635,12 @@ def tracked_bots():
 def save_features():
     """Какие инструменты показывать на главной: DNS, загрузка серверов, проекты, боты."""
     from ..services.ui_preferences import save_ui_features
-    save_ui_features(current_app, request.form.getlist('features'))
+    try:
+        save_ui_features(current_app, request.form.getlist('features'))
+    except OSError as exc:
+        flash(_('Не удалось сохранить набор кнопок: нет доступа к файлу %(path)s. Проверьте права на запись.',
+                path=exc.args[0] if exc.args else 'config.json'), 'danger')
+        return redirect(url_for('main.settings') + '#ui-features')
     flash(_('Набор кнопок на главной сохранён.'), 'success')
     return redirect(url_for('main.settings') + '#ui-features')
 

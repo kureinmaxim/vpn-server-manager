@@ -29,6 +29,17 @@ def test_settings_switches_tools_and_keeps_language(app, client):
     assert load_ui_features(app)['bots'] is True
 
 
+def test_unwritable_config_reports_error_instead_of_saved(app, client, monkeypatch):
+    _login(client)
+    monkeypatch.setattr('app.services.ui_preferences._write_config', lambda path, data: False)
+    response = client.post('/settings/features', data={'csrf_token': 'test-csrf', 'features': ['bots']})
+    assert response.status_code == 302
+    with client.session_transaction() as state:
+        flashed = state['_flashes']
+    assert flashed[0][0] == 'danger' and 'config.json' in flashed[0][1]
+    assert load_ui_features(app)['bots'] is False
+
+
 def test_settings_page_lists_switches(app, client):
     _login(client)
     page = client.get('/settings').get_data(as_text=True)
