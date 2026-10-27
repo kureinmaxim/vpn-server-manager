@@ -83,4 +83,4 @@ jobs:
           dist/macos-local/*-local.json
           dist/macos-local/check-report.json
         if-no-files-found: error
-        retention-days: 14
+        retention-days: 10
