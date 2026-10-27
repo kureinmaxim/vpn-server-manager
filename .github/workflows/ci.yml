@@ -56,7 +56,7 @@ jobs:
 
   macos-build:
     name: macOS ARM packaged smoke
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 20
     permissions:
       contents: read

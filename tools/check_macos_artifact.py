@@ -9,6 +9,7 @@ import plistlib
 import shutil
 import subprocess
 import tempfile
+from contextlib import contextmanager
 
 from tools.macos_bundle import verify, version_tuple
 
@@ -31,6 +32,34 @@ def validate_manifest(metadata, info, version):
         raise ValueError('Invalid artifact filename')
 
 
+@contextmanager
+def mounted_image(dmg, mountpoint):
+    """Never write to the image; detach even if validation raises."""
+    subprocess.run(['hdiutil', 'attach', '-readonly', '-nobrowse', '-mountpoint',
+                    str(mountpoint), str(dmg)], check=True, capture_output=True, timeout=60)
+    try:
+        yield mountpoint
+    finally:
+        subprocess.run(['hdiutil', 'detach', str(mountpoint)], check=True,
+                       capture_output=True, timeout=60)
+
+
+def profile_phases(executable, home, cwd):
+    from desktop.profile_smoke import MARKER
+    (home / '.vsm-build-fixture').write_text(MARKER)
+    env = dict(os.environ, HOME=str(home))
+    for key in ('SECRET_KEY', 'APPDATA', 'DESKTOP_MODE'):
+        env.pop(key, None)
+    for phase in ('seed', 'verify', 'restore', 'verify'):
+        result = subprocess.run([str(executable), '--build-profile-smoke', phase],
+                                cwd=cwd, env=env, check=True, capture_output=True,
+                                text=True, timeout=60)
+        records = [line.removeprefix('VSM_PROFILE_SMOKE=') for line in result.stdout.splitlines()
+                   if line.startswith('VSM_PROFILE_SMOKE=')]
+        if len(records) != 1 or json.loads(records[0]) != {'phase': phase, 'status': 'passed'}:
+            raise ValueError('Packaged profile check did not confirm success')
+
+
 def check(root=ROOT):
     directory = root / 'dist/macos-local'
     version = json.loads((root / 'config/config.json.template').read_text())['app_info']['version']
@@ -43,10 +72,17 @@ def check(root=ROOT):
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     if digest != metadata.get('sha256'):
         raise ValueError('DMG checksum mismatch')
-    with tempfile.TemporaryDirectory(prefix='vsm-relocation-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='vsm-install-') as temporary:
         temporary = Path(temporary)
         relocated = temporary / 'Applications' / app.name
-        shutil.copytree(app, relocated, symlinks=True)
+        mountpoint = temporary / 'mounted-image'
+        mountpoint.mkdir()
+        with mounted_image(directory / metadata['artifact'], mountpoint) as mounted:
+            image_app = mounted / app.name
+            image_info = plistlib.loads((image_app / 'Contents/Info.plist').read_bytes())
+            validate_manifest(metadata, image_info, version)
+            verify(image_app)
+            shutil.copytree(image_app, relocated, symlinks=True)
         verify(relocated)
         home = temporary / 'fresh-home'
         home.mkdir()
@@ -61,7 +97,10 @@ def check(root=ROOT):
             raise ValueError('Relocated runtime does not match the manifest')
         if (home / 'Library/Application Support/VPNServerManager-Clean').exists():
             raise ValueError('Dependency smoke unexpectedly created an application profile')
-    report = dict(version=version, architecture=metadata['architecture'],
+        profile_phases(relocated / 'Contents/MacOS/VPNServerManager-Clean', home, temporary)
+    report = dict(dmg_install='passed', profile_restart='passed',
+                  legacy_payload='passed', encrypted_backup_import='passed',
+                  version=version, architecture=metadata['architecture'],
                   build_host_macos=platform.mac_ver()[0], relocated_runtime='passed',
                   signature='verified', dmg_sha256=digest,
                   gui_tested=False, notarized=False)

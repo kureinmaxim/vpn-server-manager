@@ -210,7 +210,7 @@ pytest --cov=app tests/
 
 ## macOS CI evidence
 
-The `macos-build` job uses an ARM `macos-14` runner and uv 0.10.7, builds with the
+The `macos-build` job uses an ARM `macos-15` runner and uv 0.10.7, builds with the
 same isolated launcher, then runs:
 
 ```bash
@@ -218,10 +218,22 @@ same isolated launcher, then runs:
 .venv-macos/bin/python -m tools.check_macos_artifact
 ```
 
-The verifier checks version/target/architecture, the DMG SHA-256, and the signature
-of a relocated `.app`. It runs the relocated executable's dependency self-check
-with a temporary home directory and verifies that it did not create an app profile.
-CI retains only JSON evidence for 10 days. It does not upload a release asset,
-use signing credentials, exercise GUI interactions, or test upgrade/restore.
-A successful macOS 14 CI run is not evidence of GUI compatibility on macOS 13.
+The verifier checks version/target/architecture and the DMG SHA-256, mounts the
+image read-only, verifies its app, copies it into a temporary Applications directory
+and detaches the image. It then runs that copy, with a fresh temporary home, through
+both the dependency self-check and a synthetic profile lifecycle:
+
+- First start creates a profile and renders the locked page without a GUI/network.
+- A historical list-only encrypted vault is read and saved with DNS data.
+- A separate process verifies that the key, credentials and active vault survive.
+- The real authenticated/CSRF-protected `.enc` import rejects corrupt input, then
+  restores a valid encrypted backup into a new file while retaining the original.
+- Another process verifies the restored data and persisted selection.
+
+The profile test command refuses a regular HOME or a non-frozen executable. It only
+runs with a marker in a disposable `vsm-install-*` directory. CI retains JSON evidence
+for 10 days; synthetic vaults/keys and binaries are not uploaded. This covers the
+existing `.enc` import, not the placeholder `/restore_backup` route. It does not
+exercise GUI interactions, a previous app binary's upgrade path, Gatekeeper,
+notarization, or macOS 13 itself.
 Runner reference: [GitHub hosted runners](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).

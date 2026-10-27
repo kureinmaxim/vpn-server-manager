@@ -34,6 +34,11 @@ if __name__ == '__main__':
         build_smoke()
         raise SystemExit(0)
 
+    if len(sys.argv) == 3 and sys.argv[1] == '--build-profile-smoke':
+        from desktop.profile_smoke import run as profile_smoke
+        profile_smoke(sys.argv[2])
+        raise SystemExit(0)
+
     # Настраиваем логирование
     setup_logging()
     

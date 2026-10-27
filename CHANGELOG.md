@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.7] - 2026-10-27
+
+### Added
+- macOS artifact checks now install a copy from the actual read-only DMG and detach the image before executing it.
+- A guarded packaged-profile test checks first startup, historical encrypted payload migration, restart persistence, rejection of corrupt backups and restoration through the existing authenticated `.enc` import. Synthetic profiles are confined to marked temporary homes and never uploaded.
+- CI reports distinguish these checks from GUI, cross-version upgrade and notarization approval. The ARM build job uses macOS 15 after macOS 14 runner allocation failed; the application deployment target remains 13.0.
+
 ## [5.0.6] - 2026-10-27
 
 ### Added
