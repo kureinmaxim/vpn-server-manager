@@ -97,9 +97,32 @@ or `venv/bin/python3 build_macos.py`
 Artifacts:
 
 ```text
-dist/VPNServerManager-Clean.app
-dist/VPNServerManager-Clean_Installer.dmg
+dist/macos-local/VPNServerManager-Clean.app
+dist/macos-local/VPNServerManager-Clean-X.Y.Z-arm64-local.dmg
+dist/macos-local/VPNServerManager-Clean-X.Y.Z-arm64-local.json
 ```
+
+
+The builder currently produces **local development artifacts only** (ad-hoc signed,
+not notarized). It reads the version from the tracked template, never copies the
+project configuration into the user's installed profile, and uses dedicated
+`build/macos-local` / `dist/macos-local` directories. Rebuilding replaces those two
+directories; older outputs elsewhere and the installed application are untouched.
+
+After PyInstaller, it merges the final plist, derives architecture and the highest
+minimum OS from all collected Mach-O deployment targets, signs the outer bundle,
+and requires `codesign --verify --deep --strict`. All collected binaries must
+support the executable's architectures. DMG staging preserves symlinks and verifies
+the staged signature; `hdiutil verify` must also succeed. The JSON manifest records
+the actual architecture, minimum binary target, signing status and DMG SHA-256.
+That target is a lower bound, **not a tested minimum supported macOS version**.
+
+Public release gates remain: Developer ID signing of nested code and the outer
+bundle with hardened runtime, notarization, stapling, Gatekeeper assessment, then
+clean-Mac launch/upgrade/restore tests. Do not publish a `-local` image as a trusted
+release or advise users to disable Gatekeeper. No upload to Apple or GitHub is
+performed by this builder. Follow [Apple signing guidance](https://developer.apple.com/library/archive/technotes/tn2206/)
+and [PyInstaller macOS notes](https://pyinstaller.org/en/stable/feature-notes.html).
 
 ---
 

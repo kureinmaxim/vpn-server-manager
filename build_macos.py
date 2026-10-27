@@ -9,18 +9,13 @@ import sys
 import shutil
 import subprocess
 from pathlib import Path
-from dotenv import load_dotenv
 import json
 from datetime import datetime
 
 # Основные директории
-PROJECT_ROOT = Path.cwd()
-DIST_DIR = PROJECT_ROOT / 'dist'
-BUILD_DIR = PROJECT_ROOT / 'build'
-
-# Создаем директории
-DIST_DIR.mkdir(exist_ok=True)
-BUILD_DIR.mkdir(exist_ok=True)
+PROJECT_ROOT = Path(__file__).resolve().parent
+DIST_DIR = PROJECT_ROOT / 'dist' / 'macos-local'
+BUILD_DIR = PROJECT_ROOT / 'build' / 'macos-local'
 
 def cleanup_previous_builds():
     """Очистка предыдущих сборок"""
@@ -33,7 +28,6 @@ def cleanup_previous_builds():
 def get_build_metadata_sources():
     """Возвращает доступные файлы конфигурации для сборки"""
     return [
-        PROJECT_ROOT / "config.json",
         PROJECT_ROOT / "config" / "config.json.template",
     ]
 
@@ -166,7 +160,8 @@ def build_app():
             datas.append(f"{file}:.")
     
     # Формируем аргументы для PyInstaller
-    datas_args = [f"--add-data={data}" for data in datas]
+    datas_args = [f"--add-data={PROJECT_ROOT / source}:{target}"
+                  for source, target in (data.split(":", 1) for data in datas)]
     
     # Проверяем наличие иконки
     icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.icns"
@@ -325,8 +320,9 @@ def build_app():
         icon_arg,                       # Иконка (если есть)
         "--clean",
         "--noconfirm",
-        "--distpath=dist",
-        "--workpath=build",
+        f"--distpath={DIST_DIR}",
+        f"--workpath={BUILD_DIR}",
+        f"--specpath={BUILD_DIR}",
         "--noupx",
         "--strip",
         "--osx-bundle-identifier=com.vpnservermanager.clean.app",
@@ -343,211 +339,40 @@ def build_app():
     print(f"Команда: {' '.join(pyinstaller_cmd)}")
     
     # Запуск PyInstaller
-    result = subprocess.run(pyinstaller_cmd, capture_output=False, text=True)
+    build_env = dict(os.environ, PYINSTALLER_CONFIG_DIR=str(BUILD_DIR / 'cache'))
+    result = subprocess.run(pyinstaller_cmd, capture_output=False, text=True, cwd=PROJECT_ROOT, env=build_env)
     
     if result.returncode != 0:
         print(f"❌ ОШИБКА: PyInstaller завершился с кодом {result.returncode}")
         return False
     
-    # Используем кастомный Info.plist с правильной версией
-    app_path = DIST_DIR / "VPNServerManager-Clean.app"
-    if app_path.exists():
-        info_plist_path = app_path / "Contents" / "Info.plist"
-        info_template_path = Path(__file__).parent / "Info.plist.template"
-        
-        if info_template_path.exists():
-            print(f"🔧 Установка кастомного Info.plist с версией {version}...")
-            try:
-                # Читаем шаблон
-                with open(info_template_path, 'r') as f:
-                    plist_content = f.read()
-                
-                # Заменяем {{VERSION}} на реальную версию
-                plist_content = plist_content.replace('{{VERSION}}', version)
-                
-                # Записываем кастомный plist
-                with open(info_plist_path, 'w') as f:
-                    f.write(plist_content)
-                
-                print(f"✅ Info.plist установлен: версия {version}, NSPrincipalClass=NSApplication")
-            except Exception as e:
-                print(f"⚠️ Не удалось установить Info.plist: {e}")
-        else:
-            print(f"⚠️ Шаблон Info.plist.template не найден, используем версию PyInstaller")
-            try:
-                # Fallback: просто обновляем версию
-                with open(info_plist_path, 'r') as f:
-                    plist_content = f.read()
-                
-                plist_content = plist_content.replace('<string>0.0.0</string>', f'<string>{version}</string>')
-                
-                with open(info_plist_path, 'w') as f:
-                    f.write(plist_content)
-                
-                print(f"✅ Info.plist обновлен: версия {version}")
-            except Exception as e:
-                print(f"⚠️ Не удалось обновить Info.plist: {e}")
-        
-        # Копируем config.json в пользовательскую папку для обновления версии
-        try:
-            import os
-            user_config_dir = os.path.expanduser('~/Library/Application Support/VPNServerManager-Clean')
-            if os.path.exists(user_config_dir):
-                import shutil
-                project_config = PROJECT_ROOT / 'config.json'
-                user_config = os.path.join(user_config_dir, 'config.json')
-                if project_config.exists():
-                    shutil.copy2(project_config, user_config)
-                    print(f"✅ config.json обновлен в пользовательской папке (версия {version})")
-        except Exception as e:
-            print(f"⚠️ Не удалось обновить пользовательский config.json: {e}")
-    
-    return True
-
-def create_app_bundle():
-    """Создание .app бандла для macOS"""
-    app_name = "VPNServerManager-Clean"  # Изменено для избежания конфликтов
-    
-    # Проверяем, создалась ли папка с приложением
-    app_dir = DIST_DIR / app_name
-    
-    if app_dir.exists():
-        print(f"✅ Папка приложения создана: {app_dir}")
-        
-        # Проверяем, есть ли уже .app файл
-        app_path = DIST_DIR / f"{app_name}.app"
-        
-        if app_path.exists():
-            print(f"✅ Приложение уже существует: {app_path}")
-            # Проверяем и копируем иконку если её нет
-            icon_path = app_path / "Contents" / "Resources" / "AppIcon.icns"
-            if not icon_path.exists():
-                source_icon = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
-                if source_icon.exists():
-                    shutil.copy2(source_icon, icon_path)
-                    print(f"📁 Иконка скопирована: {source_icon}")
-            return app_path
-        
-        # Создаем .app бандл из папки
-        app_contents = app_path / "Contents"
-        app_macos = app_contents / "MacOS"
-        app_resources = app_contents / "Resources"
-        
-        # Создаем директории
-        app_macos.mkdir(parents=True, exist_ok=True)
-        app_resources.mkdir(parents=True, exist_ok=True)
-        
-        # Копируем все файлы из папки приложения
-        shutil.copytree(app_dir, app_macos / app_name, dirs_exist_ok=True)
-        
-        # Создаем символическую ссылку на run.py для совместимости
-        run_py_link = app_macos / "run.py"
-        if not run_py_link.exists():
-            try:
-                os.symlink(app_name / "run.py", run_py_link)
-            except OSError:
-                # Если не удалось создать симлинк, копируем файл
-                shutil.copy2(app_dir / "run.py", run_py_link)
-        
-        # Получаем версию из config.json
-        version = get_version_from_config()
-        
-        # Создаем Info.plist с уникальным идентификатором
-        info_plist_content = f"""<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>CFBundleExecutable</key>
-    <string>{app_name}</string>
-    <key>CFBundleIdentifier</key>
-    <string>com.vpnservermanager.clean.app</string>
-    <key>CFBundleName</key>
-    <string>{app_name}</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleShortVersionString</key>
-    <string>{version}</string>
-    <key>CFBundleVersion</key>
-    <string>{version}</string>
-    <key>LSMinimumSystemVersion</key>
-    <string>10.14</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>CFBundleIconFile</key>
-    <string>AppIcon.icns</string>
-</dict>
-</plist>"""
-        
-        with open(app_contents / "Info.plist", "w") as f:
-            f.write(info_plist_content)
-        
-        # Копируем иконку если есть
-        icon_path = PROJECT_ROOT / "static" / "images" / "icon_clean.png"
-        if icon_path.exists():
-            shutil.copy2(icon_path, app_resources / "AppIcon.icns")
-            print(f"📁 Иконка скопирована: {icon_path}")
-        else:
-            print("⚠️ Иконка не найдена")
-        
-        print(f"✅ Приложение создано: {app_path}")
-        return app_path
-    else:
-        print(f"❌ Ошибка: папка приложения не найдена в {app_dir}")
-        return None
+    return (DIST_DIR / "VPNServerManager-Clean.app").is_dir()
 
 def create_readme():
     """Создание файла README.txt с инструкциями"""
-    readme_content = """# VPN Server Manager Clean
+    readme_content = """VPN Server Manager — LOCAL DEVELOPMENT BUILD
 
-## Важно: Первый запуск
+This ad-hoc signed build is not notarized and is not a public macOS release.
+Do not disable Gatekeeper to distribute it. Public distribution requires
+Developer ID signing, notarization, stapling and clean-Mac installation tests.
+Architecture and the binary deployment-target lower bound are in the adjacent
+JSON build manifest. The oldest supported OS still needs a real smoke test.
 
-При первом запуске приложения может появиться предупреждение безопасности macOS о том, 
-что приложение получено не из App Store. Для решения:
-
-1. В Finder щелкните по приложению правой кнопкой мыши (или Control+клик)
-2. Выберите "Открыть" в контекстном меню
-3. В появившемся диалоге нажмите "Открыть"
-4. После этого приложение будет запускаться без предупреждений
-
-## Хранение данных
-
-Приложение автоматически сохраняет все данные в вашей пользовательской директории:
-~/Library/Application Support/VPNServerManager-Clean/
-
-В этой директории хранятся:
-- Файлы конфигурации
-- Зашифрованные данные серверов
-- Загруженные чеки и иконки
-
-## Резервное копирование
-
-Для создания резервной копии данных, сохраните директорию:
-~/Library/Application Support/VPNServerManager-Clean/
-
-## Проблемы с запуском
-
-Если приложение не запускается, проверьте:
-1. Наличие файла env.example (шаблон для .env)
-2. Наличие прав доступа к директории данных
-
-Для технической поддержки обратитесь к разработчику.
-
-## Отличие от основного проекта
-
-Это версия "Clean" - упрощенная версия VPN Server Manager 
-с полной поддержкой интернационализации (английский, русский, китайский языки).
+Building does not modify the installed application or the user's profile.
+Runtime data: ~/Library/Application Support/VPNServerManager-Clean/
+That profile contains secrets and the encryption key: never attach it to issues.
 """
-    
+
     readme_path = DIST_DIR / "README.txt"
     with open(readme_path, "w", encoding='utf-8') as f:
         f.write(readme_content)
     
     return readme_path
 
-def create_dmg(app_path):
+def create_dmg(app_path, metadata):
     """Создание DMG образа для распространения"""
     app_name = app_path.name.split('.')[0]
-    dmg_name = f"{app_name}_Installer.dmg"
+    dmg_name = f"{app_name}-{metadata['version']}-{metadata['architecture']}-local.dmg"
     dmg_path = DIST_DIR / dmg_name
     
     # Удаляем старый DMG если есть
@@ -567,7 +392,9 @@ def create_dmg(app_path):
         tmp_dir.mkdir(parents=True)
         
         # Копируем .app в эту папку
-        shutil.copytree(app_path, tmp_dir / app_path.name)
+        shutil.copytree(app_path, tmp_dir / app_path.name, symlinks=True)
+        from tools.macos_bundle import verify
+        verify(tmp_dir / app_path.name)
         
         # Копируем README.txt
         shutil.copy(readme_path, tmp_dir / "README.txt")
@@ -582,6 +409,7 @@ def create_dmg(app_path):
             '-ov', '-format', 'UDZO', str(dmg_path)
         ], check=True)
         
+        subprocess.run(['hdiutil', 'verify', str(dmg_path)], check=True)
         # Удаляем временную папку
         shutil.rmtree(tmp_dir)
         
@@ -590,131 +418,6 @@ def create_dmg(app_path):
     except Exception as e:
         print(f"❌ Ошибка создания DMG: {e}")
         return None
-
-def diagnose_app(app_path):
-    """Диагностика проблем с запуском приложения"""
-    print("\n🔍 Диагностика приложения...")
-    
-    if not app_path.exists():
-        print("❌ Приложение не найдено")
-        return False
-    
-    # Проверяем права доступа
-    try:
-        # Ищем исполняемый файл в разных возможных местах
-        possible_executables = [
-            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean" / "VPNServerManager-Clean",
-            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean",
-            app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServerManager-Clean.app" / "VPNServerManager-Clean"
-        ]
-        
-        executable_path = None
-        for exec_path in possible_executables:
-            if exec_path.exists():
-                executable_path = exec_path
-                break
-        
-        if executable_path:
-            os.chmod(executable_path, 0o755)
-            print(f"✅ Права доступа установлены для: {executable_path.name}")
-        else:
-            print("⚠️ Исполняемый файл не найден в стандартных местах")
-            # Показываем содержимое MacOS директории
-            macos_dir = app_path / "Contents" / "MacOS"
-            if macos_dir.exists():
-                print(f"📁 Содержимое MacOS: {[f.name for f in macos_dir.iterdir()]}")
-    except Exception as e:
-        print(f"⚠️ Ошибка установки прав: {e}")
-    
-    # Проверяем зависимости
-    try:
-        if executable_path and executable_path.exists():
-            result = subprocess.run([
-                "otool", "-L", str(executable_path)
-            ], capture_output=True, text=True)
-            print("✅ Зависимости проверены")
-        else:
-            print("⚠️ Не удалось проверить зависимости")
-    except Exception as e:
-        print(f"⚠️ Ошибка проверки зависимостей: {e}")
-    
-    # Проверяем Info.plist
-    info_plist = app_path / "Contents" / "Info.plist"
-    if info_plist.exists():
-        print("✅ Info.plist найден")
-    else:
-        print("❌ Info.plist отсутствует")
-    
-    # Проверяем иконку
-    icon_path = app_path / "Contents" / "Resources" / "AppIcon.icns"
-    if icon_path.exists():
-        print("✅ Иконка найдена")
-    else:
-        print("⚠️ Иконка отсутствует")
-    
-    # Проверяем структуру приложения
-    app_dir = app_path / "Contents" / "MacOS" / "VPNServerManager-Clean"
-    if not app_dir.exists():
-        # Проверяем альтернативные пути
-        alt_paths = [
-            app_path / "Contents" / "MacOS",
-            app_path / "Contents" / "MacOS" / "app",
-            app_path / "Contents" / "MacOS" / "VPNServer-Clean.app"
-        ]
-        for alt_path in alt_paths:
-            if alt_path.exists():
-                app_dir = alt_path
-                break
-    
-    if app_dir.exists():
-        print("✅ Структура приложения корректна")
-        # Показываем размер
-        try:
-            if app_dir.is_file():
-                # Если это файл (исполняемый), считаем размер всего приложения
-                size = sum(f.stat().st_size for f in app_path.rglob('*') if f.is_file())
-                print(f"📊 Размер приложения: {size / 1024 / 1024:.1f} MB")
-                
-                # Показываем количество файлов
-                file_count = len([f for f in app_path.rglob('*') if f.is_file()])
-                print(f"📁 Количество файлов: {file_count}")
-            else:
-                # Если это директория, считаем размер как раньше
-                size = sum(f.stat().st_size for f in app_dir.rglob('*') if f.is_file())
-                print(f"📊 Размер приложения: {size / 1024 / 1024:.1f} MB")
-                
-                # Показываем количество файлов
-                file_count = len([f for f in app_dir.rglob('*') if f.is_file()])
-                print(f"📁 Количество файлов: {file_count}")
-                
-                # Показываем основные файлы
-                main_files = [f.name for f in app_dir.iterdir() if f.is_file()]
-                if main_files:
-                    print(f"📄 Основные файлы: {main_files[:5]}")  # Показываем первые 5
-        except Exception as e:
-            print(f"⚠️ Не удалось подсчитать размер: {e}")
-    else:
-        print("❌ Структура приложения некорректна")
-        # Показываем что есть в Contents
-        contents_dir = app_path / "Contents"
-        if contents_dir.exists():
-            print(f"📁 Содержимое Contents: {[f.name for f in contents_dir.iterdir()]}")
-            
-            # Проверяем MacOS директорию
-            macos_dir = contents_dir / "MacOS"
-            if macos_dir.exists():
-                print(f"📁 Содержимое MacOS: {[f.name for f in macos_dir.iterdir()]}")
-                
-                # Проверяем каждый элемент в MacOS
-                for item in macos_dir.iterdir():
-                    if item.is_dir():
-                        print(f"📂 Папка {item.name}: {[f.name for f in item.iterdir()][:3]}...")  # Показываем первые 3 файла
-                    else:
-                        print(f"📄 Файл {item.name}")
-    
-    print("🔍 Диагностика завершена")
-    return True
 
 def get_version_from_config():
     """Получение версии из config.json"""
@@ -729,67 +432,33 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '5.0.2'
+        return '5.0.3'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '5.0.2'
+        return '5.0.3'
 
 def main():
-    """Основная функция сборки"""
+    """Local build: mutate resources, sign, verify, then package; fail closed."""
+    from tools.macos_bundle import finalize, write_manifest
+    if sys.platform != 'darwin':
+        raise SystemExit('macOS is required')
     version = get_version_from_config()
-    print(f"🚀 Сборка VPN Server Manager v{version}")
-    print("=====================================")
-    print(f"📁 Проект: {PROJECT_ROOT}")
-    print(f"📦 Результат: {DIST_DIR}")
-    print()
-    
-    # Очистка
+    print(f'Local macOS build {version}; output: {DIST_DIR}')
+    # These dedicated output directories never contain the installed app/profile.
     cleanup_previous_builds()
-    
-    # Сборка
-    if build_app():
-        print("✅ Сборка завершена успешно!")
-        
-        # Создание .app бандла
-        app_path = create_app_bundle()
-        if app_path:
-            print("🎉 Приложение готово к использованию!")
-            print(f"📁 Расположение: {DIST_DIR}")
-            
-            # Диагностика приложения
-            diagnose_app(app_path)
-            
-            # Создание DMG образа
-            print("\n📦 Создание инсталлятора...")
-            dmg_path = create_dmg(app_path)
-            
-            if dmg_path:
-                print("🎉 Инсталлятор создан успешно!")
-                print(f"📦 DMG файл: {dmg_path}")
-                print()
-                print(f"🔧 Особенности сборки v{version}:")
-                print("   ✅ Централизованная версия из config.json")
-                print("   ✅ Multi-App Support (параллельный запуск)")
-                print("   ✅ Модульная архитектура")
-                print("   ✅ Application Factory Pattern")
-                print("   ✅ Service Layer (DataManagerService)")
-                print("   ✅ Blueprint Architecture")
-                print("   ✅ Dependency Injection")
-                print("   ✅ Custom Exceptions")
-                print("   ✅ Structured Logging")
-                print("   ✅ Comprehensive Testing")
-                print("   ✅ Docker Support")
-                print("   ✅ Security Enhancements")
-                print("   ✅ Modern Python Practices")
-            else:
-                print("⚠️ Приложение создано, но DMG не создался")
-                print("Приложение доступно в папке dist/")
-        else:
-            print("❌ Ошибка создания .app бандла")
-            sys.exit(1)
-    else:
-        print("❌ Ошибка сборки")
-        sys.exit(1)
+    DIST_DIR.mkdir(parents=True, exist_ok=True)
+    BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    if not build_app():
+        raise SystemExit('PyInstaller build failed')
+    app_path = DIST_DIR / 'VPNServerManager-Clean.app'
+    metadata = finalize(app_path, PROJECT_ROOT / 'Info.plist.template', version)
+    dmg_path = create_dmg(app_path, metadata)
+    if not dmg_path:
+        raise SystemExit('DMG creation or verification failed')
+    manifest = write_manifest(dmg_path, metadata)
+    print(f'Local build verified: {dmg_path}\nManifest: {manifest}')
+    print('Ad-hoc signature only. Not notarized; not ready for public release.')
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

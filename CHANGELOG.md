@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.3] - 2026-10-27
+
+### Fixed
+- macOS builds no longer overwrite the installed user's configuration. Version metadata comes only from the tracked template; build outputs and caches use dedicated local directories.
+- Final plist changes precede ad-hoc signing and strict signature verification. Packaging preserves bundle symlinks, verifies the staged app and checks the DMG; failures stop the build.
+- Architecture and minimum binary deployment target are derived from collected Mach-O files. Local image names include version/architecture, and a JSON manifest records signing status and SHA-256. These artifacts are explicitly not notarized public releases.
+
 ## [5.0.2] - 2026-10-27
 
 ### Fixed
