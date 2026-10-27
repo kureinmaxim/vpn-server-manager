@@ -7,6 +7,7 @@ import signal
 import time
 from werkzeug.serving import make_server
 from app import create_app
+from desktop import mac_menu
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +99,11 @@ class DesktopApp:
             print("[START] Starting pywebview...")
             
             # Настройки окна
+            language = self._ui_language()
             webview.start(
+                func=self._install_menu,
+                args=(language,),
+                localization=mac_menu.localization(language),
                 debug=False,
                 http_server=False,
                 private_mode=True  # Приватный режим - не сохраняет сессии между запусками
@@ -111,6 +116,21 @@ class DesktopApp:
             logger.error(f"Error starting desktop app: {str(e)}")
             raise
     
+    def _ui_language(self):
+        """Язык интерфейса из профиля — на нём же подписи меню окна."""
+        try:
+            from app.services.ui_preferences import load_ui_preferences
+            return load_ui_preferences(self.app).get('language', 'en')
+        except Exception:
+            return 'en'
+
+    def _install_menu(self, language):
+        """Масштаб в меню «Вид» на macOS (Увеличить ⌘=, Уменьшить ⌘−, Фактический размер ⌘0)."""
+        try:
+            mac_menu.install(self.window, language)
+        except Exception as e:
+            logger.warning(f"Zoom menu not installed: {e}")
+
     def on_closing(self):
         """Обработчик закрытия окна с подтверждением"""
         global SERVER_PORT, _WSGI_SERVER

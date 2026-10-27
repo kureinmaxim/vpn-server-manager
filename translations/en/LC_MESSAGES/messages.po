@@ -10394,3 +10394,20 @@ msgstr "SSH %(endpoint)s: host key changed. Expected %(expected)s; received %(re
 
 msgid "Параметры SSH изменились. Повторите проверку с актуальными данными карточки."
 msgstr "SSH settings changed. Retry with the current card credentials."
+
+msgid "Уменьшить"
+msgstr "Zoom out"
+
+msgid "Увеличить"
+msgstr "Zoom in"
+
+msgid "Фактический размер"
+msgstr "Actual size"
+
+#, python-format
+msgid "Клавиши: %(mod)s + и %(mod)s −, %(mod)s 0 — фактический размер."
+msgstr "Keys: %(mod)s + and %(mod)s −, %(mod)s 0 for actual size."
+
+#, python-format
+msgid "Масштаб: %(zoom)s"
+msgstr "Zoom: %(zoom)s"

@@ -51,3 +51,20 @@ def test_ui_preferences_reject_invalid_values(client):
     assert bad_zoom.status_code == 400
     bad_lang = client.post('/ui_preferences', json={'language': 'fr'})
     assert bad_lang.status_code == 400
+
+
+def test_zoom_accepts_every_step(client, app):
+    from app.services.ui_preferences import ZOOM_STEPS
+    assert ZOOM_STEPS[0] == '50' and ZOOM_STEPS[-1] == '150' and '100' in ZOOM_STEPS
+    response = client.post('/ui_preferences', json={'zoom': '125'}, headers={'Accept': 'application/json'})
+    assert response.status_code == 200
+    assert _read_ui(app).get('zoom') == '125'
+
+
+def test_zoom_menu_has_steps_buttons_and_keys(client):
+    html = client.get('/locked?lang=en').get_data(as_text=True)
+    assert 'const allowedZooms = ["50", "60", "70", "80", "90", "100", "110", "125", "150"]' in html
+    assert 'onclick="stepZoom(1, event)"' in html and 'onclick="stepZoom(-1, event)"' in html
+    assert 'data-zoom-step="125"' in html and 'Actual size' in html
+    assert 'window.vpnZoom' in html and "addEventListener('keydown'" in html
+    assert 'Масштаб изменён' not in html

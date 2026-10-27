@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '5.0.4'),
+            "version": app.config.get('APP_VERSION', '5.0.5'),
             "release_date": "27.10.2026",
             "last_updated": "2026-10-27",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "5.0.4",
+            "version": "5.0.5",
             "release_date": "27.10.2026",
             "last_updated": "2026-10-27",
             "developer": "Куреин М.Н."
@@ -408,7 +408,7 @@ def create_app(config_name='development'):
         
         from flask_babel import gettext as _
         from flask_babel import get_locale as babel_get_locale
-        from .services.ui_preferences import load_ui_features, load_ui_preferences
+        from .services.ui_preferences import ZOOM_STEPS, load_ui_features, load_ui_preferences
 
         from .services.project_stats import ADGUARD, CHATMAIL, FILE_MANAGER, load_projects
 
@@ -430,6 +430,7 @@ def create_app(config_name='development'):
             'developer_name': _('Куреин М.Н.'),
             'current_locale': str(babel_get_locale()),
             'ui_zoom': ui_prefs.get('zoom', '80'),
+            'zoom_steps': list(ZOOM_STEPS),
             'ui_features': load_ui_features(app),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {

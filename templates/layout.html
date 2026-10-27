@@ -74,9 +74,16 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('60', event); return false;"><i class="bi bi-zoom-out me-2"></i>60%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('80', event); return false;"><i class="bi bi-search me-2"></i>80%</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setZoom('100', event); return false;"><i class="bi bi-zoom-in me-2"></i>100%</a></li>
+                            <li class="px-3 pb-2 d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="stepZoom(-1, event)" title="{{ _('Уменьшить') }}" aria-label="{{ _('Уменьшить') }}"><i class="bi bi-zoom-out" aria-hidden="true"></i></button>
+                                <span class="flex-grow-1 text-center fw-semibold" data-zoom-value>{{ ui_zoom or '80' }}%</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="stepZoom(1, event)" title="{{ _('Увеличить') }}" aria-label="{{ _('Увеличить') }}"><i class="bi bi-zoom-in" aria-hidden="true"></i></button>
+                            </li>
+                            {% for step in zoom_steps %}
+                            <li><a class="dropdown-item d-flex justify-content-between{% if step == (ui_zoom or '80') %} active{% endif %}" href="#" data-zoom-step="{{ step }}" onclick="setZoom('{{ step }}', event); return false;">{{ step }}%{% if step == '100' %}<span class="text-body-secondary small ms-3">{{ _('Фактический размер') }}</span>{% endif %}</a></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="px-3 small text-body-secondary">{{ _('Клавиши: %(mod)s + и %(mod)s −, %(mod)s 0 — фактический размер.', mod='Ctrl/⌘') }}</li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -140,7 +147,7 @@
             if (parts.length === 2) return parts.pop().split(';').shift();
         }
 
-        const allowedZooms = ['60', '80', '100'];
+        const allowedZooms = {{ zoom_steps|tojson }};
         const serverZoom = {{ (ui_zoom or '80')|tojson }};
 
         function resolveZoom(preferred) {
@@ -155,9 +162,37 @@
             return allowedZooms.includes(serverZoom) ? serverZoom : '80';
         }
 
+        let currentZoom = '80';
         function applyZoom(zoom) {
-            document.body.style.zoom = zoom + '%';
+            currentZoom = zoom;
+            if (document.body) document.body.style.zoom = zoom + '%';
+            document.querySelectorAll('[data-zoom-value]').forEach(el => { el.textContent = zoom + '%'; });
+            document.querySelectorAll('[data-zoom-step]').forEach(el => el.classList.toggle('active', el.dataset.zoomStep === zoom));
         }
+
+        // Шаг по списку масштабов: −1 меньше, +1 больше. Зовут кнопки в шапке, Cmd/Ctrl-клавиши
+        // и меню «Вид» окна macOS (desktop/mac_menu.py через evaluate_js).
+        function stepZoom(direction, event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            const index = allowedZooms.indexOf(currentZoom);
+            const next = allowedZooms[Math.min(allowedZooms.length - 1, Math.max(0, (index < 0 ? allowedZooms.indexOf('100') : index) + direction))];
+            if (next !== currentZoom) setZoom(next);
+            return false;
+        }
+        window.vpnZoom = {
+            step: direction => stepZoom(direction),
+            reset: () => setZoom('100'),
+        };
+
+        // Cmd/Ctrl + «=»/«+», «−», «0» — как в браузере. В окне приложения браузерного масштаба нет,
+        // а в браузере свой масштаб складывался бы с нашим, поэтому клавиши перехватываются всегда.
+        document.addEventListener('keydown', function(event) {
+            if (!(event.metaKey || event.ctrlKey) || event.altKey) return;
+            const key = event.key;
+            if (key === '=' || key === '+') { stepZoom(1, event); }
+            else if (key === '-' || key === '_') { stepZoom(-1, event); }
+            else if (key === '0') { event.preventDefault(); setZoom('100'); }
+        });
 
         // Применить сохранённый масштаб сразу, без ожидания DOMContentLoaded
         applyZoom(resolveZoom(serverZoom));
@@ -310,20 +345,19 @@
                 body: JSON.stringify({ zoom: nextZoom }),
                 credentials: 'same-origin'
             }).catch(function() { /* cookie already updated as a fallback */ });
-            // Показать уведомление о применении масштаба
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-info alert-dismissible fade show position-fixed';
-            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
-            alertDiv.innerHTML = `
-                <i class="bi bi-info-circle"></i> Масштаб изменён на ${nextZoom}%
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(alertDiv);
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.remove();
-                }
-            }, 3000);
+            // Одно уведомление на серию нажатий: при удержании клавиши оно обновляется, а не множится
+            let toast = document.getElementById('zoom-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'zoom-toast';
+                toast.className = 'alert alert-info position-fixed shadow-sm py-2';
+                toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
+                toast.setAttribute('role', 'status');
+                document.body.appendChild(toast);
+            }
+            toast.textContent = {{ _('Масштаб: %(zoom)s', zoom='{zoom}%')|tojson }}.replace('{zoom}', nextZoom);
+            clearTimeout(toast.hideTimer);
+            toast.hideTimer = setTimeout(() => toast.remove(), 1500);
             return false;
         }
 

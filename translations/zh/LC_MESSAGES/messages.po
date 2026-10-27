@@ -10060,3 +10060,20 @@ msgstr "SSH %(endpoint)s：主机密钥已更改。预期 %(expected)s；收到 
 
 msgid "Параметры SSH изменились. Повторите проверку с актуальными данными карточки."
 msgstr "SSH 设置已更改。请使用卡片中的最新凭据重试。"
+
+msgid "Уменьшить"
+msgstr "缩小"
+
+msgid "Увеличить"
+msgstr "放大"
+
+msgid "Фактический размер"
+msgstr "实际大小"
+
+#, python-format
+msgid "Клавиши: %(mod)s + и %(mod)s −, %(mod)s 0 — фактический размер."
+msgstr "快捷键：%(mod)s + 和 %(mod)s −，%(mod)s 0 恢复实际大小。"
+
+#, python-format
+msgid "Масштаб: %(zoom)s"
+msgstr "缩放：%(zoom)s"

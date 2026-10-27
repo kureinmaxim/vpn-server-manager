@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.5] - 2026-10-27
+
+### Added
+- Interface zoom buttons, selectable steps, keyboard shortcuts and a localized macOS View menu. Zoom controls share the same page state and avoid stacking notifications.
+
 ## [5.0.4] - 2026-10-27
 
 ### Fixed
