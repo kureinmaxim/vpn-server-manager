@@ -79,8 +79,8 @@ def test_card_credentials_do_not_spend_tries_on_local_keys(monkeypatch):
 
 def test_messages_name_the_cause_and_the_fix(app):
     with app.test_request_context("/"):
-        assert "ssh -p 2222 root@192.0.2.1" in describe_failure(RemoteConnectError("unknown_host"), CREDS)
-        assert "ssh-keygen -R '[192.0.2.1]:2222'" in describe_failure(RemoteConnectError("changed_host"), CREDS)
+        assert "known_hosts" in describe_failure(RemoteConnectError("unknown_host"), CREDS)
+        assert "[192.0.2.1]:2222" in describe_failure(RemoteConnectError("changed_host"), CREDS)
         assert "SSH" in describe_failure(RemoteConnectError("auth"), CREDS)
         assert "2222" in describe_failure(RemoteConnectError("unreachable"), CREDS)
         assert "python3" in describe_failure(RemoteOutputError("no_python"), CREDS)
@@ -97,7 +97,7 @@ def test_disk_usage_shows_known_hosts_hint(reset_client, monkeypatch):  # noqa: 
     assert response.status_code == 502
     error = response.get_json()["error"]
     assert "known_hosts" in error
-    assert "ssh -p 22 root@192.0.2.1" in error
+    assert "192.0.2.1" in error
 
 
 def test_control_discover_shows_auth_hint(control_client, monkeypatch):  # noqa: F811
@@ -153,7 +153,7 @@ def _ed25519_public_line():
     ).decode()
 
 
-def test_unreadable_known_hosts_lines_do_not_hide_the_server_key(tmp_path, monkeypatch):
+def test_unreadable_known_hosts_fails_closed(tmp_path, monkeypatch):
     public = _ed25519_public_line()
     (tmp_path / ".ssh").mkdir()
     (tmp_path / ".ssh" / "known_hosts").write_text(
@@ -164,12 +164,9 @@ def test_unreadable_known_hosts_lines_do_not_hide_the_server_key(tmp_path, monke
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
     client = paramiko.SSHClient()
-    routes._load_known_hosts(client)
-    name = "[192.0.2.1]:2222"
-    found = client._system_host_keys.lookup(name) or client.get_host_keys().lookup(name)
-    assert found is not None and "ssh-ed25519" in found
-    # Ключ другого сервера по-прежнему неизвестен — проверка остаётся строгой.
-    assert not (client._system_host_keys.lookup("[192.0.2.9]:22") or client.get_host_keys().lookup("[192.0.2.9]:22"))
+    from app.services.ssh_trust import KnownHostsError
+    with pytest.raises(KnownHostsError):
+        routes._load_known_hosts(client)
 
 
 def test_unclassified_failure_names_only_the_exception_class(reset_client, monkeypatch):  # noqa: F811

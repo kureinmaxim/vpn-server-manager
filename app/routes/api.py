@@ -1,3 +1,5 @@
+from ..services.ssh_service import SSHService
+from ..services.ssh_trust import load_known_hosts, RejectUnknownHost, host_key_message, KnownHostsError, UnknownHostKeyError
 from flask import Blueprint, request, jsonify, session, current_app
 from flask_babel import gettext as _
 from datetime import datetime
@@ -464,7 +466,7 @@ def get_server_stats(server_id):
         logger.error(f"Error getting server stats {server_id}: {str(e)}")
         
         # Определяем тип ошибки для более понятного сообщения
-        error_message = str(e)
+        error_message = host_key_message(e) or str(e)
         if "SSH authentication failed" in error_message:
             error_message = f"SSH authentication failed. Please check username and password for server {server_id}."
         elif "not responding" in error_message or "SSH service is not running" in error_message:
@@ -746,6 +748,12 @@ def roles_snapshot(server_id):
 
 def _ssh_failure_message(exc):
     """Fixed, translated reason for an SSH failure; never the exception text."""
+    trust_message = host_key_message(exc)
+    if trust_message:
+        return trust_message
+    from ..services.ssh_service import SSHSessionInvalidated
+    if isinstance(exc, SSHSessionInvalidated):
+        return _('Параметры SSH изменились. Повторите проверку с актуальными данными карточки.')
     import socket
     from paramiko.ssh_exception import AuthenticationException, NoValidConnectionsError, SSHException
     if isinstance(exc, (AuthenticationException, AuthenticationError)):
@@ -793,7 +801,9 @@ def _load_check_snapshot(server_id, derp=False, kind=None):
     except Exception as exc:
         # Do not expose SSH internals, addresses or credentials in error text.
         logger.warning('Load snapshot failed (%s)', type(exc).__name__)
-        return jsonify(error=_ssh_failure_message(exc)), 502
+        response = jsonify(error=_ssh_failure_message(exc))
+        response.headers['Cache-Control'] = 'no-store'
+        return response, 502
 
 
 def _ssh_auth(ssh_creds, data_manager):
@@ -1398,9 +1408,9 @@ def update_history_script(server_id):
     sudo = '' if creds['user'] == 'root' else 'sudo -n '
     encoded = base64.b64encode(METRICS_HISTORY_SCRIPT.encode()).decode()
     client = paramiko.SSHClient()
-    _load_known_hosts(client)
-    client.set_missing_host_key_policy(RejectUnknownHost())
     try:
+        _load_known_hosts(client)
+        client.set_missing_host_key_policy(RejectUnknownHost())
         _connect(client, creds)
         stdout = client.exec_command(
             f'test -f {path} && echo {encoded} | base64 -d | {sudo}tee {path} > /dev/null && {sudo}chmod +x {path}'
@@ -1495,9 +1505,9 @@ def install_monitoring(server_id):
             check_client = None
             try:
                 check_client = paramiko.SSHClient()
-                check_client.load_system_host_keys()
-                check_client.set_missing_host_key_policy(paramiko.RejectPolicy())
-                check_client.connect(hostname=ip, username=user, port=port, timeout=30,
+                load_known_hosts(check_client)
+                check_client.set_missing_host_key_policy(RejectUnknownHost())
+                SSHService.connect_managed(check_client, hostname=ip, username=user, port=port, timeout=30,
                                      banner_timeout=60, auth_timeout=30,
                                      **connect_kwargs(password, auth['key'], auth['key_passphrase']))
                 
@@ -1510,6 +1520,11 @@ def install_monitoring(server_id):
                     logger.warning(f"Monitoring already installed on server {server_id}, aborting installation")
                     yield f"data: {json.dumps({'already_installed': True, 'status': 'success'})}\n\n"
                     return
+            except (KnownHostsError, UnknownHostKeyError, paramiko.BadHostKeyException) as e:
+                if check_client:
+                    check_client.close()
+                yield f"data: {json.dumps({'error': _ssh_failure_message(e), 'status': 'error'})}\n\n"
+                return
             except Exception as e:
                 if check_client:
                     check_client.close()
@@ -1527,10 +1542,10 @@ def install_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                client.load_system_host_keys()
-                client.set_missing_host_key_policy(paramiko.RejectPolicy())
+                load_known_hosts(client)
+                client.set_missing_host_key_policy(RejectUnknownHost())
                 # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
-                client.connect(hostname=ip, username=user, port=port, timeout=30,
+                SSHService.connect_managed(client, hostname=ip, username=user, port=port, timeout=30,
                                **connect_kwargs(password, auth['key'], auth['key_passphrase'],
                                                 use_local_keys=True))
                 
@@ -1690,7 +1705,7 @@ exit 0
             except paramiko.AuthenticationException:
                 yield f"data: {json.dumps({'error': 'Ошибка аутентификации SSH. Проверьте имя пользователя и пароль.', 'status': 'error'})}\n\n"
             except paramiko.SSHException as e:
-                yield f"data: {json.dumps({'error': f'Ошибка SSH: {str(e)}', 'status': 'error'})}\n\n"
+                yield f"data: {json.dumps({'error': _ssh_failure_message(e), 'status': 'error'})}\n\n"
             except Exception as e:
                 yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
             finally:
@@ -1763,10 +1778,10 @@ def uninstall_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                client.load_system_host_keys()
-                client.set_missing_host_key_policy(paramiko.RejectPolicy())
+                load_known_hosts(client)
+                client.set_missing_host_key_policy(RejectUnknownHost())
                 # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
-                client.connect(hostname=ip, username=user, port=port, timeout=30,
+                SSHService.connect_managed(client, hostname=ip, username=user, port=port, timeout=30,
                                **connect_kwargs(password, auth['key'], auth['key_passphrase'],
                                                 use_local_keys=True))
                 
@@ -1805,7 +1820,7 @@ def uninstall_monitoring(server_id):
             except paramiko.AuthenticationException:
                 yield f"data: {json.dumps({'error': 'Ошибка аутентификации SSH', 'status': 'error'})}\n\n"
             except paramiko.SSHException as e:
-                yield f"data: {json.dumps({'error': f'Ошибка SSH: {str(e)}', 'status': 'error'})}\n\n"
+                yield f"data: {json.dumps({'error': _ssh_failure_message(e), 'status': 'error'})}\n\n"
             except Exception as e:
                 yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
             finally:

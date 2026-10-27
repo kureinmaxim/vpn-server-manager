@@ -41,15 +41,7 @@ def identity(creds):
     return (creds["ip"], int(creds["port"]), creds["user"])
 
 
-class UnknownHostKeyError(paramiko.SSHException):
-    """Ключа сервера нет в ~/.ssh/known_hosts этого компьютера."""
-
-
-class RejectUnknownHost(paramiko.RejectPolicy):
-    """RejectPolicy со своим типом ошибки: отказ тот же, но причину можно назвать в интерфейсе."""
-
-    def missing_host_key(self, client, hostname, key):
-        raise UnknownHostKeyError(f"Server {hostname!r} not found in known_hosts")
+from ..services.ssh_trust import UnknownHostKeyError, RejectUnknownHost, load_known_hosts, host_key_message
 
 
 class RemoteConnectError(Exception):
@@ -73,7 +65,8 @@ def _connect(client, creds):
         # Вход как у мониторинга: пароль и/или ключ из карточки. ~/.ssh и ssh-agent —
         # только если в карточке нет ни того, ни другого: иначе чужие ключи агента
         # исчерпают MaxAuthTries раньше пароля (Too many authentication failures).
-        client.connect(hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
+        from ..services.ssh_service import SSHService
+        SSHService.connect_managed(client, hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
                        timeout=20, auth_timeout=20, banner_timeout=20,
                        **connect_kwargs(creds.get("password"), creds.get("key"), creds.get("key_passphrase"),
                                         use_local_keys=not has_ssh_auth(creds)))
@@ -94,18 +87,18 @@ def describe_failure(exc, creds, *, may_have_run=False):
     неизвестна, поэтому называются только отказы до подключения. Текст исключений
     paramiko и stderr сервера не показываются и не пишутся в журнал.
     """
+    trust_message = host_key_message(exc)
+    if trust_message:
+        return trust_message
     reason = getattr(exc, "reason", None)
     logger.warning("SSH remote operation failed: %s (%s)", reason or "unknown", type(exc).__name__)
     ip, port, user = creds.get("ip"), creds.get("port", 22), creds.get("user", "root")
     if isinstance(exc, RemoteConnectError):
+        endpoint = ip if int(port) == 22 else f'[{ip}]:{port}'
         if reason == "unknown_host":
-            return translate("Ключа этого сервера нет в ~/.ssh/known_hosts на этом компьютере — проверка ключа "
-                             "хоста здесь обязательна. Один раз подключитесь из терминала и подтвердите ключ: "
-                             "ssh -p %(port)s %(user)s@%(ip)s", port=port, user=user, ip=ip)
+            return host_key_message(UnknownHostKeyError(endpoint))
         if reason == "changed_host":
-            return translate("Ключ сервера не совпадает с записью в ~/.ssh/known_hosts (сервер переустановлен?). "
-                             "Если это ожидаемо, удалите старую запись: ssh-keygen -R '[%(ip)s]:%(port)s' — "
-                             "и подключитесь из терминала заново.", ip=ip, port=port)
+            return host_key_message(paramiko.BadHostKeyException(endpoint, None, None))
         if reason == "auth":
             return translate("SSH: не удалось войти. Проверьте пароль или SSH-ключ в карточке сервера.")
         return translate("Сервер не ответил по SSH. Проверьте IP, порт %(port)s и доступность сервера.", port=port)
@@ -133,38 +126,7 @@ OUTPUT_MARKER = "__VSM_REMOTE_OUTPUT__"
 
 
 def _load_known_hosts(client):
-    """~/.ssh/known_hosts для строгой проверки ключа хоста.
-
-    paramiko прерывает чтение всего файла на строке, которую не может разобрать
-    (метки @cert-authority/@revoked, испорченная запись): его InvalidHostKey не
-    наследуется от SSHException. Тогда файл читается построчно, такие строки
-    пропускаются, остальные ключи проверяются как обычно.
-    """
-    try:
-        client.load_system_host_keys()
-        return
-    except Exception as exc:
-        logger.warning("known_hosts: paramiko could not read the file (%s), reading line by line", type(exc).__name__)
-    keys = client.get_host_keys()
-    skipped = 0
-    try:
-        with open(os.path.expanduser("~/.ssh/known_hosts"), encoding="utf-8", errors="replace") as handle:
-            for lineno, line in enumerate(handle, 1):
-                line = line.strip()
-                if not line or line.startswith("#"):
-                    continue
-                try:
-                    entry = None if line.startswith("@") else paramiko.hostkeys.HostKeyEntry.from_line(line, lineno)
-                except Exception:
-                    entry = None
-                if entry is None:
-                    skipped += 1
-                    continue
-                for name in entry.hostnames:
-                    keys.add(name, entry.key.get_name(), entry.key)
-    except OSError:
-        return
-    logger.warning("known_hosts: skipped %d unreadable lines", skipped)
+    load_known_hosts(client)
 
 
 def failure_code(exc):
@@ -173,12 +135,11 @@ def failure_code(exc):
 
 
 def remote(creds, args, *, source=SCRIPT_SOURCE):
-    # WARNING: The general SSH pool accepts unknown host keys. Destructive reset
-    # must use verified OpenSSH known_hosts and RejectPolicy instead.
+    # Dedicated connections use the same fail-closed trust loader as monitoring.
     client = paramiko.SSHClient()
-    _load_known_hosts(client)
-    client.set_missing_host_key_policy(RejectUnknownHost())
     try:
+        _load_known_hosts(client)
+        client.set_missing_host_key_policy(RejectUnknownHost())
         _connect(client, creds)
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
         # Метка отделяет ответ скрипта от того, что при входе печатают ~/.bashrc,

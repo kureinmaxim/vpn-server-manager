@@ -5,6 +5,11 @@ import shutil
 from app import create_app
 from app.services import registry
 
+@pytest.fixture(autouse=True)
+def isolated_ssh_home(monkeypatch, tmp_path):
+    """Tests must never consult the developer's SSH keys or trust store."""
+    monkeypatch.setenv('HOME', str(tmp_path))
+
 @pytest.fixture
 def app():
     """Создание тестового приложения"""

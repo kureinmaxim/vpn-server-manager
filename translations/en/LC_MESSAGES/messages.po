@@ -10382,3 +10382,15 @@ msgstr "Key changed. The original file is retained and the new file was verified
 
 msgid "Ключ не изменён или требуется восстановление профиля. Перезапустите приложение; исходные файлы сохранены."
 msgstr "The key was not changed or profile recovery is required. Restart the application; original files are retained."
+
+msgid "Не удалось прочитать known_hosts. Проверьте права и формат файла; проверка ключей не отключена."
+msgstr "Cannot read known_hosts. Check file permissions and format; host-key verification remains enabled."
+
+msgid "SSH %(endpoint)s: ключ сервера неизвестен. Получен %(received)s. Сверьте отпечаток через независимый доверенный канал, затем сохраните проверенный ключ в known_hosts через OpenSSH."
+msgstr "SSH %(endpoint)s: unknown host key. Received %(received)s. Verify the fingerprint through an independent trusted channel, then save the verified key to known_hosts using OpenSSH."
+
+msgid "SSH %(endpoint)s: ключ сервера изменился. Ожидался %(expected)s; получен %(received)s. Подключение отклонено. Проверьте причину смены через независимый канал; не удаляйте старую запись вслепую."
+msgstr "SSH %(endpoint)s: host key changed. Expected %(expected)s; received %(received)s. Connection rejected. Verify the reason through an independent channel; do not blindly remove the old entry."
+
+msgid "Параметры SSH изменились. Повторите проверку с актуальными данными карточки."
+msgstr "SSH settings changed. Retry with the current card credentials."

@@ -2,6 +2,9 @@ import logging
 import re
 import shlex
 import threading
+import hmac
+import secrets
+import weakref
 from typing import Dict, List, Optional
 
 import paramiko
@@ -10,7 +13,8 @@ from paramiko.ssh_exception import AuthenticationException, SSHException
 from ..exceptions import AuthenticationError, SSHConnectionError
 from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
-from .ssh_auth import connect_kwargs
+from .ssh_auth import connect_kwargs, _read_key_text
+from .ssh_trust import load_known_hosts, RejectUnknownHost, trust_revision
 
 from .project_stats import build_command, load_projects, parse_sample as parse_projects, summarize as summarize_projects
 
@@ -23,13 +27,25 @@ def _key_kwargs(key: Optional[str], key_passphrase: Optional[str]) -> Dict:
     return {"key": key, "key_passphrase": key_passphrase} if key else {}
 
 
+class SSHSessionInvalidated(paramiko.SSHException):
+    def __init__(self):
+        super().__init__('SSH connection settings changed; retry with current credentials')
+        self.reason = 'connection_changed'
+
+
 class SSHService:
     """Сервис для работы с SSH/SFTP с connection pooling"""
 
     # Кэш подключений
     _connection_pool = {}
-    _pool_lock = threading.Lock()
+    _pool_lock = threading.RLock()
     _connection_locks = {}
+    _connection_signatures = {}
+    _pool_epoch = 0
+    _last_trust_revision = None
+    _live_clients = weakref.WeakKeyDictionary()
+    _host_epochs = {}
+    _signature_secret = secrets.token_bytes(32)
     _process_exclusions = {"ps", "head", "bash", "sh", "sudo", "timeout"}
     _known_port_labels = {
         "22": "SSH",
@@ -466,6 +482,78 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         return self._parse_listener_ports(output)
 
     @classmethod
+    def connect_managed(cls, client, *args, **kwargs):
+        """Dedicated operations also participate in credential revocation."""
+        cls.assert_trust_current(client)
+        hostname = kwargs.get('hostname') or args[0]
+        with cls._pool_lock:
+            epoch = (cls._pool_epoch, cls._host_epochs.get(hostname, 0))
+            cls._live_clients[client] = hostname
+        try:
+            client.connect(*args, **kwargs)
+            with cls._pool_lock:
+                if epoch != (cls._pool_epoch, cls._host_epochs.get(hostname, 0)):
+                    raise SSHSessionInvalidated()
+        except Exception as error:
+            if isinstance(error, paramiko.BadHostKeyException):
+                port = kwargs.get('port', 22)
+                error.hostname = hostname if int(port) == 22 else f'[{hostname}]:{port}'
+            with cls._pool_lock:
+                cls._live_clients.pop(client, None)
+            raise
+
+    @classmethod
+    def assert_trust_current(cls, client):
+        current = cls.refresh_trust()
+        loaded = getattr(client, '_vpn_trust_revision', None)
+        if isinstance(loaded, bytes) and current != loaded:
+            raise SSHSessionInvalidated()
+
+    @classmethod
+    def _auth_signature(cls, password, key, passphrase):
+        material = [password or '', key or '', passphrase or '']
+        if key:
+            material.append(_read_key_text(key))
+        trust = cls.refresh_trust()
+        payload = repr(material).encode() + trust
+        return hmac.digest(cls._signature_secret, payload, 'sha256')
+
+    @classmethod
+    def refresh_trust(cls):
+        try:
+            trust = trust_revision()
+        except Exception:
+            cls.close_all()
+            raise
+        with cls._pool_lock:
+            if cls._last_trust_revision is not None and cls._last_trust_revision != trust:
+                cls.close_all()
+            cls._last_trust_revision = trust
+        return trust
+
+    @classmethod
+    def invalidate_hosts(cls, hosts):
+        """Close borrowed sessions too, and fence handshakes currently in flight."""
+        with cls._pool_lock:
+            for host in set(hosts):
+                cls._host_epochs[host] = cls._host_epochs.get(host, 0) + 1
+            for client, host in list(cls._live_clients.items()):
+                if host in hosts:
+                    cls._live_clients.pop(client, None)
+                    try:
+                        client.close()
+                    except Exception as error:
+                        logger.warning('SSH close failed (%s)', type(error).__name__)
+            for pool_key in list(cls._connection_pool):
+                if pool_key[0] in hosts:
+                    connection = cls._connection_pool.pop(pool_key)
+                    cls._connection_signatures.pop(pool_key, None)
+                    try:
+                        connection.close()
+                    except Exception as error:
+                        logger.warning('SSH close failed (%s)', type(error).__name__)
+
+    @classmethod
     def get_connection_pooled(
         cls,
         hostname: str,
@@ -481,7 +569,7 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         Вход — паролем и/или ключом из карточки (ssh_auth.connect_kwargs).
         """
         # pool_key, а не key: key — это SSH-ключ из карточки
-        pool_key = f"{hostname}:{port}:{username}"
+        pool_key = (hostname, int(port), username)
 
         with cls._pool_lock:
             connection_lock = cls._connection_locks.setdefault(pool_key, threading.Lock())
@@ -490,6 +578,22 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         if not connection_lock.acquire(timeout=connection_timeout):
             raise TimeoutError("SSH connection is busy")
         try:
+            with cls._pool_lock:
+                initial_host_epoch = cls._host_epochs.get(hostname, 0)
+            try:
+                signature = cls._auth_signature(password, key, key_passphrase)
+            except Exception:
+                cls.invalidate_hosts([hostname])
+                raise
+            with cls._pool_lock:
+                if initial_host_epoch != cls._host_epochs.get(hostname, 0):
+                    raise SSHSessionInvalidated()
+                epoch = (cls._pool_epoch, cls._host_epochs.get(hostname, 0))
+                if cls._connection_signatures.get(pool_key) != signature:
+                    stale = cls._connection_pool.pop(pool_key, None)
+                    cls._connection_signatures.pop(pool_key, None)
+                    if stale is not None:
+                        stale.close()
             # Проверяем есть ли живое подключение
             with cls._pool_lock:
                 conn = cls._connection_pool.get(pool_key)
@@ -500,9 +604,15 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
                         _, stdout, _ = conn.exec_command("echo test", timeout=5)
                         stdout.channel.close()
                         logger.info(f"♻️ Reusing existing connection to {hostname}")
+                        with cls._pool_lock:
+                            if (epoch != (cls._pool_epoch, cls._host_epochs.get(hostname, 0)) or
+                                    cls._connection_pool.get(pool_key) is not conn):
+                                raise SSHSessionInvalidated()
                         return conn
+                except SSHSessionInvalidated:
+                    raise
                 except Exception as e:
-                    logger.warning(f"Connection check failed: {e}")
+                    logger.warning("Connection check failed (%s)", type(e).__name__)
                 with cls._pool_lock:
                     cls._connection_pool.pop(pool_key, None)
                 conn.close()
@@ -513,12 +623,13 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             )
             ssh = paramiko.SSHClient()
             try:
-                ssh.load_system_host_keys()
-                ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+                load_known_hosts(ssh)
+                ssh.set_missing_host_key_policy(RejectUnknownHost())
                 # Для быстрых проверок используем короткие таймауты
                 banner_timeout = min(connection_timeout * 2, 60)
                 auth_timeout = min(connection_timeout, 30)
 
+                cls.assert_trust_current(ssh)
                 ssh.connect(
                     hostname,
                     port=port,
@@ -530,14 +641,20 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
                     **connect_kwargs(password, key, key_passphrase),
                 )
 
+                latest_signature = cls._auth_signature(password, key, key_passphrase)
                 with cls._pool_lock:
+                    if epoch != (cls._pool_epoch, cls._host_epochs.get(hostname, 0)) or signature != latest_signature:
+                        raise SSHSessionInvalidated()
                     cls._connection_pool[pool_key] = ssh
+                    cls._connection_signatures[pool_key] = signature
                 logger.info(f"✅ New connection created and pooled: {hostname}")
                 return ssh
 
             except Exception as e:
+                if isinstance(e, paramiko.BadHostKeyException):
+                    e.hostname = hostname if int(port) == 22 else f'[{hostname}]:{port}'
                 ssh.close()
-                logger.error(f"Failed to connect to {hostname}: {e}")
+                logger.warning("SSH connection failed (%s)", type(e).__name__)
                 raise
         finally:
             connection_lock.release()
@@ -575,6 +692,14 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         """Закрыть все подключения (вызывать при остановке приложения)"""
         logger.info("Closing all SSH connections...")
         with cls._pool_lock:
+            cls._pool_epoch += 1
+            for client in list(cls._live_clients):
+                try:
+                    client.close()
+                except Exception:
+                    pass
+            cls._live_clients.clear()
+            cls._connection_signatures.clear()
             for key, conn in list(cls._connection_pool.items()):
                 try:
                     logger.info(f"Closing connection: {key}")
@@ -597,16 +722,17 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
     ) -> None:  # Увеличен с 10 до 30
         """Установка SSH соединения"""
         try:
+            self.disconnect()
             self.client = paramiko.SSHClient()
-            self.client.load_system_host_keys()
-            self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
+            load_known_hosts(self.client)
+            self.client.set_missing_host_key_policy(RejectUnknownHost())
 
             logger.info(f"Connecting to {hostname}:{port} as {username}")
             auth = connect_kwargs(password, key, key_passphrase)
             if key_filename and key_passphrase and not key:
                 auth["passphrase"] = key_passphrase
 
-            self.client.connect(
+            self.connect_managed(self.client,
                 hostname=hostname,
                 username=username,
                 key_filename=key_filename,  # путь к ключу: читает сам paramiko, как раньше
@@ -621,14 +747,11 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             logger.info(f"Successfully connected to {hostname}")
 
         except AuthenticationException as e:
-            logger.error(f"Authentication failed for {username}@{hostname}: {str(e)}")
-            raise AuthenticationError(f"Authentication failed: {str(e)}")
-        except SSHException as e:
-            logger.error(f"SSH connection failed to {hostname}: {str(e)}")
-            raise SSHConnectionError(f"SSH connection failed: {str(e)}")
+            self.disconnect()
+            raise AuthenticationError('SSH authentication failed') from e
         except Exception as e:
-            logger.error(f"Unexpected error connecting to {hostname}: {str(e)}")
-            raise SSHConnectionError(f"Failed to connect: {str(e)}")
+            self.disconnect()
+            raise SSHConnectionError('SSH connection failed') from e
 
     def disconnect(self) -> None:
         """Закрытие соединения"""

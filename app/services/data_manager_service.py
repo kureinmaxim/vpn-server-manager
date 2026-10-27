@@ -461,6 +461,25 @@ class DataManagerService:
                 atomic_write(path + '.backup.enc', raw)
             atomic_write(path, encrypted)
             versions[path] = revision(encrypted)
+            # Only a successful persistent change revokes live sessions.
+            old_by_id = {str(row.get('id')): row for row in old_servers}
+            new_by_id = {str(row.get('id')): row for row in clean}
+            affected = set()
+            from .ssh_address import card_addresses
+            for identifier in old_by_id.keys() | new_by_id.keys():
+                old, new = old_by_id.get(identifier, {}), new_by_id.get(identifier, {})
+                def access(row):
+                    credentials = row.get('ssh_credentials') or {}
+                    secrets = tuple(self.decrypt_data(credentials.get(field, ''))
+                                    for field in ('password', 'private_key', 'key_passphrase'))
+                    return (card_addresses(row), credentials.get('user', 'root'),
+                            str(credentials.get('port', 22)), secrets)
+                if access(old) != access(new):
+                    affected.update(card_addresses(old))
+                    affected.update(card_addresses(new))
+            if affected:
+                from .ssh_service import SSHService
+                SSHService.invalidate_hosts(affected)
 
     def create_backup(self, source_file: str, backup_dir: str, prefix: str = "backup") -> str:
         """

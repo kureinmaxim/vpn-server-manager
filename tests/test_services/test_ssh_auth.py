@@ -127,7 +127,7 @@ class TestSshServiceWithKey:
         assert kwargs["password"] is None
         assert kwargs["look_for_keys"] is False and kwargs["allow_agent"] is False
 
-    def test_bad_key_closes_client_without_connecting(self, monkeypatch):
+    def test_bad_key_does_not_create_a_connection(self, monkeypatch):
         monkeypatch.setattr(SSHService, "_connection_pool", {})
         monkeypatch.setattr(SSHService, "_connection_locks", {})
         client = Mock()
@@ -135,7 +135,7 @@ class TestSshServiceWithKey:
         with pytest.raises(paramiko.AuthenticationException):
             SSHService.get_connection_pooled("bad-key-host", 22, "root", None, key="/nonexistent/key")
         client.connect.assert_not_called()
-        client.close.assert_called_once()
+        client.close.assert_not_called()
         assert not SSHService._connection_pool
 
     def test_monitoring_methods_pass_the_key_to_the_pool(self, monkeypatch):

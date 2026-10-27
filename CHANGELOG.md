@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.2] - 2026-10-27
+
+### Fixed
+- SSH host-key errors distinguish unknown, changed and unreadable trust records. Messages show only the endpoint and public SHA256 fingerprints, with independent-verification guidance. Malformed or unsupported `known_hosts` entries fail closed.
+- Successful changes to a card's SSH credentials or addresses close its existing connections, including dedicated operations. In-flight connections cannot return to the pool after revocation; unrelated card edits retain connections.
+- Pooled connections recheck credential/key-file content and local trust on acquisition. Changes to `known_hosts` revoke existing sessions on the next SSH access. No automatic trust acceptance or remote-operation retry is added.
+
 ## [5.0.1] - 2026-10-27
 
 ### Fixed
