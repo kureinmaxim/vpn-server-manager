@@ -94,3 +94,37 @@ def test_real_codesign_detects_post_signing_plist_change(tmp_path):
     info_path.write_bytes(plistlib.dumps(info))
     with pytest.raises(subprocess.CalledProcessError):
         bundle.verify(app)
+
+
+def test_newer_dependency_rejected_before_plist_changes(tmp_path, monkeypatch):
+    app, executable = fixture_app(tmp_path)
+    before = (app / 'Contents/Info.plist').read_bytes()
+    monkeypatch.setattr(bundle, 'inspect_binaries', lambda _: [
+        (executable, {'arm64'}, '11.0'), (app / 'libpython.dylib', {'arm64'}, '26.0')])
+    run = Mock()
+    monkeypatch.setattr(bundle, 'run', run)
+    with pytest.raises(ValueError, match='libpython.dylib requires 26.0'):
+        bundle.finalize(app, 'Info.plist.template', '1.2.3', target='13.0')
+    assert (app / 'Contents/Info.plist').read_bytes() == before
+    run.assert_not_called()
+
+
+def test_supported_target_is_not_lowered_to_binary_minimum(tmp_path, monkeypatch):
+    app, executable = fixture_app(tmp_path)
+    monkeypatch.setattr(bundle, 'inspect_binaries', lambda _: [(executable, {'arm64'}, '11.0')])
+    monkeypatch.setattr(bundle, 'run', Mock())
+    result = bundle.finalize(app, 'Info.plist.template', '1.2.3', target='13.0')
+    assert result['minimum_macos'] == '13.0'
+    assert result['binary_minimum_macos'] == '11.0'
+    assert plistlib.loads((app / 'Contents/Info.plist').read_bytes())['LSMinimumSystemVersion'] == '13.0'
+
+
+def test_intel_build_explains_missing_dependency_before_download(monkeypatch):
+    from tools import build_macos_compatible as compatible
+    monkeypatch.setattr(compatible.sys, 'platform', 'darwin')
+    monkeypatch.setattr(compatible.platform, 'machine', lambda: 'x86_64')
+    run = Mock()
+    monkeypatch.setattr(compatible.subprocess, 'run', run)
+    with pytest.raises(SystemExit, match='cryptography 50'):
+        compatible.main()
+    run.assert_not_called()

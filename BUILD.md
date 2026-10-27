@@ -87,12 +87,44 @@ User data (`.env`, `config.json`, `data\`) is **not** in the installer and is **
 
 ### macOS `.app` + `.dmg`
 
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then run:
+
 ```bash
-source venv/bin/activate
-python3 build_macos.py
+python3 tools/build_macos_compatible.py
 ```
 
-or `venv/bin/python3 build_macos.py`
+The launcher downloads isolated CPython **3.13.12** into `.build-python`, creates
+`.venv-macos`, and syncs `requirements/macos-arm64.lock` with required hashes.
+It does not use Homebrew Python for the application runtime or alter the normal
+`venv`. Runtime/build packages are separated from developer tools. Native packages
+must use wheels; the sole source exception is the pure-Python `proxy-tools` package,
+whose source archive is hash-locked. uv's build-isolation tooling is not fully locked;
+this is not a claim of byte-identical reproducible builds.
+
+Current target: **Apple Silicon, macOS 13+**. Every collected Mach-O must have a
+minimum deployment target no higher than 13.0; a newer dependency fails the build
+before signing/packaging. The plist never promises an OS older than the selected
+target. A runtime self-check loads native UI/crypto dependencies and performs a
+synthetic encryption round trip without loading a profile or opening a window.
+This runs on the build host; real GUI testing on macOS 13 is still required.
+
+Intel builds are explicitly unavailable in this workflow: `cryptography 50` removed
+macOS x86_64 wheels ([upstream changelog](https://cryptography.io/en/stable/changelog/)).
+The launcher fails clearly on Intel instead of silently downgrading cryptography.
+An Intel toolchain requires separate dependency/build and security review.
+
+For maintenance, refresh the ARM lock with uv on macOS, then rebuild and test:
+
+```bash
+MACOSX_DEPLOYMENT_TARGET=13.0 uv pip compile requirements/macos-build.in \
+  --python .build-python/cpython-3.13.12-macos-aarch64-none/bin/python3.13 \
+  --python-platform aarch64-apple-darwin --only-binary :all: \
+  --no-binary proxy-tools --generate-hashes -o requirements/macos-arm64.lock
+```
+
+`python3 build_macos.py` remains a low-level entry point using the current
+interpreter, but now rejects binaries requiring more than macOS 13 by default.
+Setting `MACOSX_DEPLOYMENT_TARGET` changes the build ceiling, not existing binaries.
 
 Artifacts:
 

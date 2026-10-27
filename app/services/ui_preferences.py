@@ -10,7 +10,9 @@ from typing import Any, Dict, Optional
 logger = logging.getLogger(__name__)
 
 ALLOWED_LANGUAGES = frozenset({'ru', 'en', 'zh'})
-ALLOWED_ZOOMS = frozenset({'60', '80', '100'})
+# Шаги масштаба по порядку: меню «Вид» и Cmd+=/Cmd+− идут по ним от текущего значения
+ZOOM_STEPS = ('50', '60', '70', '80', '90', '100', '110', '125', '150')
+ALLOWED_ZOOMS = frozenset(ZOOM_STEPS)
 DEFAULT_LANGUAGE = 'en'
 DEFAULT_ZOOM = '80'
 UI_CONFIG_KEY = 'ui'

@@ -1,0 +1,31 @@
+# Runtime requirements plus packaging tools; no developer/Qt packages.
+# Core Flask dependencies
+Flask>=3.1.3
+Werkzeug>=3.0.0
+Jinja2>=3.1.0
+
+# Internationalization
+Flask-Babel==4.0.0
+Babel==2.18.0
+
+# Desktop GUI
+pywebview>=6.2.1
+
+# Cryptography
+cryptography>=50.0.0
+
+# SSH/SFTP
+paramiko>=5.0.0
+
+# HTTP requests
+requests>=2.34.2
+urllib3>=2.7.0
+
+# Images (server icons and screen snip)
+Pillow>=11.0.0
+
+# Environment variables
+python-dotenv>=1.2.2
+
+
+pyinstaller>=6.21.0

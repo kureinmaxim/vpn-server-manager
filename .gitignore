@@ -180,3 +180,8 @@ config.json
 .key-rotation*
 .profile-generation
 .profile.lock
+
+# Isolated macOS build toolchain
+.build-python/
+.build-cache/
+.venv-macos/

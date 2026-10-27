@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.4] - 2026-10-27
+
+### Fixed
+- Apple Silicon macOS builds can use an isolated CPython 3.13.12 runtime and hash-locked runtime/build dependencies instead of inheriting the host's Homebrew deployment target.
+- The default macOS target is 13.0. A dependency requiring a newer OS fails before signing; the plist distinguishes the selected target from the measured binary minimum in the manifest.
+- A packaged dependency/cryptography self-check must pass before DMG creation. It does not access user profiles or remote servers.
+- Intel builds through the isolated launcher fail explicitly: current cryptography releases no longer publish macOS x86_64 wheels. No automatic downgrade is applied. GUI validation on macOS 13 and public notarized distribution remain pending.
+
 ## [5.0.3] - 2026-10-27
 
 ### Fixed

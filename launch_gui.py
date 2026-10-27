@@ -29,6 +29,11 @@ def setup_logging():
         return False
 
 if __name__ == '__main__':
+    if sys.argv[1:] == ['--build-smoke-test']:
+        from desktop.build_smoke import run as build_smoke
+        build_smoke()
+        raise SystemExit(0)
+
     # Настраиваем логирование
     setup_logging()
     

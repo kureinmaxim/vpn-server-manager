@@ -432,10 +432,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '5.0.3'
+        return '5.0.4'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '5.0.3'
+        return '5.0.4'
 
 def main():
     """Local build: mutate resources, sign, verify, then package; fail closed."""
@@ -451,7 +451,12 @@ def main():
     if not build_app():
         raise SystemExit('PyInstaller build failed')
     app_path = DIST_DIR / 'VPNServerManager-Clean.app'
-    metadata = finalize(app_path, PROJECT_ROOT / 'Info.plist.template', version)
+    metadata = finalize(app_path, PROJECT_ROOT / 'Info.plist.template', version,
+                        target=os.environ.get('MACOSX_DEPLOYMENT_TARGET', '13.0'))
+    subprocess.run([str(app_path / 'Contents/MacOS/VPNServerManager-Clean'),
+                    '--build-smoke-test'], check=True, timeout=60)
+    metadata['runtime_smoke'] = 'passed-on-build-host'
+    metadata['python'] = sys.version.split()[0]
     dmg_path = create_dmg(app_path, metadata)
     if not dmg_path:
         raise SystemExit('DMG creation or verification failed')

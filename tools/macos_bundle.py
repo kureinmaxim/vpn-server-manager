@@ -57,11 +57,23 @@ def inspect_binaries(app):
     return binaries
 
 
+def require_compatible(binaries, target, root):
+    if not re.fullmatch(r'\d+\.\d+(?:\.\d+)?', target):
+        raise ValueError('Invalid macOS target')
+    incompatible = [(path, minimum) for path, _, minimum in binaries
+                    if version_tuple(minimum) > version_tuple(target)]
+    if incompatible:
+        details = ', '.join(f'{path.relative_to(root)} requires {minimum}'
+                            for path, minimum in incompatible[:8])
+        raise ValueError(f'Build exceeds macOS {target}: {details}. '
+                         'Use python3 tools/build_macos_compatible.py; changing plist is not a fix.')
+
+
 def verify(app):
     run('codesign', '--verify', '--deep', '--strict', '--verbose=2', str(app))
 
 
-def finalize(app, template, version):
+def finalize(app, template, version, target=None):
     app = Path(app)
     plist_path = app / 'Contents/Info.plist'
     with plist_path.open('rb') as stream:
@@ -74,6 +86,8 @@ def finalize(app, template, version):
     for path, available, _ in binaries:
         if not arches <= available:
             raise ValueError(f'Architecture mismatch: {path.relative_to(app)}')
+    if target is not None:
+        require_compatible(binaries, target, app)
     minimum = max((minimum for _, _, minimum in binaries), key=version_tuple)
     if 'arm64' in arches and version_tuple(minimum) < (11, 0, 0):
         minimum = '11.0'
@@ -82,15 +96,15 @@ def finalize(app, template, version):
     for key in ('CFBundleExecutable', 'CFBundleIconFile'):
         overlay.pop(key, None)
     info.update(overlay)
-    info['LSMinimumSystemVersion'] = minimum
+    info['LSMinimumSystemVersion'] = max((minimum, target or minimum), key=version_tuple)
     with plist_path.open('wb') as stream:
         plistlib.dump(info, stream)
     # PyInstaller has already signed nested binaries. Only the outer seal changed.
     run('codesign', '--force', '--sign', '-', str(app))
     verify(app)
     return {'version': version, 'architecture': 'universal2' if len(arches) == 2 else next(iter(arches)),
-            'minimum_macos': minimum, 'signing': 'ad-hoc-local-only',
-            'notarized': False, 'binary_count': len(binaries)}
+            'minimum_macos': info['LSMinimumSystemVersion'], 'binary_minimum_macos': minimum, 'signing': 'ad-hoc-local-only',
+            'notarized': False, 'binary_count': len(binaries), 'target_macos': target}
 
 
 def write_manifest(dmg, metadata):
