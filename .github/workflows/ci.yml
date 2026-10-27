@@ -54,7 +54,33 @@ jobs:
       env:
         PYTHONIOENCODING: utf-8
 
-# Прежний job `build` удалён: он ничего не собирал (реальный билд закомментирован),
-# только ставил pyinstaller, а macos-раннер давал разовые инфра-сбои (Failed to load
-# action manifest) → ложные «упавшие» письма. Сборка инсталляторов — локально
-# (build_windows.ps1 / build_macos.py), см. BUILD.md.
+  macos-build:
+    name: macOS ARM packaged smoke
+    runs-on: macos-14
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      with:
+        version: '0.10.7'
+        enable-cache: false
+    - name: Confirm ARM runner
+      run: test "$(uname -m)" = arm64
+    - name: Build with isolated runtime and locked dependencies
+      run: python3 tools/build_macos_compatible.py
+    - name: Validate privacy and relocated runtime
+      run: |
+        .venv-macos/bin/python tools/check_public_files.py
+        .venv-macos/bin/python -m tools.check_macos_artifact
+    - name: Record verification evidence
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-arm64-verification-${{ github.sha }}
+        path: |
+          dist/macos-local/*-local.json
+          dist/macos-local/check-report.json
+        if-no-files-found: error
+        retention-days: 14

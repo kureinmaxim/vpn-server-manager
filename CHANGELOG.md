@@ -2,6 +2,15 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.6] - 2026-10-27
+
+### Added
+- macOS ARM CI now builds the actual app/DMG with the isolated runtime and locked dependencies, checks package privacy, validates the manifest/checksum, and runs a relocated copy with a fresh home directory.
+- Verification reports identify the build-host OS and explicitly distinguish packaged dependency checks from GUI/notarization approval. CI retains JSON evidence only, not public release binaries.
+
+### Fixed
+- The macOS zoom menu no longer changes the global fullscreen-menu preference.
+
 ## [5.0.5] - 2026-10-27
 
 ### Added

@@ -119,8 +119,6 @@ def _add_items(AppKit, language):
     global _target
     # Вкладок у окна нет: без этого macOS дописывает в «Вид» «Показать панель вкладок»
     AppKit.NSWindow.setAllowsAutomaticWindowTabbing_(False)
-    # «Полноэкранный режим» уже есть от pywebview — второй такой пункт macOS не добавляет
-    AppKit.NSUserDefaults.standardUserDefaults().setBool_forKey_(False, 'NSFullScreenMenuItemEverywhere')
     menu = _view_menu(AppKit, _labels(language)['cocoa.menu.view'])
     if any(str(entry.action() or '') == 'runZoom:' for entry in menu.itemArray()):
         return

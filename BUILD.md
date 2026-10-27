@@ -206,3 +206,22 @@ pytest --cov=app tests/
 - [VERSION_MANAGEMENT.md](VERSION_MANAGEMENT.md)
 - [release_guide_ru.md](docs/release_guide_ru.md)
 - [TERMINAL_HELP.md](TERMINAL_HELP.md)
+
+
+## macOS CI evidence
+
+The `macos-build` job uses an ARM `macos-14` runner and uv 0.10.7, builds with the
+same isolated launcher, then runs:
+
+```bash
+.venv-macos/bin/python tools/check_public_files.py
+.venv-macos/bin/python -m tools.check_macos_artifact
+```
+
+The verifier checks version/target/architecture, the DMG SHA-256, and the signature
+of a relocated `.app`. It runs the relocated executable's dependency self-check
+with a temporary home directory and verifies that it did not create an app profile.
+CI retains only JSON evidence for 14 days. It does not upload a release asset,
+use signing credentials, exercise GUI interactions, or test upgrade/restore.
+A successful macOS 14 CI run is not evidence of GUI compatibility on macOS 13.
+Runner reference: [GitHub hosted runners](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).
