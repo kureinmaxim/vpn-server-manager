@@ -226,14 +226,14 @@ both the dependency self-check and a synthetic profile lifecycle:
 - First start creates a profile and renders the locked page without a GUI/network.
 - A historical list-only encrypted vault is read and saved with DNS data.
 - A separate process verifies that the key, credentials and active vault survive.
-- The real authenticated/CSRF-protected `.enc` import rejects corrupt input, then
+- The real authenticated/CSRF-protected `/restore_backup` rejects corrupt input, then
   restores a valid encrypted backup into a new file while retaining the original.
 - Another process verifies the restored data and persisted selection.
 
 The profile test command refuses a regular HOME or a non-frozen executable. It only
 runs with a marker in a disposable `vsm-install-*` directory. CI retains JSON evidence
 for 10 days; synthetic vaults/keys and binaries are not uploaded. This covers the
-existing `.enc` import, not the placeholder `/restore_backup` route. It does not
+working encrypted inventory restore route added in 5.0.8. It does not
 exercise GUI interactions, a previous app binary's upgrade path, Gatekeeper,
 notarization, or macOS 13 itself.
 Runner reference: [GitHub hosted runners](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).

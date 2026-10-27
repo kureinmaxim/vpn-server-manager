@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.8] - 2026-10-27
+
+### Added
+- Settings now offers encrypted-only inventory backups and a working restore action. Backups contain server/DNS data; profile keys, PIN, preferences and attachments are excluded.
+- Restore validates the outer vault and encrypted credential fields, writes a new private file and commits the selected path before changing runtime state. The original file is retained; wrong keys, corrupt input and stale selection are rejected.
+- Desktop downloads use pywebview's native save flow. The packaged DMG smoke test exercises the new authenticated, CSRF-protected restore route.
+
 ## [5.0.7] - 2026-10-27
 
 ### Added

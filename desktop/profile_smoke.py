@@ -66,7 +66,8 @@ def run(phase):
         with client.session_transaction() as session:
             session.update(authenticated=True, pin_verified=True, csrf_token='build-fixture-token')
         def upload(raw):
-            return client.post('/import_data', data={'data_file': (io.BytesIO(raw), 'backup.enc')},
+            return client.post('/restore_backup', data={'backup_file': (io.BytesIO(raw), 'backup.enc'),
+                                                              'confirm_restore': 'yes'},
                                headers={'X-CSRF-Token': 'build-fixture-token'})
         if upload(b'broken fixture').status_code != 302 or app.config['active_data_file'] != str(old_path):
             raise RuntimeError('Invalid backup changed active data')

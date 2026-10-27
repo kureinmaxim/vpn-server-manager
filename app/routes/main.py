@@ -1501,35 +1501,50 @@ def upload_icon():
 @main_bp.route('/download_backup')
 @require_auth
 @require_pin
-@log_request
 def download_backup():
-    """Скачивание резервной копии"""
+    from io import BytesIO
+    from flask import send_file
+    from ..services import backup_service
     try:
-        # Здесь должна быть логика создания и скачивания резервной копии
-        flash(_('Backup download not implemented yet'), 'info')
+        manager = registry.get('data_manager')
+        if manager is None:
+            raise VaultError('Data service unavailable')
+        raw = backup_service.download(manager, manager.get_active_data_path(current_app.config))
+        response = send_file(BytesIO(raw), mimetype='application/octet-stream', as_attachment=True,
+                             download_name='vault_backup_' + datetime.datetime.now().strftime('%Y%m%d_%H%M%S') + '.enc')
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+    except Exception as exc:
+        logger.warning('Encrypted backup failed (%s)', type(exc).__name__)
+        flash(_('Не удалось создать копию. Проверьте активный файл и ключ профиля.'), 'danger')
         return redirect(url_for('main.settings'))
-    except Exception as e:
-        logger.error(f"Error creating backup: {str(e)}")
-        flash(_('Error creating backup'), 'error')
-        return redirect(url_for('main.settings'))
+
 
 @main_bp.route('/restore_backup', methods=['POST'])
 @require_auth
 @require_pin
-@handle_errors
 def restore_backup():
-    """Восстановление из резервной копии"""
-    if 'backup_file' not in request.files:
-        flash(_('No backup file selected'), 'error')
+    from ..services import backup_service
+    uploaded = request.files.get('backup_file')
+    if (not uploaded or not uploaded.filename.lower().endswith('.enc')
+            or request.form.get('confirm_restore') != 'yes'):
+        flash(_('Выберите файл .enc и подтвердите переключение на восстановленную копию.'), 'warning')
         return redirect(url_for('main.settings'))
-    
-    file = request.files['backup_file']
-    if file.filename == '':
-        flash(_('No backup file selected'), 'error')
-        return redirect(url_for('main.settings'))
-    
-    # Здесь должна быть логика восстановления из резервной копии
-    flash(_('Backup restore not implemented yet'), 'info')
+    try:
+        manager = registry.get('data_manager')
+        if manager is None:
+            raise VaultError('Data service unavailable')
+        raw = uploaded.read(current_app.config['MAX_CONTENT_LENGTH'] + 1)
+        if len(raw) > current_app.config['MAX_CONTENT_LENGTH']:
+            raise VaultError('Backup is too large')
+        target = backup_service.restore(manager, manager.get_active_data_path(current_app.config), raw)
+        current_app.config['active_data_file'] = target  # Only after persistent commit.
+        from ..services.ssh_service import SSHService
+        SSHService.close_all()
+        flash(_('Копия восстановлена и подключена. Исходный файл сохранён.'), 'success')
+    except Exception as exc:
+        logger.warning('Encrypted restore failed (%s)', type(exc).__name__)
+        flash(_('Не удалось завершить восстановление. Проверьте ключ, файл и права записи. Исходные файлы сохранены; при ошибке записи перезапустите приложение.'), 'danger')
     return redirect(url_for('main.settings'))
 
 @main_bp.route('/favicon.ico')

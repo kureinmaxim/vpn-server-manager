@@ -58,6 +58,24 @@
     </section>
 
     {# ───────────── Данные ───────────── #}
+    <section class="settings-section" id="settings-backup">
+        <h2 class="settings-section-title"><i class="bi bi-shield-check" aria-hidden="true"></i> {{ _('Резервная копия данных') }}</h2>
+        <div class="settings-panel">
+            <p>{{ _('Копия .enc содержит серверы и DNS. Ключ профиля, PIN, настройки и вложения в неё не входят. Храните ключ отдельно: без исходного ключа восстановление невозможно.') }}</p>
+            <a class="btn btn-primary mb-3" download href="{{ url_for('main.download_backup') }}">{{ _('Скачать зашифрованную копию (.enc)') }}</a>
+            <form action="{{ url_for('main.restore_backup') }}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                <label for="backupFile" class="form-label">{{ _('Восстановить копию с текущим ключом профиля') }}</label>
+                {{ file_picker('backupFile', 'backup_file', accept='.enc', required=True) }}
+                <div class="form-check my-3">
+                    <input class="form-check-input" type="checkbox" id="confirmRestore" name="confirm_restore" value="yes" required>
+                    <label class="form-check-label" for="confirmRestore">{{ _('Подключить восстановленную копию. Текущий файл останется на диске; данные не объединяются.') }}</label>
+                </div>
+                <button type="submit" class="btn btn-outline-primary">{{ _('Восстановить и подключить') }}</button>
+            </form>
+        </div>
+    </section>
+
     <section class="settings-section" id="settings-data">
         <h2 class="settings-section-title"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Файл данных') }}</h2>
         <div class="settings-panel">

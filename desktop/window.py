@@ -79,6 +79,8 @@ class DesktopApp:
             logger.info(f"Creating pywebview window for http://127.0.0.1:{SERVER_PORT}")
             print(f"[WINDOW] Creating pywebview window for http://127.0.0.1:{SERVER_PORT}")
             
+            # Use the WebView download flow and its native save dialog for .enc backups.
+            webview.settings['ALLOW_DOWNLOADS'] = True
             self.window = webview.create_window(
                 'VPN Server Manager - Clean',
                 f'http://127.0.0.1:{SERVER_PORT}',

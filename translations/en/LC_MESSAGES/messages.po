@@ -10411,3 +10411,33 @@ msgstr "Keys: %(mod)s + and %(mod)s −, %(mod)s 0 for actual size."
 #, python-format
 msgid "Масштаб: %(zoom)s"
 msgstr "Zoom: %(zoom)s"
+
+msgid "Резервная копия данных"
+msgstr "Data backup"
+
+msgid "Копия .enc содержит серверы и DNS. Ключ профиля, PIN, настройки и вложения в неё не входят. Храните ключ отдельно: без исходного ключа восстановление невозможно."
+msgstr "The .enc backup contains servers and DNS. It excludes the profile key, PIN, settings and attachments. Keep the key separately: recovery requires the original key."
+
+msgid "Скачать зашифрованную копию (.enc)"
+msgstr "Download encrypted backup (.enc)"
+
+msgid "Восстановить копию с текущим ключом профиля"
+msgstr "Restore a backup using the current profile key"
+
+msgid "Подключить восстановленную копию. Текущий файл останется на диске; данные не объединяются."
+msgstr "Switch to the restored copy. The current file stays on disk; data is not merged."
+
+msgid "Восстановить и подключить"
+msgstr "Restore and select"
+
+msgid "Не удалось создать копию. Проверьте активный файл и ключ профиля."
+msgstr "Could not create a backup. Check the active file and profile key."
+
+msgid "Выберите файл .enc и подтвердите переключение на восстановленную копию."
+msgstr "Choose an .enc file and confirm switching to the restored copy."
+
+msgid "Копия восстановлена и подключена. Исходный файл сохранён."
+msgstr "Backup restored and selected. The original file was retained."
+
+msgid "Не удалось завершить восстановление. Проверьте ключ, файл и права записи. Исходные файлы сохранены; при ошибке записи перезапустите приложение."
+msgstr "Could not complete recovery. Check the key, file and write permissions. Original files were retained; restart the app after a write error."
