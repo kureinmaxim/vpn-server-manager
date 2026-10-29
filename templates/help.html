@@ -207,7 +207,7 @@
                 <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
                     <div class="accordion-body">
                         <p>{{ _('Вся информация о ваших серверах хранится в одном зашифрованном файле, что обеспечивает как безопасность, так и портативность данных.') }}</p>
-                        
+
                         <h5>{{ _('Как это работает?') }}</h5>
                         <p>
                             {{ _('Все данные о серверах, которые вы вводите, собираются вместе и преобразуются в единый текстовый блок (в формате JSON). Затем этот блок полностью шифруется и сохраняется в файл с расширением .enc.') }}
@@ -216,7 +216,7 @@
                             {{ _('Можно представить это как подробный чертеж (ваши данные), который разрезали на тысячи мельчайших кусочков и сложили в коробку (файл .enc). Без точной инструкции по сборке (ключа шифрования SECRET_KEY) никто не сможет восстановить исходный чертеж.') }}
                         </p>
 
-                        <h5>{{ _('Импорт и Экспорт') }}</h5>
+                        <h5 id="backup-transfer" tabindex="-1">{{ _('Импорт и Экспорт') }}</h5>
                         <p>{{ _('Серверы с паролями и карточка DNS (провайдеры, домены, записи) хранятся в одном зашифрованном файле .enc. Открыть его можно только ключом SECRET_KEY, поэтому резервная копия — это всегда файл данных плюс ключ.') }}</p>
                         <p>{{ _('На странице "Настройки" вы можете:') }}</p>
                         <ul>
@@ -268,7 +268,7 @@
                 <div id="collapseImportExternal" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
                     <div class="accordion-body">
                         <p>{{ _('Эта функция позволяет перенести данные о серверах из другой установки VPN Server Manager, даже если у неё другой ключ шифрования.') }}</p>
-                        
+
                         <h5>{{ _('Когда это нужно?') }}</h5>
                         <ul>
                             <li>{{ _('Вы настроили приложение на другом компьютере и хотите перенести данные на новый') }}</li>
@@ -342,7 +342,7 @@
                 <div id="collapse_transfer" class="accordion-collapse collapse" aria-labelledby="heading_transfer" data-bs-parent="#helpAccordion">
                     <div class="card-body">
                         <p>{{ _('Перенос приложения со всеми серверами, чеками и настройками требует копирования нескольких ключевых файлов и папок.') }}</p>
-                        
+
                         <div class="alert alert-info">
                             <strong>{{ _('Важно:') }}</strong> {{ _('Эта инструкция предназначена для текущей "портативной" версии приложения. В будущем, для версий, установленных через инсталлятор (Windows, macOS), будет предусмотрен специальный механизм экспорта и импорта.') }}
                         </div>
@@ -367,7 +367,7 @@
                             </li>
                             <li>{{ _('Запустите приложение. Все ваши данные, включая чеки и иконки, должны быть на месте.') }}</li>
                         </ol>
-                        
+
                         <h5 class="mt-4">{{ _('Структура файлов проекта (для разработчиков)') }}</h5>
                         <p>{{ _('Для понимания, где что лежит:') }}</p>
                         <ul>
@@ -407,7 +407,7 @@
                         <p>
                             {{ _('Для этой цели в корневой папке проекта существует специальный инструмент — <code>decrypt_tool.py</code>.')|safe }}
                         </p>
-                        
+
                         <h5>{{ _('Что он делает?') }}</h5>
                         <p>
                             {{ _('Этот скрипт использует ваш ключ <code>SECRET_KEY</code> из файла <code>.env</code> для полной расшифровки файла с данными <code>data/servers.json.enc</code>. Он корректно обрабатывает вложенную структуру и расшифровывает все учетные данные: <strong>SSH, панель управления и кабинет хостера</strong>, после чего выводит все в терминал в структурированном виде.')|safe }}
@@ -419,7 +419,7 @@
                         </p>
                         <pre><code class="language-bash">source venv/bin/activate && python3 decrypt_tool.py</code></pre>
                         <p>{{ _('Эта команда сначала активирует необходимое виртуальное окружение, а затем запускает скрипт для расшифровки.') }}</p>
-                        
+
                         <div class="alert alert-warning">
                             <strong>{{ _('Внимание:') }}</strong> {{ _('Выводимые данные (включая все пароли) будут видны в вашем терминале. Убедитесь, что вы делаете это в безопасной обстановке, где никто не сможет увидеть ваш экран.') }}
                         </div>
@@ -436,12 +436,12 @@
                 <div id="collapse_macos" class="accordion-collapse collapse" aria-labelledby="heading_macos" data-bs-parent="#helpAccordion">
                     <div class="card-body">
                         <p>{{ _('В установленной версии приложения для macOS данные хранятся в пользовательской директории для соответствия стандартам безопасности Apple.') }}</p>
-                        
+
                         <h5>{{ _('Расположение данных') }}</h5>
                         <p>{{ _('Все данные приложения (файл <code>servers.json.enc</code>, конфигурация, загруженные чеки и иконки) находятся по пути:')|safe }}</p>
                         <p><code>~/Library/Application Support/VPNServerManager/</code></p>
                         <small class="text-muted">{{ _('Чтобы быстро попасть в эту папку: откройте Finder, нажмите в меню «Переход» (Go), зажмите клавишу <code>Option (⌥)</code> и выберите появившийся пункт «Library». В открывшейся папке далее перейдите в «Application Support», а затем в «VPNServerManager».')|safe }}</small>
-                    
+
                         <h5 class="mt-4">{{ _('Версия для разработки') }}</h5>
                         <p>{{ _('Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.') }}</p>
                     </div>
@@ -457,12 +457,12 @@
                 <div id="collapse_windows" class="accordion-collapse collapse" aria-labelledby="heading_windows" data-bs-parent="#helpAccordion">
                     <div class="card-body">
                         <p>{{ _('В установленной версии приложения для Windows (') }}<code>.exe</code>{{ _(') данные хранятся в системной папке') }} <code>AppData</code>{{ _(', как и у большинства стандартных приложений.') }}</p>
-                        
+
                         <h5>{{ _('Расположение данных') }}</h5>
                         <p>{{ _('Все данные приложения (файл') }} <code>servers.json.enc</code>{{ _(', конфигурация, загруженные чеки и иконки) находятся по пути:') }}</p>
                         <p><code>%APPDATA%\VPNServerManager\</code></p>
                         <small class="text-muted">{{ _('Обычно этот путь раскрывается в') }} <code>C:\Users\ВАШЕ_ИМЯ\AppData\Roaming\VPNServerManager</code>{{ _('. Проще всего вставить') }} <code>%APPDATA%\VPNServerManager</code> {{ _('в адресную строку Проводника и нажать Enter.') }}</small>
-                    
+
                         <h5 class="mt-4">{{ _('Версия для разработки') }}</h5>
                         <p>{{ _('Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.') }}</p>
                     </div>
@@ -478,12 +478,12 @@
                 <div id="collapse_linux" class="accordion-collapse collapse" aria-labelledby="heading_linux" data-bs-parent="#helpAccordion">
                     <div class="card-body">
                         <p>{{ _('В установленной версии приложения для Linux данные хранятся в директории') }} <code>.local/share</code> {{ _('в вашей домашней папке, согласно стандартам XDG Base Directory Specification.') }}</p>
-                        
+
                         <h5>{{ _('Расположение данных') }}</h5>
                         <p>{{ _('Все данные приложения (файл') }} <code>servers.json.enc</code>{{ _(', конфигурация, загруженные чеки и иконки) находятся по пути:') }}</p>
                         <p><code>~/.local/share/VPNServerManager/</code></p>
                         <small class="text-muted">{{ _('Папка') }} <code>.local</code> {{ _('является скрытой. Чтобы увидеть её в файловом менеджере, включите отображение скрытых файлов (обычно по нажатию') }} <code>Ctrl+H</code>{{ _(').') }}</small>
-                    
+
                         <h5 class="mt-4">{{ _('Версия для разработки') }}</h5>
                         <p>{{ _('Если вы запускаете приложение из исходного кода, все данные хранятся прямо в папке проекта для удобства отладки.') }}</p>
                     </div>
@@ -499,7 +499,7 @@
                 <div id="collapse_pin" class="accordion-collapse collapse" aria-labelledby="heading_pin" data-bs-parent="#helpAccordion">
                     <div class="card-body">
                         <p>{{ _('Приложение защищено PIN-кодом для дополнительной безопасности. Это обеспечивает защиту от несанкционированного доступа к вашим данным.') }}</p>
-                        
+
                         <h5>{{ _('Первый запуск') }}</h5>
                         <p>{{ _('При первом запуске приложения вы увидите экран "Доступ ограничен". У вас есть два варианта:') }}</p>
                         <ul>
@@ -582,4 +582,18 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
+{% block scripts %}
+<script>
+(() => {
+    if (window.location.hash !== '#backup-transfer') return;
+    const heading = document.getElementById('backup-transfer');
+    const panel = heading.closest('.accordion-collapse');
+    panel.addEventListener('shown.bs.collapse', () => {
+        heading.scrollIntoView({block: 'start'});
+        heading.focus({preventScroll: true});
+    }, {once: true});
+    bootstrap.Collapse.getOrCreateInstance(panel, {toggle: false}).show();
+})();
+</script>
+{% endblock %}

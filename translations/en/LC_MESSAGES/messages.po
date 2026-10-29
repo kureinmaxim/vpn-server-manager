@@ -10474,3 +10474,24 @@ msgstr "Only a fresh installation with no existing data:"
 
 msgid "Запустите приложение и войдите по PIN этого компьютера. PIN не экспортируется и не переносится."
 msgstr "Start the app and sign in with this computer’s PIN. The PIN is neither exported nor transferred."
+
+msgid "Перенести на другой компьютер"
+msgstr "Transfer to another computer"
+
+msgid "Для обычной резервной копии используйте .enc и храните ключ отдельно. Для переноса можно скачать архив с данными и ключом: сам ZIP не зашифрован."
+msgstr "For regular backups, use .enc and keep the key separately. For transfer, you can download an archive with the data and key: the ZIP itself is not encrypted."
+
+msgid "На новом компьютере используйте чистый профиль. Если там уже есть данные, не заменяйте его ключ: используйте объединение в дополнительных настройках."
+msgstr "Use a fresh profile on the new computer. If it already has data, do not replace its key: use merge in advanced settings."
+
+msgid "Инструкция по восстановлению и переносу"
+msgstr "Restore and transfer instructions"
+
+msgid "PIN блокирует интерфейс, но не шифрует файлы. Ключ шифрования нужен для восстановления данных; смена PIN не меняет этот ключ."
+msgstr "The PIN locks the interface but does not encrypt files. The encryption key is needed to restore data; changing the PIN does not change this key."
+
+msgid "Дополнительные настройки данных и ключа"
+msgstr "Advanced data and key settings"
+
+msgid "Импорт, объединение, отвязка файла, проверка и смена ключа. Для обычной копии и восстановления используйте раздел выше."
+msgstr "Import, merge, detach a file, check or rotate a key. For regular backup and restore, use the section above."

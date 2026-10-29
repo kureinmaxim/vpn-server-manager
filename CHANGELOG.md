@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.11] - 2026-10-29
+
+### Changed
+- Settings separates ordinary backup, transfer and PIN actions from advanced import, merge, detach and encryption-key tools. Expert controls are collapsed by default in a keyboard-accessible details section.
+- Transfer guidance distinguishes a clean destination from merging into existing data; the help link opens the relevant instructions. Russian, English and Chinese explanations clarify that PIN changes do not change the encryption key.
+
 ## [5.0.10] - 2026-10-29
 
 ### Security

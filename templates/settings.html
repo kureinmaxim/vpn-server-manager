@@ -13,8 +13,9 @@
         <p class="text-body-secondary mb-0">{{ _('Кнопки главной страницы, файл данных с серверами, ключ шифрования и PIN.') }}</p>
         <nav class="settings-nav" aria-label="{{ _('Разделы настроек') }}">
             <a class="settings-chip" href="#ui-features"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Интерфейс') }}</a>
-            <a class="settings-chip" href="#settings-data"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Данные') }}</a>
-            <a class="settings-chip" href="#settings-security"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Безопасность') }}</a>
+            <a class="settings-chip" href="#settings-backup"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Резервная копия данных') }}</a>
+            <a class="settings-chip" href="#settings-transfer">{{ _('Перенести на другой компьютер') }}</a>
+            <a class="settings-chip" href="#settings-pin"><i class="bi bi-shield-lock" aria-hidden="true"></i> PIN</a>
         </nav>
     </header>
 
@@ -76,6 +77,41 @@
         </div>
     </section>
 
+    <section class="settings-section" id="settings-transfer">
+        <h2 class="settings-section-title">{{ _('Перенести на другой компьютер') }}</h2>
+        <div class="settings-panel">
+            <p>{{ _('Для обычной резервной копии используйте .enc и храните ключ отдельно. Для переноса можно скачать архив с данными и ключом: сам ZIP не зашифрован.') }}</p>
+            <p>{{ _('На новом компьютере используйте чистый профиль. Если там уже есть данные, не заменяйте его ключ: используйте объединение в дополнительных настройках.') }}</p>
+            <div class="settings-actions">
+                <button type="button" class="btn btn-outline-warning" data-export="key">{{ _('Экспортировать ключ') }}</button>
+                {% if active_data_file %}<button type="button" class="btn btn-outline-warning" data-export="package">{{ _('Незашифрованный архив секретов (.zip)') }}</button>{% endif %}
+                <a href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
+            </div>
+        </div>
+    </section>
+    <section class="settings-section" id="settings-pin">
+        <h2 class="settings-section-title">PIN</h2>
+        <p>{{ _('PIN блокирует интерфейс, но не шифрует файлы. Ключ шифрования нужен для восстановления данных; смена PIN не меняет этот ключ.') }}</p>
+            <div class="settings-panel">
+                <h3><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</h3>
+                <p class="settings-hint">{{ _('PIN открывает приложение. Новый PIN — минимум 4 символа.') }}</p>
+                <form id="changePinSettingsForm" class="settings-form">
+                    <label for="oldPin" class="form-label">{{ _('Текущий PIN') }}</label>
+                    <input type="password" class="form-control" id="oldPin" autocomplete="current-password" required>
+                    <label for="newPin" class="form-label mt-3">{{ _('Новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin" autocomplete="new-password" minlength="4" required>
+                    <label for="newPin2" class="form-label mt-3">{{ _('Повторите новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin2" autocomplete="new-password" minlength="4" required>
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</button>
+                    </div>
+                    <div id="changePinSettingsMessage" class="settings-status mt-3" hidden></div>
+                </form>
+            </div>
+    </section>
+    <details class="settings-section settings-advanced" id="settings-advanced">
+        <summary>{{ _('Дополнительные настройки данных и ключа') }}</summary>
+        <p class="settings-hint mt-3">{{ _('Импорт, объединение, отвязка файла, проверка и смена ключа. Для обычной копии и восстановления используйте раздел выше.') }}</p>
     <section class="settings-section" id="settings-data">
         <h2 class="settings-section-title"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Файл данных') }}</h2>
         <div class="settings-panel">
@@ -88,8 +124,6 @@
                 <p class="settings-hint">{{ _('Все данные о серверах загружаются из этого зашифрованного файла.') }}</p>
                 <div class="settings-actions">
                     <button type="button" class="btn btn-primary" data-export="data"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Экспортировать данные') }}</button>
-                    <button type="button" class="btn btn-outline-warning" data-export="key"><i class="bi bi-key" aria-hidden="true"></i> {{ _('Экспортировать ключ') }}</button>
-                    <button type="button" class="btn btn-outline-warning" data-export="package"><i class="bi bi-archive" aria-hidden="true"></i> {{ _('Незашифрованный архив секретов (.zip)') }}</button>
                     <form action="{{ url_for('main.detach_data') }}" method="post" class="ms-auto" data-confirm-message="{{ _('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.') }}" onsubmit="return confirm(this.dataset.confirmMessage);">
                         <button type="submit" class="btn btn-outline-danger"><i class="bi bi-unlock" aria-hidden="true"></i> {{ _('Открепить файл') }}</button>
                     </form>
@@ -136,8 +170,8 @@
 
     {# ───────────── Безопасность ───────────── #}
     <section class="settings-section" id="settings-security">
-        <h2 class="settings-section-title"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Ключ шифрования и PIN') }}</h2>
-        <div class="settings-grid settings-grid-3">
+        <h2 class="settings-section-title"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Дополнительные настройки данных и ключа') }}</h2>
+        <div class="settings-grid settings-grid-2">
             <div class="settings-panel">
                 <h3><i class="bi bi-arrow-repeat" aria-hidden="true"></i> {{ _('Смена главного ключа') }}</h3>
                 <p class="settings-hint">{{ _('При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.') }}</p>
@@ -169,24 +203,10 @@
                 </form>
             </div>
 
-            <div class="settings-panel">
-                <h3><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</h3>
-                <p class="settings-hint">{{ _('PIN открывает приложение. Новый PIN — минимум 4 символа.') }}</p>
-                <form id="changePinSettingsForm" class="settings-form">
-                    <label for="oldPin" class="form-label">{{ _('Текущий PIN') }}</label>
-                    <input type="password" class="form-control" id="oldPin" autocomplete="current-password" required>
-                    <label for="newPin" class="form-label mt-3">{{ _('Новый PIN') }}</label>
-                    <input type="password" class="form-control" id="newPin" autocomplete="new-password" minlength="4" required>
-                    <label for="newPin2" class="form-label mt-3">{{ _('Повторите новый PIN') }}</label>
-                    <input type="password" class="form-control" id="newPin2" autocomplete="new-password" minlength="4" required>
-                    <div class="settings-actions">
-                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</button>
-                    </div>
-                    <div id="changePinSettingsMessage" class="settings-status mt-3" hidden></div>
-                </form>
-            </div>
+
         </div>
     </section>
+    </details>
 </div>
 
 <!-- Что и куда экспортируется -->
