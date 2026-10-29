@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.10] - 2026-10-29
+
+### Security
+- Key and portable ZIP exports now require authenticated, PIN-unlocked POST requests, CSRF protection and explicit confirmation. The ZIP is labelled `UNENCRYPTED_SECRETS` with a warning before download; encrypted-only backup is the recommended default.
+- Secret exports are generated in memory with `Cache-Control: no-store`, without an extra server-side Downloads copy. The ZIP no longer includes the PIN or a fixed Flask session key. Vault/key consistency is checked under the profile lock; symlink attachments are excluded.
+- Help now describes separate key storage and limits key replacement to a clean installation. Tests cover restoring server and DNS credentials into a clean profile using the exported key.
+
 ## [5.0.9] - 2026-10-29
 
 ### Added

@@ -8,7 +8,6 @@ import os
 import json
 import datetime
 import shutil
-import zipfile
 import signal
 from ..services import registry, dns_registry
 from ..services.data_manager_service import DataManagerService, server_kind
@@ -1054,82 +1053,50 @@ def export_data():
         flash(f'Ошибка при экспорте: {str(e)}', 'danger')
         return redirect(url_for('main.settings'))
 
-@main_bp.route('/export_key')
+def _secret_download(raw, filename, mimetype):
+    from io import BytesIO
+    from flask import send_file
+    response = send_file(BytesIO(raw), as_attachment=True, download_name=filename,
+                         mimetype=mimetype)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+def _confirm_secret_export():
+    if request.form.get('confirm_secret_export') != 'yes':
+        abort(400)
+
+
+@main_bp.route('/export_key', methods=['POST'])
 @require_auth
 @require_pin
 def export_key():
-    """Экспортирует SECRET_KEY в виде .env файла для скачивания."""
+    """Отдаёт ключ только после подтверждения, без промежуточной копии на диске."""
+    _confirm_secret_export()
     try:
-        data_manager = registry.get('data_manager')
-        export_dir = data_manager.get_export_dir()
-        
-        # Создаем .env файл в папке Downloads
+        from ..services.profile_transaction import profile_lock
+        manager = registry.get('data_manager')
+        with profile_lock(manager.app_data_dir):
+            manager._check_profile_generation()
+            raw = f"SECRET_KEY={manager.secret_key}\n".encode()
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        key_filename = f"SECRET_KEY_{timestamp}.env"
-        key_path = os.path.join(export_dir, key_filename)
-        
-        secret_key = current_app.config.get('SECRET_KEY')
-        with open(key_path, 'w', encoding='utf-8') as f:
-            f.write(f"SECRET_KEY={secret_key}\n")
-            f.write(f"FLASK_SECRET_KEY=portable_app_key\n")
-        
-        flash(f'✅ Ключ шифрования экспортирован как: {key_filename} в папку Downloads', 'success')
-        
-        return send_from_directory(
-            export_dir,
-            key_filename,
-            as_attachment=True
-        )
-    except Exception as e:
-        logger.error(f"Error exporting key: {str(e)}")
-        flash(f'Ошибка при экспорте ключа: {str(e)}', 'danger')
+        return _secret_download(raw, f'SECRET_KEY_{timestamp}.env', 'application/octet-stream')
+    except Exception as exc:
+        logger.warning('Key export failed: %s', type(exc).__name__)
+        flash(_('Не удалось подготовить экспорт. Проверьте активный файл и ключ профиля.'), 'danger')
         return redirect(url_for('main.settings'))
 
-@main_bp.route('/export_package')
+
+@main_bp.route('/export_package', methods=['POST'])
 @require_auth
 @require_pin
 def export_package():
-    """Создает ZIP архив с данными, ключом и загруженными файлами."""
+    """Явно незашифрованный контейнер секретов; только подтверждённая загрузка."""
+    _confirm_secret_export()
     try:
-        data_manager = registry.get('data_manager')
-        
-        # Проверяем наличие активного файла данных
-        active_file = data_manager.get_active_data_path(current_app.config)
-        if not active_file or not os.path.exists(active_file):
-            flash(_('Нет активного файла данных для экспорта.'), 'warning')
-            return redirect(url_for('main.settings'))
-        
-        # Создаем ZIP файл в папке Downloads
+        from ..services import secret_export
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        zip_filename = f'vpn_servers_backup_{timestamp}.zip'
-        export_dir = data_manager.get_export_dir()
-        zip_path = os.path.join(export_dir, zip_filename)
-        
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Добавляем файл данных сервера
-            zipf.write(active_file, f"servers_{timestamp}.enc")
-            
-            # Создаем и добавляем файл с ключом
-            secret_key = current_app.config.get('SECRET_KEY')
-            env_content = f"SECRET_KEY={secret_key}\nFLASK_SECRET_KEY=portable_app_key\n"
-            zipf.writestr("SECRET_KEY.env", env_content)
-            
-            # Добавляем файл с PIN-кодом
-            current_pin = get_secret_pin()
-            pin_content = f"PIN={current_pin}\n"
-            zipf.writestr("PIN.txt", pin_content)
-            
-            # Добавляем загруженные файлы (если они есть)
-            app_data_dir = current_app.config.get('APP_DATA_DIR')
-            uploads_dir = os.path.join(app_data_dir, "uploads")
-            if os.path.exists(uploads_dir):
-                for filename in os.listdir(uploads_dir):
-                    file_path = os.path.join(uploads_dir, filename)
-                    if os.path.isfile(file_path):
-                        zipf.write(file_path, f"uploads/{filename}")
-            
-            # Добавляем README с инструкциями
-            readme_content = f"""VPN Server Manager — полный экспорт
+        readme_content = f"""VPN Server Manager — НЕЗАШИФРОВАННЫЙ архив секретов
 ===================================
 
 Дата экспорта: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M:%S')}
@@ -1139,8 +1106,7 @@ def export_package():
 - servers_{timestamp}.enc — все серверы с паролями и карточка DNS
   (провайдеры, домены, регистраторы, записи). Зашифрован ключом ниже.
 - SECRET_KEY.env — ключ шифрования для этого файла.
-- PIN.txt — PIN исходной установки (напоминание; PIN хранится в каждой
-  установке отдельно и при восстановлении не переносится).
+- PIN не экспортируется: используйте PIN целевой установки.
 - uploads/ — иконки серверов.
 
 ПАПКА ДАННЫХ ПРИЛОЖЕНИЯ
@@ -1150,8 +1116,8 @@ def export_package():
 
 ВОССТАНОВЛЕНИЕ — выберите вариант
 
-A. Новая установка или полная замена данных
-   1. Закройте приложение.
+A. Только чистая установка без существующих данных
+   1. Используйте чистую установку без существующих данных. Закройте приложение.
    2. Скопируйте SECRET_KEY.env в папку данных и переименуйте в .env
       (заменив существующий).
    3. Скопируйте содержимое uploads/ в uploads/ папки данных.
@@ -1169,24 +1135,16 @@ B. На компьютере уже есть свои серверы — объ�
 
 Файлы с данными DNS открываются версией 4.6.0 и новее.
 
-ВАЖНО: в архиве вместе лежат данные, ключ и PIN. Любой, у кого он есть,
+ВАЖНО: архив НЕ зашифрован, в нём вместе лежат данные и ключ. Любой, у кого он есть,
 получит все пароли. Храните его в менеджере паролей или на зашифрованном
 диске; после переноса удалите копию из «Загрузок».
 """
-            zipf.writestr("README.txt", readme_content)
-        
-        flash(f'✅ Полный архив создан как: {zip_filename} в папке Downloads', 'success')
-        
-        # Отправляем ZIP файл
-        return send_from_directory(
-            export_dir,
-            zip_filename,
-            as_attachment=True
-        )
-        
-    except Exception as e:
-        logger.error(f"Error creating export package: {str(e)}")
-        flash(f'Ошибка при создании архива: {str(e)}', 'danger')
+        raw = secret_export.package(registry.get('data_manager'), current_app.config,
+                                    timestamp, readme_content)
+        return _secret_download(raw, f'UNENCRYPTED_SECRETS_{timestamp}.zip', 'application/zip')
+    except Exception as exc:
+        logger.warning('Package export failed: %s', type(exc).__name__)
+        flash(_('Не удалось подготовить экспорт. Проверьте активный файл и ключ профиля.'), 'danger')
         return redirect(url_for('main.settings'))
 
 @main_bp.route('/help')

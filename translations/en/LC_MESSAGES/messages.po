@@ -10441,3 +10441,36 @@ msgstr "Backup restored and selected. The original file was retained."
 
 msgid "Не удалось завершить восстановление. Проверьте ключ, файл и права записи. Исходные файлы сохранены; при ошибке записи перезапустите приложение."
 msgstr "Could not complete recovery. Check the key, file and write permissions. Original files were retained; restart the app after a write error."
+
+msgid "Не удалось подготовить экспорт. Проверьте активный файл и ключ профиля."
+msgstr "Could not prepare the export. Check the active file and profile key."
+
+msgid "Незашифрованный архив секретов (.zip)"
+msgstr "Unencrypted secrets archive (.zip)"
+
+msgid "Место сохранения выбирает браузер или системный диалог. Приложение не создаёт дополнительную копию экспорта."
+msgstr "The browser or system dialog selects the save location. The app does not create an additional export copy."
+
+msgid "Этот файл содержит ключ доступа ко всем паролям. ZIP не зашифрован. Не отправляйте его в поддержку, issue или переписку; храните на зашифрованном носителе. PIN не экспортируется."
+msgstr "This file contains the key to all passwords. The ZIP is not encrypted. Do not send it to support, issues or chats; store it on encrypted media. The PIN is not exported."
+
+msgid "Понимаю, что экспорт содержит секреты без дополнительного шифрования."
+msgstr "I understand that this export contains secrets without additional encryption."
+
+msgid "Скачать секреты"
+msgstr "Download secrets"
+
+msgid "Резервная копия данных (рекомендуется):"
+msgstr "Data backup (recommended):"
+
+msgid "Скачайте зашифрованную копию .enc в настройках. Ключ экспортируйте отдельно и храните отдельно от копии."
+msgstr "Download an encrypted .enc backup in Settings. Export the key separately and store it apart from the backup."
+
+msgid "Архив секретов ZIP не зашифрован и содержит данные вместе с ключом. Любой получатель сможет прочитать пароли. Не прикладывайте архив или ключ к issue и обращениям в поддержку."
+msgstr "The secrets ZIP is not encrypted and contains both data and its key. Anyone receiving it can read the passwords. Never attach the archive or key to issues or support requests."
+
+msgid "Только чистая установка без существующих данных:"
+msgstr "Only a fresh installation with no existing data:"
+
+msgid "Запустите приложение и войдите по PIN этого компьютера. PIN не экспортируется и не переносится."
+msgstr "Start the app and sign in with this computer’s PIN. The PIN is neither exported nor transferred."

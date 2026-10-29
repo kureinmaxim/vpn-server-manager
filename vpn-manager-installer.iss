@@ -1,9 +1,9 @@
 ; VPN Server Manager - Inno Setup Installer Script
-; Version 5.0.9
+; Version 5.0.10
 ; Compatible with Inno Setup 6.x
 
 #define MyAppName "VPN Server Manager"
-#define MyAppVersion "5.0.9"
+#define MyAppVersion "5.0.10"
 #define MyAppPublisher "Куреин М.Н."
 #define MyAppURL "https://github.com/kureinmaxim/vpn-server-manager"
 #define MyAppExeName "start_windows.bat"

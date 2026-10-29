@@ -174,7 +174,9 @@ class TestMainRoutes:
         assert response.status_code == 200
         assert 'Экспортировать данные'.encode('utf-8') in response.data
         assert 'Экспортировать ключ'.encode('utf-8') in response.data
-        assert 'Полный экспорт'.encode('utf-8') in response.data
+        assert 'Незашифрованный архив секретов (.zip)'.encode('utf-8') in response.data
+        assert b'name="confirm_secret_export"' in response.data
+        assert b'id="secretExportForm" method="post"' in response.data
         assert b'manage_hints' in response.data
     
     def test_upload_icon_no_file(self, client):

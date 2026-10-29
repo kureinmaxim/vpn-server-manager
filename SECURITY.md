@@ -31,4 +31,4 @@ and no key recovery. Treat `.env` and full exports like a password database.
 The login PIN is a UI lock, not a second layer of encryption: it is stored in
 plain text in `config.json` and is not hashed. It keeps a shared machine from
 being an open notebook, but it does not protect the data from anyone who can read
-the files. Full exports bundle the data file, the key and the PIN together.
+the files. The explicitly labelled UNENCRYPTED_SECRETS ZIP bundles the data file and its key; it is not encrypted as a whole. PINs are not exported. Downloading a key or this ZIP requires authentication, PIN unlock, CSRF and explicit confirmation. Files are generated in memory without an additional copy in Downloads. Never attach them to issues or support requests. Prefer an encrypted-only .enc backup and store its recovery key separately.

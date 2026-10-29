@@ -54,8 +54,9 @@ def test_export_then_import_restores_dns(env):
     assert client.get('/export_data').status_code == 200
     exported = next(exports.glob('servers_export_*.enc')).read_bytes()
 
-    client.get('/export_package')
-    with zipfile.ZipFile(next(exports.glob('*.zip'))) as archive:
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    assert response.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         assert archive.read(next(n for n in archive.namelist() if n.endswith('.enc'))) == exported
 
     manager = registry.get('data_manager')
@@ -165,8 +166,9 @@ def test_external_merge_skips_same_ip_under_another_name(env, tmp_path):
 
 def test_full_export_readme_explains_both_restore_paths(env):
     client, exports = env
-    client.get('/export_package')
-    with zipfile.ZipFile(next(exports.glob('*.zip'))) as archive:
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    assert response.status_code == 200
+    with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         readme = archive.read('README.txt').decode()
     for text in ('карточка DNS', 'Импорт файла данных', 'Импорт серверов из другой установки',
                  'PIN этого компьютера', 'VPNServerManager-Clean'):
@@ -174,11 +176,79 @@ def test_full_export_readme_explains_both_restore_paths(env):
 
 
 @pytest.mark.parametrize('lang,expected', [
-    ('en', ['Full export (recommended):', 'Restoring from a full export', 'VPNServerManager-Clean</code>', 'App data folder:']),
-    ('zh', ['完整导出（推荐）：', '从完整导出恢复']),
+    ('en', ['Data backup (recommended):', 'Restoring from a full export', 'VPNServerManager-Clean</code>', 'App data folder:']),
+    ('zh', ['数据备份（推荐）：', '从完整导出恢复']),
 ])
 def test_help_explains_backup_and_restore(env, lang, expected):
     client, _ = env
     text = client.get('/help?lang=' + lang).text
     for item in expected:
         assert item in text
+
+
+@pytest.mark.parametrize('route', ['/export_key', '/export_package'])
+def test_secret_export_requires_post_confirmation_csrf_and_auth(env, route):
+    client, exports = env
+    assert client.get(route).status_code == 405
+    assert client.post(route).status_code == 400
+    assert client.post(route, data={'confirm_secret_export': 'yes'}, csrf=False).status_code == 403
+    for flags in ({'authenticated': False, 'pin_verified': False},
+                  {'authenticated': True, 'pin_verified': False, 'pin_authenticated': False}):
+        with client.session_transaction() as session:
+            session.update(flags)
+        result = client.post(route, data={'confirm_secret_export': 'yes'})
+        assert result.status_code in (302, 401, 403)
+        assert 'attachment' not in result.headers.get('Content-Disposition', '')
+    assert not list(exports.iterdir())
+
+
+@pytest.mark.parametrize('route', ['/export_key', '/export_package'])
+def test_secret_export_no_disk_copy_or_fixed_session_key(env, route):
+    client, exports = env
+    response = client.post(route, data={'confirm_secret_export': 'yes'})
+    assert response.status_code == 200
+    assert response.headers['Cache-Control'] == 'no-store'
+    assert not list(exports.iterdir())
+    if route == '/export_package':
+        assert 'UNENCRYPTED_SECRETS_' in response.headers['Content-Disposition']
+        with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
+            assert 'PIN.txt' not in archive.namelist()
+            raw = archive.read('SECRET_KEY.env')
+    else:
+        raw = response.data
+    assert raw == f'SECRET_KEY={registry.get("data_manager").secret_key}\n'.encode()
+    assert b'FLASK_SECRET_KEY' not in raw
+
+
+def test_package_restores_in_clean_profile_with_exported_key(env, tmp_path):
+    client, _ = env
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
+        key = archive.read('SECRET_KEY.env').decode().strip().split('=', 1)[1]
+        raw = archive.read(next(n for n in archive.namelist() if n.endswith('.enc')))
+    clean = tmp_path / 'clean-profile'
+    clean.mkdir()
+    manager = DataManagerService(key, str(clean))
+    registry.register('data_manager', manager)
+    client.application.config.update(APP_DATA_DIR=str(clean), active_data_file=None)
+    response = client.post('/restore_backup', data={
+        'backup_file': (io.BytesIO(raw), 'copy.enc'), 'confirm_restore': 'yes'})
+    assert response.status_code == 302
+    manager, servers, dns = current()
+    assert servers[0]['ssh_credentials']['password_decrypted'] == 'ssh'
+    assert dns['domains'][0]['name'] == 'example.com'
+    assert password(manager, dns) == 'p%ss'
+
+
+def test_package_skips_symlink_attachments(env, tmp_path):
+    client, _ = env
+    uploads = tmp_path / 'uploads'
+    uploads.mkdir()
+    outside = tmp_path / 'unrelated-secret'
+    outside.write_text('not-an-attachment')
+    (uploads / 'linked.txt').symlink_to(outside)
+    (uploads / 'icon.txt').write_text('fixture')
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
+        assert 'uploads/linked.txt' not in archive.namelist()
+        assert archive.read('uploads/icon.txt') == b'fixture'

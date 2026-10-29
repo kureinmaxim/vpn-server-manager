@@ -89,7 +89,7 @@
                 <div class="settings-actions">
                     <button type="button" class="btn btn-primary" data-export="data"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Экспортировать данные') }}</button>
                     <button type="button" class="btn btn-outline-warning" data-export="key"><i class="bi bi-key" aria-hidden="true"></i> {{ _('Экспортировать ключ') }}</button>
-                    <button type="button" class="btn btn-outline-warning" data-export="package" title="{{ _('Включает PIN-код') }}"><i class="bi bi-archive" aria-hidden="true"></i> {{ _('Полный экспорт') }}</button>
+                    <button type="button" class="btn btn-outline-warning" data-export="package"><i class="bi bi-archive" aria-hidden="true"></i> {{ _('Незашифрованный архив секретов (.zip)') }}</button>
                     <form action="{{ url_for('main.detach_data') }}" method="post" class="ms-auto" data-confirm-message="{{ _('Вы уверены, что хотите открепить файл данных? Список серверов будет пуст.') }}" onsubmit="return confirm(this.dataset.confirmMessage);">
                         <button type="submit" class="btn btn-outline-danger"><i class="bi bi-unlock" aria-hidden="true"></i> {{ _('Открепить файл') }}</button>
                     </form>
@@ -204,22 +204,29 @@
                     <ul class="mb-0 mt-1 small">
                         <li>{{ _('Зашифрованные данные серверов') }}</li>
                         <li>{{ _('Ключ шифрования (.env)') }}</li>
-                        <li>{{ _('PIN-код для входа (PIN.txt)') }}</li>
                         <li>{{ _('Загруженные файлы (uploads/)') }}</li>
                         <li>{{ _('Инструкции по импорту (README.txt)') }}</li>
                     </ul>
                 </div>
                 <p class="mb-1"><strong><i class="bi bi-folder" aria-hidden="true"></i> {{ _('Место сохранения:') }}</strong></p>
-                <code class="settings-path d-block">~/Downloads/<span id="exportLocationText"></span></code>
-                <p class="settings-hint mt-3 mb-0">{{ _('Файл будет автоматически загружен в браузере') }}. {{ _('Проверьте папку Downloads после завершения') }}.</p>
+                <code class="settings-path d-block"><span id="exportLocationText"></span></code>
+                <p class="settings-hint mt-3 mb-0">{{ _('Место сохранения выбирает браузер или системный диалог. Приложение не создаёт дополнительную копию экспорта.') }}</p>
                 <p id="exportKeyWarning" class="settings-status settings-status-warn mt-3 mb-0" hidden>
                     <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
-                    <span>{{ _('Ключ и PIN открывают все пароли серверов: храните файл отдельно от данных и никому не пересылайте.') }}</span>
+                    <span>{{ _('Этот файл содержит ключ доступа ко всем паролям. ZIP не зашифрован. Не отправляйте его в поддержку, issue или переписку; храните на зашифрованном носителе. PIN не экспортируется.') }}</span>
                 </p>
+                <div id="secretExportConfirmation" class="form-check mt-3" hidden>
+                    <input class="form-check-input" type="checkbox" id="confirmSecretExport" name="confirm_secret_export" value="yes" form="secretExportForm">
+                    <label class="form-check-label" for="confirmSecretExport">{{ _('Понимаю, что экспорт содержит секреты без дополнительного шифрования.') }}</label>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ _('Отмена') }}</button>
-                <a class="btn btn-primary" id="confirmExportBtn" href="#"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Продолжить экспорт') }}</a>
+                <form id="secretExportForm" method="post" hidden>
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <button type="submit" class="btn btn-warning">{{ _('Скачать секреты') }}</button>
+                </form>
+                <a class="btn btn-primary" download id="confirmExportBtn" href="#"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Продолжить экспорт') }}</a>
             </div>
         </div>
     </div>
@@ -238,9 +245,9 @@
         noConnection: {{ _('Ошибка соединения с сервером')|tojson }},
     };
     const exportsInfo = {
-        data: [{{ _('Файл данных серверов (.enc)')|tojson }}, 'servers_export_YYYYMMDD_HHMMSS.enc', {{ url_for('main.export_data')|tojson }}],
+        data: [{{ _('Файл данных серверов (.enc)')|tojson }}, 'vault_backup_YYYYMMDD_HHMMSS.enc', {{ url_for('main.download_backup')|tojson }}],
         key: [{{ _('Ключ шифрования (.env)')|tojson }}, 'SECRET_KEY_YYYYMMDD_HHMMSS.env', {{ url_for('main.export_key')|tojson }}],
-        package: [{{ _('Полный архив (.zip)')|tojson }}, 'vpn_servers_backup_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
+        package: [{{ _('Незашифрованный архив секретов (.zip)')|tojson }}, 'UNENCRYPTED_SECRETS_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
     };
 
     // Экспорт: сначала окно «что и куда», потом загрузка
@@ -251,6 +258,15 @@
         document.getElementById('exportLocationText').textContent = file;
         document.getElementById('packageInfo').hidden = button.dataset.export !== 'package';
         document.getElementById('exportKeyWarning').hidden = button.dataset.export === 'data';
+        const sensitive = button.dataset.export !== 'data';
+        const form = document.getElementById('secretExportForm');
+        form.hidden = !sensitive;
+        form.action = url;
+        document.getElementById('secretExportConfirmation').hidden = !sensitive;
+        const confirmation = document.getElementById('confirmSecretExport');
+        confirmation.checked = false;
+        confirmation.required = sensitive;
+        document.getElementById('confirmExportBtn').hidden = sensitive;
         document.getElementById('confirmExportBtn').href = url;
         bootstrap.Modal.getOrCreateInstance(exportModal).show();
     }));
