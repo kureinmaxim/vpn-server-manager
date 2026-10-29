@@ -1,4 +1,4 @@
-# VPN Server Manager v5.0.8
+# VPN Server Manager v5.0.9
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**5.0.8 development branch:** encrypted inventory backup and restore, DMG installation and synthetic profile/restore checks in macOS CI, improved zoom controls and macOS View menu, isolated Apple Silicon builds targeting macOS 13, verified local packaging, clear SSH host-key errors and stale-connection revocation, recoverable key rotation, atomic vault saves with conflict detection, strict SSH host-key verification, CSRF protection, a shared PIN limiter, and metadata-only bot checks. This branch is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#508---2026-10-27)
+**5.0.8 development branch:** encrypted inventory backup and restore, DMG installation and synthetic profile/restore checks in macOS CI, improved zoom controls and macOS View menu, isolated Apple Silicon builds targeting macOS 13, verified local packaging, clear SSH host-key errors and stale-connection revocation, recoverable key rotation, atomic vault saves with conflict detection, strict SSH host-key verification, CSRF protection, a shared PIN limiter, and metadata-only bot checks. This branch is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#509---2026-10-29)
 
 ## See your fleet at a glance
 

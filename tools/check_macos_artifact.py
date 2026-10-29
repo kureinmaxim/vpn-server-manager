@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Validate the packaged artifact and execute a relocated copy with a fresh HOME."""
+import argparse
 import hashlib
 import json
 import os
@@ -44,13 +45,13 @@ def mounted_image(dmg, mountpoint):
                        capture_output=True, timeout=60)
 
 
-def profile_phases(executable, home, cwd):
+def profile_phases(executable, home, cwd, phases=('seed', 'verify', 'restore', 'verify')):
     from desktop.profile_smoke import MARKER
     (home / '.vsm-build-fixture').write_text(MARKER)
     env = dict(os.environ, HOME=str(home))
     for key in ('SECRET_KEY', 'APPDATA', 'DESKTOP_MODE'):
         env.pop(key, None)
-    for phase in ('seed', 'verify', 'restore', 'verify'):
+    for phase in phases:
         result = subprocess.run([str(executable), '--build-profile-smoke', phase],
                                 cwd=cwd, env=env, check=True, capture_output=True,
                                 text=True, timeout=60)
@@ -60,7 +61,31 @@ def profile_phases(executable, home, cwd):
             raise ValueError('Packaged profile check did not confirm success')
 
 
-def check(root=ROOT):
+def upgrade_profile(previous_dmg, current_app, temporary, version):
+    """Replace an old packaged app while keeping only its synthetic profile."""
+    mountpoint = temporary / 'previous-image'
+    mountpoint.mkdir()
+    installed = temporary / 'upgrade-Applications' / current_app.name
+    with mounted_image(previous_dmg, mountpoint) as mounted:
+        old_app = mounted / current_app.name
+        info = plistlib.loads((old_app / 'Contents/Info.plist').read_bytes())
+        previous_version = info['CFBundleShortVersionString']
+        if version_tuple(previous_version) >= version_tuple(version):
+            raise ValueError('Upgrade requires a strictly older app version')
+        verify(old_app)
+        shutil.copytree(old_app, installed, symlinks=True)
+    home = temporary / 'upgrade-home'
+    home.mkdir()
+    executable = installed / 'Contents/MacOS/VPNServerManager-Clean'
+    profile_phases(executable, home, temporary, phases=('seed', 'verify'))
+    shutil.rmtree(installed)
+    shutil.copytree(current_app, installed, symlinks=True)
+    verify(installed)
+    profile_phases(executable, home, temporary, phases=('verify', 'restore', 'verify'))
+    return {'status': 'passed', 'from_version': previous_version, 'to_version': version}
+
+
+def check(root=ROOT, previous_dmg=None):
     directory = root / 'dist/macos-local'
     version = json.loads((root / 'config/config.json.template').read_text())['app_info']['version']
     app = directory / 'VPNServerManager-Clean.app'
@@ -72,6 +97,7 @@ def check(root=ROOT):
         digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     if digest != metadata.get('sha256'):
         raise ValueError('DMG checksum mismatch')
+    upgrade = {'status': 'not_tested'}
     with tempfile.TemporaryDirectory(prefix='vsm-install-') as temporary:
         temporary = Path(temporary)
         relocated = temporary / 'Applications' / app.name
@@ -98,16 +124,22 @@ def check(root=ROOT):
         if (home / 'Library/Application Support/VPNServerManager-Clean').exists():
             raise ValueError('Dependency smoke unexpectedly created an application profile')
         profile_phases(relocated / 'Contents/MacOS/VPNServerManager-Clean', home, temporary)
+        if previous_dmg is not None:
+            upgrade = upgrade_profile(Path(previous_dmg).resolve(), relocated, temporary, version)
     report = dict(dmg_install='passed', profile_restart='passed',
                   legacy_payload='passed', encrypted_backup_import='passed',
                   version=version, architecture=metadata['architecture'],
                   build_host_macos=platform.mac_ver()[0], relocated_runtime='passed',
                   signature='verified', dmg_sha256=digest,
-                  gui_tested=False, notarized=False)
+                  gui_tested=False, notarized=False, upgrade=upgrade)
     (directory / 'check-report.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps(report))
     return report
 
 
 if __name__ == '__main__':
-    check()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--previous-dmg', type=Path,
+                        help='Trusted older local DMG supporting --build-profile-smoke (5.0.7+)')
+    args = parser.parse_args()
+    check(previous_dmg=args.previous_dmg)

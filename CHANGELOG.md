@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.9] - 2026-10-29
+
+### Added
+- macOS artifact verification accepts a trusted previous local DMG to test a real cross-version packaged upgrade in a disposable profile: old app seed/restart, bundle replacement, new app verification/restore/restart.
+- Reports distinguish a successful version-pair upgrade from an untested upgrade. Same-version and downgrade inputs are rejected; the installed application and user profile remain untouched.
+
 ## [5.0.8] - 2026-10-27
 
 ### Added

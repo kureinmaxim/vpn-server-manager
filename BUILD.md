@@ -234,6 +234,26 @@ The profile test command refuses a regular HOME or a non-frozen executable. It o
 runs with a marker in a disposable `vsm-install-*` directory. CI retains JSON evidence
 for 10 days; synthetic vaults/keys and binaries are not uploaded. This covers the
 working encrypted inventory restore route added in 5.0.8. It does not
-exercise GUI interactions, a previous app binary's upgrade path, Gatekeeper,
-notarization, or macOS 13 itself.
+exercise GUI interactions, Gatekeeper, notarization, or macOS 13 itself.
+By default the report marks cross-version upgrade as `not_tested`.
 Runner reference: [GitHub hosted runners](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job).
+
+### Cross-version packaged upgrade (local)
+
+Keep a trusted previous local DMG outside the build output before rebuilding. Then run:
+
+```bash
+.venv-macos/bin/python -m tools.check_macos_artifact --previous-dmg /absolute/path/previous-local.dmg
+```
+
+The previous app must support the guarded profile smoke command (5.0.7 or later)
+and have a strictly lower version. This executes both binaries: the older app
+creates and verifies a synthetic profile, then the verifier replaces its temporary
+installed bundle with the current app. The new app verifies the retained key,
+credentials, DNS and selection, restores a backup and verifies another restart.
+Both images are detached before their apps execute. No installed application or
+real user profile is modified. Use only a trusted DMG: this option executes its code;
+an ad-hoc signature verifies integrity, not publisher identity.
+The JSON report records `upgrade.status`, `from_version` and `to_version` only on
+success. Ordinary CI without a previous DMG does not claim an upgrade test.
+This does not establish compatibility with 4.x or test a GUI upgrade/Gatekeeper.
