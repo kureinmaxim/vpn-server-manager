@@ -1046,7 +1046,7 @@ msgstr "本节汇集了用于快速评估服务器状态的最有用命令。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:13
 #: templates/cheatsheet.html:13
 msgid "Содержание"
-msgstr "创建..."
+msgstr "目录"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:18
 #: templates/cheatsheet.html:18
@@ -1315,7 +1315,7 @@ msgstr "删除包："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:367
 #: templates/cheatsheet.html:367
 msgid "Проверить статус NGINX:"
-msgstr "检查服务状态"
+msgstr "检查 NGINX 状态："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:374
 #: templates/cheatsheet.html:374
@@ -1325,12 +1325,12 @@ msgstr "启动 NGINX："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:381
 #: templates/cheatsheet.html:381
 msgid "Остановить NGINX:"
-msgstr "安装包"
+msgstr "停止 NGINX："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:388
 #: templates/cheatsheet.html:388
 msgid "Перезапустить NGINX:"
-msgstr "重启服务："
+msgstr "重启 NGINX："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:395
 #: templates/cheatsheet.html:395
@@ -1360,7 +1360,7 @@ msgstr "检查活动的 NGINX 连接："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:438
 #: templates/cheatsheet.html:438
 msgid "Проверить статус Docker:"
-msgstr "检查服务状态"
+msgstr "检查 Docker 状态："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:445
 #: templates/cheatsheet.html:445
@@ -1385,12 +1385,12 @@ msgstr "启动容器："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:473
 #: templates/cheatsheet.html:473
 msgid "Остановить контейнер:"
-msgstr "安装包"
+msgstr "停止容器："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:480
 #: templates/cheatsheet.html:480
 msgid "Удалить контейнер:"
-msgstr "删除包："
+msgstr "删除容器："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:487
 #: templates/cheatsheet.html:487
@@ -1410,22 +1410,22 @@ msgstr "检查服务状态"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:516
 #: templates/cheatsheet.html:516
 msgid "Запустить службу:"
-msgstr "重启服务："
+msgstr "启动服务："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:523
 #: templates/cheatsheet.html:523
 msgid "Остановить службу:"
-msgstr "重启服务："
+msgstr "停止服务："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:544
 #: templates/cheatsheet.html:544
 msgid "Отключить автозапуск службы:"
-msgstr "启用服务自动启动："
+msgstr "禁用服务自动启动："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:551
 #: templates/cheatsheet.html:551
 msgid "Перезагрузить конфигурацию systemd:"
-msgstr "重新加载系统配置："
+msgstr "重新加载 systemd 配置："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:558
 #: templates/cheatsheet.html:558
@@ -1507,7 +1507,7 @@ msgstr "未指定"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:331
 #: templates/edit_server.html:124 templates/edit_server.html:331
 msgid "Управление чеками"
-msgstr "数据管理"
+msgstr "收据管理"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:136
 #: templates/edit_server.html:136
@@ -1546,24 +1546,24 @@ msgstr "寄主的新密码"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:206
 #: templates/edit_server.html:206
 msgid "Быстрая загрузка чека"
-msgstr "快速检查负载"
+msgstr "快速上传收据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:208
 #: templates/edit_server.html:208
 msgid "Файл нового чека"
-msgstr "新检查的文件"
+msgstr "新收据文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:210
 #: templates/edit_server.html:210
 msgid ""
 "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
 "используйте кнопку \"Управление чеками\"."
-msgstr "用于快速加载一张支票。要查看所有检查，请使用\" CHEK管理\"按钮。"
+msgstr "用于快速上传一张收据。要查看所有收据，请使用“收据管理”按钮。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:213
 #: templates/edit_server.html:213
 msgid "Описание чека"
-msgstr "描述正在等待"
+msgstr "收据说明"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:214
 #: templates/edit_server.html:214
@@ -1593,12 +1593,12 @@ msgstr "添加服务器"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:265
 #: templates/edit_server.html:265
 msgid "Чеки по оплате:"
-msgstr "付款检查："
+msgstr "付款收据："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:273
 #: templates/edit_server.html:273
 msgid "Добавить новый чек"
-msgstr "添加第一个服务器"
+msgstr "添加新收据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:276
 #: templates/edit_server.html:276
@@ -1613,7 +1613,7 @@ msgstr "例如，2024年2月的付款"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:280
 #: templates/edit_server.html:280
 msgid "Файл чека"
-msgstr "查看"
+msgstr "收据文件"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:285
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/manage_hints.html:25
@@ -1624,13 +1624,13 @@ msgstr "添加"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:292
 #: templates/edit_server.html:292
 msgid "Загруженные чеки"
-msgstr "加载支票"
+msgstr "已上传的收据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:298
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:329
 #: templates/edit_server.html:298 templates/edit_server.html:329
 msgid "Чек"
-msgstr "查看"
+msgstr "收据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:299
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:330
@@ -1642,7 +1642,7 @@ msgstr "加载："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:335
 #: templates/edit_server.html:308 templates/edit_server.html:335
 msgid "Чеки еще не загружены."
-msgstr "检查尚未加载。"
+msgstr "尚未上传收据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:314
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:490
@@ -1658,27 +1658,27 @@ msgstr "网络错误"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:332
 #: templates/edit_server.html:332
 msgid "Ошибка при добавлении чека:"
-msgstr "复制时出错"
+msgstr "添加收据时出错："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:333
 #: templates/edit_server.html:333
 msgid "Не удалось добавить чек:"
-msgstr "复制文本失败："
+msgstr "无法添加收据："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:334
 #: templates/edit_server.html:334
 msgid "Вы уверены, что хотите удалить этот чек? Это действие необратимо."
-msgstr "您确定要删除这个服务器吗？"
+msgstr "确定要删除此收据吗？此操作无法撤销。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:336
 #: templates/edit_server.html:336
 msgid "Не удалось удалить чек."
-msgstr "复制文本失败："
+msgstr "无法删除收据。"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:337
 #: templates/edit_server.html:337
 msgid "Ошибка при удалении чека:"
-msgstr "复制时出错"
+msgstr "删除收据时出错："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:338
 #: templates/edit_server.html:338
@@ -3668,7 +3668,7 @@ msgstr "创建的ZIP存档中添加了文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:654
 #: templates/help.html:654
 msgid "с вашим PIN-кодом"
-msgstr "包含您的PIN码"
+msgstr "包含您的 PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:655
 #: templates/help.html:655
@@ -4191,7 +4191,7 @@ msgstr "没有用于完整诊断的实用程序："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:934
 #: templates/index.html:934
 msgid "Установите командой:"
-msgstr "安装包"
+msgstr "使用此命令安装："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1010
 #: templates/index.html:1010
@@ -4467,12 +4467,12 @@ msgstr "创建PIN"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:248
 #: templates/index_locked.html:248
 msgid "PIN-код из архива"
-msgstr "档案中的销钉代码"
+msgstr "归档中的 PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
 msgid "PIN-код найден!"
-msgstr "找到销钉代码！"
+msgstr "已找到 PIN！"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
@@ -4538,7 +4538,7 @@ msgstr "填写所有字段"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:570
 #: templates/index_locked.html:570
 msgid "Новые PIN-коды не совпадают"
-msgstr "新的针代码不匹配"
+msgstr "两次输入的新 PIN 不一致"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:592
 #: templates/index_locked.html:592
@@ -4569,7 +4569,7 @@ msgstr "检查档案时有错误"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:721
 #: templates/index_locked.html:721
 msgid "PIN-коды не совпадают"
-msgstr "引脚代码不匹配"
+msgstr "两次输入的 PIN 不一致"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:727
 #: templates/index_locked.html:727
@@ -4834,7 +4834,7 @@ msgstr "建议安装额外的实用程序"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:135
 #: templates/monitoring.html:135
 msgid "Установить все одной командой:"
-msgstr "安装包"
+msgstr "使用一条命令全部安装："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:139
 #: templates/monitoring.html:139
@@ -5241,7 +5241,7 @@ msgstr "完整导出"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:107
 #: templates/settings.html:107
 msgid "Включает PIN-код"
-msgstr "新PIN码"
+msgstr "包含 PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:115
 #: templates/settings.html:115
@@ -5457,7 +5457,7 @@ msgstr "加密服务器数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:349
 #: templates/settings.html:349
 msgid "PIN-код для входа (PIN.txt)"
-msgstr "更改登录PIN码"
+msgstr "登录 PIN（PIN.txt）"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:350
 #: templates/settings.html:350
@@ -5497,7 +5497,7 @@ msgstr "继续出口"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:427
 #: templates/settings.html:427
 msgid "Управление PIN-кодом"
-msgstr "数据管理"
+msgstr "PIN 管理"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:432
 #: templates/settings.html:432

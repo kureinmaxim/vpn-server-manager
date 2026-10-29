@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.12] - 2026-10-30
+
+### Fixed
+- English and Chinese receipt labels and delete confirmations now refer to receipts, not hints, servers or copying errors.
+- Corrected start/stop/disable and container/package mix-ups in command help, including NGINX and systemd labels; Chinese PIN labels no longer use words for physical pins.
+- Added a UI terminology guide and semantic regression checks alongside placeholder checks.
+
 ## [5.0.11] - 2026-10-29
 
 ### Changed

@@ -24,3 +24,23 @@ def test_examples_and_placeholders_survive_translation(lang):
             if placeholder not in message.string:
                 broken.append(message.id)
     assert broken == []
+
+
+@pytest.mark.parametrize('lang,terms', [
+    ('en', ('stop', 'start', 'disable', 'receipt', 'hint')),
+    ('zh', ('停止', '启动', '禁用', '收据', '提示')),
+])
+def test_action_and_receipt_meanings_are_not_swapped(lang, terms):
+    """Protect reviewed meanings: stop != install/restart; receipt != server/hint."""
+    messages = catalog(lang)
+    stop, start, disable, receipt, hint = terms
+    for source in ('Остановить службу:', 'Остановить контейнер:', 'Остановить NGINX:'):
+        assert stop in messages[source].string.lower()
+    assert start in messages['Запустить службу:'].string.lower()
+    assert disable in messages['Отключить автозапуск службы:'].string.lower()
+    for source in ('Управление чеками', 'Добавить новый чек', 'Описание чека',
+                   'Вы уверены, что хотите удалить этот чек? Это действие необратимо.'):
+        assert receipt in messages[source].string.lower()
+        assert hint not in messages[source].string.lower()
+    assert hint in messages['Управление подсказками'].string.lower()
+    assert messages['Остановить службу:'].string != messages['Перезапустить службу:'].string

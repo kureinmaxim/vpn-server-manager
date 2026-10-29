@@ -1060,7 +1060,7 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:13
 #: templates/cheatsheet.html:13
 msgid "Содержание"
-msgstr "Creation..."
+msgstr "Contents"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:18
 #: templates/cheatsheet.html:18
@@ -1334,7 +1334,7 @@ msgstr "Check NGINX status:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:374
 #: templates/cheatsheet.html:374
 msgid "Запустить NGINX:"
-msgstr "Launch NGINX:"
+msgstr "Start NGINX:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:381
 #: templates/cheatsheet.html:381
@@ -1399,12 +1399,12 @@ msgstr "Start the container:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:473
 #: templates/cheatsheet.html:473
 msgid "Остановить контейнер:"
-msgstr "Install package"
+msgstr "Stop container:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:480
 #: templates/cheatsheet.html:480
 msgid "Удалить контейнер:"
-msgstr "Remove package:"
+msgstr "Remove container:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:487
 #: templates/cheatsheet.html:487
@@ -1424,17 +1424,17 @@ msgstr "Check service status"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:516
 #: templates/cheatsheet.html:516
 msgid "Запустить службу:"
-msgstr "Restart service:"
+msgstr "Start service:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:523
 #: templates/cheatsheet.html:523
 msgid "Остановить службу:"
-msgstr "Restart service:"
+msgstr "Stop service:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:544
 #: templates/cheatsheet.html:544
 msgid "Отключить автозапуск службы:"
-msgstr "Enable service autostart:"
+msgstr "Disable service autostart:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/cheatsheet.html:551
 #: templates/cheatsheet.html:551
@@ -1521,7 +1521,7 @@ msgstr "Not specified"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:331
 #: templates/edit_server.html:124 templates/edit_server.html:331
 msgid "Управление чеками"
-msgstr "Hint Management"
+msgstr "Receipt management"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:136
 #: templates/edit_server.html:136
@@ -1560,26 +1560,24 @@ msgstr "New password of the hoster"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:206
 #: templates/edit_server.html:206
 msgid "Быстрая загрузка чека"
-msgstr "Fast a check load"
+msgstr "Quick receipt upload"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:208
 #: templates/edit_server.html:208
 msgid "Файл нового чека"
-msgstr "The file of the new check"
+msgstr "New receipt file"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:210
 #: templates/edit_server.html:210
 msgid ""
 "Используйте для быстрой загрузки одного чека. Для просмотра всех чеков "
 "используйте кнопку \"Управление чеками\"."
-msgstr ""
-"Use for quick loading of one check. To view all the checks, use the "
-"\"Chek Management\" button."
+msgstr "Use this to quickly upload one receipt. To view all receipts, use the \"Receipt management\" button."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:213
 #: templates/edit_server.html:213
 msgid "Описание чека"
-msgstr "The description is waiting"
+msgstr "Receipt description"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:214
 #: templates/edit_server.html:214
@@ -1609,12 +1607,12 @@ msgstr "Add Server"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:265
 #: templates/edit_server.html:265
 msgid "Чеки по оплате:"
-msgstr "Payment checks:"
+msgstr "Payment receipts:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:273
 #: templates/edit_server.html:273
 msgid "Добавить новый чек"
-msgstr "Add First Server"
+msgstr "Add a new receipt"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:276
 #: templates/edit_server.html:276
@@ -1629,7 +1627,7 @@ msgstr "For example, payment for February 2024"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:280
 #: templates/edit_server.html:280
 msgid "Файл чека"
-msgstr "Check"
+msgstr "Receipt file"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:285
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/manage_hints.html:25
@@ -1640,13 +1638,13 @@ msgstr "Add"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:292
 #: templates/edit_server.html:292
 msgid "Загруженные чеки"
-msgstr "Loaded checks"
+msgstr "Uploaded receipts"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:298
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:329
 #: templates/edit_server.html:298 templates/edit_server.html:329
 msgid "Чек"
-msgstr "Check"
+msgstr "Receipt"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:299
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:330
@@ -1658,7 +1656,7 @@ msgstr "Loaded:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:335
 #: templates/edit_server.html:308 templates/edit_server.html:335
 msgid "Чеки еще не загружены."
-msgstr "Checks are not yet loaded."
+msgstr "No receipts have been uploaded yet."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:314
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:490
@@ -1674,27 +1672,27 @@ msgstr "Network error"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:332
 #: templates/edit_server.html:332
 msgid "Ошибка при добавлении чека:"
-msgstr "Error copying"
+msgstr "Error adding receipt:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:333
 #: templates/edit_server.html:333
 msgid "Не удалось добавить чек:"
-msgstr "Failed to copy text: "
+msgstr "Could not add receipt:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:334
 #: templates/edit_server.html:334
 msgid "Вы уверены, что хотите удалить этот чек? Это действие необратимо."
-msgstr "Are you sure you want to delete this server?"
+msgstr "Are you sure you want to delete this receipt? This cannot be undone."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:336
 #: templates/edit_server.html:336
 msgid "Не удалось удалить чек."
-msgstr "Failed to copy text: "
+msgstr "Could not delete the receipt."
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:337
 #: templates/edit_server.html:337
 msgid "Ошибка при удалении чека:"
-msgstr "Error copying"
+msgstr "Error deleting receipt:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:338
 #: templates/edit_server.html:338
@@ -3875,7 +3873,7 @@ msgstr "A file is added to the created ZIP archive"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:654
 #: templates/help.html:654
 msgid "с вашим PIN-кодом"
-msgstr "Changing the PIN code"
+msgstr "with your PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/help.html:655
 #: templates/help.html:655
@@ -4413,7 +4411,7 @@ msgstr "There are no utilities for complete diagnostics:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:934
 #: templates/index.html:934
 msgid "Установите командой:"
-msgstr "Install package"
+msgstr "Install with this command:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1010
 #: templates/index.html:1010
@@ -4693,12 +4691,12 @@ msgstr "Create PIN"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:248
 #: templates/index_locked.html:248
 msgid "PIN-код из архива"
-msgstr "PIN-Code from the archive"
+msgstr "PIN from the archive"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
 msgid "PIN-код найден!"
-msgstr "PIN code found!"
+msgstr "PIN found!"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:255
 #: templates/index_locked.html:255
@@ -4764,7 +4762,7 @@ msgstr "Fill all the fields"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:570
 #: templates/index_locked.html:570
 msgid "Новые PIN-коды не совпадают"
-msgstr "New PIN codes do not match"
+msgstr "New PINs do not match"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:592
 #: templates/index_locked.html:592
@@ -4795,7 +4793,7 @@ msgstr "There was an error when checking the archive"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:721
 #: templates/index_locked.html:721
 msgid "PIN-коды не совпадают"
-msgstr "PIN codes do not match"
+msgstr "PINs do not match"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:727
 #: templates/index_locked.html:727
@@ -5060,7 +5058,7 @@ msgstr "It is recommended to install additional utilities"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:135
 #: templates/monitoring.html:135
 msgid "Установить все одной командой:"
-msgstr "Install package"
+msgstr "Install all with one command:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:139
 #: templates/monitoring.html:139
@@ -5356,7 +5354,7 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:7
 #: templates/settings.html:3 templates/settings.html:7
 msgid "Управление данными"
-msgstr "Hint Management"
+msgstr "Data management"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:24
 #: templates/settings.html:24
@@ -5475,7 +5473,7 @@ msgstr "Full export"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:107
 #: templates/settings.html:107
 msgid "Включает PIN-код"
-msgstr "New PIN code"
+msgstr "Includes PIN"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:115
 #: templates/settings.html:115
