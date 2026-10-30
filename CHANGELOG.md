@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.18] - 2026-10-30
+
+### Fixed
+- Restored missing receipt upload/delete endpoints and added authenticated attachment downloads. Receipts are stored outside the public icon namespace; auth, PIN, CSRF and vault-conflict handling protect mutations.
+- Receipt upload now announces completion and focuses the resulting link. Removed silently ignored receipt inputs from card forms in favor of the working receipt dialog; safely render receipt text without HTML interpolation.
+- SSH status and monitoring-removal dialogs reuse Bootstrap instances, have accessible close controls and default destructive confirmation focus to Cancel. Added live keyboard upload and synthetic SSH dialog regressions.
+
 ## [5.0.17] - 2026-10-30
 
 ### Fixed

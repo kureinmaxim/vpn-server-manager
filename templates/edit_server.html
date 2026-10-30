@@ -306,13 +306,8 @@
                     <label for="software_info" class="form-label">{{ _('Установленное ПО') }}</label>
                     <textarea class="form-control form-control-sm" id="software_info" name="software_info" rows="2">{{ server.get('software_info', '') }}</textarea>
                 </div>
-                <div class="col-md-6">
-                    <label for="receipt" class="form-label">{{ _('Файл нового чека') }}</label>
-                    {{ file_picker('receipt', 'receipt', compact=True) }}
-                </div>
-                <div class="col-md-6">
-                    <label for="receipt_description" class="form-label">{{ _('Описание чека') }}</label>
-                    <input type="text" class="form-control form-control-sm" id="receipt_description" name="receipt_description" placeholder="{{ _('Например, Оплата за январь 2024') }}">
+                <div class="col-12">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#receiptsModal">{{ _('Управление чеками') }}</button>
                 </div>
                 {% if hints %}
                 <div class="col-12">
@@ -366,6 +361,7 @@
 
         <!-- List of existing receipts -->
         <h6>{{ _('Загруженные чеки') }}</h6>
+        <div id="receipt-status" role="status" class="mb-2"></div>
         <ul class="list-group" id="receipts-list">
             {% if server.payment_info and server.payment_info.receipts %}
                 {% for receipt in server.payment_info.receipts %}
@@ -373,9 +369,9 @@
                     <div>
                         <strong>{{ receipt.description or _('Чек') }}</strong><br>
                         <small class="text-muted">{{ _('Загружен:') }} {{ receipt.upload_date | format_datetime }}</small><br>
-                        <a href="{{ url_for('main.uploaded_file', filename=receipt.filename) }}" target="_blank">{{ receipt.original_name }}</a>
+                        <a href="{{ url_for('receipts.download', server_id=server.id, filename=receipt.filename) }}" target="_blank">{{ receipt.original_name }}</a>
                     </div>
-                    <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="{{ receipt.filename }}">
+                    <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="{{ receipt.filename }}" aria-label="{{ _('Удалить') }}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </li>
@@ -469,18 +465,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                 const safeFilenameId = newReceipt.filename.replace(/\./g, '_').replace(/ /g, '_');
                 listItem.id = `receipt-${safeFilenameId}`;
-                listItem.innerHTML = `
-                    <div>
-                        <strong>${newReceipt.description || i18n.receipt}</strong><br>
-                        <small class="text-muted">${i18n.uploaded} ${newReceipt.formatted_date}</small><br>
-                        <a href="/uploads/${newReceipt.filename}" target="_blank">${newReceipt.original_name}</a>
-                    </div>
-                    <button class="btn btn-sm btn-outline-danger delete-receipt-btn" data-filename="${newReceipt.filename}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                `;
+                const details = document.createElement('div');
+                const title = document.createElement('strong');
+                title.textContent = newReceipt.description || i18n.receipt;
+                const link = document.createElement('a');
+                link.href = '/server/' + encodeURIComponent(serverId) + '/receipts/file/' + encodeURIComponent(newReceipt.filename);
+                link.textContent = newReceipt.original_name;
+                details.append(title, document.createElement('br'), link);
+                const remove = document.createElement('button');
+                remove.type = 'button';
+                remove.className = 'btn btn-sm btn-outline-danger delete-receipt-btn';
+                remove.dataset.filename = newReceipt.filename;
+                remove.textContent = {{ _('Удалить')|tojson }};
+                listItem.append(details, remove);
                 receiptsList.prepend(listItem);
                 addReceiptForm.reset();
+                document.getElementById('receipt-status').textContent = {{ _('Чек добавлен.')|tojson }};
+                if (document.activeElement === document.body || addReceiptForm.contains(document.activeElement)) link.focus();
                 
                 const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
                 const count = receiptsList.getElementsByTagName('li').length;
@@ -523,6 +524,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     listItem.remove();
+                    document.getElementById('new_receipt_description').focus();
                     
                     const receiptBtn = document.querySelector('button[data-bs-target="#receiptsModal"]');
                     const count = receiptsList.getElementsByTagName('li').length;

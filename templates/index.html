@@ -13,7 +13,7 @@
             {% for category, message in messages %}
                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Закрыть') }}"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -453,7 +453,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="ipInfoModalLabel">{{ _('Информация об IP') }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
       </div>
       <div class="modal-body">
         <pre id="ipInfoContent"></pre>
@@ -491,14 +491,14 @@
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
       </div>
       <div class="modal-body">
         <div id="statsLoading" class="text-center my-3">
           <div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>
           <div class="mt-2">{{ _('Загрузка...') }}</div>
         </div>
-        <div id="statsWarning" class="alert alert-warning d-none"></div>
+        <div id="statsWarning" role="status" class="alert alert-warning d-none"></div>
         <div id="statsContent" class="d-none">
           <div class="row">
             <!-- Top Row -->
@@ -850,7 +850,7 @@
         document.getElementById('statusManageServerBtn').href = {{ url_for('server_control.page', server_id='SERVER_ID')|tojson }}.replace('SERVER_ID', encodeURIComponent(serverId));
         consecutiveErrors = 0;
         var modalEl = document.getElementById('serverStatusModal');
-        var modal = new bootstrap.Modal(modalEl);
+        var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         // Reset UI
         document.getElementById('statsLoading').classList.remove('d-none');
         document.getElementById('statsContent').classList.add('d-none');

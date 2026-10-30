@@ -10,7 +10,7 @@
     });
     document.addEventListener('shown.bs.modal', (event) => {
         const modal = event.target;
-        const input = modal.querySelector('#pinInput, #newPinInput');
+        const input = modal.querySelector(modal.dataset.modalInitialFocus || '#pinInput, #newPinInput');
         if (input && input.getClientRects().length) input.focus();
     });
     document.addEventListener('hidden.bs.modal', (event) => {

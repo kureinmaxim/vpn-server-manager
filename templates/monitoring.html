@@ -491,12 +491,12 @@
 </div>
 
 <!-- Modal для подтверждения удаления -->
-<div class="modal fade" id="uninstallModal" tabindex="-1">
+<div class="modal fade" id="uninstallModal" tabindex="-1" aria-labelledby="uninstallTitle" data-modal-initial-focus="#cancel-uninstall-btn">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">⚠️ {{ _('Подтверждение удаления') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title" id="uninstallTitle">⚠️ {{ _('Подтверждение удаления') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <p>{{ _('Вы уверены, что хотите удалить систему мониторинга?') }}</p>
@@ -1749,7 +1749,7 @@ function showUninstallModal() {
     console.log('🗑️ Opening uninstall modal');
     
     const modalEl = document.getElementById('uninstallModal');
-    const modal = new bootstrap.Modal(modalEl);
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
     
     // Сбрасываем состояние модального окна

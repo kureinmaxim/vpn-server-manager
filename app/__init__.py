@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '5.0.17'),
+            "version": app.config.get('APP_VERSION', '5.0.18'),
             "release_date": "30.10.2026",
             "last_updated": "2026-10-30",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "5.0.17",
+            "version": "5.0.18",
             "release_date": "30.10.2026",
             "last_updated": "2026-10-30",
             "developer": "Куреин М.Н."
@@ -341,6 +341,8 @@ def create_app(config_name='development'):
     # Регистрация blueprints
     from .routes import main_bp, api_bp, pin_bp, vendor_bp
     app.register_blueprint(main_bp)
+    from .routes.receipts import receipts_bp
+    app.register_blueprint(receipts_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(pin_bp)
     app.register_blueprint(vendor_bp)

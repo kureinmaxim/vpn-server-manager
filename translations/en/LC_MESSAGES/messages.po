@@ -10538,3 +10538,12 @@ msgstr "Interface language"
 
 msgid "Тема интерфейса"
 msgstr "Interface theme"
+
+msgid "Не удалось обработать чек."
+msgstr "Unable to process the receipt."
+
+msgid "Чек добавлен."
+msgstr "Receipt added."
+
+msgid "Чек можно добавить после сохранения карточки."
+msgstr "You can add a receipt after saving the server card."
