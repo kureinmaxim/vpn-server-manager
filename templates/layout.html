@@ -47,12 +47,13 @@
     </script>
 </head>
 <body>
+    <a class="skip-content" href="#main-content">{{ _('Перейти к содержимому') }}</a>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 <i class="bi bi-hdd-stack"></i> {{ _('VPS Manager') }}
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Меню навигации') }}">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -69,8 +70,8 @@
                         <a class="nav-link" href="{{ url_for('main.about') }}">{{ _('О программе') }}</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-search"></i>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('Масштаб интерфейса') }}">
+                            <i class="bi bi-search" aria-hidden="true"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
@@ -87,8 +88,8 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-translate"></i>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('Язык интерфейса') }}">
+                            <i class="bi bi-translate" aria-hidden="true"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="{{ url_for('main.change_language', language='ru') }}">🇷🇺 Русский</a></li>
@@ -97,8 +98,8 @@
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-circle-half"></i>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="{{ _('Тема интерфейса') }}">
+                            <i class="bi bi-circle-half" aria-hidden="true"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
@@ -108,7 +109,7 @@
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}">
+                        <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}" aria-label="{{ _('Выйти из системы') }}">
                             <i class="bi bi-box-arrow-right"></i>
                         </a>
                     </li>
@@ -118,7 +119,7 @@
         </div>
     </nav>
 
-    <main class="content container mb-5">
+    <main id="main-content" tabindex="-1" class="content container mb-5">
         {% block content %}{% endblock %}
     </main>
     

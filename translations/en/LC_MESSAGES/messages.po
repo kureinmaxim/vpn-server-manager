@@ -10526,3 +10526,15 @@ msgstr "To sign out, use the sign-out icon in the top bar. The next login will r
 
 msgid "Восстановление доступно после входа в настройках. Импорт ZIP на экране входа не поддерживается."
 msgstr "Restore is available in Settings after signing in. ZIP import on the login screen is not supported."
+
+msgid "Перейти к содержимому"
+msgstr "Skip to content"
+
+msgid "Меню навигации"
+msgstr "Navigation menu"
+
+msgid "Язык интерфейса"
+msgstr "Interface language"
+
+msgid "Тема интерфейса"
+msgstr "Interface theme"

@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.15] - 2026-10-30
+
+### Changed
+- Shared navigation now names icon-only controls for screen readers in all three languages and identifies the mobile menu's controlled region.
+- Added a keyboard skip-to-content link and a two-color focus indicator. Navigation dropdowns scroll within the viewport when enlarged.
+
 ## [5.0.14] - 2026-10-30
 
 ### Changed

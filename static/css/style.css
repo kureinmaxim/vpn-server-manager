@@ -523,3 +523,31 @@ body:has(.server-form) .navbar.mb-4 {
 .editor-field .form-control::placeholder { color: var(--bs-secondary-color); opacity: .6; }
 @media (max-width: 575.98px) { .editor-fields { grid-template-columns: minmax(0, 1fr); } }
 .editor-field textarea.editor-grow { resize: none; overflow: hidden; min-height: calc(1.5em + .5rem + 2px); line-height: 1.5; overflow-wrap: anywhere; }
+
+/* Двухцветный фокус виден на светлых и тёмных поверхностях. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid #fff !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px #111 !important;
+}
+
+.skip-content {
+    position: fixed;
+    top: .5rem;
+    left: .5rem;
+    z-index: 1100;
+    padding: .65rem 1rem;
+    background: #fff;
+    color: #111;
+    transform: translateY(calc(-100% - 1rem));
+}
+.skip-content:focus {
+    transform: translateY(0);
+    color: #111;
+}
+
+/* Длинное меню масштаба остаётся прокручиваемым при увеличении. */
+.navbar .dropdown-menu {
+    max-height: 70vh;
+    overflow-y: auto;
+}
