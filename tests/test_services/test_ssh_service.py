@@ -3,6 +3,18 @@ from unittest.mock import Mock, patch, MagicMock
 from app.services.ssh_service import SSHService
 from app.exceptions import SSHConnectionError, AuthenticationError
 
+
+def _stream_channel(stdout_data=b'', stderr_data=b'', status=0):
+    channel = Mock()
+    channel.recv_ready.side_effect = [bool(stdout_data), False]
+    channel.recv.return_value = stdout_data
+    channel.recv_stderr_ready.side_effect = [bool(stderr_data), False]
+    channel.recv_stderr.return_value = stderr_data
+    channel.exit_status_ready.return_value = True
+    channel.recv_exit_status.return_value = status
+    return channel
+
+
 class TestSSHService:
     """Тесты для SSHService"""
     
@@ -58,6 +70,25 @@ class TestSSHService:
         assert kwargs['password'] is None
         assert kwargs['key_filename'] == '/path/to/key'
         assert kwargs['port'] == 22
+
+    def test_connect_preserves_card_key_passphrase(self, monkeypatch):
+        from app.services import ssh_connection
+
+        seen = []
+        client = Mock()
+
+        def auth_kwargs(password, key, passphrase, *, use_local_keys):
+            seen.append((password, key, passphrase, use_local_keys))
+            return {}
+
+        monkeypatch.setattr('app.services.ssh_service.paramiko.SSHClient', lambda: client)
+        monkeypatch.setattr(ssh_connection, 'prepare_trusted_client', lambda _client: None)
+        monkeypatch.setattr(ssh_connection, 'connect_kwargs', auth_kwargs)
+        monkeypatch.setattr(SSHService, 'connect_managed', lambda *_args, **_kwargs: None)
+
+        SSHService().connect('192.0.2.10', 'operator', key='card-key', key_passphrase='card-phrase')
+
+        assert seen == [(None, 'card-key', 'card-phrase', False)]
     
     @patch('app.services.ssh_service.paramiko.SSHClient')
     def test_connect_authentication_error(self, mock_ssh_client):
@@ -120,9 +151,7 @@ class TestSSHService:
         mock_stdin = Mock()
         mock_stdout = Mock()
         mock_stderr = Mock()
-        mock_stdout.channel.recv_exit_status.return_value = 0
-        mock_stdout.read.return_value = b'output data'
-        mock_stderr.read.return_value = b''
+        mock_stdout.channel = _stream_channel(stdout_data=b'output data')
         
         service.client = Mock()
         service.client.exec_command.return_value = (mock_stdin, mock_stdout, mock_stderr)
@@ -132,7 +161,7 @@ class TestSSHService:
         assert result['exit_status'] == 0
         assert result['stdout'] == 'output data'
         assert result['stderr'] == ''
-        service.client.exec_command.assert_called_once_with('ls -la')
+        service.client.exec_command.assert_called_once_with('ls -la', timeout=30)
     
     def test_execute_command_not_connected(self):
         """Тест выполнения команды без подключения"""
@@ -140,6 +169,43 @@ class TestSSHService:
         
         with pytest.raises(SSHConnectionError):
             service.execute_command('ls -la')
+
+    def test_execute_remote_command_uses_bounded_job_service(self):
+        service = SSHService()
+        client = Mock()
+        stdin, stdout, stderr = Mock(), Mock(), Mock()
+        stdout.channel = _stream_channel(stdout_data=b'EXISTS\n')
+        client.exec_command.return_value = stdin, stdout, stderr
+        service.get_connection_pooled = Mock(return_value=client)
+
+        result = service.execute_remote_command(
+            '192.0.2.1', 'operator', 'fixture-password', '[ -f /tmp/x ]', timeout=8
+        )
+
+        assert result == {'success': True, 'output': 'EXISTS\n', 'error': '', 'exit_status': 0}
+        client.exec_command.assert_called_once_with('[ -f /tmp/x ]', timeout=8)
+
+    def test_execute_remote_command_returns_safe_error_code(self):
+        from paramiko import SSHException
+        service = SSHService()
+        client = Mock()
+        client.exec_command.side_effect = SSHException('private remote path')
+        service.get_connection_pooled = Mock(return_value=client)
+
+        result = service.execute_remote_command('192.0.2.1', 'operator', 'pw', 'true')
+
+        assert result == {'success': False, 'output': '', 'error': 'exec_failed', 'exit_status': -1}
+
+    def test_execute_command_does_not_leak_remote_exception(self):
+        from paramiko import SSHException
+        service = SSHService()
+        service.client = Mock()
+        service.client.exec_command.side_effect = SSHException('private remote path')
+
+        with pytest.raises(SSHConnectionError) as caught:
+            service.execute_command('true')
+
+        assert 'private remote path' not in str(caught.value)
     
     def test_get_sftp_client(self):
         """Тест получения SFTP клиента"""

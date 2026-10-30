@@ -10662,6 +10662,18 @@ msgstr "sudo is unavailable on the remote host. This operation requires root or 
 msgid "Эта операция поддерживает только Debian или Ubuntu Linux. Изменений не внесено."
 msgstr "This operation supports Debian or Ubuntu Linux only. No changes were made."
 
+msgid "Не удалось проверить результат обновления. Проверьте текущее состояние перед повтором."
+msgstr "Could not verify the update result. Check the current state before retrying."
+
+msgid "Файл резервной копии слишком большой."
+msgstr "The backup file is too large."
+
+msgid "Не удалось импортировать данные. Проверьте ключ, структуру файла и активный профиль."
+msgstr "Could not import the data. Check the key, file structure, and active profile."
+
+msgid "Не удалось завершить операцию мониторинга. Проверьте сервер и его состояние перед повтором."
+msgstr "Could not complete the monitoring operation. Check the server and its state before retrying."
+
 msgid "Выберите дополнительные проверки для главной страницы. Списки проектов и ботов будут пустыми: приложение не изучает конфигурационные файлы, чтобы заполнить их автоматически. Их можно заполнить вручную или импортировать типовые примеры."
 msgstr "Choose additional checks for the home page. Project and bot lists start empty: the app does not inspect configuration files to populate them automatically. Add entries manually or import generic examples."
 

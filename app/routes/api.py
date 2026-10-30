@@ -1,5 +1,5 @@
 from ..services.ssh_service import SSHService
-from ..services.ssh_trust import load_known_hosts, RejectUnknownHost, host_key_message, KnownHostsError, UnknownHostKeyError
+from ..services.ssh_trust import host_key_message, KnownHostsError, UnknownHostKeyError
 from flask import Blueprint, request, jsonify, session, current_app
 from flask_babel import gettext as _
 from datetime import datetime
@@ -12,9 +12,11 @@ from ..utils.validators import Validators
 from ..utils.rate_limiter import RateLimiter
 from ..exceptions import ValidationError, AuthenticationError, APIError
 from ..models.server import Server
-from ..services.ssh_auth import connect_kwargs, has_ssh_auth
+from ..services.ssh_auth import has_ssh_auth
+from ..services.ssh_connection import connect_card_client, resolve_server_ssh_credentials
+from ..services.ssh_remote_job import run_remote_job
 from ..services.data_manager_service import server_kind
-from ..services.ssh_address import card_addresses, ssh_address
+from ..services.ssh_address import card_addresses
 
 logger = logging.getLogger(__name__)
 
@@ -416,45 +418,28 @@ def get_server_stats(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        # Получаем данные сервера
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
-        
-        if not server:
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        if not server or not creds:
             return jsonify({
                 'error': f'Server with id {server_id} not found'
             }), 404
         
         # Получаем timeout из параметров запроса
         timeout = int(request.args.get('timeout', 30))
-        
-        # Получаем SSH credentials из правильной структуры
-        ssh_creds = server.get('ssh_credentials', {})
-        ssh_user = ssh_creds.get('user', 'root')
-        ssh_port = ssh_creds.get('port', 22)  # Получаем SSH порт
-        
-        # Пароль и/или ключ из карточки
-        try:
-            auth = _ssh_auth(ssh_creds, data_manager)
-        except Exception as e:
-            logger.error(f"Failed to decrypt SSH credentials: {str(e)}")
-            auth = {}
-        
-        if not has_ssh_auth(auth):
+        if not has_ssh_auth(creds):
             return jsonify({
                 'error': 'SSH password or key not available. Please edit server and set SSH credentials.'
             }), 400
         
         # Получаем статистику через SSH
         stats = ssh_service.get_server_stats(
-            ip=ssh_address(server, ssh_port),
-            user=ssh_user,
-            password=auth['password'],
-            port=ssh_port,  # Передаем SSH порт
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
+            port=creds['port'],
             timeout=timeout,
-            key=auth['key'],
-            key_passphrase=auth['key_passphrase'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
         )
         
         return jsonify({
@@ -806,52 +791,9 @@ def _load_check_snapshot(server_id, derp=False, kind=None):
         return response, 502
 
 
-def _ssh_auth(ssh_creds, data_manager):
-    """Пароль и ключ входа из карточки, расшифрованные. Ошибку расшифровки пробрасывает.
-
-    Ключ расшифровывается только здесь, перед подключением: в списке серверов и в
-    HTML его открытого текста нет.
-    """
-    def secret(field):
-        value = ssh_creds.get(field + '_decrypted', '')
-        if not value and ssh_creds.get(field):
-            value = data_manager.decrypt_data(ssh_creds[field])
-        return value or ''
-
-    return {
-        'password': secret('password'),
-        'key': secret('private_key'),
-        'key_passphrase': secret('key_passphrase'),
-    }
-
-
 def _get_server_ssh_credentials(server_id, data_manager):
     """Helper: SSH credentials карточки (пароль и/или ключ) с расшифровкой"""
-    from flask import current_app
-    servers = data_manager.load_servers(current_app.config)
-    server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
-    
-    if not server:
-        return None, None
-    
-    ssh_creds = server.get('ssh_credentials', {})
-    try:
-        auth = _ssh_auth(ssh_creds, data_manager)
-    except Exception as e:
-        logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
-        return None, None
-    
-    creds = {
-        # Main address or the first extra address (mesh, LAN) that answers on the SSH port
-        'ip': ssh_address(server, ssh_creds.get('port', 22)),
-        'user': ssh_creds.get('user', 'root'),
-        'password': auth['password'],
-        'port': ssh_creds.get('port', 22),
-    }
-    if auth['key']:
-        # Поля ключа — только если он задан: без ключа набор прежний (ip, user, password, port)
-        creds.update(key=auth['key'], key_passphrase=auth['key_passphrase'])
-    return server, creds
+    return resolve_server_ssh_credentials(server_id, data_manager, current_app.config)
 
 @api_bp.route('/monitoring/<server_id>/network-stats', methods=['GET'])
 @require_auth
@@ -1321,27 +1263,12 @@ def check_monitoring_installed(server_id):
         if not ssh_service or not data_manager:
             raise APIError('Required services not available')
         
-        from flask import current_app
-        servers = data_manager.load_servers(current_app.config)
-        server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
-        
-        if not server:
+        server, creds = _get_server_ssh_credentials(server_id, data_manager)
+        if not server or not creds:
             return jsonify({
                 'success': False,
                 'error': f'Server with id {server_id} not found'
             }), 404
-        
-        # Пароль и/или ключ SSH из карточки
-        ssh_creds = server.get('ssh_credentials', {})
-        try:
-            auth = _ssh_auth(ssh_creds, data_manager)
-        except Exception as e:
-            logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
-            return jsonify({
-                'success': False,
-                'error': 'Failed to decrypt server password',
-                'installed': False
-            })
         
         # Проверяем наличие скрипта мониторинга на сервере
         logger.info(f"Checking if monitoring is installed on server {server_id}")
@@ -1349,13 +1276,13 @@ def check_monitoring_installed(server_id):
         # Проверяем существование главного скрипта с коротким таймаутом (быстрая проверка)
         check_cmd = "[ -f /usr/local/bin/monitoring/get-all-stats.sh ] && echo 'EXISTS' || echo 'NOT_FOUND'"
         result = ssh_service.execute_remote_command(
-            ip=ssh_address(server, ssh_creds.get('port', 22)),
-            user=ssh_creds.get('user', 'root'),
-            password=auth['password'],
+            ip=creds['ip'],
+            user=creds['user'],
+            password=creds['password'],
             command=check_cmd,
-            port=ssh_creds.get('port', 22),
-            key=auth['key'],
-            key_passphrase=auth['key_passphrase'],
+            port=creds['port'],
+            key=creds.get('key'),
+            key_passphrase=creds.get('key_passphrase'),
             timeout=8,              # Таймаут выполнения команды
             connection_timeout=10   # Быстрый таймаут подключения для проверки (вместо 30)
         )
@@ -1397,7 +1324,6 @@ def update_history_script(server_id):
     """
     import base64
     import paramiko
-    from .reset import _connect, _load_known_hosts, RejectUnknownHost, describe_failure, failure_code
     data_manager = registry.get('data_manager')
     if not data_manager:
         return jsonify(success=False, error=_('Сервис мониторинга недоступен.')), 503
@@ -1409,18 +1335,16 @@ def update_history_script(server_id):
     encoded = base64.b64encode(METRICS_HISTORY_SCRIPT.encode()).decode()
     client = paramiko.SSHClient()
     try:
-        _load_known_hosts(client)
-        client.set_missing_host_key_policy(RejectUnknownHost())
-        _connect(client, creds)
-        stdout = client.exec_command(
+        connect_card_client(client, creds, timeout=20, banner_timeout=20, auth_timeout=20)
+        result = run_remote_job(client,
             f'test -f {path} && echo {encoded} | base64 -d | {sudo}tee {path} > /dev/null && {sudo}chmod +x {path}'
-            f' && grep -q /proc/stat {path} && echo OK', timeout=20)[1]
-        if stdout.read().decode('utf-8', 'replace').strip() != 'OK':
+            f' && grep -q /proc/stat {path} && echo OK', timeout=20, max_output_bytes=64 * 1024)
+        if result.exit_status != 0 or result.stdout.decode('utf-8', 'replace').strip() != 'OK':
             return jsonify(success=False, error=_('Не удалось обновить скрипт истории. Нужен root или sudo -n.')), 502
         return jsonify(success=True)
     except Exception as exc:
-        return jsonify(success=False, error=describe_failure(exc, creds, may_have_run=True)
-                       or _('Не удалось обновить скрипт истории.') + failure_code(exc)), 502
+        return jsonify(success=False, error=_ssh_failure_message(exc)
+                       or _('Не удалось проверить результат обновления. Проверьте текущее состояние перед повтором.')), 502
     finally:
         client.close()
 
@@ -1466,28 +1390,14 @@ def install_monitoring(server_id):
                 yield f"data: {json.dumps({'error': 'Required services not available', 'status': 'error'})}\n\n"
                 return
             
-            from flask import current_app
-            servers = data_manager.load_servers(current_app.config)
-            server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
-            
-            if not server:
+            server, creds = _get_server_ssh_credentials(server_id, data_manager)
+            if not server or not creds:
                 yield f"data: {json.dumps({'error': f'Server with id {server_id} not found', 'status': 'error'})}\n\n"
                 return
             
-            # Получаем credentials
-            ssh_creds = server.get('ssh_credentials', {})
-            user = ssh_creds.get('user', 'root')
-            port = ssh_creds.get('port', 22)
-            ip = ssh_address(server, port)
-            
-            # Пароль и/или ключ из карточки (как в get_server_stats)
-            try:
-                auth = _ssh_auth(ssh_creds, data_manager)
-            except Exception as e:
-                logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
-                yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
-                return
-            password = auth['password']
+            user, port, ip = creds['user'], creds['port'], creds['ip']
+            password = creds['password']
+            auth = {'key': creds.get('key'), 'key_passphrase': creds.get('key_passphrase')}
             
             if not has_ssh_auth(auth):
                 yield f"data: {json.dumps({'error': 'Нет ни пароля, ни SSH-ключа. Отредактируйте сервер и укажите данные входа по SSH.', 'status': 'error'})}\n\n"
@@ -1505,11 +1415,7 @@ def install_monitoring(server_id):
             check_client = None
             try:
                 check_client = paramiko.SSHClient()
-                load_known_hosts(check_client)
-                check_client.set_missing_host_key_policy(RejectUnknownHost())
-                SSHService.connect_managed(check_client, hostname=ip, username=user, port=port, timeout=30,
-                                     banner_timeout=60, auth_timeout=30,
-                                     **connect_kwargs(password, auth['key'], auth['key_passphrase']))
+                connect_card_client(check_client, creds, timeout=30, banner_timeout=60, auth_timeout=30)
                 
                 # Проверяем наличие файла мониторинга
                 _, stdout, _ = check_client.exec_command('test -f /usr/local/bin/monitoring/get-all-stats.sh && echo "exists"', timeout=10)
@@ -1542,12 +1448,7 @@ def install_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                load_known_hosts(client)
-                client.set_missing_host_key_policy(RejectUnknownHost())
-                # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
-                SSHService.connect_managed(client, hostname=ip, username=user, port=port, timeout=30,
-                               **connect_kwargs(password, auth['key'], auth['key_passphrase'],
-                                                use_local_keys=True))
+                connect_card_client(client, creds, timeout=30, banner_timeout=60, auth_timeout=30)
                 
                 yield f"data: {json.dumps({'step': 1, 'total': 7, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
                 if check_cancelled():
@@ -1707,7 +1608,8 @@ exit 0
             except paramiko.SSHException as e:
                 yield f"data: {json.dumps({'error': _ssh_failure_message(e), 'status': 'error'})}\n\n"
             except Exception as e:
-                yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
+                logger.warning('Monitoring install failed (%s)', type(e).__name__)
+                yield f"data: {json.dumps({'error': _('Не удалось завершить операцию мониторинга. Проверьте сервер и его состояние перед повтором.'), 'status': 'error'})}\n\n"
             finally:
                 if client:
                     try:
@@ -1718,8 +1620,8 @@ exit 0
                 installation_cancelled[server_id] = False
                         
         except Exception as e:
-            logger.error(f"Error during monitoring installation: {str(e)}")
-            yield f"data: {json.dumps({'error': str(e), 'status': 'error'})}\n\n"
+            logger.warning('Monitoring installation failed (%s)', type(e).__name__)
+            yield f"data: {json.dumps({'error': _('Не удалось завершить операцию мониторинга. Проверьте сервер и его состояние перед повтором.'), 'status': 'error'})}\n\n"
             installation_cancelled[server_id] = False
     
     return Response(stream_with_context(generate_progress()), mimetype='text/event-stream')
@@ -1743,28 +1645,13 @@ def uninstall_monitoring(server_id):
                 yield f"data: {json.dumps({'error': 'Required services not available', 'status': 'error'})}\n\n"
                 return
             
-            from flask import current_app
-            servers = data_manager.load_servers(current_app.config)
-            server = next((s for s in servers if str(s.get('id')) == str(server_id)), None)
-            
-            if not server:
+            server, creds = _get_server_ssh_credentials(server_id, data_manager)
+            if not server or not creds:
                 yield f"data: {json.dumps({'error': f'Server with id {server_id} not found', 'status': 'error'})}\n\n"
                 return
             
-            # Получаем credentials
-            ssh_creds = server.get('ssh_credentials', {})
-            user = ssh_creds.get('user', 'root')
-            port = ssh_creds.get('port', 22)
-            ip = ssh_address(server, port)
-            
-            # Пароль и/или ключ из карточки (как в get_server_stats)
-            try:
-                auth = _ssh_auth(ssh_creds, data_manager)
-            except Exception as e:
-                logger.error(f"Failed to decrypt SSH credentials for server {server_id}: {e}")
-                yield f"data: {json.dumps({'error': 'Не удалось расшифровать пароль сервера', 'status': 'error'})}\n\n"
-                return
-            password = auth['password']
+            user, port, ip = creds['user'], creds['port'], creds['ip']
+            auth = {'key': creds.get('key'), 'key_passphrase': creds.get('key_passphrase')}
             
             if not has_ssh_auth(auth):
                 yield f"data: {json.dumps({'error': 'Нет ни пароля, ни SSH-ключа. Отредактируйте сервер и укажите данные входа по SSH.', 'status': 'error'})}\n\n"
@@ -1778,12 +1665,7 @@ def uninstall_monitoring(server_id):
             client = None
             try:
                 client = paramiko.SSHClient()
-                load_known_hosts(client)
-                client.set_missing_host_key_policy(RejectUnknownHost())
-                # Как раньше: при установке также пробуются ~/.ssh и ssh-agent
-                SSHService.connect_managed(client, hostname=ip, username=user, port=port, timeout=30,
-                               **connect_kwargs(password, auth['key'], auth['key_passphrase'],
-                                                use_local_keys=True))
+                connect_card_client(client, creds, timeout=30, banner_timeout=60, auth_timeout=30)
                 
                 yield f"data: {json.dumps({'step': 1, 'total': 5, 'message': '✅ Подключено к серверу', 'status': 'success'})}\n\n"
 
@@ -1822,7 +1704,8 @@ def uninstall_monitoring(server_id):
             except paramiko.SSHException as e:
                 yield f"data: {json.dumps({'error': _ssh_failure_message(e), 'status': 'error'})}\n\n"
             except Exception as e:
-                yield f"data: {json.dumps({'error': f'Ошибка: {str(e)}', 'status': 'error'})}\n\n"
+                logger.warning('Monitoring uninstall failed (%s)', type(e).__name__)
+                yield f"data: {json.dumps({'error': _('Не удалось завершить операцию мониторинга. Проверьте сервер и его состояние перед повтором.'), 'status': 'error'})}\n\n"
             finally:
                 if client:
                     try:
@@ -1831,8 +1714,8 @@ def uninstall_monitoring(server_id):
                         pass
                         
         except Exception as e:
-            logger.error(f"Error during monitoring uninstallation: {str(e)}")
-            yield f"data: {json.dumps({'error': str(e), 'status': 'error'})}\n\n"
+            logger.warning('Monitoring uninstallation failed (%s)', type(e).__name__)
+            yield f"data: {json.dumps({'error': _('Не удалось завершить операцию мониторинга. Проверьте сервер и его состояние перед повтором.'), 'status': 'error'})}\n\n"
     
     return Response(stream_with_context(generate_uninstall_progress()), mimetype='text/event-stream')
 

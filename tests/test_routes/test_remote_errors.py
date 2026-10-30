@@ -20,9 +20,14 @@ def ssh_client(monkeypatch, connect_error=None, stdout_data=b'{"results": []}', 
     if connect_error is not None:
         client.connect.side_effect = connect_error
     stdin, stdout, stderr = MagicMock(), MagicMock(), MagicMock()
-    stdout.read.return_value = stdout_data
-    stdout.channel.recv_exit_status.return_value = status
-    stderr.read.return_value = stderr_data
+    channel = MagicMock()
+    channel.recv_ready.side_effect = [bool(stdout_data), False]
+    channel.recv.return_value = stdout_data
+    channel.recv_stderr_ready.side_effect = [bool(stderr_data), False]
+    channel.recv_stderr.return_value = stderr_data
+    channel.exit_status_ready.return_value = True
+    channel.recv_exit_status.return_value = status
+    stdout.channel = channel
     client.exec_command.return_value = stdin, stdout, stderr
     monkeypatch.setattr(routes.paramiko, "SSHClient", lambda: client)
     return client
@@ -68,16 +73,26 @@ def test_empty_answer_is_classified_without_leaking_stderr(monkeypatch, status, 
     assert str(caught.value) == reason  # только код причины, без stderr сервера
 
 
-def test_card_credentials_do_not_spend_tries_on_local_keys(monkeypatch):
+def test_remote_operations_use_card_credentials_without_local_fallback(monkeypatch):
     client = ssh_client(monkeypatch)
     routes.remote(CREDS, [])
     kwargs = client.connect.call_args.kwargs
     assert kwargs["password"] == "fixture-only"
     assert kwargs["look_for_keys"] is False and kwargs["allow_agent"] is False
-    # Без пароля и ключа в карточке — как раньше, ~/.ssh и ssh-agent.
+    # Без секрета в карточке операции сброса не должны незаметно переключаться
+    # на посторонний ключ из ~/.ssh или ssh-agent.
+    stdin, stdout, stderr = MagicMock(), MagicMock(), MagicMock()
+    channel = MagicMock()
+    channel.recv_ready.side_effect = [True, False]
+    channel.recv.return_value = b'{"results": []}'
+    channel.recv_stderr_ready.side_effect = [False, False]
+    channel.exit_status_ready.return_value = True
+    channel.recv_exit_status.return_value = 0
+    stdout.channel = channel
+    client.exec_command.return_value = stdin, stdout, stderr
     routes.remote(dict(CREDS, password=""), [])
     kwargs = client.connect.call_args.kwargs
-    assert kwargs["look_for_keys"] is True and kwargs["allow_agent"] is True
+    assert kwargs["look_for_keys"] is False and kwargs["allow_agent"] is False
 
 
 def test_messages_name_the_cause_and_the_fix(app):

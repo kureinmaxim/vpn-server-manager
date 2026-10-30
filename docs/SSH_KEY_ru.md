@@ -28,7 +28,7 @@ ssh-copy-id -p PORT USER@SERVER
 
 VPN Server Manager читает ключ по сохранённому пути при SSH-подключении; резервный архив содержит путь, но не копирует файл. Вставленный текст ключа входит в зашифрованную карточку и экспорт.
 
-Импорт `~/.ssh/config` поддерживает буквальный `Host`, `HostName`, `User`, `Port` и первый `IdentityFile`. Он не применяет `Include`, `Match`, шаблоны, ProxyJump/ProxyCommand или HostKeyAlias. SSH-agent и аппаратные ключи не настраиваются этим импортом; для предсказуемого входа сохраните ключ или пароль в карточке. [Подробности и ограничения](SSH_OPERATIONS_MATRIX_ru.md).
+Импорт `~/.ssh/config` поддерживает буквальный `Host`, `HostName`, `User`, `Port` и первый `IdentityFile`. Он не применяет `Include`, `Match`, шаблоны, ProxyJump/ProxyCommand или HostKeyAlias. SSH-agent и аппаратные ключи не настраиваются импортом; SSH-операции приложения используют пароль и ключ, явно выбранные в карточке, и не перебирают локальные identities автоматически. [Подробности и ограничения](SSH_OPERATIONS_MATRIX_ru.md).
 
 ## Доверять ключу сервера отдельно
 

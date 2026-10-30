@@ -96,8 +96,13 @@ def test_reset_unknown_result_cannot_replay(reset_client, monkeypatch):
 def test_remote_verifies_host_keys_and_sends_script_on_stdin(monkeypatch):
     client = MagicMock()
     stdin, stdout, stderr = MagicMock(), MagicMock(), MagicMock()
-    stdout.read.return_value = b'{"success": true}'
-    stdout.channel.recv_exit_status.return_value = 0
+    channel = MagicMock()
+    channel.recv_ready.side_effect = [True, False]
+    channel.recv.return_value = b'{"success": true}'
+    channel.recv_stderr_ready.side_effect = [False, False]
+    channel.exit_status_ready.return_value = True
+    channel.recv_exit_status.return_value = 0
+    stdout.channel = channel
     client.exec_command.return_value = stdin, stdout, stderr
     monkeypatch.setattr(routes.paramiko, "SSHClient", lambda: client)
     routes.remote({"ip": "192.0.2.1", "port": 22, "user": "root", "password": "fixture-only"}, ["--components", "bot"])

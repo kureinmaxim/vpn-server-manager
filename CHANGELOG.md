@@ -11,6 +11,9 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 
 ### Fixed
 - SSH connection timeouts, host-key failures, login failures, missing/insufficient sudo and unsupported reset platforms receive distinct guidance.
+- Server endpoints, card credential decryption and strict host-key setup now share one SSH connection service; monitoring install/removal and reset no longer differ by silently trying local keys or ssh-agent.
+- Remote commands share a bounded job runner that drains stdout/stderr safely and avoids logging command text or remote error details.
+- External encrypted-vault imports now merge and switch the selected vault under the profile lock; runtime selection changes only after the encrypted file and config selection are committed.
 
 ## [5.0.20] - 2026-10-30
 

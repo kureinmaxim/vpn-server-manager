@@ -15,9 +15,9 @@ from flask import Blueprint, current_app, jsonify, render_template, request, ses
 
 from ..services import registry
 from ..services.reset_payload import SCRIPT_SOURCE
-from ..services.ssh_auth import connect_kwargs, has_ssh_auth
+from ..services.ssh_connection import connect_card_client, resolve_server_ssh_credentials
+from ..services.ssh_remote_job import RemoteJobError, run_remote_job
 from ..utils.decorators import require_auth, require_pin, csrf_protect
-from .api import _get_server_ssh_credentials
 
 reset_bp = Blueprint("reset", __name__)
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ def target(server_id):
     manager = registry.get("data_manager")
     if not manager:
         abort(503)
-    server, creds = _get_server_ssh_credentials(server_id, manager)
+    server, creds = resolve_server_ssh_credentials(server_id, manager, current_app.config)
     if not server or not creds:
         abort(404)
     return server, creds
@@ -63,14 +63,7 @@ class RemoteOutputError(ValueError):
 
 def _connect(client, creds):
     try:
-        # Вход как у мониторинга: пароль и/или ключ из карточки. ~/.ssh и ssh-agent —
-        # только если в карточке нет ни того, ни другого: иначе чужие ключи агента
-        # исчерпают MaxAuthTries раньше пароля (Too many authentication failures).
-        from ..services.ssh_service import SSHService
-        SSHService.connect_managed(client, hostname=creds["ip"], port=int(creds["port"]), username=creds["user"],
-                       timeout=20, auth_timeout=20, banner_timeout=20,
-                       **connect_kwargs(creds.get("password"), creds.get("key"), creds.get("key_passphrase"),
-                                        use_local_keys=not has_ssh_auth(creds)))
+        connect_card_client(client, creds, timeout=20, auth_timeout=20, banner_timeout=20)
     except UnknownHostKeyError as exc:
         raise RemoteConnectError("unknown_host") from exc
     except paramiko.BadHostKeyException as exc:
@@ -146,32 +139,25 @@ def failure_code(exc):
 
 
 def remote(creds, args, *, source=SCRIPT_SOURCE):
-    # Dedicated connections use the same fail-closed trust loader as monitoring.
     client = paramiko.SSHClient()
     try:
-        _load_known_hosts(client)
-        client.set_missing_host_key_policy(RejectUnknownHost())
         _connect(client, creds)
         command = ([] if creds["user"] == "root" else ["sudo", "-n"]) + ["python3", "-", *args]
         # Метка отделяет ответ скрипта от того, что при входе печатают ~/.bashrc,
         # ~/.profile и скрипты входа: такой текст ломал разбор JSON.
         shell_command = f"printf '%s\\n' {OUTPUT_MARKER}; {shlex.join(command)}"
         try:
-            stdin, stdout, stderr = client.exec_command(shell_command, timeout=1800)
-            stdin.write(source)
-            stdin.flush()
-            stdin.channel.shutdown_write()
-            raw = stdout.read(2 * 1024 * 1024)
-            status = stdout.channel.recv_exit_status()
-        except (OSError, paramiko.SSHException) as exc:
-            raise RemoteOutputError("exec_failed") from exc
+            result = run_remote_job(client, shell_command, timeout=1800, input_data=source)
+            raw, status = result.stdout, result.exit_status
+        except RemoteJobError as exc:
+            raise RemoteOutputError(exc.reason) from exc
         text = raw.decode("utf-8", errors="replace")
         _, found, body = text.partition(OUTPUT_MARKER + "\n")
         if not found:
             body = text  # ответ без метки (старые сценарии, заглушки тестов)
         if not body.strip():
             # Ответа нет: по stderr определяется только причина, сам текст никуда не уходит.
-            err = (stderr.read(4096) or b"").lower()
+            err = result.stderr[:4096].lower()
             if b"password is required" in err or b"terminal is required" in err:
                 raise RemoteOutputError("sudo_password")
             if b"sudo" in err and b"not found" in err:

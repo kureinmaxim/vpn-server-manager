@@ -14,7 +14,9 @@ from ..exceptions import AuthenticationError, SSHConnectionError
 from .service_catalog import SERVICE_CATALOG
 from .load_snapshot import SNAPSHOT_COMMAND, parse_snapshot
 from .ssh_auth import connect_kwargs, _read_key_text
-from .ssh_trust import load_known_hosts, RejectUnknownHost, trust_revision
+from .ssh_trust import trust_revision
+from .ssh_connection import prepare_trusted_client
+from .ssh_remote_job import RemoteJobError, run_remote_job
 
 from .project_stats import build_command, load_projects, parse_sample as parse_projects, summarize as summarize_projects
 
@@ -623,8 +625,7 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             )
             ssh = paramiko.SSHClient()
             try:
-                load_known_hosts(ssh)
-                ssh.set_missing_host_key_policy(RejectUnknownHost())
+                prepare_trusted_client(ssh)
                 # Для быстрых проверок используем короткие таймауты
                 banner_timeout = min(connection_timeout * 2, 60)
                 auth_timeout = min(connection_timeout, 30)
@@ -724,24 +725,17 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
         try:
             self.disconnect()
             self.client = paramiko.SSHClient()
-            load_known_hosts(self.client)
-            self.client.set_missing_host_key_policy(RejectUnknownHost())
-
             logger.info(f"Connecting to {hostname}:{port} as {username}")
-            auth = connect_kwargs(password, key, key_passphrase)
-            if key_filename and key_passphrase and not key:
-                auth["passphrase"] = key_passphrase
-
-            self.connect_managed(self.client,
-                hostname=hostname,
-                username=username,
-                key_filename=key_filename,  # путь к ключу: читает сам paramiko, как раньше
-                port=port,
+            from .ssh_connection import connect_card_client
+            connect_card_client(
+                self.client,
+                {'ip': hostname, 'user': username, 'password': password, 'port': port, 'key': key,
+                 'key_passphrase': key_passphrase},
                 timeout=timeout,
-                banner_timeout=60,  # Время ожидания SSH banner
-                auth_timeout=30,  # Время на аутентификацию
-                # password, ключ из карточки (key: путь или текст); без ~/.ssh и ssh-agent
-                **auth,
+                banner_timeout=60,
+                auth_timeout=30,
+                key_filename=key_filename,
+                key_passphrase=key_passphrase,
             )
 
             logger.info(f"Successfully connected to {hostname}")
@@ -774,21 +768,19 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             raise SSHConnectionError("Not connected to SSH server")
 
         try:
-            logger.info(f"Executing command: {command}")
-            stdin, stdout, stderr = self.client.exec_command(command)
-
-            exit_status = stdout.channel.recv_exit_status()
-            stdout_data = stdout.read().decode("utf-8")
-            stderr_data = stderr.read().decode("utf-8")
-
+            logger.debug('Executing remote command')
+            result = run_remote_job(self.client, command, timeout=30)
             return {
-                "exit_status": exit_status,
-                "stdout": stdout_data,
-                "stderr": stderr_data,
+                "exit_status": result.exit_status,
+                "stdout": result.stdout.decode("utf-8", errors="replace"),
+                "stderr": result.stderr.decode("utf-8", errors="replace"),
             }
-        except Exception as e:
-            logger.error(f"Error executing command '{command}': {str(e)}")
-            raise SSHConnectionError(f"Command execution failed: {str(e)}")
+        except RemoteJobError as exc:
+            logger.warning('Remote command failed (%s)', exc.reason)
+            raise SSHConnectionError(f"Command execution failed: {exc.reason}") from exc
+        except Exception as exc:
+            logger.warning('Remote command failed (%s)', type(exc).__name__)
+            raise SSHConnectionError("Command execution failed") from exc
 
     def execute_remote_command(
         self,
@@ -813,22 +805,19 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
                 ip, port, user, password, connection_timeout=connection_timeout, **_key_kwargs(key, key_passphrase)
             )
 
-            logger.info(f"Executing remote command on {ip}: {command}")
-            _, stdout, stderr = client.exec_command(command, timeout=timeout)
-
-            output = stdout.read().decode("utf-8")
-            error = stderr.read().decode("utf-8")
-            exit_status = stdout.channel.recv_exit_status()
+            logger.debug('Executing remote command')
+            result = run_remote_job(client, command, timeout=timeout)
 
             return {
-                "success": exit_status == 0,
-                "output": output,
-                "error": error,
-                "exit_status": exit_status,
+                "success": result.exit_status == 0,
+                "output": result.stdout.decode("utf-8", errors="replace"),
+                "error": result.stderr.decode("utf-8", errors="replace"),
+                "exit_status": result.exit_status,
             }
-        except Exception as e:
-            logger.error(f"Error executing remote command on {ip}: {str(e)}")
-            return {"success": False, "output": "", "error": str(e), "exit_status": -1}
+        except Exception as exc:
+            reason = getattr(exc, 'reason', type(exc).__name__)
+            logger.warning('Remote command failed (%s)', reason)
+            return {"success": False, "output": "", "error": str(reason), "exit_status": -1}
 
     def get_sftp_client(self) -> paramiko.SFTPClient:
         """Получение SFTP клиента"""

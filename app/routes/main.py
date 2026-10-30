@@ -865,180 +865,67 @@ def import_data():
 @require_auth
 @require_pin
 def import_external_data():
-    """Импорт внешних данных с другим ключом шифрования"""
-    imported_ok = False
-    import tempfile
+    """Merge a foreign vault; the service commits its file and selection atomically."""
     from cryptography.fernet import Fernet, InvalidToken
-    
-    try:
-        data_manager = registry.get('data_manager')
-        if not data_manager:
-            flash(_('Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ шифрования.'), 'danger')
-            return redirect(url_for('main.settings'))
-            
-        uploaded_file = request.files['external_file']
-        external_key = request.form.get('external_key', '').strip()
-        
-        if not uploaded_file or not external_key:
-            flash(_('Необходимо выбрать файл и указать внешний ключ шифрования.'), 'danger')
-            return redirect(url_for('main.settings'))
-            
-        if not uploaded_file.filename.endswith('.enc'):
-            flash(_('Неверный тип файла. Пожалуйста, выберите файл .enc'), 'danger')
-            return redirect(url_for('main.settings'))
-        
-        # Проверяем формат ключа
-        try:
-            test_fernet = Fernet(external_key.encode())
-        except Exception:
-            flash(_('Неверный формат ключа шифрования. Ключ должен быть действительным ключом Fernet.'), 'danger')
-            return redirect(url_for('main.settings'))
-        
-        # Создаем временный файл для проверки
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            uploaded_file.save(temp_file.name)
-            temp_file_path = temp_file.name
-        
-        try:
-            # Пытаемся расшифровать файл с внешним ключом
-            with open(temp_file_path, 'rb') as f:
-                encrypted_data = f.read()
-            
-            fernet_external = Fernet(external_key.encode())
-            decrypted_data = fernet_external.decrypt(encrypted_data)
-            servers_data, external_dns = data_manager.split_payload(json.loads(decrypted_data.decode('utf-8')))
-            
-            # load_servers() молча возвращает [] при ошибке расшифровки, поэтому
-            # сначала проверяем, что текущий файл читается ключом этой установки.
-            try:
-                current_dns = data_manager.load_dns(current_app.config)
-            except InvalidToken:
-                flash(_('Текущий файл данных не расшифровывается ключом из .env этой установки. '
-                        'Восстановите прежний SECRET_KEY в .env и перезапустите приложение.'), 'danger')
-                return redirect(url_for('main.settings'))
+    from ..services.external_import import CurrentVaultUnreadable, merge_external_vault
 
-            # Загружаем текущие серверы
-            current_servers = data_manager.load_servers(current_app.config)
-            
-            # Объединяем серверы
-            merge_result = data_manager.merge_servers(current_servers, servers_data)
-            merged_servers = merge_result['merged_servers']
-            added_count = merge_result['added_count']
-            skipped_count = merge_result['skipped_count']
-            
-            # Перешифровываем пароли в новых серверах
-            our_secret_key = current_app.config.get('SECRET_KEY')
-            for server in merged_servers[len(current_servers):]:  # Только новые серверы
-                # Перешифровываем SSH пароли
-                if 'ssh_credentials' in server:
-                    if 'password' in server['ssh_credentials'] and server['ssh_credentials']['password']:
-                        server['ssh_credentials']['password'] = data_manager.re_encrypt_password(
-                            server['ssh_credentials']['password'],
-                            external_key,
-                            our_secret_key
-                        )
-                    if 'root_password' in server['ssh_credentials'] and server['ssh_credentials']['root_password']:
-                        server['ssh_credentials']['root_password'] = data_manager.re_encrypt_password(
-                            server['ssh_credentials']['root_password'],
-                            external_key,
-                            our_secret_key
-                        )
-                    # SSH-ключ и его фраза-пароль зашифрованы так же, как пароли
-                    for field in ('private_key', 'key_passphrase'):
-                        if server['ssh_credentials'].get(field):
-                            server['ssh_credentials'][field] = data_manager.re_encrypt_password(
-                                server['ssh_credentials'][field],
-                                external_key,
-                                our_secret_key
-                            )
-                
-                # Перешифровываем пароли панели управления
-                if 'panel_credentials' in server:
-                    if 'password' in server['panel_credentials'] and server['panel_credentials']['password']:
-                        server['panel_credentials']['password'] = data_manager.re_encrypt_password(
-                            server['panel_credentials']['password'],
-                            external_key,
-                            our_secret_key
-                        )
-                    if 'user' in server['panel_credentials'] and server['panel_credentials']['user']:
-                        server['panel_credentials']['user'] = data_manager.re_encrypt_password(
-                            server['panel_credentials']['user'],
-                            external_key,
-                            our_secret_key
-                        )
-                
-                # Перешифровываем пароли кабинета хостера
-                if 'hoster_credentials' in server:
-                    if 'password' in server['hoster_credentials'] and server['hoster_credentials']['password']:
-                        server['hoster_credentials']['password'] = data_manager.re_encrypt_password(
-                            server['hoster_credentials']['password'],
-                            external_key,
-                            our_secret_key
-                        )
-                    if 'user' in server['hoster_credentials'] and server['hoster_credentials']['user']:
-                        server['hoster_credentials']['user'] = data_manager.re_encrypt_password(
-                            server['hoster_credentials']['user'],
-                            external_key,
-                            our_secret_key
-                        )
-            
-            # Создаем новый файл с объединенными данными
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"merged_{timestamp}.enc"
-            
-            app_data_dir = current_app.config.get('APP_DATA_DIR')
-            data_dir = os.path.join(app_data_dir, "data")
-            os.makedirs(data_dir, exist_ok=True)
-            
-            file_path = os.path.join(data_dir, filename)
-            merged_dns, dns_added = dns_registry.merge(
-                current_dns, external_dns,
-                lambda value: data_manager.re_encrypt_password(value, external_key, our_secret_key))
-            data_manager.save_servers(merged_servers, file_path,
-                                      dns={} if dns_registry.is_empty(merged_dns) else merged_dns)
-            
-            # Обновляем конфигурацию
-            current_app.config['active_data_file'] = file_path
-            
-            # Сохраняем конфигурацию
-            config_path = os.path.join(app_data_dir, 'config.json')
-            from ..services.config_io import read_config, write_config
-            config_data = read_config(config_path)
-            
-            config_data['active_data_file'] = file_path
-            write_config(config_path, config_data)
-            
-            imported_ok = True
-            # Информируем пользователя о результате
-            if added_count > 0:
-                message = f'Успешно импортировано {added_count} новых серверов!'
-                if skipped_count > 0:
-                    message += f' Пропущено {skipped_count} дублирующихся серверов.'
-                flash(_(message), 'success')
-            elif not dns_added:
-                flash(_('Все сервера из импортируемого файла уже существуют в вашем списке.'), 'info')
-            if dns_added:
-                flash(_('Импортировано доменов DNS: %(count)s', count=dns_added), 'success')
-            
-        except InvalidToken:
-            flash(_('Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа.'), 'danger')
-        except json.JSONDecodeError:
-            flash(_('Ошибка: файл содержит некорректные данные.'), 'danger')
-        except Exception as e:
-            logger.error(f"Error importing external data: {str(e)}")
-            flash(f'Ошибка при импорте: {str(e)}', 'danger')
-        finally:
-            # Удаляем временный файл
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-                
-    except Exception as e:
-        logger.error(f"Error processing external import: {str(e)}")
-        flash(f'Ошибка при обработке файла: {str(e)}', 'danger')
-    
-    if imported_ok:
-        return redirect(url_for('main.index'))
-    return redirect(url_for('main.settings'))
+    manager = registry.get('data_manager')
+    if manager is None:
+        flash(_('Сервис управления данными не инициализирован. Проверьте конфигурацию и ключ шифрования.'), 'danger')
+        return redirect(url_for('main.settings'))
+
+    uploaded_file = request.files.get('external_file')
+    external_key = request.form.get('external_key', '').strip()
+    if not uploaded_file or not external_key:
+        flash(_('Необходимо выбрать файл и указать внешний ключ шифрования.'), 'danger')
+        return redirect(url_for('main.settings'))
+    if not (uploaded_file.filename or '').lower().endswith('.enc'):
+        flash(_('Неверный тип файла. Пожалуйста, выберите файл .enc'), 'danger')
+        return redirect(url_for('main.settings'))
+    try:
+        Fernet(external_key.encode())
+    except Exception:
+        flash(_('Неверный формат ключа шифрования. Ключ должен быть действительным ключом Fernet.'), 'danger')
+        return redirect(url_for('main.settings'))
+
+    raw = uploaded_file.read(current_app.config['MAX_CONTENT_LENGTH'] + 1)
+    if len(raw) > current_app.config['MAX_CONTENT_LENGTH']:
+        flash(_('Файл резервной копии слишком большой.'), 'danger')
+        return redirect(url_for('main.settings'))
+
+    try:
+        result = merge_external_vault(manager, current_app.config, raw, external_key)
+    except CurrentVaultUnreadable:
+        flash(_('Текущий файл данных не расшифровывается ключом из .env этой установки. '
+                'Восстановите прежний SECRET_KEY в .env и перезапустите приложение.'), 'danger')
+        return redirect(url_for('main.settings'))
+    except InvalidToken:
+        flash(_('Ошибка: неверный ключ шифрования. Проверьте правильность введенного ключа.'), 'danger')
+        return redirect(url_for('main.settings'))
+    except json.JSONDecodeError:
+        flash(_('Ошибка: файл содержит некорректные данные.'), 'danger')
+        return redirect(url_for('main.settings'))
+    except Exception as exc:
+        logger.error('External vault import failed (%s)', type(exc).__name__)
+        flash(_('Не удалось импортировать данные. Проверьте ключ, структуру файла и активный профиль.'), 'danger')
+        return redirect(url_for('main.settings'))
+
+    # Persistent file and config switch are already committed. Runtime follows them now.
+    current_app.config['active_data_file'] = result['active_data_file']
+    added_count = result['added_count']
+    skipped_count = result['skipped_count']
+    dns_added = result['dns_added']
+    if added_count > 0:
+        message = f'Успешно импортировано {added_count} новых серверов!'
+        if skipped_count > 0:
+            message += f' Пропущено {skipped_count} дублирующихся серверов.'
+        flash(_(message), 'success')
+    elif not dns_added:
+        flash(_('Все сервера из импортируемого файла уже существуют в вашем списке.'), 'info')
+    if dns_added:
+        flash(_('Импортировано доменов DNS: %(count)s', count=dns_added), 'success')
+
+    return redirect(url_for('main.index'))
 
 @main_bp.route('/export_data')
 @require_auth

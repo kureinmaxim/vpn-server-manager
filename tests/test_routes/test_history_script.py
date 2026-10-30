@@ -4,7 +4,9 @@ import paramiko
 import pytest
 
 from app.routes import api
-from app.routes.reset import RemoteConnectError
+from app.services import ssh_connection
+from app.services.ssh_service import SSHService
+from app.services.ssh_trust import UnknownHostKeyError
 
 URL = '/api/monitoring/one/history-script'
 
@@ -18,17 +20,25 @@ def history_client(client, monkeypatch):
         {'id': server_id}, {'ip': '192.0.2.1', 'port': 22, 'user': 'admin', 'password': 'fixture-only'}))
     ssh = Mock()
     monkeypatch.setattr(paramiko, 'SSHClient', Mock(return_value=ssh))
-    monkeypatch.setattr('app.routes.reset._load_known_hosts', Mock())
-    connect = Mock()
-    monkeypatch.setattr('app.routes.reset._connect', connect)
+    monkeypatch.setattr(ssh_connection, 'load_known_hosts', Mock())
+    monkeypatch.setattr(SSHService, 'connect_managed', lambda target, **kwargs: target.connect(**kwargs))
+    connect = ssh.connect
     client.ssh, client.connect = ssh, connect
     return client
 
 
 def _reply(ssh, text):
     stdout = Mock()
-    stdout.read.return_value = text.encode()
-    ssh.exec_command.return_value = (Mock(), stdout, Mock())
+    stderr = Mock()
+    stdout_data = text.encode()
+    channel = Mock()
+    channel.recv_ready.side_effect = [bool(stdout_data), False]
+    channel.recv.return_value = stdout_data
+    channel.recv_stderr_ready.side_effect = [False, False]
+    channel.recv_exit_status.return_value = 0
+    channel.exit_status_ready.return_value = True
+    stdout.channel = channel
+    ssh.exec_command.return_value = (Mock(), stdout, stderr)
 
 
 def test_requires_login_and_csrf(client, history_client):
@@ -54,6 +64,6 @@ def test_failure_hides_details(history_client):
     _reply(history_client.ssh, 'sudo: a password is required')
     response = history_client.post(URL, headers={'X-CSRF-Token': 'test-csrf'})
     assert response.status_code == 502 and b'password is required' not in response.data
-    history_client.connect.side_effect = RemoteConnectError('unknown_host')
+    history_client.connect.side_effect = UnknownHostKeyError('[192.0.2.1]:22')
     response = history_client.post(URL, headers={'X-CSRF-Token': 'test-csrf'})
     assert response.status_code == 502 and b'fixture-only' not in response.data

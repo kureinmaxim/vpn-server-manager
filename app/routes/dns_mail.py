@@ -8,8 +8,9 @@ from flask_babel import gettext as _
 from ..services import registry
 from ..services.dns_mail import settings, remote_probe, remember
 from ..services.ssh_auth import has_ssh_auth
+from ..services.ssh_connection import resolve_server_ssh_credentials
 from ..utils.decorators import require_auth, require_pin
-from .api import _get_server_ssh_credentials, load_check_limiter
+from .api import load_check_limiter
 from .net_tools import _slots
 
 dns_mail_bp = Blueprint('dns_mail', __name__, url_prefix='/diagnostics')
@@ -68,7 +69,7 @@ def detail(server_id):
             if not load_check_limiter.is_allowed('diagnostics:' + server_id) or not _slots.acquire(blocking=False):
                 return jsonify(error=_('Дождитесь завершения предыдущих проверок.')), 429
             try:
-                server, creds = _get_server_ssh_credentials(server_id, manager)
+                server, creds = resolve_server_ssh_credentials(server_id, manager, current_app.config)
                 if not server or not has_ssh_auth(creds):
                     return jsonify(error=_('Укажите IP и пароль или SSH-ключ в карточке сервера.')), 400
                 client = registry.get('ssh').get_connection_pooled(
