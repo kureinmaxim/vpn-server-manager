@@ -1,0 +1,115 @@
+/* Solid text/background pairs measured against WCAG 2.2 SC 1.4.3.
+   Kept after theme styles so primary controls have explicit text in every state. */
+[data-bs-theme="light"] {
+    --a11y-primary-bg: #008060;
+    --a11y-primary-outline: #008060;
+    --a11y-primary-hover: #005942;
+    --a11y-primary-text: #ffffff;
+    --a11y-primary-surface-text: #ffffff;
+    --a11y-secondary: #495057;
+    --a11y-on-secondary: #ffffff;
+    --a11y-success: #146c43;
+    --a11y-info: #08758a;
+    --a11y-warning: #806000;
+    --a11y-danger: #b02a37;
+}
+[data-bs-theme="dark"] {
+    --a11y-primary-bg: #00bfa5;
+    --a11y-primary-outline: #00bfa5;
+    --a11y-primary-hover: #33cdc0;
+    --a11y-primary-text: #001b16;
+    --a11y-primary-surface-text: #001b16;
+    --a11y-secondary: #adb5bd;
+    --a11y-on-secondary: #0d1a26;
+    --a11y-success: #75b798;
+    --a11y-info: #6edff6;
+    --a11y-warning: #ffda6a;
+    --a11y-danger: #ea868f;
+}
+html[data-skin="minecraft"] {
+    --a11y-primary-bg: #385b24;
+    --a11y-primary-outline: #8bc34a;
+    --a11y-primary-hover: #446b2c;
+    --a11y-primary-text: #ffffff;
+    --a11y-primary-surface-text: #101808;
+}
+html .btn-primary {
+    --bs-btn-bg: var(--a11y-primary-bg);
+    --bs-btn-color: var(--a11y-primary-text);
+    --bs-btn-hover-bg: var(--a11y-primary-hover);
+    --bs-btn-hover-color: var(--a11y-primary-text);
+    --bs-btn-active-bg: var(--a11y-primary-hover);
+    --bs-btn-active-color: var(--a11y-primary-text);
+}
+html[data-skin="minecraft"] .btn-primary {
+    --bs-btn-bg: var(--a11y-primary-bg);
+    --bs-btn-color: var(--a11y-primary-text);
+    --bs-btn-hover-bg: var(--a11y-primary-hover);
+    --bs-btn-hover-color: var(--a11y-primary-text);
+    --bs-btn-active-bg: var(--a11y-primary-hover);
+    --bs-btn-active-color: var(--a11y-primary-text);
+    filter: none; /* Brightness must not alter the measured text/background pair. */
+}
+html[data-skin="minecraft"] .btn-primary:hover:not(:disabled):not(.disabled) { filter: none; }
+.bg-primary.text-white, .badge.bg-primary { color: var(--a11y-primary-surface-text) !important; }
+[data-bs-theme] .badge.bg-success { color: #ffffff !important; }
+[data-bs-theme] .text-success { color: var(--a11y-success) !important; }
+[data-bs-theme] .text-info { color: var(--a11y-info) !important; }
+[data-bs-theme] .text-warning { color: var(--a11y-warning) !important; }
+[data-bs-theme] .text-danger { color: var(--a11y-danger) !important; }
+
+[data-bs-theme] .btn-outline-secondary {
+    --bs-btn-color: var(--a11y-secondary);
+    --bs-btn-border-color: var(--a11y-secondary);
+    --bs-btn-hover-bg: var(--a11y-secondary);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-bg: var(--a11y-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+[data-bs-theme] .btn-outline-primary {
+    --bs-btn-color: var(--a11y-primary-outline);
+    --bs-btn-border-color: var(--a11y-primary-outline);
+    --bs-btn-hover-bg: var(--a11y-primary-outline);
+    --bs-btn-active-bg: var(--a11y-primary-outline);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+[data-bs-theme] .btn-outline-success {
+    --bs-btn-color: var(--a11y-success);
+    --bs-btn-border-color: var(--a11y-success);
+    --bs-btn-hover-bg: var(--a11y-success);
+    --bs-btn-active-bg: var(--a11y-success);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+[data-bs-theme] .btn-outline-info {
+    --bs-btn-color: var(--a11y-info);
+    --bs-btn-border-color: var(--a11y-info);
+    --bs-btn-hover-bg: var(--a11y-info);
+    --bs-btn-active-bg: var(--a11y-info);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+[data-bs-theme] .btn-outline-warning {
+    --bs-btn-color: var(--a11y-warning);
+    --bs-btn-border-color: var(--a11y-warning);
+    --bs-btn-hover-bg: var(--a11y-warning);
+    --bs-btn-active-bg: var(--a11y-warning);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+[data-bs-theme] .btn-outline-danger {
+    --bs-btn-color: var(--a11y-danger);
+    --bs-btn-border-color: var(--a11y-danger);
+    --bs-btn-hover-bg: var(--a11y-danger);
+    --bs-btn-active-bg: var(--a11y-danger);
+    --bs-btn-hover-color: var(--a11y-on-secondary);
+    --bs-btn-active-color: var(--a11y-on-secondary);
+}
+
+html[data-skin="minecraft"] [class*="btn-outline-"]:hover:not(:disabled):not(.disabled) { filter: none; }

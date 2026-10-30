@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ app_info.get('version', '') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/theme_minecraft.css') }}?v={{ app_info.get('version', '') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/accessibility.css') }}?v={{ app_info.get('version', '') }}">
     <style>
         html, body {
             height: 100%;
@@ -51,7 +52,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-hdd-stack"></i> {{ _('VPS Manager') }}
+                <i class="bi bi-hdd-stack" aria-hidden="true"></i> {{ _('VPS Manager') }}
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="{{ _('Меню навигации') }}">
                 <span class="navbar-toggler-icon"></span>
@@ -102,15 +103,15 @@
                             <i class="bi bi-circle-half" aria-hidden="true"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2"></i>{{ _('Светлая') }}</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2"></i>{{ _('Темная') }}</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="setTheme('minecraft', event); return false;"><i class="bi bi-bricks me-2"></i>Minecraft</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light', event); return false;"><i class="bi bi-sun-fill me-2" aria-hidden="true"></i>{{ _('Светлая') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark', event); return false;"><i class="bi bi-moon-stars-fill me-2" aria-hidden="true"></i>{{ _('Темная') }}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('minecraft', event); return false;"><i class="bi bi-bricks me-2" aria-hidden="true"></i>Minecraft</a></li>
                         </ul>
                     </li>
                     {% if session.get('pin_authenticated') %}
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="logout(event); return false;" title="{{ _('Выйти из системы') }}" aria-label="{{ _('Выйти из системы') }}">
-                            <i class="bi bi-box-arrow-right"></i>
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
                         </a>
                     </li>
                     {% endif %}
@@ -131,9 +132,9 @@
             </p>
             {% if server_info %}
             <p class="mb-0 mt-1 text-info" style="font-size: 0.85em;">
-                <i class="bi bi-server"></i> {{ server_info.url }} 
+                <i class="bi bi-server" aria-hidden="true"></i> {{ server_info.url }}
                 <span class="text-white-50">|</span> 
-                <i class="bi bi-hdd-network"></i> {{ _('Порт') }}: {{ server_info.port }}
+                <i class="bi bi-hdd-network" aria-hidden="true"></i> {{ _('Порт') }}: {{ server_info.port }}
             </p>
             {% endif %}
         </div>
@@ -369,7 +370,7 @@
             const originalText = button.innerHTML;
             
             // Показываем индикатор загрузки
-            button.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Проверка...';
+            button.innerHTML = '<i class="bi bi-arrow-clockwise spin" aria-hidden="true"></i> Проверка...';
             button.disabled = true;
             
             fetch(`/check_ip/${ipAddress}`)
@@ -390,7 +391,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="pinLoginModalLabel">
-                                        <i class="bi bi-search"></i> Информация об IP: ${ipAddress}
+                                        <i class="bi bi-search" aria-hidden="true"></i> Информация об IP: ${ipAddress}
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
                                 </div>
@@ -436,7 +437,7 @@
                     alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
                     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
                     alertDiv.innerHTML = `
-                        <i class="bi bi-exclamation-triangle"></i> <strong>Ошибка проверки IP:</strong><br>
+                        <i class="bi bi-exclamation-triangle" aria-hidden="true"></i> <strong>Ошибка проверки IP:</strong><br>
                         ${error.message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     `;
@@ -533,7 +534,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="bi bi-key"></i> {{ _('Вход по PIN') }}
+                                <i class="bi bi-key" aria-hidden="true"></i> {{ _('Вход по PIN') }}
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>

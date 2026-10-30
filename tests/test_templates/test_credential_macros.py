@@ -112,8 +112,11 @@ def test_password_input_compact_hides_help_text(app):
     ).render()
 
     assert 'input-group-sm' in html
-    assert 'form-text' not in html
-    assert 'title="Hint"' in html
+    assert 'form-text visually-hidden' in html
+    assert 'id="pHelp"' in html
+    assert 'aria-describedby="pHelp"' in html
+    assert 'tabindex="-1"' not in html
+    assert 'aria-pressed="false"' in html
 
 
 def test_set_badge_and_edit_labels_are_english(app):
@@ -166,3 +169,15 @@ def test_icon_picker_shows_preview_and_screen_snip(app):
     assert 'From screen' in html
     assert 'name="server_icon_data"' in html
     assert 'name="remove_icon"' in html
+
+
+def test_secret_actions_have_field_specific_names_and_keyboard_access(app):
+    html = app.jinja_env.from_string(
+        MACROS + "{{ cred.password_input('key_pass', 'key_pass', 'Key passphrase', help_text='Help', compact=True) }}"
+    ).render()
+    assert 'aria-controls="key_pass"' in html
+    assert 'aria-pressed="false"' in html
+    assert html.count(': Key passphrase"') == 2
+    assert 'tabindex="-1"' not in html
+    assert 'aria-describedby="key_passHelp"' in html
+    assert 'id="key_passHelp"' in html

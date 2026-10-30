@@ -2,6 +2,14 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.19] - 2026-10-30
+
+### Fixed
+- Improved text and control contrast across light, dark and Minecraft themes, including primary buttons, status text and outline buttons.
+- Password show/copy actions are keyboard accessible, identify the related field and expose the reveal state. Compact field help remains available to assistive technology.
+- Command copy buttons now identify the command, and decorative icons are hidden from screen readers.
+- Added contrast ratio and credential accessibility regression checks.
+
 ## [5.0.18] - 2026-10-30
 
 ### Fixed

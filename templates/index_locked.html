@@ -7,12 +7,12 @@
             <div class="card text-center shadow-lg">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
-                        <i class="bi bi-lock-fill"></i> {{ _('Доступ ограничен') }}
+                        <i class="bi bi-lock-fill" aria-hidden="true"></i> {{ _('Доступ ограничен') }}
                     </h3>
                 </div>
                 <div class="card-body py-5">
                     <div class="mb-4">
-                        <i class="bi bi-shield-lock display-1 text-muted"></i>
+                        <i class="bi bi-shield-lock display-1 text-muted" aria-hidden="true"></i>
                     </div>
                     <h4 class="card-title mb-3">🔐 {{ _('Требуется PIN-код') }}</h4>
                     <p class="card-text text-muted mb-4">
@@ -20,14 +20,14 @@
                     </p>
                     
                     <div id="firstTimeHint" class="alert alert-info" role="alert" style="display: none;">
-                        <i class="bi bi-lightbulb"></i>
+                        <i class="bi bi-lightbulb" aria-hidden="true"></i>
                         <strong>{{ _('Совет:') }}</strong> {{ _('Если вы используете приложение впервые, нажмите кнопку "Первый запуск" для создания PIN-кода.') }}
                     </div>
                     
                     <!-- Счетчик блокировки -->
                     <div id="blockCounter" class="alert alert-danger" style="display: none;">
                         <div class="d-flex align-items-center justify-content-center">
-                            <i class="bi bi-lock-fill me-2"></i>
+                            <i class="bi bi-lock-fill me-2" aria-hidden="true"></i>
                             <span id="blockTimer">🔒 {{ _('Вход заблокирован на') }} <strong id="countdown">30</strong> {{ _('секунд') }}</span>
                         </div>
                         <div class="progress mt-2">
@@ -37,16 +37,16 @@
                     
                     <div class="d-grid gap-3 d-sm-flex justify-content-sm-center mt-4">
                         <button type="button" class="btn btn-primary btn-lg px-4" onclick="showPinLoginModal()" id="pinLoginButton">
-                            <i class="bi bi-key"></i> {{ _('Ввести PIN') }}
+                            <i class="bi bi-key" aria-hidden="true"></i> {{ _('Ввести PIN') }}
                         </button>
                         <button id="firstSetupButton" type="button" class="btn btn-secondary btn-lg px-4" onclick="showFirstTimeSetup()" style="display: none;">
-                            <i class="bi bi-plus-circle"></i> {{ _('Первый запуск') }}
+                            <i class="bi bi-plus-circle" aria-hidden="true"></i> {{ _('Первый запуск') }}
                         </button>
                     </div>
                 </div>
                 <div class="card-footer text-muted">
                     <small>
-                        <i class="bi bi-shield-check"></i> 
+                        <i class="bi bi-shield-check" aria-hidden="true"></i>
                         {{ _("PIN ограничивает доступ к интерфейсу. Он не шифрует файлы и не защищает их от человека, который может читать папку профиля.") }}
                     </small>
                 </div>
@@ -61,7 +61,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="pinLoginModalLabel">
-                    <i class="bi bi-key"></i> {{ _('Вход по PIN-коду') }}
+                    <i class="bi bi-key" aria-hidden="true"></i> {{ _('Вход по PIN-коду') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
@@ -135,22 +135,22 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="firstTimeSetupModalLabel">
-                    <i class="bi bi-rocket"></i> {{ _('Первый запуск') }}
+                    <i class="bi bi-rocket" aria-hidden="true"></i> {{ _('Первый запуск') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle"></i>
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
                     <strong>{{ _('Информация:') }}</strong> {{ _("В чистой установке выберите «Первый запуск» и задайте PIN длиной не менее 4 символов. PIN 1234 доступен как вариант по умолчанию; для личных данных задайте свой.") }}
                 </div>
                 <p>{{ _('Выберите действие:') }}</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-outline-primary" onclick="setupNewPin()">
-                        <i class="bi bi-plus-circle"></i> {{ _('Создать новый PIN-код') }}
+                        <i class="bi bi-plus-circle" aria-hidden="true"></i> {{ _('Создать новый PIN-код') }}
                     </button>
                     <button type="button" class="btn btn-outline-success" onclick="useDefaultPin()">
-                        <i class="bi bi-key-fill"></i> {{ _('Использовать PIN 1234') }}
+                        <i class="bi bi-key-fill" aria-hidden="true"></i> {{ _('Использовать PIN 1234') }}
                     </button>
                     <a class="btn btn-outline-secondary" href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
                     <p class="small text-body-secondary">{{ _("Восстановление доступно после входа в настройках. Импорт ZIP на экране входа не поддерживается.") }}</p>
@@ -170,13 +170,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="archiveUploadModalLabel">
-                    <i class="bi bi-archive"></i> {{ _('Импорт из архива') }}
+                    <i class="bi bi-archive" aria-hidden="true"></i> {{ _('Импорт из архива') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle"></i>
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
                     <strong>{{ _('Информация:') }}</strong> {{ _('Загрузите ZIP архив, созданный функцией "Полный экспорт".') }}
                 </div>
                 <form id="archiveUploadForm">
@@ -211,13 +211,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createPinModalLabel">
-                    <i class="bi bi-plus-circle"></i> {{ _('Создание нового PIN-кода') }}
+                    <i class="bi bi-plus-circle" aria-hidden="true"></i> {{ _('Создание нового PIN-кода') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
-                    <i class="bi bi-info-circle"></i>
+                    <i class="bi bi-info-circle" aria-hidden="true"></i>
                     <strong>{{ _('Информация:') }}</strong> {{ _('Создайте новый PIN-код для защиты приложения.') }}
                 </div>
                 <form id="createPinForm">
@@ -250,13 +250,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="pinShowModalLabel">
-                    <i class="bi bi-key"></i> {{ _('PIN-код из архива') }}
+                    <i class="bi bi-key" aria-hidden="true"></i> {{ _('PIN-код из архива') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
                     <strong>{{ _('PIN-код найден!') }}</strong> {{ _('Запомните или запишите этот код.') }}
                 </div>
                 <div class="text-center">
@@ -264,7 +264,7 @@
                     <p class="text-muted">{{ _('Этот PIN-код потребуется для входа в приложение после импорта данных.') }}</p>
                 </div>
                 <div class="alert alert-warning" role="alert">
-                    <i class="bi bi-exclamation-triangle"></i>
+                    <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
                     <strong>{{ _('Важно:') }}</strong> {{ _('PIN-код будет показан только один раз. Запишите его!') }}
                 </div>
             </div>
@@ -321,7 +321,7 @@
         // Блокируем кнопку входа
         if (pinLoginButton) {
             pinLoginButton.disabled = true;
-            pinLoginButton.innerHTML = '<i class="bi bi-lock-fill"></i> ' + '{{ _("Вход заблокирован") }}';
+            pinLoginButton.innerHTML = '<i class="bi bi-lock-fill" aria-hidden="true"></i> ' + '{{ _("Вход заблокирован") }}';
         }
         
         // Запускаем таймер обратного отсчета
@@ -363,7 +363,7 @@
         // Разблокируем кнопку входа
         if (pinLoginButton) {
             pinLoginButton.disabled = false;
-            pinLoginButton.innerHTML = '<i class="bi bi-key"></i> ' + '{{ _("Ввести PIN") }}';
+            pinLoginButton.innerHTML = '<i class="bi bi-key" aria-hidden="true"></i> ' + '{{ _("Ввести PIN") }}';
         }
     }
     
@@ -1054,4 +1054,4 @@
         }
     });
 </script>
-{% endblock %} 
+{% endblock %}

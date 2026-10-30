@@ -168,6 +168,7 @@
         var eyeIcon = button.querySelector('i');
         var revealing = input.dataset.revealed !== '1';
         input.dataset.revealed = revealing ? '1' : '0';
+        button.setAttribute('aria-pressed', String(revealing));
         applySecretInputType(input);
         if (eyeIcon) {
             eyeIcon.classList.toggle('bi-eye', !revealing);
@@ -397,6 +398,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.copy-btn[aria-label]').forEach(function (button) {
+            var command = button.closest('.d-flex')?.querySelector('code');
+            if (command) button.setAttribute('aria-label', button.getAttribute('aria-label') + ': ' + command.textContent.trim());
+        });
         bindPasteSanitize(document);
         bindSecretInputMasks(document);
         bindSshRootHint(document);
