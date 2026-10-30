@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.16] - 2026-10-30
+
+### Fixed
+- PIN dialogs focus inputs after opening, restore the invoking control after closing and initialize keyboard tab navigation.
+- Keyboard tab changes update the PIN action; Enter submits PIN forms without accumulating login handlers after reopening. Reuse Bootstrap modal instances.
+- Removed PIN value logging from the login screen; named close buttons and announced PIN feedback.
+
 ## [5.0.15] - 2026-10-30
 
 ### Changed

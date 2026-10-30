@@ -63,7 +63,7 @@
                 <h5 class="modal-title" id="pinLoginModalLabel">
                     <i class="bi bi-key"></i> {{ _('Вход по PIN-коду') }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <!-- Навигационные вкладки -->
@@ -91,7 +91,7 @@
                             <input type="password" class="form-control" id="pinInput" 
                                    placeholder="{{ _('Введите PIN') }}" autocomplete="off">
                         </div>
-                        <div id="pinLoginMessage" class="alert" style="display: none;"></div>
+                        <div id="pinLoginMessage" role="alert" class="alert" style="display: none;"></div>
                     </div>
                     
                     <!-- Вкладка смены PIN -->
@@ -99,6 +99,7 @@
                          aria-labelledby="change-pin-tab">
                         <p class="text-muted mb-3 mt-3">{{ _('Смените PIN-код для входа') }}</p>
                         <form id="changePinForm">
+                        <button type="submit" hidden></button>
                             <div class="mb-3">
                                 <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                 <input type="password" class="form-control" id="oldPin" name="old_pin" 
@@ -114,7 +115,7 @@
                                 <input type="password" class="form-control" id="newPin2" name="new_pin2" 
                                        placeholder="{{ _('Повторите новый PIN') }}" autocomplete="off" required>
                             </div>
-                            <div id="changePinMessage" class="alert" style="display: none;"></div>
+                            <div id="changePinMessage" role="alert" class="alert" style="display: none;"></div>
                         </form>
                     </div>
                 </div>
@@ -136,7 +137,7 @@
                 <h5 class="modal-title" id="firstTimeSetupModalLabel">
                     <i class="bi bi-rocket"></i> {{ _('Первый запуск') }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
@@ -171,7 +172,7 @@
                 <h5 class="modal-title" id="archiveUploadModalLabel">
                     <i class="bi bi-archive"></i> {{ _('Импорт из архива') }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
@@ -212,7 +213,7 @@
                 <h5 class="modal-title" id="createPinModalLabel">
                     <i class="bi bi-plus-circle"></i> {{ _('Создание нового PIN-кода') }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
@@ -220,6 +221,7 @@
                     <strong>{{ _('Информация:') }}</strong> {{ _('Создайте новый PIN-код для защиты приложения.') }}
                 </div>
                 <form id="createPinForm">
+                        <button type="submit" hidden></button>
                     <div class="mb-3">
                         <label for="newPinInput" class="form-label">{{ _('Новый PIN-код') }}</label>
                         <input type="password" class="form-control" id="newPinInput" name="new_pin" 
@@ -250,7 +252,7 @@
                 <h5 class="modal-title" id="pinShowModalLabel">
                     <i class="bi bi-key"></i> {{ _('PIN-код из архива') }}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-success" role="alert">
@@ -407,32 +409,21 @@
     
     // Функция показа модального окна входа по PIN
     function showPinLoginModal() {
-        const modal = new bootstrap.Modal(document.getElementById('pinLoginModal'));
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('pinLoginModal'));
         modal.show();
         
-        // Фокус на поле ввода
-        setTimeout(() => {
-            document.getElementById('pinInput').focus();
-        }, 500);
-        
-        // Обработка нажатия Enter
-        document.getElementById('pinInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitPinLogin();
-            }
-        });
     }
     
     // Функция показа модального окна первого запуска
     function showFirstTimeSetup() {
         showFirstSetupMessage('', 'info', true);
-        const modal = new bootstrap.Modal(document.getElementById('firstTimeSetupModal'));
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('firstTimeSetupModal'));
         modal.show();
     }
     
     // Функция показа модального окна загрузки архива
     function showArchiveUpload() {
-        const modal = new bootstrap.Modal(document.getElementById('archiveUploadModal'));
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('archiveUploadModal'));
         modal.show();
         // Закрываем модальное окно первого запуска
         const firstTimeModal = bootstrap.Modal.getInstance(document.getElementById('firstTimeSetupModal'));
@@ -443,7 +434,7 @@
     
     // Функция настройки нового PIN
     function setupNewPin() {
-        const modal = new bootstrap.Modal(document.getElementById('createPinModal'));
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createPinModal'));
         modal.show();
         // Закрываем модальное окно первого запуска
         const firstTimeModal = bootstrap.Modal.getInstance(document.getElementById('firstTimeSetupModal'));
@@ -468,7 +459,6 @@
         submitButton.textContent = '{{ _("Проверка...") }}';
         
             // JSON body
-        console.log('Sending PIN:', pin);
         fetch('/pin/login_ajax', {
             method: 'POST',
             headers: {
@@ -639,7 +629,7 @@
         
         // Показываем модальное окно создания нового PIN
         setTimeout(() => {
-            const createPinModal = new bootstrap.Modal(document.getElementById('createPinModal'));
+            const createPinModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createPinModal'));
             createPinModal.show();
         }, 500);
     }
@@ -656,7 +646,7 @@
         
         // Показываем модальное окно загрузки архива
         setTimeout(() => {
-            const archiveModal = new bootstrap.Modal(document.getElementById('archiveUploadModal'));
+            const archiveModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('archiveUploadModal'));
             archiveModal.show();
         }, 500);
     }
@@ -712,7 +702,7 @@
         
         // Показываем PIN
         document.getElementById('pinDisplay').textContent = pin;
-        const pinModal = new bootstrap.Modal(document.getElementById('pinShowModal'));
+        const pinModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('pinShowModal'));
         pinModal.show();
         
         // Сохраняем PIN для последующего использования
@@ -893,7 +883,7 @@
     // Функция показа PIN из архива
     function showPinFromArchive(pin) {
         document.getElementById('pinDisplay').textContent = pin;
-        const modal = new bootstrap.Modal(document.getElementById('pinShowModal'));
+        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('pinShowModal'));
         modal.show();
         // Закрываем модальное окно загрузки архива
         const archiveModal = bootstrap.Modal.getInstance(document.getElementById('archiveUploadModal'));
@@ -1009,7 +999,7 @@
     
     // Обработка смены вкладок
     document.addEventListener('DOMContentLoaded', function() {
-        document.addEventListener('click', function(e) {
+        document.addEventListener('shown.bs.tab', function(e) {
             const submitButton = document.getElementById('modalSubmitBtn');
             if (e.target.id === 'change-pin-tab') {
                 submitButton.textContent = '{{ _("Сменить PIN") }}';

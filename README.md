@@ -1,4 +1,4 @@
-# VPN Server Manager v5.0.15
+# VPN Server Manager v5.0.16
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**5.0.15 development branch:** shared navigation has screen-reader labels, a keyboard skip link and visible focus. Zoom supports 100% defaults and enlargement to 200%. This branch is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#5015---2026-10-30)
+**5.0.16 development branch:** PIN dialogs support keyboard tab changes, Enter submission and focus restoration. This branch is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#5016---2026-10-30)
 
 ## See your fleet at a glance
 

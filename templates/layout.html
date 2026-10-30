@@ -389,10 +389,10 @@
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">
+                                    <h5 class="modal-title" id="pinLoginModalLabel">
                                         <i class="bi bi-search"></i> Информация об IP: ${ipAddress}
                                     </h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
                                 </div>
                                 <div class="modal-body">
                                     <div class="row">
@@ -526,6 +526,8 @@
             const modal = document.createElement('div');
             modal.className = 'modal fade';
             modal.id = 'pinLoginModal';
+            modal.tabIndex = -1;
+            modal.setAttribute('aria-labelledby', 'pinLoginModalLabel');
             modal.innerHTML = `
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -561,7 +563,7 @@
                                         <input type="password" class="form-control" id="pinInput" 
                                                placeholder="{{ _('Введите PIN') }}" autocomplete="off">
                                     </div>
-                                    <div id="pinLoginMessage" class="alert" style="display: none;"></div>
+                                    <div id="pinLoginMessage" role="alert" class="alert" style="display: none;"></div>
                                 </div>
                                 
                                 <!-- Вкладка смены PIN -->
@@ -569,6 +571,7 @@
                                      aria-labelledby="change-pin-tab">
                                     <p class="text-muted mb-3 mt-3">{{ _('Смените PIN-код для входа') }}</p>
                                     <form id="changePinForm">
+                        <button type="submit" hidden></button>
                                         <div class="mb-3">
                                             <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                             <input type="password" class="form-control" id="oldPin" name="old_pin" 
@@ -584,7 +587,7 @@
                                             <input type="password" class="form-control" id="newPin2" name="new_pin2" 
                                                    placeholder="{{ _('Повторите новый PIN') }}" autocomplete="off" required>
                                         </div>
-                                        <div id="changePinMessage" class="alert" style="display: none;"></div>
+                                        <div id="changePinMessage" role="alert" class="alert" style="display: none;"></div>
                                     </form>
                                 </div>
                             </div>
@@ -603,18 +606,6 @@
             // Показываем модальный диалог
             const bootstrapModal = new bootstrap.Modal(modal);
             bootstrapModal.show();
-            
-            // Фокус на поле ввода
-            setTimeout(() => {
-                document.getElementById('pinInput').focus();
-            }, 500);
-            
-            // Обработка нажатия Enter
-            document.getElementById('pinInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    submitPinLogin();
-                }
-            });
             
             // Удаляем модальный диалог после закрытия
             modal.addEventListener('hidden.bs.modal', function() {
@@ -724,7 +715,7 @@
             .finally(() => {
                 // Восстанавливаем кнопку
                 submitButton.disabled = false;
-                submitButton.textContent = 'Войти';
+                submitButton.textContent = {{ _('Войти')|tojson }};
             });
         }
         
@@ -836,7 +827,7 @@
             .finally(() => {
                 // Восстанавливаем кнопку
                 submitButton.disabled = false;
-                submitButton.textContent = 'Сменить PIN';
+                submitButton.textContent = {{ _('Сменить PIN')|tojson }};
             });
         }
         
@@ -850,20 +841,21 @@
         
         // Обработка смены вкладок
         document.addEventListener('DOMContentLoaded', function() {
-            document.addEventListener('click', function(e) {
+            document.addEventListener('shown.bs.tab', function(e) {
                 const submitButton = document.getElementById('modalSubmitBtn');
                 if (e.target.id === 'change-pin-tab') {
-                    submitButton.textContent = 'Сменить PIN';
+                    submitButton.textContent = {{ _('Сменить PIN')|tojson }};
                     submitButton.onclick = submitChangePin;
                     submitButton.className = 'btn btn-warning';
                 } else if (e.target.id === 'login-tab') {
-                    submitButton.textContent = 'Войти';
+                    submitButton.textContent = {{ _('Войти')|tojson }};
                     submitButton.onclick = submitPinLogin;
                     submitButton.className = 'btn btn-primary';
                 }
             });
         });
     </script>
+    <script src="{{ url_for('static', filename='js/modal_accessibility.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html> 
