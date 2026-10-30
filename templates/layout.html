@@ -76,11 +76,11 @@
                             <li class="dropdown-header">{{ _('Масштаб интерфейса') }}</li>
                             <li class="px-3 pb-2 d-flex align-items-center gap-2">
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="stepZoom(-1, event)" title="{{ _('Уменьшить') }}" aria-label="{{ _('Уменьшить') }}"><i class="bi bi-zoom-out" aria-hidden="true"></i></button>
-                                <span class="flex-grow-1 text-center fw-semibold" data-zoom-value>{{ ui_zoom or '80' }}%</span>
+                                <span class="flex-grow-1 text-center fw-semibold" data-zoom-value>{{ ui_zoom or ui_default_zoom }}%</span>
                                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="stepZoom(1, event)" title="{{ _('Увеличить') }}" aria-label="{{ _('Увеличить') }}"><i class="bi bi-zoom-in" aria-hidden="true"></i></button>
                             </li>
                             {% for step in zoom_steps %}
-                            <li><a class="dropdown-item d-flex justify-content-between{% if step == (ui_zoom or '80') %} active{% endif %}" href="#" data-zoom-step="{{ step }}" onclick="setZoom('{{ step }}', event); return false;">{{ step }}%{% if step == '100' %}<span class="text-body-secondary small ms-3">{{ _('Фактический размер') }}</span>{% endif %}</a></li>
+                            <li><a class="dropdown-item d-flex justify-content-between{% if step == (ui_zoom or ui_default_zoom) %} active{% endif %}" href="#" data-zoom-step="{{ step }}" onclick="setZoom('{{ step }}', event); return false;">{{ step }}%{% if step == '100' %}<span class="text-body-secondary small ms-3">{{ _('Фактический размер') }}</span>{% endif %}</a></li>
                             {% endfor %}
                             <li><hr class="dropdown-divider"></li>
                             <li class="px-3 small text-body-secondary">{{ _('Клавиши: %(mod)s + и %(mod)s −, %(mod)s 0 — фактический размер.', mod='Ctrl/⌘') }}</li>
@@ -148,7 +148,8 @@
         }
 
         const allowedZooms = {{ zoom_steps|tojson }};
-        const serverZoom = {{ (ui_zoom or '80')|tojson }};
+        const defaultZoom = {{ ui_default_zoom|tojson }};
+        const serverZoom = {{ (ui_zoom or ui_default_zoom)|tojson }};
 
         function resolveZoom(preferred) {
             const candidate = String(preferred || '').replace('%', '');
@@ -159,10 +160,10 @@
             if (allowedZooms.includes(cookieZoom)) {
                 return cookieZoom;
             }
-            return allowedZooms.includes(serverZoom) ? serverZoom : '80';
+            return allowedZooms.includes(serverZoom) ? serverZoom : defaultZoom;
         }
 
-        let currentZoom = '80';
+        let currentZoom = defaultZoom;
         function applyZoom(zoom) {
             currentZoom = zoom;
             if (document.body) document.body.style.zoom = zoom + '%';

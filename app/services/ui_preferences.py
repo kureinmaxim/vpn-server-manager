@@ -11,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 ALLOWED_LANGUAGES = frozenset({'ru', 'en', 'zh'})
 # Шаги масштаба по порядку: меню «Вид» и Cmd+=/Cmd+− идут по ним от текущего значения
-ZOOM_STEPS = ('50', '60', '70', '80', '90', '100', '110', '125', '150')
+ZOOM_STEPS = ('50', '60', '70', '80', '90', '100', '110', '125', '150', '175', '200')
 ALLOWED_ZOOMS = frozenset(ZOOM_STEPS)
 DEFAULT_LANGUAGE = 'en'
-DEFAULT_ZOOM = '80'
+DEFAULT_ZOOM = '100'
 UI_CONFIG_KEY = 'ui'
 # Кнопки главной страницы. «Проекты» и «Боты» — каталоги под свои проекты и Telegram-ботов:
 # в новой установке они скрыты, включаются в настройках.

@@ -432,10 +432,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '5.0.13'
+        return '5.0.14'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '5.0.13'
+        return '5.0.14'
 
 def main():
     """Local build: mutate resources, sign, verify, then package; fail closed."""

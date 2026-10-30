@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.14] - 2026-10-30
+
+### Changed
+- New profiles start at 100% UI zoom instead of 80%. Existing profile and cookie choices remain respected.
+- Added 175% and 200% zoom to the shared steps used by the page controls and macOS View menu. Tests cover default size and persistence of old and enlarged settings.
+
 ## [5.0.13] - 2026-10-30
 
 ### Fixed
