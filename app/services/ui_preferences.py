@@ -113,6 +113,13 @@ def load_ui_features(app) -> Dict[str, bool]:
     return features
 
 
+def ui_features_configured(app) -> bool:
+    """Whether the profile has saved an explicit choice of dashboard tools."""
+    stored = _read_config(_config_path(app)).get(UI_CONFIG_KEY)
+    features = stored.get('features') if isinstance(stored, dict) else None
+    return isinstance(features, dict)
+
+
 def save_ui_features(app, enabled) -> Dict[str, bool]:
     """Store the shown tools; names outside DEFAULT_FEATURES are ignored.
 

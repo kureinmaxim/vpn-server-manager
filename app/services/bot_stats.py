@@ -14,18 +14,10 @@ from . import bot_senders
 from .project_stats import _ITEM, _PROCESS, ProjectError, number, unit_id
 from .ui_preferences import _config_path, _read_config, _write_config
 
-DEFAULT_BOTS = [
-    {'name': 'TelegramOnly', 'units': ['telegramonly'],
-     'health_url': 'http://127.0.0.1:8000/health', 'health_word': 'healthy'},
-    {'name': 'BotCriptoM',
-     'units': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop', 'botcriptom-dash-bridge',
-               'botcriptom-stop-bridge', 'botcriptom-fleet-drain']},
-    {'name': 'telegram-helper-lite', 'containers': ['telegram-helper-lite']},
-    # macOS mesh nodes: no systemd or Docker, recognised by the command line (launchd agents).
-    {'name': 'Hermes', 'commands': ['hermes gateway run'], 'tasks': ['lesson-report', 'lesson-report-test']},
-    {'name': 'Проверка уроков', 'commands': ['/Users/tutor/kid-tutor/server.py']},
-    {'name': 'TelegramOnly maintenance', 'units': ['telegramonly-maintenance'], 'service': True},
-    {'name': 'Weekly monitoring report', 'units': ['monitoring-weekly'], 'service': True},
+DEFAULT_BOTS = []
+EXAMPLE_BOTS = [
+    {'name': 'Telegram bot example', 'units': ['example-bot'], 'containers': ['example-bot']},
+    {'name': 'Scheduled task example', 'units': ['example-task'], 'service': True},
 ]
 CONFIG_KEY = 'tracked_bots'
 MAX_BOTS = 30
@@ -118,17 +110,19 @@ def load_bots(app=None):
     if app is None:
         from flask import current_app, has_app_context
         if not has_app_context():
-            return clean_bots(DEFAULT_BOTS)
+            return []
         app = current_app
     stored = _read_config(_config_path(app)).get(CONFIG_KEY)
+    if stored is None:
+        return []
     try:
-        return clean_bots(DEFAULT_BOTS if stored is None else stored)
+        return clean_bots(stored)
     except BotError:
-        return clean_bots(DEFAULT_BOTS)
+        return []
 
 
 def save_bots(app, bots):
-    """Raises BotError on invalid input; None restores the defaults."""
+    """Raises BotError on invalid input; None removes the saved user catalog."""
     path = _config_path(app)
     data = _read_config(path)
     if bots is None:

@@ -9,33 +9,17 @@ import shlex
 from .dns_mail_probe import ROLE_NAMES
 from .ui_preferences import _config_path, _read_config, _write_config
 
-DEFAULT_PROJECTS = [
-    {'name': 'BotCriptoM',
-     'units': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop',
-               'botcriptom-dash-bridge', 'botcriptom-stop-bridge'],
-     'containers': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop', 'botcriptom-proxy']},
-    {'name': 'Rust File Manager', 'units': ['rust-file-manager', 'rfm-internal-bridge'], 'containers': []},
-    {'name': 'UGCTL (UDP gRPC COM Lite)',
-     'units': ['ugctl-server', 'ugctl-api', 'ugctl-bu', 'ugctl-bz', 'ugctl-bf',
-               'ugctl-ha', 'ugctl-remote-cli'], 'containers': []},
-    {'name': 'Reticulum', 'units': ['ha-reticulum-bridge', 'rnsd', 'lxmd', 'reticulum', 'ha-rns-watchdog.timer'],
-     'containers': ['ha_rns_bridge', 'reticulumpn', 'reticulum'], 'processes': ['rnsd', 'lxmd']},
-    {'name': 'Dockhand', 'units': [], 'containers': ['dockhand']},
-    {'name': 'Headscale / Headplane', 'units': ['headscale', 'headplane'], 'containers': ['headscale', 'headplane']},
-    {'name': ROLE_NAMES['adguard'],
-     'units': ['AdGuardHome', 'adguardhome', 'adguard-home'],
-     'containers': ['adguardhome', 'adguard-home']},
-    {'name': ROLE_NAMES['chatmail'],
-     'units': ['doveauth', 'chatmail-metadata', 'filtermail',
-               'filtermail-incoming', 'filtermail-transport'],
-     'containers': []},
+DEFAULT_PROJECTS = []
+EXAMPLE_PROJECTS = [
+    {'name': 'Web application example', 'units': ['example-web'], 'containers': ['example-web']},
+    {'name': 'Background worker example', 'units': ['example-worker'], 'processes': ['worker']},
 ]
-# Saved lists that still match the catalog before DNS/Chatmail were editable.
-_LEGACY_DEFAULT_NAMES = frozenset(p['name'] for p in DEFAULT_PROJECTS
-                                  if p['name'] not in ROLE_NAMES.values())
-FILE_MANAGER = next(p for p in DEFAULT_PROJECTS if 'rust-file-manager' in p['units'])
-ADGUARD = next(p for p in DEFAULT_PROJECTS if p['name'] == ROLE_NAMES['adguard'])
-CHATMAIL = next(p for p in DEFAULT_PROJECTS if p['name'] == ROLE_NAMES['chatmail'])
+# These product roles have dedicated discovery and stay separate from the user catalog.
+FILE_MANAGER = {'name': 'Rust File Manager', 'units': ['rust-file-manager', 'rfm-internal-bridge']}
+ADGUARD = {'name': ROLE_NAMES['adguard'], 'units': ['AdGuardHome', 'adguardhome', 'adguard-home']}
+CHATMAIL = {'name': ROLE_NAMES['chatmail'],
+            'units': ['doveauth', 'chatmail-metadata', 'filtermail',
+                      'filtermail-incoming', 'filtermail-transport']}
 CONFIG_KEY = 'tracked_projects'
 MAX_PROJECTS = 30
 MAX_ITEMS = 16
@@ -109,19 +93,16 @@ def load_projects(app=None):
             return clean_projects(DEFAULT_PROJECTS)
         app = current_app
     stored = _read_config(_config_path(app)).get(CONFIG_KEY)
+    if stored is None:
+        return []
     try:
-        if stored is None:
-            return clean_projects(DEFAULT_PROJECTS)
-        projects = clean_projects(stored)
+        return clean_projects(stored)
     except ProjectError:
-        return clean_projects(DEFAULT_PROJECTS)
-    if {p['name'] for p in projects} == _LEGACY_DEFAULT_NAMES:
-        return clean_projects(DEFAULT_PROJECTS)
-    return projects
+        return []
 
 
 def save_projects(app, projects):
-    """Raises ProjectError on invalid input; None restores the defaults."""
+    """Raises ProjectError on invalid input; None removes the saved user catalog."""
     path = _config_path(app)
     data = _read_config(path)
     if projects is None:
@@ -179,7 +160,7 @@ def _containers(text, names):
     """None when Docker did not answer (e.g. no access), so containers stay unknown."""
     lines = ('\n' + text).split('\nDOCKER\n', 1)[1].splitlines() if '\nDOCKER\n' in '\n' + text else []
     if 'NO_DOCKER' in lines:
-        return {}
+        return None
     if 'DOCKER_OK' not in lines:
         return None
     states = {}
@@ -262,13 +243,17 @@ def summarize(rows, projects):
             continue
         own = [row for row in rows if row['project'] == project['key']]
         found = [row for row in own if row['status'] not in ('not_installed', 'unknown')]
+        unknown = [row for row in own if row['status'] == 'unknown']
         services = {row['name'] for row in found if row['kind'] == 'unit' and row['status'] == 'active'}
         found = [row for row in found if row['kind'] != 'process' or row['name'] + '.service' not in services]
         if not found:
-            if own and all(row['status'] == 'unknown' for row in own):
-                result.append({'key': project['key'], 'name': project['name'], 'state': 'unknown', 'components': []})
+            if unknown:
+                result.append({'key': project['key'], 'name': project['name'], 'state': 'unknown',
+                               'components': unknown})
             continue
         active = sum(row['status'] == 'active' for row in found)
-        state = 'running' if active == len(found) else 'partial' if active else 'stopped'
-        result.append({'key': project['key'], 'name': project['name'], 'state': state, 'components': found})
+        state = ('unknown' if unknown else
+                 'running' if active == len(found) else 'partial' if active else 'stopped')
+        result.append({'key': project['key'], 'name': project['name'], 'state': state,
+                       'components': found + unknown})
     return result

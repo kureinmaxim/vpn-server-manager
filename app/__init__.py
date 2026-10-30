@@ -227,7 +227,7 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '5.0.19'),
+            "version": app.config.get('APP_VERSION', '5.0.20'),
             "release_date": "30.10.2026",
             "last_updated": "2026-10-30",
             "developer": "Куреин М.Н."
@@ -244,7 +244,7 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "5.0.19",
+            "version": "5.0.20",
             "release_date": "30.10.2026",
             "last_updated": "2026-10-30",
             "developer": "Куреин М.Н."
@@ -410,12 +410,15 @@ def create_app(config_name='development'):
         
         from flask_babel import gettext as _
         from flask_babel import get_locale as babel_get_locale
-        from .services.ui_preferences import DEFAULT_ZOOM, ZOOM_STEPS, load_ui_features, load_ui_preferences
+        from .services.ui_preferences import (DEFAULT_ZOOM, ZOOM_STEPS, load_ui_features,
+                                              load_ui_preferences, ui_features_configured)
 
         from .services.project_stats import ADGUARD, CHATMAIL, FILE_MANAGER, load_projects
+        from .services.bot_stats import load_bots
 
         ui_prefs = load_ui_preferences(app)
         projects = load_projects(app)
+        bots = load_bots(app)
         from .services.dns_mail_probe import ROLE_NAMES
         from .services.remote_derp import derp_display_name
         return {
@@ -435,6 +438,8 @@ def create_app(config_name='development'):
             'ui_default_zoom': DEFAULT_ZOOM,
             'zoom_steps': list(ZOOM_STEPS),
             'ui_features': load_ui_features(app),
+            'ui_features_configured': ui_features_configured(app),
+            'tracked_bot_containers': any(bot['containers'] for bot in bots),
             'is_desktop_app': app.config.get('IS_DESKTOP_APP', False),
             'server_info': None if app.config.get('IS_DESKTOP_APP', False) else {
                 'host': server_host,

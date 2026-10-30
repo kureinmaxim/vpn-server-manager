@@ -2,6 +2,15 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.20] - 2026-10-30
+
+### Changed
+- First-run setup asks which optional project and bot checks to show. New profiles start with empty catalogs; generic examples are added only when the user imports them.
+- Project and bot catalog pages explain that names are user-supplied and configuration files are not inspected to populate the lists.
+
+### Fixed
+- Docker containers that cannot be checked remain unknown instead of being reported as missing. Project and bot checks explain when Docker Engine access is unavailable.
+
 ## [5.0.19] - 2026-10-30
 
 ### Fixed

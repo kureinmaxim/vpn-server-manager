@@ -30,7 +30,7 @@
 <div class="container mt-4 editor-page">
     {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), url_for('main.settings')), (_('Отслеживаемые проекты'), None)]) }}
     <h1 class="editor-title"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Отслеживаемые проекты') }}</h1>
-    <p class="text-body-secondary">{{ _('Эти проекты ищутся на серверах в окне «Проекты», в статусе сервера и в мониторинге. TelegramOnly показан в своём разделе. Укажите имена служб systemd (без .service) и контейнеров Docker через запятую — проект считается найденным, если на сервере есть хотя бы одна из них.') }}</p>
+    <p class="text-body-secondary">{{ _('На серверах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не изучает конфигурационные файлы, чтобы заполнять его автоматически. Укажите имена через запятую или добавьте типовые примеры и замените вымышленные имена своими.') }}</p>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
@@ -41,27 +41,33 @@
         {% endfor %}
     {% endwith %}
 
+    {% if not projects %}<div class="alert alert-info" role="status">{{ _('Список проектов пока пуст. Добавьте свой проект или импортируйте типовые примеры.') }}</div>{% endif %}
+
     <form method="post" id="tracked-projects-form">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <div class="editor-cards" id="tracked-projects-rows">
             {% for project in projects %}{{ project_row(project) }}{% endfor %}
         </div>
         <template id="tracked-project-template">{{ project_row({'name': '', 'units': [], 'containers': [], 'processes': []}, hint=True) }}</template>
+        {% for example in examples %}<template data-project-example="{{ example.name }}">{{ project_row(example) }}</template>{% endfor %}
+        <p class="small text-body-secondary mt-2 mb-0">{{ _('Имена в примерах вымышлены. Замените их на реальные имена служб, контейнеров и процессов вашего сервера перед проверкой.') }}</p>
+        <p id="tracked-projects-message" class="small mt-2 mb-0" role="status" aria-live="polite"></p>
         <div class="d-flex flex-wrap gap-2 mt-3">
             <button type="button" class="btn btn-outline-info" id="add-project"><i class="bi bi-plus-lg" aria-hidden="true"></i> {{ _('Добавить проект') }}</button>
+            <button type="button" class="btn btn-outline-secondary" id="import-project-examples"><i class="bi bi-journal-plus" aria-hidden="true"></i> {{ _('Добавить типовые примеры') }}</button>
             <button type="submit" class="btn btn-primary">{{ _('Сохранить') }}</button>
             <button type="submit" class="btn btn-outline-secondary ms-auto" name="action" value="reset"
-                    formnovalidate onclick="return confirm({{ _('Вернуть стандартный список проектов? Ваши изменения будут потеряны.')|tojson|forceescape }})">{{ _('Восстановить стандартный список') }}</button>
+                    formnovalidate onclick="return confirm({{ _('Очистить список отслеживаемых проектов?')|tojson|forceescape }})">{{ _('Очистить список') }}</button>
         </div>
     </form>
     <p class="small text-body-secondary mt-3 mb-1">{{ _('Процессы — для программ, запущенных без службы и контейнера, например rnsd вручную в терминале. Проверяется только имя процесса, как в ps (до 15 знаков), и число таких процессов.') }}</p>
     <p class="small text-body-secondary mb-1">{{ _('Службу, которую периодически запускает таймер, указывайте вместе с суффиксом .timer, например ha-rns-watchdog.timer: сама такая служба между запусками остановлена.') }}</p>
-    <p class="small text-body-secondary">{{ _('Стандартный список: %(names)s.', names=defaults|map(attribute='name')|join(', ')) }}</p>
 </div>
 <script>
 (function () {
     const rows = document.getElementById('tracked-projects-rows');
     const template = document.getElementById('tracked-project-template');
+    const status = document.getElementById('tracked-projects-message');
     // Поле растёт по тексту: длинный список виден целиком, а не обрезается краем
     const grow = el => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 2 + 'px'; };
     const growAll = root => root.querySelectorAll('textarea.editor-grow').forEach(grow);
@@ -73,6 +79,29 @@
         growAll(rows.lastElementChild);
         rows.lastElementChild.querySelector('input').focus();
         rows.lastElementChild.scrollIntoView({behavior: 'smooth', block: 'center'});
+    });
+    document.getElementById('import-project-examples').addEventListener('click', () => {
+        const known = new Set(Array.from(rows.querySelectorAll('[data-project-row] input[name="name"]'), input => input.value.trim().toLowerCase()));
+        let firstAdded = null;
+        let added = 0;
+        document.querySelectorAll('template[data-project-example]').forEach(example => {
+            const name = example.dataset.projectExample;
+            if (known.has(name.toLowerCase())) return;
+            const fragment = example.content.cloneNode(true);
+            const row = fragment.querySelector('[data-project-row]');
+            if (!firstAdded) firstAdded = row;
+            rows.append(fragment);
+            known.add(name.toLowerCase());
+            added++;
+        });
+        growAll(rows);
+        status.textContent = added
+            ? {{ _('Типовые примеры добавлены. Замените вымышленные имена перед сохранением.')|tojson }}
+            : {{ _('Типовые примеры уже есть в списке.')|tojson }};
+        if (firstAdded) {
+            firstAdded.querySelector('input').focus();
+            firstAdded.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
     });
     rows.addEventListener('click', event => {
         const button = event.target.closest('[data-remove-project]');

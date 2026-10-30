@@ -3,10 +3,19 @@ import re
 
 import pytest
 
-from app.services.bot_stats import (DEFAULT_BOTS, BotError, build_command, clean_bots, load_bots, parse,
+from app.services.bot_stats import (DEFAULT_BOTS, EXAMPLE_BOTS, BotError, build_command, clean_bots, load_bots, parse,
                                     save_bots)
 
-BOTS = clean_bots(DEFAULT_BOTS)
+BOTS = clean_bots([
+    {'name': 'TelegramOnly', 'units': ['telegramonly'],
+     'health_url': 'http://127.0.0.1:8000/health', 'health_word': 'healthy'},
+    {'name': 'BotCriptoM', 'units': ['botcriptom', 'botcriptom-dash', 'botcriptom-stop',
+                                    'botcriptom-dash-bridge', 'botcriptom-stop-bridge', 'botcriptom-fleet-drain']},
+    {'name': 'telegram-helper-lite', 'containers': ['telegram-helper-lite']},
+    {'name': 'Hermes', 'commands': ['hermes gateway run'], 'tasks': ['lesson-report', 'lesson-report-test']},
+    {'name': 'TelegramOnly maintenance', 'units': ['telegramonly-maintenance'], 'service': True},
+    {'name': 'Weekly monitoring report', 'units': ['monitoring-weekly'], 'service': True},
+])
 NOW = 1_800_000_000
 UPTIME = 100_000.0
 BOOT = NOW - UPTIME
@@ -176,6 +185,9 @@ def test_catalog_validation_rejects_shell_unsafe_names(bot, error):
 
 
 def test_catalog_normalises_and_saves(app):
+    assert DEFAULT_BOTS == [] and load_bots(app) == []
+    assert {bot['name'] for bot in clean_bots(EXAMPLE_BOTS)} == {
+        'Telegram bot example', 'Scheduled task example'}
     saved = save_bots(app, [{'name': ' My  bot ', 'units': 'mybot.service, mybot-worker', 'containers': '',
                              'health_url': 'http://127.0.0.1:9000/health', 'health_word': 'ok', 'service': False}])
     assert saved
@@ -183,4 +195,4 @@ def test_catalog_normalises_and_saves(app):
     assert (bot['name'], bot['units'], bot['health_url']) == ('My bot', ['mybot', 'mybot-worker'],
                                                               'http://127.0.0.1:9000/health')
     save_bots(app, None)
-    assert [b['name'] for b in load_bots(app)] == [b['name'] for b in BOTS]
+    assert load_bots(app) == []

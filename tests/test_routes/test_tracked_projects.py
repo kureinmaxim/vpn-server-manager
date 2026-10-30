@@ -6,29 +6,29 @@ def login(client):
         session.update(authenticated=True, pin_authenticated=True, pin_verified=True, csrf_token='token')
 
 
-def test_page_lists_defaults_and_requires_login(app, client):
+def test_page_starts_empty_and_offers_generic_examples(app, client):
     assert client.get('/settings/projects').status_code in (302, 401)
     login(client)
     html = client.get('/settings/projects').get_data(as_text=True)
-    assert 'value="BotCriptoM"' in html and 'value="Dockhand"' in html
-    assert 'value="AdGuard Home / DNS"' in html and 'value="Chatmail relay"' in html
-    assert '>botcriptom, botcriptom-dash' in html
-    assert '>AdGuardHome, adguardhome, adguard-home</textarea>' in html
-    assert '>doveauth, chatmail-metadata, filtermail' in html
+    assert load_projects(app) == []
+    assert 'value="Web application example"' in html and 'value="Background worker example"' in html
+    assert 'id="import-project-examples"' in html and 'data-project-example=' in html
+    assert '/Users/' not in html and 'BotCriptoM' not in html
 
 
 def test_save_add_remove_and_reset(app, client, all_features):
     login(client)
-    form = {'csrf_token': 'token', 'name': ['BotCriptoM', 'Blog', 'Manual RNS'],
-            'units': ['botcriptom', 'ghost.service', ''], 'containers': ['', 'ghost-db', ''],
-            'processes': ['', '', 'rnsd']}
+    form = {'csrf_token': 'token', 'name': ['Example project', 'Blog', 'Manual process'],
+            'units': ['example-app', 'ghost.service', ''], 'containers': ['', 'ghost-db', ''],
+            'processes': ['', '', 'worker']}
     assert client.post('/settings/projects', data=form).status_code == 302
     assert [(p['name'], p['units'], p['containers'], p['processes']) for p in load_projects(app)] == [
-        ('BotCriptoM', ['botcriptom'], [], []), ('Blog', ['ghost'], ['ghost-db'], []), ('Manual RNS', [], [], ['rnsd'])]
-    assert '>rnsd</textarea>' in client.get('/settings/projects').get_data(as_text=True)
+        ('Example project', ['example-app'], [], []), ('Blog', ['ghost'], ['ghost-db'], []),
+        ('Manual process', [], [], ['worker'])]
+    assert '>worker</textarea>' in client.get('/settings/projects').get_data(as_text=True)
     assert 'Blog' in client.get('/').get_data(as_text=True)
     client.post('/settings/projects', data={'csrf_token': 'token', 'action': 'reset'})
-    assert 'Dockhand' in [p['name'] for p in load_projects(app)]
+    assert load_projects(app) == []
 
 
 def test_invalid_input_is_rejected_and_kept_in_the_form(app, client):
@@ -37,7 +37,7 @@ def test_invalid_input_is_rejected_and_kept_in_the_form(app, client):
                                                        'units': ['x; reboot'], 'containers': [''], 'processes': ['']})
     assert response.status_code == 400
     assert '>x; reboot</textarea>' in response.get_data(as_text=True)
-    assert 'Dockhand' in [p['name'] for p in load_projects(app)]
+    assert load_projects(app) == []
 
 
 def test_csrf_is_required(app, client):

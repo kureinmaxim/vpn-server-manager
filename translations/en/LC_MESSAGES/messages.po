@@ -10547,3 +10547,81 @@ msgstr "Receipt added."
 
 msgid "Чек можно добавить после сохранения карточки."
 msgstr "You can add a receipt after saving the server card."
+
+msgid "Тест IP, Тест DNS и Net Tools видны всегда. Выберите, какие дополнительные проверки показывать. Списки проектов и ботов начинаются пустыми; можно добавить свои имена или импортировать типовые примеры."
+msgstr "IP Test, DNS Test and Net Tools are always shown. Choose which additional checks to display. Project and bot lists start empty; add your own names or import generic examples."
+
+msgid "Что вы хотите отслеживать?"
+msgstr "What would you like to track?"
+
+msgid "Выберите дополнительные проверки для главной страницы. Списки проектов и ботов будут пустыми: приложение не ищет названия в ваших файлах. Их можно заполнить вручную или импортировать типовые примеры."
+msgstr "Choose additional checks for the home page. Project and bot lists start empty: the app does not search your files for names. Add entries manually or import generic examples."
+
+msgid "Сохранить выбор"
+msgstr "Save selection"
+
+msgid "Настроить позже"
+msgstr "Set up later"
+
+msgid "На серверах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не сканирует ваши файлы и не выбирает проекты автоматически. Укажите имена через запятую или добавьте типовые примеры и замените вымышленные имена своими."
+msgstr "Servers are checked only for the systemd units, Docker containers and processes you specify. The list starts empty: the app does not scan your files or choose projects automatically. Enter names separated by commas, or add generic examples and replace their fictional names with your own."
+
+msgid "Список проектов пока пуст. Добавьте свой проект или импортируйте типовые примеры."
+msgstr "Your project list is empty. Add a project or import generic examples."
+
+msgid "Имена в примерах вымышлены. Замените их на реальные имена служб, контейнеров и процессов вашего сервера перед проверкой."
+msgstr "The example names are fictional. Replace them with the actual unit, container and process names on your server before checking."
+
+msgid "Добавить типовые примеры"
+msgstr "Add generic examples"
+
+msgid "Очистить список отслеживаемых проектов?"
+msgstr "Clear the tracked project list?"
+
+msgid "Очистить список отслеживаемых ботов?"
+msgstr "Clear the tracked bot list?"
+
+msgid "Очистить список"
+msgstr "Clear list"
+
+msgid "Типовые примеры добавлены. Замените вымышленные имена перед сохранением."
+msgstr "Generic examples added. Replace their fictional names before saving."
+
+msgid "Типовые примеры уже есть в списке."
+msgstr "The generic examples are already in the list."
+
+msgid "Список отслеживаемых проектов очищен."
+msgstr "Tracked project list cleared."
+
+msgid "На узлах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не сканирует ваши файлы и не выбирает ботов автоматически. Укажите свои имена или добавьте типовые примеры и замените вымышленные имена."
+msgstr "Nodes are checked only for the systemd units, Docker containers and processes you specify. The list starts empty: the app does not scan your files or choose bots automatically. Enter your own names, or add generic examples and replace their fictional names."
+
+msgid "Список ботов пока пуст. Добавьте своего бота или импортируйте типовые примеры."
+msgstr "Your bot list is empty. Add a bot or import generic examples."
+
+msgid "Имена в примерах вымышлены. Замените их на реальные службы, контейнеры и процессы вашего узла перед проверкой."
+msgstr "The example names are fictional. Replace them with actual unit, container and process names on your node before checking."
+
+msgid "Список отслеживаемых ботов очищен."
+msgstr "Tracked bot list cleared."
+
+msgid "Контейнеры не проверены: нужен доступ к API Docker Engine на узле."
+msgstr "Containers were not checked: access to the Docker Engine API on the node is required."
+
+msgid "TOS: контейнеры не проверены. Нужен доступ к API Docker Engine на узле."
+msgstr "TOS: containers were not checked. Access to the Docker Engine API on the node is required."
+
+msgid "Docker не обнаружен: контейнеры не проверены. Нужен доступ к API Docker Engine на узле."
+msgstr "Docker was not found: containers were not checked. Access to the Docker Engine API on the node is required."
+
+msgid "Docker недоступен: проверьте API Engine и права доступа; контейнеры не проверены."
+msgstr "Docker is unavailable: check the Engine API and access permissions; containers were not checked."
+
+msgid "Выберите дополнительные проверки для главной страницы. Списки проектов и ботов будут пустыми: приложение не изучает конфигурационные файлы, чтобы заполнить их автоматически. Их можно заполнить вручную или импортировать типовые примеры."
+msgstr "Choose additional checks for the home page. Project and bot lists start empty: the app does not inspect configuration files to populate them automatically. Add entries manually or import generic examples."
+
+msgid "На серверах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не изучает конфигурационные файлы, чтобы заполнять его автоматически. Укажите имена через запятую или добавьте типовые примеры и замените вымышленные имена своими."
+msgstr "Servers are checked only for the systemd units, Docker containers and processes you specify. The list starts empty: the app does not inspect configuration files to populate it automatically. Enter names separated by commas, or add generic examples and replace their fictional names with your own."
+
+msgid "На узлах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не изучает конфигурационные файлы, чтобы заполнять его автоматически. Укажите свои имена или добавьте типовые примеры и замените вымышленные имена."
+msgstr "Nodes are checked only for the systemd units, Docker containers and processes you specify. The list starts empty: the app does not inspect configuration files to populate it automatically. Enter your own names, or add generic examples and replace their fictional names."

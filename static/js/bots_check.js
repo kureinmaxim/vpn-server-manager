@@ -114,7 +114,12 @@
         const list = [];
         if (node.os === 'macos') list.push(t.macos);
         else if (!node.systemd) list.push(t.noSystemd);
-        if ((node.docker === 'unavailable' && node.os !== 'macos') || (node.tos && node.docker !== 'ok')) list.push(node.tos ? t.dockerTos : t.dockerUnavailable);
+        if ((node.docker === 'unavailable' && (node.os !== 'macos' || config.containerChecksConfigured))
+            || (node.tos && node.docker !== 'ok')) {
+            list.push(node.tos ? t.dockerTos : t.dockerUnavailable);
+        } else if (config.containerChecksConfigured && node.docker === 'absent') {
+            list.push(t.dockerAbsent);
+        }
         (node.kuma || []).forEach(item => { if (t.kumaStates[item.state]) list.push(t.kumaStates[item.state]); });
         const stacks = node.stacks || {};
         if (stacks.files && !(stats.senders || []).some(row => row.kind === 'stack')) list.push(t.stacksClean.replace('{count}', stacks.files));

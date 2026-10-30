@@ -5,10 +5,22 @@ from unittest.mock import Mock
 import pytest
 
 from app.services.dns_mail_probe import ROLE_NAMES
-from app.services.project_stats import (CHATMAIL, DEFAULT_PROJECTS, FILE_MANAGER, ProjectError, build_command,
+from app.services.project_stats import (ADGUARD, CHATMAIL, DEFAULT_PROJECTS, EXAMPLE_PROJECTS, FILE_MANAGER,
+                                        ProjectError, build_command,
                                         clean_projects, load_projects, parse_sample, save_projects, summarize)
 
-PROJECTS = clean_projects(DEFAULT_PROJECTS)
+PROJECTS = clean_projects([
+    {'name': 'Web application', 'units': ['web-app', 'web-app-api', 'web-app-worker'],
+     'containers': ['web-app', 'web-db']},
+    {'name': 'File service', 'units': ['file-service', 'file-bridge']},
+    {'name': 'Mesh service', 'units': ['mesh-bridge', 'mesh-daemon', 'relay', 'mesh-watchdog.timer'],
+     'containers': ['mesh-bridge', 'mesh-node'], 'processes': ['relay', 'mesh-agent']},
+    {'name': 'Dashboard', 'containers': ['dashboard']},
+    {'name': 'Control plane', 'units': ['control-plane', 'control-ui'],
+     'containers': ['control-plane', 'control-ui']},
+    {'name': ADGUARD['name'], 'units': ADGUARD['units'], 'containers': ['adguardhome']},
+    {'name': CHATMAIL['name'], 'units': CHATMAIL['units']},
+])
 
 
 def unit(name, cpu='2000000000', memory='104857600', pid='42', state='active', load='loaded'):
@@ -25,103 +37,138 @@ def row(rows, name):
 
 
 def test_interval_cpu_and_service_memory():
-    rows = parse_sample(sample(100, unit('botcriptom.service'))
-                        + sample(102, unit('botcriptom.service', cpu='5000000000')) + '\nDOCKER\nNO_DOCKER', PROJECTS)
-    bot = row(rows, 'botcriptom.service')
+    rows = parse_sample(sample(100, unit('web-app.service'))
+                        + sample(102, unit('web-app.service', cpu='5000000000')) + '\nDOCKER\nNO_DOCKER', PROJECTS)
+    bot = row(rows, 'web-app.service')
     assert bot['cpu_percent'] == 150  # CPU can span more than one core.
     assert bot['memory_bytes'] == 104857600 and bot['tasks'] == 4
-    assert bot['project_name'] == 'BotCriptoM' and bot['group'] == 'project'
+    assert bot['project_name'] == 'Web application' and bot['group'] == 'project'
 
 
 def test_unavailable_counters_and_failed_probe_are_not_zero():
-    rows = parse_sample(sample(100, unit('botcriptom.service'))
-                        + sample(101, unit('botcriptom.service', cpu='[not set]', memory='18446744073709551615')), PROJECTS)
-    assert row(rows, 'botcriptom.service')['cpu_percent'] is None
-    assert row(rows, 'botcriptom.service')['memory_bytes'] is None
+    rows = parse_sample(sample(100, unit('web-app.service'))
+                        + sample(101, unit('web-app.service', cpu='[not set]', memory='18446744073709551615')), PROJECTS)
+    assert row(rows, 'web-app.service')['cpu_percent'] is None
+    assert row(rows, 'web-app.service')['memory_bytes'] is None
     assert all(r['status'] == 'unknown' for r in parse_sample('', PROJECTS))
 
 
 def test_restarted_stopped_or_reset_service_has_no_misleading_cpu():
-    first = sample(100, unit('rust-file-manager.service'))
-    for second in (sample(101, unit('rust-file-manager.service', pid='99')),
-                   sample(101, unit('rust-file-manager.service', state='inactive')),
-                   sample(101, unit('rust-file-manager.service', cpu='0')),
-                   sample(100, unit('rust-file-manager.service'))):
-        assert row(parse_sample(first + second, PROJECTS), 'rust-file-manager.service')['cpu_percent'] is None
+    first = sample(100, unit('file-service.service'))
+    for second in (sample(101, unit('file-service.service', pid='99')),
+                   sample(101, unit('file-service.service', state='inactive')),
+                   sample(101, unit('file-service.service', cpu='0')),
+                   sample(100, unit('file-service.service'))):
+        assert row(parse_sample(first + second, PROJECTS), 'file-service.service')['cpu_percent'] is None
 
 
 def test_docker_states_distinguish_missing_docker_from_no_access():
     base = sample(100) + sample(101)
-    running = parse_sample(base + '\nDOCKER\nbotcriptom|running\ndockhand|exited\nother|running\nDOCKER_OK', PROJECTS)
-    assert row(running, 'botcriptom')['status'] == 'active'
-    assert row(running, 'dockhand')['status'] == 'inactive'
-    assert row(running, 'botcriptom-stop')['status'] == 'not_installed'
+    running = parse_sample(base + '\nDOCKER\nweb-app|running\ndashboard|exited\nother|running\nDOCKER_OK', PROJECTS)
+    assert row(running, 'web-app')['status'] == 'active'
+    assert row(running, 'dashboard')['status'] == 'inactive'
+    assert row(running, 'web-db')['status'] == 'not_installed'
     assert all(r['name'] != 'other' for r in running)
-    assert row(parse_sample(base + '\nDOCKER\nNO_DOCKER', PROJECTS), 'botcriptom')['status'] == 'not_installed'
-    assert row(parse_sample(base + '\nDOCKER\n', PROJECTS), 'botcriptom')['status'] == 'unknown'
+    assert row(parse_sample(base + '\nDOCKER\nNO_DOCKER', PROJECTS), 'web-app')['status'] == 'unknown'
+    assert row(parse_sample(base + '\nDOCKER\n', PROJECTS), 'web-app')['status'] == 'unknown'
+
+
+def test_container_only_project_stays_visible_when_docker_is_unavailable():
+    projects = clean_projects([{'name': 'Container app', 'containers': ['container-app']}])
+    rows = parse_sample(sample(100) + sample(101) + '\nDOCKER\nNO_DOCKER', projects)
+    [project] = summarize(rows, projects)
+    assert project['state'] == 'unknown'
+    assert project['components'][0]['kind'] == 'container'
+    assert project['components'][0]['status'] == 'unknown'
 
 
 def test_summary_lists_only_found_projects_with_their_state():
-    text = (sample(100, unit('botcriptom.service'), unit('botcriptom-dash.service', state='failed'),
-                   unit('headscale.service', load='not-found', state='inactive'))
-            + sample(101, unit('botcriptom.service'), unit('botcriptom-dash.service', state='failed'),
-                     unit('headscale.service', load='not-found', state='inactive'),
-                     unit('rnsd.service'))
-            + '\nDOCKER\nNO_DOCKER')
+    text = (sample(100, unit('web-app.service'), unit('web-app-api.service', state='failed'),
+                   unit('web-app-worker.service', load='not-found', state='inactive'),
+                   unit('control-plane.service', load='not-found', state='inactive'),
+                   unit('control-ui.service', load='not-found', state='inactive'),
+                   unit('mesh-bridge.service', load='not-found', state='inactive'),
+                   unit('mesh-daemon.service', load='not-found', state='inactive'),
+                   unit('mesh-watchdog.timer', load='not-found', state='inactive'))
+            + sample(101, unit('web-app.service'), unit('web-app-api.service', state='failed'),
+                     unit('web-app-worker.service', load='not-found', state='inactive'),
+                     unit('control-plane.service', load='not-found', state='inactive'),
+                     unit('control-ui.service', load='not-found', state='inactive'),
+                     unit('mesh-bridge.service', load='not-found', state='inactive'),
+                     unit('mesh-daemon.service', load='not-found', state='inactive'),
+                     unit('mesh-watchdog.timer', load='not-found', state='inactive'),
+                     unit('relay.service'))
+            + '\nPROC\nP=relay=0\nP=mesh-agent=0\nPROC_OK\nDOCKER\nDOCKER_OK')
     projects = {p['name']: p for p in summarize(parse_sample(text, PROJECTS), PROJECTS)}
-    assert projects['BotCriptoM']['state'] == 'partial'
-    assert [c['name'] for c in projects['BotCriptoM']['components']] == ['botcriptom.service', 'botcriptom-dash.service']
-    assert projects['Reticulum']['state'] == 'running'
-    assert 'Headscale / Headplane' not in projects
+    assert projects['Web application']['state'] == 'partial'
+    assert [c['name'] for c in projects['Web application']['components']] == [
+        'web-app.service', 'web-app-api.service']
+    assert projects['Mesh service']['state'] == 'running'
+    assert 'Control plane' not in projects
     assert all(p['state'] == 'unknown' for p in summarize(parse_sample('', PROJECTS), PROJECTS))
 
 
 def test_default_catalog_and_read_only_probe():
     names = [p['name'] for p in PROJECTS]
-    assert names[:3] == ['BotCriptoM', 'Rust File Manager', 'UGCTL (UDP gRPC COM Lite)']
-    assert {'Reticulum', 'Dockhand', 'Headscale / Headplane',
-            ROLE_NAMES['adguard'], ROLE_NAMES['chatmail']} <= set(names)
+    assert DEFAULT_PROJECTS == []
+    assert load_projects() == []
+    assert {'Web application example', 'Background worker example'} == {
+        p['name'] for p in clean_projects(EXAMPLE_PROJECTS)}
     assert FILE_MANAGER['name'] == 'Rust File Manager' and 'rust-file-manager' in FILE_MANAGER['units']
     assert CHATMAIL['name'] == ROLE_NAMES['chatmail'] and 'doveauth' in CHATMAIL['units']
-    assert 'chatmail_relay' in {p['key'] for p in clean_projects(DEFAULT_PROJECTS)}
-    assert not any(n in names for n in ('ApiAigRPC', 'ApiNgRPC', 'ApiXgRPC', 'TelegramHelper', 'PDF3MD'))
+    assert ADGUARD['name'] == ROLE_NAMES['adguard']
+    assert not any('example' in p['name'].lower() for p in load_projects())
     units = [u for p in PROJECTS for u in p['units']]
-    assert 'telegramonly' not in units and not any(u.startswith(('ha-stub', 'ha-adapter', 'shskm')) for u in units)
+    assert 'web-app.service' not in build_command([])
     command = build_command(PROJECTS)
-    assert 'botcriptom.service' in command and 'docker ps' in command
+    assert 'web-app.service' in command and 'docker ps' in command
     for forbidden in ('Environment', 'ExecStart', 'restart', 'docker inspect', 'docker logs'):
         assert forbidden not in command
 
 
 def test_reticulum_found_via_ha_bridge_and_watchdog_timer():
-    states = (unit('ha-reticulum-bridge.service'), unit('ha-rns-watchdog.timer', pid='0'),
-              unit('reticulum.service', load='not-found', state='inactive'))
-    text = sample(100, *states) + sample(101, *states) + '\nDOCKER\nNO_DOCKER'
-    assert 'ha-rns-watchdog.timer ' in build_command(PROJECTS) + ' '
-    assert 'ha-rns-watchdog.timer.service' not in build_command(PROJECTS)
-    reticulum = next(p for p in summarize(parse_sample(text, PROJECTS), PROJECTS) if p['name'] == 'Reticulum')
-    assert reticulum['state'] == 'running'
-    assert [c['name'] for c in reticulum['components']] == ['ha-reticulum-bridge.service', 'ha-rns-watchdog.timer']
-    docker = parse_sample(sample(100) + sample(101) + '\nDOCKER\nha_rns_bridge|running\nDOCKER_OK', PROJECTS)
-    reticulum = next(p for p in summarize(docker, PROJECTS) if p['name'] == 'Reticulum')
-    assert reticulum['state'] == 'running' and reticulum['components'][0]['name'] == 'ha_rns_bridge'
+    states = (unit('mesh-bridge.service'), unit('mesh-watchdog.timer', pid='0'),
+              unit('relay.service', load='not-found', state='inactive'),
+              unit('mesh-daemon.service', load='not-found', state='inactive'))
+    text = (sample(100, *states) + sample(101, *states)
+            + '\nPROC\nP=relay=0\nP=mesh-agent=0\nPROC_OK\nDOCKER\nDOCKER_OK')
+    assert 'mesh-watchdog.timer ' in build_command(PROJECTS) + ' '
+    assert 'mesh-watchdog.timer.service' not in build_command(PROJECTS)
+    project = next(p for p in summarize(parse_sample(text, PROJECTS), PROJECTS) if p['name'] == 'Mesh service')
+    assert project['state'] == 'running'
+    assert [c['name'] for c in project['components']] == ['mesh-bridge.service', 'mesh-watchdog.timer']
+    missing = (unit('mesh-bridge.service', load='not-found', state='inactive'),
+               unit('mesh-daemon.service', load='not-found', state='inactive'),
+               unit('relay.service', load='not-found', state='inactive'),
+               unit('mesh-watchdog.timer', load='not-found', state='inactive'))
+    docker = parse_sample(sample(100, *missing) + sample(101, *missing)
+                          + '\nPROC\nP=relay=0\nP=mesh-agent=0\nPROC_OK'
+                          + '\nDOCKER\nmesh-bridge|running\nDOCKER_OK', PROJECTS)
+    project = next(p for p in summarize(docker, PROJECTS) if p['name'] == 'Mesh service')
+    assert project['state'] == 'running' and project['components'][0]['name'] == 'mesh-bridge'
 
 
 def test_manually_started_processes_are_counted_by_name_only():
     command = build_command(PROJECTS)
-    assert "for p in rnsd lxmd;" in command and 'pgrep -x -- "$p"' in command
+    assert "for p in relay mesh-agent;" in command and 'pgrep -x -- "$p"' in command
     assert 'pgrep -f' not in command and '/proc/' + '*/cmdline' not in command
-    base = sample(100) + sample(101)
-    rows = parse_sample(base + '\nPROC\nP=rnsd=2\nP=lxmd=0\nPROC_OK\nDOCKER\nNO_DOCKER', PROJECTS)
-    assert row(rows, 'rnsd')['status'] == 'active' and row(rows, 'rnsd')['count'] == 2
-    assert row(rows, 'lxmd')['status'] == 'not_installed'
-    reticulum = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Reticulum')
-    assert reticulum['state'] == 'running' and [c['kind'] for c in reticulum['components']] == ['process']
-    rows = parse_sample(sample(100, unit('rnsd.service')) + sample(101, unit('rnsd.service')) + '\nPROC\nP=rnsd=1\nP=lxmd=0\nPROC_OK', PROJECTS)
-    reticulum = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Reticulum')
-    assert [(c['kind'], c['name']) for c in reticulum['components']] == [('unit', 'rnsd.service')]
-    for missing in ('\nPROC\nNO_PGREP\nDOCKER\nNO_DOCKER', '\nPROC\nP=rnsd=1\n', ''):
-        assert row(parse_sample(base + missing, PROJECTS), 'rnsd')['status'] == 'unknown'
+    absent_units = (unit('mesh-bridge.service', load='not-found', state='inactive'),
+                    unit('mesh-daemon.service', load='not-found', state='inactive'),
+                    unit('relay.service', load='not-found', state='inactive'),
+                    unit('mesh-watchdog.timer', load='not-found', state='inactive'))
+    base = sample(100, *absent_units) + sample(101, *absent_units)
+    rows = parse_sample(base + '\nPROC\nP=relay=2\nP=mesh-agent=0\nPROC_OK\nDOCKER\nDOCKER_OK', PROJECTS)
+    assert row(rows, 'relay')['status'] == 'active' and row(rows, 'relay')['count'] == 2
+    assert row(rows, 'mesh-agent')['status'] == 'not_installed'
+    project = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Mesh service')
+    assert project['state'] == 'running' and [c['kind'] for c in project['components']] == ['process']
+    rows = parse_sample(sample(100, *absent_units, unit('relay.service'))
+                        + sample(101, *absent_units, unit('relay.service'))
+                        + '\nPROC\nP=relay=1\nP=mesh-agent=0\nPROC_OK\nDOCKER\nDOCKER_OK', PROJECTS)
+    project = next(p for p in summarize(rows, PROJECTS) if p['name'] == 'Mesh service')
+    assert [(c['kind'], c['name']) for c in project['components']] == [('unit', 'relay.service')]
+    for missing in ('\nPROC\nNO_PGREP\nDOCKER\nNO_DOCKER', '\nPROC\nP=relay=1\n', ''):
+        assert row(parse_sample(base + missing, PROJECTS), 'relay')['status'] == 'unknown'
 
 
 def test_custom_projects_are_validated_before_reaching_the_shell():
@@ -159,13 +206,11 @@ def test_role_discovery_is_not_listed_twice():
     assert next(p for p in summarize(rows, PROJECTS) if p['name'] == ROLE_NAMES['adguard'])['discovery'] == 'detected'
 
 
-def test_legacy_default_list_gains_dns_and_chatmail(app):
-    old = [p for p in DEFAULT_PROJECTS if p['name'] not in ROLE_NAMES.values()]
-    assert {p['name'] for p in old} == {
-        'BotCriptoM', 'Rust File Manager', 'UGCTL (UDP gRPC COM Lite)',
-        'Reticulum', 'Dockhand', 'Headscale / Headplane'}
-    assert save_projects(app, old)
-    assert [p['name'] for p in load_projects(app)] == [p['name'] for p in PROJECTS]
+def test_unconfigured_and_invalid_catalogs_stay_empty(app):
+    assert load_projects(app) == []
+    path = os.path.join(app.config['APP_DATA_DIR'], 'config.json')
+    json.dump({'tracked_projects': [{'name': 'bad', 'units': ['$(id)']}]}, open(path, 'w'))
+    assert load_projects(app) == []
 
 
 def test_saved_list_persists_next_to_ui_preferences_and_resets(app):
@@ -179,9 +224,9 @@ def test_saved_list_persists_next_to_ui_preferences_and_resets(app):
     assert save_projects(app, [])
     assert load_projects(app) == []
     assert save_projects(app, None)
-    assert [p['name'] for p in load_projects(app)] == [p['name'] for p in PROJECTS]
+    assert load_projects(app) == []
     json.dump({'tracked_projects': [{'name': 'bad', 'units': ['$(id)']}]}, open(path, 'w'))
-    assert [p['name'] for p in load_projects(app)] == [p['name'] for p in PROJECTS]
+    assert load_projects(app) == []
 
 
 def test_collector_failure_does_not_fail_server_snapshot():

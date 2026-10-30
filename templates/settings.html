@@ -31,7 +31,7 @@
     {# ───────────── Интерфейс ───────────── #}
     <section class="settings-section" id="ui-features">
         <h2 class="settings-section-title"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Кнопки на главной') }}</h2>
-        <p class="settings-lead">{{ _('Тест IP, Тест DNS и Net Tools видны всегда. Остальное включается, если вам это нужно: выключенный инструмент пропадает с главной и из окон серверов, данные и списки сохраняются.') }}</p>
+        <p class="settings-lead">{{ _('Тест IP, Тест DNS и Net Tools видны всегда. Выберите, какие дополнительные проверки показывать. Списки проектов и ботов начинаются пустыми; можно добавить свои имена или импортировать типовые примеры.') }}</p>
         <form action="{{ url_for('main.save_features') }}" method="post">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
             {% set feature_rows = [

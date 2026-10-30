@@ -1,4 +1,4 @@
-# VPN Server Manager v5.0.19
+# VPN Server Manager v5.0.20
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
@@ -26,7 +26,7 @@
 
 VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
 
-**5.0.19 development branch:** improved theme contrast and VoiceOver names/states for credential and command controls. This branch also includes the receipt and keyboard improvements from 5.0.18. It is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#5019---2026-10-30)
+**5.0.20 development branch:** Projects and Bots now start with empty catalogs; first-run setup lets you choose whether to show them, and generic examples are imported explicitly. Docker access gaps are reported instead of appearing as empty results. This branch also includes the contrast, screen-reader labels and keyboard improvements from 5.0.19 and 5.0.18. It is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#5020---2026-10-30)
 
 ## See your fleet at a glance
 
@@ -44,7 +44,7 @@ Servers that run your own DNS (AdGuard Home) or a Chatmail relay for Delta Chat 
   <br><sub>Demonstration servers and addresses</sub>
 </p>
 
-Open **Projects** beside it to see which servers run your own projects — BotCriptoM, Rust File Manager, UGCTL, AdGuard Home, Chatmail and Own DERP when Headscale has an embedded relay — and how many of each project's services, containers and processes are up. Server Status and Monitoring list the same projects for one server. **Edit list** adds or removes projects by their systemd service, Docker container and process names.
+Open **Projects** beside it to see which servers run your configured projects and how many of each project's services, containers and processes are up. New profiles start with empty project and bot catalogs. Add your own names or import generic example rows from Settings; configuration files are not inspected to populate the lists. Server Status and Monitoring show the same projects for one server.
 
 <p align="center">
   <img src="docs/images/09-projects.jpg" alt="Projects overview showing on which servers each tracked project runs and how many of its services, containers and processes are up" width="640">

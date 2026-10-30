@@ -19,6 +19,32 @@
         {% endif %}
     {% endwith %}
 
+    {% if not ui_features_configured %}
+    <section class="card shadow-sm mb-4" id="tracking-onboarding" aria-labelledby="tracking-onboarding-title">
+        <div class="card-body">
+            <h2 class="h4 card-title" id="tracking-onboarding-title">{{ _('Что вы хотите отслеживать?') }}</h2>
+            <p class="card-text text-body-secondary">{{ _('Выберите дополнительные проверки для главной страницы. Списки проектов и ботов будут пустыми: приложение не изучает конфигурационные файлы, чтобы заполнить их автоматически. Их можно заполнить вручную или импортировать типовые примеры.') }}</p>
+            <form action="{{ url_for('main.save_features') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                <input type="hidden" name="features" value="dns">
+                <input type="hidden" name="features" value="load">
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="features" value="projects" id="onboarding-projects">
+                        <label class="form-check-label" for="onboarding-projects">{{ _('Проекты') }}</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="features" value="bots" id="onboarding-bots">
+                        <label class="form-check-label" for="onboarding-bots">{{ _('Боты') }}</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">{{ _('Сохранить выбор') }}</button>
+                <a class="btn btn-outline-secondary ms-1" href="{{ url_for('main.settings') }}#ui-features">{{ _('Настроить позже') }}</a>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Индикатор состояния интернета -->
     {% if internet_available is defined %}
         <div class="d-flex justify-content-end mb-3">

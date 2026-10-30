@@ -1,4 +1,7 @@
-from app.services.ui_preferences import load_ui_features, save_ui_features, save_ui_preferences
+from app.services.bot_stats import load_bots
+from app.services.project_stats import load_projects
+from app.services.ui_preferences import (load_ui_features, save_ui_features, save_ui_preferences,
+                                          ui_features_configured)
 
 
 def _login(client):
@@ -10,9 +13,27 @@ def test_new_install_hides_personal_tools(app, client):
     assert load_ui_features(app) == {'dns': True, 'load': True, 'projects': False, 'bots': False}
     _login(client)
     page = client.get('/').get_data(as_text=True)
+    assert 'id="tracking-onboarding"' in page and 'What would you like to track?' in page
     assert 'data-bs-target="#loadCheckModal"' in page
     assert 'data-bs-target="#projectsCheckModal"' not in page and 'id="projectsCheckModal"' not in page
     assert 'data-bs-target="#botsCheckModal"' not in page and 'id="botsCheckModal"' not in page
+    assert load_projects(app) == [] and load_bots(app) == []
+    assert not ui_features_configured(app)
+
+
+def test_onboarding_saves_only_the_selected_tools(app, client):
+    _login(client)
+    page = client.get('/').get_data(as_text=True)
+    assert 'name="features" value="projects"' in page and 'name="features" value="bots"' in page
+    response = client.post('/settings/features', data={
+        'csrf_token': 'test-csrf', 'features': ['dns', 'load', 'projects']})
+    assert response.status_code == 302
+    assert load_ui_features(app) == {'dns': True, 'load': True, 'projects': True, 'bots': False}
+    assert ui_features_configured(app)
+    page = client.get('/').get_data(as_text=True)
+    assert 'id="tracking-onboarding"' not in page
+    assert 'data-bs-target="#projectsCheckModal"' in page
+    assert 'id="botsCheckModal"' not in page
 
 
 def test_settings_switches_tools_and_keeps_language(app, client):

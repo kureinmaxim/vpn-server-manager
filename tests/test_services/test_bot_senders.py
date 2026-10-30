@@ -6,16 +6,16 @@ import subprocess
 import pytest
 
 from app.services import bot_senders
-from app.services.bot_stats import DEFAULT_BOTS, build_command, clean_bots, load_getme, parse, save_getme
+from app.services.bot_stats import build_command, clean_bots, load_getme, parse, save_getme
 
-BOTS = clean_bots(DEFAULT_BOTS)
+BOTS = clean_bots([{'name': 'Example container bot', 'containers': ['example-helper']}])
 # Ненастоящий токен той же формы; собран из частей, чтобы сканер секретов не принимал его за утечку
 TOKEN = '123456789:' + 'AA' + 'TestOnly' * 4
 
 
 def output(senders):
     return '\n'.join(['NODE', 'SYSTEMD=1', 'NOW=1800000000', 'UP=1000', '', 'UNITS', '', 'SUSPECTS', 'DOCKER',
-                      'C=telegram-helper-lite|running', 'DOCKER_OK', 'SENDERS', senders, 'END'])
+                      'C=example-helper|running', 'DOCKER_OK', 'SENDERS', senders, 'END'])
 
 
 WATCHDOG = ('X=timer|homelab-watchdog.timer|homelab-watchdog.service|aseee|8867590267:kurein_homelab_alerts_bot|'
@@ -54,7 +54,7 @@ def test_last_run_result(result, status, active, expected):
 
 def test_containers_only_variable_names_and_catalog_containers_skipped():
     lines = ('E=/notify|running|PATH,TELEGRAM_BOT_TOKEN,TELEGRAM_CHAT_ID,\n'
-             'E=/telegram-helper-lite|running|BOT_TOKEN,\nE=/plain|running|PATH,HOME,')
+             'E=/example-helper|running|BOT_TOKEN,\nE=/plain|running|PATH,HOME,')
     [row] = parse(output(lines), BOTS)['senders']
     assert row == {'kind': 'container', 'name': 'notify', 'state': 'running',
                    'variables': ['TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'], 'bots': []}

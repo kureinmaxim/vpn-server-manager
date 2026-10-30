@@ -98,9 +98,13 @@
         absent.textContent = finished && missing.length && body.querySelector('th')
             ? t.absent.replace('{names}', missing.join(', ')) : '';
         const failed = servers.filter(server => server.error || (server.projects || []).some(p => p.state === 'unknown'));
-        errors.textContent = failed.length
-            ? t.errors.replace('{names}', failed.map(server => (server.name || server.ip_address)
-                + (server.error ? ` (${server.error})` : '')).join('; ')) : '';
+        const messages = [];
+        if (failed.length) messages.push(t.errors.replace('{names}', failed.map(server => (server.name || server.ip_address)
+            + (server.error ? ` (${server.error})` : '')).join('; ')));
+        const dockerUnavailable = servers.some(server => (server.projects || []).some(project =>
+            (project.components || []).some(component => component.kind === 'container' && component.status === 'unknown')));
+        if (dockerUnavailable) messages.push(t.dockerUnavailable);
+        errors.textContent = messages.join(' ');
         if (servers.length) {
             progress.textContent = t.progress.replace('{done}', done.length).replace('{total}', servers.length);
             if (completedAt) progress.textContent += ' · ' + t.completed.replace('{time}', completedAt.toLocaleTimeString(locale));

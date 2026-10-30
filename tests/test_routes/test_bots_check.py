@@ -5,8 +5,8 @@ import pytest
 
 from app.routes.api import load_check_limiter
 from app.services import registry
-from app.services.bot_stats import DEFAULT_BOTS, clean_bots, load_bots, parse
-from tests.test_services.test_bot_stats import ULTRAHOST
+from app.services.bot_stats import load_bots, parse
+from tests.test_services.test_bot_stats import BOTS, ULTRAHOST
 
 
 @pytest.fixture
@@ -23,7 +23,7 @@ def bots_client(client):
     manager.decrypt_data.return_value = "decrypted-secret"
     registry.register("data_manager", manager)
     ssh = Mock()
-    ssh.get_bots_snapshot.return_value = parse(ULTRAHOST, clean_bots(DEFAULT_BOTS))
+    ssh.get_bots_snapshot.return_value = parse(ULTRAHOST, BOTS)
     registry.register("ssh", ssh)
     load_check_limiter.requests.clear()
     yield client
@@ -89,12 +89,14 @@ def login(client):
         session.update(authenticated=True, pin_authenticated=True, pin_verified=True, csrf_token="token")
 
 
-def test_settings_page_lists_defaults_and_requires_login(app, client):
+def test_settings_page_starts_empty_and_offers_generic_examples(app, client):
     assert client.get("/settings/bots").status_code in (302, 401)
     login(client)
     html = client.get("/settings/bots").get_data(as_text=True)
-    assert 'value="TelegramOnly"' in html and 'value="http://127.0.0.1:8000/health"' in html
-    assert 'value="telegram-helper-lite"' in html
+    assert load_bots(app) == []
+    assert 'value="Telegram bot example"' in html and 'value="Scheduled task example"' in html
+    assert 'id="import-bot-examples"' in html and 'data-bot-example=' in html
+    assert '/Users/' not in html and 'TelegramOnly' not in html
 
 
 def test_settings_save_reject_and_reset(app, client):
@@ -109,7 +111,7 @@ def test_settings_save_reject_and_reset(app, client):
     assert response.status_code == 400 and '>x; reboot</textarea>' in response.get_data(as_text=True)
     assert [b["name"] for b in load_bots(app)] == ["News bot", "Nightly"]
     client.post("/settings/bots", data={"csrf_token": "token", "action": "reset"})
-    assert "TelegramOnly" in [b["name"] for b in load_bots(app)]
+    assert load_bots(app) == []
 
 
 def test_settings_getme_checkbox(app, client):

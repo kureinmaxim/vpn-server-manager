@@ -548,7 +548,7 @@ def edit_server(server_id):
 def tracked_projects():
     """Projects shown in Server Status, Monitoring and the Projects overview."""
     import secrets
-    from ..services.project_stats import DEFAULT_PROJECTS, ProjectError, clean_projects, load_projects, save_projects
+    from ..services.project_stats import EXAMPLE_PROJECTS, ProjectError, clean_projects, load_projects, save_projects
     session.setdefault('csrf_token', secrets.token_urlsafe(32))
     if request.method == 'POST':
         if request.form.get('action') == 'reset':
@@ -567,15 +567,15 @@ def tracked_projects():
                    'containers': _('Имена контейнеров: латиница, цифры и символы @ . _ - (до 64 знаков, не больше 16 на проект).'),
                    }.get(str(error), _('Слишком много проектов.')), 'danger')
             return render_template('tracked_projects.html', projects=projects or [],
-                                   defaults=clean_projects(DEFAULT_PROJECTS)), 400
+                                   examples=clean_projects(EXAMPLE_PROJECTS)), 400
         if saved:
             flash(_('Список проектов сохранён.') if projects is not None
-                  else _('Восстановлен стандартный список проектов.'), 'success')
+                  else _('Список отслеживаемых проектов очищен.'), 'success')
         else:
             flash(_('Не удалось сохранить список проектов.'), 'danger')
         return redirect(url_for('main.tracked_projects'))
     return render_template('tracked_projects.html', projects=load_projects(current_app),
-                           defaults=clean_projects(DEFAULT_PROJECTS))
+                           examples=clean_projects(EXAMPLE_PROJECTS))
 
 
 @main_bp.route('/settings/bots', methods=['GET', 'POST'])
@@ -585,7 +585,7 @@ def tracked_projects():
 def tracked_bots():
     """Telegram bots shown in the Bots overview."""
     import secrets
-    from ..services.bot_stats import (DEFAULT_BOTS, BotError, clean_bots, load_bots, load_getme, save_bots,
+    from ..services.bot_stats import (EXAMPLE_BOTS, BotError, clean_bots, load_bots, load_getme, save_bots,
                                       save_getme)
     session.setdefault('csrf_token', secrets.token_urlsafe(32))
     if request.method == 'POST':
@@ -612,14 +612,15 @@ def tracked_bots():
                    'health_url': _('Адрес проверки: только http://127.0.0.1:порт/путь (латиница, цифры и / _ . -).'),
                    'health_word': _('Ожидаемое слово: латиница, цифры, _ и - (до 32 знаков), вместе с адресом проверки.'),
                    }.get(str(error), _('Слишком много ботов.')), 'danger')
-            return render_template('tracked_bots.html', bots=bots or [], defaults=clean_bots(DEFAULT_BOTS),
+            return render_template('tracked_bots.html', bots=bots or [], examples=clean_bots(EXAMPLE_BOTS),
                                    getme=getme), 400
         if saved:
-            flash(_('Список ботов сохранён.') if bots is not None else _('Восстановлен стандартный список ботов.'), 'success')
+            flash(_('Список ботов сохранён.') if bots is not None
+                  else _('Список отслеживаемых ботов очищен.'), 'success')
         else:
             flash(_('Не удалось сохранить список ботов.'), 'danger')
         return redirect(url_for('main.tracked_bots'))
-    return render_template('tracked_bots.html', bots=load_bots(current_app), defaults=clean_bots(DEFAULT_BOTS),
+    return render_template('tracked_bots.html', bots=load_bots(current_app), examples=clean_bots(EXAMPLE_BOTS),
                            getme=load_getme(current_app))
 
 

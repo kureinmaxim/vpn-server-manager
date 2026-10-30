@@ -180,10 +180,10 @@ def test_main_page_includes_load_check_in_offline_mode(load_client, all_features
     assert b'data-bs-target="#loadCheckModal"' in response.data
     assert b"js/load_check.js" in response.data
     assert b'data-bs-target="#projectsCheckModal"' in response.data
-    assert b"js/projects_check.js" in response.data and b"BotCriptoM" in response.data
+    assert b"js/projects_check.js" in response.data and b"BotCriptoM" not in response.data
     assert "Chatmail relay" in response.get_data(as_text=True)
     assert "Свой DERP" in response.get_data(as_text=True) or "Custom DERP" in response.get_data(as_text=True)
-    assert "Процессы rnsd, lxmd показываются, только если запущены." in response.get_data(as_text=True)
+    assert "rnsd" not in response.get_data(as_text=True)
 
 
 def test_projects_snapshot_uses_saved_credentials_and_own_rate_limit(load_client):
