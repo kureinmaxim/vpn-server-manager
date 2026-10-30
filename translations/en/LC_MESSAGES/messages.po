@@ -10617,6 +10617,51 @@ msgstr "Docker was not found: containers were not checked. Access to the Docker 
 msgid "Docker недоступен: проверьте API Engine и права доступа; контейнеры не проверены."
 msgstr "Docker is unavailable: check the Engine API and access permissions; containers were not checked."
 
+msgid "Файл ~/.ssh/config не найден на компьютере, где запущено приложение."
+msgstr "~/.ssh/config was not found on the computer running the app."
+
+msgid "Не удалось прочитать ~/.ssh/config. Проверьте кодировку и размер файла."
+msgstr "Could not read ~/.ssh/config. Check its encoding and file size."
+
+msgid "Импортировать из ~/.ssh/config"
+msgstr "Import from ~/.ssh/config"
+
+msgid "Псевдоним SSH"
+msgstr "SSH alias"
+
+msgid "Сначала импортируйте конфигурацию"
+msgstr "Import the config first"
+
+msgid "Читается файл на компьютере, где запущено приложение. Импорт поддерживает Host, HostName, User, Port и первый IdentityFile. ProxyJump, ProxyCommand, HostKeyAlias, Include, Match и шаблоны Host не применяются. Импорт не настраивает SSH-agent или аппаратные ключи; прочие найденные директивы будут перечислены."
+msgstr "The file is read on the computer running the app. Import supports Host, HostName, User, Port, and the first IdentityFile. ProxyJump, ProxyCommand, HostKeyAlias, Include, Match, and Host patterns are not applied. The importer does not configure SSH-agent or hardware keys; other directives found are listed."
+
+msgid "Читаю настройки SSH…"
+msgstr "Reading SSH settings…"
+
+msgid "Выберите псевдоним SSH"
+msgstr "Choose an SSH alias"
+
+msgid "Не найдено явных псевдонимов Host. Шаблоны Host *, Include и Match не импортируются."
+msgstr "No explicit Host aliases were found. Host * patterns, Include, and Match are not imported."
+
+msgid "Псевдоним выбран. Адрес подключения"
+msgstr "Alias selected. Connection endpoint"
+
+msgid "Не применены директивы"
+msgstr "Directives not applied"
+
+msgid "Время ожидания SSH-соединения истекло до входа. Проверьте адрес, порт и сетевой маршрут."
+msgstr "SSH connection timed out before login. Check the endpoint, port, and network path."
+
+msgid "У пользователя SSH недостаточно прав. Используйте root или настройте sudo без запроса пароля."
+msgstr "The SSH account lacks the required privileges. Use root or grant non-interactive sudo for this operation."
+
+msgid "На удалённом узле нет sudo. Для этой операции нужен root или установленный sudo."
+msgstr "sudo is unavailable on the remote host. This operation requires root or an installed sudo command."
+
+msgid "Эта операция поддерживает только Debian или Ubuntu Linux. Изменений не внесено."
+msgstr "This operation supports Debian or Ubuntu Linux only. No changes were made."
+
 msgid "Выберите дополнительные проверки для главной страницы. Списки проектов и ботов будут пустыми: приложение не изучает конфигурационные файлы, чтобы заполнить их автоматически. Их можно заполнить вручную или импортировать типовые примеры."
 msgstr "Choose additional checks for the home page. Project and bot lists start empty: the app does not inspect configuration files to populate them automatically. Add entries manually or import generic examples."
 

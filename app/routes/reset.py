@@ -5,6 +5,7 @@ import logging
 import os
 import secrets
 import shlex
+import socket
 import threading
 import time
 
@@ -76,6 +77,8 @@ def _connect(client, creds):
         raise RemoteConnectError("changed_host") from exc
     except paramiko.AuthenticationException as exc:
         raise RemoteConnectError("auth") from exc
+    except (socket.timeout, TimeoutError) as exc:
+        raise RemoteConnectError("timeout") from exc
     except (OSError, paramiko.SSHException) as exc:
         raise RemoteConnectError("unreachable") from exc
 
@@ -101,12 +104,20 @@ def describe_failure(exc, creds, *, may_have_run=False):
             return host_key_message(paramiko.BadHostKeyException(endpoint, None, None))
         if reason == "auth":
             return translate("SSH: не удалось войти. Проверьте пароль или SSH-ключ в карточке сервера.")
+        if reason == "timeout":
+            return translate("Время ожидания SSH-соединения истекло до входа. Проверьте адрес, порт и сетевой маршрут.")
         return translate("Сервер не ответил по SSH. Проверьте IP, порт %(port)s и доступность сервера.", port=port)
+    if isinstance(exc, RemoteOutputError) and reason == "unsupported_platform":
+        return translate("Эта операция поддерживает только Debian или Ubuntu Linux. Изменений не внесено.")
+    if isinstance(exc, RemoteOutputError) and reason in ("privilege", "sudo_missing", "sudo_password"):
+        if reason == "sudo_missing":
+            return translate("На удалённом узле нет sudo. Для этой операции нужен root или установленный sudo.")
+        if reason == "privilege":
+            return translate("У пользователя SSH недостаточно прав. Используйте root или настройте sudo без запроса пароля.")
+        return translate("sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля.")
     if isinstance(exc, RemoteOutputError) and not may_have_run:
         if exc.reason == "no_python":
             return translate("На сервере нет python3 — он нужен для этой операции: apt-get install -y python3")
-        if exc.reason == "sudo_password":
-            return translate("sudo запрашивает пароль. Подключайтесь как root или разрешите пользователю sudo без пароля.")
         if exc.reason == "python_error":
             return translate("python3 на сервере завершился с ошибкой — возможно, версия старше 3.7. "
                              "Проверьте: ssh -p %(port)s %(user)s@%(ip)s python3 --version", port=port, user=user, ip=ip)
@@ -163,6 +174,12 @@ def remote(creds, args, *, source=SCRIPT_SOURCE):
             err = (stderr.read(4096) or b"").lower()
             if b"password is required" in err or b"terminal is required" in err:
                 raise RemoteOutputError("sudo_password")
+            if b"sudo" in err and b"not found" in err:
+                raise RemoteOutputError("sudo_missing")
+            if any(marker in err for marker in (b"not in the sudoers", b"not permitted")):
+                raise RemoteOutputError("privilege")
+            if b"sudo" in err and b"permission denied" in err:
+                raise RemoteOutputError("privilege")
             if status == 127 or b"not found" in err:
                 raise RemoteOutputError("no_python")
             if b"traceback" in err or b"syntaxerror" in err:
@@ -176,6 +193,10 @@ def remote(creds, args, *, source=SCRIPT_SOURCE):
         if not isinstance(result, dict):
             raise ValueError("Invalid reset response")
         if status and "plan_hash" not in result:
+            if result.get("error") == "Debian/Ubuntu Linux required":
+                raise RemoteOutputError("unsupported_platform")
+            if result.get("error") == "Run with sudo for a complete inventory":
+                raise RemoteOutputError("privilege")
             return {"success": False, "error": result.get("error", "Remote reset failed"), "backup": result.get("backup")}
         return result
     finally:

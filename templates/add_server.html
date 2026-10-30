@@ -118,6 +118,7 @@
                 <p class="text-muted small mb-3">
                     {{ _('При вставке пароля лишние пробелы, переносы и невидимые символы удаляются автоматически.') }}
                 </p>
+                {% include 'partials/ssh_config_import.html' %}
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>

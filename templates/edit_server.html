@@ -137,6 +137,7 @@
                 <section class="server-form-section">
                     <h5>{{ _('SSH-доступ') }}</h5>
                     <p class="small text-muted mb-2">{{ _('Пустое поле нового пароля — не менять. Чтобы стереть сохранённый пароль, нажмите корзину. Если на сервере только root — кнопка «Только root».') }}</p>
+                    {% include 'partials/ssh_config_import.html' %}
                     <div class="row g-2">
                         <div class="col-sm-8">
                             <label for="ssh_user" class="form-label">{{ _('Пользователь SSH') }}</label>

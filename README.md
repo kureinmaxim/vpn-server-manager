@@ -1,258 +1,137 @@
-# VPN Server Manager v5.0.20
+# VPN Server Manager v5.0.21
 
 <p align="center">
-  <img src="static/VPSc.png" alt="VPN Server Manager" width="140">
+  <img src="static/VPSc.png" alt="VPN Server Manager" width="120">
 </p>
 
 <p align="center">
-  <strong>Your servers, their health, and how they connect — in one desktop app.</strong><br>
-  Encrypted inventory · SSH management · Tailscale &amp; DERP diagnostics
+  <strong>A local SSH manager for your servers and homelab.</strong><br>
+  Encrypted inventory · server checks · DNS · Tailscale and DERP diagnostics
 </p>
 
 <p align="center">
-  <a href="https://github.com/kureinmaxim/vpn-server-manager/releases"><img src="https://img.shields.io/github/v/release/kureinmaxim/vpn-server-manager?style=flat-square" alt="Latest release"></a>
-  <a href="https://github.com/kureinmaxim/vpn-server-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/kureinmaxim/vpn-server-manager/ci.yml?style=flat-square" alt="CI"></a>
+  <a href="https://github.com/kureinmaxim/vpn-server-manager/releases/latest"><strong>Download the published release</strong></a>
+  &nbsp; · &nbsp; <a href="#quick-start"><strong>Run from source</strong></a>
+  &nbsp; · &nbsp; <a href="CHANGELOG.md">Changelog</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/kureinmaxim/vpn-server-manager/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/kureinmaxim/vpn-server-manager/ci.yml?style=flat-square" alt="CI status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0F766E?style=flat-square" alt="MIT License"></a>
   <a href="#quick-start"><img src="https://img.shields.io/badge/python-3.13+-3776AB?style=flat-square" alt="Python 3.13+"></a>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-1F2937?style=flat-square" alt="Windows, macOS, Linux">
 </p>
 
-<p align="center">
-  <a href="https://github.com/kureinmaxim/vpn-server-manager/releases/latest"><strong>Download for Windows</strong></a>
-  &nbsp; · &nbsp; <a href="#quick-start">Run from source</a>
-  &nbsp; · &nbsp; <a href="docs/INDEX_ru.md">Russian documentation</a>
-  &nbsp; · &nbsp; <a href="CHANGELOG.md">What's new</a>
-</p>
+VPN Server Manager keeps a personal server inventory, SSH credentials, domains, and provider details in a local encrypted vault. It runs as a desktop app or a local web server. It is designed for one operator, not a shared team control plane.
 
-VPN Server Manager keeps server logins, panel credentials, domains and provider details in an encrypted local vault. Compare server load, inspect services over SSH, and see which machines belong to the Tailscale network of the PC running the app. Open it as a native desktop window or in a browser; a Telegram bot is optional.
+**What's new in development 5.0.21:** limited OpenSSH config import, clearer SSH failure guidance, and a published platform/privilege matrix. The branch also includes empty-first Projects and Bots catalogs. This branch is not a signed macOS release; see the [changelog](CHANGELOG.md) and [verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md).
 
-**5.0.20 development branch:** Projects and Bots now start with empty catalogs; first-run setup lets you choose whether to show them, and generic examples are imported explicitly. Docker access gaps are reported instead of appearing as empty results. This branch also includes the contrast, screen-reader labels and keyboard improvements from 5.0.19 and 5.0.18. It is not a signed macOS release. [Migration and verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md) · [Changelog](CHANGELOG.md#5020---2026-10-30)
+## Three common workflows
 
-## See your fleet at a glance
+1. **Add and check a server.** Save SSH access in a card, verify the server host key, then review status and load. [First server guide](docs/FIRST_SERVER_ru.md).
+2. **Monitor a fleet or NAS.** Compare server load, inspect services, and check the app computer's Tailscale mesh and DERP path. [NAS guide](docs/NAS_SSH_SETUP_ru.md) · [platform limits](docs/SSH_OPERATIONS_MATRIX_ru.md).
+3. **Maintain DNS and protect your data.** Keep domains and provider details in the local vault, run selected DNS checks, and export or restore a backup. [Backup and restore](docs/BACKUP_RESTORE_ru.md).
 
-Open **Server load** next to DNS to compare CPU, memory, disk space, load averages and network traffic across active servers. Filter by name or address and sort by the metric that matters.
+## Limits to know
 
-<p align="center">
-  <img src="docs/images/07-load-mesh-overview.jpg" alt="Server load overview with resource metrics, Tailscale membership, coordinator and exit-node roles, and DERP region latency measured through the selected exit node" width="1100">
-  <br><sub>English interface · demonstration servers and addresses</sub>
-</p>
-
-Servers that run your own DNS (AdGuard Home) or a Chatmail relay for Delta Chat get a purple or orange badge in the same table. The dot shows whether the services are up; the line below shows the last functional check from the **Status** button, so you can see at a glance which VPS carries which service. Click a badge to open its diagnostics.
-
-<p align="center">
-  <img src="docs/images/10-dns-chatmail-roles.jpg" alt="Server load with own DNS server and Chatmail badges, service state dots and the last functional check next to exit-node roles" width="900">
-  <br><sub>Demonstration servers and addresses</sub>
-</p>
-
-Open **Projects** beside it to see which servers run your configured projects and how many of each project's services, containers and processes are up. New profiles start with empty project and bot catalogs. Add your own names or import generic example rows from Settings; configuration files are not inspected to populate the lists. Server Status and Monitoring show the same projects for one server.
-
-<p align="center">
-  <img src="docs/images/09-projects.jpg" alt="Projects overview showing on which servers each tracked project runs and how many of its services, containers and processes are up" width="640">
-  <br><sub>Demonstration servers · AdGuard, Chatmail and Own DERP appear when SSH finds them</sub>
-</p>
-
-| What you want to know | Where to look |
-|---|---|
-| **Which server is under pressure?** | CPU, memory and disk meters; sortable load and traffic columns. |
-| **Is it in this PC's mesh?** | The mesh column matches visible Tailscale peers and shows regular nodes, available exits and the exit selected on the PC. |
-| **Where is the coordinator?** | The control endpoint is named above the table and marked on matching server cards. |
-| **Which relay is closest?** | The DERP summary shows measured region latencies and highlights custom regions. Hover over a latency to see what it measures. With an exit node selected, netcheck runs through it, so each latency is PC → exit node → region; the home DERP is still chosen directly by Tailscale. |
-
-## Understand the connection, not just the status
-
-An idle peer can have an empty direct address. Its home DERP region alone does **not** prove that traffic is being relayed. Click **Check path** to send up to three Tailscale pings and see the last confirmed direct or DERP path with its check time.
-
-<p align="center">
-  <img src="docs/images/08-derp-diagnostics.jpg" alt="Expanded custom DERP diagnostics showing the confirmed peer path, Headscale version, HTTPS probe, STUN listener and port availability" width="1000">
-  <br><sub>Read-only diagnostics · demonstration data, no private infrastructure details</sub>
-</p>
-
-Expand **DERP and port availability** to inspect an existing Headscale relay or assess a possible relay host: embedded DERP configuration, local HTTPS probe, STUN listener, public interface IPv4 and port occupancy. A successful local probe does not establish internet reachability; firewall and NAT still matter. [How the checks work →](docs/README_MONITORING_ru.md#derp-в-обзоре-загрузки-4111)
-
-## Keep everyday operations together
-
-<p align="center">
-  <img src="docs/images/03-server-board.png" alt="Server board — compact cards with price, payment date, checks and node type, the toolbar with DNS, Server load, Projects and Bots; drag to reorder, archive" width="900">
-  <br><sub>Compact cards · mesh / file-manager / Chatmail icons · demonstration servers</sub>
-</p>
-
-## What you get
-
-| | |
-|---|---|
-| **Encrypted vault** | Fernet encryption for server data. Import / export full backups. Lose the key, lose the data — by design. |
-| **Desktop or browser** | Native window on Windows, macOS, and Linux, or `python run.py` for web mode. |
-| **PIN lock** | Quick lock on the local app so a shared machine is not an open notebook. |
-| **SSH monitoring** | Logs in with a password or an SSH key from the server card. Live traffic, firewall, systemd services, Docker, security events, CPU/RAM history. Knows TelegramOnly, Reticulum, and web panels (Dockhand, Headplane) over an SSH tunnel. |
-| **Server management** | Inspect Docker and systemd services, control their lifecycle, and use supported protocol settings and client operations. [Supported configurations and limits](CHANGELOG.md). |
-| **DNS & network tools** | Keep domains, providers, renewal dates and records together. Import Cloudflare zone exports: add missing records, or replace them to match the file after a cleanup at the provider. Run network checks and use terminal examples, including DNS queries with `dig`. [DNS card guide (RU)](docs/DNS_CARD_ru.md). |
-| **Mesh & DERP** | Local Tailscale membership, coordinator and exit roles, custom relay diagnostics and an explicit path check. No Tailscale configuration changes. |
-| **Works offline** | The inventory stays usable without internet. Network-only actions disable themselves cleanly. |
-| **Languages** | Russian, English, and Chinese. `.po` catalogs compile on first launch. |
-
-<details>
-<summary>More screenshots: PIN protection, server editing and settings</summary>
-
-These historical screenshots illustrate the UI; labels and settings have changed in 5.0.x.
-
-<p align="center">
-  <img src="docs/images/01-pin-lock.png" alt="PIN lock screen" width="430">
-  &nbsp;
-  <img src="docs/images/02-pin-modal.png" alt="PIN login dialog" width="430">
-</p>
-
-<p align="center">
-  <img src="docs/images/04-add-server.png" alt="Edit a server: basic information, extra mesh and LAN addresses, node type and payment, with a Back button and section trail" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/05-settings.png" alt="Settings: home page button switches, data file, import and export, encryption key and PIN" width="720">
-</p>
-
-<p align="center">
-  <img src="docs/images/06-about.png" alt="About page with version, developer and GitHub repository link" width="720">
-</p>
-
-</details>
+- This is a server manager, not a VPN client or traffic tunnel.
+- The vault is local and intended for one operator. There are no shared roles, approvals, or central audit trail. Do not use a shared drive as a team database.
+- Remote features run over a direct SSH connection. The app does not provide an SSH jump host or cloud relay.
+- Linux-only actions need supported remote tools and may need root or non-interactive `sudo -n`. Docker checks require access to Docker Engine; otherwise container state is reported as unknown.
+- The published release and the development branch can have different platform packaging. The release page identifies available downloads.
 
 ## Quick start
 
-**Requires Python 3.13+.**
+### Published build
 
-### Windows
+Open the [latest release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest) and download its installer. Check the accompanying SHA-256 value before installing.
+
+### Run from source
+
+**Requires Python 3.13+.** The first launch creates a local profile and encryption key.
+
+Windows:
 
 ```cmd
 setup_windows.bat
 start_windows.bat
 ```
 
-Or in PowerShell:
+Or install manually in PowerShell:
 
 ```powershell
 git clone https://github.com/kureinmaxim/vpn-server-manager.git
 cd vpn-server-manager
-
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-
 copy env.example .env
 python generate_key.py
 copy config\config.json.template config.json
-
-python -m babel.messages.frontend compile -d translations
 python run.py
 ```
 
-### macOS / Linux
+macOS / Linux:
 
 ```bash
 git clone https://github.com/kureinmaxim/vpn-server-manager.git
 cd vpn-server-manager
-
 python3 -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
-
 cp env.example .env
 python3 generate_key.py
 cp config/config.json.template config.json
-
-python -m babel.messages.frontend compile -d translations
 python3 run.py
 ```
 
-### Run
+`python run.py --desktop` opens the native window when pywebview is installed. See the [build guide](BUILD.md) for packaging.
 
-```text
-Web:     python run.py
-Desktop: python run_desktop.py
-Debug:   python run.py --debug
-```
+## Step-by-step guides
 
-The current [release](https://github.com/kureinmaxim/vpn-server-manager/releases/latest) includes a Windows installer and SHA256 checksum. macOS and Linux users can run from source; see [BUILD.md](BUILD.md) for packaging.
+- [First server](docs/FIRST_SERVER_ru.md) — add a card, establish SSH host-key trust, run the first check.
+- [NAS over SSH](docs/NAS_SSH_SETUP_ru.md) — enable SSH, choose account permissions, understand Docker/systemd limits.
+- [SSH keys](docs/SSH_KEY_ru.md) — create a key, install its public part, save the private key or path in the card.
+- [Backup and restore](docs/BACKUP_RESTORE_ru.md) — export, replace a profile, or merge servers into another installation.
 
-For the load overview, save working SSH credentials in each server card — a password, an SSH key or both (see [SSH login](#ssh-login-password-or-key)). Mesh and DERP diagnostics also require Tailscale on the **application host**. Remote DERP inspection uses existing Python 3 and standard Linux tools; unavailable dependencies are reported without installing anything.
+## What you can monitor
 
-## SSH login: password or key
-
-Every server card has an **SSH access** block. The app logs in with what you save there:
-
-| In the card | How the app logs in |
+| Area | Examples |
 |---|---|
-| Password only | With the password, as before |
-| SSH key only | With the key; password login on the server can be turned off |
-| Key and password | Key first; the password is used if the key is refused |
+| **Server health** | CPU, memory, disk, network traffic, security events and systemd services over SSH. |
+| **Network** | Tailscale membership, selected exit node, DERP latency and an explicitly requested peer-path check. |
+| **Services** | Docker state when Docker Engine is reachable; optional user-defined Projects and Bots lists. |
+| **DNS** | Providers, domains, records, renewal dates, imports and selected functional checks. |
+| **Operations** | Supported service controls and protocol/client operations. Scope and required privileges vary by remote OS. |
 
-The **SSH key** field takes either:
+Project and bot lists start empty. Add your own entries or import generic examples; configuration files are not inspected to populate them. See the [SSH support matrix](docs/SSH_OPERATIONS_MATRIX_ru.md) for OpenSSH import, operating systems, Docker and permissions.
 
-- a path to a private key on the computer running the app, for example `~/.ssh/id_ed25519` (works on macOS, Linux and Windows);
-- or the private key text itself (`-----BEGIN OPENSSH PRIVATE KEY-----` …).
+<details>
+<summary>Screenshots</summary>
 
-Ed25519, ECDSA and RSA keys are supported, including keys protected with a passphrase (enter it in **Key passphrase**). The key is checked when the card is saved. If it cannot be read (no such file, unsupported format, wrong passphrase), the card is saved without the key and a warning explains why.
+<p align="center">
+  <img src="docs/images/03-server-board.png" alt="Server cards with navigation to DNS, server load, Projects and Bots" width="820">
+</p>
+<p align="center">
+  <img src="docs/images/07-load-mesh-overview.jpg" alt="Fleet load overview with resource metrics and Tailscale roles" width="900">
+</p>
+<p align="center">
+  <img src="docs/images/08-derp-diagnostics.jpg" alt="DERP diagnostics with a confirmed peer path and port checks" width="900">
+</p>
 
-The key and its passphrase are encrypted like passwords. The card shows only the fingerprint (`ssh-ed25519 SHA256:…`) and the path, never the key; the trash button removes it. Everything that connects over SSH uses the key: status and monitoring, the load overview and DERP, security events and brief, monitoring install, service control and reset.
+</details>
 
-### Switch a server to key-only login
-
-1. On the computer running the app, create a key if you do not have one: `ssh-keygen -t ed25519`.
-2. Copy its public part to the server: `ssh-copy-id -p PORT root@SERVER_IP`.
-3. Check the login without a password: `ssh -o PasswordAuthentication=no -p PORT root@SERVER_IP`.
-4. In the server card set **SSH key** to `~/.ssh/id_ed25519`, save, and check that status and monitoring load.
-5. Only then turn off password login on the server: `PasswordAuthentication no` (for root also `PermitRootLogin prohibit-password`), then reload sshd. Keep the current SSH session open and test the login from a second terminal.
-
-Until the card has a key, the security brief warns that turning off password login would lock the app out of the server.
-
-**Known host key.** Monitoring and the load overview accept the server's host key on first contact. Operations that change or inspect the server more deeply — **Reset**, **Service control**, **Disk usage** and **Cleanup archives** — require the key to be in `~/.ssh/known_hosts` of the user running the app, so a replaced server cannot receive commands. Connect once from a terminal on the same computer (`ssh -p PORT root@SERVER_IP`) and accept the key. If one of these pages fails, it says why: unknown or changed host key, failed login, no answer, missing `python3` or `sudo` asking for a password.
-
-A key saved as a **path** is read from that file on every connection. Backups contain the path, not the key file: on another computer put the key at the same path, or paste the key text into the card. A pasted key travels inside the encrypted data file.
-
-Details in Russian: [docs/SECURITY_BEST_PRACTICES_ru.md](docs/SECURITY_BEST_PRACTICES_ru.md#вход-по-ssh-ключу).
-
-## Backup and restore
-
-Servers (with their passwords) and the DNS card (providers, domains, records) are stored in **one encrypted `.enc` file**. It can only be decrypted with `SECRET_KEY` from `.env`, so a backup is always **data file + key**.
-
-**Back up:** Settings → **Full export** creates `vpn_servers_backup_<date>.zip` in Downloads:
-
-| File | Contents |
-|---|---|
-| `servers_<date>.enc` | All servers and the whole DNS card |
-| `SECRET_KEY.env` | The key for that `.enc` file |
-| `PIN.txt` | Login PIN of the source install (a reminder; the PIN is per install and is not restored) |
-| `uploads/` | Server icons |
-
-The archive holds data, key and PIN together: anyone with it can read every password. Keep it in a password manager or on an encrypted drive, never in chats or git.
-
-SSH keys saved in cards as a file path are not copied into the archive — only the path is. Pasted keys are included, encrypted. See [SSH login](#ssh-login-password-or-key).
-
-**Restore**, depending on the target computer:
-
-- **Fresh install (or full replacement):** close the app, put `SECRET_KEY.env` into the app data folder as `.env`, copy `uploads/`, start the app, then Settings → **Import Data File** → `servers_<date>.enc` → **Import and Attach**.
-- **The computer already has its own servers:** keep its `.env`. Settings → **Import servers from another installation** → choose `servers_<date>.enc`, paste the value after `SECRET_KEY=` → **Import and merge servers**. Duplicates (same name or IP) and existing domains are skipped; passwords are re-encrypted with the local key.
-
-App data folder: macOS `~/Library/Application Support/VPNServerManager-Clean/`, Windows `%APPDATA%\VPNServerManager-Clean\`, Linux `~/.local/share/VPNServerManager-Clean/`.
-
-Files with DNS data need version 4.6.0 or newer. Step-by-step guide with troubleshooting: [docs/BACKUP_RESTORE_ru.md](docs/BACKUP_RESTORE_ru.md) (Russian).
-
-## Safety notes
-
-- Default PIN in the template is `1234`. Change it before real use.
-- Keep `.env` (`SECRET_KEY`) and encrypted exports off shared drives and out of git.
-- There is no password recovery. A full export is the backup.
-- Prefer SSH keys for servers: with a key in the card, password login can be turned off on the server without cutting off the app.
-
-## Docs
+## Documentation and safety
 
 - [Documentation index](docs/INDEX_ru.md) (Russian)
-- [Build guide](BUILD.md) · [RU](BUILD_ru.md)
-- [Terminal help](TERMINAL_HELP.md) · [RU](TERMINAL_HELP_ru.md)
-- [Version management](VERSION_MANAGEMENT.md)
-- [Release process](docs/release_guide_ru.md) (Russian)
-- [Monitoring](docs/README_MONITORING_ru.md) (Russian)
-- [Docker](docs/DOCKER_GUIDE_ru.md) (Russian)
+- [Monitoring guide](docs/README_MONITORING_ru.md) (Russian)
+- [DNS card guide](docs/DNS_CARD_ru.md) (Russian)
+- [Docker guide](docs/DOCKER_GUIDE_ru.md) (Russian)
+- [Build guide](BUILD.md)
+- [Terminal help](TERMINAL_HELP.md) · [Russian](TERMINAL_HELP_ru.md)
 - [Changelog](CHANGELOG.md)
-- [Lessons](lessons/README.md) (Russian: app + Git)
+
+Change the default PIN before real use. Keep `.env` and exported backup files out of git and off shared drives. The encryption key is required to read a backup; there is no password recovery.
 
 Questions: [Discussions](https://github.com/kureinmaxim/vpn-server-manager/discussions). Bugs: [Issues](https://github.com/kureinmaxim/vpn-server-manager/issues).
 

@@ -376,6 +376,26 @@ def add_server():
         flash(_('Ошибка при добавлении сервера: %(error)s', error=str(e)), 'danger')
         return render_template('add_server.html')
 
+
+@main_bp.route('/ssh-config/import', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def import_ssh_config():
+    """Read the app user's OpenSSH config only after an explicit import request."""
+    from ..services.ssh_config_import import SSHConfigImportError, read_local_ssh_config
+
+    try:
+        imported = read_local_ssh_config()
+    except FileNotFoundError:
+        return jsonify(error=_('Файл ~/.ssh/config не найден на компьютере, где запущено приложение.')), 404
+    except SSHConfigImportError as exc:
+        logger.info('OpenSSH config import rejected (%s)', str(exc))
+        return jsonify(error=_('Не удалось прочитать ~/.ssh/config. Проверьте кодировку и размер файла.')), 400
+    response = jsonify(imported)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
 @main_bp.route('/delete_server/<int:server_id>', methods=['POST'])
 @require_auth
 @require_pin

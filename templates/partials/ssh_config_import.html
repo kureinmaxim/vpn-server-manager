@@ -1,0 +1,22 @@
+<div class="border rounded p-3 mb-3" data-ssh-config-import
+     data-url="{{ url_for('main.import_ssh_config') }}"
+     data-loading="{{ _('Читаю настройки SSH…') }}"
+     data-select-alias="{{ _('Выберите псевдоним SSH') }}"
+     data-no-hosts="{{ _('Не найдено явных псевдонимов Host. Шаблоны Host *, Include и Match не импортируются.') }}"
+     data-imported="{{ _('Псевдоним выбран. Адрес подключения') }}"
+     data-ignored="{{ _('Не применены директивы') }}"
+     data-error="{{ _('Не удалось импортировать настройки SSH.') }}">
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-import-ssh-config>
+            <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>
+            {{ _('Импортировать из ~/.ssh/config') }}
+        </button>
+        <label class="form-label small mb-0" for="ssh-config-alias">{{ _('Псевдоним SSH') }}</label>
+        <select class="form-select form-select-sm flex-grow-1" id="ssh-config-alias" data-ssh-config-alias disabled hidden>
+            <option value="">{{ _('Сначала импортируйте конфигурацию') }}</option>
+        </select>
+    </div>
+    <p class="form-text mt-2 mb-0">{{ _('Читается файл на компьютере, где запущено приложение. Импорт поддерживает Host, HostName, User, Port и первый IdentityFile. ProxyJump, ProxyCommand, HostKeyAlias, Include, Match и шаблоны Host не применяются. Импорт не настраивает SSH-agent или аппаратные ключи; прочие найденные директивы будут перечислены.') }}</p>
+    <p class="small mt-2 mb-0" data-ssh-config-status role="status" aria-live="polite" aria-atomic="true"></p>
+</div>
+<script src="{{ url_for('static', filename='js/ssh_config_import.js') }}" defer></script>

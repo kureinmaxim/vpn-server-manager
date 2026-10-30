@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.21] - 2026-10-30
+
+### Added
+- Server cards can explicitly import the supported `Host`, `HostName`, `User`, `Port` and first `IdentityFile` values from the app user's OpenSSH config. Unsupported directives are listed without exposing their values.
+- Added an SSH support and privilege matrix covering app and remote platforms, Docker access and unsupported team operations.
+- Reorganized the README around three common workflows, current download options, short product limits and separate first-server, NAS, SSH-key and backup guides.
+
+### Fixed
+- SSH connection timeouts, host-key failures, login failures, missing/insufficient sudo and unsupported reset platforms receive distinct guidance.
+
 ## [5.0.20] - 2026-10-30
 
 ### Changed

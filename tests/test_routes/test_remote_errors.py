@@ -1,4 +1,5 @@
 """Понятные причины сбоя проверок по SSH (Disk usage, архивы, сброс, управление службами)."""
+import json
 import socket
 from unittest.mock import MagicMock, Mock
 
@@ -39,7 +40,7 @@ def test_unknown_host_policy_still_rejects():
     (routes.UnknownHostKeyError("not found in known_hosts"), "unknown_host"),
     (paramiko.BadHostKeyException("192.0.2.1", Mock(), Mock()), "changed_host"),
     (paramiko.AuthenticationException("denied"), "auth"),
-    (socket.timeout("timed out"), "unreachable"),
+    (socket.timeout("timed out"), "timeout"),
     (ConnectionRefusedError(), "unreachable"),
     (paramiko.SSHException("Error reading SSH protocol banner"), "unreachable"),
 ])
@@ -55,6 +56,8 @@ def test_connect_failures_are_classified(monkeypatch, error, reason):
 @pytest.mark.parametrize("status,stderr_data,reason", [
     (127, b"bash: python3: command not found", "no_python"),
     (1, b"sudo: a password is required", "sudo_password"),
+    (127, b"bash: sudo: command not found", "sudo_missing"),
+    (1, b"admin is not in the sudoers file", "privilege"),
     (1, b"", "no_output"),
 ])
 def test_empty_answer_is_classified_without_leaking_stderr(monkeypatch, status, stderr_data, reason):
@@ -82,9 +85,13 @@ def test_messages_name_the_cause_and_the_fix(app):
         assert "known_hosts" in describe_failure(RemoteConnectError("unknown_host"), CREDS)
         assert "[192.0.2.1]:2222" in describe_failure(RemoteConnectError("changed_host"), CREDS)
         assert "SSH" in describe_failure(RemoteConnectError("auth"), CREDS)
+        assert "timed out" in describe_failure(RemoteConnectError("timeout"), CREDS)
         assert "2222" in describe_failure(RemoteConnectError("unreachable"), CREDS)
         assert "python3" in describe_failure(RemoteOutputError("no_python"), CREDS)
         assert "sudo" in describe_failure(RemoteOutputError("sudo_password"), CREDS)
+        assert "lacks the required privileges" in describe_failure(RemoteOutputError("privilege"), CREDS, may_have_run=True)
+        assert "sudo is unavailable" in describe_failure(RemoteOutputError("sudo_missing"), CREDS, may_have_run=True)
+        assert "Debian or Ubuntu" in describe_failure(RemoteOutputError("unsupported_platform"), CREDS, may_have_run=True)
         # После запуска изменяющей команды точная причина неизвестна — только общий текст.
         assert describe_failure(RemoteOutputError("no_python"), CREDS, may_have_run=True) is None
         assert describe_failure(RemoteConnectError("auth"), CREDS, may_have_run=True)
@@ -123,6 +130,19 @@ def test_login_banner_before_the_marker_is_ignored(monkeypatch):
 ])
 def test_unparsable_answers_are_classified(monkeypatch, stdout_data, status, stderr_data, reason):
     ssh_client(monkeypatch, stdout_data=stdout_data, status=status, stderr_data=stderr_data)
+    with pytest.raises(RemoteOutputError) as caught:
+        routes.remote(CREDS, [])
+    assert caught.value.reason == reason
+
+
+@pytest.mark.parametrize("error,reason", [
+    ("Debian/Ubuntu Linux required", "unsupported_platform"),
+    ("Run with sudo for a complete inventory", "privilege"),
+])
+def test_reset_payload_platform_and_privilege_errors_are_classified(monkeypatch, error, reason):
+    ssh_client(monkeypatch, stdout_data=(routes.OUTPUT_MARKER + '\n'
+                                        + json.dumps({'success': False, 'error': error})).encode(),
+               status=1)
     with pytest.raises(RemoteOutputError) as caught:
         routes.remote(CREDS, [])
     assert caught.value.reason == reason

@@ -16,10 +16,10 @@ def get_version():
             if config_path.exists():
                 with open(config_path, "r", encoding="utf-8") as fh:
                     config = json.load(fh)
-                    return config.get('app_info', {}).get('version', '5.0.20')
+                    return config.get('app_info', {}).get('version', '5.0.21')
     except Exception:
-        return '5.0.20'
-    return '5.0.20'
+        return '5.0.21'
+    return '5.0.21'
 
 # Читаем README файл
 def read_readme():
