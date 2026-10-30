@@ -6,7 +6,7 @@ let id=0; const pending=new Map();
 ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){pending.get(m.id)(m);pending.delete(m.id);}};
 async function call(method,params={}){const n=++id;const p=new Promise(r=>pending.set(n,r));ws.send(JSON.stringify({id:n,method,params}));const m=await p;if(m.error)throw Error(JSON.stringify(m.error));return m.result;}
 async function evaluate(expression){const r=await call('Runtime.evaluate',{expression,returnByValue:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;}
-async function key(key,code,num){await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,windowsVirtualKeyCode:num,text:key==='Enter'?'\r':undefined});await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,windowsVirtualKeyCode:num});}
+async function key(key,code,num,modifiers=0){await call('Input.dispatchKeyEvent',{type:'keyDown',key,code,modifiers,windowsVirtualKeyCode:num,text:key==='Enter'?'\r':undefined});await call('Input.dispatchKeyEvent',{type:'keyUp',key,code,modifiers,windowsVirtualKeyCode:num});}
 
 await call('Page.reload');
 await new Promise(r=>setTimeout(r,1500));
@@ -34,10 +34,12 @@ await pause();
 await evaluate("document.getElementById('pinInput').focus()");
 await key('Enter','Enter',13);
 assert.equal(await evaluate('window.loginCount'),2);
+for (const modifiers of [0, 8]) {
 for(let n=0;n<18;n++){
- await key('Tab','Tab',9); await new Promise(r=>setTimeout(r,40));
- if (await evaluate('document.activeElement === document.body')) await key('Tab','Tab',9); await new Promise(r=>setTimeout(r,40));
+ await key('Tab','Tab',9,modifiers); await new Promise(r=>setTimeout(r,40));
+ if (await evaluate('document.activeElement === document.body')) await key('Tab','Tab',9,modifiers); await new Promise(r=>setTimeout(r,40));
  assert.equal(await evaluate("Boolean(document.activeElement.closest('#pinLoginModal'))"),true);
 }
-console.log('PASS: initial focus, Enter once after reopening, arrow tabs, form Enter, Escape return, Tab containment');
+}
+console.log('PASS: initial focus, Enter once after reopening, arrow tabs, form Enter, Escape return, Tab/Shift+Tab containment');
 ws.close();

@@ -137,14 +137,16 @@ def test_developer_name_latin_for_zh(app):
         assert _('Куреин М.Н.') == 'Kurein M.N.'
 
 
-def test_file_picker_uses_app_language_not_os_widget(app):
+def test_required_file_picker_is_focusable_for_native_validation(app):
     from flask_babel import force_locale
 
     with force_locale('en'):
         html = app.jinja_env.from_string(
-            MACROS + "{{ cred.file_picker('server_icon', 'server_icon', compact=True) }}"
+            MACROS + "{{ cred.file_picker('server_icon', 'server_icon', compact=True, required=True) }}"
         ).render()
-    assert 'Select File' in html
+    assert 'required' in html
+    assert 'd-none' not in html
+    assert 'form-control-sm' in html
     assert 'No file selected' in html
     assert 'js-file-picker-input' in html
     assert 'Выбор файла' not in html

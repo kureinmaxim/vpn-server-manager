@@ -421,28 +421,24 @@
         modal.show();
     }
     
-    // Функция показа модального окна загрузки архива
-    function showArchiveUpload() {
-        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('archiveUploadModal'));
-        modal.show();
-        // Закрываем модальное окно первого запуска
-        const firstTimeModal = bootstrap.Modal.getInstance(document.getElementById('firstTimeSetupModal'));
-        if (firstTimeModal) {
-            firstTimeModal.hide();
+    // Не перекрываем ловушки фокуса и backdrop двух диалогов.
+    function openSetupStep(targetId) {
+        const previous = document.getElementById('firstTimeSetupModal');
+        const next = document.getElementById(targetId);
+        const openNext = () => {
+            bootstrap.Modal.getOrCreateInstance(next).show(document.getElementById('firstSetupButton'));
+        };
+        if (previous.classList.contains('show')) {
+            previous.addEventListener('hidden.bs.modal', openNext, {once: true});
+            bootstrap.Modal.getOrCreateInstance(previous).hide();
+        } else {
+            openNext();
         }
     }
-    
-    // Функция настройки нового PIN
-    function setupNewPin() {
-        const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('createPinModal'));
-        modal.show();
-        // Закрываем модальное окно первого запуска
-        const firstTimeModal = bootstrap.Modal.getInstance(document.getElementById('firstTimeSetupModal'));
-        if (firstTimeModal) {
-            firstTimeModal.hide();
-        }
-    }
-    
+
+    function showArchiveUpload() { openSetupStep('archiveUploadModal'); }
+    function setupNewPin() { openSetupStep('createPinModal'); }
+
     // Функция отправки PIN для входа
     function submitPinLogin() {
         const pin = document.getElementById('pinInput').value;

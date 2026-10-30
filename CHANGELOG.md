@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.17] - 2026-10-30
+
+### Fixed
+- Required file pickers use visible native inputs, allowing keyboard access and native validation focus. File-picker wording follows the browser/OS language.
+- First-run dialog transitions wait for the previous dialog to close, preserving one backdrop and returning focus to the original trigger.
+- Settings PIN feedback is announced; receipt dialog close labels are translated. Browser regressions cover Shift+Tab, setup transitions, export consent and form submission/validation.
+
 ## [5.0.16] - 2026-10-30
 
 ### Fixed
