@@ -47,7 +47,7 @@
                 <div class="card-footer text-muted">
                     <small>
                         <i class="bi bi-shield-check"></i> 
-                        {{ _('Все данные защищены шифрованием. PIN-код обеспечивает дополнительную защиту.') }}
+                        {{ _("PIN ограничивает доступ к интерфейсу. Он не шифрует файлы и не защищает их от человека, который может читать папку профиля.") }}
                     </small>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                         <div class="mb-3">
                             <label for="pinInput" class="form-label">{{ _('PIN-код') }}</label>
                             <input type="password" class="form-control" id="pinInput" 
-                                   placeholder="{{ _('Введите PIN') }}" maxlength="4" autocomplete="off">
+                                   placeholder="{{ _('Введите PIN') }}" autocomplete="off">
                         </div>
                         <div id="pinLoginMessage" class="alert" style="display: none;"></div>
                     </div>
@@ -102,17 +102,17 @@
                             <div class="mb-3">
                                 <label for="oldPin" class="form-label">{{ _('Старый PIN') }}</label>
                                 <input type="password" class="form-control" id="oldPin" name="old_pin" 
-                                       placeholder="{{ _('Введите старый PIN') }}" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Введите старый PIN') }}" autocomplete="off" required>
                             </div>
                             <div class="mb-3">
                                 <label for="newPin1" class="form-label">{{ _('Новый PIN') }}</label>
                                 <input type="password" class="form-control" id="newPin1" name="new_pin1" 
-                                       placeholder="{{ _('Введите новый PIN') }}" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Введите новый PIN') }}" autocomplete="off" required>
                             </div>
                             <div class="mb-3">
                                 <label for="newPin2" class="form-label">{{ _('Подтвердите новый PIN') }}</label>
                                 <input type="password" class="form-control" id="newPin2" name="new_pin2" 
-                                       placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
+                                       placeholder="{{ _('Повторите новый PIN') }}" autocomplete="off" required>
                             </div>
                             <div id="changePinMessage" class="alert" style="display: none;"></div>
                         </form>
@@ -141,7 +141,7 @@
             <div class="modal-body">
                 <div class="alert alert-info" role="alert">
                     <i class="bi bi-info-circle"></i>
-                    <strong>{{ _('Информация:') }}</strong> {{ _('Вы можете задать свой PIN-код, использовать PIN по умолчанию 1234 или импортировать существующие данные.') }}
+                    <strong>{{ _('Информация:') }}</strong> {{ _("В чистой установке выберите «Первый запуск» и задайте PIN длиной не менее 4 символов. PIN 1234 доступен как вариант по умолчанию; для личных данных задайте свой.") }}
                 </div>
                 <p>{{ _('Выберите действие:') }}</p>
                 <div class="d-grid gap-2">
@@ -151,9 +151,8 @@
                     <button type="button" class="btn btn-outline-success" onclick="useDefaultPin()">
                         <i class="bi bi-key-fill"></i> {{ _('Использовать PIN 1234') }}
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="showArchiveUpload()">
-                        <i class="bi bi-upload"></i> {{ _('Импортировать из архива') }}
-                    </button>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
+                    <p class="small text-body-secondary">{{ _("Восстановление доступно после входа в настройках. Импорт ZIP на экране входа не поддерживается.") }}</p>
                 </div>
                 <div id="firstSetupMessage" class="alert mt-3" style="display: none;"></div>
             </div>
@@ -224,13 +223,13 @@
                     <div class="mb-3">
                         <label for="newPinInput" class="form-label">{{ _('Новый PIN-код') }}</label>
                         <input type="password" class="form-control" id="newPinInput" name="new_pin" 
-                               placeholder="{{ _('Введите новый PIN (минимум 4 символа)') }}" maxlength="4" autocomplete="off" required>
+                               placeholder="{{ _('Введите новый PIN (минимум 4 символа)') }}" autocomplete="off" required>
                         <div class="form-text">{{ _('PIN должен содержать минимум 4 символа') }}</div>
                     </div>
                     <div class="mb-3">
                         <label for="confirmPinInput" class="form-label">{{ _('Подтвердите PIN-код') }}</label>
                         <input type="password" class="form-control" id="confirmPinInput" name="confirm_pin" 
-                               placeholder="{{ _('Повторите новый PIN') }}" maxlength="4" autocomplete="off" required>
+                               placeholder="{{ _('Повторите новый PIN') }}" autocomplete="off" required>
                     </div>
                     <div id="createPinMessage" class="alert" style="display: none;"></div>
                 </form>

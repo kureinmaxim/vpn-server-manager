@@ -433,7 +433,7 @@ msgstr "The requested page does not exist or has been moved."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:34
 #: templates/404.html:24 templates/500.html:34
 msgid "На главную"
-msgstr "Change Main Key"
+msgstr "Home"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:27
 #: templates/404.html:27
@@ -463,7 +463,7 @@ msgstr "An internal server error has occurred. We are working to eliminate it."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:24
 #: templates/500.html:24
 msgid "Что можно сделать:"
-msgstr "What does it do?"
+msgstr "What you can do:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:26
 #: templates/500.html:26
@@ -4050,7 +4050,7 @@ msgstr "No internet"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:29
 #: templates/index.html:29
 msgid "Обновить статус интернета"
-msgstr "No internet"
+msgstr "Refresh internet status"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:37
 #: templates/index.html:37
@@ -4135,7 +4135,7 @@ msgstr "Next Payment"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:154
 #: templates/index.html:151 templates/index.html:154
 msgid "Требуется интернет"
-msgstr "No internet"
+msgstr "Internet connection required"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:152
 #: templates/index.html:152
@@ -4260,7 +4260,7 @@ msgstr "Edit"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:340
 #: templates/index.html:340
 msgid "Мониторинг"
-msgstr "Audit and Monitoring"
+msgstr "Monitoring"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:342
 #: templates/index.html:342
@@ -4401,7 +4401,7 @@ msgstr "No process data"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:887
 #: templates/index.html:887
 msgid "Нет данных о сетевых интерфейсах"
-msgstr "View Network Interfaces"
+msgstr "No network interface data"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:931
 #: templates/index.html:931
@@ -4446,7 +4446,7 @@ msgstr "Save error:"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1083
 #: templates/index.html:1086
 msgid "Ошибка создания скриншота:"
-msgstr "Save error:"
+msgstr "Screenshot creation error:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:10
 #: templates/index_locked.html:10
@@ -4726,7 +4726,7 @@ msgstr "Import Data"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:319
 #: templates/index_locked.html:319
 msgid "Вход заблокирован"
-msgstr "Login blocked for"
+msgstr "Login blocked"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:450
 #: templates/index_locked.html:450
@@ -4835,7 +4835,7 @@ msgstr "Reducation ..."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:926
 #: templates/index_locked.html:926
 msgid "Импорт данных..."
-msgstr "Import Data File"
+msgstr "Importing data…"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1011
 #: templates/index_locked.html:1011
@@ -4906,7 +4906,7 @@ msgstr "Are you sure you want to close the application?"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:398
 #: templates/layout.html:398
 msgid "Вы уверены, что хотите выйти из системы?"
-msgstr "Are you sure you want to exit the system?"
+msgstr "Are you sure you want to sign out?"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:422
 #: templates/layout.html:422
@@ -5013,7 +5013,7 @@ msgstr "Installation will take 1-2 minutes"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:53
 #: templates/monitoring.html:53
 msgid "Установить мониторинг"
-msgstr "Audit and Monitoring"
+msgstr "Install monitoring"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:69
 #: templates/monitoring.html:69
@@ -5038,17 +5038,17 @@ msgstr "Error connection to the server"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:106
 #: templates/monitoring.html:106
 msgid "Что делать:"
-msgstr "What does it do?"
+msgstr "What to do:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:111
 #: templates/monitoring.html:111
 msgid "Проверить настройки сервера"
-msgstr "Add New Server"
+msgstr "Check server settings"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:114
 #: templates/monitoring.html:114
 msgid "Повторить попытку"
-msgstr "Repeat new key"
+msgstr "Try again"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:128
 #: templates/monitoring.html:128
@@ -5175,12 +5175,12 @@ msgstr "RAM Usage"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:266
 #: templates/monitoring.html:266
 msgid "Подтверждение удаления"
-msgstr "Key Confirmation"
+msgstr "Confirm deletion"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:270
 #: templates/monitoring.html:270
 msgid "Вы уверены, что хотите удалить систему мониторинга?"
-msgstr "Are you sure you want to delete this hint?"
+msgstr "Are you sure you want to uninstall the monitoring system?"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:271
 #: templates/monitoring.html:271
@@ -5196,7 +5196,7 @@ msgstr "Metrics history files"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:302
 #: templates/monitoring.html:274 templates/monitoring.html:302
 msgid "Настройки мониторинга"
-msgstr "Audit and Monitoring"
+msgstr "Monitoring settings"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:276
 #: templates/monitoring.html:276
@@ -5227,7 +5227,7 @@ msgstr "Uninstall monitoring"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:576
 #: templates/monitoring.html:318 templates/monitoring.html:576
 msgid "Сервер:"
-msgstr "Server icon"
+msgstr "Server:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:462
 #: templates/monitoring.html:462
@@ -5292,7 +5292,7 @@ msgstr "Make sure password access is allowed on the server"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:593
 #: templates/monitoring.html:593
 msgid "Произошла ошибка при получении данных мониторинга"
-msgstr "An error occurred when creating PIN"
+msgstr "Could not retrieve monitoring data"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:597
 #: templates/monitoring.html:597
@@ -5307,7 +5307,7 @@ msgstr "See logs/app.log for details"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:637
 #: templates/monitoring.html:637
 msgid "Установлено:"
-msgstr "Installed software"
+msgstr "Installed:"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:638
 #: templates/monitoring.html:638
@@ -5331,12 +5331,12 @@ msgstr ""
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:771
 #: templates/monitoring.html:771
 msgid "Ошибка подключения"
-msgstr "Save error:"
+msgstr "Connection error"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:775
 #: templates/monitoring.html:775
 msgid "Обновить страницу"
-msgstr "No internet"
+msgstr "Reload page"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:924
 #: templates/monitoring.html:924
@@ -5683,7 +5683,7 @@ msgstr "Full archive (.zip)"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:337
 #: templates/settings.html:337
 msgid "Информация об экспорте"
-msgstr "Processor Information"
+msgstr "Export information"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:343
 #: templates/settings.html:343
@@ -10493,3 +10493,36 @@ msgstr "Advanced data and key settings"
 
 msgid "Импорт, объединение, отвязка файла, проверка и смена ключа. Для обычной копии и восстановления используйте раздел выше."
 msgstr "Import, merge, detach a file, check or rotate a key. For regular backup and restore, use the section above."
+
+msgid "PIN ограничивает доступ к интерфейсу. Он не шифрует файлы и не защищает их от человека, который может читать папку профиля."
+msgstr "The PIN restricts access to the interface. It does not encrypt files or protect them from someone who can read the profile folder."
+
+msgid "В чистой установке выберите «Первый запуск» и задайте PIN длиной не менее 4 символов. PIN 1234 доступен как вариант по умолчанию; для личных данных задайте свой."
+msgstr "On a fresh installation, choose First launch and set a PIN of at least 4 characters. The default 1234 is available; choose your own for personal data."
+
+msgid "Первичная настройка записывает PIN и не удаляет данные. После завершения настройки или обнаружения существующего файла серверов она недоступна."
+msgstr "Initial setup saves the PIN without deleting data. It is unavailable after setup is completed or an existing server data file is detected."
+
+msgid "На экране блокировки нажмите «Ввести PIN». Для смены PIN в настройках укажите текущий PIN и дважды новый. Смена PIN не меняет ключ шифрования."
+msgstr "On the locked screen, select Enter PIN. To change it in Settings, enter the current PIN and the new PIN twice. Changing the PIN does not change the encryption key."
+
+msgid "После 3 неверных попыток в одной сессии вход блокируется на 30 секунд. Дополнительно действует общий лимит: 10 запросов входа, смены или настройки PIN за 60 секунд."
+msgstr "After 3 incorrect attempts in one session, login is blocked for 30 seconds. A shared limit also allows 10 PIN login, change or setup requests per 60 seconds."
+
+msgid "PIN хранится открытым текстом в config.json профиля. Не отправляйте этот файл в поддержку. Для расшифровки .enc нужен отдельный ключ SECRET_KEY из .env."
+msgstr "The PIN is stored as plain text in the profile’s config.json. Do not send this file to support. Decrypting .enc requires the separate SECRET_KEY from .env."
+
+msgid "PIN не входит ни в копию .enc, ни в новый архив секретов ZIP. После переноса используется PIN целевого компьютера. Старый PIN.txt не импортируется автоматически."
+msgstr "Neither .enc backups nor new secrets ZIP archives include the PIN. After transfer, use the destination computer’s PIN. An old PIN.txt is not imported automatically."
+
+msgid "Восстанавливайте данные после входа через настройки. Для копии .enc нужен её исходный ключ; перенос на чистый профиль описан в разделе «Импорт и Экспорт»."
+msgstr "Restore data through Settings after signing in. An .enc backup needs its original key; transfer to a fresh profile is described in Import and Export."
+
+msgid "Если PIN забыт, не удаляйте папку профиля и не создавайте новый ключ: это не восстанавливает доступ к зашифрованной копии. Сохраните исходные файлы и ключ отдельно."
+msgstr "If you forget the PIN, do not delete the profile folder or generate a new key: that will not recover an encrypted backup. Preserve the original files and keep the key separately."
+
+msgid "Для выхода используйте значок выхода в верхней панели. Следующий вход потребует PIN."
+msgstr "To sign out, use the sign-out icon in the top bar. The next login will require the PIN."
+
+msgid "Восстановление доступно после входа в настройках. Импорт ZIP на экране входа не поддерживается."
+msgstr "Restore is available in Settings after signing in. ZIP import on the login screen is not supported."

@@ -90,3 +90,46 @@ class TestPinRoutes:
 
         with client.session_transaction() as sess:
             assert sess['pin_authenticated'] is True
+
+
+def test_long_pin_can_be_set_changed_and_used_in_login(client, app):
+    from html.parser import HTMLParser
+    write_runtime_config(app)
+    assert client.post('/pin/first_time_setup', data={'new_pin': 'test-pin-123'}).status_code == 200
+    assert client.post('/pin/change_ajax', json={
+        'old_pin': 'test-pin-123', 'new_pin': 'test-pin-456'}).status_code == 200
+    client.post('/pin/logout')
+    assert client.post('/pin/login_ajax', json={'pin': 'test-pin-456'}).status_code == 200
+
+    class Inputs(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == 'input' and attrs.get('type') == 'password':
+                assert 'maxlength' not in attrs or int(attrs['maxlength']) >= len('test-pin-456')
+    Inputs().feed(client.get('/locked').text)
+
+
+def test_setup_refuses_existing_vault_without_removing_it(client, app):
+    from pathlib import Path
+    write_runtime_config(app)
+    vault = Path(app.config['DATA_DIR']) / app.config['SERVERS_FILE']
+    vault.write_bytes(b'preserve-original-fixture')
+    assert client.post('/pin/first_time_setup', data={'new_pin': 'new-pin'}).status_code == 403
+    assert vault.read_bytes() == b'preserve-original-fixture'
+
+
+def test_help_pin_claims_and_headings_match_current_behavior(client):
+    from flask_babel import force_locale
+    with client.session_transaction() as session:
+        session.update(authenticated=True, pin_verified=True)
+    with force_locale('ru'):
+        help_text = client.get('/help').text
+        assert 'PIN хранится открытым текстом' in help_text
+        assert 'После 3 неверных попыток' in help_text
+        assert '10 запросов' in help_text
+        assert 'PIN хранится в зашифрованном виде' not in help_text
+        assert 'все существующие данные будут удалены' not in help_text
+        for url in ('/help', '/add_server', '/manage_hints'):
+            response = client.get(url)
+            assert response.status_code == 200
+            assert "{ _('" not in response.text

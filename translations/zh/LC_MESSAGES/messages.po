@@ -423,7 +423,7 @@ msgstr "请求的页面不存在或已被移动。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:34
 #: templates/404.html:24 templates/500.html:34
 msgid "На главную"
-msgstr "更换主密钥"
+msgstr "返回首页"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/404.html:27
 #: templates/404.html:27
@@ -453,7 +453,7 @@ msgstr "发生内部服务器错误。我们正在努力消除它。"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:24
 #: templates/500.html:24
 msgid "Что можно сделать:"
-msgstr "它有什么作用？"
+msgstr "可执行的操作："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/500.html:26
 #: templates/500.html:26
@@ -1008,7 +1008,7 @@ msgstr "软件包管理 (apt)"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:270
 #: templates/add_server.html:270
 msgid "Безопасность (ufw / fail2ban)"
-msgstr "PIN码安全性"
+msgstr "安全（ufw / fail2ban）"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/add_server.html:302
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/edit_server.html:327
@@ -3830,7 +3830,7 @@ msgstr "无网络"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:29
 #: templates/index.html:29
 msgid "Обновить статус интернета"
-msgstr "无网络"
+msgstr "刷新网络状态"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:37
 #: templates/index.html:37
@@ -3915,7 +3915,7 @@ msgstr "下次付款"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:154
 #: templates/index.html:151 templates/index.html:154
 msgid "Требуется интернет"
-msgstr "需要网络"
+msgstr "需要互联网连接"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:152
 #: templates/index.html:152
@@ -4040,7 +4040,7 @@ msgstr "编辑"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:340
 #: templates/index.html:340
 msgid "Мониторинг"
-msgstr "审计和监控"
+msgstr "监控"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:342
 #: templates/index.html:342
@@ -4181,7 +4181,7 @@ msgstr "无过程数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:887
 #: templates/index.html:887
 msgid "Нет данных о сетевых интерфейсах"
-msgstr "查看网络接口"
+msgstr "没有网络接口数据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:931
 #: templates/index.html:931
@@ -4226,7 +4226,7 @@ msgstr "保存错误："
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index.html:1083
 #: templates/index.html:1086
 msgid "Ошибка создания скриншота:"
-msgstr "保存错误："
+msgstr "创建截图时出错："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:10
 #: templates/index_locked.html:10
@@ -4502,7 +4502,7 @@ msgstr "导入数据"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:319
 #: templates/index_locked.html:319
 msgid "Вход заблокирован"
-msgstr "登录被阻止"
+msgstr "登录已锁定"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:450
 #: templates/index_locked.html:450
@@ -4611,7 +4611,7 @@ msgstr "还原..."
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:926
 #: templates/index_locked.html:926
 msgid "Импорт данных..."
-msgstr "导入数据"
+msgstr "正在导入数据…"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/index_locked.html:1011
 #: templates/index_locked.html:1011
@@ -4682,7 +4682,7 @@ msgstr "您确定要关闭应用程序吗？"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:398
 #: templates/layout.html:398
 msgid "Вы уверены, что хотите выйти из системы?"
-msgstr "您确定要删除这个服务器吗？"
+msgstr "确定要退出登录吗？"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/layout.html:422
 #: templates/layout.html:422
@@ -4789,7 +4789,7 @@ msgstr "安装需要 1-2 分钟"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:53
 #: templates/monitoring.html:53
 msgid "Установить мониторинг"
-msgstr "审计和监控"
+msgstr "安装监控"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:69
 #: templates/monitoring.html:69
@@ -4814,17 +4814,17 @@ msgstr "与服务器的错误连接"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:106
 #: templates/monitoring.html:106
 msgid "Что делать:"
-msgstr "它有什么作用？"
+msgstr "处理方法："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:111
 #: templates/monitoring.html:111
 msgid "Проверить настройки сервера"
-msgstr "添加新服务器"
+msgstr "检查服务器设置"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:114
 #: templates/monitoring.html:114
 msgid "Повторить попытку"
-msgstr "重复新密钥"
+msgstr "重试"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:128
 #: templates/monitoring.html:128
@@ -4951,12 +4951,12 @@ msgstr "内存使用情况"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:266
 #: templates/monitoring.html:266
 msgid "Подтверждение удаления"
-msgstr "密钥确认"
+msgstr "确认删除"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:270
 #: templates/monitoring.html:270
 msgid "Вы уверены, что хотите удалить систему мониторинга?"
-msgstr "您确定要删除这个提示吗？"
+msgstr "确定要卸载监控系统吗？"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:271
 #: templates/monitoring.html:271
@@ -4972,7 +4972,7 @@ msgstr "指标历史文件"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:302
 #: templates/monitoring.html:274 templates/monitoring.html:302
 msgid "Настройки мониторинга"
-msgstr "审计和监控"
+msgstr "监控设置"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:276
 #: templates/monitoring.html:276
@@ -5003,7 +5003,7 @@ msgstr "卸载监控"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:576
 #: templates/monitoring.html:318 templates/monitoring.html:576
 msgid "Сервер:"
-msgstr "服务器状态："
+msgstr "服务器："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:462
 #: templates/monitoring.html:462
@@ -5068,7 +5068,7 @@ msgstr "确保服务器允许密码访问"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:593
 #: templates/monitoring.html:593
 msgid "Произошла ошибка при получении данных мониторинга"
-msgstr "创建PIN时发生错误"
+msgstr "无法获取监控数据"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:597
 #: templates/monitoring.html:597
@@ -5083,7 +5083,7 @@ msgstr "详细信息请参见logs/app.log"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:637
 #: templates/monitoring.html:637
 msgid "Установлено:"
-msgstr "已安装软件"
+msgstr "已安装："
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:638
 #: templates/monitoring.html:638
@@ -5105,12 +5105,12 @@ msgstr "与服务器的连接已丢失。自动更新已停止。刷新页面。
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:771
 #: templates/monitoring.html:771
 msgid "Ошибка подключения"
-msgstr "保存错误："
+msgstr "连接错误"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:775
 #: templates/monitoring.html:775
 msgid "Обновить страницу"
-msgstr "无网络"
+msgstr "刷新页面"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/monitoring.html:924
 #: templates/monitoring.html:924
@@ -5437,7 +5437,7 @@ msgstr "完整档案（.zip）"
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:337
 #: templates/settings.html:337
 msgid "Информация об экспорте"
-msgstr "处理器信息"
+msgstr "导出信息"
 
 #: dist/VPNServerManager-Clean.app/Contents/Resources/templates/settings.html:343
 #: templates/settings.html:343
@@ -10161,3 +10161,36 @@ msgstr "数据和密钥高级设置"
 
 msgid "Импорт, объединение, отвязка файла, проверка и смена ключа. Для обычной копии и восстановления используйте раздел выше."
 msgstr "导入、合并、解除文件关联、检查或更换密钥。日常备份和恢复请使用上方区域。"
+
+msgid "PIN ограничивает доступ к интерфейсу. Он не шифрует файлы и не защищает их от человека, который может читать папку профиля."
+msgstr "PIN 限制对界面的访问。它不加密文件，也无法防止能够读取配置文件夹的人访问数据。"
+
+msgid "В чистой установке выберите «Первый запуск» и задайте PIN длиной не менее 4 символов. PIN 1234 доступен как вариант по умолчанию; для личных данных задайте свой."
+msgstr "全新安装时，选择“首次运行”并设置至少 4 个字符的 PIN。可使用默认值 1234；存储个人数据时请自行设置。"
+
+msgid "Первичная настройка записывает PIN и не удаляет данные. После завершения настройки или обнаружения существующего файла серверов она недоступна."
+msgstr "初始设置保存 PIN，不会删除数据。设置完成或检测到现有服务器数据文件后，此功能不可用。"
+
+msgid "На экране блокировки нажмите «Ввести PIN». Для смены PIN в настройках укажите текущий PIN и дважды новый. Смена PIN не меняет ключ шифрования."
+msgstr "在锁定屏幕上选择“输入 PIN”。在设置中更改时，输入当前 PIN 并输入两次新 PIN。更改 PIN 不会更改加密密钥。"
+
+msgid "После 3 неверных попыток в одной сессии вход блокируется на 30 секунд. Дополнительно действует общий лимит: 10 запросов входа, смены или настройки PIN за 60 секунд."
+msgstr "同一会话中输入错误 3 次后，登录将锁定 30 秒。此外，PIN 登录、更改和设置共用每 60 秒 10 次请求的限制。"
+
+msgid "PIN хранится открытым текстом в config.json профиля. Не отправляйте этот файл в поддержку. Для расшифровки .enc нужен отдельный ключ SECRET_KEY из .env."
+msgstr "PIN 以明文存储在配置目录的 config.json 中。请勿将此文件发送给支持人员。解密 .enc 需要 .env 中独立的 SECRET_KEY。"
+
+msgid "PIN не входит ни в копию .enc, ни в новый архив секретов ZIP. После переноса используется PIN целевого компьютера. Старый PIN.txt не импортируется автоматически."
+msgstr ".enc 备份和新的机密 ZIP 归档均不包含 PIN。迁移后使用目标电脑的 PIN。旧 PIN.txt 不会自动导入。"
+
+msgid "Восстанавливайте данные после входа через настройки. Для копии .enc нужен её исходный ключ; перенос на чистый профиль описан в разделе «Импорт и Экспорт»."
+msgstr "登录后通过设置恢复数据。.enc 备份需要原始密钥；迁移到全新配置的步骤见“导入和导出”。"
+
+msgid "Если PIN забыт, не удаляйте папку профиля и не создавайте новый ключ: это не восстанавливает доступ к зашифрованной копии. Сохраните исходные файлы и ключ отдельно."
+msgstr "忘记 PIN 时，请勿删除配置文件夹或生成新密钥：这无法恢复加密备份。请保留原始文件并单独保存密钥。"
+
+msgid "Для выхода используйте значок выхода в верхней панели. Следующий вход потребует PIN."
+msgstr "要退出，请使用顶部栏的退出图标。下次登录需要 PIN。"
+
+msgid "Восстановление доступно после входа в настройках. Импорт ZIP на экране входа не поддерживается."
+msgstr "登录后可在设置中恢复数据。登录屏幕不支持 ZIP 导入。"

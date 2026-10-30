@@ -2,6 +2,13 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.13] - 2026-10-30
+
+### Fixed
+- PIN help now describes plain-text profile storage, non-destructive initial setup, three-attempt session blocking, the shared request limit and exports without PINs. Login links to working restore instructions instead of an unsupported ZIP import.
+- PIN fields no longer truncate input to four characters, allowing login with longer PINs accepted by the backend.
+- Corrected English/Chinese navigation, retry, refresh, monitoring errors and destructive confirmations. Help, add-server and hint headings now render translated text rather than raw template expressions.
+
 ## [5.0.12] - 2026-10-30
 
 ### Fixed

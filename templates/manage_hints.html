@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container mt-4">
     {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), url_for('main.settings')), (_('Управление подсказками'), None)]) }}
-    <h1 class="mb-4">{ _('Управление подсказками') }</h1>
+    <h1 class="mb-4">{{ _('Управление подсказками') }}</h1>
 
     <div class="card mb-4">
         <div class="card-header">

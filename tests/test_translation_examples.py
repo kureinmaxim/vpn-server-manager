@@ -44,3 +44,12 @@ def test_action_and_receipt_meanings_are_not_swapped(lang, terms):
         assert hint not in messages[source].string.lower()
     assert hint in messages['Управление подсказками'].string.lower()
     assert messages['Остановить службу:'].string != messages['Перезапустить службу:'].string
+
+
+@pytest.mark.parametrize('lang,logout,monitoring', [('en', 'sign out', 'monitoring'),
+                                                  ('zh', '退出', '监控')])
+def test_confirmation_objects_remain_distinct(lang, logout, monitoring):
+    messages = catalog(lang)
+    assert logout in messages['Вы уверены, что хотите выйти из системы?'].string.lower()
+    assert monitoring in messages['Вы уверены, что хотите удалить систему мониторинга?'].string.lower()
+    assert messages['Подтверждение удаления'].string != messages['Подтверждение ключа'].string
