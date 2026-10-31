@@ -1055,6 +1055,91 @@ B. На компьютере уже есть свои серверы — объ�
         flash(_('Не удалось подготовить экспорт. Проверьте активный файл и ключ профиля.'), 'danger')
         return redirect(url_for('main.settings'))
 
+
+@main_bp.route('/export_catalogs', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def export_catalogs():
+    """Export selected, non-secret project/bot catalogs as a portable JSON file."""
+    from ..services.catalog_transfer import CatalogTransferError, export as export_catalog_data
+
+    manager = registry.get('data_manager')
+    if manager is None:
+        flash(_('Каталоги не экспортированы: сервис данных недоступен.'), 'danger')
+        return redirect(url_for('main.settings') + '#settings-transfer')
+    try:
+        raw = export_catalog_data(manager, current_app.config, {
+            'projects': request.form.get('include_projects') == 'yes',
+            'bots': request.form.get('include_bots') == 'yes',
+        })
+        filename = 'vpnservermanager_catalogs_' + datetime.datetime.now().strftime('%Y%m%d_%H%M%S') + '.json'
+        return _secret_download(raw, filename, 'application/json')
+    except CatalogTransferError as exc:
+        if str(exc) == 'nothing_selected':
+            message = _('Выберите хотя бы один список для экспорта.')
+        else:
+            message = _('Не удалось подготовить списки. Проверьте сохранённые каталоги и повторите экспорт.')
+        logger.warning('Catalog export failed (%s)', str(exc))
+        flash(message, 'danger')
+        return redirect(url_for('main.settings') + '#settings-transfer')
+    except Exception as exc:
+        logger.warning('Catalog export failed (%s)', type(exc).__name__)
+        flash(_('Не удалось подготовить списки. Проверьте профиль и повторите экспорт.'), 'danger')
+        return redirect(url_for('main.settings') + '#settings-transfer')
+
+
+@main_bp.route('/import_catalogs', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def import_catalogs():
+    """Import selected catalogs, merging by name unless replacement was requested."""
+    from ..services.catalog_transfer import CatalogTransferError, MAX_BYTES, import_catalogs as import_catalog_data
+
+    uploaded = request.files.get('catalog_file')
+    selected = {
+        'projects': request.form.get('import_projects') == 'yes',
+        'bots': request.form.get('import_bots') == 'yes',
+    }
+    mode = request.form.get('catalog_mode', 'merge')
+    if (not uploaded or not (uploaded.filename or '').lower().endswith('.json') or
+            request.form.get('confirm_catalog_import') != 'yes'):
+        flash(_('Выберите JSON-файл и подтвердите импорт списков.'), 'warning')
+        return redirect(url_for('main.settings') + '#settings-transfer')
+    try:
+        raw = uploaded.read(MAX_BYTES + 1)
+        if len(raw) > MAX_BYTES:
+            raise CatalogTransferError('catalog_too_large')
+        manager = registry.get('data_manager')
+        if manager is None:
+            raise CatalogTransferError('profile_unavailable')
+        counts = import_catalog_data(manager, raw, selected=selected, mode=mode)
+        imported = []
+        if 'projects' in counts:
+            imported.append(_('проекта: %(count)s', count=counts['projects']))
+        if 'bots' in counts:
+            imported.append(_('бота: %(count)s', count=counts['bots']))
+        flash(_('Списки импортированы. Записей — %(counts)s.', counts='; '.join(imported)), 'success')
+    except CatalogTransferError as exc:
+        messages = {
+            'nothing_selected': _('Отметьте проекты и/или ботов для импорта.'),
+            'catalog_too_large': _('Файл списков слишком большой.'),
+            'invalid_file': _('Файл списков повреждён или имеет неверный формат.'),
+            'unsupported_format': _('Формат файла списков не поддерживается этой версией приложения.'),
+            'invalid_catalog': _('В файле есть некорректные записи. Ничего не изменено.'),
+            'no_catalogs': _('В файле нет списков проектов или ботов.'),
+            'selected_catalog_missing': _('В файле нет каждого выбранного списка. Ничего не изменено.'),
+            'invalid_mode': _('Выберите способ объединения списков.'),
+            'profile_unavailable': _('Сервис данных недоступен. Проверьте профиль и ключ.'),
+        }
+        logger.warning('Catalog import rejected (%s)', str(exc))
+        flash(messages.get(str(exc), _('Не удалось импортировать списки. Ничего не изменено.')), 'danger')
+    except Exception as exc:
+        logger.warning('Catalog import failed (%s)', type(exc).__name__)
+        flash(_('Не удалось импортировать списки. Проверьте профиль и файл.'), 'danger')
+    return redirect(url_for('main.settings') + '#settings-transfer')
+
 @main_bp.route('/help')
 @log_request
 def help():

@@ -10682,3 +10682,87 @@ msgstr "Servers are checked only for the systemd units, Docker containers and pr
 
 msgid "На узлах ищутся только указанные вами службы systemd, контейнеры Docker и процессы. Новый список пуст: приложение не изучает конфигурационные файлы, чтобы заполнять его автоматически. Укажите свои имена или добавьте типовые примеры и замените вымышленные имена."
 msgstr "Nodes are checked only for the systemd units, Docker containers and processes you specify. The list starts empty: the app does not inspect configuration files to populate it automatically. Enter your own names, or add generic examples and replace their fictional names."
+
+msgid "Каталоги не экспортированы: сервис данных недоступен."
+msgstr "Catalogs were not exported: the data service is unavailable."
+
+msgid "Выберите хотя бы один список для экспорта."
+msgstr "Select at least one list to export."
+
+msgid "Не удалось подготовить списки. Проверьте сохранённые каталоги и повторите экспорт."
+msgstr "Could not prepare the lists. Check the saved catalogs and try again."
+
+msgid "Не удалось подготовить списки. Проверьте профиль и повторите экспорт."
+msgstr "Could not prepare the lists. Check the profile and try again."
+
+msgid "Выберите JSON-файл и подтвердите импорт списков."
+msgstr "Choose a JSON file and confirm importing the lists."
+
+msgid "Списки импортированы. Записей — %(counts)s."
+msgstr "Lists imported. Entries: %(counts)s."
+
+msgid "Отметьте проекты и/или ботов для импорта."
+msgstr "Select projects and/or bots to import."
+
+msgid "Файл списков слишком большой."
+msgstr "The catalog file is too large."
+
+msgid "Файл списков повреждён или имеет неверный формат."
+msgstr "The catalog file is damaged or has an invalid format."
+
+msgid "Формат файла списков не поддерживается этой версией приложения."
+msgstr "This catalog file format is not supported by this app version."
+
+msgid "В файле есть некорректные записи. Ничего не изменено."
+msgstr "The file contains invalid entries. Nothing was changed."
+
+msgid "В файле нет списков проектов или ботов."
+msgstr "The file contains no project or bot lists."
+
+msgid "В файле нет каждого выбранного списка. Ничего не изменено."
+msgstr "The file is missing a selected list. Nothing was changed."
+
+msgid "Выберите способ объединения списков."
+msgstr "Choose how to apply the lists."
+
+msgid "Сервис данных недоступен. Проверьте профиль и ключ."
+msgstr "The data service is unavailable. Check the profile and key."
+
+msgid "Не удалось импортировать списки. Ничего не изменено."
+msgstr "Could not import the lists. Nothing was changed."
+
+msgid "Не удалось импортировать списки. Проверьте профиль и файл."
+msgstr "Could not import the lists. Check the profile and file."
+
+msgid "Перенести списки проектов и ботов"
+msgstr "Transfer project and bot lists"
+
+msgid "Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только названия и идентификаторы служб, контейнеров и процессов — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов."
+msgstr "A separate JSON file transfers saved lists between Windows and macOS. It contains only names and identifiers for services, containers, and processes—no servers, passwords, tokens, or encryption key. Save changes on the Projects and Bots pages first."
+
+msgid "Экспорт списков"
+msgstr "Export lists"
+
+msgid "Скачать выбранные списки (.json)"
+msgstr "Download selected lists (.json)"
+
+msgid "Импорт списков"
+msgstr "Import lists"
+
+msgid "Импортировать проекты, если они есть в файле"
+msgstr "Import projects if they are in the file"
+
+msgid "Импортировать ботов, если они есть в файле"
+msgstr "Import bots if they are in the file"
+
+msgid "Если имя уже есть на этом компьютере"
+msgstr "If a name already exists on this computer"
+
+msgid "Объединить: сохранить остальные записи; совпадающие обновить из файла"
+msgstr "Merge: keep other entries; update matching names from the file"
+
+msgid "Заменить каждый выбранный список целиком"
+msgstr "Replace each selected list"
+
+msgid "Подтверждаю импорт только отмеченных списков"
+msgstr "I confirm importing only the checked lists"

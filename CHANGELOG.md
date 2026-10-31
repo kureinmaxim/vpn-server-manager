@@ -6,6 +6,7 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 
 ### Added
 - Server cards can explicitly import the supported `Host`, `HostName`, `User`, `Port` and first `IdentityFile` values from the app user's OpenSSH config. Unsupported directives are listed without exposing their values.
+- Project and bot catalogs can be exported to a portable JSON file and imported by list on another computer, with merge or replace choices; the file excludes server credentials and encryption keys.
 - Added an SSH support and privilege matrix covering app and remote platforms, Docker access and unsupported team operations.
 - Reorganized the README around three common workflows, current download options, short product limits and separate first-server, NAS, SSH-key and backup guides.
 

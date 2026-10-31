@@ -88,6 +88,54 @@
                 <a href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
             </div>
         </div>
+        <div class="settings-panel mt-3">
+            <h3><i class="bi bi-list-check" aria-hidden="true"></i> {{ _('Перенести списки проектов и ботов') }}</h3>
+            <p class="settings-hint">{{ _('Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только названия и идентификаторы служб, контейнеров и процессов — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов.') }}</p>
+            <div class="settings-grid settings-grid-2">
+                <form action="{{ url_for('main.export_catalogs') }}" method="post" class="settings-form">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <h4>{{ _('Экспорт списков') }}</h4>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="include_projects" value="yes" id="exportCatalogProjects" checked>
+                        <label class="form-check-label" for="exportCatalogProjects">{{ _('Проекты') }}</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="include_bots" value="yes" id="exportCatalogBots" checked>
+                        <label class="form-check-label" for="exportCatalogBots">{{ _('Боты') }}</label>
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Скачать выбранные списки (.json)') }}</button>
+                </form>
+                <form action="{{ url_for('main.import_catalogs') }}" method="post" enctype="multipart/form-data" class="settings-form">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <h4>{{ _('Импорт списков') }}</h4>
+                    {{ file_picker('catalogTransferFile', 'catalog_file', accept='.json', required=True) }}
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" name="import_projects" value="yes" id="importCatalogProjects" checked>
+                        <label class="form-check-label" for="importCatalogProjects">{{ _('Импортировать проекты, если они есть в файле') }}</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="import_bots" value="yes" id="importCatalogBots" checked>
+                        <label class="form-check-label" for="importCatalogBots">{{ _('Импортировать ботов, если они есть в файле') }}</label>
+                    </div>
+                    <fieldset class="mb-3">
+                        <legend class="form-label">{{ _('Если имя уже есть на этом компьютере') }}</legend>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="catalog_mode" id="catalogMerge" value="merge" checked>
+                            <label class="form-check-label" for="catalogMerge">{{ _('Объединить: сохранить остальные записи; совпадающие обновить из файла') }}</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="catalog_mode" id="catalogReplace" value="replace">
+                            <label class="form-check-label" for="catalogReplace">{{ _('Заменить каждый выбранный список целиком') }}</label>
+                        </div>
+                    </fieldset>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="confirm_catalog_import" value="yes" id="confirmCatalogImport" required>
+                        <label class="form-check-label" for="confirmCatalogImport">{{ _('Подтверждаю импорт только отмеченных списков') }}</label>
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-upload" aria-hidden="true"></i> {{ _('Импортировать списки') }}</button>
+                </form>
+            </div>
+        </div>
     </section>
     <section class="settings-section" id="settings-pin">
         <h2 class="settings-section-title">PIN</h2>
