@@ -80,7 +80,7 @@
     <section class="settings-section" id="settings-transfer">
         <h2 class="settings-section-title">{{ _('Перенести на другой компьютер') }}</h2>
         <div class="settings-panel">
-            <p>{{ _('Для обычной резервной копии используйте .enc и храните ключ отдельно. Для переноса можно скачать архив с данными и ключом: сам ZIP не зашифрован.') }}</p>
+            <p>{{ _('Для обычной резервной копии используйте .enc и храните ключ отдельно. Полный ZIP для переноса содержит серверы, DNS, проекты, ботов, вложения и ключ; сам архив не зашифрован.') }}</p>
             <p>{{ _('На новом компьютере используйте чистый профиль. Если там уже есть данные, не заменяйте его ключ: используйте объединение в дополнительных настройках.') }}</p>
             <div class="settings-actions">
                 <button type="button" class="btn btn-outline-warning" data-export="key">{{ _('Экспортировать ключ') }}</button>
@@ -90,7 +90,8 @@
         </div>
         <div class="settings-panel mt-3">
             <h3><i class="bi bi-list-check" aria-hidden="true"></i> {{ _('Перенести списки проектов и ботов') }}</h3>
-            <p class="settings-hint">{{ _('Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только названия и идентификаторы служб, контейнеров и процессов — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов.') }}</p>
+            <p class="settings-hint">{{ _('Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только данные каталогов: идентификаторы обнаружения, команды, задачи и адреса локальной проверки — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов.') }}</p>
+            <p class="settings-hint">{{ _('В полном ZIP эти же списки уже включены в catalogs.json. Чтобы перенести только каталоги из ZIP, извлеките catalogs.json и выберите его ниже.') }}</p>
             <div class="settings-grid settings-grid-2">
                 <form action="{{ url_for('main.export_catalogs') }}" method="post" class="settings-form">
                     <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -272,6 +273,7 @@
                     <ul class="mb-0 mt-1 small">
                         <li>{{ _('Зашифрованные данные серверов') }}</li>
                         <li>{{ _('Ключ шифрования (.env)') }}</li>
+                        <li>{{ _('Списки проектов и ботов (catalogs.json)') }}</li>
                         <li>{{ _('Загруженные файлы (uploads/)') }}</li>
                         <li>{{ _('Инструкции по импорту (README.txt)') }}</li>
                     </ul>
@@ -315,7 +317,7 @@
     const exportsInfo = {
         data: [{{ _('Файл данных серверов (.enc)')|tojson }}, 'vault_backup_YYYYMMDD_HHMMSS.enc', {{ url_for('main.download_backup')|tojson }}],
         key: [{{ _('Ключ шифрования (.env)')|tojson }}, 'SECRET_KEY_YYYYMMDD_HHMMSS.env', {{ url_for('main.export_key')|tojson }}],
-        package: [{{ _('Незашифрованный архив секретов (.zip)')|tojson }}, 'UNENCRYPTED_SECRETS_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
+        package: [{{ _('Незашифрованный архив секретов (.zip)')|tojson }}, 'UNENCRYPTED_SECRETS_full_transfer_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
     };
 
     // Экспорт: сначала окно «что и куда», потом загрузка

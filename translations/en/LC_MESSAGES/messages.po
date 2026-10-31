@@ -10766,3 +10766,15 @@ msgstr "Replace each selected list"
 
 msgid "Подтверждаю импорт только отмеченных списков"
 msgstr "I confirm importing only the checked lists"
+
+msgid "Для обычной резервной копии используйте .enc и храните ключ отдельно. Полный ZIP для переноса содержит серверы, DNS, проекты, ботов, вложения и ключ; сам архив не зашифрован."
+msgstr "For a regular backup, use .enc and keep the key separately. The full transfer ZIP contains servers, DNS, projects, bots, attachments, and the key; the archive itself is not encrypted."
+
+msgid "Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только данные каталогов: идентификаторы обнаружения, команды, задачи и адреса локальной проверки — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов."
+msgstr "A separate JSON file transfers saved lists between Windows and macOS. It contains catalog data only: discovery identifiers, commands, tasks, and local health-check URLs—no servers, passwords, tokens, or encryption key. Save changes on the Projects and Bots pages first."
+
+msgid "В полном ZIP эти же списки уже включены в catalogs.json. Чтобы перенести только каталоги из ZIP, извлеките catalogs.json и выберите его ниже."
+msgstr "The full ZIP already includes these lists in catalogs.json. To transfer only the catalogs from a ZIP, extract catalogs.json and select it below."
+
+msgid "Списки проектов и ботов (catalogs.json)"
+msgstr "Project and bot lists (catalogs.json)"

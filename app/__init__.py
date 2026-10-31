@@ -227,9 +227,9 @@ def load_app_info(app):
         runtime_config = _load_json_if_exists(runtime_config_path) or {}
 
         app_info = (release_config or {}).get('app_info') or {
-            "version": app.config.get('APP_VERSION', '5.0.21'),
-            "release_date": "30.10.2026",
-            "last_updated": "2026-10-30",
+            "version": app.config.get('APP_VERSION', '5.0.22'),
+            "release_date": "31.10.2026",
+            "last_updated": "2026-10-31",
             "developer": "Куреин М.Н."
         }
         app.config['app_info'] = app_info
@@ -244,9 +244,9 @@ def load_app_info(app):
     except Exception as e:
         app.logger.warning(f"Could not load app_info: {e}")
         app.config['app_info'] = {
-            "version": "5.0.21",
-            "release_date": "30.10.2026",
-            "last_updated": "2026-10-30",
+            "version": "5.0.22",
+            "release_date": "31.10.2026",
+            "last_updated": "2026-10-31",
             "developer": "Куреин М.Н."
         }
 
@@ -326,6 +326,12 @@ def create_app(config_name='development'):
     with profile_lock(profile_dir, allow_pending=True):
         recovered = recover_profile(profile_dir)
         manage_user_config(app)
+        if getattr(sys, 'frozen', False):
+            from .services.private_catalog_seed import seed_private_catalogs
+            try:
+                seed_private_catalogs(app)
+            except Exception as exc:
+                app.logger.warning('Optional private catalog seed was not applied (%s)', type(exc).__name__)
         if recovered or generation(profile_dir):
             profile_key = dotenv_values(os.path.join(profile_dir, '.env')).get('SECRET_KEY')
             if not profile_key:

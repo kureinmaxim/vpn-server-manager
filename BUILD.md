@@ -101,6 +101,12 @@ must use wheels; the sole source exception is the pure-Python `proxy-tools` pack
 whose source archive is hash-locked. uv's build-isolation tooling is not fully locked;
 this is not a claim of byte-identical reproducible builds.
 
+Standard builds omit personal project and bot records. For a private, user-specific
+installer only, set `VSM_PRIVATE_CATALOGS` to a valid portable catalog JSON export
+before running the builder. The file is bundled as a one-time profile seed; do not
+commit it or distribute that DMG as the public GitHub installer. With the variable
+unset, new users start with empty catalogs and can add their own.
+
 Current target: **Apple Silicon, macOS 13+**. Every collected Mach-O must have a
 minimum deployment target no higher than 13.0; a newer dependency fails the build
 before signing/packaging. The plist never promises an OS older than the selected

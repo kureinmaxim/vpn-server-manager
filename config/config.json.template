@@ -1,9 +1,9 @@
 {
   "SECRET_KEY_FILE": ".env",
   "app_info": {
-    "version": "5.0.21",
-    "release_date": "30.10.2026",
-    "last_updated": "2026-10-30",
+    "version": "5.0.22",
+    "release_date": "31.10.2026",
+    "last_updated": "2026-10-31",
     "developer": "Куреин М.Н.",
     "description": "VPN Server Manager - Менеджер VPN серверов"
   },

@@ -129,6 +129,20 @@ def build_app():
         "desktop:desktop",              # Desktop GUI
     ]
 
+    private_catalogs = os.environ.get('VSM_PRIVATE_CATALOGS')
+    if private_catalogs:
+        private_catalogs_path = Path(private_catalogs).expanduser().resolve()
+        if not private_catalogs_path.is_file() or private_catalogs_path.is_symlink():
+            raise SystemExit('VSM_PRIVATE_CATALOGS must point to a regular, non-symlink JSON file')
+        try:
+            from app.services.catalog_transfer import CATALOGS, _parse
+            private_catalog_data = _parse(private_catalogs_path.read_bytes())
+            if set(private_catalog_data) != set(CATALOGS):
+                raise ValueError('both project and bot catalogs are required')
+        except Exception as exc:
+            raise SystemExit('VSM_PRIVATE_CATALOGS is not a valid portable projects/bots export') from exc
+        datas.append(f"{private_catalogs_path}:private/user_catalogs.json")
+
     config_template = PROJECT_ROOT / "config" / "config.json.template"
     if config_template.exists():
         datas.append("config/config.json.template:config")
@@ -432,10 +446,10 @@ def get_version_from_config():
                         return version
 
         print("⚠️ Файлы конфигурации версии не найдены, используем версию по умолчанию")
-        return '5.0.21'
+        return '5.0.22'
     except Exception as e:
         print(f"⚠️ Ошибка чтения конфигурации версии: {e}, используем версию по умолчанию")
-        return '5.0.21'
+        return '5.0.22'
 
 def main():
     """Local build: mutate resources, sign, verify, then package; fail closed."""

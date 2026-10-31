@@ -2,6 +2,12 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.0.22] - 2026-10-31
+
+### Added
+- The macOS builder supports an optional private catalog seed for a user-specific installer. Standard/public builds omit it and stay empty-first; a supplied seed merges once into the local profile and preserves differently named local entries.
+- The full cross-platform transfer ZIP now includes `catalogs.json` with every saved project and bot field. The archive restore guide explains how to import it alongside the encrypted servers and DNS vault.
+
 ## [5.0.21] - 2026-10-30
 
 ### Added
