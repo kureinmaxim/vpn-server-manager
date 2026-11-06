@@ -21,6 +21,11 @@
   <a href="#quick-start"><img src="https://img.shields.io/badge/python-3.13+-3776AB?style=flat-square" alt="Python 3.13+"></a>
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-1F2937?style=flat-square" alt="Windows, macOS, Linux">
 </p>
+<div align="center">
+
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/maximkurein/badge.svg)](https://hub.xerj.org/contributors/maximkurein)
+
+</div>
 
 VPN Server Manager keeps a personal server inventory, SSH credentials, domains, and provider details in a local encrypted vault. It runs as a desktop app or a local web server. It is designed for one operator, not a shared team control plane.
 
