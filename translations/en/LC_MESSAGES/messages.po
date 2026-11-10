@@ -10778,3 +10778,21 @@ msgstr "The full ZIP already includes these lists in catalogs.json. To transfer 
 
 msgid "Списки проектов и ботов (catalogs.json)"
 msgstr "Project and bot lists (catalogs.json)"
+
+msgid "Требует внимания"
+msgstr "Needs attention"
+
+msgid "Проблем не найдено"
+msgstr "No problems found"
+
+msgid "Не установлено: {count}"
+msgstr "Not installed: {count}"
+
+msgid "не работают: {names}"
+msgstr "not running: {names}"
+
+msgid "все найденные службы работают"
+msgstr "all detected services are running"
+
+msgid "Мост слушает (:50061)"
+msgstr "Bridge is listening (:50061)"

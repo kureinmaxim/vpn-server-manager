@@ -10446,3 +10446,21 @@ msgstr "完整 ZIP 已在 catalogs.json 中包含这些列表。如只迁移目�
 
 msgid "Списки проектов и ботов (catalogs.json)"
 msgstr "项目和机器人列表 (catalogs.json)"
+
+msgid "Требует внимания"
+msgstr "需要关注"
+
+msgid "Проблем не найдено"
+msgstr "未发现问题"
+
+msgid "Не установлено: {count}"
+msgstr "未安装：{count}"
+
+msgid "не работают: {names}"
+msgstr "未运行：{names}"
+
+msgid "все найденные службы работают"
+msgstr "检测到的服务均在运行"
+
+msgid "Мост слушает (:50061)"
+msgstr "网桥正在监听 (:50061)"

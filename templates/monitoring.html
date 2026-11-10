@@ -2,24 +2,26 @@
 {% from "macros/nav.html" import crumbs %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui2">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/monitoring.css') }}?v={{ app_info.get('version', '') }}-ui3">
 {% set ssh_port = server.get('ssh_credentials', {}).get('port', 22) %}
 <div class="container-fluid mt-3 monitoring-page">
     {{ crumbs([(_('Список серверов'), url_for('main.index')), (server.name + ' · ' + _('Мониторинг'), None)]) }}
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <h1>
-                <i class="bi bi-bar-chart-line"></i> {{ _('Расширенный мониторинг') }}
-            </h1>
-            <p class="text-muted mb-0 small">
-                <strong>{{ server.name }}</strong> - {{ server.ip_address }}
-                {% if server.provider %}<span class="badge bg-secondary">{{ server.provider }}</span>{% endif %}
+    <header class="mon-header">
+        <div class="mon-header-main">
+            <h1>{{ server.name }}</h1>
+            <p class="mon-header-meta">
+                <span>{{ server.ip_address }}</span>
+                {% if server.provider %}<span>{{ server.provider }}</span>{% endif %}
+                <span>{{ _('Расширенный мониторинг') }}</span>
             </p>
         </div>
-        <div>
-            <a href="{{ url_for('dns_mail.detail', server_id=server.id) }}" class="btn btn-outline-info btn-sm">DNS / Chatmail</a>
+        <div class="mon-header-actions">
+            <a href="{{ url_for('dns_mail.detail', server_id=server.id) }}" class="btn btn-outline-secondary btn-sm">DNS / Chatmail</a>
+            <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil-square" aria-hidden="true"></i> {{ _('Настроить сервер') }}
+            </a>
         </div>
-    </div>
+    </header>
 
     <div id="installation-check-error" class="alert alert-warning" role="alert" hidden>
         <p>{{ _('Не удалось проверить установку мониторинга. Проверьте SSH-подключение и повторите попытку.') }}</p>
@@ -120,372 +122,319 @@
 
     <!-- Stats Container (скрыт по умолчанию, показывается после проверки) -->
     <div id="stats-container" style="display: none;">
-        <div id="mon-status" class="mon-status d-flex flex-wrap align-items-center gap-1 mb-3" aria-live="polite">
-            <span id="mon-status-chips" class="d-contents"></span>
-            <button type="button" class="btn btn-outline-warning btn-sm mon-status-brief d-none" id="security-brief-btn">
-                <i class="bi bi-chat-left-text"></i> {{ _('Разобрать ситуацию') }}
-            </button>
-        </div>
-        <div id="security-brief" class="security-brief d-none">
-            <section class="security-brief-block">
-                <h4>{{ _('Разбор') }}</h4>
-                <pre id="security-brief-summary" class="security-brief-text"></pre>
-            </section>
-            <section class="security-brief-block" id="security-brief-prompt-block">
-                <div class="security-brief-head">
-                    <h4>{{ _('Промпт для LLM') }}</h4>
-                    <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-security-prompt">
-                        <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
-                    </button>
+        <!-- Connection Error Alert -->
+        <div id="connection-error-alert" class="alert alert-danger d-none mb-3" role="alert">
+            <div class="d-flex align-items-start gap-3">
+                <div class="flex-grow-1">
+                    <h5 class="alert-heading mb-2">
+                        <i class="bi bi-exclamation-octagon" aria-hidden="true"></i> {{ _('Ошибка подключения к серверу') }}
+                    </h5>
+                    <p class="mb-2" id="connection-error-message"></p>
+                    <div id="connection-error-details" class="small text-muted mb-2"></div>
+                    <div class="mt-3">
+                        <h6>{{ _('Что делать:') }}</h6>
+                        <ul id="connection-error-solutions" class="small mb-0"></ul>
+                    </div>
+                    <div class="mt-3 d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil" aria-hidden="true"></i> {{ _('Проверить настройки сервера') }}
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Повторить попытку') }}
+                        </button>
+                    </div>
                 </div>
-                <pre id="security-brief-prompt" class="security-brief-text"></pre>
-            </section>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
         </div>
-        <nav class="monitoring-nav" aria-label="{{ _('Разделы мониторинга') }}">
+
+        <nav class="monitoring-nav ui-tabs" aria-label="{{ _('Разделы мониторинга') }}">
             <a href="#monitoring-overview">{{ _('Обзор') }}</a>
             <a href="#monitoring-network">{{ _('Сеть') }}</a>
             <a href="#monitoring-services">{{ _('Сервисы') }}</a>
             <a href="#monitoring-security">{{ _('Безопасность') }}</a>
             <a href="#monitoring-history">{{ _('История') }}</a>
         </nav>
-    <div class="btop-board" id="monitoring-overview" tabindex="-1" aria-label="{{ _('Нагрузка сервера') }}">
-        <section class="btop-box" id="btop-cpu-box">
-            <header>
-                <span>CPU</span>
-                <strong id="btop-cpu-val">—</strong>
-            </header>
-            <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
-            <div class="btop-spark" id="btop-cpu-spark"></div>
-        </section>
-        <section class="btop-box" id="btop-mem-box">
-            <header>
-                <span>{{ _('Память') }}</span>
-                <strong id="btop-mem-val">—</strong>
-            </header>
-            <div class="btop-bar"><i id="btop-mem-fill"></i></div>
-            <div class="btop-spark" id="btop-mem-spark"></div>
-        </section>
-        <section class="btop-box">
-            <header>
-                <span>{{ _('Сеть') }}</span>
-                <strong id="btop-net-val"></strong>
-            </header>
-            <div class="btop-net-row">
-                <span>↓</span>
-                <div class="btop-bar"><i id="btop-rx-fill"></i></div>
-                <em id="btop-rx-val">0.00</em>
-            </div>
-            <div class="btop-net-row">
-                <span>↑</span>
-                <div class="btop-bar"><i id="btop-tx-fill"></i></div>
-                <em id="btop-tx-val">0.00</em>
-            </div>
-        </section>
-    </div>
-        <div class="monitoring-overview card mb-4">
-            <div class="card-body">
-                <div class="overview-header">
-                    <div>
-                        <h2 class="overview-title">{{ _('Сводка по серверу') }}</h2>
-                    </div>
-                    <div class="overview-actions">
-                        <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-pencil-square"></i> {{ _('Настроить сервер') }}
-                        </a>
-                    </div>
-                </div>
-                <div class="overview-grid">
-                    <div class="overview-item">
-                        <span class="overview-label">{{ _('SSH порт') }}</span>
-                        <span class="overview-value">{{ ssh_port }}</span>
-                    </div>
-                    <div class="overview-item">
-                        <span class="overview-label">{{ _('Firewall backend') }}</span>
-                        <span class="overview-value" id="summary-fw-backend">-</span>
-                    </div>
-                    <div class="overview-item">
-                        <span class="overview-label">{{ _('Статус firewall') }}</span>
-                        <span class="overview-value" id="summary-fw-status">-</span>
-                    </div>
-                    <div class="overview-item">
-                        <span class="overview-label">{{ _('Listening ports') }}</span>
-                        <span class="overview-value" id="summary-port-count">0</span>
-                    </div>
-                    <div class="overview-item overview-item-wide">
-                        <span class="overview-label">{{ _('Сетевые интерфейсы') }}</span>
-                        <span class="overview-value" id="summary-interfaces">{{ _('Загрузка...') }}</span>
-                    </div>
-                    <div class="overview-item">
-                        <span class="overview-label">{{ _('Обновление системы') }}</span>
-                        <span class="overview-value" id="summary-last-update">-</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-    <!-- Connection Error Alert -->
-    <div id="connection-error-alert" class="alert alert-danger d-none mb-4" role="alert">
-        <div class="d-flex align-items-start">
-            <div class="me-3" style="font-size: 2rem;">⚠️</div>
-            <div class="flex-grow-1">
-                <h5 class="alert-heading mb-2">
-                    <i class="bi bi-exclamation-octagon"></i> {{ _('Ошибка подключения к серверу') }}
-                </h5>
-                <p class="mb-2" id="connection-error-message"></p>
-                <div id="connection-error-details" class="small text-muted mb-2"></div>
-                <div class="mt-3">
-                    <h6>{{ _('Что делать:') }}</h6>
-                    <ul id="connection-error-solutions" class="small mb-0"></ul>
-                </div>
-                <div class="mt-3">
-                    <a href="{{ url_for('main.edit_server', server_id=server.id) }}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-pencil"></i> {{ _('Проверить настройки сервера') }}
-                    </a>
-                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="location.reload()">
-                        <i class="bi bi-arrow-clockwise"></i> {{ _('Повторить попытку') }}
+        <!-- Обзор: что требует внимания, четыре показателя, нагрузка и сводка -->
+        <section class="mon-section" id="monitoring-overview" data-mon-section="overview" tabindex="-1">
+            <div id="mon-status" class="mon-attention ui-card" aria-live="polite">
+                <div class="mon-attention-head">
+                    <h2 class="ui-card-title" id="mon-attention-title">
+                        <span class="ui-dot" id="mon-attention-dot" aria-hidden="true"></span>
+                        <span id="mon-attention-text">{{ _('Получаю данные с сервера') }}</span>
+                    </h2>
+                    <button type="button" class="btn btn-outline-secondary btn-sm d-none" id="security-brief-btn">
+                        <i class="bi bi-chat-left-text" aria-hidden="true"></i> {{ _('Разобрать ситуацию') }}
                     </button>
                 </div>
-            </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    </div>
-
-    <!-- Tools Check Alert -->
-    <div id="tools-alert" class="alert alert-warning d-none mb-4" role="alert">
-        <div class="d-flex align-items-start">
-            <div class="me-3" style="font-size: 2rem;"><i class="bi bi-tools"></i></div>
-            <div class="flex-grow-1">
-                <h5 class="alert-heading mb-2">
-                    <i class="bi bi-exclamation-triangle"></i> {{ _('Рекомендуется установить дополнительные утилиты') }}
-                </h5>
-                <p class="mb-2" id="tools-summary"></p>
-                
-                <div id="missing-tools-list" class="mb-3"></div>
-                
-                <div id="install-all-section" class="d-none">
-                    <h6>{{ _('Установить все одной командой:') }}</h6>
-                    <div class="input-group">
-                        <input type="text" class="form-control font-monospace" id="install-all-cmd" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="copyCommand('install-all-cmd')">
-                            <i class="bi bi-clipboard"></i> {{ _('Копировать') }}
-                        </button>
-                    </div>
+                <ul id="mon-status-chips" class="mon-attention-list"></ul>
+                <p id="mon-status-facts" class="mon-attention-facts" hidden></p>
+                <div id="security-brief" class="security-brief d-none">
+                    <section class="security-brief-block">
+                        <h4>{{ _('Разбор') }}</h4>
+                        <pre id="security-brief-summary" class="security-brief-text"></pre>
+                    </section>
+                    <section class="security-brief-block" id="security-brief-prompt-block">
+                        <div class="security-brief-head">
+                            <h4>{{ _('Промпт для LLM') }}</h4>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="copy-security-prompt">
+                                <i class="bi bi-clipboard" aria-hidden="true"></i> {{ _('Копировать') }}
+                            </button>
+                        </div>
+                        <pre id="security-brief-prompt" class="security-brief-text"></pre>
+                    </section>
                 </div>
             </div>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    </div>
 
-    <div id="load-diagnosis" class="load-diagnosis">
-        <p id="load-diagnosis-text" class="mb-2">{{ _('Считаю загрузку по /proc/stat и load average…') }}</p>
-        <details class="load-tools" id="load-tools">
-            <summary class="load-tools-title">{{ _('Команды htop и btop') }}</summary>
-            <div class="load-tool-row">
-                <span>htop</span>
-                <input type="text" class="form-control font-monospace" id="load-htop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop">
-                <button class="btn btn-warning" type="button" onclick="copyCommand('load-htop-cmd')">{{ _('Копировать') }}</button>
-            </div>
-            <div class="load-tool-row">
-                <span>btop</span>
-                <input type="text" class="form-control font-monospace" id="load-btop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y btop">
-                <button class="btn btn-warning" type="button" onclick="copyCommand('load-btop-cmd')">{{ _('Копировать') }}</button>
-            </div>
-        </details>
-    </div>
-
-    <div class="row g-4 monitoring-grid">
-        <div class="col-12 col-lg-7">
-            <div id="monitoring-network" tabindex="-1" class="network-traffic card monitoring-card">
-                <div class="card-body">
-                    <h3><i class="bi bi-graph-up"></i> {{ _('Сетевой трафик') }}</h3>
-                    <div class="mb-2 monitoring-caption">
-                        <span id="monitored-interfaces">🔍 {{ _('Мониторинг всех сетевых интерфейсов') }}</span>
-                    </div>
-                    <div class="traffic-stats">
-                        <div class="stat">
-                            <span class="label">↓ {{ _('Загрузка:') }}</span>
-                            <span class="value" id="rx-speed">0 MB/s</span>
-                            <span class="peak">{{ _('Пик:') }} <span id="rx-peak">0</span> MB/s</span>
-                        </div>
-                        <div class="stat">
-                            <span class="label">↑ {{ _('Отдача:') }}</span>
-                            <span class="value" id="tx-speed">0 MB/s</span>
-                            <span class="peak">{{ _('Пик:') }} <span id="tx-peak">0</span> MB/s</span>
+            <!-- Tools Check Alert: раскрывается из строки «Нет утилит» -->
+            <div id="tools-alert" class="alert alert-warning d-none" role="alert">
+                <div class="d-flex align-items-start gap-3">
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-2">
+                            <i class="bi bi-tools" aria-hidden="true"></i> {{ _('Рекомендуется установить дополнительные утилиты') }}
+                        </h5>
+                        <p class="mb-2" id="tools-summary"></p>
+                        <div id="missing-tools-list" class="mb-3"></div>
+                        <div id="install-all-section" class="d-none">
+                            <h6>{{ _('Установить все одной командой:') }}</h6>
+                            <div class="input-group">
+                                <input type="text" class="form-control font-monospace" id="install-all-cmd" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyCommand('install-all-cmd')">
+                                    <i class="bi bi-clipboard" aria-hidden="true"></i> {{ _('Копировать') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="daily-stats">
-                        <p>📈 {{ _('За 24 часа:') }} ↓ <span id="daily-rx">0 GB</span> ↑ <span id="daily-tx">0 GB</span></p>
-                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-lg-5">
-            <div class="firewall-status card monitoring-card">
-                <div class="card-body">
-                    <h3><i class="bi bi-shield-check"></i> {{ _('Статус брандмауэра') }}</h3>
-                    <div class="firewall-info">
-                        <div class="status-badge">
-                            <span id="fw-status">{{ _('Загрузка...') }}</span>
-                        </div>
-                        <div class="fw-details">
-                            <p><strong>{{ _('Backend:') }}</strong> <span id="fw-backend">-</span></p>
-                            <p><strong>{{ _('Listening ports:') }}</strong> <span id="open-ports">-</span></p>
-                            <p><strong>{{ _('Количество listening ports:') }}</strong> <span id="listening-ports-count">0</span></p>
-                            <p id="fw-rules-row" class="d-none"><strong>{{ _('Порты в правилах UFW:') }}</strong> <span id="fw-rules-ports">-</span></p>
-                            <p><strong>{{ _('Заблокировано за 24ч:') }}</strong> <span id="blocked-count">0</span> {{ _('попыток') }}</p>
-                            <p class="last-block">
-                                <strong>{{ _('Последний блок:') }}</strong>
-                                <span id="last-blocked-ip">-</span>
-                                ({{ _('порт:') }} <span id="last-blocked-port">-</span>)
-                            </p>
-                        </div>
+
+            <div class="btop-board" aria-label="{{ _('Нагрузка сервера') }}">
+                <section class="btop-box ui-card" id="btop-cpu-box">
+                    <header>
+                        <span>CPU</span>
+                        <strong id="btop-cpu-val">—</strong>
+                    </header>
+                    <div class="btop-bar"><i id="btop-cpu-fill"></i></div>
+                    <div class="btop-spark" id="btop-cpu-spark"></div>
+                </section>
+                <section class="btop-box ui-card" id="btop-mem-box">
+                    <header>
+                        <span>{{ _('Память') }}</span>
+                        <strong id="btop-mem-val">—</strong>
+                    </header>
+                    <div class="btop-bar"><i id="btop-mem-fill"></i></div>
+                    <div class="btop-spark" id="btop-mem-spark"></div>
+                </section>
+                <section class="btop-box ui-card">
+                    <header>
+                        <span>{{ _('Сеть') }}</span>
+                        <strong id="btop-net-val"></strong>
+                    </header>
+                    <div class="btop-net-row">
+                        <i class="bi bi-arrow-down" aria-hidden="true"></i>
+                        <div class="btop-bar"><i id="btop-rx-fill"></i></div>
+                        <em id="btop-rx-val">0.00</em>
                     </div>
+                    <div class="btop-net-row">
+                        <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                        <div class="btop-bar"><i id="btop-tx-fill"></i></div>
+                        <em id="btop-tx-val">0.00</em>
+                    </div>
+                </section>
+                <a class="btop-box ui-card btop-link" id="btop-svc-box" href="#monitoring-services">
+                    <header>
+                        <span>{{ _('Службы') }}</span>
+                        <strong id="btop-svc-val">—</strong>
+                    </header>
+                    <div class="btop-bar"><i id="btop-svc-fill"></i></div>
+                    <p class="btop-note" id="btop-svc-note"></p>
+                </a>
+            </div>
+
+            <div class="mon-pair">
+                <div id="load-diagnosis" class="load-diagnosis ui-card">
+                    <h2 class="ui-card-title">{{ _('Нагрузка сервера') }}</h2>
+                    <p id="load-diagnosis-text" class="mb-0">{{ _('Считаю загрузку по /proc/stat и load average…') }}</p>
+                    <details class="load-tools" id="load-tools">
+                        <summary class="load-tools-title">{{ _('Команды htop и btop') }}</summary>
+                        <div class="load-tool-row">
+                            <span>htop</span>
+                            <input type="text" class="form-control form-control-sm font-monospace" id="load-htop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y htop">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="copyCommand('load-htop-cmd')">{{ _('Копировать') }}</button>
+                        </div>
+                        <div class="load-tool-row">
+                            <span>btop</span>
+                            <input type="text" class="form-control form-control-sm font-monospace" id="load-btop-cmd" readonly value="sudo apt-get update && sudo apt-get install -y btop">
+                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="copyCommand('load-btop-cmd')">{{ _('Копировать') }}</button>
+                        </div>
+                    </details>
+                </div>
+                <div class="monitoring-overview ui-card">
+                    <h2 class="ui-card-title overview-title">{{ _('Сводка по серверу') }}</h2>
+                    <dl class="ui-kv">
+                        <div><dt>{{ _('SSH порт') }}</dt><dd>{{ ssh_port }}</dd></div>
+                        <div><dt>Firewall</dt><dd><span id="summary-fw-backend">-</span> · <span id="summary-fw-status">-</span></dd></div>
+                        <div><dt>{{ _('Listening ports') }}</dt><dd id="summary-port-count">0</dd></div>
+                        <div><dt>{{ _('Сетевые интерфейсы') }}</dt><dd id="summary-interfaces">{{ _('Загрузка...') }}</dd></div>
+                        <div><dt>{{ _('Обновление системы') }}</dt><dd id="summary-last-update">-</dd></div>
+                    </dl>
                 </div>
             </div>
-        </div>
-        <div class="col-12 col-xl-5">
+
+            <div class="mon-footer-actions">
+                <button class="btn btn-link btn-sm text-danger" id="uninstall-btn-main">
+                    <i class="bi bi-trash" aria-hidden="true"></i> {{ _('Удалить мониторинг') }}
+                </button>
+            </div>
+        </section>
+
+        <!-- Сеть -->
+        <section class="mon-section mon-pair" id="monitoring-network" data-mon-section="network" tabindex="-1" hidden>
+            <div class="network-traffic ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-graph-up" aria-hidden="true"></i> {{ _('Сетевой трафик') }}</h2>
+                <p class="monitoring-caption" id="monitored-interfaces">{{ _('Мониторинг всех сетевых интерфейсов') }}</p>
+                <div class="traffic-stats">
+                    <div class="stat">
+                        <span class="label"><i class="bi bi-arrow-down" aria-hidden="true"></i> {{ _('Загрузка:') }}</span>
+                        <span class="value" id="rx-speed">0 MB/s</span>
+                        <span class="peak">{{ _('Пик:') }} <span id="rx-peak">0</span> MB/s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label"><i class="bi bi-arrow-up" aria-hidden="true"></i> {{ _('Отдача:') }}</span>
+                        <span class="value" id="tx-speed">0 MB/s</span>
+                        <span class="peak">{{ _('Пик:') }} <span id="tx-peak">0</span> MB/s</span>
+                    </div>
+                </div>
+                <p class="daily-stats mb-0">{{ _('За 24 часа:') }}
+                    <i class="bi bi-arrow-down" aria-hidden="true"></i> <span id="daily-rx">0 GB</span>
+                    <i class="bi bi-arrow-up" aria-hidden="true"></i> <span id="daily-tx">0 GB</span></p>
+            </div>
+            <div class="firewall-status ui-card">
+                <div class="ui-card-head">
+                    <h2 class="ui-card-title"><i class="bi bi-shield-check" aria-hidden="true"></i> {{ _('Статус брандмауэра') }}</h2>
+                    <span id="fw-status" class="ui-state">{{ _('Загрузка...') }}</span>
+                </div>
+                <dl class="ui-kv ui-kv-rows fw-details">
+                    <div><dt>{{ _('Backend:') }}</dt><dd id="fw-backend">-</dd></div>
+                    <div><dt>{{ _('Listening ports:') }} (<span id="listening-ports-count">0</span>)</dt><dd id="open-ports">-</dd></div>
+                    <div id="fw-rules-row" class="d-none"><dt>{{ _('Порты в правилах UFW:') }}</dt><dd id="fw-rules-ports">-</dd></div>
+                    <div><dt>{{ _('Заблокировано за 24ч:') }}</dt><dd><span id="blocked-count">0</span> {{ _('попыток') }}</dd></div>
+                    <div class="last-block"><dt>{{ _('Последний блок:') }}</dt>
+                        <dd><span id="last-blocked-ip">-</span> ({{ _('порт:') }} <span id="last-blocked-port">-</span>)</dd></div>
+                </dl>
+            </div>
+        </section>
+
+        <!-- Сервисы: группы без данных не показываются -->
+        <section class="mon-section mon-services" id="monitoring-services" data-mon-section="services" tabindex="-1" hidden>
             {% if ui_features.projects %}
-            <div class="project-status card monitoring-card mb-3">
-                <div class="card-body">
-                    <h3><i class="bi bi-boxes"></i> {{ _('Мои проекты') }}</h3>
-                    {% include 'partials/project_stats.html' %}
-                </div>
+            <div class="project-status ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Мои проекты') }}</h2>
+                {% include 'partials/project_stats.html' %}
             </div>
             {% endif %}
-            <div id="monitoring-services" tabindex="-1" class="active-services card monitoring-card mb-3">
-                <div class="card-body">
-                    <h3><i class="bi bi-router"></i> {{ _('VPN / Proxy сервисы') }}</h3>
-                    <div id="proxy-services-list" class="services-grid">
-                        <div class="text-muted">{{ _('Загрузка...') }}</div>
-                    </div>
+            <div class="active-services ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-router" aria-hidden="true"></i> {{ _('VPN / Proxy сервисы') }}</h2>
+                <div id="proxy-services-list" class="services-grid">
+                    <div class="text-muted">{{ _('Загрузка...') }}</div>
                 </div>
             </div>
-            <div class="telegramonly-stack card monitoring-card mb-3">
-                <div class="card-body">
-                    <h3><i class="bi bi-stack"></i> {{ _('TelegramOnly стек') }}</h3>
-                    <div id="telegramonly-services-list" class="services-grid">
-                        <div class="text-muted">{{ _('Загрузка...') }}</div>
-                    </div>
+            <div class="active-services ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Системные сервисы') }}</h2>
+                <div id="services-list" class="services-grid">
+                    <div class="text-muted">{{ _('Загрузка...') }}</div>
                 </div>
             </div>
-            <div class="reticulum-status card monitoring-card mb-3">
-                <div class="card-body">
-                    <h3><i class="bi bi-broadcast"></i> {{ _('Reticulum / HA-стек') }}</h3>
-                    <div id="reticulum-status" class="services-grid">
-                        <div class="text-muted">{{ _('Загрузка...') }}</div>
+            <div class="telegramonly-stack ui-card" data-mon-optional hidden>
+                <h2 class="ui-card-title"><i class="bi bi-stack" aria-hidden="true"></i> {{ _('TelegramOnly стек') }}</h2>
+                <div id="telegramonly-services-list" class="services-grid"></div>
+            </div>
+            <div class="reticulum-status ui-card" data-mon-optional hidden>
+                <h2 class="ui-card-title"><i class="bi bi-broadcast" aria-hidden="true"></i> {{ _('Reticulum / HA-стек') }}</h2>
+                <div id="reticulum-status" class="services-grid"></div>
+            </div>
+            <div class="webpanels ui-card" data-mon-optional hidden>
+                <h2 class="ui-card-title"><i class="bi bi-window-stack" aria-hidden="true"></i> {{ _('Web-панели (SSH-туннель)') }}</h2>
+                <div id="webpanels-list" class="services-grid services-grid-wide"></div>
+            </div>
+        </section>
+
+        <!-- Безопасность -->
+        <section class="mon-section" id="monitoring-security" data-mon-section="security" tabindex="-1" hidden>
+            <div class="security-events ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-shield-exclamation" aria-hidden="true"></i> {{ _('События безопасности (24ч)') }}</h2>
+                <div class="events-grid">
+                    <div class="event-card" id="ssh-failures-card">
+                        <div class="event-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="ssh-failures">0</div>
+                            <div class="event-label">{{ _('Неудачные SSH попытки') }}</div>
+                        </div>
+                    </div>
+                    <div class="event-card" id="security-updates-card">
+                        <div class="event-icon"><i class="bi bi-arrow-repeat" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="security-updates">0</div>
+                            <div class="event-label">{{ _('Обновления безопасности') }}</div>
+                        </div>
+                    </div>
+                    <div class="event-card" id="new-ports-card">
+                        <div class="event-icon"><i class="bi bi-plug" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="new-ports">0</div>
+                            <div class="event-label">{{ _('Новые открытые порты') }}</div>
+                        </div>
+                    </div>
+                    <div class="event-card" id="fail2ban-card">
+                        <div class="event-icon"><i class="bi bi-lock" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="fail2ban-banned">0</div>
+                            <div class="event-label">{{ _('Fail2ban забанил IP') }}</div>
+                        </div>
+                    </div>
+                    <div class="event-card event-card-danger" id="failed-services-card">
+                        <div class="event-icon"><i class="bi bi-tools" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="failed-services">0</div>
+                            <div class="event-label">{{ _('Проблемные systemd unit\'ы') }}</div>
+                        </div>
+                    </div>
+                    <div class="event-card" id="journal-errors-card">
+                        <div class="event-icon"><i class="bi bi-journal-text" aria-hidden="true"></i></div>
+                        <div class="event-content">
+                            <div class="event-value" id="journal-errors">0</div>
+                            <div class="event-label">{{ _('Ошибки journal') }}</div>
+                        </div>
                     </div>
                 </div>
+                <p class="last-update mb-0" id="system-update-line">
+                    {{ _('Последнее обновление пакетов: нет данных') }}
+                </p>
             </div>
-            <div class="webpanels card monitoring-card">
-                <div class="card-body">
-                    <h3><i class="bi bi-window-stack"></i> {{ _('Web-панели (SSH-туннель)') }}</h3>
-                    <div id="webpanels-list" class="services-grid">
-                        <div class="text-muted">{{ _('Загрузка...') }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-xl-7">
-            <div class="active-services card monitoring-card mb-3">
-                <div class="card-body">
-                    <h3><i class="bi bi-gear"></i> {{ _('Системные сервисы') }}</h3>
-                    <div id="services-list" class="services-grid">
-                        <div class="text-muted">{{ _('Загрузка...') }}</div>
-                    </div>
-                </div>
-            </div>
-            <div id="monitoring-security" tabindex="-1" class="security-events card monitoring-card">
-                <div class="card-body">
-                    <h3><i class="bi bi-shield-exclamation"></i> {{ _('События безопасности (24ч)') }}</h3>
-                    <div class="events-grid">
-                        <div class="event-card" id="ssh-failures-card">
-                            <div class="event-icon"><i class="bi bi-shield-lock"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="ssh-failures">0</div>
-                                <div class="event-label">{{ _('Неудачные SSH попытки') }}</div>
-                            </div>
-                        </div>
+        </section>
 
-                        <div class="event-card" id="security-updates-card">
-                            <div class="event-icon"><i class="bi bi-arrow-repeat"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="security-updates">0</div>
-                                <div class="event-label">{{ _('Обновления безопасности') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="event-card" id="new-ports-card">
-                            <div class="event-icon"><i class="bi bi-plug"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="new-ports">0</div>
-                                <div class="event-label">{{ _('Новые открытые порты') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="event-card" id="fail2ban-card">
-                            <div class="event-icon"><i class="bi bi-lock"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="fail2ban-banned">0</div>
-                                <div class="event-label">{{ _('Fail2ban забанил IP') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="event-card" id="failed-services-card">
-                            <div class="event-icon"><i class="bi bi-tools"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="failed-services">0</div>
-                                <div class="event-label">{{ _('Проблемные systemd unit\'ы') }}</div>
-                            </div>
-                        </div>
-
-                        <div class="event-card" id="journal-errors-card">
-                            <div class="event-icon"><i class="bi bi-journal-text"></i></div>
-                            <div class="event-content">
-                                <div class="event-value" id="journal-errors">0</div>
-                                <div class="event-label">{{ _('Ошибки journal') }}</div>
-                            </div>
+        <!-- История -->
+        <section class="mon-section" id="monitoring-history" data-mon-section="history" tabindex="-1" hidden>
+            <div class="mini-charts ui-card">
+                <h2 class="ui-card-title"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i> {{ _('История производительности (60 мин)') }}</h2>
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3>{{ _('Использование CPU') }}</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="cpu-chart"></canvas>
                         </div>
                     </div>
-
-                    <div class="last-update" id="system-update-line">
-                        {{ _('Последнее обновление пакетов: нет данных') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12">
-            <div id="monitoring-history" tabindex="-1" class="mini-charts card monitoring-card mb-4">
-                <div class="card-body">
-                    <h3><i class="bi bi-graph-up-arrow"></i> {{ _('История производительности (60 мин)') }}</h3>
-                    <div class="charts-container">
-                        <div class="chart-card card">
-                            <div class="card-body">
-                                <h4>{{ _('Использование CPU') }}</h4>
-                                <div class="chart-wrapper">
-                                    <canvas id="cpu-chart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="chart-card card">
-                            <div class="card-body">
-                                <h4>{{ _('Использование памяти') }}</h4>
-                                <div class="chart-wrapper">
-                                    <canvas id="memory-chart"></canvas>
-                                </div>
-                            </div>
+                    <div class="chart-card">
+                        <h3>{{ _('Использование памяти') }}</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="memory-chart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-        <!-- Delete Monitoring Button -->
-        <div class="mt-4 text-end">
-            <button class="btn btn-outline-danger" id="uninstall-btn-main">
-                <i class="bi bi-trash"></i> {{ _('Удалить мониторинг') }}
-            </button>
-        </div>
+        </section>
 
     </div> <!-- End #stats-container -->
 </div>
@@ -495,7 +444,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uninstallTitle">⚠️ {{ _('Подтверждение удаления') }}</h5>
+                <h5 class="modal-title" id="uninstallTitle"><i class="bi bi-exclamation-triangle text-warning" aria-hidden="true"></i> {{ _('Подтверждение удаления') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
@@ -579,6 +528,17 @@ const monI18n = {
     historyOldHint: {{ _('Скрипт cron считает CPU через top и пишет нули и сотни. Кнопка заменит только файл /usr/local/bin/monitoring/update-metrics-history.sh; новые точки появятся через 5 минут.') | tojson }},
     historyUpdate: {{ _('Обновить скрипт истории') | tojson }},
     historyUpdated: {{ _('Скрипт истории обновлён') | tojson }},
+    attention: {{ _('Требует внимания') | tojson }},
+    allClear: {{ _('Проблем не найдено') | tojson }},
+    svcRunning: {{ _('Работает') | tojson }},
+    svcStopped: {{ _('Остановлен') | tojson }},
+    svcFailed: {{ _('Сбой') | tojson }},
+    svcMissing: {{ _('Не установлено: {count}') | tojson }},
+    svcProblems: {{ _('не работают: {names}') | tojson }},
+    svcAllUp: {{ _('все найденные службы работают') | tojson }},
+    fwActive: {{ _('Активен') | tojson }},
+    fwInactive: {{ _('Неактивен') | tojson }},
+    bridgeListening: {{ _('Мост слушает (:50061)') | tojson }},
     kbs: 'KB/s',
     mbs: 'MB/s'
 };
@@ -629,11 +589,11 @@ async function updateNetworkStats() {
                 const n = stats.interfaces.length;
                 const unit = n === 1 ? monI18n.interfaceOne : monI18n.interfaceMany;
                 document.getElementById('monitored-interfaces').innerHTML =
-                    `🔍 ${monI18n.monitoring} <strong>${interfacesList}</strong> (${n} ${unit})`;
+                    `${monI18n.monitoring} <strong>${interfacesList}</strong> (${n} ${unit})`;
                 document.getElementById('summary-interfaces').textContent = interfacesList;
             } else if (stats.interface) {
                 document.getElementById('monitored-interfaces').textContent =
-                    `🔍 ${monI18n.monitoring} ${stats.interface}`;
+                    `${monI18n.monitoring} ${stats.interface}`;
                 document.getElementById('summary-interfaces').textContent = stats.interface;
             } else {
                 document.getElementById('summary-interfaces').textContent = '-';
@@ -659,11 +619,11 @@ async function updateFirewallStatus() {
             const backendElement = document.getElementById('fw-backend');
             const fwRulesRow = document.getElementById('fw-rules-row');
             if (stats.status && stats.status.toLowerCase() === 'active') {
-                statusElement.textContent = '✅ Active';
-                statusElement.className = 'status-active';
+                statusElement.textContent = monI18n.fwActive;
+                statusElement.className = 'ui-state ui-state-ok';
             } else {
-                statusElement.textContent = '❌ Inactive';
-                statusElement.className = 'status-inactive';
+                statusElement.textContent = monI18n.fwInactive;
+                statusElement.className = 'ui-state ui-state-danger';
             }
             
             backendElement.textContent = stats.backend || 'none';
@@ -721,41 +681,51 @@ async function updateServicesStatus() {
             proxyContainer.innerHTML = '';
             if (teloContainer) teloContainer.innerHTML = '';
 
+            const svcLabels = {active: monI18n.svcRunning, failed: monI18n.svcFailed};
             const renderService = (service, target) => {
+                const state = service.status === 'active' ? 'ok' : service.status === 'failed' ? 'danger' : 'off';
                 const serviceEl = document.createElement('div');
                 serviceEl.className = `service-item ${service.status}`;
-
-                let statusIcon = '❌';
-                let statusText = 'inactive';
-                if (service.status === 'active') {
-                    statusIcon = '✅';
-                    statusText = 'active';
-                } else if (service.status === 'not_installed') {
-                    statusIcon = '➖';
-                    statusText = 'not installed';
-                } else if (service.status === 'failed') {
-                    statusIcon = '⚠️';
-                    statusText = 'failed';
-                }
-
-                var uptime = (service.status === 'not_installed') ? '' : (service.uptime && service.uptime !== '-' ? service.uptime : '');
-                serviceEl.innerHTML = `
-                    <div class="service-header">
-                        <span class="service-name">${service.display_name || service.name}</span>
-                        <span class="service-status">${statusIcon} ${statusText}</span>
-                    </div>
-                    ${uptime ? '<div class="service-uptime">' + uptime + '</div>' : ''}
-                `;
-
-                target.appendChild(serviceEl);
+                const dot = document.createElement('span');
+                dot.className = 'ui-dot ui-dot-' + state;
+                dot.setAttribute('aria-hidden', 'true');
+                const name = document.createElement('span');
+                name.className = 'service-name';
+                name.textContent = service.display_name || service.name;
+                const status = document.createElement('span');
+                status.className = 'service-status';
+                const uptime = service.uptime && service.uptime !== '-' ? service.uptime : '';
+                status.textContent = state === 'ok' && uptime ? uptime : (svcLabels[service.status] || monI18n.svcStopped);
+                if (state === 'ok') status.title = monI18n.svcRunning;
+                serviceEl.append(dot, name, status);
                 if (service.control_component) {
                     const manage = document.createElement('a');
-                    manage.className = 'small d-inline-block mt-2';
+                    manage.className = 'service-manage';
                     manage.href = {{ url_for('server_control.page', server_id=server.id)|tojson }};
-                    manage.textContent = {{ _('Управление сервером')|tojson }};
+                    manage.title = {{ _('Управление сервером')|tojson }};
+                    manage.setAttribute('aria-label', manage.title);
+                    manage.innerHTML = '<i class="bi bi-sliders" aria-hidden="true"></i>';
                     serviceEl.appendChild(manage);
                 }
+                target.appendChild(serviceEl);
             };
+            // Installed services are rows; the ones that are not on the server fold into one line.
+            const renderGroup = (list, target) => {
+                const present = list.filter(service => service.status !== 'not_installed');
+                const missing = list.filter(service => service.status === 'not_installed');
+                present.forEach(service => renderService(service, target));
+                if (missing.length) {
+                    const fold = document.createElement('details');
+                    fold.className = 'service-missing';
+                    const summary = document.createElement('summary');
+                    summary.textContent = monI18n.svcMissing.replace('{count}', missing.length);
+                    const names = document.createElement('p');
+                    names.textContent = missing.map(service => service.display_name || service.name).join(', ');
+                    fold.append(summary, names);
+                    target.appendChild(fold);
+                }
+            };
+            paintServicesTile(services.filter(service => service.group !== 'project' && service.status !== 'not_installed'));
 
             const proxyServices = services.filter(service => service.group === 'proxy');
             const teloServices = services.filter(service => service.group === 'telegramonly');
@@ -764,21 +734,20 @@ async function updateServicesStatus() {
                 {{ url_for('dns_mail.detail', server_id=server.id)|tojson }});
 
             if (proxyServices.length) {
-                proxyServices.forEach(service => renderService(service, proxyContainer));
+                renderGroup(proxyServices, proxyContainer);
             } else {
                 proxyContainer.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
             }
 
             if (teloContainer) {
                 if (teloServices.length) {
-                    teloServices.forEach(service => renderService(service, teloContainer));
-                } else {
-                    teloContainer.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
+                    renderGroup(teloServices, teloContainer);
                 }
+                teloContainer.closest('[data-mon-optional]').hidden = !teloServices.length;
             }
 
             if (systemServices.length) {
-                systemServices.forEach(service => renderService(service, container));
+                renderGroup(systemServices, container);
             } else {
                 container.innerHTML = '<div class="text-muted">{{ _("Не обнаружено") }}</div>';
             }
@@ -801,35 +770,27 @@ async function updateReticulumStatus() {
             return;
         }
         const d = data.data;
+        const card = container.closest('[data-mon-optional]');
+        if (card) card.hidden = !d.installed;
         if (!d.installed) {
-            container.innerHTML = '<div class="text-muted">{{ _("HA-стек не установлен") }}</div>';
+            container.innerHTML = '';
             return;
         }
 
-        const row = (label, ok) => {
-            const icon = ok ? '✅' : '❌';
-            const txt = ok ? 'active' : 'inactive';
-            return `<div class="service-item ${ok ? 'active' : 'inactive'}">
-                        <div class="service-header">
-                            <span class="service-name">${label}</span>
-                            <span class="service-status">${icon} ${txt}</span>
-                        </div>
+        const ok = d.bridge_active && d.listening_50061;
+        let html = `<div class="service-item ${ok ? 'active' : 'inactive'}">
+                        <span class="ui-dot ui-dot-${ok ? 'ok' : 'danger'}" aria-hidden="true"></span>
+                        <span class="service-name">${monI18n.bridgeListening}</span>
+                        <span class="service-status">${ok ? monI18n.svcRunning : monI18n.svcStopped}</span>
                     </div>`;
-        };
-
-        let html = '';
-        html += row('Мост слушает (:50061)', d.bridge_active && d.listening_50061);
         if (d.bridge_hash) {
-            html += `<div class="service-item active">
-                        <div class="service-header">
-                            <span class="service-name">Bridge hash</span>
-                        </div>
-                        <div class="service-uptime" style="font-family:monospace;word-break:break-all;cursor:pointer"
-                             title="{{ _('Копировать') }}"
-                             onclick="navigator.clipboard && navigator.clipboard.writeText('${d.bridge_hash}')">${d.bridge_hash}</div>
+            html += `<div class="service-item service-item-wide">
+                        <span class="service-name">Bridge hash</span>
+                        <code class="service-code" title="{{ _('Копировать') }}"
+                              onclick="navigator.clipboard && navigator.clipboard.writeText('${d.bridge_hash}')">${d.bridge_hash}</code>
                     </div>`;
         } else {
-            html += '<div class="text-muted">{{ _("Мост запущен — hash появится в логе старта") }}</div>';
+            html += '<div class="text-muted small">{{ _("Мост запущен — hash появится в логе старта") }}</div>';
         }
         container.innerHTML = html;
     } catch (error) {
@@ -844,32 +805,25 @@ async function updateWebpanels() {
         const container = document.getElementById('webpanels-list');
         if (!container) return;
 
-        if (!data.success || !data.data || !data.data.panels || !data.data.panels.length) {
-            container.innerHTML = '<div class="text-muted">—</div>';
+        const card = container.closest('[data-mon-optional]');
+        const panels = data.success && data.data && data.data.panels || [];
+        if (card) card.hidden = !panels.length;
+        if (!panels.length) {
+            container.innerHTML = '';
             return;
         }
 
         let html = '';
-        data.data.panels.forEach(p => {
-            const icon = p.running ? '✅' : '⚪';
-            const txt = p.running ? 'running' : '{{ _("не запущена") }}';
+        panels.forEach(p => {
             // Туннель и «Открыть» показываем ТОЛЬКО когда сервис реально слушает порт,
             // иначе ссылка ведёт в никуда (Connection refused при пробросе).
-            let body;
-            if (p.running) {
-                body = `<div class="service-uptime" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                            <code style="cursor:pointer;word-break:break-all" title="{{ _('Копировать команду туннеля') }}"
+            const body = p.running ? `<code class="service-code" title="{{ _('Копировать команду туннеля') }}"
                                   onclick="navigator.clipboard && navigator.clipboard.writeText('${p.tunnel_cmd}')">${p.tunnel_cmd}</code>
-                            <a href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} ↗</a>
-                        </div>`;
-            } else {
-                body = '';
-            }
-            html += `<div class="service-item ${p.running ? 'active' : ''}">
-                        <div class="service-header">
-                            <span class="service-name">${p.label} <small class="text-muted">:${p.local_port}</small></span>
-                            <span class="service-status">${icon} ${txt}</span>
-                        </div>
+                            <a class="service-open" href="${p.url}" target="_blank" rel="noopener">{{ _('Открыть') }} <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>` : '';
+            html += `<div class="service-item service-item-wide ${p.running ? 'active' : ''}">
+                        <span class="ui-dot ui-dot-${p.running ? 'ok' : 'off'}" aria-hidden="true"></span>
+                        <span class="service-name">${p.label} <small class="text-muted">:${p.local_port}</small></span>
+                        <span class="service-status">${p.running ? monI18n.svcRunning : '{{ _("не запущена") }}'}</span>
                         ${body}
                     </div>`;
         });
@@ -922,7 +876,8 @@ async function updateSecurityEvents() {
             sshCard.classList.toggle('warning', (stats.ssh_failures_24h || 0) >= 500);
             updatesCard.classList.toggle('warning', (stats.security_updates_available || 0) > 0);
             newPortsCard.classList.toggle('warning', (stats.new_open_ports || 0) > 0);
-            fail2banCard.classList.toggle('warning', (stats.fail2ban_banned || 0) > 0);
+            // Banned addresses mean Fail2ban is doing its job: a figure, not a warning.
+            fail2banCard.classList.remove('warning');
             failedServicesCard.classList.toggle('warning', (stats.failed_services || 0) > 0);
             journalErrorsCard.classList.toggle('warning', (stats.error_events_24h || 0) >= 50);
             
@@ -992,38 +947,16 @@ function createCharts() {
         }
     };
     
-    const cpuCtx = document.getElementById('cpu-chart').getContext('2d');
-    cpuChart = new Chart(cpuCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'CPU %',
-                data: [],
-                borderColor: '#0d6efd',
-                backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: chartOptions
+    const accent = theme.getPropertyValue('--ui-accent').trim() || theme.getPropertyValue('--bs-primary').trim();
+    const series = label => ({
+        label, data: [], borderColor: accent, backgroundColor: accent + '22',
+        borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, fill: true, tension: 0.3
     });
-    
-    const memCtx = document.getElementById('memory-chart').getContext('2d');
-    memoryChart = new Chart(memCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Memory %',
-                data: [],
-                borderColor: '#6610f2',
-                backgroundColor: 'rgba(102, 16, 242, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: chartOptions
+    cpuChart = new Chart(document.getElementById('cpu-chart').getContext('2d'), {
+        type: 'line', data: {labels: [], datasets: [series('CPU %')]}, options: chartOptions
+    });
+    memoryChart = new Chart(document.getElementById('memory-chart').getContext('2d'), {
+        type: 'line', data: {labels: [], datasets: [series('Memory %')]}, options: chartOptions
     });
 }
 
@@ -1062,9 +995,9 @@ async function updateCharts() {
 }
 
 function meterColor(pct) {
-    if (pct < 50) return 'var(--bs-primary)';
-    if (pct < 75) return '#e6b325';
-    return '#f07178';
+    if (pct < 75) return 'var(--ui-accent)';
+    if (pct < 90) return 'var(--ui-warn)';
+    return 'var(--ui-danger)';
 }
 
 function paintMeter(fillId, valId, pct) {
@@ -1076,7 +1009,25 @@ function paintMeter(fillId, valId, pct) {
     fill.style.width = clamped + '%';
     fill.style.background = meterColor(clamped);
     val.textContent = clamped.toFixed(1) + '%';
-    val.style.color = meterColor(clamped);
+}
+
+// Fourth tile: how many of the services found on the server are running.
+function paintServicesTile(found) {
+    const val = document.getElementById('btop-svc-val');
+    const fill = document.getElementById('btop-svc-fill');
+    const note = document.getElementById('btop-svc-note');
+    const box = document.getElementById('btop-svc-box');
+    if (!val || !fill || !note) return;
+    const down = found.filter(service => service.status !== 'active');
+    const failed = found.some(service => service.status === 'failed');
+    const up = found.length - down.length;
+    val.textContent = found.length ? up + ' / ' + found.length : '—';
+    fill.style.width = found.length ? (up / found.length) * 100 + '%' : '0';
+    fill.style.background = failed ? 'var(--ui-danger)' : down.length ? 'var(--ui-warn)' : 'var(--ui-ok)';
+    note.textContent = !found.length ? '' : down.length
+        ? monI18n.svcProblems.replace('{names}', down.map(service => service.display_name || service.name).join(', '))
+        : monI18n.svcAllUp;
+    if (box) box.classList.toggle('is-hot', failed);
 }
 
 function paintSpark(id, values) {
@@ -1088,23 +1039,41 @@ function paintSpark(id, values) {
     pts.forEach(n => {
         const bar = document.createElement('span');
         bar.style.height = Math.max(6, Math.min(100, n)) + '%';
-        bar.style.background = meterColor(n);
+        bar.style.background = n >= 75 ? meterColor(n) : 'var(--ui-spark)';
         el.appendChild(bar);
     });
 }
 
-// One strip of chips: firewall, SSH attempts, bans, failed units, journal, updates, tools.
-// Colour by severity: ok (green), info (grey), warn (yellow), danger (red); details in the tooltip.
-function statusChip(level, icon, text, title, onClick) {
-    const chip = document.createElement(onClick ? 'button' : 'span');
-    if (onClick) { chip.type = 'button'; chip.addEventListener('click', onClick); }
-    chip.className = 'mon-chip mon-chip-' + level;
-    const i = document.createElement('i');
-    i.className = 'bi ' + icon;
-    i.setAttribute('aria-hidden', 'true');
-    chip.append(i, document.createTextNode(' ' + text));
-    if (title) chip.title = title;
-    return chip;
+// What needs attention: warnings and failures as rows, the rest as one quiet line.
+// Levels: ok and info go to the quiet line, warn and danger become rows; details in the tooltip.
+function statusChip(level, icon, text, title, onClick, kind) {
+    return {level, icon, text, title: title || '', onClick: onClick || null, kind: kind || ''};
+}
+
+function attentionRow(item) {
+    const row = document.createElement('li');
+    row.className = 'mon-attention-row mon-chip-' + item.level;
+    const dot = document.createElement('span');
+    dot.className = 'ui-dot ui-dot-' + (item.level === 'danger' ? 'danger' : 'warn');
+    dot.setAttribute('aria-hidden', 'true');
+    const icon = document.createElement('i');
+    icon.className = 'bi ' + item.icon;
+    icon.setAttribute('aria-hidden', 'true');
+    const text = document.createElement(item.onClick ? 'button' : 'span');
+    text.className = 'mon-attention-label';
+    text.textContent = item.text;
+    if (item.onClick) {
+        text.type = 'button';
+        text.classList.add('btn', 'btn-link');
+        text.addEventListener('click', item.onClick);
+    }
+    row.append(dot, icon, text);
+    if (item.title) {
+        const hint = document.createElement('small');
+        hint.textContent = item.title;
+        row.appendChild(hint);
+    }
+    return row;
 }
 
 function renderStatus() {
@@ -1153,13 +1122,27 @@ function renderStatus() {
     }
     if (monStatus.historyScript === 'outdated') {
         chips.push(statusChip('warn', 'bi-graph-down', monI18n.historyOld + ' · ' + monI18n.historyUpdate,
-            monI18n.historyOldHint, updateHistoryScript));
+            monI18n.historyOldHint, updateHistoryScript, 'history'));
     } else if (monStatus.historyScript === 'updated') {
         chips.push(statusChip('ok', 'bi-graph-up', monI18n.historyUpdated));
     }
-    // The brief is about security: the history-script chip alone does not call for it.
-    const alarming = chips.some(chip => /mon-chip-(warn|danger)/.test(chip.className) && !chip.querySelector('.bi-graph-down'));
-    list.replaceChildren(...chips);
+    const rows = chips.filter(chip => chip.level === 'warn' || chip.level === 'danger');
+    const facts = chips.filter(chip => chip.level === 'ok' || chip.level === 'info');
+    list.replaceChildren(...rows.map(attentionRow));
+    const factsLine = document.getElementById('mon-status-facts');
+    if (factsLine) {
+        factsLine.textContent = facts.map(chip => chip.text).join(' · ');
+        factsLine.hidden = !facts.length;
+    }
+    const worst = rows.some(chip => chip.level === 'danger') ? 'danger' : rows.length ? 'warn' : 'ok';
+    const dot = document.getElementById('mon-attention-dot');
+    const title = document.getElementById('mon-attention-text');
+    if (chips.length) {
+        if (dot) dot.className = 'ui-dot ui-dot-' + worst;
+        if (title) title.textContent = rows.length ? monI18n.attention + ': ' + rows.length : monI18n.allClear;
+    }
+    // The brief is about security: the history-script row alone does not call for it.
+    const alarming = rows.some(chip => chip.kind !== 'history');
     const brief = document.getElementById('security-brief-btn');
     if (brief) brief.classList.toggle('d-none', !alarming
         && !(sec && sec.ssh_failures_24h));
@@ -1216,8 +1199,8 @@ function paintLoadDiagnosis(diagnosis) {
 function paintPriorityLoad(cpu, memory) {
     const cpuBox = document.getElementById('btop-cpu-box');
     const memBox = document.getElementById('btop-mem-box');
-    if (cpuBox) cpuBox.classList.toggle('is-hot', Number(cpu) >= 75);
-    if (memBox) memBox.classList.toggle('is-hot', Number(memory) >= 75);
+    if (cpuBox) cpuBox.classList.toggle('is-hot', Number(cpu) >= 90);
+    if (memBox) memBox.classList.toggle('is-hot', Number(memory) >= 90);
 }
 
 function paintLoadMeters(history) {
@@ -1243,11 +1226,11 @@ function paintNetMeters(down, up, downKbs, upKbs) {
     const txVal = document.getElementById('btop-tx-val');
     if (rx) {
         rx.style.width = Math.min(100, (down / scale) * 100) + '%';
-        rx.style.background = '#7aa2f7';
+        rx.style.background = 'var(--ui-accent)';
     }
     if (tx) {
         tx.style.width = Math.min(100, (up / scale) * 100) + '%';
-        tx.style.background = '#9ece6a';
+        tx.style.background = 'var(--ui-accent)';
     }
     if (rxVal) rxVal.textContent = speedText(Number.isFinite(downKbs) ? downKbs : down * 1024);
     if (txVal) txVal.textContent = speedText(Number.isFinite(upKbs) ? upKbs : up * 1024);
@@ -1339,10 +1322,10 @@ async function checkRequiredTools() {
             if (toolsData.missing && toolsData.missing.length > 0) {
                 toolsData.missing.forEach(tool => {
                     const toolDiv = document.createElement('div');
-                    toolDiv.className = 'missing-tool-item mb-3 p-3 bg-light rounded';
+                    toolDiv.className = 'missing-tool-item';
                     toolDiv.innerHTML = `
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <strong>❌ ${tool.name}</strong>
+                            <strong><i class="bi bi-x-circle text-danger" aria-hidden="true"></i> ${tool.name}</strong>
                             <span class="badge bg-${tool.category === 'optional' ? 'warning' : 'danger'}">${tool.category}</span>
                         </div>
                         <p class="mb-2 small text-muted">${tool.description}</p>
@@ -1361,10 +1344,10 @@ async function checkRequiredTools() {
             if (toolsData.warnings && toolsData.warnings.length > 0) {
                 toolsData.warnings.forEach(tool => {
                     const toolDiv = document.createElement('div');
-                    toolDiv.className = 'missing-tool-item mb-3 p-3 bg-warning bg-opacity-10 rounded border border-warning';
+                    toolDiv.className = 'missing-tool-item';
                     toolDiv.innerHTML = `
                         <div class="d-flex align-items-center mb-2">
-                            <strong>⚠️ ${tool.name}</strong>
+                            <strong><i class="bi bi-exclamation-triangle text-warning" aria-hidden="true"></i> ${tool.name}</strong>
                             <span class="ms-2 text-warning">${tool.warning}</span>
                         </div>
                         ${tool.fix_cmd ? `
@@ -1460,7 +1443,6 @@ function showErrorNotification(message) {
     notification.style.maxWidth = '400px';
     notification.innerHTML = `
         <div class="d-flex align-items-start">
-            <div style="font-size: 2rem; margin-right: 15px;">⚠️</div>
             <div>
                 <strong>{{ _("Ошибка подключения") }}</strong><br>
                 ${message}

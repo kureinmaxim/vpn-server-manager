@@ -20,3 +20,9 @@ def test_monitoring_renders_its_stylesheet_and_section_links(client):
     for section in ('overview', 'network', 'services', 'security', 'history'):
         assert f'href="#monitoring-{section}"' in html
         assert f'id="monitoring-{section}"' in html
+    # Shared interface rules come from the layout; sections switch by attribute, not by card class.
+    assert 'css/ui.css?v=' in html
+    assert html.count('data-mon-section=') == 5
+    # In the markup, state is a dot or an icon from Bootstrap Icons, never an emoji standing in for one.
+    markup = html[html.index('monitoring-page'):html.index('js/project_stats.js')]
+    assert not any(mark in markup for mark in ('✅', '❌', '⚠️', '🔍', '📈'))

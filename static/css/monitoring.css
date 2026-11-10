@@ -1,141 +1,175 @@
-/* Monitoring uses the same theme tokens as DNS and Server Load. */
+/* Monitoring is built from the shared rules in ui.css: cards, tabs, dots, label/value pairs. */
 
-.monitoring-page { max-width: 1320px; margin-inline: auto; padding-bottom: 2rem; }
-.monitoring-page h1 { font-size: 1.6rem; font-weight: 650; }
-.monitoring-page h2, .monitoring-page h3 { font-size: 1.05rem; font-weight: 600; }
-.monitoring-page h4 { font-size: .95rem; }
-.monitoring-page [id^="monitoring-"] { scroll-margin-top: 5rem; }
-.monitoring-page .monitoring-nav { display: flex; flex-wrap: wrap; gap: .4rem; padding: .5rem 0 1rem; }
-.monitoring-page .monitoring-nav a { padding: .45rem .85rem; border: 1px solid var(--bs-border-color); border-radius: .5rem; text-decoration: none; background: var(--bs-tertiary-bg); }
-.monitoring-page .monitoring-nav a:hover { border-color: var(--bs-primary); }
-.monitoring-page .card { border: 1px solid var(--bs-border-color); border-radius: .75rem; box-shadow: none; }
-.monitoring-page .card-body { padding: .75rem; }
+.monitoring-page { max-width: 1200px; margin-inline: auto; padding-bottom: 2rem; }
 .monitoring-page [hidden] { display: none !important; }
-.monitoring-page .monitoring-nav a[aria-current] { color: var(--bs-body-bg); background: var(--bs-primary); border-color: var(--bs-primary); }
-.monitoring-page .monitoring-grid { align-items: flex-start; }
-.monitoring-page .btop-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-.monitoring-page .btop-box { min-width: 0; padding: .65rem .8rem; border: 1px solid var(--bs-border-color); border-radius: .75rem; background: var(--bs-tertiary-bg); }
-.monitoring-page .btop-box.is-hot { border-color: var(--bs-danger); }
-.monitoring-page .btop-box header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; margin-bottom: .75rem; color: var(--bs-secondary-color); }
-.monitoring-page .btop-box header strong { font-size: 1.2rem; color: var(--bs-body-color); font-variant-numeric: tabular-nums; }
-.monitoring-page .btop-bar { height: 6px; background: var(--bs-border-color); border-radius: 1rem; overflow: hidden; }
-.monitoring-page .btop-bar > i { display: block; height: 100%; width: 0; border-radius: inherit; }
-.monitoring-page .btop-spark { display: flex; align-items: flex-end; gap: 2px; height: 18px; margin-top: .5rem; }
-.monitoring-page .btop-spark span { flex: 1; min-width: 0; border-radius: 2px; }
-.monitoring-page .btop-net-row { display: grid; grid-template-columns: 1rem minmax(0, 1fr) 5.5rem; align-items: center; gap: .5rem; margin-top: .6rem; }
-.monitoring-page .btop-net-row em { font-style: normal; text-align: right; font-size: .875rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.monitoring-page .overview-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .75rem; margin-bottom: 1rem; }
-.monitoring-page .overview-title { margin: 0; }
-.monitoring-page .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-.monitoring-page .overview-item { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
-.monitoring-page .overview-label { color: var(--bs-secondary-color); font-size: .8rem; }
-.monitoring-page .overview-value { font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; }
-.monitoring-page .load-diagnosis { margin-bottom: 1.5rem; font-size: .875rem; color: var(--bs-secondary-color); }
-.monitoring-page .load-tools { border-block: 1px solid var(--bs-border-color); padding-block: .75rem; margin-top: .75rem; }
-.monitoring-page .load-tools-title { cursor: pointer; color: var(--bs-body-color); }
-.monitoring-page .load-tool-row { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: .75rem; margin-top: .75rem; }
-.monitoring-page .load-tool-row input { font-size: .8rem; }
-.monitoring-page .traffic-stats { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 1rem; }
-.monitoring-page .stat { flex: 1; min-width: 0; padding: .75rem; border: 1px solid var(--bs-border-color); border-radius: .5rem; }
-.monitoring-page .stat .value { display: block; font-size: 1.35rem; font-weight: 600; margin-block: .35rem; font-variant-numeric: tabular-nums; }
-.monitoring-page .stat .label, .monitoring-page .stat .peak, .monitoring-page .monitoring-caption { font-size: .85rem; color: var(--bs-secondary-color); }
-.monitoring-page .daily-stats, .monitoring-page .last-update { padding-top: .75rem; border-top: 1px solid var(--bs-border-color); font-size: .85rem; color: var(--bs-secondary-color); }
-.monitoring-page .status-badge { margin-block: .5rem; }
-.monitoring-page .status-active, .monitoring-page .status-inactive { display: inline-block; padding: .3rem .65rem; border-radius: .4rem; font-size: .85rem; }
-.monitoring-page .status-active { color: var(--bs-success-text-emphasis); background: var(--bs-success-bg-subtle); }
-.monitoring-page .status-inactive { color: var(--bs-danger-text-emphasis); background: var(--bs-danger-bg-subtle); }
-.monitoring-page .fw-details p { margin: 0; padding-block: .5rem; border-bottom: 1px solid var(--bs-border-color); overflow-wrap: anywhere; font-size: .875rem; }
-.monitoring-page .fw-details strong { font-weight: 500; color: var(--bs-secondary-color); }
-.monitoring-page .services-grid { display: flex; flex-direction: column; gap: .4rem; }
-.monitoring-page .service-item { padding: .6rem .75rem; border: 1px solid var(--bs-border-color); border-left-width: 3px; border-radius: .4rem; overflow-wrap: anywhere; }
-.monitoring-page .service-item.active { border-left-color: var(--bs-success); }
-.monitoring-page .service-item.inactive { border-left-color: var(--bs-danger); }
-.monitoring-page .service-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; }
-.monitoring-page .service-name { font-weight: 600; font-size: .9rem; }
-.monitoring-page .service-status, .monitoring-page .service-uptime { color: var(--bs-secondary-color); font-size: .8rem; }
-.monitoring-page .events-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-block: 1rem; }
-.monitoring-page .event-card { display: flex; align-items: center; gap: .75rem; border: 1px solid var(--bs-border-color); border-radius: .5rem; padding: .75rem; }
-.monitoring-page .event-value { font-size: 1.35rem; font-weight: 600; }
-.monitoring-page .event-label { color: var(--bs-secondary-color); font-size: .8rem; }
-.monitoring-page .event-card.warning { border-color: var(--bs-danger); }
-.monitoring-page .priority-strip { margin-bottom: 1rem; }
-.monitoring-page .priority-card { padding: 1rem; border: 1px solid var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); border-radius: .75rem; }
-.monitoring-page .security-brief { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-.monitoring-page .security-brief-card { padding: 1rem; border: 1px solid var(--bs-border-color); border-radius: .75rem; }
-.monitoring-page .security-brief-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .5rem; }
-.monitoring-page .security-brief-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 22rem; overflow: auto; font-size: .8rem; }
-.monitoring-page .charts-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.monitoring-page .chart-wrapper { height: 185px; position: relative; }
+.monitoring-page [id^="monitoring-"] { scroll-margin-top: 5rem; }
+.monitoring-page [id^="monitoring-"]:focus { outline: none; }
+.monitoring-page h3 { font-size: var(--ui-text-sm); font-weight: 600; color: var(--ui-muted); }
+.monitoring-page h4 { font-size: var(--ui-text-sm); font-weight: 600; }
+
+/* Header: the server, where it is, what can be done */
+.monitoring-page .mon-header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; margin-bottom: .75rem; }
+.monitoring-page .mon-header h1 { margin: 0; font-size: var(--ui-text-lg); font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
+.monitoring-page .mon-header-meta { display: flex; flex-wrap: wrap; gap: .15rem .5rem; margin: .3rem 0 0; font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .mon-header-meta span + span::before { content: "·"; margin-right: .5rem; }
+.monitoring-page .mon-header-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* Sections: one is visible at a time */
+.monitoring-page .mon-section { display: grid; gap: var(--ui-gap); }
+.monitoring-page .mon-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ui-gap); align-items: start; }
+.monitoring-page .mon-services { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.monitoring-page .mon-footer-actions { display: flex; justify-content: flex-end; }
+.monitoring-page .mon-footer-actions .btn { text-decoration: none; }
+
+/* Needs attention: rows only for warnings and failures, the rest in one quiet line */
+.monitoring-page .mon-attention-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.monitoring-page .mon-attention-head .ui-card-title { margin: 0; }
+.monitoring-page .mon-attention-list { list-style: none; margin: 0; padding: 0; }
+.monitoring-page .mon-attention-list:not(:empty) { margin-top: .75rem; }
+.monitoring-page .mon-attention-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: .25rem .5rem; padding: .5rem 0; border-top: 1px solid var(--ui-border); font-size: var(--ui-text-sm); }
+.monitoring-page .mon-attention-row > .ui-dot { align-self: center; }
+.monitoring-page .mon-attention-row > .bi { color: var(--ui-muted); }
+.monitoring-page .mon-attention-label { font-weight: 600; }
+.monitoring-page button.mon-attention-label { padding: 0; border: 0; font-size: inherit; text-align: left; }
+.monitoring-page .mon-attention-row small { flex-basis: 100%; padding-left: 2.25rem; font-size: var(--ui-text-xs); color: var(--ui-muted); }
+.monitoring-page .mon-attention-facts { margin: .75rem 0 0; padding-top: .625rem; border-top: 1px solid var(--ui-border); font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .security-brief { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ui-gap); margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--ui-border); }
+.monitoring-page .security-brief-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; }
+.monitoring-page .security-brief-text { margin: .5rem 0 0; padding: .75rem; max-height: 22rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: var(--ui-text-xs); background: var(--ui-sunken); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); }
+.monitoring-page .missing-tool-item { padding: .75rem 0; border-top: 1px solid var(--bs-warning-border-subtle); }
+
+/* Four figures */
+.monitoring-page .btop-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--ui-gap); }
+.monitoring-page .btop-box { padding: .875rem 1rem; }
+.monitoring-page .btop-box.is-hot { border-color: var(--ui-danger); }
+.monitoring-page .btop-box header { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; margin-bottom: .75rem; font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .btop-box header strong { font-size: var(--ui-text-lg); font-weight: 650; line-height: 1; color: var(--bs-body-color); font-variant-numeric: tabular-nums; }
+.monitoring-page .btop-bar { height: 4px; background: var(--ui-border); border-radius: 2px; overflow: hidden; }
+.monitoring-page .btop-bar > i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--ui-accent); }
+.monitoring-page .btop-spark { display: flex; align-items: flex-end; gap: 2px; height: 22px; margin-top: .625rem; }
+.monitoring-page .btop-spark span { flex: 1; min-width: 0; border-radius: 1px; }
+.monitoring-page .btop-net-row { display: grid; grid-template-columns: 1rem minmax(0, 1fr) 5.25rem; align-items: center; gap: .5rem; color: var(--ui-muted); }
+.monitoring-page .btop-net-row + .btop-net-row { margin-top: .625rem; }
+.monitoring-page .btop-net-row em { font-style: normal; text-align: right; font-size: var(--ui-text-sm); font-weight: 600; white-space: nowrap; color: var(--bs-body-color); font-variant-numeric: tabular-nums; }
+.monitoring-page .btop-link { display: block; color: inherit; text-decoration: none; }
+.monitoring-page .btop-link:hover { border-color: var(--ui-accent); }
+.monitoring-page .btop-note { margin: .625rem 0 0; font-size: var(--ui-text-xs); color: var(--ui-muted); overflow-wrap: anywhere; }
+
+/* Load and summary */
+.monitoring-page .load-diagnosis { font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .load-diagnosis .ui-card-title { color: var(--bs-body-color); }
+.monitoring-page .load-tools { margin-top: .75rem; padding-top: .625rem; border-top: 1px solid var(--ui-border); }
+.monitoring-page .load-tools-title { cursor: pointer; }
+.monitoring-page .load-tool-row { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; align-items: center; gap: .5rem; margin-top: .625rem; }
+
+/* Network */
+.monitoring-page .monitoring-caption { margin: -.25rem 0 .75rem; font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .traffic-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ui-gap); margin-bottom: .75rem; }
+.monitoring-page .stat .label, .monitoring-page .stat .peak { display: block; font-size: var(--ui-text-xs); color: var(--ui-muted); }
+.monitoring-page .stat .value { display: block; margin-block: .2rem; font-size: var(--ui-text-lg); font-weight: 650; font-variant-numeric: tabular-nums; }
+.monitoring-page .daily-stats, .monitoring-page .last-update { padding-top: .625rem; border-top: 1px solid var(--ui-border); font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.monitoring-page .fw-details > div:first-child { border-top: 0; padding-top: 0; }
+
+/* Services: one line each, state as a dot */
+.monitoring-page .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); gap: 0 1.5rem; }
+.monitoring-page .services-grid-wide, .monitoring-page #reticulum-status { grid-template-columns: 1fr; }
+.monitoring-page .services-grid > .text-muted { font-size: var(--ui-text-sm); }
+.monitoring-page .service-item { display: flex; align-items: center; gap: .5rem; min-width: 0; padding: .45rem 0; border-top: 1px solid var(--ui-border); font-size: var(--ui-text-sm); }
+.monitoring-page .service-item-wide { flex-wrap: wrap; }
+.monitoring-page .service-name { flex: 1; min-width: 0; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.monitoring-page .service-status { flex: none; font-size: var(--ui-text-xs); color: var(--ui-muted); font-variant-numeric: tabular-nums; }
+.monitoring-page .service-item.failed .service-status { color: var(--ui-danger); font-weight: 600; }
+.monitoring-page .service-manage { flex: none; color: var(--ui-muted); }
+.monitoring-page .service-code { flex-basis: 100%; cursor: pointer; font-size: var(--ui-text-xs); overflow-wrap: anywhere; color: var(--ui-muted); }
+.monitoring-page .service-open { font-size: var(--ui-text-xs); white-space: nowrap; }
+.monitoring-page .service-missing { grid-column: 1 / -1; padding-top: .5rem; border-top: 1px solid var(--ui-border); font-size: var(--ui-text-xs); color: var(--ui-muted); }
+.monitoring-page .service-missing summary { cursor: pointer; }
+.monitoring-page .service-missing p { margin: .35rem 0 0; }
+
+/* Security: neutral figures; colour only where the count crosses its threshold */
+.monitoring-page .events-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem 1.5rem; margin-bottom: .75rem; }
+.monitoring-page .event-card { display: flex; align-items: center; gap: .75rem; min-width: 0; padding: .625rem 0; border-top: 1px solid var(--ui-border); }
+.monitoring-page .event-icon { flex: none; font-size: 1.1rem; color: var(--ui-muted); }
+.monitoring-page .event-value { font-size: var(--ui-text-lg); font-weight: 650; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.monitoring-page .event-label { font-size: var(--ui-text-xs); color: var(--ui-muted); }
+.monitoring-page .event-card.warning :is(.event-value, .event-icon) { color: var(--ui-warn); }
+.monitoring-page .event-card-danger.warning :is(.event-value, .event-icon) { color: var(--ui-danger); }
+
+/* History */
+.monitoring-page .charts-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+.monitoring-page .chart-wrapper { height: 200px; position: relative; }
+
+/* Installation */
 .monitoring-page .installation-panel { max-width: 720px; margin: 1rem auto; }
-.monitoring-page .install-card { border: 1px solid var(--bs-border-color); border-radius: .75rem; background: var(--bs-tertiary-bg); }
+.monitoring-page .install-card { border: 1px solid var(--ui-border); border-radius: var(--ui-radius); background: var(--ui-surface); }
 .monitoring-page .install-header, .monitoring-page .install-body { padding: 1.25rem; }
-.monitoring-page .install-header { border-bottom: 1px solid var(--bs-border-color); }
+.monitoring-page .install-header { border-bottom: 1px solid var(--ui-border); }
+.monitoring-page .install-header h3 { font-size: var(--ui-text-md); color: var(--bs-body-color); }
 .monitoring-page .install-features { margin-bottom: 1rem; }
 .monitoring-page .install-features ul { padding-left: 1.25rem; }
 .monitoring-page #install-btn { width: 100%; }
-:is(.monitoring-page, #uninstallModal) .progress-bar-container { position: relative; height: 2rem; background: var(--bs-border-color); border-radius: .5rem; overflow: hidden; margin-block: 1rem; }
-:is(.monitoring-page, #uninstallModal) .progress-bar-container .progress-bar { height: 100%; width: 0; background: var(--bs-primary); }
+:is(.monitoring-page, #uninstallModal) .progress-bar-container { position: relative; height: 2rem; background: var(--ui-border); border-radius: var(--ui-radius-sm); overflow: hidden; margin-block: 1rem; }
+:is(.monitoring-page, #uninstallModal) .progress-bar-container .progress-bar { height: 100%; width: 0; background: var(--ui-accent); }
 #uninstallModal .progress-bar-container .progress-bar-danger { background: var(--bs-danger); }
 :is(.monitoring-page, #uninstallModal) .progress-text { position: absolute; inset: 0; display: grid; place-items: center; }
-:is(.monitoring-page, #uninstallModal) .install-logs { max-height: 300px; overflow: auto; padding: 1rem; background: var(--bs-body-bg); border: 1px solid var(--bs-border-color); border-radius: .5rem; font-family: var(--bs-font-monospace); font-size: .8rem; }
+:is(.monitoring-page, #uninstallModal) .install-logs { max-height: 300px; overflow: auto; padding: 1rem; background: var(--ui-sunken); border: 1px solid var(--ui-border); border-radius: var(--ui-radius-sm); font-family: var(--bs-font-monospace); font-size: var(--ui-text-xs); }
 :is(.monitoring-page, #uninstallModal) .log-entry { padding-block: .2rem; }
 :is(.monitoring-page, #uninstallModal) .log-error { color: var(--bs-danger-text-emphasis); }
 :is(.monitoring-page, #uninstallModal) .log-success { color: var(--bs-success-text-emphasis); }
 :is(.monitoring-page, #uninstallModal) .log-warning { color: var(--bs-warning-text-emphasis); }
-.monitoring-page a:focus-visible, .monitoring-page summary:focus-visible { outline: 2px solid var(--bs-primary); outline-offset: 3px; }
-@media (max-width: 767.98px) {
-    .monitoring-page .btop-board, .monitoring-page .charts-container, .monitoring-page .security-brief { grid-template-columns: 1fr; }
-    .monitoring-page .load-tool-row { grid-template-columns: minmax(0, 1fr) auto; }
-    .monitoring-page .load-tool-row > span { grid-column: 1 / -1; }
-    .monitoring-page .stat .value { font-size: 1.05rem; }
-    .monitoring-page .card-body { padding: .85rem; }
-    .monitoring-page .monitoring-nav { gap: .3rem; }
-    .monitoring-page .monitoring-nav a { font-size: .85rem; padding: .4rem .65rem; }
-}
+.monitoring-page a:focus-visible, .monitoring-page summary:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 3px; }
 
-/* Status strip: one row of chips instead of alarm boxes */
-.monitoring-page .d-contents { display: contents; }
-.monitoring-page .mon-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .3em .75em; border-radius: 999px;
-    font-size: .85rem; font-weight: 500; border: 1px solid var(--bs-border-color); background: var(--bs-body-bg); color: var(--bs-body-color); line-height: 1.4; }
-.monitoring-page button.mon-chip { cursor: pointer; }
-.monitoring-page .mon-chip-ok { border-color: var(--bs-success-border-subtle); background: var(--bs-success-bg-subtle); color: var(--bs-success-text-emphasis); }
-.monitoring-page .mon-chip-info { color: var(--bs-secondary-color); }
-.monitoring-page .mon-chip-warn { border-color: var(--bs-warning-border-subtle); background: var(--bs-warning-bg-subtle); color: var(--bs-warning-text-emphasis); }
-.monitoring-page .mon-chip-danger { border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); color: var(--bs-danger-text-emphasis); }
-.monitoring-page .mon-status-brief { border-radius: 999px; }
-
-/* Exchange with the server: steps, bar, estimate; folds to one line after the first load */
-.monitoring-page .mon-sync { border: 1px solid var(--bs-border-color); border-radius: .75rem; padding: .6rem .9rem; background: var(--bs-tertiary-bg); }
-.monitoring-page .mon-sync-head { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; font-size: .9rem; }
-.monitoring-page .mon-sync-meta { color: var(--bs-secondary-color); font-variant-numeric: tabular-nums; }
+/* Exchange with the server: a box with steps while loading, one quiet line afterwards */
+.monitoring-page .mon-sync { margin-bottom: 1rem; padding: .625rem .875rem; border: 1px solid var(--ui-border); border-radius: var(--ui-radius); background: var(--ui-surface); }
+/* A failed installation check already says what went wrong: no second message under it. */
+.monitoring-page #installation-check-error:not([hidden]) ~ .mon-sync { display: none; }
+.monitoring-page .mon-sync-head { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem .6rem; font-size: var(--ui-text-sm); }
+.monitoring-page .mon-sync-meta { color: var(--ui-muted); font-variant-numeric: tabular-nums; }
 .monitoring-page .mon-sync-eta { margin-left: .35rem; }
-.monitoring-page .mon-sync-live { margin-left: auto; color: var(--bs-secondary-color); font-size: .85rem; display: none; }
-.monitoring-page .mon-sync-toggle { padding: 0 .25rem; color: var(--bs-secondary-color); }
-.monitoring-page .mon-sync-pulse { width: .6rem; height: .6rem; border-radius: 50%; background: var(--bs-info); flex: none; animation: mon-pulse 1.2s ease-in-out infinite; }
-.monitoring-page .mon-sync.is-done .mon-sync-pulse { background: var(--bs-success); animation: none; }
-.monitoring-page .mon-sync.is-done.has-errors .mon-sync-pulse { background: var(--bs-warning); }
-.monitoring-page .mon-sync.is-done.is-polling .mon-sync-pulse { background: var(--bs-info); animation: mon-pulse 1.2s ease-in-out infinite; }
-.monitoring-page .mon-sync-bar { height: 4px; border-radius: 2px; background: var(--bs-border-color); margin: .5rem 0; overflow: hidden; }
-.monitoring-page .mon-sync-fill { height: 100%; width: 0; border-radius: 2px; transition: width .5s ease;
-    background: linear-gradient(90deg, var(--bs-info), var(--bs-success)); background-size: 200% 100%; animation: mon-flow 1.6s linear infinite; }
-.monitoring-page .mon-sync.is-done .mon-sync-fill { animation: none; background: var(--bs-success); }
-.monitoring-page .mon-sync.is-done.has-errors .mon-sync-fill { background: var(--bs-warning); }
+.monitoring-page .mon-sync-live { color: var(--ui-muted); display: none; }
+.monitoring-page .mon-sync-toggle { padding: 0 .25rem; color: var(--ui-muted); }
+.monitoring-page .mon-sync-pulse { width: .5rem; height: .5rem; border-radius: 50%; background: var(--ui-accent); flex: none; animation: mon-pulse 1.2s ease-in-out infinite; }
+.monitoring-page .mon-sync.is-done .mon-sync-pulse { background: var(--ui-ok); animation: none; }
+.monitoring-page .mon-sync.is-done.has-errors .mon-sync-pulse { background: var(--ui-warn); }
+.monitoring-page .mon-sync.is-done.is-polling .mon-sync-pulse { background: var(--ui-accent); animation: mon-pulse 1.2s ease-in-out infinite; }
+.monitoring-page .mon-sync-bar { height: 3px; border-radius: 2px; background: var(--ui-border); margin: .5rem 0; overflow: hidden; }
+.monitoring-page .mon-sync-fill { height: 100%; width: 0; border-radius: 2px; transition: width .5s ease; background: var(--ui-accent); }
+.monitoring-page .mon-sync.is-done .mon-sync-fill { background: var(--ui-ok); }
+.monitoring-page .mon-sync.is-done.has-errors .mon-sync-fill { background: var(--ui-warn); }
 .monitoring-page .mon-sync-steps { display: flex; flex-wrap: wrap; gap: .3rem; }
-.monitoring-page .mon-step { display: inline-flex; align-items: center; gap: .3rem; padding: .15em .6em; border-radius: 999px; font-size: .8rem;
-    border: 1px solid var(--bs-border-color); color: var(--bs-secondary-color); font-variant-numeric: tabular-nums; transition: background .3s, color .3s; }
-.monitoring-page .mon-step-run { color: var(--bs-info-text-emphasis); border-color: var(--bs-info-border-subtle); background: var(--bs-info-bg-subtle); }
-.monitoring-page .mon-step-ok { color: var(--bs-success-text-emphasis); border-color: var(--bs-success-border-subtle); background: var(--bs-success-bg-subtle); }
+.monitoring-page .mon-step { display: inline-flex; align-items: center; gap: .3rem; padding: .1em .55em; border-radius: 999px; font-size: var(--ui-text-xs);
+    border: 1px solid var(--ui-border); color: var(--ui-muted); font-variant-numeric: tabular-nums; transition: background .3s, color .3s; }
+.monitoring-page .mon-step-run { color: var(--bs-body-color); border-color: var(--ui-accent); }
+.monitoring-page .mon-step-ok { color: var(--bs-success-text-emphasis); border-color: var(--bs-success-border-subtle); }
 .monitoring-page .mon-step-err { color: var(--bs-danger-text-emphasis); border-color: var(--bs-danger-border-subtle); background: var(--bs-danger-bg-subtle); }
 .monitoring-page .mon-step-spin { width: .7rem; height: .7rem; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: mon-spin .8s linear infinite; }
-.monitoring-page .mon-sync.is-compact { padding-block: .35rem; }
+.monitoring-page .mon-sync.is-compact { padding: 0; border: 0; background: none; }
+.monitoring-page .mon-sync.is-compact .mon-sync-head { color: var(--ui-muted); font-size: var(--ui-text-xs); }
 .monitoring-page .mon-sync.is-compact .mon-sync-bar,
 .monitoring-page .mon-sync.is-compact .mon-sync-steps,
 .monitoring-page .mon-sync.is-compact .mon-sync-meta { display: none; }
 .monitoring-page .mon-sync.is-done .mon-sync-live { display: inline; }
-.monitoring-page .mon-sync.is-compact .mon-sync-title { font-weight: 500; }
+.monitoring-page .mon-sync.is-done .mon-sync-live:not(:empty)::before { content: "· "; }
+.monitoring-page .mon-sync.is-compact .mon-sync-title { font-weight: 400; }
+html[data-skin="minecraft"] .monitoring-page :is(.mon-step, .mon-sync-pulse, .btop-bar, .mon-sync-bar) { border-radius: 0; }
 @keyframes mon-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.75); } }
-@keyframes mon-flow { from { background-position: 200% 0; } to { background-position: 0 0; } }
 @keyframes mon-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) {
-    .monitoring-page .mon-sync-pulse, .monitoring-page .mon-sync-fill, .monitoring-page .mon-step-spin { animation: none !important; }
+    .monitoring-page .mon-sync-pulse, .monitoring-page .mon-step-spin { animation: none !important; }
+    .monitoring-page .mon-sync-fill { transition: none; }
+}
+
+@media (max-width: 991.98px) {
+    .monitoring-page .btop-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .monitoring-page .mon-pair, .monitoring-page .mon-services { grid-template-columns: 1fr; }
+}
+@media (max-width: 575.98px) {
+    .monitoring-page .btop-board, .monitoring-page .charts-container, .monitoring-page .security-brief,
+    .monitoring-page .traffic-stats { grid-template-columns: 1fr; }
+    .monitoring-page .events-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .monitoring-page .load-tool-row { grid-template-columns: minmax(0, 1fr) auto; }
+    .monitoring-page .load-tool-row > span { grid-column: 1 / -1; }
+    .monitoring-page .ui-kv-rows > div { flex-direction: column; gap: .15rem; }
+    .monitoring-page .ui-kv-rows dd { text-align: left; }
+    .monitoring-page .ui-tabs { gap: .25rem .875rem; }
 }

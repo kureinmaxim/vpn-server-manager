@@ -1,0 +1,57 @@
+/* Shared interface rules: one accent, state colours for state only, one radius, four text sizes.
+   Pages build on these instead of declaring their own colours and sizes. */
+
+:root {
+    --ui-radius: .625rem;
+    --ui-radius-sm: .375rem;
+    --ui-gap: 1rem;
+    --ui-text-xs: .75rem;
+    --ui-text-sm: .8125rem;
+    --ui-text-md: .9375rem;
+    --ui-text-lg: 1.375rem;
+    --ui-surface: var(--bs-tertiary-bg);
+    --ui-sunken: var(--bs-body-bg);
+    --ui-border: var(--bs-border-color);
+    --ui-muted: var(--bs-secondary-color);
+    --ui-accent: var(--bs-primary);
+    --ui-ok: var(--a11y-success, var(--bs-success));
+    --ui-warn: var(--a11y-warning, var(--bs-warning));
+    --ui-danger: var(--a11y-danger, var(--bs-danger));
+    --ui-spark: color-mix(in srgb, var(--ui-accent) 40%, transparent);
+}
+html[data-skin="minecraft"] { --ui-radius: 0; --ui-radius-sm: 0; }
+
+/* Card: the only container surface */
+.ui-card { min-width: 0; padding: 1rem 1.125rem; background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: var(--ui-radius); }
+.ui-card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .75rem; }
+.ui-card-head > .ui-card-title { margin-bottom: 0; }
+.ui-card-title { display: flex; align-items: center; gap: .5rem; margin: 0 0 .75rem; font-size: var(--ui-text-md); font-weight: 600; line-height: 1.3; }
+.ui-card-title > .bi { color: var(--ui-muted); }
+
+/* Label and value pairs: a grid by default, full-width rows with .ui-kv-rows */
+.ui-kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: .875rem 1rem; margin: 0; }
+.ui-kv > div { min-width: 0; }
+.ui-kv dt { margin-bottom: .2rem; font-size: var(--ui-text-xs); font-weight: 400; color: var(--ui-muted); }
+.ui-kv dd { margin: 0; font-size: var(--ui-text-sm); font-weight: 600; overflow-wrap: anywhere; }
+.ui-kv-rows { display: block; }
+.ui-kv-rows > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: .5rem 0; border-top: 1px solid var(--ui-border); }
+.ui-kv-rows dt { flex: none; margin: 0; font-size: var(--ui-text-sm); }
+.ui-kv-rows dd { text-align: right; }
+
+/* State: a dot, or a short label where the word is needed */
+.ui-dot { flex: none; display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; background: var(--ui-muted); }
+.ui-dot-ok { background: var(--ui-ok); }
+.ui-dot-warn { background: var(--ui-warn); }
+.ui-dot-danger { background: var(--ui-danger); }
+.ui-dot-off { background: transparent; box-shadow: inset 0 0 0 1.5px var(--ui-muted); }
+.ui-state { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .55rem; border: 1px solid var(--ui-border); border-radius: 999px; font-size: var(--ui-text-xs); font-weight: 600; color: var(--ui-muted); }
+.ui-state-ok { color: var(--bs-success-text-emphasis); background: var(--bs-success-bg-subtle); border-color: var(--bs-success-border-subtle); }
+.ui-state-danger { color: var(--bs-danger-text-emphasis); background: var(--bs-danger-bg-subtle); border-color: var(--bs-danger-border-subtle); }
+html[data-skin="minecraft"] :is(.ui-dot, .ui-state) { border-radius: 0; }
+
+/* Tabs: underlined, so they do not look like action buttons */
+.ui-tabs { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--ui-border); }
+.ui-tabs a { margin-bottom: -1px; padding: .5rem .125rem; border-bottom: 2px solid transparent; font-size: var(--ui-text-md); color: var(--ui-muted); text-decoration: none; }
+.ui-tabs a:hover { color: var(--bs-body-color); }
+.ui-tabs a[aria-current] { color: var(--bs-body-color); font-weight: 600; border-bottom-color: var(--ui-accent); }
+.ui-tabs a:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; border-radius: var(--ui-radius-sm); }

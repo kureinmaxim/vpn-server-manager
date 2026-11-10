@@ -2,36 +2,25 @@
 (() => {
     const page = document.querySelector('.monitoring-page');
     if (!page) return;
-    const groups = {
-        overview: '.monitoring-overview, #load-diagnosis',
-        network: '.network-traffic, .firewall-status',
-        services: '.active-services, .telegramonly-stack, .reticulum-status, .webpanels, .project-status',
-        security: '.security-events',
-        history: '.mini-charts',
-    };
-    const links = [...page.querySelectorAll('.monitoring-nav a')];
-    function showSection(section) {
-        if (!Object.hasOwn(groups, section)) section = 'overview';
-        Object.entries(groups).forEach(([name, selector]) => {
-            page.querySelectorAll(selector).forEach(el => { el.hidden = name !== section; });
-        });
-        // Empty Bootstrap columns must not retain their width or gutters.
-        page.querySelectorAll('[class*="col-"]').forEach(column => {
-            const cards = [...column.querySelectorAll('.monitoring-card')];
-            if (cards.length) column.hidden = cards.every(card => card.hidden);
-        });
-        const grid = page.querySelector('.monitoring-grid');
-        if (grid) grid.hidden = section === 'overview';
+    const sections = [...page.querySelectorAll('[data-mon-section]')];
+    const links = [...page.querySelectorAll('a[href^="#monitoring-"]')];
+    const names = sections.map(section => section.dataset.monSection);
+    function showSection(name, focus) {
+        if (!names.includes(name)) name = 'overview';
+        sections.forEach(section => { section.hidden = section.dataset.monSection !== name; });
         links.forEach(link => {
-            if (link.hash === '#monitoring-' + section) link.setAttribute('aria-current', 'true');
+            if (!link.closest('.monitoring-nav')) return;
+            if (link.hash === '#monitoring-' + name) link.setAttribute('aria-current', 'true');
             else link.removeAttribute('aria-current');
         });
+        if (focus) history.replaceState(null, '', '#monitoring-' + name);
         // Charts created while hidden need their new container dimensions.
         window.dispatchEvent(new Event('resize'));
     }
     links.forEach(link => link.addEventListener('click', event => {
         event.preventDefault();
-        showSection(link.hash.replace('#monitoring-', ''));
+        showSection(link.hash.replace('#monitoring-', ''), true);
     }));
+    window.addEventListener('hashchange', () => showSection(location.hash.replace('#monitoring-', '')));
     showSection(location.hash.replace('#monitoring-', ''));
 })();
