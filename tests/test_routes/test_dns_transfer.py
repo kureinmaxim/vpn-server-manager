@@ -280,30 +280,46 @@ def _restore(client, raw, name='transfer.zip', **form):
                        content_type='multipart/form-data')
 
 
-def test_download_survives_the_second_get_a_webview_makes(env):
-    """The app window saves a file by requesting its address again with GET. That request used to
-    reach a POST-only route and the 405 page was saved under the export's name (153 bytes)."""
+def test_download_works_without_the_session_cookie_a_webview_download_lacks(env):
+    """pywebview on macOS cancels the navigation and downloads the address again through the shared
+    NSURLSession, which has no cookie of the window. That request used to get the lock screen, and the
+    HTML of the lock screen was saved under the export's name (a 94 KB 'zip' that no archiver opens)."""
     client, _ = env
     prepared = client.post('/export_key', data={'confirm_secret_export': 'yes'})
     location = prepared.headers['Location']
-    first, second = client.get(location), client.get(location)
-    assert first.status_code == second.status_code == 200
-    assert first.data == second.data and first.data.startswith(b'SECRET_KEY=')
-    assert 'attachment' in second.headers['Content-Disposition']
+    first = client.get(location)
+    assert first.status_code == 200 and first.data.startswith(b'SECRET_KEY=')
+    assert 'attachment' in first.headers['Content-Disposition']
+    # The second request of the window: a client with no cookies at all.
+    bare = client.application.test_client()
+    second = bare.get(location)
+    assert second.status_code == 200 and second.data == first.data
+    assert b'Access Restricted' not in second.data and b'pinInput' not in second.data
 
 
-def test_prepared_download_belongs_to_its_session_and_expires(env, monkeypatch):
+def test_prepared_download_is_unguessable_short_lived_and_limited(env, monkeypatch):
     from app.services import pending_downloads
     client, _ = env
+    bare = client.application.test_client()
+    assert bare.get('/export_download/not-a-real-token').status_code == 404
     location = client.post('/export_key', data={'confirm_secret_export': 'yes'}).headers['Location']
-    stranger = client.application.test_client()
-    with stranger.session_transaction() as session:
-        session.update(authenticated=True, pin_verified=True, pin_authenticated=True, csrf_token='another-session')
-    refused = stranger.get(location)
-    assert refused.status_code == 302 and b'SECRET_KEY' not in refused.data
+    token = location.rsplit('/', 1)[1]
+    assert len(token) >= 43 and pending_downloads.MAX_FETCHES == 3 and pending_downloads.TTL_SECONDS <= 60
+    assert [bare.get(location).status_code for _ in range(4)] == [200, 200, 200, 404]
+    expiring = client.post('/export_key', data={'confirm_secret_export': 'yes'}).headers['Location']
     monkeypatch.setattr(pending_downloads.time, 'monotonic', lambda: 10 ** 9)
-    expired = client.get(location)
-    assert expired.status_code == 302 and b'SECRET_KEY' not in expired.data
+    assert bare.get(expiring).status_code == 404
+    # A signed-in user with an expired link is sent back to Settings with an explanation.
+    stale = client.get(expiring)
+    assert stale.status_code == 302 and 'settings' in stale.headers['Location']
+
+
+def test_export_still_requires_post_confirmation_csrf_and_login(env):
+    client, _ = env
+    bare = client.application.test_client()
+    assert bare.post('/export_key', data={'confirm_secret_export': 'yes'}).status_code in (302, 401, 403)
+    assert client.post('/export_key', data={'confirm_secret_export': 'yes'}, csrf=False).status_code == 403
+    assert client.post('/export_key').status_code == 400
 
 
 def test_transfer_file_restores_everything_on_another_computer(env, tmp_path):

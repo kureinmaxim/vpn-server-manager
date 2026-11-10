@@ -1,4 +1,4 @@
-# VPN Server Manager v5.2.1
+# VPN Server Manager v5.2.2
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="120">
@@ -29,7 +29,7 @@
 
 VPN Server Manager keeps a personal server inventory, SSH credentials, domains, and provider details in a local encrypted vault. It runs as a desktop app or a local web server. It is designed for one operator, not a shared team control plane.
 
-**What's new in development 5.2.1:** everything moves to another computer in one file. Settings now open with "Transfer to another computer": create a transfer file (optionally password-protected) and restore servers, NAS and PC cards, DNS, projects, bots and icons from it with one button. Exports from the desktop window save the real file again instead of an error page. This branch is not a signed macOS release; see the [changelog](CHANGELOG.md) and [verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md).
+**What's new in development 5.2.2:** everything moves to another computer in one file. Settings now open with "Transfer to another computer": create a transfer file (optionally password-protected) and restore servers, NAS and PC cards, DNS, projects, bots and icons from it with one button. Exports from the desktop window save the real file again instead of an error page. This branch is not a signed macOS release; see the [changelog](CHANGELOG.md) and [verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md).
 
 ## Three common workflows
 

@@ -2,6 +2,11 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.2.2] - 2026-11-10
+
+### Fixed
+- Saving an export from the app window on macOS still produced a broken file in 5.2.1: the file was the lock screen (HTML) under a `.zip` name, which no archiver opens. The window cancels the navigation and downloads the address again through the system session, which does not carry the window's cookie, so the sign-in check turned that second request into the lock screen. The prepared export is now fetched by an unguessable one-time address instead of by the session: 256-bit token, valid for one minute, served at most three times, held in memory only. Creating the export still requires a signed-in user, the confirmation and the CSRF token.
+
 ## [5.2.1] - 2026-11-10
 
 ### Added

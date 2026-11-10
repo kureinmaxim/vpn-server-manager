@@ -988,27 +988,28 @@ def export_data():
         return redirect(url_for('main.settings'))
 
 def _secret_download(raw, filename, mimetype):
-    """Подготовить загрузку и перенаправить на GET: окно приложения сохраняет файл повторным
-    GET-запросом, и ответ на POST до диска не доходит (см. services/pending_downloads.py)."""
+    """Подготовить загрузку и перенаправить на GET. Окно приложения сохраняет файл вторым запросом
+    без cookie сессии, поэтому адрес защищён случайным токеном (см. services/pending_downloads.py)."""
     from ..services import pending_downloads
-    token = pending_downloads.put(raw, filename, mimetype, session.get('csrf_token', ''))
+    token = pending_downloads.put(raw, filename, mimetype)
     response = redirect(url_for('main.export_download', token=token), code=303)
     response.headers['Cache-Control'] = 'no-store'
     return response
 
 
 @main_bp.route('/export_download/<token>')
-@require_auth
-@require_pin
 def export_download(token):
-    """Отдаёт подготовленный экспорт той же сессии; адрес перестаёт работать через две минуты."""
+    """Отдаёт подготовленный экспорт тому, кто знает токен; без сессии, потому что окно приложения
+    скачивает файл запросом без cookie. Токен живёт минуту и расходуется за три запроса."""
     from io import BytesIO
     from flask import send_file
     from ..services import pending_downloads
-    item = pending_downloads.get(token, session.get('csrf_token', ''))
+    item = pending_downloads.take(token)
     if item is None:
-        flash(_('Ссылка на экспорт устарела. Запустите экспорт ещё раз.'), 'warning')
-        return redirect(url_for('main.settings'))
+        if session.get('authenticated') and session.get('pin_verified'):
+            flash(_('Ссылка на экспорт устарела. Запустите экспорт ещё раз.'), 'warning')
+            return redirect(url_for('main.settings'))
+        abort(404)
     response = send_file(BytesIO(item['raw']), as_attachment=True, download_name=item['filename'],
                          mimetype=item['mimetype'])
     response.headers['Cache-Control'] = 'no-store'
