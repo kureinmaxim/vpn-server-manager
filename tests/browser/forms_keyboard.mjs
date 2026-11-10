@@ -30,7 +30,7 @@ await walk('createPinModal');
 await key('Escape','Escape',27); await pause();
 assert.equal(await evaluate('document.activeElement.id'),'firstSetupButton');
 await page('settings');
-await evaluate("document.querySelector('[data-export=package]').focus()");
+await evaluate("document.getElementById('settings-advanced').open=true;document.querySelector('[data-export=key]').focus()");
 await key('Enter','Enter',13); await pause();
 await walk('exportInfoModal');
 await evaluate("window.exportsCount=0;document.getElementById('secretExportForm').addEventListener('submit',e=>{e.preventDefault();window.exportsCount++});document.querySelector('#secretExportForm button').focus()");

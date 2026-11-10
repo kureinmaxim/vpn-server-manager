@@ -54,7 +54,7 @@ def test_export_then_import_restores_dns(env):
     assert client.get('/export_data').status_code == 200
     exported = next(exports.glob('servers_export_*.enc')).read_bytes()
 
-    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'}, follow_redirects=True)
     assert response.status_code == 200
     with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         assert archive.read(next(n for n in archive.namelist() if n.endswith('.enc'))) == exported
@@ -166,7 +166,7 @@ def test_external_merge_skips_same_ip_under_another_name(env, tmp_path):
 
 def test_full_export_readme_explains_both_restore_paths(env):
     client, exports = env
-    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'}, follow_redirects=True)
     assert response.status_code == 200
     with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         readme = archive.read('README.txt').decode()
@@ -205,7 +205,10 @@ def test_secret_export_requires_post_confirmation_csrf_and_auth(env, route):
 @pytest.mark.parametrize('route', ['/export_key', '/export_package'])
 def test_secret_export_no_disk_copy_or_fixed_session_key(env, route):
     client, exports = env
-    response = client.post(route, data={'confirm_secret_export': 'yes'})
+    prepared = client.post(route, data={'confirm_secret_export': 'yes'})
+    # The POST only prepares the file; the bytes are served by a separate GET (see pending_downloads).
+    assert prepared.status_code == 303 and prepared.headers['Cache-Control'] == 'no-store'
+    response = client.get(prepared.headers['Location'])
     assert response.status_code == 200
     assert response.headers['Cache-Control'] == 'no-store'
     assert not list(exports.iterdir())
@@ -222,7 +225,7 @@ def test_secret_export_no_disk_copy_or_fixed_session_key(env, route):
 
 def test_package_restores_in_clean_profile_with_exported_key(env, tmp_path):
     client, _ = env
-    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'}, follow_redirects=True)
     with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         key = archive.read('SECRET_KEY.env').decode().strip().split('=', 1)[1]
         raw = archive.read(next(n for n in archive.namelist() if n.endswith('.enc')))
@@ -248,7 +251,145 @@ def test_package_skips_symlink_attachments(env, tmp_path):
     outside.write_text('not-an-attachment')
     (uploads / 'linked.txt').symlink_to(outside)
     (uploads / 'icon.txt').write_text('fixture')
-    response = client.post('/export_package', data={'confirm_secret_export': 'yes'})
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes'}, follow_redirects=True)
     with zipfile.ZipFile(io.BytesIO(response.data)) as archive:
         assert 'uploads/linked.txt' not in archive.namelist()
         assert archive.read('uploads/icon.txt') == b'fixture'
+
+
+# --- one-file transfer: export on one profile, restore on another ---------------
+
+def _package(client, **form):
+    response = client.post('/export_package', data={'confirm_secret_export': 'yes', **form}, follow_redirects=True)
+    assert response.status_code == 200
+    return response
+
+
+def _fresh_profile(client, tmp_path, name='other-pc'):
+    """A second computer: its own key, no data yet."""
+    profile = tmp_path / name
+    profile.mkdir()
+    manager = DataManagerService(Fernet.generate_key().decode(), str(profile))
+    registry.register('data_manager', manager)
+    client.application.config.update(APP_DATA_DIR=str(profile), active_data_file=None)
+    return manager, profile
+
+
+def _restore(client, raw, name='transfer.zip', **form):
+    return client.post('/restore_transfer', data={'transfer_file': (io.BytesIO(raw), name), **form},
+                       content_type='multipart/form-data')
+
+
+def test_download_survives_the_second_get_a_webview_makes(env):
+    """The app window saves a file by requesting its address again with GET. That request used to
+    reach a POST-only route and the 405 page was saved under the export's name (153 bytes)."""
+    client, _ = env
+    prepared = client.post('/export_key', data={'confirm_secret_export': 'yes'})
+    location = prepared.headers['Location']
+    first, second = client.get(location), client.get(location)
+    assert first.status_code == second.status_code == 200
+    assert first.data == second.data and first.data.startswith(b'SECRET_KEY=')
+    assert 'attachment' in second.headers['Content-Disposition']
+
+
+def test_prepared_download_belongs_to_its_session_and_expires(env, monkeypatch):
+    from app.services import pending_downloads
+    client, _ = env
+    location = client.post('/export_key', data={'confirm_secret_export': 'yes'}).headers['Location']
+    stranger = client.application.test_client()
+    with stranger.session_transaction() as session:
+        session.update(authenticated=True, pin_verified=True, pin_authenticated=True, csrf_token='another-session')
+    refused = stranger.get(location)
+    assert refused.status_code == 302 and b'SECRET_KEY' not in refused.data
+    monkeypatch.setattr(pending_downloads.time, 'monotonic', lambda: 10 ** 9)
+    expired = client.get(location)
+    assert expired.status_code == 302 and b'SECRET_KEY' not in expired.data
+
+
+def test_transfer_file_restores_everything_on_another_computer(env, tmp_path):
+    client, _ = env
+    uploads = tmp_path / 'uploads'
+    uploads.mkdir()
+    (uploads / 'icon_1.png').write_bytes(b'png-bytes')
+    from app.services.config_io import read_config, write_config
+    config = read_config(tmp_path / 'config.json')
+    config['tracked_projects'] = [{'name': 'Shop API', 'units': ['shop-api.service'], 'containers': [], 'processes': []}]
+    write_config(tmp_path / 'config.json', config)
+    archive = _package(client).data
+
+    manager, profile = _fresh_profile(client, tmp_path)
+    response = _restore(client, archive)
+    assert response.status_code == 302 and response.headers['Location'].endswith('/')
+    manager, servers, dns = current()
+    assert [server['name'] for server in servers] == ['vps']
+    # Secrets are re-encrypted with the key of this computer, not carried over with the old one.
+    assert servers[0]['ssh_credentials']['password_decrypted'] == 'ssh'
+    assert dns['domains'][0]['name'] == 'example.com' and password(manager, dns) == 'p%ss'
+    assert (profile / 'uploads' / 'icon_1.png').read_bytes() == b'png-bytes'
+    assert [row['name'] for row in read_config(profile / 'config.json')['tracked_projects']] == ['Shop API']
+
+    # A second restore of the same file adds nothing and removes nothing.
+    assert _restore(client, archive).status_code == 302
+    assert [server['name'] for server in current()[1]] == ['vps']
+    assert len(current()[2]['domains']) == 1
+
+
+def test_transfer_file_with_passphrase(env, tmp_path):
+    from app.services import transfer_archive
+    client, _ = env
+    short = client.post('/export_package', data={'confirm_secret_export': 'yes', 'transfer_passphrase': 'short',
+                                                  'transfer_passphrase_again': 'short'})
+    assert short.status_code == 302 and 'settings' in short.headers['Location']
+    sealed = _package(client, transfer_passphrase='correct horse', transfer_passphrase_again='correct horse')
+    assert '.vsmx' in sealed.headers['Content-Disposition']
+    raw = sealed.data
+    assert transfer_archive.is_sealed(raw) and b'SECRET_KEY' not in raw and b'servers_' not in raw
+
+    _fresh_profile(client, tmp_path)
+    for wrong in ({}, {'transfer_passphrase': 'not the one'}):
+        assert _restore(client, raw, 'transfer.vsmx', **wrong).status_code == 302
+        assert current()[1] == []
+    assert _restore(client, raw, 'transfer.vsmx', transfer_passphrase='correct horse').status_code == 302
+    assert [server['name'] for server in current()[1]] == ['vps']
+
+
+def test_transfer_restore_rejects_foreign_archives_without_writing(env, tmp_path):
+    client, _ = env
+    good = _package(client).data
+    _manager, profile = _fresh_profile(client, tmp_path)
+
+    def repack(change):
+        output = io.BytesIO()
+        with zipfile.ZipFile(io.BytesIO(good)) as source, zipfile.ZipFile(output, 'w') as target:
+            for info in source.infolist():
+                if change(info.filename) is not None:
+                    target.writestr(change(info.filename), source.read(info))
+            target.writestr('../escape.txt', b'outside')
+            target.writestr('uploads/../../escape2.txt', b'outside')
+            target.writestr('uploads/sub/dir.png', b'nested')
+        return output.getvalue()
+
+    for raw in (b'not a zip', repack(lambda name: None if name == 'SECRET_KEY.env' else name),
+                repack(lambda name: None if name.endswith('.enc') else name)):
+        assert _restore(client, raw).status_code == 302
+        assert current()[1] == [] and not (profile / 'uploads').exists()
+    assert client.post('/restore_transfer', data={'transfer_file': (io.BytesIO(good), 'notes.txt')},
+                       content_type='multipart/form-data').status_code == 302
+    assert current()[1] == []
+
+    # Unexpected members are ignored: nothing is written outside the uploads folder.
+    assert _restore(client, repack(lambda name: name)).status_code == 302
+    assert [server['name'] for server in current()[1]] == ['vps']
+    assert not (tmp_path / 'escape.txt').exists() and not (profile / 'escape2.txt').exists()
+    assert not (profile / 'uploads' / 'sub').exists()
+
+
+def test_transfer_restore_requires_auth_and_csrf(env):
+    client, _ = env
+    good = _package(client).data
+    assert client.get('/restore_transfer').status_code == 405
+    assert client.post('/restore_transfer', data={'transfer_file': (io.BytesIO(good), 't.zip')},
+                       content_type='multipart/form-data', csrf=False).status_code == 403
+    with client.session_transaction() as session:
+        session.update(authenticated=False, pin_verified=False, pin_authenticated=False)
+    assert _restore(client, good).status_code in (302, 401, 403)

@@ -10796,3 +10796,144 @@ msgstr "all detected services are running"
 
 msgid "Мост слушает (:50061)"
 msgstr "Bridge is listening (:50061)"
+
+msgid "NAS и ПК: %(count)s"
+msgstr "NAS and PCs: %(count)s"
+
+msgid "Серверов: %(count)s"
+msgstr "Servers: %(count)s"
+
+msgid "Доменов DNS: %(count)s"
+msgstr "DNS domains: %(count)s"
+
+msgid "Проектов: %(count)s"
+msgstr "Projects: %(count)s"
+
+msgid "Ботов: %(count)s"
+msgstr "Bots: %(count)s"
+
+msgid "Иконок: %(count)s"
+msgstr "Icons: %(count)s"
+
+msgid "Что войдёт в файл"
+msgstr "What goes into the file"
+
+msgid "Перенос на другой компьютер"
+msgstr "Transfer to another computer"
+
+msgid "Перенос на другой компьютер, кнопки главной страницы и резервная копия. Ключ, PIN и ручной импорт — в «Дополнительно»."
+msgstr "Transfer to another computer, home page buttons and backup. The key, PIN and manual import are under “Advanced”."
+
+msgid "Один файл со всем содержимым: серверы и карточки NAS и ПК с доступами, DNS, проекты, боты и иконки. Создайте его здесь, перенесите на флешке и восстановите на другом компьютере одной кнопкой. PIN не переносится: на каждом компьютере он свой."
+msgstr "One file with everything: servers and NAS and PC cards with their credentials, DNS, projects, bots and icons. Create it here, carry it on a USB drive and restore it on another computer with one button. The PIN is not transferred: each computer has its own."
+
+msgid "На этом компьютере: создать файл"
+msgstr "On this computer: create the file"
+
+msgid "На другом компьютере: восстановить"
+msgstr "On the other computer: restore"
+
+msgid "Пароль для файла"
+msgstr "Password for the file"
+
+msgid "Пароль ещё раз"
+msgstr "Password again"
+
+msgid "Не короче 8 символов"
+msgstr "At least 8 characters"
+
+msgid "Без пароля получится обычный ZIP: любой, у кого окажется флешка, прочитает все пароли серверов."
+msgstr "Without a password the result is a plain ZIP: anyone who gets the USB drive can read every server password."
+
+msgid "Получится файл .vsmx. Без пароля его не открыть; пароль не восстанавливается, запомните его."
+msgstr "The result is a .vsmx file. It cannot be opened without the password, and the password cannot be recovered, so remember it."
+
+msgid "Понимаю, что в файле все доступы к серверам"
+msgstr "I understand that the file holds all server credentials"
+
+msgid "Создать файл переноса"
+msgstr "Create transfer file"
+
+msgid "На этом компьютере пока нет данных: переносить нечего. Добавьте сервер или восстановите данные из файла справа."
+msgstr "There is no data on this computer yet, so there is nothing to transfer. Add a server or restore data from a file on the right."
+
+msgid "Выберите файл целиком, распаковывать не нужно. Всё из файла добавится к тому, что уже есть: имеющиеся записи не удаляются, одинаковые серверы и домены пропускаются, ключ этого компьютера не меняется."
+msgstr "Choose the whole file; do not unpack it. Everything in it is added to what is already here: existing records are not deleted, identical servers and domains are skipped, and this computer's key does not change."
+
+msgid "Файл переноса (.vsmx или .zip)"
+msgstr "Transfer file (.vsmx or .zip)"
+
+msgid "Пароль файла"
+msgstr "File password"
+
+msgid "Только для файла .vsmx"
+msgstr "Only for a .vsmx file"
+
+msgid "Восстановить из файла переноса"
+msgstr "Restore from transfer file"
+
+msgid "Дополнительно: PIN, ключ, ручной импорт"
+msgstr "Advanced: PIN, key, manual import"
+
+msgid "Для переноса и обычной копии эти действия не нужны. Здесь смена PIN, отдельный перенос списков, импорт и объединение файлов .enc, отвязка файла, экспорт, проверка и смена ключа."
+msgstr "Transfer and regular backups do not need these actions. Here you can change the PIN, transfer the lists separately, import and merge .enc files, detach the file, and export, verify or change the key."
+
+msgid "PIN блокирует интерфейс, но не шифрует файлы. Новый PIN — минимум 4 символа."
+msgstr "The PIN locks the interface but does not encrypt files. A new PIN needs at least 4 characters."
+
+msgid "Отдельный файл с ключом шифрования. Нужен, чтобы открыть копию .enc на другой установке. В файл переноса ключ уже включён."
+msgstr "A separate file with the encryption key. It is needed to open an .enc copy on another installation. The transfer file already includes the key."
+
+msgid "Пароли для файла переноса не совпадают."
+msgstr "The passwords for the transfer file do not match."
+
+msgid "Пароль для файла переноса: не короче %(count)s символов, оба поля должны совпадать."
+msgstr "Password for the transfer file: at least %(count)s characters, and both fields must match."
+
+msgid "Ссылка на экспорт устарела. Запустите экспорт ещё раз."
+msgstr "The export link has expired. Start the export again."
+
+msgid "Выберите файл переноса: .vsmx или .zip, созданный этим приложением."
+msgstr "Choose a transfer file: a .vsmx or .zip created by this app."
+
+msgid "Файл переноса слишком большой."
+msgstr "The transfer file is too large."
+
+msgid "Файл защищён паролем. Введите пароль, заданный при создании файла."
+msgstr "The file is password-protected. Enter the password set when the file was created."
+
+msgid "Пароль не подходит к этому файлу. Ничего не изменено."
+msgstr "The password does not match this file. Nothing was changed."
+
+msgid "Файл повреждён или это не файл переноса. Ничего не изменено."
+msgstr "The file is damaged or is not a transfer file. Nothing was changed."
+
+msgid "В файле нет данных и ключа в ожидаемом виде. Ничего не изменено."
+msgstr "The file does not contain the data and key in the expected form. Nothing was changed."
+
+msgid "Списки проектов и ботов в файле повреждены. Ничего не изменено."
+msgstr "The project and bot lists in the file are damaged. Nothing was changed."
+
+msgid "Не удалось восстановить из файла переноса. Проверьте файл и активный профиль."
+msgstr "Could not restore from the transfer file. Check the file and the active profile."
+
+msgid "Восстановлено из файла переноса. Добавлено серверов: %(servers)s, пропущено как уже имеющиеся: %(skipped)s. Доменов DNS: %(dns)s. В списках теперь проектов: %(projects)s, ботов: %(bots)s. Иконок: %(icons)s."
+msgstr "Restored from the transfer file. Servers added: %(servers)s, skipped as already present: %(skipped)s. DNS domains: %(dns)s. The lists now hold projects: %(projects)s, bots: %(bots)s. Icons: %(icons)s."
+
+msgid "Перенос одним файлом"
+msgstr "Transfer with one file"
+
+msgid "На старом компьютере: «Настройки» → «Перенос на другой компьютер» → задайте пароль → «Создать файл переноса». Сохраните файл на флешку."
+msgstr "On the old computer: Settings → Transfer to another computer → set a password → Create transfer file. Save the file to a USB drive."
+
+msgid "На новом компьютере установите приложение и задайте PIN."
+msgstr "On the new computer, install the app and set a PIN."
+
+msgid "«Настройки» → «Перенос на другой компьютер» → выберите файл с флешки, введите пароль → «Восстановить из файла переноса». Серверы, карточки NAS и ПК, DNS, проекты, боты и иконки добавятся к имеющимся."
+msgstr "Settings → Transfer to another computer → choose the file from the USB drive, enter the password → Restore from transfer file. Servers, NAS and PC cards, DNS, projects, bots and icons are added to what is already there."
+
+msgid "Файл переноса"
+msgstr "Transfer file"
+
+msgid "PIN, ключ, ручной импорт"
+msgstr "PIN, key, manual import"

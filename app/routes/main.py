@@ -671,8 +671,34 @@ def settings():
     session.setdefault('csrf_token', secrets.token_urlsafe(32))
     return render_template(
         'settings.html',
-        active_data_file=current_app.config.get('active_data_file')
+        active_data_file=current_app.config.get('active_data_file'),
+        transfer_counts=_transfer_counts(),
     )
+
+
+def _transfer_counts():
+    """Сколько чего войдёт в файл переноса: страница показывает это до создания файла."""
+    counts = dict(servers=0, nodes=0, domains=0, projects=0, bots=0, icons=0)
+    manager = registry.get('data_manager')
+    if manager is None:
+        return counts
+    try:
+        from pathlib import Path
+        from ..services.config_io import read_config
+        servers = manager.load_servers(current_app.config)
+        counts['nodes'] = sum(1 for server in servers if server_kind(server) != 'vps')
+        counts['servers'] = len(servers) - counts['nodes']
+        counts['domains'] = len(dns_registry.normalize(manager.load_dns(current_app.config))['domains'])
+        config = read_config(Path(manager.app_data_dir) / 'config.json')
+        counts['projects'] = len(config.get('tracked_projects') or [])
+        counts['bots'] = len(config.get('tracked_bots') or [])
+        uploads = Path(manager.app_data_dir) / 'uploads'
+        if uploads.is_dir() and not uploads.is_symlink():
+            counts['icons'] = sum(1 for path in uploads.iterdir() if path.is_file() and not path.is_symlink())
+    except Exception as exc:
+        # Счётчики — подсказка; страница настроек должна открыться и при нечитаемом файле данных.
+        logger.warning('Transfer counts unavailable (%s)', type(exc).__name__)
+    return counts
 
 @main_bp.route('/change_main_key', methods=['POST'])
 @require_auth
@@ -962,10 +988,29 @@ def export_data():
         return redirect(url_for('main.settings'))
 
 def _secret_download(raw, filename, mimetype):
+    """Подготовить загрузку и перенаправить на GET: окно приложения сохраняет файл повторным
+    GET-запросом, и ответ на POST до диска не доходит (см. services/pending_downloads.py)."""
+    from ..services import pending_downloads
+    token = pending_downloads.put(raw, filename, mimetype, session.get('csrf_token', ''))
+    response = redirect(url_for('main.export_download', token=token), code=303)
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+@main_bp.route('/export_download/<token>')
+@require_auth
+@require_pin
+def export_download(token):
+    """Отдаёт подготовленный экспорт той же сессии; адрес перестаёт работать через две минуты."""
     from io import BytesIO
     from flask import send_file
-    response = send_file(BytesIO(raw), as_attachment=True, download_name=filename,
-                         mimetype=mimetype)
+    from ..services import pending_downloads
+    item = pending_downloads.get(token, session.get('csrf_token', ''))
+    if item is None:
+        flash(_('Ссылка на экспорт устарела. Запустите экспорт ещё раз.'), 'warning')
+        return redirect(url_for('main.settings'))
+    response = send_file(BytesIO(item['raw']), as_attachment=True, download_name=item['filename'],
+                         mimetype=item['mimetype'])
     response.headers['Cache-Control'] = 'no-store'
     return response
 
@@ -1001,6 +1046,13 @@ def export_key():
 def export_package():
     """Явно незашифрованный контейнер секретов; только подтверждённая загрузка."""
     _confirm_secret_export()
+    from ..services import transfer_archive
+    passphrase = request.form.get('transfer_passphrase', '')
+    if passphrase and (len(passphrase) < transfer_archive.MIN_PASSPHRASE
+                       or passphrase != request.form.get('transfer_passphrase_again', passphrase)):
+        flash(_('Пароль для файла переноса: не короче %(count)s символов, оба поля должны совпадать.',
+                count=transfer_archive.MIN_PASSPHRASE), 'danger')
+        return redirect(url_for('main.settings') + '#settings-transfer')
     try:
         from ..services import secret_export
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1024,7 +1076,16 @@ def export_package():
 - Windows: %APPDATA%\\VPNServerManager-Clean\\
 - Linux:   ~/.local/share/VPNServerManager-Clean/
 
-ВОССТАНОВЛЕНИЕ — выберите вариант
+ВОССТАНОВЛЕНИЕ
+
+Простой способ (если в настройках есть кнопка «Восстановить из файла переноса»):
+   1. Установите приложение на другом компьютере и задайте PIN.
+   2. Настройки -> Перенос на другой компьютер -> «Восстановить из файла переноса».
+   3. Выберите этот файл целиком, распаковывать его не нужно.
+   Серверы, карточки NAS и ПК, DNS, проекты, боты и иконки добавятся к тому, что уже есть.
+   Имеющиеся записи не удаляются, дубликаты пропускаются.
+
+Вручную — если простой способ недоступен:
 
 A. Только чистая установка без существующих данных
    1. Используйте чистую установку без существующих данных. Закройте приложение.
@@ -1055,11 +1116,71 @@ B. На компьютере уже есть свои серверы — объ�
 """
         raw = secret_export.package(registry.get('data_manager'), current_app.config,
                                     timestamp, readme_content)
+        if passphrase:
+            # С паролем архив шифруется целиком: файл на флешке без пароля не читается.
+            return _secret_download(transfer_archive.seal(raw, passphrase),
+                                    f'VSM_transfer_{timestamp}.vsmx', 'application/octet-stream')
         return _secret_download(raw, f'UNENCRYPTED_SECRETS_full_transfer_{timestamp}.zip', 'application/zip')
     except Exception as exc:
         logger.warning('Package export failed: %s', type(exc).__name__)
         flash(_('Не удалось подготовить экспорт. Проверьте активный файл и ключ профиля.'), 'danger')
         return redirect(url_for('main.settings'))
+
+
+@main_bp.route('/restore_transfer', methods=['POST'])
+@require_auth
+@require_pin
+@csrf_protect
+def restore_transfer():
+    """Восстановить всё из одного файла переноса: серверы, DNS, проекты, боты, иконки."""
+    from ..services import transfer_archive
+    from ..services.external_import import CurrentVaultUnreadable
+
+    back = redirect(url_for('main.settings') + '#settings-transfer')
+    manager = registry.get('data_manager')
+    uploaded = request.files.get('transfer_file')
+    if manager is None:
+        flash(_('Сервис данных недоступен. Проверьте профиль и ключ.'), 'danger')
+        return back
+    if not uploaded or not (uploaded.filename or '').lower().endswith(('.zip', '.vsmx')):
+        flash(_('Выберите файл переноса: .vsmx или .zip, созданный этим приложением.'), 'warning')
+        return back
+    limit = current_app.config['MAX_CONTENT_LENGTH']
+    raw = uploaded.read(limit + 1)
+    if len(raw) > limit:
+        flash(_('Файл переноса слишком большой.'), 'danger')
+        return back
+    messages = {
+        'passphrase_required': _('Файл защищён паролем. Введите пароль, заданный при создании файла.'),
+        'wrong_passphrase': _('Пароль не подходит к этому файлу. Ничего не изменено.'),
+        'invalid_file': _('Файл повреждён или это не файл переноса. Ничего не изменено.'),
+        'not_a_transfer': _('В файле нет данных и ключа в ожидаемом виде. Ничего не изменено.'),
+        'invalid_catalogs': _('Списки проектов и ботов в файле повреждены. Ничего не изменено.'),
+        'too_large': _('Файл переноса слишком большой.'),
+    }
+    try:
+        result = transfer_archive.restore(manager, current_app.config, raw,
+                                          request.form.get('transfer_passphrase', ''))
+    except transfer_archive.TransferError as exc:
+        logger.warning('Transfer restore rejected (%s)', str(exc))
+        flash(messages.get(str(exc), messages['invalid_file']), 'danger')
+        return back
+    except CurrentVaultUnreadable:
+        flash(_('Текущий файл данных не расшифровывается ключом из .env этой установки. '
+                'Восстановите прежний SECRET_KEY в .env и перезапустите приложение.'), 'danger')
+        return back
+    except Exception as exc:
+        logger.error('Transfer restore failed (%s)', type(exc).__name__)
+        flash(_('Не удалось восстановить из файла переноса. Проверьте файл и активный профиль.'), 'danger')
+        return back
+
+    current_app.config['active_data_file'] = result['active_data_file']
+    flash(_('Восстановлено из файла переноса. Добавлено серверов: %(servers)s, пропущено как уже имеющиеся: '
+            '%(skipped)s. Доменов DNS: %(dns)s. В списках теперь проектов: %(projects)s, ботов: %(bots)s. '
+            'Иконок: %(icons)s.',
+            servers=result['added_count'], skipped=result['skipped_count'], dns=result['dns_added'],
+            projects=result['projects'], bots=result['bots'], icons=result['icons']), 'success')
+    return redirect(url_for('main.index'))
 
 
 @main_bp.route('/export_catalogs', methods=['POST'])

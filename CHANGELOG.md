@@ -2,6 +2,18 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.2.1] - 2026-11-10
+
+### Added
+- Restore from one transfer file: Settings → Transfer to another computer → choose the file. Servers, NAS and PC cards, DNS, projects, bots and icons are added to the current profile in one step. Existing records are kept, duplicates are skipped, and the key of the target computer is not replaced.
+- A transfer file can be protected with a password (`.vsmx`): the archive is encrypted with a key derived from the password by scrypt, so a lost USB drive does not expose server credentials. Without a password the file is the same plain ZIP as before.
+
+### Changed
+- Settings are organised around the transfer scenario: creating the file and restoring from it sit side by side at the top, with a count of what the file will hold. PIN, key export and change, manual `.enc` import and the separate catalog transfer moved under "Advanced".
+
+### Fixed
+- Exporting the key, the transfer archive or the catalog lists from the desktop window saved a 153-byte "405 Method Not Allowed" page instead of the file. The window saves a download by requesting its address again with GET, and these exports accepted only POST. The POST now prepares the file and redirects to a short-lived address that only the same session can fetch; nothing is written to disk.
+
 ## [5.2.0] - 2026-11-10
 
 ### Changed

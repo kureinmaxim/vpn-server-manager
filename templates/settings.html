@@ -10,12 +10,12 @@
     {{ crumbs([(_('Список серверов'), url_for('main.index')), (_('Настройки'), None)]) }}
     <header class="settings-head">
         <h1><i class="bi bi-gear" aria-hidden="true"></i> {{ _('Настройки') }}</h1>
-        <p class="text-body-secondary mb-0">{{ _('Кнопки главной страницы, файл данных с серверами, ключ шифрования и PIN.') }}</p>
+        <p class="text-body-secondary mb-0">{{ _('Перенос на другой компьютер, кнопки главной страницы и резервная копия. Ключ, PIN и ручной импорт — в «Дополнительно».') }}</p>
         <nav class="settings-nav" aria-label="{{ _('Разделы настроек') }}">
-            <a class="settings-chip" href="#ui-features"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Интерфейс') }}</a>
+            <a class="settings-chip" href="#settings-transfer"><i class="bi bi-usb-drive" aria-hidden="true"></i> {{ _('Файл переноса') }}</a>
+            <a class="settings-chip" href="#ui-features"><i class="bi bi-toggles" aria-hidden="true"></i> {{ _('Кнопки на главной') }}</a>
             <a class="settings-chip" href="#settings-backup"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Резервная копия данных') }}</a>
-            <a class="settings-chip" href="#settings-transfer">{{ _('Перенести на другой компьютер') }}</a>
-            <a class="settings-chip" href="#settings-pin"><i class="bi bi-shield-lock" aria-hidden="true"></i> PIN</a>
+            <a class="settings-chip" href="#settings-advanced"><i class="bi bi-sliders" aria-hidden="true"></i> {{ _('PIN, ключ, ручной импорт') }}</a>
         </nav>
     </header>
 
@@ -27,6 +27,63 @@
             </div>
         {% endfor %}
     {% endwith %}
+
+    {# ───────────── Перенос: главный сценарий страницы ───────────── #}
+    <section class="settings-section" id="settings-transfer">
+        <h2 class="settings-section-title"><i class="bi bi-usb-drive" aria-hidden="true"></i> {{ _('Перенос на другой компьютер') }}</h2>
+        <p class="settings-lead">{{ _('Один файл со всем содержимым: серверы и карточки NAS и ПК с доступами, DNS, проекты, боты и иконки. Создайте его здесь, перенесите на флешке и восстановите на другом компьютере одной кнопкой. PIN не переносится: на каждом компьютере он свой.') }}</p>
+        <div class="settings-grid settings-grid-2">
+            <div class="settings-panel">
+                <h3><span class="settings-step" aria-hidden="true">1</span> {{ _('На этом компьютере: создать файл') }}</h3>
+                {% if active_data_file %}
+                <ul class="ui-tags settings-inventory" aria-label="{{ _('Что войдёт в файл') }}">
+                    <li class="ui-tag">{{ _('Серверов: %(count)s', count=transfer_counts.servers) }}</li>
+                    <li class="ui-tag">{{ _('NAS и ПК: %(count)s', count=transfer_counts.nodes) }}</li>
+                    <li class="ui-tag">{{ _('Доменов DNS: %(count)s', count=transfer_counts.domains) }}</li>
+                    <li class="ui-tag">{{ _('Проектов: %(count)s', count=transfer_counts.projects) }}</li>
+                    <li class="ui-tag">{{ _('Ботов: %(count)s', count=transfer_counts.bots) }}</li>
+                    <li class="ui-tag">{{ _('Иконок: %(count)s', count=transfer_counts.icons) }}</li>
+                </ul>
+                <form action="{{ url_for('main.export_package') }}" method="post" class="settings-form" id="transferExportForm">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <label for="transferPassphrase" class="form-label">{{ _('Пароль для файла') }}</label>
+                    <input type="password" class="form-control" name="transfer_passphrase" id="transferPassphrase" minlength="8" autocomplete="new-password" placeholder="{{ _('Не короче 8 символов') }}">
+                    <label for="transferPassphraseAgain" class="form-label mt-3">{{ _('Пароль ещё раз') }}</label>
+                    <input type="password" class="form-control" name="transfer_passphrase_again" id="transferPassphraseAgain" autocomplete="new-password">
+                    <p class="settings-hint mt-2" id="transferKindHint" data-sealed="{{ _('Получится файл .vsmx. Без пароля его не открыть; пароль не восстанавливается, запомните его.') }}" data-open="{{ _('Без пароля получится обычный ZIP: любой, у кого окажется флешка, прочитает все пароли серверов.') }}">{{ _('Без пароля получится обычный ZIP: любой, у кого окажется флешка, прочитает все пароли серверов.') }}</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmTransferExport" name="confirm_secret_export" value="yes" required>
+                        <label class="form-check-label" for="confirmTransferExport">{{ _('Понимаю, что в файле все доступы к серверам') }}</label>
+                    </div>
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-download" aria-hidden="true"></i> {{ _('Создать файл переноса') }}</button>
+                    </div>
+                    <div id="transferExportMessage" role="status" class="settings-status settings-status-danger mt-3" hidden></div>
+                </form>
+                {% else %}
+                <div class="settings-status settings-status-warn">
+                    <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                    <span>{{ _('На этом компьютере пока нет данных: переносить нечего. Добавьте сервер или восстановите данные из файла справа.') }}</span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="settings-panel">
+                <h3><span class="settings-step" aria-hidden="true">2</span> {{ _('На другом компьютере: восстановить') }}</h3>
+                <p class="settings-hint">{{ _('Выберите файл целиком, распаковывать не нужно. Всё из файла добавится к тому, что уже есть: имеющиеся записи не удаляются, одинаковые серверы и домены пропускаются, ключ этого компьютера не меняется.') }}</p>
+                <form action="{{ url_for('main.restore_transfer') }}" method="post" enctype="multipart/form-data" class="settings-form">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <label for="transferFile" class="form-label">{{ _('Файл переноса (.vsmx или .zip)') }}</label>
+                    {{ file_picker('transferFile', 'transfer_file', accept='.vsmx,.zip', required=True) }}
+                    <label for="transferRestorePassphrase" class="form-label mt-3">{{ _('Пароль файла') }}</label>
+                    <input type="password" class="form-control" name="transfer_passphrase" id="transferRestorePassphrase" autocomplete="off" placeholder="{{ _('Только для файла .vsmx') }}">
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-upload" aria-hidden="true"></i> {{ _('Восстановить из файла переноса') }}</button>
+                        <a href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
 
     {# ───────────── Интерфейс ───────────── #}
     <section class="settings-section" id="ui-features">
@@ -58,7 +115,6 @@
         </form>
     </section>
 
-    {# ───────────── Данные ───────────── #}
     <section class="settings-section" id="settings-backup">
         <h2 class="settings-section-title"><i class="bi bi-shield-check" aria-hidden="true"></i> {{ _('Резервная копия данных') }}</h2>
         <div class="settings-panel">
@@ -77,19 +133,30 @@
         </div>
     </section>
 
-    <section class="settings-section" id="settings-transfer">
-        <h2 class="settings-section-title">{{ _('Перенести на другой компьютер') }}</h2>
+    <details class="settings-section settings-advanced" id="settings-advanced">
+        <summary>{{ _('Дополнительно: PIN, ключ, ручной импорт') }}</summary>
+        <p class="settings-hint mt-3">{{ _('Для переноса и обычной копии эти действия не нужны. Здесь смена PIN, отдельный перенос списков, импорт и объединение файлов .enc, отвязка файла, экспорт, проверка и смена ключа.') }}</p>
+    <section class="settings-section" id="settings-pin">
+        <h2 class="settings-section-title"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</h2>
         <div class="settings-panel">
-            <p>{{ _('Для обычной резервной копии используйте .enc и храните ключ отдельно. Полный ZIP для переноса содержит серверы, DNS, проекты, ботов, вложения и ключ; сам архив не зашифрован.') }}</p>
-            <p>{{ _('На новом компьютере используйте чистый профиль. Если там уже есть данные, не заменяйте его ключ: используйте объединение в дополнительных настройках.') }}</p>
-            <div class="settings-actions">
-                <button type="button" class="btn btn-outline-warning" data-export="key">{{ _('Экспортировать ключ') }}</button>
-                {% if active_data_file %}<button type="button" class="btn btn-outline-warning" data-export="package">{{ _('Незашифрованный архив секретов (.zip)') }}</button>{% endif %}
-                <a href="{{ url_for('main.help') }}#backup-transfer">{{ _('Инструкция по восстановлению и переносу') }}</a>
-            </div>
+            <p class="settings-hint">{{ _('PIN блокирует интерфейс, но не шифрует файлы. Новый PIN — минимум 4 символа.') }}</p>
+                <form id="changePinSettingsForm" class="settings-form settings-pin-form">
+                    <label for="oldPin" class="form-label">{{ _('Текущий PIN') }}</label>
+                    <input type="password" class="form-control" id="oldPin" autocomplete="current-password" required>
+                    <label for="newPin" class="form-label mt-3">{{ _('Новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin" autocomplete="new-password" minlength="4" required>
+                    <label for="newPin2" class="form-label mt-3">{{ _('Повторите новый PIN') }}</label>
+                    <input type="password" class="form-control" id="newPin2" autocomplete="new-password" minlength="4" required>
+                    <div class="settings-actions">
+                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</button>
+                    </div>
+                    <div id="changePinSettingsMessage" role="status" class="settings-status mt-3" hidden></div>
+                </form>
         </div>
-        <div class="settings-panel mt-3">
-            <h3><i class="bi bi-list-check" aria-hidden="true"></i> {{ _('Перенести списки проектов и ботов') }}</h3>
+    </section>
+    <section class="settings-section" id="settings-catalogs">
+        <h2 class="settings-section-title"><i class="bi bi-list-check" aria-hidden="true"></i> {{ _('Перенести списки проектов и ботов') }}</h2>
+        <div class="settings-panel">
             <p class="settings-hint">{{ _('Отдельный JSON-файл переносит сохранённые списки между Windows и macOS. В нём только данные каталогов: идентификаторы обнаружения, команды, задачи и адреса локальной проверки — без серверов, паролей, токенов и ключа. Сначала сохраните изменения на страницах проектов и ботов.') }}</p>
             <p class="settings-hint">{{ _('В полном ZIP эти же списки уже включены в catalogs.json. Чтобы перенести только каталоги из ZIP, извлеките catalogs.json и выберите его ниже.') }}</p>
             <div class="settings-grid settings-grid-2">
@@ -138,29 +205,6 @@
             </div>
         </div>
     </section>
-    <section class="settings-section" id="settings-pin">
-        <h2 class="settings-section-title">PIN</h2>
-        <p>{{ _('PIN блокирует интерфейс, но не шифрует файлы. Ключ шифрования нужен для восстановления данных; смена PIN не меняет этот ключ.') }}</p>
-            <div class="settings-panel">
-                <h3><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</h3>
-                <p class="settings-hint">{{ _('PIN открывает приложение. Новый PIN — минимум 4 символа.') }}</p>
-                <form id="changePinSettingsForm" class="settings-form">
-                    <label for="oldPin" class="form-label">{{ _('Текущий PIN') }}</label>
-                    <input type="password" class="form-control" id="oldPin" autocomplete="current-password" required>
-                    <label for="newPin" class="form-label mt-3">{{ _('Новый PIN') }}</label>
-                    <input type="password" class="form-control" id="newPin" autocomplete="new-password" minlength="4" required>
-                    <label for="newPin2" class="form-label mt-3">{{ _('Повторите новый PIN') }}</label>
-                    <input type="password" class="form-control" id="newPin2" autocomplete="new-password" minlength="4" required>
-                    <div class="settings-actions">
-                        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-123" aria-hidden="true"></i> {{ _('Сменить PIN') }}</button>
-                    </div>
-                    <div id="changePinSettingsMessage" role="status" class="settings-status mt-3" hidden></div>
-                </form>
-            </div>
-    </section>
-    <details class="settings-section settings-advanced" id="settings-advanced">
-        <summary>{{ _('Дополнительные настройки данных и ключа') }}</summary>
-        <p class="settings-hint mt-3">{{ _('Импорт, объединение, отвязка файла, проверка и смена ключа. Для обычной копии и восстановления используйте раздел выше.') }}</p>
     <section class="settings-section" id="settings-data">
         <h2 class="settings-section-title"><i class="bi bi-database" aria-hidden="true"></i> {{ _('Файл данных') }}</h2>
         <div class="settings-panel">
@@ -221,6 +265,13 @@
     <section class="settings-section" id="settings-security">
         <h2 class="settings-section-title"><i class="bi bi-shield-lock" aria-hidden="true"></i> {{ _('Дополнительные настройки данных и ключа') }}</h2>
         <div class="settings-grid settings-grid-2">
+            <div class="settings-panel">
+                <h3><i class="bi bi-key" aria-hidden="true"></i> {{ _('Экспортировать ключ') }}</h3>
+                <p class="settings-hint">{{ _('Отдельный файл с ключом шифрования. Нужен, чтобы открыть копию .enc на другой установке. В файл переноса ключ уже включён.') }}</p>
+                <div class="settings-actions">
+                    <button type="button" class="btn btn-outline-warning" data-export="key">{{ _('Экспортировать ключ') }}</button>
+                </div>
+            </div>
             <div class="settings-panel">
                 <h3><i class="bi bi-arrow-repeat" aria-hidden="true"></i> {{ _('Смена главного ключа') }}</h3>
                 <p class="settings-hint">{{ _('При смене ключа будет создан новый зашифрованный файл данных. Старый файл сохранится как резервная копия.') }}</p>
@@ -313,12 +364,46 @@
         pinChanged: {{ _('PIN изменён')|tojson }},
         pinFailed: {{ _('Не удалось сменить PIN')|tojson }},
         noConnection: {{ _('Ошибка соединения с сервером')|tojson }},
+        passphraseMismatch: {{ _('Пароли для файла переноса не совпадают.')|tojson }},
     };
     const exportsInfo = {
         data: [{{ _('Файл данных серверов (.enc)')|tojson }}, 'vault_backup_YYYYMMDD_HHMMSS.enc', {{ url_for('main.download_backup')|tojson }}],
         key: [{{ _('Ключ шифрования (.env)')|tojson }}, 'SECRET_KEY_YYYYMMDD_HHMMSS.env', {{ url_for('main.export_key')|tojson }}],
         package: [{{ _('Незашифрованный архив секретов (.zip)')|tojson }}, 'UNENCRYPTED_SECRETS_full_transfer_YYYYMMDD_HHMMSS.zip', {{ url_for('main.export_package')|tojson }}],
     };
+
+    // Ссылка на раздел внутри свёрнутого блока «Дополнительно» раскрывает его
+    const openTarget = () => {
+        const target = location.hash && document.getElementById(location.hash.slice(1));
+        const fold = target && target.closest('details');
+        if (fold && !fold.open) { fold.open = true; target.scrollIntoView(); }
+    };
+    window.addEventListener('hashchange', openTarget);
+    openTarget();
+
+    // Файл переноса: подсказка, каким он получится, и сверка двух полей пароля до отправки
+    const transferForm = document.getElementById('transferExportForm');
+    if (transferForm) {
+        const first = document.getElementById('transferPassphrase');
+        const again = document.getElementById('transferPassphraseAgain');
+        const hint = document.getElementById('transferKindHint');
+        const message = document.getElementById('transferExportMessage');
+        const refresh = () => {
+            hint.textContent = first.value ? hint.dataset.sealed : hint.dataset.open;
+            again.required = !!first.value;
+            message.hidden = true;
+        };
+        first.addEventListener('input', refresh);
+        again.addEventListener('input', () => { message.hidden = true; });
+        transferForm.addEventListener('submit', event => {
+            if (first.value !== again.value) {
+                event.preventDefault();
+                message.textContent = t.passphraseMismatch;
+                message.hidden = false;
+                again.focus();
+            }
+        });
+    }
 
     // Экспорт: сначала окно «что и куда», потом загрузка
     const exportModal = document.getElementById('exportInfoModal');

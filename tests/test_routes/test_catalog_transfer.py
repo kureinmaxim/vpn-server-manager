@@ -60,7 +60,7 @@ def test_export_downloads_only_selected_catalogs_without_profile_secrets(app, cl
 
     response = client.post('/export_catalogs', data={
         'include_projects': 'yes',
-    })
+    }, follow_redirects=True)
 
     assert response.status_code == 200
     assert response.mimetype == 'application/json'
