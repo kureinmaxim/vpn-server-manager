@@ -2,7 +2,7 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [5.2.0] - 2026-11-10
 
 ### Changed
 - Monitoring page redesigned. The header is one line with the server name; a "Needs attention" list shows only warnings and failures, and everything that is fine folds into one quiet line. CPU, memory, network and a new services figure appear on the overview only instead of on every tab.
