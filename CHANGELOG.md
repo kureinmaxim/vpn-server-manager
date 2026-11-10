@@ -2,6 +2,16 @@
 
 All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/).
 
+## [5.1.0] - 2026-11-10
+
+### Security
+- Monitoring no longer puts the contents of `/var/tmp/metrics_history.json` into a shell command. That directory is writable by every user of the VPS, so a planted file could run commands as the app's SSH user. History is now parsed and validated locally, and written back as one quoted argument through a temporary file.
+- The open-ports baseline in `/var/tmp` is written the same way.
+- Minimum versions raised for packages with published advisories: Pillow 13.0.0, urllib3 2.8.0, Werkzeug 3.1.9.
+
+### Changed
+- Metrics history no longer needs `jq` on the server when the app polls it. The optional cron script still uses it.
+
 ## [5.0.22] - 2026-10-31
 
 ### Added

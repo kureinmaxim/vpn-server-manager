@@ -1,4 +1,4 @@
-# VPN Server Manager v5.0.22
+# VPN Server Manager v5.1.0
 
 <p align="center">
   <img src="static/VPSc.png" alt="VPN Server Manager" width="120">
@@ -29,7 +29,7 @@
 
 VPN Server Manager keeps a personal server inventory, SSH credentials, domains, and provider details in a local encrypted vault. It runs as a desktop app or a local web server. It is designed for one operator, not a shared team control plane.
 
-**What's new in development 5.0.22:** local macOS builds can opt into a private catalog seed, and the full transfer archive includes both saved lists. Standard/public builds stay empty-first so each user can enter their own projects and bots. This branch is not a signed macOS release; see the [changelog](CHANGELOG.md) and [verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md).
+**What's new in development 5.1.0:** monitoring no longer passes the contents of world-writable `/var/tmp` files on the VPS into shell commands, and the minimum Pillow, urllib3 and Werkzeug versions are raised past published advisories. This branch is not a signed macOS release; see the [changelog](CHANGELOG.md) and [verification notes](docs/SECURITY_FOUNDATION_5.0_ru.md).
 
 ## Three common workflows
 

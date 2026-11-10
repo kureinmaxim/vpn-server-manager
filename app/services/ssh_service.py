@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 import shlex
@@ -1718,8 +1719,7 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             new_open_ports = 0
             if not baseline_exists:
                 # Создаем baseline
-                ports_str = "\n".join(current_ports)
-                client.exec_command(f'echo "{ports_str}" > {baseline_file}')
+                self._write_remote_file(client, baseline_file, "\n".join(current_ports) + "\n")
             else:
                 # Сравниваем с baseline
                 _, stdout, _ = client.exec_command(f"cat {baseline_file}")
@@ -2026,6 +2026,39 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
             },
         }
 
+    @staticmethod
+    def _write_remote_file(client, path: str, text: str, timeout: int = 10) -> None:
+        """Запись файла на сервер без подстановки данных в shell.
+
+        Текст уходит одним аргументом в кавычках shlex. mktemp + mv заменяют сам файл, а не то,
+        на что указывает чужая символическая ссылка в общем каталоге.
+        """
+        target = shlex.quote(path)
+        _, stdout, _ = client.exec_command(
+            f't=$(mktemp {target}.XXXXXX) && printf %s {shlex.quote(text)} > "$t" '
+            f'&& chmod 644 "$t" && mv -f "$t" {target} || rm -f "$t"',
+            timeout=timeout,
+        )
+        stdout.read()
+
+    @staticmethod
+    def _clean_history_points(raw: str) -> List[Dict]:
+        """Точки истории из файла на сервере: остаются только числа, остальное отбрасывается."""
+        try:
+            data = json.loads(raw)
+        except ValueError:
+            return []
+        points = []
+        for item in data if isinstance(data, list) else []:
+            if not isinstance(item, dict):
+                continue
+            values = [item.get(name) for name in ("timestamp", "cpu", "memory")]
+            if any(isinstance(v, bool) or not isinstance(v, (int, float)) or v != v or abs(v) == float("inf")
+                   for v in values):
+                continue
+            points.append({"timestamp": int(values[0]), "cpu": float(values[1]), "memory": float(values[2])})
+        return points
+
     def _history_script_state(self, client) -> str:
         """absent / ok / outdated: старый cron-скрипт считал CPU по top -bn1 и писал 0 или 100."""
         state = self._read_command_output(
@@ -2062,47 +2095,17 @@ echo "CPU $T $((u2+n2-u-n)) $((s2+irq2+sirq2-s-irq-sirq)) $((io2-io)) $((st2-st)
 
             timestamp = int(time.time())
 
-            # Проверяем, установлен ли jq
-            _, stdout, _ = client.exec_command(
-                'export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH"; command -v jq 2>/dev/null'
-            )
-            has_jq = bool(stdout.read().decode("utf-8").strip())
-
-            # Читаем существующую историю
+            # Читаем существующую историю. /var/tmp доступен на запись всем пользователям VPS,
+            # поэтому содержимое файла — недоверенные данные: его нельзя подставлять в команду.
             _, stdout, _ = client.exec_command(
                 f'test -f {history_file} && cat {history_file} || echo "[]"'
             )
-            history_json = stdout.read().decode("utf-8").strip() or "[]"
+            history = self._clean_history_points(stdout.read().decode("utf-8", "replace"))
+            history.append({"timestamp": timestamp, "cpu": float(cpu_usage), "memory": mem_usage})
 
-            if has_jq:
-                # Используем jq для обновления истории
-                new_point = f'{{"timestamp":{timestamp},"cpu":{cpu_usage},"memory":{mem_usage}}}'
-                cmd = f"echo '{history_json}' | jq \". += [{new_point}] | .[-{max_points}:]\" > {history_file} && cat {history_file}"
-                _, stdout, _ = client.exec_command(cmd)
-                result = stdout.read().decode("utf-8").strip()
-
-                import json
-
-                history = json.loads(result) if result else []
-            else:
-                # Без jq - используем Python для парсинга
-                import json
-
-                try:
-                    history = json.loads(history_json) if history_json != "[]" else []
-                except:
-                    history = []
-
-                history.append(
-                    {"timestamp": timestamp, "cpu": cpu_usage, "memory": mem_usage}
-                )
-
-                # Оставляем только последние max_points точек
-                history = history[-max_points:]
-
-                # Сохраняем обратно
-                history_str = json.dumps(history)
-                client.exec_command(f"echo '{history_str}' > {history_file}")
+            # Оставляем только последние max_points точек
+            history = history[-max_points:]
+            self._write_remote_file(client, history_file, json.dumps(history))
 
             return {
                 "points": history,

@@ -593,6 +593,43 @@ def test_repo_history_script_uses_proc_stat():
     assert '/proc/stat' in METRICS_HISTORY_SCRIPT and 'CPU_USAGE=$(top' not in METRICS_HISTORY_SCRIPT
 
 
+def test_metrics_history_never_puts_remote_file_content_into_a_command():
+    # /var/tmp is world-writable: another VPS user can plant this file before the first poll.
+    planted = '[{"timestamp":1,"cpu":2,"memory":3},{"timestamp":"x"}, "\'; touch /tmp/pwned; echo \'"]'
+    commands = []
+    client = _output_client([('id -u', '0'), ('cat /var/tmp/metrics_history.json', planted), ('free', '41.5')])
+    original = client.exec_command.side_effect
+    client.exec_command.side_effect = lambda command, timeout=None: (commands.append(command), original(command))[1]
+    service = SSHService()
+    with patch.object(service, 'get_connection_pooled', return_value=client), \
+            patch.object(service, '_sample_cpu', return_value={'used': 7.5, 'steal': 0.0, 'top': []}), \
+            patch.object(service, '_read_load_diagnosis', return_value={}):
+        result = service.get_metrics_history('192.0.2.10', 'root', 'x')
+    assert [(p['cpu'], p['memory']) for p in result['points']] == [(2.0, 3.0), (7.5, 41.5)]
+    assert not any('pwned' in command for command in commands)
+    assert not any('jq' in command for command in commands)
+
+
+def test_clean_history_points_keeps_only_numeric_points():
+    clean = SSHService._clean_history_points
+    assert clean('not json') == [] and clean('{"timestamp":1}') == []
+    assert clean('[{"timestamp":1,"cpu":true,"memory":3},{"timestamp":1,"cpu":NaN,"memory":3},'
+                 '{"timestamp":5,"cpu":1.5,"memory":2,"extra":"$(id)"}]') == [{'timestamp': 5, 'cpu': 1.5, 'memory': 2.0}]
+
+
+def test_write_remote_file_survives_a_real_shell(tmp_path):
+    import subprocess
+    target = tmp_path / 'history file.json'
+    marker = tmp_path / 'pwned'
+    text = f"'; touch {marker}; echo '\n$(touch {marker}) `touch {marker}` \"\\"
+    client = Mock(spec=['exec_command'])
+    client.exec_command.side_effect = lambda command, timeout=None: (
+        subprocess.run(['sh', '-c', command], check=True, timeout=10), (Mock(), Mock(), Mock()))[1]
+    SSHService._write_remote_file(client, str(target), text)
+    assert target.read_text() == text and not marker.exists()
+    assert [p.name for p in tmp_path.iterdir()] == ['history file.json']
+
+
 def test_services_are_probed_in_one_command():
     descriptors = [
         {'name': 'xray', 'display_name': 'Xray', 'group': 'proxy', 'unit_candidates': ['xray', 'xray-core']},
