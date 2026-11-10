@@ -1,14 +1,11 @@
 .net-tools { max-width: 1120px; }
-.net-tools h1 i { color: var(--bs-info); }
+.net-tools h1 i { color: var(--ui-muted); }
 .net-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: .75rem; }
 .net-card { display: flex; flex-direction: column; gap: .35rem; padding: 1rem 1.25rem; border: 1px solid var(--bs-border-color); border-radius: .75rem; background: var(--bs-tertiary-bg); color: var(--bs-body-color); text-decoration: none; }
 .net-card:hover, .net-card:focus-visible { border-color: var(--bs-primary); color: var(--bs-body-color); }
 .net-card:focus-visible { outline: 3px solid var(--bs-primary); outline-offset: 3px; }
 .net-card h2 { display: flex; align-items: center; gap: .55rem; font-size: 1.05rem; margin: 0; }
 .net-icon { font-size: 1.15rem; color: var(--bs-primary); }
-.net-accent-1 .net-icon, .net-accent-4 .net-icon { color: #d5883e; }
-.net-accent-2 .net-icon, .net-accent-7 .net-icon { color: #559dd5; }
-.net-accent-5 .net-icon, .net-accent-8 .net-icon { color: #ad80d5; }
 .net-card p { font-size: .875rem; color: var(--bs-secondary-color); line-height: 1.5; margin: 0; }
 .net-tools .card h2 { font-size: 1.05rem; }
 .net-tools .cheat-section { scroll-margin-top: .75rem; }
@@ -21,7 +18,7 @@
 .net-detail { font-size: .9rem; }
 .net-detail > nav { margin-bottom: .85rem !important; }
 .net-detail > header { margin-bottom: .85rem !important; }
-.net-detail h1 { font-size: 1.35rem; margin-bottom: .25rem; }
+.net-detail h1 { margin-bottom: .25rem; }
 .net-detail h1 i { font-size: 1.15rem; }
 .net-detail > header p { font-size: .8125rem; line-height: 1.4; }
 .net-detail .row.g-3 { --bs-gutter-x: .7rem; --bs-gutter-y: .7rem; }

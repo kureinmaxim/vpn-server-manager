@@ -37,10 +37,6 @@
     --bs-btn-hover-border-color: var(--bs-link-hover-color);
 }
 
-[data-bs-theme="dark"] .badge.bg-success {
-    color: #1a2938 !important; /* Темный текст на зеленом фоне */
-}
-
 /* Принудительно задает темный цвет текста для шапки карточки в обеих темах */
 .force-dark-text, .force-dark-text h5, .force-dark-text small {
     color: #212529 !important;
@@ -540,7 +536,7 @@ body:has(.server-form) .navbar.mb-4 {
 
 /* Server board: neutral cards; the colour chosen for a server is a stripe, not a filled header. */
 .board-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; margin-bottom: 1rem; }
-.board-head h1 { margin: 0 0 .625rem; font-size: 1.5rem; font-weight: 650; }
+.board-head h1 { margin: 0 0 .625rem; }
 .board-tools { display: flex; flex-wrap: wrap; gap: .375rem; }
 .server-preview-card { border-color: var(--ui-border); border-radius: var(--ui-radius); }
 .server-preview-card .card-header { background-color: transparent !important; border-bottom: 0; box-shadow: inset 0 3px 0 var(--card-bg-color); }

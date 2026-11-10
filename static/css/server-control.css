@@ -24,5 +24,4 @@
 @media (max-width: 575.98px) {
     #server-control .control-state { float: none; display: block; margin: .2rem 0 0 1rem; }
     #server-control .control-toolbar input, #server-control .control-toolbar select { width: 100%; flex-basis: 100%; }
-    #server-control h1 { font-size: 1.35rem; }
 }

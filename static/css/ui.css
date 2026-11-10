@@ -9,6 +9,8 @@
     --ui-text-sm: .8125rem;
     --ui-text-md: .9375rem;
     --ui-text-lg: 1.375rem;
+    --ui-text-h2: 1.125rem;
+    --ui-text-xl: 1.5rem;
     --ui-surface: var(--bs-tertiary-bg);
     --ui-sunken: var(--bs-body-bg);
     --ui-border: var(--bs-border-color);
@@ -60,3 +62,28 @@ html[data-skin="minecraft"] :is(.ui-dot, .ui-state, .ui-tag) { border-radius: 0;
 .ui-tabs a:hover { color: var(--bs-body-color); }
 .ui-tabs a[aria-current] { color: var(--bs-body-color); font-weight: 600; border-bottom-color: var(--ui-accent); }
 .ui-tabs a:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; border-radius: var(--ui-radius-sm); }
+
+/* Page furniture: one title size, one section-heading size, flat cards with the shared radius.
+   :where() keeps these as defaults that a utility class can still override. */
+:where(.content) h1 { font-size: var(--ui-text-xl); font-weight: 650; line-height: 1.2; }
+:where(.content) h2 { font-size: var(--ui-text-h2); font-weight: 600; }
+.card { --bs-card-border-color: var(--ui-border); --bs-card-border-radius: var(--ui-radius); --bs-card-inner-border-radius: calc(var(--ui-radius) - 1px); }
+.content .card.shadow-sm, .content .card.shadow { box-shadow: none !important; }
+
+/* Badges: soft pills in the state colours instead of solid blocks. Bootstrap sets these with
+   !important, so the override has to as well. */
+.badge { font-weight: 600; }
+.badge:is(.text-bg-success, .bg-success) { color: var(--bs-success-text-emphasis) !important; background-color: var(--bs-success-bg-subtle) !important; box-shadow: inset 0 0 0 1px var(--bs-success-border-subtle); }
+.badge:is(.text-bg-warning, .bg-warning) { color: var(--bs-warning-text-emphasis) !important; background-color: var(--bs-warning-bg-subtle) !important; box-shadow: inset 0 0 0 1px var(--bs-warning-border-subtle); }
+.badge:is(.text-bg-danger, .bg-danger) { color: var(--bs-danger-text-emphasis) !important; background-color: var(--bs-danger-bg-subtle) !important; box-shadow: inset 0 0 0 1px var(--bs-danger-border-subtle); }
+.badge:is(.text-bg-info, .bg-info) { color: var(--bs-body-color) !important; background-color: var(--ui-sunken) !important; box-shadow: inset 0 0 0 1px var(--ui-accent); }
+.badge:is(.text-bg-secondary, .bg-secondary) { color: var(--ui-muted) !important; background-color: var(--ui-sunken) !important; box-shadow: inset 0 0 0 1px var(--ui-border); }
+
+/* Keep the page width steady. When a section opens and the page outgrows the window, the scrollbar
+   used to appear and push every card sideways; its space is now reserved from the start.
+   Bootstrap pads the body by the scrollbar width when a modal opens, which would shift the page
+   the other way once that space is always reserved, so the padding is cancelled. */
+@supports (scrollbar-gutter: stable) {
+    html { scrollbar-gutter: stable; }
+    body.modal-open { padding-right: 0 !important; }
+}

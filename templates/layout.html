@@ -758,7 +758,7 @@
                 const minutes = Math.floor(seconds / 60);
                 const secs = seconds % 60;
                 const timeStr = `${minutes}:${secs.toString().padStart(2, '0')}`;
-                messageDiv.innerHTML = `🔒 Вход заблокирован на <strong>${timeStr}</strong> секунд`;
+                messageDiv.innerHTML = `<i class="bi bi-lock-fill" aria-hidden="true"></i> {{ _("Вход заблокирован на") }} <strong>${timeStr}</strong> {{ _("секунд") }}`;
             }
         }
         

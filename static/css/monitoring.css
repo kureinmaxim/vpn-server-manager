@@ -9,7 +9,7 @@
 
 /* Header: the server, where it is, what can be done */
 .monitoring-page .mon-header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; margin-bottom: .75rem; }
-.monitoring-page .mon-header h1 { margin: 0; font-size: var(--ui-text-lg); font-weight: 650; line-height: 1.2; overflow-wrap: anywhere; }
+.monitoring-page .mon-header h1 { margin: 0; overflow-wrap: anywhere; }
 .monitoring-page .mon-header-meta { display: flex; flex-wrap: wrap; gap: .15rem .5rem; margin: .3rem 0 0; font-size: var(--ui-text-sm); color: var(--ui-muted); }
 .monitoring-page .mon-header-meta span + span::before { content: "·"; margin-right: .5rem; }
 .monitoring-page .mon-header-actions { display: flex; flex-wrap: wrap; gap: .5rem; }

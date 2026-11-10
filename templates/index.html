@@ -1366,15 +1366,15 @@
                 .then(function(resp){
                     console.log('Response:', resp);
                     if (resp && resp.success) {
-                        alert('✅ {{ _("PNG сохранён:") }} ' + resp.filename + '\\n📁 {{ _("Папка:") }} ' + resp.dir);
+                        alert('{{ _("PNG сохранён:") }} ' + resp.filename + '\\n{{ _("Папка:") }} ' + resp.dir);
                     } else {
                         console.error('Save failed:', resp);
-                        alert('❌ {{ _("Не удалось сохранить на сервере:") }} ' + (resp.error || '{{ _("Неизвестная ошибка") }}'));
+                        alert('{{ _("Не удалось сохранить на сервере:") }} ' + (resp.error || '{{ _("Неизвестная ошибка") }}'));
                     }
                 })
                 .catch(function(err){
                     console.error('Fetch error:', err);
-                    alert('❌ {{ _("Ошибка сохранения:") }} ' + err.message);
+                    alert('{{ _("Ошибка сохранения:") }} ' + err.message);
                 });
             })
             .catch(function(err){

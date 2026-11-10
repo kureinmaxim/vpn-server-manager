@@ -12,7 +12,11 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 - Server load window: one compact row per server. Connection state is a dot next to the server name instead of a separate column; the mesh column shows short neutral tags, and addresses, paths, role checks and DERP port details open under "Details" and stay open while the table refreshes.
 - Server list: cards are neutral, and the colour chosen for a server is a stripe at the top of its card instead of a filled header. Status, DNS and streaming marks are quiet tags; mesh and role marks use one neutral style where colour only shows a problem. The toolbar buttons are separate and neutral.
 
+- Remaining pages follow the same rules: one page-title and one section-heading size, flat cards with one radius, and soft state badges instead of solid blocks (projects, bots, DNS roles, server cards). DNS, Net Tools and Settings lose their one-off purple, blue and per-tool icon colours; the 404, 500 and lock screens lose their filled headers.
+
 ### Fixed
+- Opening a section of an expanded server card no longer makes the page jump sideways: when the page outgrew the window the scrollbar appeared and shifted every card. Its space is now reserved from the start.
+- The lock countdown in the shared layout was hard-coded in Russian; it now uses the translated strings.
 - "Bridge is listening (:50061)" on the monitoring page was not translatable and stayed Russian in the English and Chinese interface.
 - A failed monitoring installation check no longer shows a second, never-finishing progress panel under the error.
 - The server list no longer throws a script error on every load when the offline banner, and with it the "check internet" button, is absent.

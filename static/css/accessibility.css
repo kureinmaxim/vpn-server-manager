@@ -52,7 +52,6 @@ html[data-skin="minecraft"] .btn-primary {
 }
 html[data-skin="minecraft"] .btn-primary:hover:not(:disabled):not(.disabled) { filter: none; }
 .bg-primary.text-white, .badge.bg-primary { color: var(--a11y-primary-surface-text) !important; }
-[data-bs-theme] .badge.bg-success { color: #ffffff !important; }
 [data-bs-theme] .text-success { color: var(--a11y-success) !important; }
 [data-bs-theme] .text-info { color: var(--a11y-info) !important; }
 [data-bs-theme] .text-warning { color: var(--a11y-warning) !important; }
