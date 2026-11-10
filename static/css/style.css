@@ -382,21 +382,11 @@ body:has(.server-form) .navbar.mb-4 {
     height: 1.35rem;
     font-size: 0.72rem;
 }
-.server-mesh-mark.is-mesh { background: #0aa2c0; color: #fff; }
-.server-mesh-mark.is-mesh.is-offline { background: #6c757d; }
-.server-mesh-mark.is-exit { background: #198754; color: #fff; }
-.server-mesh-mark.is-exit-ready { background: #6c757d; color: #fff; }
-.server-mesh-mark.is-coord { background: #0d6efd; color: #fff; }
-.server-mesh-mark.is-derp { background: #6f42c1; color: #fff; }
-.server-mesh-mark.is-files { background: #b45309; color: #fff; }
-.server-mesh-mark.is-files.is-partial { background: #ca8a04; }
-.server-mesh-mark.is-files.is-down { background: #78716c; }
-.server-mesh-mark.is-dns { background: #6f42c1; color: #fff; }
-.server-mesh-mark.is-dns.is-partial { background: #a370f7; color: #1b1b1b; }
-.server-mesh-mark.is-dns.is-down { background: #78716c; color: #fff; }
-.server-mesh-mark.is-chatmail { background: #fd7e14; color: #1b1b1b; }
-.server-mesh-mark.is-chatmail.is-partial { background: #e8590c; color: #fff; }
-.server-mesh-mark.is-chatmail.is-down { background: #78716c; color: #fff; }
+/* Marks are neutral: the icon says what it is, colour only says how it is doing. */
+.server-mesh-mark { background: var(--ui-sunken); color: var(--bs-body-color); border: 1px solid var(--ui-border); }
+.server-mesh-mark.is-exit, .server-mesh-mark.is-coord { border-color: var(--ui-accent); color: var(--ui-accent); }
+.server-mesh-mark.is-partial { border-color: var(--ui-warn); color: var(--ui-warn); }
+.server-mesh-mark.is-down, .server-mesh-mark.is-offline { color: var(--ui-muted); opacity: .6; }
 
 .server-preview-title {
     min-width: 0;
@@ -431,10 +421,6 @@ body:has(.server-form) .navbar.mb-4 {
 .server-preview-card.is-archived {
     filter: grayscale(0.9);
     opacity: 0.58;
-}
-
-.server-preview-card.is-archived .card-header {
-    background-color: #8a8f96 !important;
 }
 
 .server-preview-card:not(.is-expanded) .server-card-full {
@@ -551,3 +537,18 @@ body:has(.server-form) .navbar.mb-4 {
     max-height: 70vh;
     overflow-y: auto;
 }
+
+/* Server board: neutral cards; the colour chosen for a server is a stripe, not a filled header. */
+.board-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; margin-bottom: 1rem; }
+.board-head h1 { margin: 0 0 .625rem; font-size: 1.5rem; font-weight: 650; }
+.board-tools { display: flex; flex-wrap: wrap; gap: .375rem; }
+.server-preview-card { border-color: var(--ui-border); border-radius: var(--ui-radius); }
+.server-preview-card .card-header { background-color: transparent !important; border-bottom: 0; box-shadow: inset 0 3px 0 var(--card-bg-color); }
+.server-preview-card .card-header.force-dark-text,
+.server-preview-card .card-header.force-dark-text h5 { color: var(--bs-body-color) !important; }
+.server-preview-card .card-header.force-dark-text small,
+.server-preview-card .server-preview-title .small { color: var(--ui-muted) !important; }
+.server-preview-card .server-preview-os { color: var(--ui-muted); }
+.server-card-compact .card-body { padding-top: 0 !important; }
+.server-card-compact .card-body .ui-tag > .bi { color: var(--ui-ok); }
+.server-preview-card .server-actions.card-footer { background: transparent; border-top-color: var(--ui-border); }

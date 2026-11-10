@@ -63,17 +63,17 @@
         </div>
     {% endif %}
 
-    <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
+    <div class="board-head">
         <div>
             <h1>{{ _('Список серверов') }}</h1>
-            <div class="btn-group flex-wrap" role="group">
-                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
-                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
-                <a href="{{ url_for('net_tools.index') }}" class="btn btn-sm btn-outline-info" title="{{ _('Сетевые инструменты') }}">Net Tools</a>
+            <div class="board-tools" role="group">
+                <a href="{{ service_urls.get('general_ip_test', 'https://browserleaks.com/ip') }}" target="_blank" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Ваш IP: browserleaks.com') }}">{{ _('Тест IP') }}</a>
+                <a href="{{ service_urls.get('general_dns_test', 'https://dnsleaktest.com/') }}" target="_blank" class="btn btn-sm btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-container="body" title="{{ _('Утечка DNS: dnsleaktest.com') }}">{{ _('Тест DNS') }}</a>
+                <a href="{{ url_for('net_tools.index') }}" class="btn btn-sm btn-outline-secondary" title="{{ _('Сетевые инструменты') }}">Net Tools</a>
                 {% if ui_features.dns %}<a href="{{ url_for('dns.index') }}" class="btn btn-sm btn-dns" title="{{ _('Домены и DNS-провайдеры') }}"><i class="bi bi-cloud-fill" aria-hidden="true"></i> DNS</a>{% endif %}
-                {% if ui_features.load %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#loadCheckModal" title="{{ _('Быстрая проверка загрузки активных серверов') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> {{ _('Загрузка серверов') }}</button>{% endif %}
-                {% if ui_features.projects %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#projectsCheckModal" title="{{ _('Где запущены ваши проекты, кроме TelegramOnly') }}"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Проекты') }}</button>{% endif %}
-                {% if ui_features.bots %}<button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#botsCheckModal" title="{{ _('Какие Telegram-боты запущены на узлах') }}"><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Боты') }}</button>{% endif %}
+                {% if ui_features.load %}<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#loadCheckModal" title="{{ _('Быстрая проверка загрузки активных серверов') }}"><i class="bi bi-speedometer2" aria-hidden="true"></i> {{ _('Загрузка серверов') }}</button>{% endif %}
+                {% if ui_features.projects %}<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#projectsCheckModal" title="{{ _('Где запущены ваши проекты, кроме TelegramOnly') }}"><i class="bi bi-boxes" aria-hidden="true"></i> {{ _('Проекты') }}</button>{% endif %}
+                {% if ui_features.bots %}<button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#botsCheckModal" title="{{ _('Какие Telegram-боты запущены на узлах') }}"><i class="bi bi-robot" aria-hidden="true"></i> {{ _('Боты') }}</button>{% endif %}
             </div>
         </div>
         <a href="{{ url_for('main.add_server') }}" class="btn btn-primary">{{ _('Добавить сервер') }}</a>
@@ -167,13 +167,14 @@
                             'Приостановлен': 'warning',
                             'Удален': 'danger'
                         }.get(server.status, 'secondary') %}
-                        <span class="badge bg-{{ status_color }}">{{ server.status }}</span>
-                        {% if server.get('kind', 'vps') != 'vps' %}<span class="badge text-bg-secondary">{{ 'NAS' if server.kind == 'nas' else _('ПК') }}</span>{% endif %}
+                        {% set status_dot = {'success': 'ok', 'danger': 'danger', 'warning': 'warn'}.get(status_color, 'off') %}
+                        <span class="ui-tag"><span class="ui-dot ui-dot-{{ status_dot }}" aria-hidden="true"></span>{{ server.status }}</span>
+                        {% if server.get('kind', 'vps') != 'vps' %}<span class="ui-tag">{{ 'NAS' if server.kind == 'nas' else _('ПК') }}</span>{% endif %}
                         {% if server.get('kind', 'vps') == 'vps' and server.get('checks', {}).get('dns_ok') %}
-                        <span class="badge bg-success">DNS</span>
+                        <span class="ui-tag"><i class="bi bi-check2" aria-hidden="true"></i>DNS</span>
                         {% endif %}
                         {% if server.get('kind', 'vps') == 'vps' and server.get('checks', {}).get('streaming_ok') %}
-                        <span class="badge bg-success">{{ _('Стрим') }}</span>
+                        <span class="ui-tag"><i class="bi bi-check2" aria-hidden="true"></i>{{ _('Стрим') }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -701,7 +702,9 @@
         });
         
         // Инициализируем tooltip для кнопки проверки интернета
-        new bootstrap.Tooltip(document.getElementById('check-internet-btn'));
+        // Кнопка есть только в офлайн-плашке: без проверки конструктор падал при каждой загрузке.
+        var checkInternetBtn = document.getElementById('check-internet-btn');
+        if (checkInternetBtn) new bootstrap.Tooltip(checkInternetBtn);
     });
 
     // Функция для проверки статуса интернета

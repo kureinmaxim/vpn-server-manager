@@ -9,10 +9,13 @@ All notable changes to VPN Server Manager. Format: [Keep a Changelog](https://ke
 - Services are compact rows with a state dot; services that are not installed fold into one line, and the TelegramOnly, Reticulum and web-panel groups appear only when found on the server.
 - Colour marks state only: meters turn amber from 75 % and red from 90 %, charts use the app accent, and Fail2ban bans are no longer shown as a warning.
 - New `static/css/ui.css` holds the shared rules (card, tabs, state dot, label/value pairs, text sizes) that other pages will move to.
+- Server load window: one compact row per server. Connection state is a dot next to the server name instead of a separate column; the mesh column shows short neutral tags, and addresses, paths, role checks and DERP port details open under "Details" and stay open while the table refreshes.
+- Server list: cards are neutral, and the colour chosen for a server is a stripe at the top of its card instead of a filled header. Status, DNS and streaming marks are quiet tags; mesh and role marks use one neutral style where colour only shows a problem. The toolbar buttons are separate and neutral.
 
 ### Fixed
 - "Bridge is listening (:50061)" on the monitoring page was not translatable and stayed Russian in the English and Chinese interface.
 - A failed monitoring installation check no longer shows a second, never-finishing progress panel under the error.
+- The server list no longer throws a script error on every load when the offline banner, and with it the "check internet" button, is absent.
 
 ## [5.1.0] - 2026-11-10
 

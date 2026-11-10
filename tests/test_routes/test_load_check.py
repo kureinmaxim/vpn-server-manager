@@ -184,6 +184,10 @@ def test_main_page_includes_load_check_in_offline_mode(load_client, all_features
     assert "Chatmail relay" in response.get_data(as_text=True)
     assert "Свой DERP" in response.get_data(as_text=True) or "Custom DERP" in response.get_data(as_text=True)
     assert "rnsd" not in response.get_data(as_text=True)
+    # One header cell per rendered column: connection state lives in the server cell, not in its own column.
+    table = response.get_data(as_text=True).split('load-check-table', 1)[1].split('</thead>', 1)[0]
+    assert table.count('<th scope="col"') == 7
+    assert b'class="board-tools"' in response.data
 
 
 def test_projects_snapshot_uses_saved_credentials_and_own_rate_limit(load_client):

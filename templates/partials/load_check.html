@@ -9,13 +9,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Закрыть') }}"></button>
             </div>
             <div class="modal-body">
-                <p id="load-check-mesh" class="small text-body-secondary" role="status"></p>
-                <div id="load-check-derp" class="small border rounded p-2 mb-3" role="status" aria-live="polite"></div>
+                <p id="load-check-mesh" class="load-context-line" role="status"></p>
+                <div id="load-check-derp" class="load-context" role="status" aria-live="polite"></div>
                 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
                     <div id="load-check-progress" class="small" role="status" aria-live="polite"></div>
                     <div class="d-flex gap-2">
                         <input id="load-check-filter" class="form-control form-control-sm" type="search" placeholder="{{ _('Найти сервер…') }}" aria-label="{{ _('Найти сервер…') }}">
-                        <button id="load-check-refresh" type="button" class="btn btn-sm btn-outline-info text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
+                        <button id="load-check-refresh" type="button" class="btn btn-sm btn-outline-secondary text-nowrap"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i> {{ _('Обновить') }}</button>
                     </div>
                 </div>
                 <div class="table-responsive load-check-table-wrap">
@@ -24,7 +24,6 @@
                         <thead>
                             <tr>
                                 <th scope="col" aria-sort="ascending"><button type="button" data-load-sort="name">{{ _('Сервер') }} ↕</button></th>
-                                <th scope="col">{{ _('Состояние') }}</th>
                                 <th scope="col">{{ _('Mesh рабочего ПК') }}</th>
                                 <th scope="col"><button type="button" data-load-sort="cpu">{{ _('ЦП') }} ↕</button></th>
                                 <th scope="col"><button type="button" data-load-sort="memory">{{ _('Память') }} ↕</button></th>
@@ -54,6 +53,7 @@ window.LOAD_CHECK_CONFIG = {
     diagnosticsUrl: {{ url_for('dns_mail.detail', server_id='__SERVER__') | tojson }},
     monitoringUrl: {{ url_for('main.monitoring', server_id='__SERVER__') | tojson }},
     i18n: {
+        details: {{ _('Подробнее') | tojson }},
         checkPath: {{ _('Проверить путь') | tojson }},
         pathHint: {{ _('До 3 tailscale ping по нажатию. Первый ответ может идти через DERP, пока устанавливается прямой путь.') | tojson }},
         peerHome: {{ _('Домашний DERP пира: {region}') | tojson }},

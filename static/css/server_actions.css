@@ -14,7 +14,7 @@
     font-weight: 500; line-height: 1.2; white-space: nowrap;
 }
 .server-actions .server-action-icon { width: 36px; flex: 0 0 36px; padding: 6px; }
-.server-actions .server-action-status { color: var(--bs-info); background: rgba(var(--bs-info-rgb), .09); }
+.server-actions .server-action-status { color: var(--ui-accent); background: rgba(var(--bs-primary-rgb), .1); }
 .server-actions .server-action:hover { background: rgba(var(--bs-secondary-rgb), .18); color: var(--bs-body-color); }
 .server-actions .server-action:focus-visible { outline: 2px solid var(--bs-info); outline-offset: 2px; box-shadow: none; }
 .server-actions-more { margin-left: auto; flex-shrink: 0; }

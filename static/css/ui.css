@@ -47,7 +47,12 @@ html[data-skin="minecraft"] { --ui-radius: 0; --ui-radius-sm: 0; }
 .ui-state { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .55rem; border: 1px solid var(--ui-border); border-radius: 999px; font-size: var(--ui-text-xs); font-weight: 600; color: var(--ui-muted); }
 .ui-state-ok { color: var(--bs-success-text-emphasis); background: var(--bs-success-bg-subtle); border-color: var(--bs-success-border-subtle); }
 .ui-state-danger { color: var(--bs-danger-text-emphasis); background: var(--bs-danger-bg-subtle); border-color: var(--bs-danger-border-subtle); }
-html[data-skin="minecraft"] :is(.ui-dot, .ui-state) { border-radius: 0; }
+/* Tag: a short neutral label; the dot inside carries the state, the accent marks "this one is yours" */
+.ui-tags { display: flex; flex-wrap: wrap; gap: .3rem; }
+.ui-tag { display: inline-flex; align-items: center; gap: .35rem; max-width: 100%; padding: .1rem .5rem; border: 1px solid var(--ui-border); border-radius: 999px; font-size: var(--ui-text-xs); font-weight: 500; line-height: 1.5; color: var(--bs-body-color); background: var(--ui-sunken); text-decoration: none; }
+a.ui-tag:hover { border-color: var(--ui-accent); color: var(--bs-body-color); }
+.ui-tag-accent { border-color: var(--ui-accent); }
+html[data-skin="minecraft"] :is(.ui-dot, .ui-state, .ui-tag) { border-radius: 0; }
 
 /* Tabs: underlined, so they do not look like action buttons */
 .ui-tabs { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--ui-border); }

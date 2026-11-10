@@ -63,11 +63,11 @@
             hinted(`UDP: ${truth(derp.udp)}`, t.udpHint), ' · ',
             hinted(`${t.preferredDerp}: ${derp.preferred || '—'}`, t.preferredDerpHint));
         derpSummary.append(summary);
-        if (derp.exit_selected) derpSummary.append(element('div', t.exitWarning.replace('{name}', derp.exit_name || '—'), 'text-warning'));
-        const regions = element('div', undefined, 'd-flex flex-wrap gap-2 mt-2');
+        if (derp.exit_selected) derpSummary.append(element('div', t.exitWarning.replace('{name}', derp.exit_name || '—'), 'load-warning'));
+        const regions = element('div', undefined, 'ui-tags mt-2');
         for (const region of derp.regions || []) {
             const latency = region.latency_ms === null ? t.unknown : region.latency_ms.toLocaleString(locale, {maximumFractionDigits: 1}) + ' ' + t.ms;
-            const badge = element('span', `${region.own ? t.own + ' ' : ''}${region.code}: ${latency}`, region.own ? 'badge text-bg-info' : 'badge text-bg-secondary');
+            const badge = element('span', `${region.own ? t.own + ' ' : ''}${region.code}: ${latency}`, 'ui-tag' + (region.own ? ' ui-tag-accent' : ''));
             const target = `${region.name || region.code} (${region.hosts.join(', ') || region.id})`;
             badge.title = derp.exit_selected
                 ? t.latencyExitHint.replace('{name}', derp.exit_name || '—').replace('{region}', target)
@@ -77,14 +77,28 @@
         derpSummary.append(regions);
         const measured = (derp.regions || []).some(region => region.latency_ms !== null);
         derpSummary.append(measured
-            ? element('div', t.derpCache.replace('{time}', new Date(derp.checked_at * 1000).toLocaleTimeString(locale)), 'text-body-secondary mt-1')
-            : element('div', t.derpNoLatency, 'text-warning mt-1'));
+            ? element('div', t.derpCache.replace('{time}', new Date(derp.checked_at * 1000).toLocaleTimeString(locale)), 'load-detail')
+            : element('div', t.derpNoLatency, 'load-warning'));
     }
 
-    function remoteDerpDetails(row, cell) {
+    // A short label with an optional state dot: the only kind of mark in the mesh column.
+    function tag(text, dot, title, href) {
+        const node = element(href ? 'a' : 'span', undefined, 'ui-tag');
+        if (dot) {
+            const mark = element('span', undefined, 'ui-dot ui-dot-' + dot);
+            mark.setAttribute('aria-hidden', 'true');
+            node.append(mark);
+        }
+        node.append(text);
+        if (title) node.title = title;
+        if (href) node.href = href;
+        return node;
+    }
+
+    function remoteDerpDetails(row, tags, more) {
         const data = row.derp;
         if (!data || data.state !== 'ready') {
-            cell.append(element('span', data ? t.derpUnavailable : t.derpLoading, 'load-detail'));
+            more.push(element('span', data ? t.derpUnavailable : t.derpLoading, 'load-detail'));
             return;
         }
         const cfg = data.config;
@@ -94,41 +108,38 @@
             const healthy = data.probe_code === 200 && data.stun_listening === true;
             const failed = data.probe_code !== null && data.probe_code !== 200 || data.stun_listening === false;
             const role = failed ? t.derpFailed : healthy ? (used ? t.derpPrimary : mesh && mesh.state === 'ready' ? t.derpStandby : t.unknown) : t.unknown;
-            cell.append(element('span', `${t.ownDerp} ${cfg.region_code || '—'} (${cfg.region_id ?? '—'}) — ${role}`,
-                'badge d-block mt-1 ' + (failed ? 'text-bg-warning' : healthy ? 'text-bg-info' : 'text-bg-secondary')));
+            tags.append(tag(`${t.ownDerp} ${cfg.region_code || '—'} (${cfg.region_id ?? '—'}) — ${role}`,
+                failed ? 'warn' : healthy ? 'ok' : 'off'));
         }
-        const details = element('details', undefined, 'load-detail');
-        details.append(element('summary', t.derpDetails));
-        details.append(element('div', `Headscale: ${truth(data.headscale)} ${data.version || ''}`));
+        more.push(element('strong', t.derpDetails, 'load-detail'));
+        more.push(element('div', `Headscale: ${truth(data.headscale)} ${data.version || ''}`));
         if (cfg) {
-            details.append(element('div', `${t.derpEnabled}: ${truth(cfg.enabled)} · verify_clients: ${truth(cfg.verify_clients)}`));
-            details.append(element('div', `/derp/probe: ${data.probe_code ?? '—'} · STUN ${data.stun_port ?? '—'}: ${truth(data.stun_listening)}`));
-            details.append(element('div', `${t.publicMap}: ${truth(cfg.public_map)}`));
-        } else details.append(element('div', t.derpConfigUnknown));
-        details.append(element('div', `${t.publicIpv4}: ${truth(data.public_ipv4)} · UDP 3478 ${data.udp3478_busy === true ? t.busy : data.udp3478_busy === false ? t.freePort : t.unknown}`));
-        details.append(element('div', data.tcp443_busy === true
+            more.push(element('div', `${t.derpEnabled}: ${truth(cfg.enabled)} · verify_clients: ${truth(cfg.verify_clients)}`));
+            more.push(element('div', `/derp/probe: ${data.probe_code ?? '—'} · STUN ${data.stun_port ?? '—'}: ${truth(data.stun_listening)}`));
+            more.push(element('div', `${t.publicMap}: ${truth(cfg.public_map)}`));
+        } else more.push(element('div', t.derpConfigUnknown));
+        more.push(element('div', `${t.publicIpv4}: ${truth(data.public_ipv4)} · UDP 3478 ${data.udp3478_busy === true ? t.busy : data.udp3478_busy === false ? t.freePort : t.unknown}`));
+        more.push(element('div', data.tcp443_busy === true
             ? t.portConflict.replace('{owner}', data.tcp443_owner || t.unknown)
             : `TCP 443: ${data.tcp443_busy === false ? t.freePort : t.unknown}`));
-        details.append(element('div', t.derpCandidateHint));
-        cell.append(details);
+        more.push(element('div', t.derpCandidateHint));
     }
 
-    const roleStateClass = {running: 'is-running', partial: 'is-partial', stopped: 'is-stopped'};
+    const roleStateDot = {running: 'ok', partial: 'warn', stopped: 'danger'};
     const roleStateLabel = {running: t.roleRunning, partial: t.rolePartial, stopped: t.roleStopped};
     const checkLabel = {healthy: t.roleHealthy, error: t.roleError, unavailable: t.roleUnavailable,
         unconfigured: t.roleUnconfigured, partial: t.rolePartial};
     const roleTitle = {adguard: t.roleAdguard, chatmail: t.roleChatmail};
 
-    function roleBlocks(row, cell) {
+    function roleBlocks(row, tags, more) {
         for (const role of row.roles || []) {
             const core = (role.components || []).filter(part => !part.optional);
             const active = core.filter(part => part.status === 'active').length;
-            const link = element('a', undefined, `badge d-block mt-1 text-decoration-none load-role load-role-${role.key}`);
-            link.append(element('span', undefined, 'load-role-dot ' + (roleStateClass[role.state] || 'is-unknown')),
-                `${roleTitle[role.key] || role.name} · ${roleStateLabel[role.state] || t.roleUnknown}` + (core.length ? ` ${active}/${core.length}` : ''));
-            link.href = config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(row.server.id)) + '?role=' + encodeURIComponent(role.key);
-            link.title = t.roleHint + '\n' + core.map(part => `${part.name}: ${part.status}`).join('\n');
-            cell.append(link);
+            const title = roleTitle[role.key] || role.name;
+            tags.append(tag(`${title} · ${roleStateLabel[role.state] || t.roleUnknown}` + (core.length ? ` ${active}/${core.length}` : ''),
+                roleStateDot[role.state] || 'off',
+                t.roleHint + '\n' + core.map(part => `${part.name}: ${part.status}`).join('\n'),
+                config.diagnosticsUrl.replace('__SERVER__', encodeURIComponent(row.server.id)) + '?role=' + encodeURIComponent(role.key)));
             const last = role.last_check;
             let note = t.roleNotChecked;
             if (last) {
@@ -136,7 +147,8 @@
                 if (last.checked_at) note += ' · ' + new Date(last.checked_at).toLocaleTimeString(locale);
                 if (last.stale) note += ' · ' + t.roleStale;
             }
-            cell.append(element('span', note, 'load-detail' + (last && last.state === 'healthy' && !last.stale ? ' text-success' : last && ['error', 'unavailable'].includes(last.state) ? ' text-warning' : '')));
+            more.push(element('div', `${title} — ${note}`,
+                last && ['error', 'unavailable'].includes(last.state) ? 'load-warning' : ''));
         }
     }
 
@@ -157,40 +169,55 @@
             ? nodes.filter(node => [node.name, (node.dns || '').split('.')[0]].some(value => value && labels.includes(value.toLowerCase())))
             : [];
         const peer = matches.length === 1 ? matches[0] : byName.length === 1 ? byName[0] : null;
+        const tags = element('div', undefined, 'ui-tags');
+        const more = [];
+        const notes = [];
         if (mesh && mesh.coordinator && (address === mesh.coordinator.toLowerCase() || (mesh.coordinator_ips || []).includes(address))) {
-            const badge = element('span', t.coordinator, 'badge text-bg-primary d-block mb-1');
-            badge.title = t.coordinatorHint; cell.append(badge);
+            const mark = tag(t.coordinator, null, t.coordinatorHint);
+            mark.classList.add('ui-tag-accent');
+            tags.append(mark);
         }
-        cell.append(element('span', peer ? t.meshMember : mesh && mesh.state === 'ready' && identity ? t.meshOther : t.meshUnknown, peer ? 'text-success' : 'text-body-secondary'));
+        const member = element('div', undefined, 'load-member');
+        const dot = element('span', undefined, 'ui-dot ui-dot-' + (peer ? (peer.online ? 'ok' : 'warn') : 'off'));
+        dot.setAttribute('aria-hidden', 'true');
+        member.append(dot, peer ? t.meshMember : mesh && mesh.state === 'ready' && identity ? t.meshOther : t.meshUnknown);
         if (peer) {
-            cell.append(element('span', peer.exit_selected ? t.meshSelected : peer.exit_available ? t.meshExit : t.meshNode,
-                'badge d-block mt-1 ' + (peer.exit_selected ? 'text-bg-success' : peer.exit_available ? 'text-bg-info' : 'text-bg-secondary')));
-            if (byName.length === 1 && !matches.length) cell.append(element('span', t.matchedByName, 'load-detail'));
-            cell.append(element('span', peer.ips.join(', '), 'load-detail'));
-            if (!peer.online) cell.append(element('span', t.meshOffline, 'load-detail text-warning'));
+            tags.append(tag(peer.exit_selected ? t.meshSelected : peer.exit_available ? t.meshExit : t.meshNode, peer.exit_selected ? 'ok' : null));
+            if (byName.length === 1 && !matches.length) more.push(element('div', t.matchedByName));
+            more.push(element('div', peer.ips.join(', ')));
+            if (!peer.online) notes.push(element('span', t.meshOffline, 'load-warning'));
             if (!row.path || !['direct', 'relay'].includes(row.path.state)) {
-                cell.append(element('span', peer.cur_addr ? t.statusAddress.replace('{address}', peer.cur_addr) : t.pathUnconfirmed, 'load-detail'));
+                more.push(element('div', peer.cur_addr ? t.statusAddress.replace('{address}', peer.cur_addr) : t.pathUnconfirmed));
             }
             if (peer.relay) {
                 const own = (derp && derp.regions || []).some(region => region.own && region.code === peer.relay);
-                const home = element('span', t.peerHome.replace('{region}', peer.relay) + (own ? ` (${t.ownRegion})` : ''), 'load-detail');
+                const home = element('div', t.peerHome.replace('{region}', peer.relay) + (own ? ` (${t.ownRegion})` : ''));
                 home.title = t.peerHomeHint;
-                cell.append(home);
+                more.push(home);
             }
             if (row.path) {
                 const path = row.path;
-                cell.append(element('span', path.state === 'direct' ? t.directPath.replace('{address}', path.address)
-                    : path.state === 'relay' ? t.relayPath.replace('{region}', path.relay) : t.pathUnknown, 'load-detail text-info'));
-                if (path.checked_at) cell.append(element('span', 'ping: ' + new Date(path.checked_at * 1000).toLocaleTimeString(locale), 'load-detail'));
-                if (path.error) cell.append(element('span', path.error, 'load-detail text-warning'));
+                notes.push(element('span', path.state === 'direct' ? t.directPath.replace('{address}', path.address)
+                    : path.state === 'relay' ? t.relayPath.replace('{region}', path.relay) : t.pathUnknown, 'load-detail'));
+                if (path.checked_at) more.push(element('div', 'ping: ' + new Date(path.checked_at * 1000).toLocaleTimeString(locale)));
+                if (path.error) notes.push(element('span', path.error, 'load-warning'));
             }
-            const ping = element('button', row.pathChecking ? t.checking : t.checkPath, 'btn btn-sm btn-outline-secondary mt-1');
+            const ping = element('button', row.pathChecking ? t.checking : t.checkPath, 'btn btn-sm btn-outline-secondary load-ping');
             ping.type = 'button'; ping.disabled = !!row.pathChecking; ping.title = t.pathHint;
             ping.addEventListener('click', () => checkPath(row, peer));
-            cell.append(ping);
+            more.push(ping);
         }
-        roleBlocks(row, cell);
-        remoteDerpDetails(row, cell);
+        roleBlocks(row, tags, more);
+        remoteDerpDetails(row, tags, more);
+        cell.append(member);
+        if (tags.childNodes.length) cell.append(tags);
+        cell.append(...notes);
+        // Addresses, paths and port checks stay one click away; the row keeps its height.
+        const details = element('details', undefined, 'load-more');
+        details.open = !!row.open;
+        details.addEventListener('toggle', () => { row.open = details.open; });
+        details.append(element('summary', t.details), ...more);
+        cell.append(details);
         return cell;
     }
     let sort = {key: 'name', direction: 1};
@@ -247,7 +274,7 @@
         });
         if (!visible.length) {
             const cell = element('td', rows.length ? t.noMatches : t.empty, 'text-center text-body-secondary py-5');
-            cell.colSpan = 8;
+            cell.colSpan = 7;
             const tr = element('tr'); tr.append(cell); body.append(tr);
         }
         for (const row of visible) {
@@ -257,11 +284,13 @@
             link.href = config.monitoringUrl.replace('__SERVER__', encodeURIComponent(row.server.id));
             server.append(link, element('span', row.server.ip_address, 'load-detail'));
             tr.append(server);
-            const state = element('td', undefined, 'load-state');
-            const stateClass = row.error ? 'text-danger' : row.stats ? (row.partial ? 'text-warning' : 'text-success') : 'text-body-secondary';
-            state.append(element('span', row.error ? t.failed : row.stats ? (row.partial ? t.partial : t.ready) : (row.checking ? t.checking : t.waiting), stateClass));
-            if (row.error) state.append(element('span', row.error, 'load-detail'));
-            tr.append(state);
+            const stateDot = element('span', undefined, 'ui-dot ui-dot-' + (row.error ? 'danger' : row.stats ? (row.partial ? 'warn' : 'ok') : 'off'));
+            stateDot.title = row.error ? t.failed : row.stats ? (row.partial ? t.partial : t.ready) : (row.checking ? t.checking : t.waiting);
+            stateDot.setAttribute('role', 'img');
+            stateDot.setAttribute('aria-label', stateDot.title);
+            link.prepend(stateDot);
+            if (row.error) server.append(element('span', row.error, 'load-warning'));
+            else if (!row.stats || row.partial) server.append(element('span', stateDot.title, 'load-detail'));
             tr.append(meshCell(row));
             const stats = row.stats || {};
             tr.append(metricCell(stats.cpu));
@@ -272,7 +301,7 @@
                 load.textContent = stats.load.averages.map(n => loadNumber.format(n)).join(' / ');
                 load.className = 'text-nowrap';
                 load.append(element('span', `${t.cores}: ${stats.load.cores} · ${loadNumber.format(stats.load.per_core)} ${t.perCore}`, 'load-detail'));
-                if (stats.load.per_core >= 1) load.classList.add('text-warning');
+                if (stats.load.per_core >= 1) load.classList.add('load-hot');
             }
             tr.append(load);
             const network = element('td', '—', 'text-nowrap');

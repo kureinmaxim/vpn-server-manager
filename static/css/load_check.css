@@ -1,29 +1,31 @@
-#loadCheckModal .modal-dialog { max-width: 1380px; }
-.load-check-table { min-width: 1010px; font-size: .875rem; }
-.load-check-table th { white-space: nowrap; color: var(--bs-secondary-color); }
-.load-check-table th button {
-    border: 0; background: none; padding: .2rem 0; color: inherit; font: inherit;
-}
-.load-check-table th[aria-sort] button { color: var(--bs-info-text-emphasis); }
-.load-check-table td { padding: .9rem .5rem; font-variant-numeric: tabular-nums; }
-.load-check-table .load-server-name { display: block; max-width: 210px; overflow-wrap: anywhere; }
-.load-check-table .load-state { max-width: 185px; font-size: .8rem; }
-.load-check-table .load-detail { display: block; font-size: .75rem; color: var(--bs-secondary-color); margin-top: .2rem; }
-.load-check-meter { height: 4px; margin-top: .4rem; background: var(--bs-secondary-bg); border-radius: 4px; overflow: hidden; }
-.load-check-meter span { height: 100%; display: block; background: var(--bs-info); }
-.load-check-meter.is-warm span { background: var(--bs-warning); }
-.load-check-meter.is-hot span { background: var(--bs-danger); }
+/* Server load: one row per server; details of the mesh column open on demand. Shared rules: ui.css. */
+#loadCheckModal .modal-dialog { max-width: 1280px; }
+#loadCheckModal .modal-title { font-size: var(--ui-text-md); font-weight: 600; }
+.load-context-line { margin-bottom: .5rem; font-size: var(--ui-text-sm); color: var(--ui-muted); }
+.load-context { margin-bottom: 1rem; padding: .625rem .875rem; border: 1px solid var(--ui-border); border-radius: var(--ui-radius); background: var(--ui-sunken); font-size: var(--ui-text-sm); }
+.load-context:empty { display: none; }
+.load-detail { display: block; margin-top: .2rem; font-size: var(--ui-text-xs); font-weight: 400; color: var(--ui-muted); }
+.load-warning { display: block; margin-top: .2rem; font-size: var(--ui-text-xs); color: var(--ui-warn); }
 #load-check-filter { max-width: 200px; }
-.load-check-table .load-mesh { min-width: 180px; max-width: 230px; font-size: .8rem; overflow-wrap: anywhere; }
-.load-check-table .load-mesh .badge { white-space: normal; }
-.load-check-table .load-role { color: #fff; text-align: left; }
-.load-check-table .load-role-adguard { background: var(--bs-purple, #6f42c1); }
-.load-check-table .load-role-chatmail { background: var(--bs-orange, #fd7e14); color: #1b1b1b; }
-.load-role-dot { display: inline-block; width: .6rem; height: .6rem; margin-right: .4rem; border-radius: 50%; border: 1px solid rgba(255,255,255,.85); vertical-align: baseline; }
-.load-role-dot.is-running { background: #20c997; }
-.load-role-dot.is-partial { background: #ffc107; }
-.load-role-dot.is-stopped { background: #dc3545; }
-.load-role-dot.is-unknown { background: #adb5bd; }
+.load-check-table { min-width: 920px; font-size: var(--ui-text-sm); --bs-table-bg: transparent; }
+.load-check-table th { white-space: nowrap; font-size: var(--ui-text-xs); font-weight: 500; color: var(--ui-muted); }
+.load-check-table th button { border: 0; background: none; padding: .2rem 0; color: inherit; font: inherit; }
+.load-check-table th[aria-sort] button { color: var(--bs-body-color); font-weight: 600; }
+.load-check-table td { padding: .75rem .5rem; vertical-align: top; font-variant-numeric: tabular-nums; }
+.load-check-table .load-server-name { display: flex; align-items: center; gap: .45rem; max-width: 210px; overflow-wrap: anywhere; }
+.load-check-table .load-hot { color: var(--ui-warn); }
+.load-check-meter { height: 4px; max-width: 9rem; margin-top: .4rem; background: var(--ui-border); border-radius: 2px; overflow: hidden; }
+.load-check-meter span { height: 100%; display: block; background: var(--ui-accent); }
+.load-check-meter.is-warm span { background: var(--ui-warn); }
+.load-check-meter.is-hot span { background: var(--ui-danger); }
+.load-check-table .load-mesh { min-width: 220px; max-width: 320px; overflow-wrap: anywhere; }
+.load-member { display: flex; align-items: center; gap: .45rem; margin-bottom: .35rem; }
+.load-more { margin-top: .35rem; font-size: var(--ui-text-xs); color: var(--ui-muted); }
+.load-more summary { cursor: pointer; }
+.load-more > div, .load-more > strong { margin-top: .25rem; }
+.load-more > strong { margin-top: .5rem; color: var(--bs-body-color); }
+.load-more .load-ping { margin-top: .4rem; font-size: var(--ui-text-xs); }
+html[data-skin="minecraft"] .load-check-meter { border-radius: 0; }
 
 /* Bots overview: one block per node, readable in light and dark themes. */
 .bots-check-node { background: var(--bs-body-bg); }
