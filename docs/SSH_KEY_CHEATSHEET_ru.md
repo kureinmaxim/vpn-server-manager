@@ -1,6 +1,6 @@
 # Шпаргалка по переходу с пароля SSH на ключ
 
-Пример для Linux VPS с пользователем `root` и портом `22542`. В профилях клиентов укажите IP своего VPS. Для каждого ПК, Mac и iPhone создайте отдельный ключ. На VPS добавляется только публичная часть. Приватный файл остаётся на устройстве.
+В примерах используется Linux VPS и вход под `root`. Подставьте адрес, логин и SSH-порт из своей карточки сервера. Для каждого ПК, Mac и iPhone создайте отдельный ключ. На VPS добавляется только публичная часть. Приватный файл остаётся на устройстве.
 
 **Перед началом** оставьте рабочий сеанс Tabby открытым и проверьте, что можете войти через консоль хостинга. Парольный вход отключайте после проверки всех нужных клиентов.
 
@@ -20,16 +20,18 @@
 | Linux VPS · вход под `root` | Приватный ключ клиента хранится на его устройстве | `/root/.ssh/authorized_keys` |
 | Linux VPS · вход под обычным пользователем | Приватный ключ клиента хранится на его устройстве | `~/.ssh/authorized_keys` в домашней папке этого пользователя |
 
-`id_ed25519` — стандартное имя пары Ed25519 в OpenSSH. В командах ниже задано отдельное имя `hip_hosting_ed25519`, чтобы было понятно, для какого VPS создана пара. В Tabby и VPN Server Manager выбирайте файл **без `.pub`**. В `authorized_keys` добавляйте только содержимое файла **с `.pub`**.
+`id_ed25519` — стандартное имя пары Ed25519 в OpenSSH. В примерах пара для доступа к VPS называется `vps_ed25519`. В Tabby и VPN Server Manager выбирайте файл **без `.pub`**. В `authorized_keys` добавляйте только содержимое файла **с `.pub`**.
 
 ## Windows · PowerShell
 
 На новом ПК создайте ключ с фразой-паролем. Если файл уже существует, используйте этот ключ или выберите новое имя. На ПК, где Tabby и VPN Server Manager уже проверены, повторная генерация не нужна.
 
+Для настройки с нуля используйте [пошаговую инструкцию для нового Windows-ПК](SSH_KEY_windows.md).
+
 ```powershell
-$key = Join-Path $env:USERPROFILE '.ssh\hip_hosting_ed25519'
+$key = Join-Path $env:USERPROFILE '.ssh\vps_ed25519'
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $key) | Out-Null
-ssh-keygen -t ed25519 -C 'windows-hip-hosting' -f $key
+ssh-keygen -t ed25519 -C 'windows-pc-01' -f $key
 ```
 
 В том же PowerShell узнайте отпечаток, скопируйте публичный ключ и выведите путь к приватному файлу для приложений.
@@ -45,8 +47,8 @@ $key
 ```bash
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
-key="$HOME/.ssh/hip_hosting_ed25519"
-ssh-keygen -t ed25519 -C 'macos-hip-hosting' -f "$key"
+key="$HOME/.ssh/vps_ed25519"
+ssh-keygen -t ed25519 -C 'mac-01' -f "$key"
 ```
 
 Задайте фразу-пароль. Если файл с таким именем уже есть, сохраните его и выберите другое имя для нового ключа. Затем в том же Terminal выполните:
@@ -59,7 +61,7 @@ printf '%s\n' "$key"
 
 ## iPhone · SSH-клиент
 
-В Termius откройте **Keychain → + → Generate Key**, выберите **Ed25519** и назовите ключ `iphone-hip-hosting`. Откройте созданный ключ и скопируйте **Public Key**. В другом SSH-клиенте ищите создание ключа и копирование его публичной части. [Документация Termius](https://termius.com/)
+В Termius откройте **Keychain → + → Generate Key**, выберите **Ed25519** и назовите ключ, например `iphone-01`. Откройте созданный ключ и скопируйте **Public Key**. В другом SSH-клиенте ищите создание ключа и копирование его публичной части. [Документация Termius](https://termius.com/)
 
 Добавьте публичную строку на VPS через рабочий сеанс или консоль хостинга по шагам ниже. Затем в профиле VPS на iPhone выберите созданный ключ и откройте новое подключение. Если клиент впервые показывает отпечаток **сервера**, сверьте его через доверенный сеанс VPS. Отпечатки сервера и ключа входа относятся к разным ключам.
 
@@ -94,21 +96,21 @@ ssh-keygen -lf /root/.ssh/authorized_keys
 
 ### Напрямую с ПК командой SSH
 
-Этот способ подходит, когда командный `ssh` с этого ПК уже может войти на VPS и `/root/.ssh/authorized_keys` создан. Выполните одну команду добавления для каждого нового ключа. Замените `VPS_IP` своим адресом, а `22542` — портом SSH, если у вас другой порт. Команды дописывают публичную строку в конец файла и сохраняют существующие ключи.
+Этот способ подходит, когда командный `ssh` с этого ПК уже может войти на VPS под `root` и `/root/.ssh/authorized_keys` создан. Выполните одну команду добавления для каждого нового ключа. Замените `VPS_IP` адресом VPS, а `SSH_PORT` числом из поля SSH-порта в карточке. Команды дописывают публичную строку в конец файла и сохраняют существующие ключи.
 
 **Windows · PowerShell**
 
 ```powershell
-$key = Join-Path $env:USERPROFILE '.ssh\hip_hosting_ed25519'
+$key = Join-Path $env:USERPROFILE '.ssh\vps_ed25519'
 $publicKey = Get-Content -LiteralPath "$key.pub" -ErrorAction Stop
-$publicKey | ssh -p 22542 root@VPS_IP "{ echo; tr -d '\r'; echo; } >> /root/.ssh/authorized_keys"
+$publicKey | ssh -p SSH_PORT root@VPS_IP "{ echo; tr -d '\r'; echo; } >> /root/.ssh/authorized_keys"
 ```
 
 **macOS или Linux · Terminal**
 
 ```bash
-key="$HOME/.ssh/hip_hosting_ed25519"
-ssh -p 22542 root@VPS_IP '{ echo; cat; echo; } >> /root/.ssh/authorized_keys' < "$key.pub"
+key="$HOME/.ssh/vps_ed25519"
+ssh -p SSH_PORT root@VPS_IP '{ echo; cat; echo; } >> /root/.ssh/authorized_keys' < "$key.pub"
 ```
 
 После копирования проверьте отпечаток на VPS командой `ssh-keygen -lf /root/.ssh/authorized_keys`. Если на новом ПК вход ещё не настроен, перенесите его файл `.pub` на устройство с рабочим доступом или вставьте публичную строку через консоль хостинга по предыдущим шагам.
@@ -163,7 +165,7 @@ systemctl show -p Id -p ActiveState ssh.service sshd.service
 ## Отозвать ключ потерянного или проданного ПК
 
 1. Войдите на VPS с другого устройства по его ключу или через консоль хостинга. Оставьте этот сеанс открытым. Найдите отпечаток `SHA256:…` старого ПК. Если ПК ещё у вас, запустите на нём `ssh-keygen -lf` с путём к его файлу `.pub`. Если ПК потерян, используйте ранее сохранённый отпечаток или запись `Accepted publickey` от входа, который вы можете привязать к этому ПК. У устройств за одним Tailscale exit node может быть одинаковый IP.
-2. На VPS посмотрите отпечатки и номера строк. Комментарий вроде `windows-hip-hosting` помогает найти нужную строку. Перед удалением сверьте её по отпечатку.
+2. На VPS посмотрите отпечатки и номера строк. Комментарий вроде `windows-pc-01` помогает найти нужную строку. Перед удалением сверьте её по отпечатку.
 
    ```bash
    ssh-keygen -lf /root/.ssh/authorized_keys
@@ -197,8 +199,8 @@ systemctl show -p Id -p ActiveState ssh.service sshd.service
 **Windows · PowerShell**
 
 ```powershell
-$key = Join-Path $env:USERPROFILE '.ssh\hip_hosting_ed25519'
-$backup = 'E:\SSH-Backup\windows-hip-hosting'
+$key = Join-Path $env:USERPROFILE '.ssh\vps_ed25519'
+$backup = 'E:\SSH-Backup\windows-pc-01'
 New-Item -ItemType Directory -Force -Path $backup -ErrorAction Stop | Out-Null
 Copy-Item -LiteralPath @($key, "$key.pub") -Destination $backup -ErrorAction Stop
 ```
@@ -206,8 +208,8 @@ Copy-Item -LiteralPath @($key, "$key.pub") -Destination $backup -ErrorAction Sto
 **macOS или Linux · Terminal**
 
 ```bash
-key="$HOME/.ssh/hip_hosting_ed25519"
-backup='/Volumes/SSH-Backup/mac-hip-hosting'
+key="$HOME/.ssh/vps_ed25519"
+backup='/Volumes/SSH-Backup/mac-01'
 mkdir -p "$backup" && cp -p "$key" "$key.pub" "$backup/"
 ```
 
